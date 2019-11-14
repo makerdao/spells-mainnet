@@ -52,7 +52,7 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract DssTestsAfterSpell is DSTest {
+contract DssLaunchAfterSpell is DSTest {
     Hevm hevm;
 
     Dai dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);

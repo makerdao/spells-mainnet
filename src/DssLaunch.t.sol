@@ -19,7 +19,7 @@ contract VatLike {
     function ilks(bytes32) external view returns (Ilk memory);
 }
 
-contract DssTests is DSTest {
+contract DssLaunch is DSTest {
     Dai dai;
     Vat vat;
     Vow vow;
