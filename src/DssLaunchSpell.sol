@@ -48,17 +48,12 @@ contract DssLaunchSpell {
         tag = _tag;
     }
 
-    function schedule() public {
+    function cast() public {
         // 1574092800 == Monday, November 18, 2019 16:00:00 GMT
         require(now >= 1574092800, "launch-time-error");
-        require(eta == 0, "spell-already-scheduled");
-        eta = now + PauseLike(pause).delay();
-        pause.plot(action, tag, sig, eta);
-    }
-
-    function cast() public {
         require(!done, "spell-already-cast");
-        pause.exec(action, tag, sig, eta);
         done = true;
+        pause.plot(action, tag, sig, now);
+        pause.exec(action, tag, sig, now);
     }
 }

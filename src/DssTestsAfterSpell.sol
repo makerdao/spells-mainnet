@@ -5,11 +5,9 @@ import "ds-test/test.sol";
 import {Dai} from "dss/dai.sol";
 import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
-import "erc20/erc20.sol";
+import {ERC20} from "erc20/erc20.sol";
 
-contract TubLike {
-
-}
+import {DssLaunchSpell} from "./DssLaunchSpell.sol";
 
 contract ChiefLike {
     function hat() public view returns (address);
@@ -23,9 +21,28 @@ contract RegistryLike {
 }
 
 contract ProxyLike {
-    function execute(address, bytes memory) public;
+    function execute(address, bytes memory) public payable;
 }
 
+contract TokenLike {
+    function balanceOf(address) public view returns (uint);
+    function approve(address, uint) public;
+}
+
+contract ManagerLike {
+    function urns(uint) public view returns (address);
+}
+
+contract TubLike {
+    function ink(bytes32) public view returns (uint);
+    function per() public view returns (uint);
+    function rap(bytes32) public returns (uint);
+    function tab(bytes32) public returns (uint);
+}
+
+contract ValueLike {
+    function peek() public view returns (uint, bool);
+}
 
 contract Hevm {
     function warp(uint) public;
@@ -34,32 +51,32 @@ contract Hevm {
 contract DssTestsAfterSpell is DSTest {
     Hevm hevm;
 
-    Dai dai;
-    Vat vat;
-    Vow vow;
-    ERC20 gov;
-    ChiefLike chief;
-    address manager;
+    Dai dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    Vat vat = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    Vow vow = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    ERC20 gov = ERC20(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     ProxyLike proxy;
+    address proxyActions = 0x82ecD135Dce65Fbc6DbdD0e4237E0AF93FFD5038;
+    address migrationPActions = 0xe4B22D484958E582098A98229A24e8A43801b674;
+    address migration = 0xc73e0383F3Aff3215E6f04B0331D58CeCf0Ab849;
+    address manager = 0x5ef30b9986345249bc32d8928B7ee64DE9435E39;
+    address jug = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address ethJoin = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
+    address daiJoin = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
 
-    TubLike tub;
+    address saiPActions = 0x526af336D614adE5cc252A407062B8861aF998F5;
+    TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
+    TokenLike sai = TokenLike(0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359);
+    ValueLike pep = ValueLike(0x99041F808D598B782D5a3e498681C2452A31da08);
 
-    DssInitSpell spell;
+    DssLaunchSpell spell;
 
     uint constant RAD = 10 ** 45;
 
     function setUp() public {
-        dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-        vat = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-        vow = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-        chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
-        gov = ERC20(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-        manager = 0x5ef30b9986345249bc32d8928B7ee64DE9435E39;
         RegistryLike registry = RegistryLike(0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4);
-
-        tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
-
-        spell = new DssInitSpell();
+        spell = new DssLaunchSpell();
 
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(1574092700);
@@ -82,8 +99,8 @@ contract DssTestsAfterSpell is DSTest {
     }
 
     function waitAndCast() public {
+        // Let's push the time to the launch moment
         hevm.warp(1574092800);
-        spell.schedule();
         spell.cast();
     }
 
@@ -109,70 +126,200 @@ contract DssTestsAfterSpell is DSTest {
         assertEq(line, 100000000 * RAD);
     }
 
-    function testFailSpellSchedule() public {
+    function testFailSpellCast() public {
         vote();
-        spell.schedule();
+        // It can not be spelled if the time for launch hasn't passed
+        spell.cast();
     }
 
-    // function createETHVault() public {
-    //     vote();
-    //     waitAndCast();
+    function openCdpAndGenerateDai(uint ilkAmt, uint daiAmt) private returns (uint cdp) {
+        uint value = ilkAmt;
+        address target = address(proxy);
+        bytes memory data = abi.encodeWithSignature(
+            "execute(address,bytes)",
+            proxyActions,
+            abi.encodeWithSignature(
+                "openLockETHAndDraw(address,address,address,address,bytes32,uint256)",
+                manager,
+                jug,
+                ethJoin,
+                daiJoin,
+                bytes32("ETH-A"),
+                daiAmt
+            )
+        );
+        assembly {
+            let succeeded := call(sub(gas, 5000), target, value, add(data, 0x20), mload(data), 0, 0)
+            let size := returndatasize
+            let response := mload(0x40)
+            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(response, size)
+            returndatacopy(add(response, 0x20), 0, size)
 
-    // }
+            cdp := mload(add(response, 0x20))
 
-}
-
-// Launch activation spell:
-
-contract VatLike {
-    function file(bytes32,uint) public;
-    function file(bytes32,bytes32,uint) public;
-}
-
-contract PauseLike {
-    function delay() public view returns (uint256);
-    function plot(address, bytes32, bytes memory, uint256) public;
-    function exec(address, bytes32, bytes memory, uint256) public;
-}
-
-contract SpellAction {
-    uint constant RAD = 10 ** 45;
-
-    function execute() public {
-        VatLike(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B).file("Line", 153000000 * RAD);
-        VatLike(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B).file("ETH-A", "line", 50000000 * RAD);
-        VatLike(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B).file("BAT-A", "line", 3000000 * RAD);
-        VatLike(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B).file("SAI", "line", 100000000 * RAD);
-    }
-}
-
-contract DssInitSpell {
-    PauseLike public pause = PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
-    address   public action;
-    bytes32   public tag;
-    uint256   public eta;
-    bytes     public sig;
-    bool      public done;
-
-    constructor() public {
-        sig = abi.encodeWithSignature("execute()");
-        action = address(new SpellAction());
-        bytes32 _tag;
-        address _action = action;
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
+            switch iszero(succeeded)
+            case 1 {
+                // throw if delegatecall failed
+                revert(add(response, 0x20), size)
+            }
+        }
     }
 
-    function schedule() public {
-        require(now >= 1574092800, "launch-time-error");
-        require(eta == 0, "spell-already-scheduled");
-        eta = now + PauseLike(pause).delay();
-        pause.plot(action, tag, sig, eta);
+    function testCreateETHVault() public {
+        vote();
+        waitAndCast();
+
+        uint cdp = openCdpAndGenerateDai(10 ether, 1000 ether);
+
+        address urn = ManagerLike(manager).urns(cdp);
+
+        (uint ink, uint art) = vat.urns("ETH-A", urn);
+        (, uint rate,,,) = vat.ilks("ETH-A");
+
+        assertEq(ink, 10 ether);
+        assertEq(art, 1000 ether / rate + 1);
     }
 
-    function cast() public {
-        require(!done, "spell-already-cast");
-        pause.exec(action, tag, sig, eta);
-        done = true;
+    function openCupAndGenerateSai(uint ethAmt, uint saiAmt) private returns (bytes32 cup) {
+        uint value = ethAmt;
+        address target = address(proxy);
+        bytes memory data = abi.encodeWithSignature(
+            "execute(address,bytes)",
+            saiPActions,
+            abi.encodeWithSignature(
+                "lockAndDraw(address,uint256)",
+                address(tub),
+                saiAmt
+            )
+        );
+        assembly {
+            let succeeded := call(sub(gas, 5000), target, value, add(data, 0x20), mload(data), 0, 0)
+            let size := returndatasize
+            let response := mload(0x40)
+            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(response, size)
+            returndatacopy(add(response, 0x20), 0, size)
+
+            cup := mload(add(response, 0x20))
+
+            switch iszero(succeeded)
+            case 1 {
+                // throw if delegatecall failed
+                revert(add(response, 0x20), size)
+            }
+        }
+    }
+
+    function swapSaiToDai(uint amt) private {
+        sai.approve(address(proxy), amt);
+        proxy.execute(
+            migrationPActions,
+            abi.encodeWithSignature(
+                "swapSaiToDai(address,uint256)",
+                migration,
+                amt
+            )
+        );
+    }
+
+    function testSwapSaiToDaiAndBack() public {
+        vote();
+        waitAndCast();
+
+        assertEq(sai.balanceOf(address(this)), 0);
+        // Generates SAI
+        openCupAndGenerateSai(10 ether, 1000 ether);
+        assertEq(sai.balanceOf(address(this)), 1000 ether);
+        assertEq(dai.balanceOf(address(this)), 0);
+
+        // Swaps 1000 SAI for 1000 DAI
+        swapSaiToDai(1000 ether);
+
+        assertEq(sai.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), 1000 ether);
+
+        dai.approve(address(proxy), 1000 ether);
+
+        // Swaps 1000 SAI for 1000 DAI
+        proxy.execute(
+            migrationPActions,
+            abi.encodeWithSignature(
+                "swapDaiToSai(address,uint256)",
+                migration,
+                1000 ether
+            )
+        );
+
+        assertEq(sai.balanceOf(address(this)), 1000 ether);
+        assertEq(dai.balanceOf(address(this)), 0);
+    }
+
+    function migrateCdp(bytes memory _data) private returns (uint cdp) {
+        bytes memory data = abi.encodeWithSignature(
+            "execute(address,bytes)",
+            migrationPActions,
+            _data
+        );
+        address target = address(proxy);
+        assembly {
+            let succeeded := call(sub(gas, 5000), target, 0, add(data, 0x20), mload(data), 0, 0)
+            let size := returndatasize
+            let response := mload(0x40)
+            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(response, size)
+            returndatacopy(add(response, 0x20), 0, size)
+
+            cdp := mload(add(response, 0x20))
+
+            switch iszero(succeeded)
+            case 1 {
+                // throw if delegatecall failed
+                revert(add(response, 0x20), size)
+            }
+        }
+    }
+
+    function testCDPMigrationPayWithMKR() public {
+        vote();
+        waitAndCast();
+
+        bytes32 cup = openCupAndGenerateSai(20 ether, 1000 ether);
+
+        assertEq(tub.ink(cup), 20 ether * 10 ** 27 / tub.per());
+        assertEq(tub.tab(cup), 1000 ether);
+
+        openCupAndGenerateSai(0.1 ether, 10 ether);
+
+        swapSaiToDai(1010 ether);
+
+        hevm.warp(now + 864000); // 10 days of fees
+
+        (uint val, bool ok) = pep.peek();
+        assertTrue(ok);
+        uint govFee = tub.rap(cup) * 10 ** 18 / val;
+
+        assertTrue(govFee > 0);
+
+        // Migrate CDP
+        gov.approve(address(proxy), uint(-1));
+        uint cdp = migrateCdp(
+            abi.encodeWithSignature(
+                "migrate(address,bytes32)",
+                migration,
+                cup
+            )
+        );
+
+        assertEq(tub.ink(cup), 0);
+        assertEq(tub.tab(cup), 0);
+
+        address urn = ManagerLike(cdp).urns(cdp);
+
+        (uint ink, uint art) = vat.urns("ETH-A", urn);
+        (, uint rate,,,) = vat.ilks("ETH-A");
+
+        assertEq(ink, 20 ether * 10 ** 27 / tub.per());
+        assertEq(art, 1000 ether / rate + 1);
     }
 }
