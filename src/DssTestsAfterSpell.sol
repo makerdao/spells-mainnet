@@ -44,6 +44,10 @@ contract ValueLike {
     function peek() public view returns (uint, bool);
 }
 
+contract OtcLike {
+    function getPayAmount(address, address, uint) public view returns (uint);
+}
+
 contract Hevm {
     function warp(uint) public;
 }
@@ -69,6 +73,8 @@ contract DssTestsAfterSpell is DSTest {
     TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
     TokenLike sai = TokenLike(0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359);
     ValueLike pep = ValueLike(0x99041F808D598B782D5a3e498681C2452A31da08);
+
+    OtcLike otc = OtcLike(0x39755357759cE0d7f32dC8dC45414CCa409AE24e);
 
     DssLaunchSpell spell;
 
@@ -301,13 +307,64 @@ contract DssTestsAfterSpell is DSTest {
 
         assertTrue(govFee > 0);
 
+        uint prevGovBalance = gov.balanceOf(address(this));
+
         // Migrate CDP
-        gov.approve(address(proxy), uint(-1));
+        gov.approve(address(proxy), govFee);
         uint cdp = migrateCdp(
             abi.encodeWithSignature(
                 "migrate(address,bytes32)",
                 migration,
                 cup
+            )
+        );
+
+        assertEq(gov.balanceOf(address(this)), prevGovBalance - govFee);
+
+        assertEq(tub.ink(cup), 0);
+        assertEq(tub.tab(cup), 0);
+
+        address urn = ManagerLike(cdp).urns(cdp);
+
+        (uint ink, uint art) = vat.urns("ETH-A", urn);
+        (, uint rate,,,) = vat.ilks("ETH-A");
+
+        assertEq(ink, 20 ether * 10 ** 27 / tub.per());
+        assertEq(art, 1000 ether / rate + 1);
+    }
+
+    function testCDPMigrationPayWithDebt() public {
+        vote();
+        waitAndCast();
+
+        bytes32 cup = openCupAndGenerateSai(20 ether, 1000 ether);
+
+        assertEq(tub.ink(cup), 20 ether * 10 ** 27 / tub.per());
+        assertEq(tub.tab(cup), 1000 ether);
+
+        openCupAndGenerateSai(0.1 ether, 10 ether);
+
+        swapSaiToDai(1010 ether);
+
+        hevm.warp(now + 864000); // 10 days of fees
+
+        (uint val, bool ok) = pep.peek();
+        assertTrue(ok);
+        uint govFee = tub.rap(cup) * 10 ** 18 / val;
+
+        uint payAmt = otc.getPayAmount(address(sai), address(gov), govFee + 1);
+
+        assertTrue(govFee > 0);
+
+        // Migrate CDP
+        uint cdp = migrateCdp(
+            abi.encodeWithSignature(
+                "migratePayFeeWithDebt(address,bytes32,address,uint256,uint256)",
+                migration,
+                cup,
+                address(otc),
+                99999 ether,
+                0
             )
         );
 
@@ -320,6 +377,6 @@ contract DssTestsAfterSpell is DSTest {
         (, uint rate,,,) = vat.ilks("ETH-A");
 
         assertEq(ink, 20 ether * 10 ** 27 / tub.per());
-        assertEq(art, 1000 ether / rate + 1);
+        assertEq(art, 1000 ether / rate + payAmt + 1);
     }
 }
