@@ -33,9 +33,9 @@ contract DssTests is DSTest {
 
         assertEq(vow.wait(), 172800);
         assertEq(vow.dump(), 250 ether);
-        assertEq(vow.sump(), 50000 ether);
-        assertEq(vow.bump(), 10000 ether);
-        assertEq(vow.hump(), 500000 ether);
+        assertEq(vow.sump(), 50000 * 10 ** 45);
+        assertEq(vow.bump(), 10000 * 10 ** 45);
+        assertEq(vow.hump(), 500000 * 10 ** 45);
     }
 
 
