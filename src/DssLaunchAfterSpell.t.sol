@@ -76,13 +76,13 @@ contract DssLaunchAfterSpell is DSTest {
 
     OtcLike otc = OtcLike(0x39755357759cE0d7f32dC8dC45414CCa409AE24e);
 
-    DssLaunchSpell spell;
+    DssLaunchSpell spell = DssLaunchSpell(0xF44113760c4f70aFeEb412C63bC713B13E6e202E);
 
     uint constant RAD = 10 ** 45;
 
     function setUp() public {
         RegistryLike registry = RegistryLike(0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4);
-        spell = new DssLaunchSpell();
+        // spell = new DssLaunchSpell();
 
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(1574092700);
@@ -184,7 +184,7 @@ contract DssLaunchAfterSpell is DSTest {
         (, uint rate,,,) = vat.ilks("ETH-A");
 
         assertEq(ink, 10 ether);
-        assertEq(art, 1000 ether / rate + 1);
+        assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
     }
 
     function openCupAndGenerateSai(uint ethAmt, uint saiAmt) private returns (bytes32 cup) {
@@ -324,13 +324,13 @@ contract DssLaunchAfterSpell is DSTest {
         assertEq(tub.ink(cup), 0);
         assertEq(tub.tab(cup), 0);
 
-        address urn = ManagerLike(cdp).urns(cdp);
+        address urn = ManagerLike(manager).urns(cdp);
 
         (uint ink, uint art) = vat.urns("ETH-A", urn);
         (, uint rate,,,) = vat.ilks("ETH-A");
 
         assertEq(ink, 20 ether * 10 ** 27 / tub.per());
-        assertEq(art, 1000 ether / rate + 1);
+        assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
     }
 
     function testCDPMigrationPayWithDebt() public {
@@ -350,6 +350,7 @@ contract DssLaunchAfterSpell is DSTest {
 
         (uint val, bool ok) = pep.peek();
         assertTrue(ok);
+
         uint govFee = tub.rap(cup) * 10 ** 18 / val;
 
         uint payAmt = otc.getPayAmount(address(sai), address(gov), govFee + 1);
@@ -371,12 +372,12 @@ contract DssLaunchAfterSpell is DSTest {
         assertEq(tub.ink(cup), 0);
         assertEq(tub.tab(cup), 0);
 
-        address urn = ManagerLike(cdp).urns(cdp);
+        address urn = ManagerLike(manager).urns(cdp);
 
         (uint ink, uint art) = vat.urns("ETH-A", urn);
         (, uint rate,,,) = vat.ilks("ETH-A");
 
-        assertEq(ink, 20 ether * 10 ** 27 / tub.per());
-        assertEq(art, 1000 ether / rate + payAmt + 1);
+        assertEq(ink, 20 ether);
+        assertEq(art, (1000 ether + payAmt) * 10 ** 27 / rate + 1);
     }
 }
