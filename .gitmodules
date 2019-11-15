@@ -4,3 +4,6 @@
 [submodule "lib/dss"]
 	path = lib/dss
 	url = https://github.com/makerdao/dss
+[submodule "lib/mkr-authority"]
+	path = lib/mkr-authority
+	url = git@github.com:makerdao/mkr-authority.git
