@@ -67,7 +67,10 @@ contract DssLaunchAfterSpell is DSTest {
     address manager = 0x5ef30b9986345249bc32d8928B7ee64DE9435E39;
     address jug = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address ethJoin = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
+    address batJoin = 0x3D0B1912B66114d4096F48A8CEe3A56C231772cA;
     address daiJoin = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
+
+    TokenLike bat = TokenLike(0x0D8775F648430679A709E98d2b0Cb6250d2887EF);
 
     address saiPActions = 0x526af336D614adE5cc252A407062B8861aF998F5;
     TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
@@ -138,7 +141,7 @@ contract DssLaunchAfterSpell is DSTest {
         spell.cast();
     }
 
-    function openCdpAndGenerateDai(uint ilkAmt, uint daiAmt) private returns (uint cdp) {
+    function openETHCdpAndGenerateDai(uint ilkAmt, uint daiAmt) private returns (uint cdp) {
         uint value = ilkAmt;
         address target = address(proxy);
         bytes memory data = abi.encodeWithSignature(
@@ -172,11 +175,46 @@ contract DssLaunchAfterSpell is DSTest {
         }
     }
 
+    function openBATCdpAndGenerateDai(uint ilkAmt, uint daiAmt) private returns (uint cdp) {
+        address target = address(proxy);
+        bytes memory data = abi.encodeWithSignature(
+            "execute(address,bytes)",
+            proxyActions,
+            abi.encodeWithSignature(
+                "openLockGemAndDraw(address,address,address,address,bytes32,uint256,uint256,bool)",
+                manager,
+                jug,
+                batJoin,
+                daiJoin,
+                bytes32("BAT-A"),
+                ilkAmt,
+                daiAmt,
+                true
+            )
+        );
+        assembly {
+            let succeeded := call(sub(gas, 5000), target, 0, add(data, 0x20), mload(data), 0, 0)
+            let size := returndatasize
+            let response := mload(0x40)
+            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(response, size)
+            returndatacopy(add(response, 0x20), 0, size)
+
+            cdp := mload(add(response, 0x20))
+
+            switch iszero(succeeded)
+            case 1 {
+                // throw if delegatecall failed
+                revert(add(response, 0x20), size)
+            }
+        }
+    }
+
     function testCreateETHVault() public {
         vote();
         waitAndCast();
 
-        uint cdp = openCdpAndGenerateDai(10 ether, 1000 ether);
+        uint cdp = openETHCdpAndGenerateDai(10 ether, 1000 ether);
 
         address urn = ManagerLike(manager).urns(cdp);
 
@@ -185,6 +223,22 @@ contract DssLaunchAfterSpell is DSTest {
 
         assertEq(ink, 10 ether);
         assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
+    }
+
+    function testCreateBATVault() public {
+        vote();
+        waitAndCast();
+
+        bat.approve(address(proxy), 150 ether);
+        uint cdp = openBATCdpAndGenerateDai(150 ether, 20 ether);
+
+        address urn = ManagerLike(manager).urns(cdp);
+
+        (uint ink, uint art) = vat.urns("BAT-A", urn);
+        (, uint rate,,,) = vat.ilks("BAT-A");
+
+        assertEq(ink, 150 ether);
+        assertEq(art, 20 ether * 10 ** 27 / rate + 1);
     }
 
     function openCupAndGenerateSai(uint ethAmt, uint saiAmt) private returns (bytes32 cup) {
@@ -329,7 +383,7 @@ contract DssLaunchAfterSpell is DSTest {
         (uint ink, uint art) = vat.urns("ETH-A", urn);
         (, uint rate,,,) = vat.ilks("ETH-A");
 
-        assertEq(ink, 20 ether * 10 ** 27 / tub.per());
+        assertEq(ink, 20 ether);
         assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
     }
 
