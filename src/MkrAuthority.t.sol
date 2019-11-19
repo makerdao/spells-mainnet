@@ -58,9 +58,9 @@ contract MkrAuthorityTest is DSTest {
         mkrauth = new MkrAuthority();
     }
 
-    function setupDebtAuction() public {}
+    function setupDebtAuction() private {}
 
-    function setupSurplusAuction() public {}
+    function setupSurplusAuction() private {}
 
     function test_canAddMkrAuth() public {
         assertTrue(gov.authority() == address(0));
@@ -68,7 +68,16 @@ contract MkrAuthorityTest is DSTest {
         assertTrue(gov.authority() == address(mkrauth));
     }
 
-    function testFail_cannotDealFlop() public {}
+    function test_canRemoveOwner() public {
+        assertTrue(gov.owner() == address(this));
+        gov.setOwner(address(0));
+        assertTrue(gov.owner() == address(0));
+    }
+
+    function testFail_cannotDealFlop() public {
+        assertTrue(gov.authority() == address(0));
+    }
+
     function testFail_cannotDealFlap() public {}
 
     function test_canDealFlop_new() public {}
