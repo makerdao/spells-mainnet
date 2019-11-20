@@ -49,7 +49,7 @@ contract VatLike {
 
 contract TakeOverSpellAction {
     address public owner; // placeholder for pauseproxy
-    address constant multisig = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
+    address public multisig = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
     address constant vat = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
     function execute() public {
