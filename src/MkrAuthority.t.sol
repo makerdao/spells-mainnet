@@ -106,7 +106,7 @@ contract MkrAuthorityTest is DSTest {
 
     function masterChief() private {
         gov.approve(address(chief), uint256(-1));
-        chief.lock(gov.balanceOf(address(this)));
+        chief.lock(gov.balanceOf(address(this)) - 1); // keep 1 for flap auction
         address[] memory vote = new address[](1);
 
         TakeOverSpell spell = new TakeOverSpell();
@@ -132,16 +132,6 @@ contract MkrAuthorityTest is DSTest {
         uint256 sump = vow.sump();
         vat.suck(address(vow), address(this), surplus + sump + Ash + Sin);
         vow.heal(surplus);
-        // assertTrue(vat.dai(address(vow)) == 0);
-        // assertTrue(vat.dai(address(this)) == surplus + sump + Ash + Sin);
-        // uint256 sin = vat.sin(address(vow));
-        // emit log_named_uint("surp", vat.dai(address(vow)));
-        // emit log_named_uint("debt", sin);
-        // emit log_named_uint("sump", sump);
-        // emit log_named_uint("Sin ", Sin);
-        // emit log_named_uint("Ash ", Ash);
-        // emit log_named_uint("debt", sin - Sin - Ash);
-        // assertTrue(sump <= sin - Sin - Ash);
         return vow.flop();
     }
 
@@ -154,9 +144,25 @@ contract MkrAuthorityTest is DSTest {
         flop.dent(id, lot, bid);
     }
 
-    function setupDebtAuction() private {}
+    function setupFlap() private returns(uint) {
+        masterChief(); // Allows `vat.suck`
+        uint256 surplus = vat.dai(address(vow));
+        uint256 debt = vat.sin(address(vow)) - vow.Sin() - vow.Ash();
+        uint256 bump = vow.bump();
+        uint256 hump = vow.hump();
+        vat.suck(address(this), address(vow), surplus + debt + bump + hump);
+        vow.heal(debt);
+        return vow.flap();
+    }
 
-    function setupSurplusAuction() private {}
+    function bidFlap(uint256 id) private {
+        gov.approve(address(flap), uint256(-1));
+        uint256 lot = vow.bump();
+        uint256 bid = 1;
+        emit log_named_uint('lot', lot);
+        emit log_named_uint('bid', bid);
+        flap.tend(id, lot, bid);
+    }
 
     function test_canAddMkrAuth() public {
         assertTrue(gov.authority() == address(0));
@@ -179,7 +185,14 @@ contract MkrAuthorityTest is DSTest {
         flop.deal(flopId);
     }
 
-    function testFail_cannotDealFlap() public {}
+    function testFail_cannotDealFlap() public {
+        assertTrue(gov.authority() == address(0));
+        uint flapId = setupFlap();
+        bidFlap(flapId);
+        hevm.warp(uint48(now) + flap.ttl() + 1);
+
+        flap.deal(flapId);
+    }
 
     function test_canDealFlop_new() public {
         setupMkrAuth();
@@ -191,7 +204,15 @@ contract MkrAuthorityTest is DSTest {
         flop.deal(flopId);
     }
 
-    function test_canDealFlap_new() public {}
+    function test_canDealFlap_new() public {
+        setupMkrAuth();
+
+        uint flapId = setupFlap();
+        bidFlap(flapId);
+        hevm.warp(uint48(now) + flap.ttl() + 1);
+
+        flap.deal(flapId);
+    }
 
     function test_canDealFlop_stuck() public {
         assertTrue(gov.authority() == address(0));
@@ -204,5 +225,13 @@ contract MkrAuthorityTest is DSTest {
         flop.deal(flopId);
     }
 
-    function test_canDealFlap_stuck() public {}
+    function test_canDealFlap_stuck() public {
+        uint flapId = setupFlap();
+        bidFlap(flapId);
+        hevm.warp(uint48(now) + flap.ttl() + 1);
+
+        setupMkrAuth();
+
+        flap.deal(flapId);
+    }
 }
