@@ -7,6 +7,7 @@ import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flapper} from "dss/flap.sol";
+import {Flopper as FlopperFix} from "dss-fix-flop/flop.sol";
 
 import {MkrAuthority} from "mkr-authority/MkrAuthority.sol";
 
@@ -47,13 +48,23 @@ contract VatLike {
     function Line() public returns(uint256);
 }
 
+contract FlopLike {
+    function dent(uint id, uint lot, uint bid) external;
+}
+
 contract TakeOverSpellAction {
     address constant multisig = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
     address constant vat = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant vow = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant flop = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
 
     function execute() public {
         VatLike(vat).rely(multisig);
         require(VatLike(vat).wards(multisig) == 1, "Vat/is-ward-now");
+        Flopper(flop).rely(multisig);
+        require(Flopper(flop).wards(multisig) == 1, "Flop/is-ward-now");
+        Vow(vow).rely(multisig);
+        require(Vow(vow).wards(multisig) == 1, "Vow/is-ward-now");
     }
 }
 
@@ -86,6 +97,7 @@ contract MkrAuthorityTest is DSTest {
     Vat vat     = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     Vow vow     = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
     Flopper flop = Flopper(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
+    FlopperFix newFlop;
     Flapper flap = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
 
     MkrLike gov     = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
@@ -125,7 +137,6 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function setupFlop() private returns(uint) {
-        masterChief(); // Allows `vat.suck`
         uint256 surplus = vat.dai(address(vow));
         uint256 Sin = vow.Sin();
         uint256 Ash = vow.Ash();
@@ -135,13 +146,13 @@ contract MkrAuthorityTest is DSTest {
         return vow.flop();
     }
 
-    function bidFlop(uint256 id) private {
-        vat.hope(address(flop));
+    function bidFlop(address _flop, uint256 id) private {
+        vat.hope(_flop);
         uint256 bid = vow.sump();
         uint256 lot = 1;
         emit log_named_uint('lot', lot);
         emit log_named_uint('bid', bid);
-        flop.dent(id, lot, bid);
+        FlopLike(_flop).dent(id, lot, bid);
     }
 
     function setupFlap() private returns(uint) {
@@ -177,9 +188,10 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function testFail_cannotDealFlop() public {
+        masterChief();
         assertTrue(gov.authority() == address(0));
         uint flopId = setupFlop();
-        bidFlop(flopId);
+        bidFlop(address(flop), flopId);
         hevm.warp(uint48(now) + flop.ttl() + 1);
 
         flop.deal(flopId);
@@ -196,9 +208,10 @@ contract MkrAuthorityTest is DSTest {
 
     function test_canDealFlop_new() public {
         setupMkrAuth();
+        masterChief();
 
         uint flopId = setupFlop();
-        bidFlop(flopId);
+        bidFlop(address(flop), flopId);
         hevm.warp(uint48(now) + flop.ttl() + 1);
 
         flop.deal(flopId);
@@ -215,9 +228,10 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function test_canDealFlop_stuck() public {
+        masterChief();
         assertTrue(gov.authority() == address(0));
         uint flopId = setupFlop();
-        bidFlop(flopId);
+        bidFlop(address(flop), flopId);
         hevm.warp(uint48(now) + flop.ttl() + 1);
 
         setupMkrAuth();
@@ -233,5 +247,42 @@ contract MkrAuthorityTest is DSTest {
         setupMkrAuth();
 
         flap.deal(flapId);
+    }
+
+    function testFail_cannotYankFlop() public {
+        setupMkrAuth();
+        masterChief();
+
+        uint flopId = setupFlop();
+        bidFlop(address(flop), flopId);
+
+        flop.cage();
+
+        flop.yank(flopId);
+    }
+
+    function replaceFlopper() private {
+        newFlop = new FlopperFix(address(vat), address(gov));
+        newFlop.file("beg", flop.beg());
+        newFlop.file("pad", flop.pad());
+        newFlop.file("ttl", flop.ttl());
+        newFlop.file("tau", flop.tau());
+        newFlop.rely(address(vow));
+        vow.file("flopper", address(newFlop));
+        vat.rely(address(newFlop));
+    }
+
+    function test_canYankFlop() public {
+        setupMkrAuth();
+        masterChief();
+
+        replaceFlopper();
+
+        uint flopId = setupFlop();
+        bidFlop(address(newFlop), flopId);
+
+        newFlop.cage();
+
+        newFlop.yank(flopId);
     }
 }
