@@ -23,8 +23,7 @@ contract PauseLike {
     function exec(address, bytes32, bytes memory, uint256) public;
 }
 
-contract DssFlopYankFixSpellAction {
-    uint constant RAD = 10 ** 45;
+contract DssFlopReplaceSpellAction {
     address constant newFLOPPER = _____;
     address constant MKRAUTHORITY = _____;
     address constant VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
@@ -57,7 +56,7 @@ contract DssFlopYankFixSpellAction {
     }
 }
 
-contract DssFlopYankFixSpell {
+contract DssFlopReplaceSpell {
     PauseLike public pause =
         PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
     address   public action;
@@ -68,7 +67,7 @@ contract DssFlopYankFixSpell {
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
-        action = address(new DssFlopYankFixSpellAction());
+        action = address(new DssFlopReplaceSpellAction());
         bytes32 _tag;
         address _action = action;
         assembly { _tag := extcodehash(_action) }
