@@ -1,8 +1,20 @@
 pragma solidity 0.5.12;
 
-contract VatLike {
-    function file(bytes32,uint) public;
-    function file(bytes32,bytes32,uint) public;
+contract WardsLike {
+    function rely(address) public;
+    function deny(address) public;
+}
+
+contract FileLike {
+    function file(bytes32, uint) public;
+    function file(bytes32, address) public;
+}
+
+contract FlopLike {
+    function beg() public returns(uint);
+    function pad() public returns(uint);
+    function ttl() public returns(uint);
+    function tau() public returns(uint);
 }
 
 contract PauseLike {
@@ -11,26 +23,41 @@ contract PauseLike {
     function exec(address, bytes32, bytes memory, uint256) public;
 }
 
-contract LaunchSpellAction {
+contract DssFlopYankFixSpellAction {
     uint constant RAD = 10 ** 45;
+    address constant newFLOPPER = _____;
+    address constant MKRAUTHORITY = _____;
     address constant VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant oldFLOPPER = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
+
 
     function execute() public {
-        // set the global debt ceiling to 153,000,000
-        VatLike(VAT).file("Line", 153000000 * RAD);
+        // # Setup new Flopper #
+        // file same beg on new Flopper
+        FileLike(newFLOPPER).file("beg", FlopLike(oldFLOPPER).beg());
+        // file same pad on new Flopper
+        FileLike(newFLOPPER).file("pad", FlopLike(oldFLOPPER).pad());
+        // file same ttl on new Flopper
+        FileLike(newFLOPPER).file("ttl", FlopLike(oldFLOPPER).ttl());
+        // file same tau on new Flopper
+        FileLike(newFLOPPER).file("tau", FlopLike(oldFLOPPER).tau());
+        // rely on the vow
+        WardsLike(newFlopper).rely(VOW);
+        // Vat relies on new Flopper
+        WardsLike(VAT).rely(newFlopper);
+        // File new Flopper on Vow
+        FileLike(VOW).file("flopper", newFlopper);
+        FileLike(MKRAUTHORITY).rely(newFlopper);
 
-        // set the ETH-A debt ceiling to 50,000,000
-        VatLike(VAT).file("ETH-A", "line", 50000000 * RAD);
-
-        // set the BAT-A debt ceiling to 3,000,000
-        VatLike(VAT).file("BAT-A", "line", 3000000 * RAD);
-
-        // set the SAI debt ceiling to 100,000,000
-        VatLike(VAT).file("SAI", "line", 100000000 * RAD);
+        // # Close down Old Flopper #
+        WardsLike(oldFlopper).deny(VOW);
+        FlopLike(oldFlopper).cage();
+        FileLike(MKRAUTHORITY).deny(oldFlopper);
     }
 }
 
-contract DssLaunchSpell {
+contract DssFlopYankFixSpell {
     PauseLike public pause =
         PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
     address   public action;
@@ -41,7 +68,7 @@ contract DssLaunchSpell {
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
-        action = address(new LaunchSpellAction());
+        action = address(new DssFlopYankFixSpellAction());
         bytes32 _tag;
         address _action = action;
         assembly { _tag := extcodehash(_action) }
@@ -49,8 +76,6 @@ contract DssLaunchSpell {
     }
 
     function cast() public {
-        // 1574092800 == Monday, November 18, 2019 16:00:00 GMT
-        require(now >= 1574092800, "launch-time-error");
         require(!done, "spell-already-cast");
         done = true;
         pause.plot(action, tag, sig, now);
