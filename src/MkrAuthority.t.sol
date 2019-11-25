@@ -110,8 +110,7 @@ contract MkrAuthorityTest is DSTest {
 
     function setUp() public {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-        // hevm.warp(1574092700);
-        // hevm.warp(now);
+        hevm.warp(1574092700);
 
         mkrauth = new MkrAuthority();
     }
