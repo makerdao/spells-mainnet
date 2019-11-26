@@ -23,12 +23,18 @@ contract PauseLike {
     function exec(address, bytes32, bytes memory, uint256) public;
 }
 
+contract MomLike {
+    function setPep(address) external;
+}
+
 contract DssFlopReplaceSpellAction {
     address constant newFLOPPER = _____;
     address constant MKRAUTHORITY = _____;
     address constant VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant oldFLOPPER = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
+    address constant SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    address constant MKRPEP = 0x99041F808D598B782D5a3e498681C2452A31da08;
 
 
     function execute() public {
@@ -53,6 +59,8 @@ contract DssFlopReplaceSpellAction {
         WardsLike(oldFlopper).deny(VOW);
         FlopLike(oldFlopper).cage();
         FileLike(MKRAUTHORITY).deny(oldFlopper);
+
+        MomLike(SAIMOM).setPep(MKRPEP);
     }
 }
 
