@@ -109,8 +109,8 @@ contract DssFlopReplaceSpellTest is DSTest {
     }
 
     function testFlopSpellIsCast() public {
-        // spell = DssFlopReplaceSpell(0x30cfdb937E46E946b1038397f9Cd6fa231B90863);
-        spell = new DssFlopReplaceSpell();
+        spell = DssFlopReplaceSpell(0x902f009d4dE4a7828284B04b364dD43F00E51A02);
+        // spell = new DssFlopReplaceSpell();
         assertEq(tub.pep(), 0x5C1fc813d9c1B5ebb93889B3d63bA24984CA44B7);
         assertEq(address(vow.flopper()), 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
 
