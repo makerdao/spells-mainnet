@@ -30,7 +30,7 @@ contract MomLike {
 
 contract DssFlopReplaceSpellAction {
     address constant public newFLOPPER = 0x4D95A049d5B0b7d32058cd3F2163015747522e99;
-    address constant public MKRAUTHORITY = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
+    // address constant public MKRAUTHORITY = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
     address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant public oldFLOPPER = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
