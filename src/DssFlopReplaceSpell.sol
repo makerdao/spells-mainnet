@@ -15,6 +15,7 @@ contract FlopLike {
     function pad() public returns(uint);
     function ttl() public returns(uint);
     function tau() public returns(uint);
+    function cage() public;
 }
 
 contract PauseLike {
@@ -28,13 +29,13 @@ contract MomLike {
 }
 
 contract DssFlopReplaceSpellAction {
-    address constant newFLOPPER = 0x4D95A049d5B0b7d32058cd3F2163015747522e99;
-    address constant MKRAUTHORITY = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
-    address constant VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
-    address constant oldFLOPPER = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
-    address constant SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
-    address constant MKRPEP = 0x99041F808D598B782D5a3e498681C2452A31da08;
+    address constant public newFLOPPER = 0x4D95A049d5B0b7d32058cd3F2163015747522e99;
+    address constant public MKRAUTHORITY = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
+    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant public oldFLOPPER = 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC;
+    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    address constant public MKRPEP = 0x99041F808D598B782D5a3e498681C2452A31da08;
 
 
     function execute() public {
@@ -48,17 +49,17 @@ contract DssFlopReplaceSpellAction {
         // file same tau on new Flopper
         FileLike(newFLOPPER).file("tau", FlopLike(oldFLOPPER).tau());
         // rely on the vow
-        WardsLike(newFlopper).rely(VOW);
+        WardsLike(newFLOPPER).rely(VOW);
         // Vat relies on new Flopper
-        WardsLike(VAT).rely(newFlopper);
+        WardsLike(VAT).rely(newFLOPPER);
         // File new Flopper on Vow
-        FileLike(VOW).file("flopper", newFlopper);
-        FileLike(MKRAUTHORITY).rely(newFlopper);
+        FileLike(VOW).file("flopper", newFLOPPER);
+        // WardsLike(MKRAUTHORITY).rely(newFLOPPER);
 
         // # Close down Old Flopper #
-        WardsLike(oldFlopper).deny(VOW);
-        FlopLike(oldFlopper).cage();
-        FileLike(MKRAUTHORITY).deny(oldFlopper);
+        WardsLike(oldFLOPPER).deny(VOW);
+        FlopLike(oldFLOPPER).cage();
+        // WardsLike(MKRAUTHORITY).deny(oldFLOPPER);
 
         // change Pep in SCD to Medianizer
         MomLike(SAIMOM).setPep(MKRPEP);
