@@ -261,7 +261,8 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function replaceFlopper() private {
-        newFlop = new FlopperFix(address(vat), address(gov));
+        // newFlop = new FlopperFix(address(vat), address(gov));
+        newFlop = FlopperFix(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
         newFlop.file("beg", flop.beg());
         newFlop.file("pad", flop.pad());
         newFlop.file("ttl", flop.ttl());
