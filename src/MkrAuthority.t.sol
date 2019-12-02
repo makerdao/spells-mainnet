@@ -103,7 +103,7 @@ contract MkrAuthorityTest is DSTest {
     MkrLike gov     = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
 
-    MkrAuthority mkrauth;
+    MkrAuthority mkrauth = MkrAuthority(0xc725e52E55929366dFdF86ac4857Ae272e8BF13D);
 
     uint256  constant RAD = 10 ** 45;
     uint256  constant ONE = 1.00E18;
@@ -112,7 +112,7 @@ contract MkrAuthorityTest is DSTest {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(1574092700);
 
-        mkrauth = new MkrAuthority();
+        // mkrauth = new MkrAuthority();
     }
 
     function masterChief() private {
