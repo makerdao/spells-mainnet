@@ -52,6 +52,18 @@ contract FlopLike {
     function dent(uint id, uint lot, uint bid) external;
 }
 
+contract DeployerActions is DSTest {
+    function doSetRoot(address mkrauth, address guy) public {
+        emit log_named_address("mkrauth", mkrauth);
+        emit log_named_address("guy", guy);
+        // MkrAuthority(mkrauth).setRoot(guy);
+    }
+}
+
+contract ProxyLike {
+    function execute(address, bytes memory) public returns(bytes memory);
+}
+
 contract TakeOverSpellAction {
     address constant multisig = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
     address constant vat = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
@@ -90,6 +102,39 @@ contract TakeOverSpell {
     }
 }
 
+contract DSProxy is DSTest {
+    constructor() public {}
+
+    function() external payable {
+    }
+
+    function execute(address _target, bytes memory _data)
+        public
+        payable
+        returns (bytes memory response)
+    {
+        require(_target != address(0), "ds-proxy-target-address-required");
+        emit log_named_address("target", _target);
+
+        // call contract in current context
+        assembly {
+            let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 0)
+            let size := returndatasize
+
+            response := mload(0x40)
+            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(response, size)
+            returndatacopy(add(response, 0x20), 0, size)
+
+            switch iszero(succeeded)
+            case 1 {
+                // throw if delegatecall failed
+                revert(add(response, 0x20), size)
+            }
+        }
+    }
+}
+
 contract MkrAuthorityTest is DSTest {
     Hevm hevm;
 
@@ -105,6 +150,10 @@ contract MkrAuthorityTest is DSTest {
 
     MkrAuthority mkrauth = MkrAuthority(0xc725e52E55929366dFdF86ac4857Ae272e8BF13D);
 
+    // ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
+    ProxyLike proxy;
+    DeployerActions deployerActions;
+
     uint256  constant RAD = 10 ** 45;
     uint256  constant ONE = 1.00E18;
 
@@ -113,6 +162,10 @@ contract MkrAuthorityTest is DSTest {
         hevm.warp(1574092700);
 
         // mkrauth = new MkrAuthority();
+        proxy = ProxyLike(address(new DSProxy()));
+        deployerActions = new DeployerActions();
+        emit log_named_address("target", address(deployerActions));
+        //doSetRoot(address(mkrauth), address(this));
     }
 
     function masterChief() private {
@@ -131,8 +184,10 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function setupMkrAuth() private {
+        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", address(mkrauth), address(this)));
+        // deployer.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", address(mkrauth), address(this)));
         gov.setAuthority(address(mkrauth));
-        mkrauth.rely(address(flop));
+        // mkrauth.rely(address(flop));
     }
 
     function setupFlop() private returns(uint) {
