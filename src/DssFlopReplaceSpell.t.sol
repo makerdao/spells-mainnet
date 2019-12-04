@@ -49,6 +49,30 @@ contract OtcLike {
     function getPayAmount(address, address, uint) public view returns (uint);
 }
 
+contract FlopLike {
+    function wards(address) external returns(uint256);
+    function ttl() external returns(uint256);
+    function beg() external returns(uint256);
+    function pad() external returns(uint256);
+    function tau() external returns(uint256);
+
+    function file(bytes32,uint) external;
+
+    function rely(address) external;
+    function deny(address) external;
+    function dent(uint,uint,uint) external;
+    function deal(uint) external;
+    function yank(uint) external;
+    function cage() external;
+    function live() external returns(uint256);
+}
+
+contract WardsLike {
+    function wards(address) external returns(uint256);
+    function rely(address) public;
+    function deny(address) public;
+}
+
 contract Hevm {
     function warp(uint) public;
 }
@@ -122,6 +146,26 @@ contract DssFlopReplaceSpellTest is DSTest {
         assertEq(vat.wards(0x4D95A049d5B0b7d32058cd3F2163015747522e99), 1);
 
         assertTrue(spell.done());
+    }
+
+    function testFlopSpellSetup() public {
+        spell = DssFlopReplaceSpell(0x902f009d4dE4a7828284B04b364dD43F00E51A02);
+        address flop = address(vow.flopper());
+        assertEq(flop, 0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
+
+        vote();
+        spell.cast();
+
+        address newFlop = address(vow.flopper());
+        assertEq(FlopLike(flop).beg(), FlopLike(newFlop).beg());
+        assertEq(FlopLike(flop).pad(), FlopLike(newFlop).pad());
+        assertEq(FlopLike(flop).ttl(), FlopLike(newFlop).ttl());
+        assertEq(FlopLike(flop).tau(), FlopLike(newFlop).tau());
+        assertEq(WardsLike(newFlop).wards(address(vow)), 1);
+        assertEq(WardsLike(address(vat)).wards(newFlop), 1);
+
+        assertEq(WardsLike(flop).wards(address(vow)), 0);
+        assertEq(FlopLike(flop).live(), 0);
     }
 
 }
