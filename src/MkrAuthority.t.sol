@@ -74,7 +74,7 @@ contract MkrAuthorityLike {
     function wards(address) external returns(uint256);
 }
 
-contract DeployerActions is DSTest {
+contract DeployerActions {
     function doSetRoot(address mkrauth, address guy) public {
         MkrAuthorityLike(mkrauth).setRoot(guy);
     }
@@ -144,7 +144,6 @@ contract MkrAuthorityTest is DSTest {
     DeployerActions deployerActions;
 
     uint256  constant RAD = 10 ** 45;
-    uint256  constant ONE = 1.00E18;
 
     function setUp() public {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
@@ -188,8 +187,6 @@ contract MkrAuthorityTest is DSTest {
         vat.hope(_flop);
         uint256 bid = vow.sump();
         uint256 lot = 1;
-        emit log_named_uint('lot', lot);
-        emit log_named_uint('bid', bid);
         FlopLike(_flop).dent(id, lot, bid);
     }
 
@@ -208,8 +205,6 @@ contract MkrAuthorityTest is DSTest {
         gov.approve(address(flap), uint256(-1));
         uint256 lot = vow.bump();
         uint256 bid = 1;
-        emit log_named_uint('lot', lot);
-        emit log_named_uint('bid', bid);
         flap.tend(id, lot, bid);
     }
 
