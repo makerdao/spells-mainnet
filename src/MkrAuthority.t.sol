@@ -7,9 +7,6 @@ import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flapper} from "dss/flap.sol";
-import {Flopper as FlopperFix} from "dss-fix-flop/flop.sol";
-
-import {MkrAuthority} from "mkr-authority/MkrAuthority.sol";
 
 /**
  * Must be executed from the Multisig address.
@@ -56,7 +53,6 @@ contract DeployerActions is DSTest {
     function doSetRoot(address mkrauth, address guy) public {
         emit log_named_address("mkrauth", mkrauth);
         emit log_named_address("guy", guy);
-        // MkrAuthority(mkrauth).setRoot(guy);
     }
 }
 
@@ -103,8 +99,6 @@ contract TakeOverSpell {
 }
 
 contract DSProxy is DSTest {
-    constructor() public {}
-
     function() external payable {
     }
 
@@ -138,17 +132,17 @@ contract DSProxy is DSTest {
 contract MkrAuthorityTest is DSTest {
     Hevm hevm;
 
-    Dai dai     = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    Vat vat     = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    Vow vow     = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    Flopper flop = Flopper(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
-    FlopperFix newFlop;
-    Flapper flap = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
+    Dai dai         = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    Vat vat         = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    Vow vow         = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    Flopper flop    = Flopper(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
+    Flopper newFlop;
+    Flapper flap    = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
 
     MkrLike gov     = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
 
-    MkrAuthority mkrauth = MkrAuthority(0xc725e52E55929366dFdF86ac4857Ae272e8BF13D);
+    address mkrauth = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
 
     // ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
     ProxyLike proxy;
@@ -161,11 +155,9 @@ contract MkrAuthorityTest is DSTest {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(1574092700);
 
-        // mkrauth = new MkrAuthority();
         proxy = ProxyLike(address(new DSProxy()));
         deployerActions = new DeployerActions();
         emit log_named_address("target", address(deployerActions));
-        //doSetRoot(address(mkrauth), address(this));
     }
 
     function masterChief() private {
@@ -184,10 +176,8 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function setupMkrAuth() private {
-        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", address(mkrauth), address(this)));
-        // deployer.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", address(mkrauth), address(this)));
+        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", mkrauth, address(this)));
         gov.setAuthority(address(mkrauth));
-        // mkrauth.rely(address(flop));
     }
 
     function setupFlop() private returns(uint) {
@@ -232,7 +222,7 @@ contract MkrAuthorityTest is DSTest {
     function test_canAddMkrAuth() public {
         assertTrue(gov.authority() == address(0));
         setupMkrAuth();
-        assertTrue(gov.authority() == address(mkrauth));
+        assertTrue(gov.authority() == mkrauth);
     }
 
     function test_canRemoveOwner() public {
@@ -316,8 +306,7 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function replaceFlopper() private {
-        // newFlop = new FlopperFix(address(vat), address(gov));
-        newFlop = FlopperFix(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
+        newFlop = Flopper(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
         newFlop.file("beg", flop.beg());
         newFlop.file("pad", flop.pad());
         newFlop.file("ttl", flop.ttl());
