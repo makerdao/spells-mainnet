@@ -5,7 +5,6 @@ import "ds-test/test.sol";
 import {Dai} from "dss/dai.sol";
 import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
-import {Flopper} from "dss/flop.sol";
 import {Flapper} from "dss/flap.sol";
 
 /**
@@ -46,7 +45,20 @@ contract VatLike {
 }
 
 contract FlopLike {
-    function dent(uint id, uint lot, uint bid) external;
+    function wards(address) external returns(uint256);
+    function ttl() external returns(uint256);
+    function beg() external returns(uint256);
+    function pad() external returns(uint256);
+    function tau() external returns(uint256);
+
+    function file(bytes32,uint) external;
+
+    function rely(address) external;
+    function deny(address) external;
+    function dent(uint,uint,uint) external;
+    function deal(uint) external;
+    function yank(uint) external;
+    function cage() external;
 }
 
 contract MkrAuthorityLike {
@@ -72,8 +84,8 @@ contract TakeOverSpellAction {
     function execute() public {
         VatLike(vat).rely(multisig);
         require(VatLike(vat).wards(multisig) == 1, "Vat/is-ward-now");
-        Flopper(flop).rely(multisig);
-        require(Flopper(flop).wards(multisig) == 1, "Flop/is-ward-now");
+        FlopLike(flop).rely(multisig);
+        require(FlopLike(flop).wards(multisig) == 1, "Flop/is-ward-now");
         Vow(vow).rely(multisig);
         require(Vow(vow).wards(multisig) == 1, "Vow/is-ward-now");
     }
@@ -107,8 +119,8 @@ contract MkrAuthorityTest is DSTest {
     Dai dai         = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     Vat vat         = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     Vow vow         = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    Flopper flop    = Flopper(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
-    Flopper newFlop;
+    FlopLike flop    = FlopLike(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
+    FlopLike newFlop;
     Flapper flap    = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
 
     MkrLike gov     = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
@@ -274,8 +286,8 @@ contract MkrAuthorityTest is DSTest {
         flop.yank(flopId);
     }
 
-    function replaceFlopper() private {
-        newFlop = Flopper(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
+    function replaceFlopLike() private {
+        newFlop = FlopLike(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
         newFlop.file("beg", flop.beg());
         newFlop.file("pad", flop.pad());
         newFlop.file("ttl", flop.ttl());
@@ -289,7 +301,7 @@ contract MkrAuthorityTest is DSTest {
         setupMkrAuth();
         masterChief();
 
-        replaceFlopper();
+        replaceFlopLike();
 
         uint flopId = setupFlop();
         bidFlop(address(newFlop), flopId);
