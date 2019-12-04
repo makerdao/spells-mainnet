@@ -16,6 +16,12 @@ contract Hevm {
     function warp(uint) public;
 }
 
+contract WardsLike {
+    function wards(address) public returns(uint256);
+    function rely(address) public;
+    function deny(address) external;
+}
+
 contract PauseLike {
     function delay() public view returns (uint256);
     function plot(address, bytes32, bytes memory, uint256) public;
@@ -63,11 +69,17 @@ contract FlopLike {
 
 contract MkrAuthorityLike {
     function setRoot(address) public;
+    function rely(address) external;
+    function deny(address) external;
+    function wards(address) external returns(uint256);
 }
 
 contract DeployerActions is DSTest {
     function doSetRoot(address mkrauth, address guy) public {
         MkrAuthorityLike(mkrauth).setRoot(guy);
+    }
+    function doRely(address ward, address guy) public {
+        WardsLike(ward).rely(guy);
     }
 }
 
@@ -116,17 +128,17 @@ contract TakeOverSpell {
 contract MkrAuthorityTest is DSTest {
     Hevm hevm;
 
-    Dai dai         = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    Vat vat         = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    Vow vow         = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    FlopLike flop    = FlopLike(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
-    FlopLike newFlop;
-    Flapper flap    = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
+    Dai dai            = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    Vat vat            = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    Vow vow            = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    FlopLike flop       = FlopLike(0xBE00FE8Dfd9C079f1E5F5ad7AE9a3Ad2c571FCAC);
+    FlopLike newFlop   = FlopLike(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
+    Flapper flap        = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
 
-    MkrLike gov     = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
+    MkrLike gov        = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    ChiefLike chief    = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
 
-    address mkrauth = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
+    address mkrauth    = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
 
     ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
     DeployerActions deployerActions;
@@ -159,6 +171,7 @@ contract MkrAuthorityTest is DSTest {
     function setupMkrAuth() private {
         ProxyLike(deployer).execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address,address)", mkrauth, address(this)));
         gov.setAuthority(address(mkrauth));
+        WardsLike(mkrauth).rely(address(flop));
     }
 
     function setupFlop() private returns(uint) {
@@ -287,7 +300,7 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function replaceFlopLike() private {
-        newFlop = FlopLike(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
+        ProxyLike(deployer).execute(address(deployerActions), abi.encodeWithSignature("doRely(address,address)", address(newFlop), address(this)));
         newFlop.file("beg", flop.beg());
         newFlop.file("pad", flop.pad());
         newFlop.file("ttl", flop.ttl());
