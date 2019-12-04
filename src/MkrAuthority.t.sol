@@ -294,7 +294,7 @@ contract MkrAuthorityTest is DSTest {
         flop.yank(flopId);
     }
 
-    function replaceFlopLike() private {
+    function replaceFlopper() private {
         ProxyLike(deployer).execute(address(deployerActions), abi.encodeWithSignature("doRely(address,address)", address(newFlop), address(this)));
         newFlop.file("beg", flop.beg());
         newFlop.file("pad", flop.pad());
@@ -309,7 +309,7 @@ contract MkrAuthorityTest is DSTest {
         setupMkrAuth();
         masterChief();
 
-        replaceFlopLike();
+        replaceFlopper();
 
         uint flopId = setupFlop();
         bidFlop(address(newFlop), flopId);
