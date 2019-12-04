@@ -176,7 +176,7 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function setupMkrAuth() private {
-        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address, address)", mkrauth, address(this)));
+        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address,address)", mkrauth, address(this)));
         gov.setAuthority(address(mkrauth));
     }
 
