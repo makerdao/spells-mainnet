@@ -49,10 +49,13 @@ contract FlopLike {
     function dent(uint id, uint lot, uint bid) external;
 }
 
+contract MkrAuthorityLike {
+    function setRoot(address) public;
+}
+
 contract DeployerActions is DSTest {
     function doSetRoot(address mkrauth, address guy) public {
-        emit log_named_address("mkrauth", mkrauth);
-        emit log_named_address("guy", guy);
+        MkrAuthorityLike(mkrauth).setRoot(guy);
     }
 }
 
@@ -98,37 +101,6 @@ contract TakeOverSpell {
     }
 }
 
-contract DSProxy is DSTest {
-    function() external payable {
-    }
-
-    function execute(address _target, bytes memory _data)
-        public
-        payable
-        returns (bytes memory response)
-    {
-        require(_target != address(0), "ds-proxy-target-address-required");
-        emit log_named_address("target", _target);
-
-        // call contract in current context
-        assembly {
-            let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 0)
-            let size := returndatasize
-
-            response := mload(0x40)
-            mstore(0x40, add(response, and(add(add(size, 0x20), 0x1f), not(0x1f))))
-            mstore(response, size)
-            returndatacopy(add(response, 0x20), 0, size)
-
-            switch iszero(succeeded)
-            case 1 {
-                // throw if delegatecall failed
-                revert(add(response, 0x20), size)
-            }
-        }
-    }
-}
-
 contract MkrAuthorityTest is DSTest {
     Hevm hevm;
 
@@ -144,8 +116,7 @@ contract MkrAuthorityTest is DSTest {
 
     address mkrauth = 0xc725e52E55929366dFdF86ac4857Ae272e8BF13D;
 
-    // ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
-    ProxyLike proxy;
+    ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
     DeployerActions deployerActions;
 
     uint256  constant RAD = 10 ** 45;
@@ -155,9 +126,7 @@ contract MkrAuthorityTest is DSTest {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(1574092700);
 
-        proxy = ProxyLike(address(new DSProxy()));
         deployerActions = new DeployerActions();
-        emit log_named_address("target", address(deployerActions));
     }
 
     function masterChief() private {
@@ -176,7 +145,7 @@ contract MkrAuthorityTest is DSTest {
     }
 
     function setupMkrAuth() private {
-        proxy.execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address,address)", mkrauth, address(this)));
+        ProxyLike(deployer).execute(address(deployerActions), abi.encodeWithSignature("doSetRoot(address,address)", mkrauth, address(this)));
         gov.setAuthority(address(mkrauth));
     }
 
