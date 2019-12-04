@@ -4,12 +4,7 @@
 
 dapp build
 
-function clean() {
-  unset LANG
-  unset DAPP_TEST_ADDRESS;
-  unset DAPP_TEST_NUMBER;
-  rm -rf "state";
-}
+function clean() { rm -rf "state"; }
 
 trap clean EXIT
 export LANG=C.UTF-8
