@@ -7,6 +7,3 @@
 [submodule "lib/mkr-authority"]
 	path = lib/mkr-authority
 	url = git@github.com:makerdao/mkr-authority.git
-[submodule "lib/dss-fix-flop"]
-	path = lib/dss-fix-flop
-	url = https://github.com/makerdao/dss
