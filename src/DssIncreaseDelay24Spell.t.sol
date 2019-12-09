@@ -61,8 +61,8 @@ contract DssIncreaseDelay24SpellTest is DSTest {
     }
 
     function testIncreaseDelay24SpellIsCast() public {
-        // spell = DssIncreaseDelay24Spell(0xF267EFDDA842539a2cAff990259395188a86b813);
-        spell = new DssIncreaseDelay24Spell();
+        spell = DssIncreaseDelay24Spell(0x1A7D50b73ACf1D2b4073Ca5F94890A3C05C01401);
+        // spell = new DssIncreaseDelay24Spell();
 
         assertEq(pause.delay(), 0);
 
