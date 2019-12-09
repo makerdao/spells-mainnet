@@ -8,10 +8,9 @@ contract PauseLike {
 }
 
 contract DssIncreaseDelay24SpellAction {
-    PauseLike public pause =
-        PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
+    address constant public PAUSE = 0xbE286431454714F511008713973d3B053A2d38f3;
     function execute() external {
-        pause.setDelay(60 * 60 * 24);
+        PauseLike(PAUSE).setDelay(60 * 60 * 24);
     }
 }
 
