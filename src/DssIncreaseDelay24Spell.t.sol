@@ -44,6 +44,7 @@ contract DssIncreaseDelay24SpellTest is DSTest {
         PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
     ERC20 gov = ERC20(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
+
     DssIncreaseDelay24Spell spell;
 
     function vote() private {
@@ -69,7 +70,13 @@ contract DssIncreaseDelay24SpellTest is DSTest {
         vote();
         spell.cast();
 
+        // test ETH_OSM rely on OSM_MOM
+        // test BAT_OSM rely on OSM_MOM
+        // test OSM_MOM Authority is Chief
+        // test OSM_MOM has OSM for ETH-A
+        // test OSM_MOM has OSM for BAT-A
         assertEq(pause.delay(), 60 * 60 * 24);
     }
 
+    // add test for checking canCall on OSM-MOM
 }
