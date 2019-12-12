@@ -8,6 +8,10 @@ contract PauseLike {
     function owner() external returns(address);
 }
 
+contract OSMLike {
+    function rely(address) external;
+}
+
 contract OSMMomLike {
     function setAuthority(address) external;
     function setOsm(bytes32, address) external;
@@ -20,7 +24,7 @@ contract DssIncreaseDelay24SpellAction {
     address constant public ETH_OSM = 0x81fe72b5a8d1a857d176c3e7d5bd2679a9b85763;
     address constant public BAT_OSM = 0xb4eb54af9cc7882df0121d26c5b97e802915abe6;
 
-    address constant public OSM_MOM = address(0); // TODO add deployed address
+    address constant public OSM_MOM = address(0); // TODO(cmooney) add deployed address
 
     function execute() external {
         OSMLike(ETH_OSM).rely(OSM_MOM);
