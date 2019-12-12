@@ -93,7 +93,6 @@ contract DssIncreaseDelay24SpellTest is DSTest {
         assertEq(bat_osm.wards(address(osm_mom)), 1);
 
         // test OSM_MOM Authority is Chief
-        // TODO(brian): make sure the interface is conformant
         assertEq(osm_mom.authority(), address(chief));
 
         // test OSM_MOM has OSM for ETH-A
