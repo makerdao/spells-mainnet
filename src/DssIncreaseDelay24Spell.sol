@@ -21,10 +21,10 @@ contract DssIncreaseDelay24SpellAction {
     address constant public PAUSE = 0xbE286431454714F511008713973d3B053A2d38f3;
     address constant public CHIEF = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
 
-    address constant public ETH_OSM = 0x81fe72b5a8d1a857d176c3e7d5bd2679a9b85763;
-    address constant public BAT_OSM = 0xb4eb54af9cc7882df0121d26c5b97e802915abe6;
+    address constant public ETH_OSM = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
+    address constant public BAT_OSM = 0xB4eb54AF9Cc7882DF0121d26c5b97E802915ABe6;
 
-    address constant public OSM_MOM = address(0); // TODO(cmooney) add deployed address
+    address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
 
     function execute() external {
         OSMLike(ETH_OSM).rely(OSM_MOM);
