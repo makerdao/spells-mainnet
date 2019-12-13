@@ -80,7 +80,8 @@ contract DssIncreaseDelay24SpellTest is DSTest {
     }
 
     function testIncreaseDelay24SpellIsCast() public {
-        spell = new DssIncreaseDelay24Spell();
+        // spell = new DssIncreaseDelay24Spell();
+        spell = DssIncreaseDelay24Spell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
 
         assertEq(pause.delay(), 0);
 
@@ -123,6 +124,44 @@ contract DssIncreaseDelay24SpellTest is DSTest {
 
     // non-authorized call to osm_mom.stop() should fail
     function testFailCanCall() public {
+        // spell = new DssIncreaseDelay24Spell();
+        spell = DssIncreaseDelay24Spell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
+
+        assertEq(pause.delay(), 0);
+
+        vote();
+        spell.cast();
+
+        // test ETH_OSM rely on OSM_MOM
+        assertEq(eth_osm.wards(address(osm_mom)), 1);
+
+        // test BAT_OSM rely on OSM_MOM
+        assertEq(bat_osm.wards(address(osm_mom)), 1);
+
+        // test OSM_MOM authority is chief
+        assertEq(osm_mom.authority(), address(chief));
+
+        // test OSM_MOM owner is pause_proxy from deploy
+        assertEq(osm_mom.owner(), address(pause_proxy));
+
+        // test OSM_MOM has OSM for ETH-A
+        assertEq(osm_mom.osms('ETH-A'), address(eth_osm));
+
+        // test OSM_MOM has OSM for BAT-A
+        assertEq(osm_mom.osms('BAT-A'), address(bat_osm));
+
+        // test that the new pause delay is 24 hours
+        assertEq(pause.delay(), 60 * 60 * 24);
+
+        // just make sure the hat can call osm_mom.stop()
+        address[] memory vote = new address[](1);
+        vote[0] = address(0x1);
+
+        chief.vote(vote);
+        chief.lift(address(0x1));
+        assertEq(chief.hat(), address(0x1));
+        assertEq(osm_mom.authority(), address(chief));
+
         osm_mom.stop('ETH-A');
     }
 }
