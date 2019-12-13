@@ -45,6 +45,7 @@ contract OSMLike {
 contract OSMMomLike {
     function authority() external view returns (address);
     function osms(bytes32) external view returns (address);
+    function owner() external view returns (address);
     function setAuthority(address) external;
     function setOsm(bytes32, address) external;
 }
@@ -92,8 +93,11 @@ contract DssIncreaseDelay24SpellTest is DSTest {
         // test BAT_OSM rely on OSM_MOM
         assertEq(bat_osm.wards(address(osm_mom)), 1);
 
-        // test OSM_MOM Authority is Chief
+        // test OSM_MOM authority is chief
         assertEq(osm_mom.authority(), address(chief));
+
+        // test OSM_MOM owner is pause from deploy
+        assertEq(osm_mom.owner(), address(pause));
 
         // test OSM_MOM has OSM for ETH-A
         assertEq(osm_mom.osms('ETH-A'), address(eth_osm));
@@ -103,9 +107,26 @@ contract DssIncreaseDelay24SpellTest is DSTest {
 
         // test that the new pause delay is 24 hours
         assertEq(pause.delay(), 60 * 60 * 24);
-
-        fail();
     }
 
-    // TODO(iamchrissmith): add test for checking canCall on OSM-MOM
+    // non-authorized call to osm_mom.stop() should fail
+    function testFailCanCall() public {
+        osm_mom.stop('ETH-A');
+    }
+
+    // just make sure the hat can call osm_mom.stop()
+    function testCanCall() public {
+        gov.approve(address(chief), uint256(-1));
+        chief.lock(gov.balanceOf(address(this)));
+
+        address[] memory vote = new address[](1);
+        vote[0] = address(this);
+
+        chief.vote(vote);
+        chief.lift(address(this));
+        assertEq(chief.hat(), address(this));
+
+        osm_mom.stop('ETH-A');
+        osm_mom.stop('BAT-A');
+    }
 }
