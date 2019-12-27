@@ -120,8 +120,8 @@ contract DssDecember27SpellTest is DSTest {
     }
 
     function testDecember27SpellIsCast() public {
-        // spell = DssDecember27Spell(0xF267EFDDA842539a2cAff990259395188a86b813);
-        spell = new DssDecember27Spell();
+        spell = DssDecember27Spell(0x94c19E029F5A1A115F3B99aD87da24D33E60A0E1);
+        // spell = new DssDecember27Spell();
         assertEq(tub.cap(), 95000000 * 10 ** 18);
         assertEq(vat.Line(), 178000000 * RAD);
         (,,,uint line,) = vat.ilks("ETH-A");
