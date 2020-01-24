@@ -23,8 +23,8 @@ contract SpellAction is DSMath {
         JugAbstract(JUG).drip("ETH-A");
         JugAbstract(JUG).drip("BAT-A");
 
-        // set the global debt ceiling to 228,000,000
-        VatAbstract(VAT).file("Line", mul(228000000, RAD));
+        // set the global debt ceiling to 173,000,000
+        VatAbstract(VAT).file("Line", mul(173000000, RAD));
 
         // set the ETH-A debt ceiling to 125,000,000
         VatAbstract(VAT).file("ETH-A", "line", mul(125000000, RAD));

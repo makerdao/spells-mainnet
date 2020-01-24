@@ -88,8 +88,8 @@ contract DssJanuary24SpellTest is DSTest, DSMath {
         (,,, uint256 lineSAI,) = vat.ilks("SAI");
         assertEq(lineSAI, mul(100000000, RAD));
 
-        // Line = 173mm
-        assertEq(vat.Line(), mul(173000000, RAD));
+        // Line = 203mm
+        assertEq(vat.Line(), mul(203000000, RAD));
 
         // SCD DC = 70mm
         assertEq(tub.cap(), mul(70000000, WAD));
