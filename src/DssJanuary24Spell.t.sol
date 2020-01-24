@@ -6,10 +6,6 @@ import "lib/dss-interfaces/src/Interfaces.sol";
 
 import {DssJanuary24Spell} from "./DssJanuary24Spell.sol";
 
-contract ProxyLike {
-    function execute(address, bytes memory) public payable;
-}
-
 contract TubLike {
     function ink(bytes32) public view returns (uint);
     function per() public view returns (uint);
@@ -88,8 +84,12 @@ contract DssJanuary24SpellTest is DSTest, DSMath {
         (,,, uint256 lineETH,) = vat.ilks("ETH-A");
         assertEq(lineETH, mul(100000000, RAD));
 
-        // Line = 203mm
-        assertEq(vat.Line(), mul(203000000, RAD));
+        // SAI line = 100mm
+        (,,, uint256 lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, mul(100000000, RAD));
+
+        // Line = 173mm
+        assertEq(vat.Line(), mul(173000000, RAD));
 
         // SCD DC = 70mm
         assertEq(tub.cap(), mul(70000000, WAD));
@@ -113,8 +113,12 @@ contract DssJanuary24SpellTest is DSTest, DSMath {
         (,,, lineETH,) = vat.ilks("ETH-A");
         assertEq(lineETH, mul(125000000, RAD));
 
+        // SAI line = 45mm
+        (,,, lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, mul(45000000, RAD));
+
         // Line = 228mm
-        assertEq(vat.Line(), mul(228000000, RAD));
+        assertEq(vat.Line(), mul(173000000, RAD));
 
         // SCD DC = 45mm
         assertEq(tub.cap(), mul(45000000, WAD));

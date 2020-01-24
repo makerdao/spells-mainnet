@@ -6,7 +6,7 @@ import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
-contract MomLike {
+contract SaiMomLike {
     function setCap(uint256) external;
     function setFee(uint256) external;
 }
@@ -28,6 +28,9 @@ contract SpellAction is DSMath {
 
         // set the ETH-A debt ceiling to 125,000,000
         VatAbstract(VAT).file("ETH-A", "line", mul(125000000, RAD));
+
+        // set the SAI debt ceiling to 45,000,000
+        VatAbstract(VAT).file("SAI", "line", mul(45000000, RAD));
 
         // set dsr to 7.75%
         PotAbstract(POT).file("dsr", 1000000002366931224128103346);
@@ -72,7 +75,7 @@ contract DssJanuary24Spell is DSMath {
         // preventing these SCD changes from being executed again.
 
         // Lower Debt Ceiling in SCD to 45,000,000
-        MomLike(SAIMOM).setCap(SCDCAP);
+        SaiMomLike(SAIMOM).setCap(SCDCAP);
     }
 
     function cast() public {
