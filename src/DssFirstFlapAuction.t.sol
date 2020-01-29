@@ -40,7 +40,7 @@ contract HasBidLike {
 contract Bidder {
     Flapper flap        = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
     MkrLike gov        = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    uint256  constant ONE = 1.00E18;
+    uint256 constant ONE = 1.00E18;
 
     constructor() public {}
 
@@ -64,9 +64,6 @@ contract DssFirstFlapAuction is DSTest {
     Flapper flap        = Flapper(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
     MkrLike gov        = MkrLike(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
 
-    // ProxyLike deployer = ProxyLike(0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc);
-    // DeployerActions deployerActions;
-
     uint256  constant RAD = 10 ** 45;
     uint256  constant ONE = 1.00E18;
 
@@ -74,23 +71,6 @@ contract DssFirstFlapAuction is DSTest {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(now);
     }
-
-    // function setupFlap() private returns(uint) {
-    //     uint256 surplus = vat.dai(address(vow));
-    //     uint256 debt = vat.sin(address(vow)) - vow.Sin() - vow.Ash();
-    //     uint256 bump = vow.bump();
-    //     uint256 hump = vow.hump();
-    //     // vat.suck(address(this), address(vow), surplus + debt + bump + hump);
-    //     // vow.heal(debt);
-    //     return vow.flap();
-    // }
-
-    // function bidFlap(uint256 id) private {
-    //     // gov.approve(address(flap), uint256(-1));
-    //     uint256 lot = vow.bump();
-    //     uint256 bid = 1;
-    //     flap.tend(id, lot, bid);
-    // }
 
     function testDssFirstFlap() public {
         uint256 debt = vat.sin(address(vow)) - vow.Sin() - vow.Ash();
