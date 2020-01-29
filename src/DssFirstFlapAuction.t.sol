@@ -103,13 +103,13 @@ contract DssFirstFlapAuction is DSTest {
         uint256 flappedSurplus = vat.dai(address(vow));
         assertTrue(futureSurplus - flappedSurplus == bump);
 
-        (uint256 bid, uint256 lot, address guy, uint48 tic, uint48 end) = flap.bids(flapId);
-        assertEq(bid, 0);
-        assertEq(lot, bump);
-        assertEq(vat.dai(address(flap)), lot);
-        assertEq(guy, address(vow));
-        assertTrue(tic == 0);
-        assertTrue(end == now + flap.tau());
+        HasBidLike.Bid memory bid = HasBidLike(address(flap)).bids(flapId);
+        assertEq(bid.bid, 0);
+        assertEq(bid.lot, bump);
+        assertEq(bid.guy, address(vow));
+        assertTrue(bid.tic == 0);
+        assertTrue(bid.end == now + flap.tau());
+        assertEq(vat.dai(address(flap)), bid.lot);
     }
 
     function testDssFlapAuction() public {
