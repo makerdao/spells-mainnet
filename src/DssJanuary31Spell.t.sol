@@ -70,8 +70,8 @@ contract DssJanuary31SpellTest is DSTest, DSMath {
     }
 
     function testDssJanuary31SpellIsCast() public {
-        // spell = DssJanuary31Spell(0x201C006C4556863533158855Eca3878B28e6E85b);
-        spell = new DssJanuary31Spell();
+        spell = DssJanuary31Spell(0x48916A2B11fA7a895426EeDF9ACf2d70523b1677);
+        // spell = new DssJanuary31Spell();
 
         // (ETH-A, BAT-A, DSR) = (8%, 8%, 7.75%)
         (uint dutyETH,) = jug.ilks("ETH-A");
