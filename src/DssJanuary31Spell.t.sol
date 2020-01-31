@@ -78,7 +78,7 @@ contract DssJanuary31SpellTest is DSTest, DSMath {
         (uint dutyBAT,) = jug.ilks("BAT-A");
         assertEq(dutyETH,   1000000002440418608258400030);
         assertEq(dutyBAT,   1000000002440418608258400030);
-        // assertEq(pot.dsr(), 1000000001847694957439350562);
+        assertEq(pot.dsr(), 1000000002366931224128103346);
 
         // ETH-A line = 125mm
         (,,, uint256 lineETH,) = vat.ilks("ETH-A");
@@ -103,8 +103,8 @@ contract DssJanuary31SpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // dsr = 7.75%
-        // assertEq(pot.dsr(), 1000000002366931224128103346);
+        // dsr = 8.75%
+        assertEq(pot.dsr(), 1000000002659864411854984565);
 
         // (ETH-A, BAT-A) = (9%, 9%)
         (dutyETH,) = jug.ilks("ETH-A");

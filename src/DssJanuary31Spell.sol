@@ -19,7 +19,7 @@ contract SpellAction is DSMath {
 
     function execute() external {
         // drip
-        // PotAbstract(POT).drip();
+        PotAbstract(POT).drip();
         JugAbstract(JUG).drip("ETH-A");
         JugAbstract(JUG).drip("BAT-A");
 
@@ -32,8 +32,8 @@ contract SpellAction is DSMath {
         // set the SAI debt ceiling to 30,000,000
         VatAbstract(VAT).file("SAI", "line", mul(30000000, RAD));
 
-        // // set dsr to 7.75%
-        // PotAbstract(POT).file("dsr", 1000000002366931224128103346);
+        // set dsr to 8.75%
+        PotAbstract(POT).file("dsr", 1000000002659864411854984565);
 
         // SF = 9%
         uint256 sf = 1000000002732676825177582095;
