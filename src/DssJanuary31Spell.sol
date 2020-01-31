@@ -26,9 +26,6 @@ contract SpellAction is DSMath {
         // set the global debt ceiling to 158,000,000 (125 + 30 + 3)
         VatAbstract(VAT).file("Line", mul(158000000, RAD));
 
-        // // set the ETH-A debt ceiling to 125,000,000
-        // VatAbstract(VAT).file("ETH-A", "line", mul(125000000, RAD));
-
         // set the SAI debt ceiling to 30,000,000
         VatAbstract(VAT).file("SAI", "line", mul(30000000, RAD));
 
