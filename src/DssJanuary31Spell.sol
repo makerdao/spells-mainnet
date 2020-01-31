@@ -30,14 +30,19 @@ contract SpellAction is SaiConstants, DSMath {
         JugAbstract(JUG).drip("ETH-A");
         JugAbstract(JUG).drip("BAT-A");
 
-        // set the global debt ceiling to 158,000,000 (125 + 30 + 3)
-        VatAbstract(VAT).file("Line", mul(158000000, RAD));
-
         // // set the ETH-A debt ceiling to 125,000,000
         // VatAbstract(VAT).file("ETH-A", "line", mul(125000000, RAD));
 
         // set the SAI debt ceiling to 30,000,000 set as RAD
         VatAbstract(VAT).file("SAI", "line", mul(SCDCAP, RAD));
+
+        // set the global debt ceiling to 158,000,000 (125 + 30 + 3)
+        (,,,uint256 lineSAI,) = VatAbstract(VAT).ilks("SAI");    // RAD
+        (,,,uint256 lineETH,) = VatAbstract(VAT).ilks("ETH-A");  // RAD
+        (,,,uint256 lineBAT,) = VatAbstract(VAT).ilks("BAT-A");  // RAD
+
+        uint256 LineVat = add(add(lineSAI, lineETH), lineBAT);
+        VatAbstract(VAT).file("Line", LineVat);
 
         // set dsr to 8.75%
         PotAbstract(POT).file("dsr", 1000000002659864411854984565);
