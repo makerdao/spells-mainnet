@@ -29,7 +29,7 @@ contract SpellAction is DSMath {
         // https://vote.makerdao.com/polling-proposal/qmsm1q1hohyctsgxpbm44fomjoukf1d5g9lmpqraikmeoc
         VatAbstract(VAT).file("ETH-A", "line", mul(150000000, RAD));
 
-        // No Sai debt celing change this week.
+        // No Sai debt ceiling change this week.
 
         // set dsr to 8.0%
         // Previously ETH SF was set to 8.0%, no change this week.
