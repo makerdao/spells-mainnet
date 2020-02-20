@@ -22,7 +22,8 @@ contract SpellAction is DSMath {
         JugAbstract(JUG).drip("ETH-A");
         JugAbstract(JUG).drip("BAT-A");
 
-        // No Global Debt Ceiling increase this week
+        // set the global debt ceiling to 183,000,000
+        VatAbstract(VAT).file("Line", mul(183000000, RAD));
 
         // set the ETH-A debt ceiling to 150,000,000
         // https://vote.makerdao.com/polling-proposal/qmsm1q1hohyctsgxpbm44fomjoukf1d5g9lmpqraikmeoc
@@ -38,7 +39,7 @@ contract SpellAction is DSMath {
         PotAbstract(POT).file("dsr", 1000000002440418608258400030);
 
         // MCD Stability fee is currently at 8% and remains the same this week.
-        //
+        // https://vote.makerdao.com/polling-proposal/qmzgvzjm4xpm4b1tk2hxhdc6p8f4zqyju38pwqieatmhel
 
         // Lower the minimum flap auction bid increase to 2%
         // https://vote.makerdao.com/polling-proposal/qmtsxrqavtczfsseytpypgqrz6z8zb613ikxwhqjv9ytzz
@@ -46,7 +47,7 @@ contract SpellAction is DSMath {
     }
 }
 
-contract DssJanuary24Spell is DSMath {
+contract DssFebruary21Spell is DSMath {
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
