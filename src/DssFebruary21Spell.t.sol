@@ -61,7 +61,7 @@ contract DssFebruary21SpellTest is DSTest, DSMath {
     }
 
     function testDssFebruary21SpellIsCast() public {
-        //spell = DssJanuary24Spell(0xf880D43bB9a32Dd212C77b82A7336bE31eCaee08);
+        //spell = DssFebruary21Spell(<addr>);
         spell = new DssFebruary21Spell();
 
         // (ETH-A, BAT-A, DSR) = (8%, 8%, 7.5%)
