@@ -36,7 +36,7 @@ contract DssFebruary21SpellTest is DSTest, DSMath {
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-        gov.mint(300000*10**18);
+        gov.mint(address(this), 300000 ether);
     }
 
     function vote() private {

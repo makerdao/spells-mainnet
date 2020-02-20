@@ -10,6 +10,7 @@ import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 
 contract SpellAction is DSMath {
     uint256 constant RAD = 10 ** 45;
+    address constant public PAUSE = 0xbE286431454714F511008713973d3B053A2d38f3;
     address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
@@ -44,6 +45,9 @@ contract SpellAction is DSMath {
         // Lower the minimum flap auction bid increase to 2%
         // https://vote.makerdao.com/polling-proposal/qmtsxrqavtczfsseytpypgqrz6z8zb613ikxwhqjv9ytzz
         FlapAbstract(FLAP).file("beg", NEW_BID);
+
+        // Increase the Pause to 24 Hours
+        DSPauseAbstract(PAUSE).setDelay(60 * 60 * 24);
     }
 }
 
@@ -84,8 +88,5 @@ contract DssFebruary21Spell is DSMath {
         // Sai Stability Fee adjustment to 9.5%
         // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
         SaiMomAbstract(SAIMOM).setFee(NEWFEE);
-
-        // Increase the Pause to 24 Hours
-        pause.setDelay(60 * 60 * 24);
     }
 }
