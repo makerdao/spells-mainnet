@@ -1,0 +1,87 @@
+pragma solidity 0.5.12;
+
+import "ds-math/math.sol";
+import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
+import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/PotAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlapAbstract.sol";
+import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
+
+contract SpellAction is DSMath {
+    uint256 constant RAD = 10 ** 45;
+    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    address constant public FLAP = 0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f;
+    uint256 constant NEW_BID = 1.02E18; // 2%
+
+    function execute() external {
+        // drip
+        PotAbstract(POT).drip();
+        JugAbstract(JUG).drip("ETH-A");
+        JugAbstract(JUG).drip("BAT-A");
+
+        // No Global Debt Ceiling increase this week
+
+        // set the ETH-A debt ceiling to 150,000,000
+        // https://vote.makerdao.com/polling-proposal/qmsm1q1hohyctsgxpbm44fomjoukf1d5g9lmpqraikmeoc
+        VatAbstract(VAT).file("ETH-A", "line", mul(150000000, RAD));
+
+        // No Sai debt celing change this week.
+
+        // set dsr to 8.0%
+        // Previously ETH SF was set to 8.0%, no change this week.
+        //  DSR rate was voted to a 0% spread, so we're bringing DSR up
+        //  to match.
+        // https://vote.makerdao.com/polling-proposal/qmss9hnszwr6egq3xn6gpx4u8bz8cajja56rgtanjev1v8
+        PotAbstract(POT).file("dsr", 1000000002440418608258400030);
+
+        // MCD Stability fee is currently at 8% and remains the same this week.
+        //
+
+        // Lower the minimum flap auction bid increase to 2%
+        // https://vote.makerdao.com/polling-proposal/qmtsxrqavtczfsseytpypgqrz6z8zb613ikxwhqjv9ytzz
+        FlapAbstract(FLAP).file("beg", NEW_BID);
+    }
+}
+
+contract DssJanuary24Spell is DSMath {
+    DSPauseAbstract  public pause =
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    uint256 constant public NEWFEE = 1000000002877801985002875644; // 9.5%
+    address          public action;
+    bytes32          public tag;
+    uint256          public eta;
+    bytes            public sig;
+    bool             public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+        action = address(new SpellAction());
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = add(now, DSPauseAbstract(pause).delay());
+        pause.plot(action, tag, sig, eta);
+
+        // NOTE: 'eta' check should mimic the old behavior of 'done', thus
+        // preventing these SCD changes from being executed again.
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+
+        // Sai Stability Fee adjustment to 9.5%
+        // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
+        SaiMomAbstract(SAIMOM).setFee(NEWFEE);
+    }
+}
