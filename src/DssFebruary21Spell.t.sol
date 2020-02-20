@@ -88,6 +88,9 @@ contract DssFebruary21SpellTest is DSTest, DSMath {
         // Flap = 3%
         assertEq(flap.beg(), 1.03E18);
 
+        // Pause is 0
+        assertEq(pause.delay(), 0);
+
         vote();
         scheduleWaitAndCast();
 
@@ -117,6 +120,9 @@ contract DssFebruary21SpellTest is DSTest, DSMath {
 
         // Flap = 2%
         assertEq(flap.beg(), 1.02E18);
+
+        // Pause is 86400 (1 day)
+        assertEq(pause.delay(), 86400);
     }
 
 }

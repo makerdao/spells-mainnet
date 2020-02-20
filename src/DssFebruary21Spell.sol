@@ -84,5 +84,8 @@ contract DssFebruary21Spell is DSMath {
         // Sai Stability Fee adjustment to 9.5%
         // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
         SaiMomAbstract(SAIMOM).setFee(NEWFEE);
+
+        // Increase the Pause to 24 Hours
+        DSPauseAbstract(PAUSE).setDelay(60 * 60 * 24);
     }
 }
