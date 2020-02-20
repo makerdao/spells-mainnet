@@ -86,6 +86,6 @@ contract DssFebruary21Spell is DSMath {
         SaiMomAbstract(SAIMOM).setFee(NEWFEE);
 
         // Increase the Pause to 24 Hours
-        DSPauseAbstract(PAUSE).setDelay(60 * 60 * 24);
+        pause.setDelay(60 * 60 * 24);
     }
 }
