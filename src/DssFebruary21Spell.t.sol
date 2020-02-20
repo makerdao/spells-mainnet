@@ -7,17 +7,9 @@ import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
 import {Pot} from "dss/pot.sol";
 import {ERC20} from "erc20/erc20.sol";
+import {DSChief} from "ds-chief/chief.sol";
 
 import {DssFebruary21Spell} from "./DssFebruary21Spell.sol";
-
-contract ChiefLike {
-    function hat() public view returns (address);
-    function lock(uint) public;
-    function vote(address[] memory) public;
-    function lift(address) public;
-    function deposits(address) public returns(uint);
-    function approvals(address) public returns(uint);
-}
 
 contract ProxyLike {
     function execute(address, bytes memory) public payable;
@@ -64,7 +56,7 @@ contract DssFebruary21Test is DSTest {
     PauseLike public pause =
         PauseLike(0xbE286431454714F511008713973d3B053A2d38f3);
     ERC20 gov = ERC20(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
+    DSChief chief = DSChief(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     address pause_proxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
     address constant public SAITOP = 0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3;
@@ -72,12 +64,13 @@ contract DssFebruary21Test is DSTest {
     DssFebruary21Spell spell;
 
     function vote() private {
-        gov.approve(address(chief), uint256(-1));
         uint balance = gov.balanceOf(address(this));
-        chief.lock(gov.balanceOf(address(this)));
-        assertEq(chief.deposits(address(this)), balance);
-        assertEq(chief.approvals(address(spell)), 0);
-        uint currentHat = chief.approvals(chief.hat());
+        DSChief(address(this)).lock(balance);
+        // deposits[address(this)] = add(deposits[address(this)], balance);
+        // addWeight(balance, votes[address(this)]);
+        // assertEq(this.deposits(address(this)), balance);
+        // assertEq(this.approvals(address(spell)), 0);
+        uint currentHat = DSChief(address(this)).approvals(DSChief(address(this)).hat());
         emit log_named_uint("bal", balance);
         emit log_named_uint("hat", currentHat);
 
@@ -86,9 +79,9 @@ contract DssFebruary21Test is DSTest {
         address[] memory vote = new address[](1);
         vote[0] = address(spell);
 
-        chief.vote(vote);
-        assertEq(chief.approvals(address(spell)), balance);
-        assertTrue(chief.approvals(chief.hat()) < balance);
+        DSChief(address(this)).vote(vote);
+        assertEq(DSChief(address(this)).approvals(address(spell)), balance);
+        assertTrue(DSChief(address(this)).approvals(DSChief(address(this)).hat()) < balance);
         // chief.lift(address(spell));
         // assertEq(chief.hat(), address(spell));
     }
