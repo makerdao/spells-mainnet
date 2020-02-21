@@ -34,8 +34,7 @@ contract SpellAction is DSMath {
 
         // set dsr to 8.0%
         // Previously ETH SF was set to 8.0%, no change this week.
-        //  DSR rate was voted to a 0% spread, so we're bringing DSR up
-        //  to match.
+        //  DSR rate was voted to a 0% spread, so we're bringing DSR up to match.
         // https://vote.makerdao.com/polling-proposal/qmss9hnszwr6egq3xn6gpx4u8bz8cajja56rgtanjev1v8
         PotAbstract(POT).file("dsr", 1000000002440418608258400030);
 
@@ -55,7 +54,7 @@ contract DssSpell20200221 is DSMath {
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
-    uint256 constant public NEWFEE = 1000000002877801985002875644; // 9.5%
+    uint256 constant public NEW_FEE = 1000000002877801985002875644; // 9.5%
     address          public action;
     bytes32          public tag;
     uint256          public eta;
@@ -87,6 +86,6 @@ contract DssSpell20200221 is DSMath {
 
         // Sai Stability Fee adjustment to 9.5%
         // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
-        SaiMomAbstract(SAIMOM).setFee(NEWFEE);
+        SaiMomAbstract(SAIMOM).setFee(NEW_FEE);
     }
 }
