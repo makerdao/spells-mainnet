@@ -24,6 +24,10 @@ contract DssSpell20200221Test is DSTest, DSMath {
     FlapAbstract  flap = FlapAbstract(0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f);
     MKRAbstract    gov = MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     SaiTubAbstract tub = SaiTubAbstract(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
+    OsmAbstract eth_osm = OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763);
+    OsmAbstract bat_osm = OsmAbstract(0xB4eb54AF9Cc7882DF0121d26c5b97E802915ABe6);
+    OsmMomAbstract osm_mom = OsmMomAbstract(0x76416A4d5190d071bfed309861527431304aA14f);
+    address pause_proxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
 
     DssSpell20200221 spell;
 
@@ -96,6 +100,24 @@ contract DssSpell20200221Test is DSTest, DSMath {
 
         vote();
         scheduleWaitAndCast();
+
+        // test ETH_OSM rely on OSM_MOM
+        assertEq(eth_osm.wards(address(osm_mom)), 1);
+
+        // test BAT_OSM rely on OSM_MOM
+        assertEq(bat_osm.wards(address(osm_mom)), 1);
+
+        // test OSM_MOM authority is chief
+        assertEq(osm_mom.authority(), address(chief));
+
+        // test OSM_MOM owner is pause_proxy from deploy
+        assertEq(osm_mom.owner(), address(pause_proxy));
+
+        // test OSM_MOM has OSM for ETH-A
+        assertEq(osm_mom.osms('ETH-A'), address(eth_osm));
+
+        // test OSM_MOM has OSM for BAT-A
+        assertEq(osm_mom.osms('BAT-A'), address(bat_osm));
 
         // spell done
         assertTrue(spell.done());
