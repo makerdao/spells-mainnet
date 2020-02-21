@@ -85,7 +85,7 @@ contract DssSpell20200221Test is DSTest, DSMath {
 
         // SCD DC = 30mm
         assertEq(tub.cap(), mul(30000000, WAD));
-        // SCD Fee = ?
+        // SCD Fee = 9%
         assertEq(tub.fee(), 1000000002732676825177582095);
 
         // Flap = 3%
