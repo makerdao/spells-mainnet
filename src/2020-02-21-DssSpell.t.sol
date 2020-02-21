@@ -40,6 +40,7 @@ contract DssSpell20200221Test is DSTest, DSMath {
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
+        // Using the Flopper test address, mint enough MKR to overcome the current hat.
         gov.mint(address(this), 300000 ether);
     }
 
