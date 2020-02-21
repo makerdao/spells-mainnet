@@ -88,15 +88,15 @@ contract DssSpell20200221 is DSMath {
 
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
         // preventing these SCD changes from being executed again.
+
+        // Sai Stability Fee adjustment to 9.5%
+        // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
+        SaiMomAbstract(SAIMOM).setFee(NEW_FEE);
     }
 
     function cast() public {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
-
-        // Sai Stability Fee adjustment to 9.5%
-        // https://vote.makerdao.com/polling-proposal/qmaj4fnjeohomnrs8m9cihrfxws4m89bwfu9eh96y8okxw
-        SaiMomAbstract(SAIMOM).setFee(NEW_FEE);
     }
 }
