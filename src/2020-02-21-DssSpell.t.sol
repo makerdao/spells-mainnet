@@ -67,8 +67,8 @@ contract DssSpell20200221Test is DSTest, DSMath {
     }
 
     function mainTests() public {
-        //spell = DssSpell20200221(<addr>);
-        spell = new DssSpell20200221();
+        spell = DssSpell20200221(0xD24FbbB4497AD32308BDa735683B55499Ddc2CaD);
+        // spell = new DssSpell20200221();
 
         // (ETH-A, BAT-A, DSR) = (8%, 8%, 7.5%)
         (uint dutyETH,) = jug.ilks("ETH-A");
@@ -162,8 +162,16 @@ contract DssSpell20200221Test is DSTest, DSMath {
         spell.schedule();
         hevm.warp(add(now, 60 * 60 * 24));
         spell.cast();
-
         assertEq(vat.Line(), 0);
+
+        // Check a spell which voids the OSMs via OsmMom doesn't need to wait for 24 hours
+        assertEq(eth_osm.stopped(), 0);
+        assertEq(bat_osm.stopped(), 0);
+        spell = DssSpell20200221(address(new OSMVoidSpell()));
+        vote();
+        spell.cast(); // No time needed to wait
+        assertEq(eth_osm.stopped(), 1);
+        assertEq(bat_osm.stopped(), 1);
     }
 
     function testFailSpell20200221IsCast() public {
@@ -214,5 +222,16 @@ contract RandomSpell is DSMath {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
+    }
+}
+
+contract OSMVoidSpell is DSMath {
+    address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
+    bool             public done;
+
+    function cast() public {
+        done = true;
+        OsmMomAbstract(OSM_MOM).stop("ETH-A");
+        OsmMomAbstract(OSM_MOM).stop("BAT-A");
     }
 }
