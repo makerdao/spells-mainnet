@@ -15,7 +15,7 @@ contract SpellAction is DSMath {
     address constant public JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
     address constant public FLAP = 0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f;
-    uint256 constant NEW_BID = 1.02E18; // 2%
+    uint256 constant NEW_BEG = 1.02E18; // 2%
 
     function execute() external {
         // drip
@@ -44,7 +44,7 @@ contract SpellAction is DSMath {
 
         // Lower the minimum flap auction bid increase to 2%
         // https://vote.makerdao.com/polling-proposal/qmtsxrqavtczfsseytpypgqrz6z8zb613ikxwhqjv9ytzz
-        FlapAbstract(FLAP).file("beg", NEW_BID);
+        FlapAbstract(FLAP).file("beg", NEW_BEG);
 
         // Increase the Pause to 24 Hours
         DSPauseAbstract(PAUSE).setDelay(60 * 60 * 24);
