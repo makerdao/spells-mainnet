@@ -9,12 +9,13 @@ function clean() { rm -rf "state"; }
 trap clean EXIT
 export LANG=C.UTF-8
 # Need to act from Multisig
-export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
+# export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
 export DAPP_TEST_TIMESTAMP=$(seth block latest timestamp)
 export DAPP_TEST_NUMBER=$(seth block latest number)
 
 # Create Flop proxy contract so we can mint MKR (flop address: 0x4D95A049d5B0b7d32058cd3F2163015747522e99)
-DIR="state/0x4D95A049d5B0b7d32058cd3F2163015747522e99"
+# DIR="state/0x4D95A049d5B0b7d32058cd3F2163015747522e99"
+DIR="state/0x8EE7D9235e01e6B42345120b5d270bdB763624C7"
 mkdir -p "$DIR"
 cd $DIR || exit 1
 # Simple Proxy with delegate call via execute(address,bytes memory)

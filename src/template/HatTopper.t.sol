@@ -6,7 +6,7 @@ import "lib/dss-interfaces/src/Interfaces.sol";
 
 /**
  * Must be executed from the Multisig address.
- * Use ./test-mkr-authority.sh to test
+ * Use ./src/template/test-example-hattopper.sh
  */
 
 contract Hevm {
@@ -82,7 +82,7 @@ contract HatTopperTest is DSTest, DSMath {
 
     DSChiefAbstract chief  = DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
 
-    address multisig       = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
+    ProxyLike multisig     = ProxyLike(0x8EE7D9235e01e6B42345120b5d270bdB763624C7);
     address proxyActions;
 
     Spell spell;
@@ -97,22 +97,24 @@ contract HatTopperTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
 
         spell = new Spell();
-
         proxyActions = address(new ProxyActions());
+    }
+
+    function mintMkr() private {
         uint preBalance = gov.balanceOf(address(this));
         assertEq(preBalance, 117993463894197760882203);
-        assertEq(DSAuthAbstract(address(gov)).owner(), multisig);
+        assertEq(DSAuthAbstract(address(gov)).owner(), address(multisig));
         uint hat = chief.approvals(chief.hat());
-        gov.mint(address(this), hat - preBalance + 2 ether);
-        // ProxyLike(address(multisig)).execute(
-        //     proxyActions,
-        //     abi.encodeWithSignature("doMint(address,address,uint)", address(gov), address(this), 1)
-        // );
+        // gov.mint(address(this), hat - preBalance + 2 ether);
+        ProxyLike(multisig).execute(
+            proxyActions,
+            abi.encodeWithSignature("doMint(address,address,uint)", address(gov), address(this), uint(2 ether))
+        );
         uint postBalance = gov.balanceOf(address(this));
         assertEq(postBalance, hat + 2 ether);
     }
 
-        function vote() private {
+    function vote() private {
         if (chief.hat() != address(spell)) {
             gov.approve(address(chief), uint256(-1));
             chief.lock(sub(gov.balanceOf(address(this)), 1 ether));
@@ -128,7 +130,7 @@ contract HatTopperTest is DSTest, DSMath {
         assertEq(chief.hat(), address(spell));
     }
 
-    function scheduleWaitAndCast() public {
+    function scheduleWaitAndCast() private {
         spell.schedule();
         hevm.warp(add(now, pause.delay()));
         spell.cast();
@@ -138,6 +140,7 @@ contract HatTopperTest is DSTest, DSMath {
         // Test pre-spell conditions
         assertTrue(pot.dsr() != 1000000000000000000000000000);
 
+        mintMkr();
         vote();
         scheduleWaitAndCast();
 
