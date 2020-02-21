@@ -66,7 +66,7 @@ contract DssSpell20200221Test is DSTest, DSMath {
         spell.cast();
     }
 
-    function testSpell20200221IsCast() public {
+    function mainTests() public {
         //spell = DssSpell20200221(<addr>);
         spell = new DssSpell20200221();
 
@@ -153,4 +153,66 @@ contract DssSpell20200221Test is DSTest, DSMath {
         assertEq(pause.delay(), 86400);
     }
 
+    function testSpell20200221IsCast() public {
+        mainTests();
+
+        // Retry to pass the same spell (this time will pass after 24 hours)
+        spell = DssSpell20200221(address(new RandomSpell()));
+        vote();
+        spell.schedule();
+        hevm.warp(add(now, 60 * 60 * 24));
+        spell.cast();
+
+        assertEq(vat.Line(), 0);
+    }
+
+    function testFailSpell20200221IsCast() public {
+        mainTests();
+
+        // Retry to pass the same spell (this time will pass after 24 hours)
+        spell = DssSpell20200221(address(new RandomSpell()));
+        vote();
+        spell.schedule();
+        hevm.warp(add(now, 60 * 60 * 24 - 1));
+        spell.cast();
+    }
+}
+
+contract RandomSpellSpellAction {
+    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+
+    function execute() external {
+        VatAbstract(VAT).file("Line", 0);
+    }
+}
+
+contract RandomSpell is DSMath {
+    DSPauseAbstract  public pause =
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address          public action;
+    bytes32          public tag;
+    uint256          public eta;
+    bytes            public sig;
+    bool             public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+        action = address(new RandomSpellSpellAction());
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = add(now, DSPauseAbstract(pause).delay());
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
 }
