@@ -2,6 +2,8 @@ pragma solidity 0.5.12;
 
 import "ds-math/math.sol";
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
@@ -11,6 +13,10 @@ import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 contract SpellAction is DSMath {
     uint256 constant RAD = 10 ** 45;
     address constant public PAUSE = 0xbE286431454714F511008713973d3B053A2d38f3;
+    address constant public CHIEF = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
+    address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
+    address constant public ETH_OSM = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
+    address constant public BAT_OSM = 0xB4eb54AF9Cc7882DF0121d26c5b97E802915ABe6;
     address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
@@ -46,6 +52,11 @@ contract SpellAction is DSMath {
         FlapAbstract(FLAP).file("beg", NEW_BEG);
 
         // Increase the Pause to 24 Hours
+        OsmAbstract(ETH_OSM).rely(OSM_MOM);
+        OsmAbstract(BAT_OSM).rely(OSM_MOM);
+        OsmMomAbstract(OSM_MOM).setAuthority(CHIEF);
+        OsmMomAbstract(OSM_MOM).setOsm("ETH-A", ETH_OSM);
+        OsmMomAbstract(OSM_MOM).setOsm("BAT-A", BAT_OSM);
         DSPauseAbstract(PAUSE).setDelay(60 * 60 * 24);
     }
 }
