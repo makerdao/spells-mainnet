@@ -85,6 +85,8 @@ contract DssSpell20200221Test is DSTest, DSMath {
 
         // SCD DC = 30mm
         assertEq(tub.cap(), mul(30000000, WAD));
+        // SCD Fee = ?
+        assertEq(tub.fee(), 1000000002732676825177582095);
 
         // Flap = 3%
         assertEq(flap.beg(), 1.03E18);
@@ -118,6 +120,8 @@ contract DssSpell20200221Test is DSTest, DSMath {
 
         // SCD DC = 30mm
         assertEq(tub.cap(), mul(30000000, WAD));
+        // SCD SF = 9.5%
+        assertEq(tub.fee(), 1000000002877801985002875644);
 
         // Flap = 2%
         assertEq(flap.beg(), 1.02E18);
