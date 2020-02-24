@@ -92,7 +92,7 @@ contract HatTopperTest is DSTest, DSMath {
         spell = new Spell();
     }
 
-    function mintMkr() private {
+    function mintMkrFrom0() private {
         uint preBalance = gov.balanceOf(address(this));
         gov.setOwner(address(0));
         assertEq(DSAuthAbstract(address(gov)).owner(), address(0));
@@ -101,6 +101,18 @@ contract HatTopperTest is DSTest, DSMath {
         assertTrue(hat > 0);
 
         MkrMinterLike(address(0)).doMint(address(gov), address(this), hat - preBalance + 2 ether);
+
+        uint postBalance = gov.balanceOf(address(this));
+        assertEq(postBalance, hat + 2 ether);
+    }
+
+    function mintMkrFromMultisig() private {
+        uint preBalance = gov.balanceOf(address(this));
+
+        uint hat = chief.approvals(chief.hat());
+        assertTrue(hat > 0);
+
+        MkrMinterLike(multisig).doMint(address(gov), address(this), hat - preBalance + 2 ether);
 
         uint postBalance = gov.balanceOf(address(this));
         assertEq(postBalance, hat + 2 ether);
@@ -128,11 +140,23 @@ contract HatTopperTest is DSTest, DSMath {
         spell.cast();
     }
 
-    function test_ExampleTest() public {
+    function test_ExampleTestFromMultisig() public {
         // Test pre-spell conditions
         assertTrue(pot.dsr() != 1000000000000000000000000000);
 
-        mintMkr();
+        mintMkrFromMultisig();
+        vote();
+        scheduleWaitAndCast();
+
+        // Test effects of Spell
+        assertTrue(pot.dsr() == 1000000000000000000000000000);
+    }
+
+    function test_ExampleTestFrom0() public {
+        // Test pre-spell conditions
+        assertTrue(pot.dsr() != 1000000000000000000000000000);
+
+        mintMkrFrom0();
         vote();
         scheduleWaitAndCast();
 
