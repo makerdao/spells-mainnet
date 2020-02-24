@@ -2,16 +2,8 @@ pragma solidity 0.5.12;
 
 import "ds-math/math.sol";
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-
-contract SaiMomLike {
-    function setOwner(address) external;
-    function owner() external view returns(address);
-}
-
-contract SaiTopLike {
-    function setOwner(address) external;
-    function owner() external view returns(address);
-}
+import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
+import "lib/dss-interfaces/src/sai/SaiTopAbstract.sol";
 
 contract SaiConstants {
     address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
@@ -28,7 +20,7 @@ contract SpellAction is SaiConstants, DSMath {
     }
 }
 
-contract DssFebruary21Spell is SaiConstants, DSMath {
+contract DssSpell is SaiConstants, DSMath {
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address          public action;
@@ -55,11 +47,11 @@ contract DssFebruary21Spell is SaiConstants, DSMath {
         // preventing these SCD changes from being executed again.
 
         // Use the Pause for SCD
-        SaiMomLike(SAIMOM).setOwner(address(DSPauseAbstract(pause).proxy()));
-        SaiTopLike(SAITOP).setOwner(address(DSPauseAbstract(pause).proxy()));
+        SaiMomAbstract(SAIMOM).setOwner(address(DSPauseAbstract(pause).proxy()));
+        SaiTopAbstract(SAITOP).setOwner(address(DSPauseAbstract(pause).proxy()));
         // Remove Chief Direct Access
-        SaiMomLike(SAIMOM).setAuthority(address(0));
-        SaiMomLike(SAITOP).setAuthority(address(0));
+        SaiMomAbstract(SAIMOM).setAuthority(address(0));
+        SaiTopAbstract(SAITOP).setAuthority(address(0));
     }
 
     function cast() public {
