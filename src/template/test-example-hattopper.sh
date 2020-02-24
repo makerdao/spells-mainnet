@@ -9,14 +9,14 @@ function clean() { rm -rf "state"; }
 trap clean EXIT
 export LANG=C.UTF-8
 # Need to act from Multisig
-# export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
+export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
 export DAPP_TEST_TIMESTAMP=$(seth block latest timestamp)
 export DAPP_TEST_NUMBER=$(seth block latest number)
 
 # Create Fake Multisig proxy actor so we can mint MKR (multisig address: 0x8EE7D9235e01e6B42345120b5d270bdB763624C7)
 # When the multisig is no longer owner of the MKR contract, this should be switched for 0x0000000000000000000000000000000000000000
-DIR="state/0x8EE7D9235e01e6B42345120b5d270bdB763624C7"
-# DIR="state/0x0000000000000000000000000000000000000000"
+# DIR="state/0x8EE7D9235e01e6B42345120b5d270bdB763624C7"
+DIR="state/0x0000000000000000000000000000000000000000"
 mkdir -p "$DIR"
 cd $DIR || exit 1
 # Simple Proxy with doMint(address gov, address dst, uint wad)
