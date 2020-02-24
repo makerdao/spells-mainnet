@@ -13,14 +13,8 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract ProxyActions {
-    function doMint(address gov, address guy, uint wad) public {
-        DSTokenAbstract(gov).mint(guy, wad);
-    }
-}
-
-contract ProxyLike {
-    function execute(address, bytes memory) public returns(bytes memory);
+contract MkrMinterLike {
+    function doMint(address, address, uint) external;
 }
 
 contract SpellAction {
@@ -82,8 +76,7 @@ contract HatTopperTest is DSTest, DSMath {
 
     DSChiefAbstract chief  = DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
 
-    ProxyLike multisig     = ProxyLike(0x8EE7D9235e01e6B42345120b5d270bdB763624C7);
-    address proxyActions;
+    address multisig     = 0x8EE7D9235e01e6B42345120b5d270bdB763624C7;
 
     Spell spell;
 
@@ -97,7 +90,6 @@ contract HatTopperTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
 
         spell = new Spell();
-        proxyActions = address(new ProxyActions());
     }
 
     function mintMkr() private {
@@ -106,10 +98,7 @@ contract HatTopperTest is DSTest, DSMath {
         assertEq(DSAuthAbstract(address(gov)).owner(), address(multisig));
         uint hat = chief.approvals(chief.hat());
         // gov.mint(address(this), hat - preBalance + 2 ether);
-        ProxyLike(multisig).execute(
-            proxyActions,
-            abi.encodeWithSignature("doMint(address,address,uint)", address(gov), address(this), uint(2 ether))
-        );
+        MkrMinterLike(multisig).doMint(address(gov), address(this), 2 ether);
         uint postBalance = gov.balanceOf(address(this));
         assertEq(postBalance, hat + 2 ether);
     }
