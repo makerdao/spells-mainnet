@@ -10,47 +10,6 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract TestDelaySpellAction {
-    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
-    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-
-    function execute() external {
-        VatAbstract(VAT).file("Line", 0);
-        SaiMomAbstract(SAIMOM).setCap(0);
-    }
-}
-
-contract TestDelaySpell is DSMath {
-    DSPauseAbstract  public pause =
-        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
-    address          public action;
-    bytes32          public tag;
-    uint256          public eta;
-    bytes            public sig;
-    bool             public done;
-
-    constructor() public {
-        sig = abi.encodeWithSignature("execute()");
-        action = address(new TestDelaySpellAction());
-        bytes32 _tag;
-        address _action = action;
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
-    }
-
-    function schedule() public {
-        require(eta == 0, "spell-already-scheduled");
-        eta = add(now, DSPauseAbstract(pause).delay());
-        pause.plot(action, tag, sig, eta);
-    }
-
-    function cast() public {
-        require(!done, "spell-already-cast");
-        done = true;
-        pause.exec(action, tag, sig, eta);
-    }
-}
-
 contract DssSpellTest is DSTest, DSMath {
     Hevm hevm;
 
@@ -96,7 +55,7 @@ contract DssSpellTest is DSTest, DSMath {
         DssSpell(spell).cast();
     }
 
-    function testAddPauseToScd() public {
+    function _testSetPause() internal {
         spell = new DssSpell();
         // spell = DssSpell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
 
@@ -125,13 +84,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     // after passing, new spells can affect SCD after delay
-    function testScdControlledByPause() public {
-        spell = new DssSpell();
-        // spell = DssSpell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+    function testDATEHEREScdControlledByPauseMom() public {
+        _testSetPause();
 
-        TestDelaySpell testSpell = new TestDelaySpell();
+        TestDelaySpellMom testSpell = new TestDelaySpellMom();
 
         assertTrue(VatAbstract(VAT).Line() != 0);
         assertTrue(SaiTubAbstract(SAITUB).cap() != 0);
@@ -141,5 +97,162 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertTrue(VatAbstract(VAT).Line() == 0);
         assertTrue(SaiTubAbstract(SAITUB).cap() == 0);
+    }
+
+    function testDATEHEREScdControlledByPauseTop() public {
+        _testSetPause();
+
+        TestDelaySpellTop testSpell = new TestDelaySpellTop();
+
+        assertTrue(!SaiTubAbstract(SAITUB).off());
+        assertTrue(SaiTubAbstract(SAITUB).cap() != 0);
+
+        vote(address(testSpell));
+        scheduleWaitAndCast(address(testSpell));
+
+        assertTrue(VatAbstract(VAT).Line() == 0);
+        assertTrue(SaiTubAbstract(SAITUB).off());
+    }
+
+    function testDATEHEREScdNoDelayMom() public {
+        TestNoDelaySpellMom testSpell = new TestNoDelaySpellMom();
+
+        assertTrue(SaiTubAbstract(SAITUB).cap() != 0);
+        vote(address(testSpell));
+        testSpell.cast();
+        assertTrue(SaiTubAbstract(SAITUB).cap() == 0);
+    }
+
+    function testFailDATEHEREScdNoDelayMom() public {
+        _testSetPause();
+
+        TestNoDelaySpellMom testSpell = new TestNoDelaySpellMom();
+
+        vote(address(testSpell));
+        testSpell.cast();
+    }
+
+    function testDATEHEREScdNoDelayTop() public {
+        TestNoDelaySpellTop testSpell = new TestNoDelaySpellTop();
+
+        assertTrue(!SaiTubAbstract(SAITUB).off());
+        vote(address(testSpell));
+        testSpell.cast();
+        assertTrue(SaiTubAbstract(SAITUB).off());
+    }
+
+    function testFailDATEHEREScdNoDelayTop() public {
+        _testSetPause();
+
+        TestNoDelaySpellTop testSpell = new TestNoDelaySpellTop();
+
+        vote(address(testSpell));
+        testSpell.cast();
+    }
+}
+
+// Delay Spell setting on SaiMom
+contract TestDelaySpellMomAction {
+    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+
+    function execute() external {
+        VatAbstract(VAT).file("Line", 0);
+        SaiMomAbstract(SAIMOM).setCap(0);
+    }
+}
+contract TestDelaySpellMom is DSMath {
+    DSPauseAbstract  public pause =
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address          public action;
+    bytes32          public tag;
+    uint256          public eta;
+    bytes            public sig;
+    bool             public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+        action = address(new TestDelaySpellMomAction());
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = add(now, DSPauseAbstract(pause).delay());
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
+}
+
+// Delay Spell setting on SaiTop
+contract TestDelaySpellTopAction {
+    address constant public SAITOP = 0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3;
+    address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+
+    function execute() external {
+        VatAbstract(VAT).file("Line", 0);
+        SaiTopAbstract(SAITOP).cage();
+    }
+}
+contract TestDelaySpellTop is DSMath {
+    DSPauseAbstract  public pause =
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address          public action;
+    bytes32          public tag;
+    uint256          public eta;
+    bytes            public sig;
+    bool             public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+        action = address(new TestDelaySpellTopAction());
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = add(now, DSPauseAbstract(pause).delay());
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
+}
+
+// No delay Spell setting on SaiMom
+contract TestNoDelaySpellMom {
+    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    bool             public done;
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        SaiMomAbstract(SAIMOM).setCap(0);
+    }
+}
+
+// No delay Spell setting on SaiTop
+contract TestNoDelaySpellTop {
+    address constant public SAITOP = 0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3;
+    bool             public done;
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        SaiTopAbstract(SAITOP).cage();
     }
 }
