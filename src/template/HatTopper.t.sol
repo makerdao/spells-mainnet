@@ -98,24 +98,22 @@ contract HatTopperTest is DSTest, DSMath {
         assertEq(DSAuthAbstract(address(gov)).owner(), address(0));
 
         uint hat = chief.approvals(chief.hat());
-        assertTrue(hat > 0);
-
-        MkrMinterLike(address(0)).doMint(address(gov), address(this), hat - preBalance + 2 ether);
-
-        uint postBalance = gov.balanceOf(address(this));
-        assertEq(postBalance, hat + 2 ether);
+        if (hat >= preBalance + 1 ether) {
+            MkrMinterLike(address(0)).doMint(address(gov), address(this), hat - preBalance + 2 ether);
+            uint postBalance = gov.balanceOf(address(this));
+            assertEq(postBalance, hat + 2 ether);
+        }
     }
 
     function mintMkrFromMultisig() private {
         uint preBalance = gov.balanceOf(address(this));
 
         uint hat = chief.approvals(chief.hat());
-        assertTrue(hat > 0);
-
-        MkrMinterLike(multisig).doMint(address(gov), address(this), hat - preBalance + 2 ether);
-
-        uint postBalance = gov.balanceOf(address(this));
-        assertEq(postBalance, hat + 2 ether);
+        if (hat >= preBalance + 1 ether) {
+            MkrMinterLike(multisig).doMint(address(gov), address(this), hat - preBalance + 2 ether);
+            uint postBalance = gov.balanceOf(address(this));
+            assertEq(postBalance, hat + 2 ether);
+        }
     }
 
     function vote() private {
