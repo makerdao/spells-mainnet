@@ -83,34 +83,6 @@ contract DssLaunchAfterSpell is DSTest {
 
     uint constant RAD = 10 ** 45;
 
-    // DSMath Functions
-    uint constant WAD = 10 ** 18;
-    uint constant RAY = 10 ** 27;
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x);
-    }
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD / 2) / WAD;
-    }
-    function rmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), RAY / 2) / RAY;
-    }
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-    function rdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, RAY), y / 2) / y;
-    }
-    //
-
-    function calculateInk(uint eth) private returns (uint inkV) {
-        inkV = rdiv(eth, tub.per());
-        inkV = rmul(inkV, tub.per()) <= eth ? inkV : inkV - 1;
-    }
-
     function setUp() public {
         RegistryLike registry = RegistryLike(0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4);
         // spell = new DssLaunchSpell();
@@ -122,18 +94,16 @@ contract DssLaunchAfterSpell is DSTest {
     }
 
     function vote() private {
-        if (chief.hat() != address(spell)) {
-            gov.approve(address(chief), uint256(-1));
-            chief.lock(gov.balanceOf(address(this)) - 1 ether);
+        gov.approve(address(chief), uint256(-1));
+        chief.lock(gov.balanceOf(address(this)));
 
-            assertTrue(!spell.done());
+        assertTrue(!spell.done());
 
-            address[] memory vote = new address[](1);
-            vote[0] = address(spell);
+        address[] memory vote = new address[](1);
+        vote[0] = address(spell);
 
-            chief.vote(vote);
-            chief.lift(address(spell));
-        }
+        chief.vote(vote);
+        chief.lift(address(spell));
         assertEq(chief.hat(), address(spell));
     }
 
@@ -200,7 +170,7 @@ contract DssLaunchAfterSpell is DSTest {
             switch iszero(succeeded)
             case 1 {
                 // throw if delegatecall failed
-                revert("", 0)
+                revert(add(response, 0x20), size)
             }
         }
     }
@@ -235,7 +205,7 @@ contract DssLaunchAfterSpell is DSTest {
             switch iszero(succeeded)
             case 1 {
                 // throw if delegatecall failed
-                revert("", 0)
+                revert(add(response, 0x20), size)
             }
         }
     }
@@ -296,7 +266,7 @@ contract DssLaunchAfterSpell is DSTest {
             switch iszero(succeeded)
             case 1 {
                 // throw if delegatecall failed
-                revert("", 0)
+                revert(add(response, 0x20), size)
             }
         }
     }
@@ -365,7 +335,7 @@ contract DssLaunchAfterSpell is DSTest {
             switch iszero(succeeded)
             case 1 {
                 // throw if delegatecall failed
-                revert("", 0)
+                revert(add(response, 0x20), size)
             }
         }
     }
@@ -374,10 +344,9 @@ contract DssLaunchAfterSpell is DSTest {
         vote();
         waitAndCast();
 
-        uint expectedInk = calculateInk(20 ether);
         bytes32 cup = openCupAndGenerateSai(20 ether, 1000 ether);
 
-        assertEq(tub.ink(cup), expectedInk);
+        assertEq(tub.ink(cup), 20 ether * 10 ** 27 / tub.per());
         assertEq(tub.tab(cup), 1000 ether);
 
         openCupAndGenerateSai(0.1 ether, 10 ether);
@@ -388,7 +357,7 @@ contract DssLaunchAfterSpell is DSTest {
 
         (uint val, bool ok) = pep.peek();
         assertTrue(ok);
-        uint govFee = wdiv(tub.rap(cup), val);
+        uint govFee = tub.rap(cup) * 10 ** 18 / val;
 
         assertTrue(govFee > 0);
 
@@ -415,17 +384,16 @@ contract DssLaunchAfterSpell is DSTest {
         (, uint rate,,,) = vat.ilks("ETH-A");
 
         assertEq(ink, 20 ether);
-        assertEq(art, mul(1000 ether, 10 ** 27) / rate + 1);
+        assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
     }
 
     function testCDPMigrationPayWithDebt() public {
         vote();
         waitAndCast();
 
-        uint expectedInk = calculateInk(20 ether);
         bytes32 cup = openCupAndGenerateSai(20 ether, 1000 ether);
 
-        assertEq(tub.ink(cup), expectedInk);
+        assertEq(tub.ink(cup), 20 ether * 10 ** 27 / tub.per());
         assertEq(tub.tab(cup), 1000 ether);
 
         openCupAndGenerateSai(0.1 ether, 10 ether);
@@ -437,9 +405,9 @@ contract DssLaunchAfterSpell is DSTest {
         (uint val, bool ok) = pep.peek();
         assertTrue(ok);
 
-        uint govFee = wdiv(tub.rap(cup), val) + 1;
+        uint govFee = tub.rap(cup) * 10 ** 18 / val;
 
-        uint payAmt = otc.getPayAmount(address(sai), address(gov), govFee);
+        uint payAmt = otc.getPayAmount(address(sai), address(gov), govFee + 1);
 
         assertTrue(govFee > 0);
 
@@ -464,6 +432,6 @@ contract DssLaunchAfterSpell is DSTest {
         (, uint rate,,,) = vat.ilks("ETH-A");
 
         assertEq(ink, 20 ether);
-        assertEq(art, mul(1000 ether + payAmt, 10 ** 27) / rate + 1);
+        assertEq(art, (1000 ether + payAmt) * 10 ** 27 / rate + 1);
     }
 }
