@@ -93,34 +93,13 @@ contract HatTopperTest is DSTest, DSMath {
     }
 
     function mintMkrFrom0() private {
-        // The next three lines only need to be here since we are running from multisig.
+        // The next two lines only need to be here since we are running from multisig.
         // Once the multisig is not the owner of MKR, we can run from any address
         // And remove these lines.
-        gov.burn(gov.balanceOf(address(this)));
         gov.setOwner(address(0));
         assertEq(DSAuthAbstract(address(gov)).owner(), address(0));
 
-        uint preBalance = gov.balanceOf(address(this));
-
-        uint hat = chief.approvals(chief.hat());
-        if (hat >= preBalance + 1 ether) {
-            MkrMinterLike(address(0)).doMint(address(gov), address(this), hat - preBalance + 2 ether);
-            uint postBalance = gov.balanceOf(address(this));
-            assertEq(postBalance, hat + 2 ether);
-        }
-    }
-
-    function mintMkrFromMultisig() private {
-        uint preBalance = gov.balanceOf(address(this));
-
-        uint hat = chief.approvals(chief.hat());
-
-        // if we already have enough to overcome the hat, then we don't need to mint.
-        if (hat >= preBalance + 1 ether) {
-            MkrMinterLike(multisig).doMint(address(gov), address(this), hat - preBalance + 2 ether);
-            uint postBalance = gov.balanceOf(address(this));
-            assertEq(postBalance, hat + 2 ether);
-        }
+        MkrMinterLike(address(0)).doMint(address(gov), address(this), uint(-1) - gov.totalSupply());
     }
 
     function vote() private {
@@ -149,7 +128,9 @@ contract HatTopperTest is DSTest, DSMath {
         // Test pre-spell conditions
         assertTrue(pot.dsr() != 1000000000000000000000000000);
 
-        mintMkrFromMultisig();
+        // guarantee we have enough to overcome any hat
+        MkrMinterLike(multisig).doMint(address(gov), address(this), uint(-1) - gov.totalSupply());
+
         vote();
         scheduleWaitAndCast();
 
