@@ -20,7 +20,7 @@ contract SpellAction is DSMath {
     address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
     address constant public VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
-    // Many the settings that change weekly rely on the rate accumulator
+    // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
     //
