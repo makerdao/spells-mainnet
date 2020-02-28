@@ -38,6 +38,18 @@ contract SpellAction {
 
         // MCD Modifications
 
+        // Set the Dai Savings Rate
+        // DSR_RATE is a value determined by the rate accumulator calculation (see above)
+        //  ex. an 8% annual rate will be 1000000002440418608258400030
+        //
+        // https://vote.makerdao.com/polling-proposal/qmewwftkvpcnqzmfrskryenlpqj4qqxqtzi9djxa8k9wn3
+        //
+        // Existing Rate: 8%
+        // New Rate: 7%
+        uint256 DSR_RATE = SEVEN_PCT_RATE;
+        PotAbstract(POT).file("dsr", DSR_RATE);
+
+
         // Set the global debt ceiling
         //
         // GLOBAL_AMOUNT is the total number of Dai that can be created by all collateral types
@@ -50,18 +62,6 @@ contract SpellAction {
         // New Ceiling: 158 million Dai
         uint256 GLOBAL_AMOUNT = 158 * ONE_MILLION;
         VatAbstract(VAT).file("Line", GLOBAL_AMOUNT * RAD);
-
-
-        // Set the Dai Savings Rate
-        // DSR_RATE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
-        //
-        // https://vote.makerdao.com/polling-proposal/qmewwftkvpcnqzmfrskryenlpqj4qqxqtzi9djxa8k9wn3
-        //
-        // Existing Rate: 8%
-        // New Rate: 7%
-        uint256 DSR_RATE = SEVEN_PCT_RATE;
-        PotAbstract(POT).file("dsr", DSR_RATE);
 
 
         // Set the ETH-A debt ceiling
