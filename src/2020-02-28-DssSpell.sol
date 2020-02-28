@@ -1,6 +1,5 @@
 pragma solidity 0.5.12;
 
-import "ds-math/math.sol";
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
@@ -8,7 +7,7 @@ import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 
 
-contract SpellAction is DSMath {
+contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     string  constant public description =
@@ -49,7 +48,7 @@ contract SpellAction is DSMath {
         // Existing Ceiling: 183 million Dai
         // New Ceiling: 158 million Dai
         uint256 GLOBAL_AMOUNT = 158000000;
-        VatAbstract(VAT).file("Line", mul(GLOBAL_AMOUNT, RAD));
+        VatAbstract(VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 
         // Set the Dai Savings Rate
@@ -73,7 +72,7 @@ contract SpellAction is DSMath {
         // Existing Line: 150 million Dai
         // New Line: 130 million Dai
         uint256 ETH_LINE = 130000000;
-        VatAbstract(VAT).file("ETH-A", "line", mul(ETH_LINE, RAD));
+        VatAbstract(VAT).file("ETH-A", "line", ETH_LINE * RAD);
 
 
         // Set the Sai MCD debt ceiling
@@ -85,12 +84,13 @@ contract SpellAction is DSMath {
         // Existing Line: 30 million Dai
         // New Line: 25 million Dai
         uint256 SAI_LINE = 25000000;
-        VatAbstract(VAT).file("SAI", "line", mul(SAI_LINE, RAD));
+        VatAbstract(VAT).file("SAI", "line", SAI_LINE * RAD);
     }
 }
 
-contract DssSpell is DSMath {
+contract DssSpell {
 
+    uint256 constant public WAD = 10**18;
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address constant public SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
@@ -115,7 +115,7 @@ contract DssSpell is DSMath {
 
     function schedule() public {
         require(eta == 0, "spell-already-scheduled");
-        eta = add(now, DSPauseAbstract(pause).delay());
+        eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
 
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
@@ -133,7 +133,7 @@ contract DssSpell is DSMath {
         // Existing ceiling: 30 million Sai
         // New ceiling: 25 million Sai
         uint256 SAI_AMOUNT = 25000000;
-        SaiMomAbstract(SAI_MOM).setCap(mul(SAI_AMOUNT, WAD));
+        SaiMomAbstract(SAI_MOM).setCap(SAI_AMOUNT * WAD);
     }
 
     function cast() public {
