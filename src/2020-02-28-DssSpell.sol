@@ -14,7 +14,7 @@ contract SpellAction {
         "2020-02-28 Weekly Executive: DSR, Sai Ceiling, Dai Ceiling";
 
     uint256 constant public RAD = 10**45;
-    uint256 constant public ONE_MILLION = 10**6;
+    uint256 constant public MILLION = 10**6;
     address constant public PAUSE = 0xbE286431454714F511008713973d3B053A2d38f3;
     address constant public JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
@@ -58,7 +58,7 @@ contract SpellAction {
         //
         // Existing Line: 150 million Dai
         // New Line: 130 million Dai
-        uint256 ETH_LINE = 130 * ONE_MILLION;
+        uint256 ETH_LINE = 130 * MILLION;
         VatAbstract(VAT).file("ETH-A", "line", ETH_LINE * RAD);
 
 
@@ -70,7 +70,7 @@ contract SpellAction {
         //
         // Existing Line: 30 million Dai
         // New Line: 25 million Dai
-        uint256 SAI_LINE = 25 * ONE_MILLION;
+        uint256 SAI_LINE = 25 * MILLION;
         VatAbstract(VAT).file("SAI", "line", SAI_LINE * RAD);
 
 
@@ -84,7 +84,7 @@ contract SpellAction {
         //
         // Existing Ceiling: 183 million Dai
         // New Ceiling: 158 million Dai
-        uint256 GLOBAL_AMOUNT = 158 * ONE_MILLION;
+        uint256 GLOBAL_AMOUNT = 158 * MILLION;
         VatAbstract(VAT).file("Line", GLOBAL_AMOUNT * RAD);
     }
 }
@@ -92,7 +92,7 @@ contract SpellAction {
 contract DssSpell {
 
     uint256 constant public WAD = 10**18;
-    uint256 constant public ONE_MILLION = 10**6;
+    uint256 constant public MILLION = 10**6;
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address constant public SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
@@ -134,7 +134,7 @@ contract DssSpell {
         //
         // Existing ceiling: 30 million Sai
         // New ceiling: 25 million Sai
-        uint256 SAI_AMOUNT = 25 * ONE_MILLION;
+        uint256 SAI_AMOUNT = 25 * MILLION;
         SaiMomAbstract(SAI_MOM).setCap(SAI_AMOUNT * WAD);
     }
 
