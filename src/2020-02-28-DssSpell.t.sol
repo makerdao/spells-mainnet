@@ -73,8 +73,8 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function mainTests20200228() public {
-        //spell = DssSpell(0xD24F...);
-        spell = new DssSpell();
+        spell = DssSpell(0xCd989b68d99DDDA02c6A58b1B3985962F4D59e33);
+        // spell = new DssSpell();
 
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
