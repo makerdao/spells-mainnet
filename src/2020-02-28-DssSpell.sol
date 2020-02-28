@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity 0.5.12;
 
 import "ds-math/math.sol";
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
