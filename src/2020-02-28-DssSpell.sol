@@ -50,20 +50,6 @@ contract SpellAction {
         PotAbstract(POT).file("dsr", DSR_RATE);
 
 
-        // Set the global debt ceiling
-        //
-        // GLOBAL_AMOUNT is the total number of Dai that can be created by all collateral types
-        //  as a whole number
-        //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
-        //
-        // https://vote.makerdao.com/polling-proposal/qmfy3resrmo97rqyfffpndujszvbv59zuacfl3rxpcu2wx
-        //
-        // Existing Ceiling: 183 million Dai
-        // New Ceiling: 158 million Dai
-        uint256 GLOBAL_AMOUNT = 158 * ONE_MILLION;
-        VatAbstract(VAT).file("Line", GLOBAL_AMOUNT * RAD);
-
-
         // Set the ETH-A debt ceiling
         // ETH_LINE is the number of Dai that can be created with WETH token collateral
         //  ex. a 100 million Dai ETH ceiling will be ETH_LINE = 100000000
@@ -86,6 +72,20 @@ contract SpellAction {
         // New Line: 25 million Dai
         uint256 SAI_LINE = 25 * ONE_MILLION;
         VatAbstract(VAT).file("SAI", "line", SAI_LINE * RAD);
+
+
+        // Set the global debt ceiling
+        //
+        // GLOBAL_AMOUNT is the total number of Dai that can be created by all collateral types
+        //  as a whole number
+        //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
+        //
+        // https://vote.makerdao.com/polling-proposal/qmfy3resrmo97rqyfffpndujszvbv59zuacfl3rxpcu2wx
+        //
+        // Existing Ceiling: 183 million Dai
+        // New Ceiling: 158 million Dai
+        uint256 GLOBAL_AMOUNT = 158 * ONE_MILLION;
+        VatAbstract(VAT).file("Line", GLOBAL_AMOUNT * RAD);
     }
 }
 
