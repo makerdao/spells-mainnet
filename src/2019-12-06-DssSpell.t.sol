@@ -8,7 +8,7 @@ import {Vow} from "dss/vow.sol";
 import {Pot} from "dss/pot.sol";
 import {ERC20} from "erc20/erc20.sol";
 
-import {DssDecember27Spell} from "./DssDecember27Spell.sol";
+import {DssDecember6Spell} from "./DssDecember6Spell.sol";
 
 contract ChiefLike {
     function hat() public view returns (address);
@@ -80,7 +80,7 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract DssDecember27SpellTest is DSTest {
+contract DssFlopReplaceSpellTest is DSTest {
     Hevm hevm;
 
     Dai dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -101,7 +101,7 @@ contract DssDecember27SpellTest is DSTest {
 
     TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
 
-    DssDecember27Spell spell;
+    DssDecember6Spell spell;
 
     uint constant RAD = 10 ** 45;
 
@@ -119,22 +119,26 @@ contract DssDecember27SpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testDecember27SpellIsCast() public {
-        spell = DssDecember27Spell(0x94c19E029F5A1A115F3B99aD87da24D33E60A0E1);
-        // spell = new DssDecember27Spell();
-        assertEq(tub.cap(), 95000000 * 10 ** 18);
-        assertEq(vat.Line(), 178000000 * RAD);
+    function testSpell20191206IsCast() public {
+        spell = DssDecember6Spell(0xF267EFDDA842539a2cAff990259395188a86b813);
+        // spell = new DssDecember6Spell();
+        assertEq(tub.cap(), 120000000 * 10 ** 18);
+        assertEq(tub.fee(), 1000000001243680656318820312);
+        assertEq(pot.dsr(), 1000000000627937192491029810);
+        assertEq(vat.Line(), 153000000 * RAD);
         (,,,uint line,) = vat.ilks("ETH-A");
-        assertEq(line, 75000000 * RAD);
+        assertEq(line, 50000000 * RAD);
 
         vote();
         spell.cast();
 
         (,,,line,) = vat.ilks("ETH-A");
         assertTrue(spell.done());
-        assertEq(tub.cap(), 70000000 * 10 ** 18);
-        assertEq(vat.Line(), 203000000 * RAD);
-        assertEq(line, 100000000 * RAD);
+        assertEq(tub.cap(), 95000000 * 10 ** 18);
+        assertEq(tub.fee(), 1000000000937303470807876289);
+        assertEq(pot.dsr(), 1000000001243680656318820312);
+        assertEq(vat.Line(), 178000000 * RAD);
+        assertEq(line, 75000000 * RAD);
     }
 
 }

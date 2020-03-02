@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssFebruary7Spell} from "./DssFebruary7Spell.sol";
+import {DssJanuary31Spell} from "./DssJanuary31Spell.sol";
 
 contract TubLike {
     function ink(bytes32) public view returns (uint);
@@ -20,7 +20,7 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract DssFebruary7SpellTest is DSTest, DSMath {
+contract DssJanuary31SpellTest is DSTest, DSMath {
     Hevm hevm;
 
     DSPauseAbstract pause =
@@ -34,7 +34,7 @@ contract DssFebruary7SpellTest is DSTest, DSMath {
     MKRAbstract gov = MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     TubLike     tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
 
-    DssFebruary7Spell spell;
+    DssJanuary31Spell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
@@ -69,19 +69,33 @@ contract DssFebruary7SpellTest is DSTest, DSMath {
         spell.cast();
     }
 
-    function testDssFebruary7SpellIsCast() public {
-        spell = DssFebruary7Spell(0x8E5F3abC36dA63142275202454c11237F47DD170);
-        // spell = new DssFebruary7Spell();
+    function testSpell20200131IsCast() public {
+        spell = DssJanuary31Spell(0x48916A2B11fA7a895426EeDF9ACf2d70523b1677);
+        // spell = new DssJanuary31Spell();
 
-        // (ETH-A, BAT-A, DSR) = (9%, 9%, 8.75%)
+        // (ETH-A, BAT-A, DSR) = (8%, 8%, 7.75%)
         (uint dutyETH,) = jug.ilks("ETH-A");
         (uint dutyBAT,) = jug.ilks("BAT-A");
-        assertEq(dutyETH,   1000000002732676825177582095);
-        assertEq(dutyBAT,   1000000002732676825177582095);
-        assertEq(pot.dsr(), 1000000002659864411854984565);
+        assertEq(dutyETH,   1000000002440418608258400030);
+        assertEq(dutyBAT,   1000000002440418608258400030);
+        assertEq(pot.dsr(), 1000000002366931224128103346);
 
-        // SCD Fee = 10%
-        assertEq(tub.fee(), 1000000003022265980097387650);
+        // ETH-A line = 125mm
+        (,,, uint256 lineETH,) = vat.ilks("ETH-A");
+        assertEq(lineETH, mul(125000000, RAD));
+
+        // SAI line = 45mm
+        (,,, uint256 lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, mul(45000000, RAD));
+
+        // Line = 173mm
+        assertEq(vat.Line(), mul(173000000, RAD));
+
+        // SCD DC = 45mm
+        assertEq(tub.cap(), mul(45000000, WAD));
+
+        // SCD Fee = 9%
+        assertEq(tub.fee(), 1000000002732676825177582095);
 
         vote();
         scheduleWaitAndCast();
@@ -89,17 +103,31 @@ contract DssFebruary7SpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // dsr = 7.5%
-        assertEq(pot.dsr(), 1000000002293273137447730714);
+        // dsr = 8.75%
+        assertEq(pot.dsr(), 1000000002659864411854984565);
 
-        // (ETH-A, BAT-A) = (8%, 8%)
+        // (ETH-A, BAT-A) = (9%, 9%)
         (dutyETH,) = jug.ilks("ETH-A");
         (dutyBAT,) = jug.ilks("BAT-A");
-        assertEq(dutyETH, 1000000002440418608258400030);
-        assertEq(dutyBAT, 1000000002440418608258400030);
+        assertEq(dutyETH, 1000000002732676825177582095);
+        assertEq(dutyBAT, 1000000002732676825177582095);
 
-        // SCD Fee = 9%
-        assertEq(tub.fee(), 1000000002732676825177582095);
+        // ETH-A line = 125mm
+        (,,, lineETH,) = vat.ilks("ETH-A");
+        assertEq(lineETH, mul(125000000, RAD));
+
+        // SAI line = 30mm
+        (,,, lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, mul(30000000, RAD));
+
+        // Line = 158mm
+        assertEq(vat.Line(), mul(158000000, RAD));
+
+        // SCD DC = 30mm
+        assertEq(tub.cap(), mul(30000000, WAD));
+
+        // SCD Fee = 10%
+        assertEq(tub.fee(), 1000000003022265980097387650);
     }
 
 }

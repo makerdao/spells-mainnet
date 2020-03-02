@@ -72,7 +72,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell.cast();
     }
 
-    function mainTests20200228() public {
+    function testSpell20200228IsCast() public {
         spell = DssSpell(0xCd989b68d99DDDA02c6A58b1B3985962F4D59e33);
         // spell = new DssSpell();
 

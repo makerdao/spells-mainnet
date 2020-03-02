@@ -6,9 +6,10 @@ import {Dai} from "dss/dai.sol";
 import {Vat} from "dss/vat.sol";
 import {Vow} from "dss/vow.sol";
 import {Pot} from "dss/pot.sol";
+import {Jug} from "dss/jug.sol";
 import {ERC20} from "erc20/erc20.sol";
 
-import {DssDecember6Spell} from "./DssDecember6Spell.sol";
+import {DssJanuary10Spell} from "./DssJanuary10Spell.sol";
 
 contract ChiefLike {
     function hat() public view returns (address);
@@ -80,13 +81,14 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract DssFlopReplaceSpellTest is DSTest {
+contract DssJanuary10SpellTest is DSTest {
     Hevm hevm;
 
     Dai dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     Vat vat = Vat(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     Vow vow = Vow(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
     Pot pot = Pot(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    Jug jug = Jug(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     ERC20 gov = ERC20(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     ChiefLike chief = ChiefLike(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     ProxyLike proxy;
@@ -94,14 +96,13 @@ contract DssFlopReplaceSpellTest is DSTest {
     address migrationPActions = 0xe4B22D484958E582098A98229A24e8A43801b674;
     address migration = 0xc73e0383F3Aff3215E6f04B0331D58CeCf0Ab849;
     address manager = 0x5ef30b9986345249bc32d8928B7ee64DE9435E39;
-    address jug = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address ethJoin = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
     address batJoin = 0x3D0B1912B66114d4096F48A8CEe3A56C231772cA;
     address daiJoin = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
 
     TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
 
-    DssDecember6Spell spell;
+    DssJanuary10Spell spell;
 
     uint constant RAD = 10 ** 45;
 
@@ -119,26 +120,30 @@ contract DssFlopReplaceSpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testDecember6SpellIsCast() public {
-        spell = DssDecember6Spell(0xF267EFDDA842539a2cAff990259395188a86b813);
-        // spell = new DssDecember6Spell();
-        assertEq(tub.cap(), 120000000 * 10 ** 18);
-        assertEq(tub.fee(), 1000000001243680656318820312);
-        assertEq(pot.dsr(), 1000000000627937192491029810);
-        assertEq(vat.Line(), 153000000 * RAD);
-        (,,,uint line,) = vat.ilks("ETH-A");
-        assertEq(line, 50000000 * RAD);
+    function testSpell20200110IsCast() public {
+        spell = DssJanuary10Spell(0x7A87aCB1f92c50297239EF9B0Ef9387105Bd4Fc5);
+        // spell = new DssJanuary10Spell();
+
+        (uint dutyETH,) = jug.ilks("ETH-A");
+        (uint dutyBAT,) = jug.ilks("BAT-A");
+
+        // 6%
+        assertEq(pot.dsr(), 1000000001847694957439350562);
+        assertEq(dutyETH, 1000000001847694957439350562);
+        assertEq(dutyBAT, 1000000001847694957439350562);
 
         vote();
         spell.cast();
 
-        (,,,line,) = vat.ilks("ETH-A");
+        (dutyETH,) = jug.ilks("ETH-A");
+        (dutyBAT,) = jug.ilks("BAT-A");
+
         assertTrue(spell.done());
-        assertEq(tub.cap(), 95000000 * 10 ** 18);
-        assertEq(tub.fee(), 1000000000937303470807876289);
+
+        // 4%
         assertEq(pot.dsr(), 1000000001243680656318820312);
-        assertEq(vat.Line(), 178000000 * RAD);
-        assertEq(line, 75000000 * RAD);
+        assertEq(dutyETH, 1000000001243680656318820312);
+        assertEq(dutyBAT, 1000000001243680656318820312);
     }
 
 }
