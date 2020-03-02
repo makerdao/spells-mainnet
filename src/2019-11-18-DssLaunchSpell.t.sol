@@ -184,7 +184,7 @@ contract DssLaunchAfterSpell is DSTest {
         spell.cast();
     }
 
-    function testSpell20191118IsCasted() public {
+    function testSpell20191118IsCast() public {
         assertEq(vat.Line(), 0);
         (,,, uint line,) = vat.ilks("ETH-A");
         assertEq(line, 0);
