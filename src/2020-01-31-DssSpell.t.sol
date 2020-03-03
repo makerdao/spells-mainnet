@@ -69,7 +69,7 @@ contract DssJanuary31SpellTest is DSTest, DSMath {
         spell.cast();
     }
 
-    function testSpell20200131IsCast() public {
+    function testSpell_2020_01_31_IsCast() public {
         spell = DssJanuary31Spell(0x48916A2B11fA7a895426EeDF9ACf2d70523b1677);
         // spell = new DssJanuary31Spell();
 

@@ -79,7 +79,7 @@ contract DssIncreaseDelay24SpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testSpell20191213IncreaseDelay24IsCast() public {
+    function testSpell_2019_12_13_IncreaseDelay24IsCast() public {
         // spell = new DssIncreaseDelay24Spell();
         spell = DssIncreaseDelay24Spell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
 
@@ -123,7 +123,7 @@ contract DssIncreaseDelay24SpellTest is DSTest {
     }
 
     // non-authorized call to osm_mom.stop() should fail
-    function testFailSpell20191213CanCall() public {
+    function testFailSpell_2019_12_13_CanCall() public {
         // spell = new DssIncreaseDelay24Spell();
         spell = DssIncreaseDelay24Spell(0xDD4Aa99077C5e976AFc22060EEafBBd1ba34eae9);
 

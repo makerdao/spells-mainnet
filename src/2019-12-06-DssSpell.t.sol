@@ -119,7 +119,7 @@ contract DssFlopReplaceSpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testSpell20191206IsCast() public {
+    function testSpell_2019_12_06_IsCast() public {
         spell = DssDecember6Spell(0xF267EFDDA842539a2cAff990259395188a86b813);
         // spell = new DssDecember6Spell();
         assertEq(tub.cap(), 120000000 * 10 ** 18);

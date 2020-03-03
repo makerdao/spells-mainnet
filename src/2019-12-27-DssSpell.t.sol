@@ -119,7 +119,7 @@ contract DssDecember27SpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testSpell20191227IsCast() public {
+    function testSpell_2019_12_27_IsCast() public {
         spell = DssDecember27Spell(0x94c19E029F5A1A115F3B99aD87da24D33E60A0E1);
         // spell = new DssDecember27Spell();
         assertEq(tub.cap(), 95000000 * 10 ** 18);

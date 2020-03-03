@@ -153,7 +153,7 @@ contract DssSpell20200221Test is DSTest, DSMath {
         assertEq(pause.delay(), 86400);
     }
 
-    function testSpell20200221IsCast() public {
+    function testSpell_2020_02_21_IsCast() public {
         mainTests();
 
         // Retry to pass the same spell (this time will pass after 24 hours)
@@ -174,7 +174,7 @@ contract DssSpell20200221Test is DSTest, DSMath {
         assertEq(bat_osm.stopped(), 1);
     }
 
-    function testFailSpell20200221IsCast() public {
+    function testFailSpell_2020_02_21_IsCast() public {
         mainTests();
 
         // Retry to pass the same spell (this time will pass after 24 hours)
