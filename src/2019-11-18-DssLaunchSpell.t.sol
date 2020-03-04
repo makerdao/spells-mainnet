@@ -121,6 +121,47 @@ contract DssLaunchAfterSpell is DSTest {
         proxy = registry.build();
     }
 
+    function testSpell_2019_11_18_dai_token() public {
+        assertEq(dai.totalSupply(), 0);
+    }
+
+    function testSpell_2019_11_18_vat() public {
+        assertEq(vat.live(), 1);
+    }
+
+    function testSpell_2019_11_18_eth_a_ilk_init() public {
+        ethIlk = VatLike(address(vat)).ilks("ETH-A");
+        assertTrue(ethIlk.rate > 0);
+    }
+
+    function testSpell_2019_11_18_eth_a_ilk_off() public {
+        assertEq(ethIlk.Art, 0);
+        assertEq(ethIlk.line, 0);
+        assertEq(ethIlk.dust, 0);
+    }
+
+    function testSpell_2019_11_18_bat_a_ilk_init() public {
+        batIlk = VatLike(address(vat)).ilks("BAT-A");
+        assertEq(batIlk.Art, 0);
+        assertTrue(batIlk.rate > 0);
+    }
+
+    function testSpell_2019_11_18_sai_ilk_init() public {
+        saiIlk = VatLike(address(vat)).ilks("SAI");
+        assertEq(saiIlk.Art, 0);
+        assertTrue(saiIlk.rate > 0);
+    }
+
+    function testSpell_2019_11_18_vow() public {
+        assertEq(vow.live(), 1);
+
+        assertEq(vow.wait(), 172800);
+        assertEq(vow.dump(), 250 ether);
+        assertEq(vow.sump(), 50000 * 10 ** 45);
+        assertEq(vow.bump(), 10000 * 10 ** 45);
+        assertEq(vow.hump(), 500000 * 10 ** 45);
+    }
+
     function vote() private {
         if (chief.hat() != address(spell)) {
             gov.approve(address(chief), uint256(-1));
@@ -143,7 +184,7 @@ contract DssLaunchAfterSpell is DSTest {
         spell.cast();
     }
 
-    function testSpellIsCasted() public {
+    function testSpell_2019_11_18_IsCast() public {
         assertEq(vat.Line(), 0);
         (,,, uint line,) = vat.ilks("ETH-A");
         assertEq(line, 0);
@@ -165,7 +206,7 @@ contract DssLaunchAfterSpell is DSTest {
         assertEq(line, 100000000 * RAD);
     }
 
-    function testFailSpellCast() public {
+    function testFailSpell_2019_11_18_Cast() public {
         vote();
         // It can not be spelled if the time for launch hasn't passed
         spell.cast();
@@ -240,7 +281,7 @@ contract DssLaunchAfterSpell is DSTest {
         }
     }
 
-    function testCreateETHVault() public {
+    function testSpell_2019_11_18_CreateETHVault() public {
         vote();
         waitAndCast();
 
@@ -255,7 +296,7 @@ contract DssLaunchAfterSpell is DSTest {
         assertEq(art, 1000 ether * 10 ** 27 / rate + 1);
     }
 
-    function testCreateBATVault() public {
+    function testSpell_2019_11_18_CreateBATVault() public {
         vote();
         waitAndCast();
 
@@ -313,7 +354,7 @@ contract DssLaunchAfterSpell is DSTest {
         );
     }
 
-    function testSwapSaiToDaiAndBack() public {
+    function testSpell_2019_11_18_SwapSaiToDaiAndBack() public {
         vote();
         waitAndCast();
 
@@ -370,7 +411,7 @@ contract DssLaunchAfterSpell is DSTest {
         }
     }
 
-    function testCDPMigrationPayWithMKR() public {
+    function testSpell_2019_11_18_CDPMigrationPayWithMKR() public {
         vote();
         waitAndCast();
 
@@ -418,7 +459,7 @@ contract DssLaunchAfterSpell is DSTest {
         assertEq(art, mul(1000 ether, 10 ** 27) / rate + 1);
     }
 
-    function testCDPMigrationPayWithDebt() public {
+    function testSpell_2019_11_18_CDPMigrationPayWithDebt() public {
         vote();
         waitAndCast();
 

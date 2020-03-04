@@ -9,7 +9,7 @@ import {Pot} from "dss/pot.sol";
 import {Jug} from "dss/jug.sol";
 import {ERC20} from "erc20/erc20.sol";
 
-import {DssJanuary3Spell} from "./DssJanuary3Spell.sol";
+import {DssJanuary10Spell} from "./DssJanuary10Spell.sol";
 
 contract ChiefLike {
     function hat() public view returns (address);
@@ -81,7 +81,7 @@ contract Hevm {
     function warp(uint) public;
 }
 
-contract DssJanuary3SpellTest is DSTest {
+contract DssJanuary10SpellTest is DSTest {
     Hevm hevm;
 
     Dai dai = Dai(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -102,7 +102,7 @@ contract DssJanuary3SpellTest is DSTest {
 
     TubLike tub = TubLike(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
 
-    DssJanuary3Spell spell;
+    DssJanuary10Spell spell;
 
     uint constant RAD = 10 ** 45;
 
@@ -120,19 +120,17 @@ contract DssJanuary3SpellTest is DSTest {
         assertEq(chief.hat(), address(spell));
     }
 
-    function testDssJanuary3SpellIsCast() public {
-        spell = DssJanuary3Spell(0x333c0501182170c5002219380ded6b12C338E272);
-        // spell = new DssJanuary3Spell();
+    function testSpell_2020_01_10_IsCast() public {
+        spell = DssJanuary10Spell(0x7A87aCB1f92c50297239EF9B0Ef9387105Bd4Fc5);
+        // spell = new DssJanuary10Spell();
 
         (uint dutyETH,) = jug.ilks("ETH-A");
         (uint dutyBAT,) = jug.ilks("BAT-A");
-        // 3%
-        assertEq(tub.fee(), 1000000000937303470807876289);
 
-        // 4%
-        assertEq(pot.dsr(), 1000000001243680656318820312);
-        assertEq(dutyETH, 1000000001243680656318820312);
-        assertEq(dutyBAT, 1000000001243680656318820312);
+        // 6%
+        assertEq(pot.dsr(), 1000000001847694957439350562);
+        assertEq(dutyETH, 1000000001847694957439350562);
+        assertEq(dutyBAT, 1000000001847694957439350562);
 
         vote();
         spell.cast();
@@ -142,13 +140,10 @@ contract DssJanuary3SpellTest is DSTest {
 
         assertTrue(spell.done());
 
-        // 5%
-        assertEq(tub.fee(), 1000000001547125957863212448);
-
-        // 6%
-        assertEq(pot.dsr(), 1000000001847694957439350562);
-        assertEq(dutyETH, 1000000001847694957439350562);
-        assertEq(dutyBAT, 1000000001847694957439350562);
+        // 4%
+        assertEq(pot.dsr(), 1000000001243680656318820312);
+        assertEq(dutyETH, 1000000001243680656318820312);
+        assertEq(dutyBAT, 1000000001243680656318820312);
     }
 
 }
