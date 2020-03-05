@@ -57,6 +57,7 @@ contract DssSpellTest is DSTest, DSMath {
         saiCap: mul(30000000, WAD),
         saiFee: 1000000002877801985002875644
     });
+    string constant DESCRIPTION = "2020-03-06 Weekly Executive: DSR spread adjustment";
 
     Hevm hevm;
 
@@ -124,7 +125,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
-            stringToBytes32("2020-03-06 Weekly Executive: DSR spread adjustment"));
+            stringToBytes32(DESCRIPTION));
 
         // (ETH-A, BAT-A, DSR)
         (uint dutyETH,) = jug.ilks("ETH-A");
