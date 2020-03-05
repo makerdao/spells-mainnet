@@ -123,6 +123,9 @@ contract DssSpellTest is DSTest, DSMath {
             spell = new DssSpell();
         }
 
+        // Test expiration
+        assertEq(spell.expiration(), (now + 30 days));
+
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
             stringToBytes32(DESCRIPTION));
