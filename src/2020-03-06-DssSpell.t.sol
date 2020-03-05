@@ -157,30 +157,30 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // dsr = 8.75%
+        // dsr
         assertEq(pot.dsr(), thisWeek.dsr);
 
-        // (ETH-A, BAT-A) = (9%, 9%)
+        // (ETH-A, BAT-A)
         (dutyETH,) = jug.ilks("ETH-A");
         (dutyBAT,) = jug.ilks("BAT-A");
         assertEq(dutyETH, thisWeek.dutyETH);
         assertEq(dutyBAT, thisWeek.dutyBAT);
 
-        // ETH-A line = 125mm
+        // ETH-A line
         (,,, lineETH,) = vat.ilks("ETH-A");
         assertEq(lineETH, thisWeek.lineETH);
 
-        // SAI line = 30mm
+        // SAI line
         (,,, lineSAI,) = vat.ilks("SAI");
         assertEq(lineSAI, thisWeek.lineSAI);
 
-        // Line = 158mm
+        // Line
         assertEq(vat.Line(), thisWeek.lineGlobal);
 
-        // SCD DC = 30mm
+        // SCD DC
         assertEq(tub.cap(), thisWeek.saiCap);
 
-        // SCD Fee = 10%
+        // SCD Fee
         assertEq(tub.fee(), thisWeek.saiFee);
     }
 
