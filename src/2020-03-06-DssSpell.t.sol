@@ -12,6 +12,9 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
 
+    // Replace with mainnet spell address to test against live
+    address constant MAINNET_SPELL = address(0);
+
     struct SystemValues {
         uint256 dsr;
         uint256 lineETH;
@@ -83,6 +86,12 @@ contract DssSpellTest is DSTest, DSMath {
         gov.mint(address(this), 300000 ether);
     }
 
+    function stringToBytes32(string memory source) public pure returns (bytes32 result) {
+        assembly {
+        result := mload(add(source, 32))
+        }
+    }
+
     function vote() private {
         if (chief.hat() != address(spell)) {
             gov.approve(address(chief), uint256(-1));
@@ -107,8 +116,15 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testSpellIsCast() public {
 
-        //spell = DssSpell(0x489...);
-        spell = new DssSpell();
+        if (MAINNET_SPELL != address(0)) {
+            spell = DssSpell(MAINNET_SPELL);
+        } else {
+            spell = new DssSpell();
+        }
+
+        // DS-Test can't handle strings directly, so cast to a bytes32.
+        assertEq(stringToBytes32(spell.description()),
+            stringToBytes32("2020-03-06 Weekly Executive: DSR spread adjustment"));
 
         // (ETH-A, BAT-A, DSR)
         (uint dutyETH,) = jug.ilks("ETH-A");
