@@ -107,7 +107,7 @@ contract DssSpell {
 
     function schedule() public {
         require(now <= expiration, "This contract has expired");
-        require(eta == 0, "This spell has already been sceduled");
+        require(eta == 0, "This spell has already been scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
 
