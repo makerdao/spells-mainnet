@@ -3,7 +3,6 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-import "lib/dss-interfaces/src/sai/SaiTubAbstract.sol";
 
 
 contract SpellAction {
@@ -74,8 +73,6 @@ contract DssSpell {
 
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
-    SaiTubAbstract   public saiTub =
-        SaiTubAbstract(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
     address          public action;
     bytes32          public tag;
     uint256          public eta;
