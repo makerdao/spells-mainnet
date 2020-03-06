@@ -258,4 +258,19 @@ contract DssSpellTest is DSTest, DSMath {
         diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
         assertTrue(diff <= TOLERANCE);
     }
+
+    function testFailSpellExpires() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        vote();
+
+        //schedule late and cast
+        hevm.warp(add(now, 31 days));
+
+        spell.schedule();
+
+        hevm.warp(add(now, pause.delay()));
+
+        spell.cast();
+    }
 }
