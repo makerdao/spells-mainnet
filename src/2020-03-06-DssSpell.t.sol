@@ -183,4 +183,79 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(tub.fee(), thisWeek.saiFee);
     }
 
+    function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
+      assembly {
+        switch x case 0 {switch n case 0 {z := b} default {z := 0}}
+        default {
+          switch mod(n, 2) case 0 { z := b } default { z := x }
+          let half := div(b, 2)  // for rounding.
+          for { n := div(n, 2) } n { n := div(n,2) } {
+            let xx := mul(x, x)
+            if iszero(eq(div(xx, x), x)) { revert(0,0) }
+            let xxRound := add(xx, half)
+            if lt(xxRound, xx) { revert(0,0) }
+            x := div(xxRound, b)
+            if mod(n,2) {
+              let zx := mul(z, x)
+              if and(iszero(iszero(x)), iszero(eq(div(zx, x), z))) { revert(0,0) }
+              let zxRound := add(zx, half)
+              if lt(zxRound, zx) { revert(0,0) }
+              z := div(zxRound, b)
+            }
+          }
+        }
+      }
+    }
+
+    function testSpellRates() public {
+        // 10^-5 (tenth of a basis point) as a RAY
+        uint TOLERANCE = 10 ** 22;
+        uint yearlyYield;
+        uint expected;
+        uint diff;
+
+
+        // SAI fee
+        yearlyYield = rpow(thisWeek.saiFee, 365 * 24 * 60 * 60, RAY);
+
+        // 9.5% => rate=1.095e27 after a year if it starts at ONE := RAY := 10 ** 27
+        expected = 1095 * 10 ** 24;
+
+        // Depending on rounding, rpow may over- or under- estimate the value
+        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
+        assertTrue(diff <= TOLERANCE);
+
+
+        // DSR
+        yearlyYield = rpow(thisWeek.dsr, 365 * 24 * 60 * 60, RAY);
+
+        // 7% => chi=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
+        expected = 107 * 10 ** 25;
+
+        // Depending on rounding, rpow may over- or under- estimate the value
+        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
+        assertTrue(diff <= TOLERANCE);
+
+
+        // ETH-A duty
+        yearlyYield = rpow(thisWeek.dutyETH, 365 * 24 * 60 * 60, RAY);
+
+        // 8% => rate=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
+        expected = 108 * 10 ** 25;
+
+        // Depending on rounding, rpow may over- or under- estimate the value
+        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
+        assertTrue(diff <= TOLERANCE);
+
+
+        // BAT-A duty
+        yearlyYield = rpow(thisWeek.dutyBAT, 365 * 24 * 60 * 60, RAY);
+
+        // 8% => rate=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
+        expected = 108 * 10 ** 25;
+
+        // Depending on rounding, rpow may over- or under- estimate the value
+        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
+        assertTrue(diff <= TOLERANCE);
+    }
 }
