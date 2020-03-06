@@ -30,9 +30,6 @@ contract SpellAction {
     uint256 constant public SEVEN_PCT_RATE = 1000000002145441671308778766;
     uint256 constant public EIGHT_PCT_RATE = 1000000002440418608258400030;
 
-    uint256 constant public RAD = 10**45;
-    uint256 constant public MILLION = 10**6;
-
     function execute() external {
 
         // Drip Pot and Jugs prior to all modifications.
@@ -58,8 +55,6 @@ contract SpellAction {
 
 
         // Set the ETH-A stability fee
-        // ETH_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
         //
         // Poll: Dai Stability Fee Adjustment - March 2, 2020
         // https://vote.makerdao.com/polling-proposal/qmacgdz8euruq4lsqyzgjhumhexu5jnhihbmgbh54law7s
@@ -67,7 +62,8 @@ contract SpellAction {
         // Existing Rate: 8%
         // New Rate: 8%
         // Since the rate is not changing this week, we want to ensure that no other
-        //  spell has changed the state preemptively.
+        //  spell has changed the state preemptively. We want to avoid a situation where
+        //  the stability fee is lower than the DSR.
         (uint256 dutyETH,) = JugAbstract(MCD_JUG).ilks("ETH-A");
         require(dutyETH == EIGHT_PCT_RATE, "Unexpected ETH-A Stability Fee");
 
@@ -86,10 +82,6 @@ contract DssSpell {
     bytes            public sig;
     uint256          public expiration;
     bool             public done;
-
-    uint256 constant internal MILLION = 10**6;
-    uint256 constant internal WAD = 10**18;
-    uint256 constant internal NINE_PT_FIVE_RATE = 1000000002877801985002875644;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -116,15 +108,12 @@ contract DssSpell {
 
 
         // Set the Sai stability fee
-        // SAI_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 10% annual rate will be 1000000003022265980097387650
         //
         // Poll: Sai Stability Fee Adjustment - March 2, 2020
         // https://vote.makerdao.com/polling-proposal/qme4mhhlcuvcg7pwyfh1pdgqwp45abrdtvrdwvcbfggunj
         //
         // Existing Rate: 9.5%
         // New Rate: 9.5%
-        require(saiTub.fee() == NINE_PT_FIVE_RATE, "Unexpected Sai Rate");
     }
 
     function cast() public {
