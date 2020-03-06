@@ -117,11 +117,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testSpellIsCast() public {
 
-        if (MAINNET_SPELL != address(0)) {
-            spell = DssSpell(MAINNET_SPELL);
-        } else {
-            spell = new DssSpell();
-        }
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
         // Test expiration
         assertEq(spell.expiration(), (now + 30 days));
