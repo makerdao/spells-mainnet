@@ -58,8 +58,6 @@ contract SpellAction {
 
 
         // Set the ETH-A stability fee
-        // ETH_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
         //
         // Poll: Dai Stability Fee Adjustment - March 2, 2020
         // https://vote.makerdao.com/polling-proposal/qmacgdz8euruq4lsqyzgjhumhexu5jnhihbmgbh54law7s
@@ -116,14 +114,14 @@ contract DssSpell {
 
 
         // Set the Sai stability fee
-        // SAI_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 10% annual rate will be 1000000003022265980097387650
         //
         // Poll: Sai Stability Fee Adjustment - March 2, 2020
         // https://vote.makerdao.com/polling-proposal/qme4mhhlcuvcg7pwyfh1pdgqwp45abrdtvrdwvcbfggunj
         //
         // Existing Rate: 9.5%
         // New Rate: 9.5%
+        // Since the rate is not changing this week, we want to ensure that no other
+        //  spell has changed the state preemptively.
         require(saiTub.fee() == NINE_PT_FIVE_RATE, "Unexpected Sai Rate");
     }
 
