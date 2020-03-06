@@ -267,10 +267,6 @@ contract DssSpellTest is DSTest, DSMath {
         //schedule late and cast
         hevm.warp(add(now, 31 days));
 
-        spell.schedule();
-
-        hevm.warp(add(now, pause.delay()));
-
-        spell.cast();
+        spell.schedule(); // Should fail here
     }
 }
