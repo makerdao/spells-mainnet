@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell} from "./2020-03-06-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-03-06-DssSpell.sol";
 
 contract Hevm {
     function warp(uint) public;
@@ -17,14 +17,18 @@ contract DssSpellTest is DSTest, DSMath {
 
     struct SystemValues {
         uint256 dsr;
+        uint256 dsrPct;
         uint256 lineETH;
         uint256 dutyETH;
+        uint256 pctETH;
         uint256 lineBAT;
         uint256 dutyBAT;
+        uint256 pctBAT;
         uint256 lineSAI;
         uint256 lineGlobal;
         uint256 saiCap;
         uint256 saiFee;
+        uint256 saiPct;
     }
 
     // If last week's spell was cast successfully, you can copy the
@@ -33,14 +37,18 @@ contract DssSpellTest is DSTest, DSMath {
     // (8%, 150m, 8%, 150m, 8%, 150m, 150m, 25m, 9.5%)
     SystemValues lastWeek = SystemValues({
         dsr: 1000000002440418608258400030,
+        dsrPct: 8 * 1000,
         lineETH: mul(150000000, RAD),
         dutyETH: 1000000002440418608258400030,
+        pctETH: 8 * 1000,
         lineBAT: mul(150000000, RAD),
         dutyBAT: 1000000002440418608258400030,
+        pctBAT: 8 * 1000,
         lineSAI: mul(30000000, RAD),
         lineGlobal: mul(183000000, RAD),
         saiCap: mul(30000000, WAD),
-        saiFee: 1000000002877801985002875644
+        saiFee: 1000000002877801985002875644,
+        saiPct: 9.5 * 1000
     });
 
     // These are the values that should be reflected in the system
@@ -48,16 +56,19 @@ contract DssSpellTest is DSTest, DSMath {
     // (7%, 150m, 8%, 150m, 8%, 150m, 150m, 25m, 9.5%)
     SystemValues thisWeek = SystemValues({
         dsr: 1000000002145441671308778766,
+        dsrPct: 7 * 1000,
         lineETH: mul(150000000, RAD),
         dutyETH: 1000000002440418608258400030,
+        pctETH: 8 * 1000,
         lineBAT: mul(150000000, RAD),
         dutyBAT: 1000000002440418608258400030,
+        pctBAT: 8 * 1000,
         lineSAI: mul(30000000, RAD),
         lineGlobal: mul(183000000, RAD),
         saiCap: mul(30000000, WAD),
-        saiFee: 1000000002877801985002875644
+        saiFee: 1000000002877801985002875644,
+        saiPct: 9.5 * 1000
     });
-    string constant DESCRIPTION = "2020-03-06 Weekly Executive: DSR spread adjustment";
 
     Hevm hevm;
 
@@ -80,6 +91,31 @@ contract DssSpellTest is DSTest, DSMath {
 
     // not provided in DSMath
     uint constant RAD = 10 ** 45;
+    function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
+      assembly {
+        switch x case 0 {switch n case 0 {z := b} default {z := 0}}
+        default {
+          switch mod(n, 2) case 0 { z := b } default { z := x }
+          let half := div(b, 2)  // for rounding.
+          for { n := div(n, 2) } n { n := div(n,2) } {
+            let xx := mul(x, x)
+            if iszero(eq(div(xx, x), x)) { revert(0,0) }
+            let xxRound := add(xx, half)
+            if lt(xxRound, xx) { revert(0,0) }
+            x := div(xxRound, b)
+            if mod(n,2) {
+              let zx := mul(z, x)
+              if and(iszero(iszero(x)), iszero(eq(div(zx, x), z))) { revert(0,0) }
+              let zxRound := add(zx, half)
+              if lt(zxRound, zx) { revert(0,0) }
+              z := div(zxRound, b)
+            }
+          }
+        }
+      }
+    }
+    // 10^-5 (tenth of a basis point) as a RAY
+    uint256 TOLERANCE = 10 ** 22;
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
@@ -115,23 +151,42 @@ contract DssSpellTest is DSTest, DSMath {
         spell.cast();
     }
 
+    function yearlyYield(uint256 duty) public returns (uint256) {
+        return rpow(duty, (365 * 24 * 60 *60), RAY);
+    }
+
+    function expectedRate(uint256 percentValue) public returns (uint256) {
+        return (100000 + percentValue) * (10 ** 22);
+    }
+
+    function diffCalc(uint256 expectedRate, uint256 yearlyYield) public returns (uint256) {
+        return (expectedRate > yearlyYield) ? expectedRate - yearlyYield : yearlyYield - expectedRate;
+    }
+
     function testSpellIsCast() public {
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
-        // Test expiration
-        // assertEq(spell.expiration(), (now + 30 days));
-
+        // Test description
+        string memory description = new SpellAction().description();
+        assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
-            stringToBytes32(DESCRIPTION));
+            stringToBytes32(description));
+
+        // Test expiration
+        // assertEq(spell.expiration(), (now + 30 days));
 
         // (ETH-A, BAT-A, DSR)
         (uint dutyETH,) = jug.ilks("ETH-A");
         (uint dutyBAT,) = jug.ilks("BAT-A");
         assertEq(dutyETH,   lastWeek.dutyETH);
+        assertTrue(diffCalc(expectedRate(lastWeek.pctETH), yearlyYield(lastWeek.dutyETH)) <= TOLERANCE);
         assertEq(dutyBAT,   lastWeek.dutyBAT);
+        assertTrue(diffCalc(expectedRate(lastWeek.pctBAT), yearlyYield(lastWeek.dutyBAT)) <= TOLERANCE);
         assertEq(pot.dsr(), lastWeek.dsr);
+        assertTrue(diffCalc(expectedRate(lastWeek.dsrPct), yearlyYield(lastWeek.dsr)) <= TOLERANCE);
+
 
         // ETH-A line
         (,,, uint256 lineETH,) = vat.ilks("ETH-A");
@@ -149,6 +204,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // SCD Fee
         assertEq(tub.fee(), lastWeek.saiFee);
+        assertTrue(diffCalc(expectedRate(lastWeek.saiPct), yearlyYield(lastWeek.saiFee)) <= TOLERANCE);
 
         vote();
         scheduleWaitAndCast();
@@ -158,12 +214,16 @@ contract DssSpellTest is DSTest, DSMath {
 
         // dsr
         assertEq(pot.dsr(), thisWeek.dsr);
+        assertTrue(diffCalc(expectedRate(thisWeek.dsrPct), yearlyYield(thisWeek.dsr)) <= TOLERANCE);
 
+        // (ETH-A, BAT-A)
         // (ETH-A, BAT-A)
         (dutyETH,) = jug.ilks("ETH-A");
         (dutyBAT,) = jug.ilks("BAT-A");
         assertEq(dutyETH, thisWeek.dutyETH);
+        assertTrue(diffCalc(expectedRate(thisWeek.pctETH), yearlyYield(thisWeek.dutyETH)) <= TOLERANCE);
         assertEq(dutyBAT, thisWeek.dutyBAT);
+        assertTrue(diffCalc(expectedRate(thisWeek.pctETH), yearlyYield(thisWeek.dutyETH)) <= TOLERANCE);
 
         // ETH-A line
         (,,, lineETH,) = vat.ilks("ETH-A");
@@ -181,82 +241,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // SCD Fee
         assertEq(tub.fee(), thisWeek.saiFee);
-    }
-
-    function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
-      assembly {
-        switch x case 0 {switch n case 0 {z := b} default {z := 0}}
-        default {
-          switch mod(n, 2) case 0 { z := b } default { z := x }
-          let half := div(b, 2)  // for rounding.
-          for { n := div(n, 2) } n { n := div(n,2) } {
-            let xx := mul(x, x)
-            if iszero(eq(div(xx, x), x)) { revert(0,0) }
-            let xxRound := add(xx, half)
-            if lt(xxRound, xx) { revert(0,0) }
-            x := div(xxRound, b)
-            if mod(n,2) {
-              let zx := mul(z, x)
-              if and(iszero(iszero(x)), iszero(eq(div(zx, x), z))) { revert(0,0) }
-              let zxRound := add(zx, half)
-              if lt(zxRound, zx) { revert(0,0) }
-              z := div(zxRound, b)
-            }
-          }
-        }
-      }
-    }
-
-    function testSpellRates() public {
-        // 10^-5 (tenth of a basis point) as a RAY
-        uint TOLERANCE = 10 ** 22;
-        uint yearlyYield;
-        uint expected;
-        uint diff;
-
-
-        // SAI fee
-        yearlyYield = rpow(thisWeek.saiFee, 365 * 24 * 60 * 60, RAY);
-
-        // 9.5% => rate=1.095e27 after a year if it starts at ONE := RAY := 10 ** 27
-        expected = 1095 * 10 ** 24;
-
-        // Depending on rounding, rpow may over- or under- estimate the value
-        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
-        assertTrue(diff <= TOLERANCE);
-
-
-        // DSR
-        yearlyYield = rpow(thisWeek.dsr, 365 * 24 * 60 * 60, RAY);
-
-        // 7% => chi=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
-        expected = 107 * 10 ** 25;
-
-        // Depending on rounding, rpow may over- or under- estimate the value
-        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
-        assertTrue(diff <= TOLERANCE);
-
-
-        // ETH-A duty
-        yearlyYield = rpow(thisWeek.dutyETH, 365 * 24 * 60 * 60, RAY);
-
-        // 8% => rate=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
-        expected = 108 * 10 ** 25;
-
-        // Depending on rounding, rpow may over- or under- estimate the value
-        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
-        assertTrue(diff <= TOLERANCE);
-
-
-        // BAT-A duty
-        yearlyYield = rpow(thisWeek.dutyBAT, 365 * 24 * 60 * 60, RAY);
-
-        // 8% => rate=1.07e27 after a year if it starts at ONE := RAY := 10 ** 27
-        expected = 108 * 10 ** 25;
-
-        // Depending on rounding, rpow may over- or under- estimate the value
-        diff = (expected > yearlyYield) ? expected - yearlyYield : yearlyYield - expected;
-        assertTrue(diff <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(thisWeek.saiPct), yearlyYield(thisWeek.saiFee)) <= TOLERANCE);
     }
 
     function testFailSpellExpires() public {
