@@ -88,6 +88,16 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("BAT-A", "duty", BAT_FEE);
 
 
+        // Set the Sai debt ceiling for the migration contract
+        // SAI_LINE is the number of Dai that can be created with Sai token collateral
+        //  ex. a 10 million Dai ETH ceiling will be SAI_LINE = 10000000
+        //
+        // Existing Line: 30m
+        // New Line: 10m
+        uint256 SAI_LINE = 10 * MILLION;
+        VatAbstract(MCD_VAT).file("SAI", "line", SAI_LINE * RAD);
+
+
         // Set the global debt ceiling
         //
         // GLOBAL_AMOUNT is the total number of Dai that can be created by all collateral types
@@ -96,7 +106,7 @@ contract SpellAction {
         //
         // Existing Ceiling: 183m
         // New Ceiling: 143m
-        uint256 GLOBAL_AMOUNT = 143 * MILLION;
+        uint256 GLOBAL_AMOUNT = 123 * MILLION;
         VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 

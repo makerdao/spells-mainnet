@@ -57,8 +57,8 @@ contract DssSpellTest is DSTest, DSMath {
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000001243680656318820312,
         pctBAT: 4 * 1000,
-        lineSAI: mul(30000000, RAD),
-        lineGlobal: mul(143000000, RAD),
+        lineSAI: mul(10000000, RAD),
+        lineGlobal: mul(123000000, RAD),
         saiCap: mul(30000000, WAD),
         saiFee: 1000000002877801985002875644,
         saiPct: 9.5 * 1000
