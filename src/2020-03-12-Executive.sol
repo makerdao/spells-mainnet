@@ -9,7 +9,7 @@ import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    string  constant public description = "MakerDAO Weekly Executive Spell";
+    string  constant public description = "03/12/2020 MakerDAO Executive Spell";
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
