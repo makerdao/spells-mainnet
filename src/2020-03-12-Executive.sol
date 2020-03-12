@@ -3,13 +3,8 @@ pragma solidity ^0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-//import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-//import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
-//import "lib/dss-interfaces/src/dss/FlapAbstract.sol";
-//import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
-
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -27,11 +22,6 @@ contract SpellAction {
     address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
     address constant public MCD_VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant public MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    //address constant public MCD_ADM = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
-    //address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
-    //address constant public PIP_ETH = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
-    //address constant public PIP_BAT = 0xB4eb54AF9Cc7882DF0121d26c5b97E802915ABe6;
-    //address constant public MCD_FLAP = 0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f;
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -42,9 +32,6 @@ contract SpellAction {
     //
     uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
     uint256 constant public FOUR_PCT_RATE = 1000000001243680656318820312;
-    //uint256 constant public EIGHT_PCT_RATE = 1000000002440418608258400030;
-    //uint256 constant public NINE_PCT_RATE  = 1000000002732676825177582095;
-    //uint256 constant public TEN_PCT_RATE   = 1000000003022265980097387650;
 
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
