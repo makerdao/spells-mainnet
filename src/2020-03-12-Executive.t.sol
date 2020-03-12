@@ -76,6 +76,9 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract     jug = JugAbstract(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     MKRAbstract     gov = MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     SaiTubAbstract  tub = SaiTubAbstract(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
+    FlipAbstract  eflip = FlipAbstract(0xd8a04F5412223F513DC55F839574430f5EC15531);
+    FlipAbstract  bflip = FlipAbstract(0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
+    FlopAbstract   flop = FlopAbstract(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
 
     DssSpell spell;
 
@@ -272,5 +275,33 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Vow hump amount
         assertEq(vow.hump(), 2000000000000000000000000000000000000000000000000000);
+    }
+
+    function testFlipTTL() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow hump amount precheck
+        assertEq(uint256(eflip.ttl()), 1);
+        assertEq(uint256(bflip.ttl()), 2);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow hump amount
+        assertEq(uint256(eflip.ttl()), 3);
+        assertEq(uint256(bflip.ttl()), 4);
+    }
+
+    function testFlopTTL() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow hump amount precheck
+        assertEq(uint256(flop.ttl()), 1);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow hump amount
+        assertEq(uint256(flop.ttl()), 2);
     }
 }

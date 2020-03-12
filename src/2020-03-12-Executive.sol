@@ -5,6 +5,8 @@ import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -22,6 +24,9 @@ contract SpellAction {
     address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
     address constant public MCD_VOW = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant public MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public MCD_FLIP_ETH_A = 0xd8a04F5412223F513DC55F839574430f5EC15531;
+    address constant public MCD_FLIP_BAT_A = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
+    address constant public MCD_FLOP = 0x4D95A049d5B0b7d32058cd3F2163015747522e99;
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -128,6 +133,35 @@ contract SpellAction {
         // New hump: 2 million Dai
         uint256 HUMP_AMOUNT = 2 * MILLION * RAD;
         VowAbstract(MCD_VOW).file("hump", HUMP_AMOUNT);
+
+
+        // Set the ETH-A Flip ttl
+        //
+        // ETH_FLIP_TTL is the bid lifetime
+        //
+        // Existing ttl: 10 minutes
+        // New ttl: 3 hours
+        uint256 ETH_FLIP_TTL = 3 hours;
+        FlipAbstract(MCD_FLIP_ETH_A).file("ttl", ETH_FLIP_TTL);
+
+        // Set the BAT-A Flip ttl
+        //
+        // BAT_FLIP_TTL is the bid lifetime
+        //
+        // Existing ttl: 10 minutes
+        // New ttl: 3 hours
+        uint256 BAT_FLIP_TTL = 3 hours;
+        FlipAbstract(MCD_FLIP_BAT_A).file("ttl", BAT_FLIP_TTL);
+
+
+        // Set the Flop ttl
+        //
+        // FLOP_TTL is the bid lifetime
+        //
+        // Existing ttl: 10 minutes
+        // New ttl: 3 hours
+        uint256 FLOP_TTL = 3 hours;
+        FlopAbstract(MCD_FLOP).file("ttl", FLOP_TTL);
     }
 }
 
