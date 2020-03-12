@@ -142,7 +142,7 @@ contract SpellAction {
         // Existing ttl: 10 minutes
         // New ttl: 3 hours
         uint256 ETH_FLIP_TTL = 3 hours;
-        FlipAbstract(MCD_FLIP_ETH_A).file("ttl", ETH_FLIP_TTL);
+        FlipAbstract(MCD_FLIP_ETH_A).file(bytes32("ttl"), ETH_FLIP_TTL);
 
         // Set the BAT-A Flip ttl
         //
@@ -151,7 +151,7 @@ contract SpellAction {
         // Existing ttl: 10 minutes
         // New ttl: 3 hours
         uint256 BAT_FLIP_TTL = 3 hours;
-        FlipAbstract(MCD_FLIP_BAT_A).file("ttl", BAT_FLIP_TTL);
+        FlipAbstract(MCD_FLIP_BAT_A).file(bytes32("ttl"), BAT_FLIP_TTL);
 
 
         // Set the Flop ttl
@@ -161,7 +161,7 @@ contract SpellAction {
         // Existing ttl: 10 minutes
         // New ttl: 3 hours
         uint256 FLOP_TTL = 3 hours;
-        FlopAbstract(MCD_FLOP).file("ttl", FLOP_TTL);
+        FlopAbstract(MCD_FLOP).file(bytes32("ttl"), FLOP_TTL);
     }
 }
 

@@ -281,27 +281,27 @@ contract DssSpellTest is DSTest, DSMath {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
         // Vow hump amount precheck
-        assertEq(uint256(eflip.ttl()), 1);
-        assertEq(uint256(bflip.ttl()), 2);
+        assertEq(uint256(eflip.ttl()), 600);
+        assertEq(uint256(bflip.ttl()), 600);
 
         vote();
         scheduleWaitAndCast();
 
         // Vow hump amount
-        assertEq(uint256(eflip.ttl()), 3);
-        assertEq(uint256(bflip.ttl()), 4);
+        assertEq(uint256(eflip.ttl()), 3 hours);
+        assertEq(uint256(bflip.ttl()), 3 hours);
     }
 
     function testFlopTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
         // Vow hump amount precheck
-        assertEq(uint256(flop.ttl()), 1);
+        assertEq(uint256(flop.ttl()), 600);
 
         vote();
         scheduleWaitAndCast();
 
         // Vow hump amount
-        assertEq(uint256(flop.ttl()), 2);
+        assertEq(uint256(flop.ttl()), 3 hours);
     }
 }
