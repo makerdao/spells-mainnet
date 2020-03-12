@@ -260,4 +260,17 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow Flop Delay
         assertEq(vow.wait(), 1209600);
     }
+
+    function testHumpIncrease() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow hump amount precheck
+        assertEq(vow.hump(), 500000000000000000000000000000000000000000000000000);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow hump amount
+        assertEq(vow.hump(), 2000000000000000000000000000000000000000000000000000);
+    }
 }

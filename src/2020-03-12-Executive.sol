@@ -108,6 +108,16 @@ contract SpellAction {
         // New wait: 14 days
         uint256 WAIT_DELAY = 14 * DAY;
         VowAbstract(MCD_VOW).file("wait", WAIT_DELAY);
+
+
+        // Increase the system surplus limit
+        //
+        // HUMP_AMOUNT is the amount of dai will can be held in surplus
+        //
+        // Existing hump: 500,000 Dai
+        // New hump: 2 million Dai
+        uint256 HUMP_AMOUNT = 2 * MILLION * RAD;
+        VowAbstract(MCD_VOW).file("hump", HUMP_AMOUNT);
     }
 }
 
