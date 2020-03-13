@@ -263,7 +263,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow Flop Delay
         assertEq(vow.wait(), 1209600);
     }
-
+/*
     function testHumpIncrease() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -276,7 +276,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow hump amount
         assertEq(vow.hump(), 2000000000000000000000000000000000000000000000000000);
     }
-
+*/
     function testFlipTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -292,6 +292,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(bflip.ttl()), 3 hours);
     }
 
+/*
     function testFlipTAU() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -306,7 +307,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(eflip.tau()), 1 days);
         assertEq(uint256(bflip.tau()), 1 days);
     }
-
+*/
     function testFlopTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 

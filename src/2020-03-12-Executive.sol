@@ -115,26 +115,6 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 
-        // Increase the wait delay for flop auctions
-        //
-        // WAIT_DELAY is the number of seconds that pass before debt is auctioned for MKR tokens
-        //
-        // Existing wait: 2 days
-        // New wait: 14 days
-        uint256 WAIT_DELAY = 14 * DAY;
-        VowAbstract(MCD_VOW).file("wait", WAIT_DELAY);
-
-
-        // Increase the system surplus limit
-        //
-        // HUMP_AMOUNT is the amount of dai will can be held in surplus
-        //
-        // Existing hump: 500,000 Dai
-        // New hump: 2 million Dai
-        uint256 HUMP_AMOUNT = 2 * MILLION * RAD;
-        VowAbstract(MCD_VOW).file("hump", HUMP_AMOUNT);
-
-
         // Set the ETH-A Flip ttl
         //
         // ETH_FLIP_TTL is the bid lifetime
