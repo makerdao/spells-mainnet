@@ -112,8 +112,8 @@ contract SpellAction {
         //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
         //
         // Existing Ceiling: 183m
-        // New Ceiling: 125m
-        uint256 GLOBAL_AMOUNT = 125 * MILLION;
+        // New Ceiling: 100m
+        uint256 GLOBAL_AMOUNT = 100 * MILLION;
         VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 
