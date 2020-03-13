@@ -142,8 +142,8 @@ contract SpellAction {
         // ETH_FLIP_TAU is the bid lifetime
         //
         // Existing tau: 3 days
-        // New tau: 1 day
-        uint256 ETH_FLIP_TAU = 1 days;
+        // New tau: 6 hours
+        uint256 ETH_FLIP_TAU = 6 hours;
         FlipAbstract(MCD_FLIP_ETH_A).file(bytes32("tau"), ETH_FLIP_TAU);
 
 
@@ -152,8 +152,8 @@ contract SpellAction {
         // BAT_FLIP_TAU is the bid lifetime
         //
         // Existing tau: 3 days
-        // New tau: 1 day
-        uint256 BAT_FLIP_TAU = 1 days;
+        // New tau: 6 hours
+        uint256 BAT_FLIP_TAU = 6 hours;
         FlipAbstract(MCD_FLIP_BAT_A).file(bytes32("tau"), BAT_FLIP_TAU);
 
 

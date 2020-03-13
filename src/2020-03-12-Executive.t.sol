@@ -168,7 +168,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test description
         string memory description = new SpellAction().description();
         assertTrue(bytes(description).length > 0);
-        // DS-Test can't handle strings directllipTAUy, so cast to a bytes32.
+        // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
             stringToBytes32(description));
 
@@ -278,6 +278,21 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow hump amount
         assertEq(uint256(eflip.ttl()), 6 hours);
         assertEq(uint256(bflip.ttl()), 6 hours);
+    }
+
+    function testFlipTAU() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow hump amount precheck
+        assertEq(uint256(eflip.tau()), 3 days);
+        assertEq(uint256(bflip.tau()), 3 days);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow hump amount
+        assertEq(uint256(eflip.tau()), 6 hours);
+        assertEq(uint256(bflip.tau()), 6 hours);
     }
 
     function testCatLump() public {
