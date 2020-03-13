@@ -71,8 +71,8 @@ contract SpellAction {
         //  ex. a 100 million Dai ETH ceiling will be ETH_LINE = 100000000
         //
         // Existing Line: 150m
-        // New Line: 110m
-        uint256 ETH_LINE = 110 * MILLION;
+        // New Line: 100m
+        uint256 ETH_LINE = 100 * MILLION;
         VatAbstract(MCD_VAT).file("ETH-A", "line", ETH_LINE * RAD);
 
 
@@ -113,7 +113,7 @@ contract SpellAction {
         //
         // Existing Ceiling: 183m
         // New Ceiling: 100m
-        uint256 GLOBAL_AMOUNT = 100 * MILLION;
+        uint256 GLOBAL_AMOUNT = 113 * MILLION;
         VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 

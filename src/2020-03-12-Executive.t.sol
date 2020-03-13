@@ -51,14 +51,14 @@ contract DssSpellTest is DSTest, DSMath {
     SystemValues thisWeek = SystemValues({
         dsr: 1000000001243680656318820312,
         dsrPct: 4 * 1000,
-        lineETH: mul(110000000, RAD),
+        lineETH: mul(100000000, RAD),
         dutyETH: 1000000001243680656318820312,
         pctETH: 4 * 1000,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000001243680656318820312,
         pctBAT: 4 * 1000,
         lineSAI: mul(10000000, RAD),
-        lineGlobal: mul(100000000, RAD),
+        lineGlobal: mul(113000000, RAD),
         saiCap: mul(25000000, WAD),
         saiFee: 1000000002293273137447730714,
         saiPct: 7.5 * 1000
