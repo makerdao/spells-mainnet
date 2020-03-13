@@ -252,6 +252,19 @@ contract DssSpellTest is DSTest, DSMath {
 
     }
 
+    function testFlopDelay() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow Flop Delay precheck
+        assertEq(vow.wait(), 172800);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow Flop Delay
+        assertEq(vow.wait(), 518400);
+    }
+
     function testFlipTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 

@@ -173,6 +173,16 @@ contract SpellAction {
         // New lump: 500m
         uint256 LUMP = 500 * WAD;
         CatAbstract(MCD_CAT).file("ETH-A", "lump", LUMP);
+
+
+        // Increase the wait delay for flop auctions
+        //
+        // WAIT_DELAY is the number of seconds that pass before debt is auctioned for MKR tokens
+        //
+        // Existing wait: 2 days
+        // New wait: 14 days
+        uint256 WAIT_DELAY = 6 * DAY;
+        VowAbstract(MCD_VOW).file("wait", WAIT_DELAY);
     }
 }
 
