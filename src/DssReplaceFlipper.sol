@@ -2,18 +2,19 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 
-import "lib/dss-interfaces/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/dss/CatAbstract.sol";
-import "lib/dss-interfaces/dss/VatAbstract.sol";
-import "lib/dss-interfaces/dss/EndAbstract.sol";
+import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
+import "lib/dss-interfaces/src/dss/CatAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/EndAbstract.sol";
 
 contract SpellAction {
-    address constant public cat = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
-    address constant public vow = 0x0F4Cbe6CBA918b7488C26E29d9ECd7368F38EA3b;
-    address constant public vat = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
-    address constant public end = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
-    address constant public oldFlipper = 0xB40139Ea36D35d0C9F6a2e62601B616F1FfbBD1b;
+    // mainnet variables
+    address constant public cat = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
+    address constant public vow = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant public vat = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public end = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    address constant public oldFlipper = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
     // address constant public newFlipper = _NEWFLIPPER_;
 
     function execute() public {
@@ -24,11 +25,14 @@ contract SpellAction {
 
         // rely the new flipper on the cat
         FlipAbstract(newFlipper).rely(cat);
-        
-        FlipAbstract(newFlipper).rely(end);
+        FlipAbstrac(newFlipper).rely(end);
 
         // rely the new flipper on the end
         EndAbstract(end).rely(newFlipper);
+
+        // deny on the old flopper
+        FlipAbstract(oldFlipper).deny(end);
+        FlipAbstract(oldFlipper).deny(cat);
     }
 }
 
