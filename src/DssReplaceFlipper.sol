@@ -25,7 +25,7 @@ contract SpellAction {
 
         // rely the new flipper on the cat
         FlipAbstract(newFlipper).rely(cat);
-        FlipAbstrac(newFlipper).rely(end);
+        FlipAbstract(newFlipper).rely(end);
 
         // rely the new flipper on the end
         EndAbstract(end).rely(newFlipper);
@@ -44,8 +44,9 @@ contract DssReplaceFlipper is DSMath {
     address public action;
     bytes32 public tag;
     uint256 public eta;
-    bytes public sig;
-    bool public done;
+    bytes   public sig;
+    uint256 public expiration;
+    bool    public done;
 
     constructor() public {
         action = address(new SpellAction());
@@ -59,6 +60,7 @@ contract DssReplaceFlipper is DSMath {
     }
 
     function schedule() public {
+        require(now <= expiration, "This contract has expired");
         require(eta == 0, "spell-already-scheduled");
         eta = add(now, pause.delay());
         pause.plot(action, tag, sig, eta);
