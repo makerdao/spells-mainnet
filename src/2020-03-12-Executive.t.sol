@@ -276,8 +276,8 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
 
         // Vow hump amount
-        assertEq(uint256(eflip.ttl()), 3 hours);
-        assertEq(uint256(bflip.ttl()), 3 hours);
+        assertEq(uint256(eflip.ttl()), 6 hours);
+        assertEq(uint256(bflip.ttl()), 6 hours);
     }
 
     function testCatLump() public {
@@ -305,6 +305,6 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
 
         // Vow hump amount
-        assertEq(uint256(flop.ttl()), 3 hours);
+        assertEq(uint256(flop.ttl()), 6 hours);
     }
 }

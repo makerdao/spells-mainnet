@@ -123,8 +123,8 @@ contract SpellAction {
         // ETH_FLIP_TTL is the bid lifetime
         //
         // Existing ttl: 10 minutes
-        // New ttl: 3 hours
-        uint256 ETH_FLIP_TTL = 3 hours;
+        // New ttl: 6 hours
+        uint256 ETH_FLIP_TTL = 6 hours;
         FlipAbstract(MCD_FLIP_ETH_A).file(bytes32("ttl"), ETH_FLIP_TTL);
 
 
@@ -133,8 +133,8 @@ contract SpellAction {
         // BAT_FLIP_TTL is the bid lifetime
         //
         // Existing ttl: 10 minutes
-        // New ttl: 3 hours
-        uint256 BAT_FLIP_TTL = 3 hours;
+        // New ttl: 6 hours
+        uint256 BAT_FLIP_TTL = 6 hours;
         FlipAbstract(MCD_FLIP_BAT_A).file(bytes32("ttl"), BAT_FLIP_TTL);
 
 
@@ -163,8 +163,8 @@ contract SpellAction {
         // FLOP_TTL is the bid lifetime
         //
         // Existing ttl: 10 minutes
-        // New ttl: 3 hours
-        uint256 FLOP_TTL = 3 hours;
+        // New ttl: 6 hours
+        uint256 FLOP_TTL = 6 hours;
         FlopAbstract(MCD_FLOP).file(bytes32("ttl"), FLOP_TTL);
 
 
