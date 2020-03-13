@@ -169,8 +169,8 @@ contract SpellAction {
 
         // Set the Lot size to 500 ETH
         //
-        // Existing lump: 50m
-        // New lump: 500m
+        // Existing lump: 50 ETH
+        // New lump: 500 ETH
         uint256 LUMP = 500 * WAD;
         CatAbstract(MCD_CAT).file("ETH-A", "lump", LUMP);
 
