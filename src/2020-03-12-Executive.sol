@@ -43,7 +43,7 @@ contract SpellAction {
     uint256 constant public WAD = 10**18;
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
-    uint256 constant public DAY = 86400; // in seconds
+    uint256 constant public HOUR = 3600; // in seconds
 
     function execute() external {
 
@@ -180,8 +180,8 @@ contract SpellAction {
         // WAIT_DELAY is the number of seconds that pass before debt is auctioned for MKR tokens
         //
         // Existing wait: 2 days
-        // New wait: 14 days
-        uint256 WAIT_DELAY = 6 * DAY;
+        // New wait: 6.5 days
+        uint256 WAIT_DELAY = 156 * HOUR;
         VowAbstract(MCD_VOW).file("wait", WAIT_DELAY);
     }
 }

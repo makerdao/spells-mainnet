@@ -262,7 +262,7 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
 
         // Vow Flop Delay
-        assertEq(vow.wait(), 518400);
+        assertEq(vow.wait(), 561600);
     }
 
     function testFlipTTL() public {
