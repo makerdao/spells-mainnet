@@ -71,6 +71,7 @@ contract DssSpellTest is DSTest, DSMath {
     DSChiefAbstract chief =
         DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     VatAbstract     vat = VatAbstract(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    CatAbstract     cat = CatAbstract(0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
     VowAbstract     vow = VowAbstract(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
     PotAbstract     pot = PotAbstract(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract     jug = JugAbstract(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
@@ -167,7 +168,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test description
         string memory description = new SpellAction().description();
         assertTrue(bytes(description).length > 0);
-        // DS-Test can't handle strings directly, so cast to a bytes32.
+        // DS-Test can't handle strings directllipTAUy, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
             stringToBytes32(description));
 
@@ -263,20 +264,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow Flop Delay
         assertEq(vow.wait(), 1209600);
     }
-/*
-    function testHumpIncrease() public {
-        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
-        // Vow hump amount precheck
-        assertEq(vow.hump(), 500000000000000000000000000000000000000000000000000);
-
-        vote();
-        scheduleWaitAndCast();
-
-        // Vow hump amount
-        assertEq(vow.hump(), 2000000000000000000000000000000000000000000000000000);
-    }
-*/
     function testFlipTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -292,22 +280,21 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(bflip.ttl()), 3 hours);
     }
 
-/*
-    function testFlipTAU() public {
+    function testCatLump() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
-        // Vow hump amount precheck
-        assertEq(uint256(eflip.tau()), 3 days);
-        assertEq(uint256(bflip.tau()), 3 days);
+        // Cat lump amount precheck
+        (,, uint256 lump) = cat.ilks("ETH-A");
+        assertEq(lump, 50 * 10**18);
 
         vote();
         scheduleWaitAndCast();
 
-        // Vow hump amount
-        assertEq(uint256(eflip.tau()), 1 days);
-        assertEq(uint256(bflip.tau()), 1 days);
+        // Cat lump amount
+        (,, lump) = cat.ilks("ETH-A");
+        assertEq(lump, 500 * 10**18);
     }
-*/
+
     function testFlopTTL() public {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
