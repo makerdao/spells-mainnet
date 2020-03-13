@@ -49,8 +49,8 @@ contract DssSpellTest is DSTest, DSMath {
     });
 
     SystemValues thisWeek = SystemValues({
-        dsr: 1000000000000000000000000000,
-        dsrPct: 0 * 1000,
+        dsr: 1000000001243680656318820312,
+        dsrPct: 4 * 1000,
         lineETH: mul(110000000, RAD),
         dutyETH: 1000000001243680656318820312,
         pctETH: 4 * 1000,
@@ -58,10 +58,10 @@ contract DssSpellTest is DSTest, DSMath {
         dutyBAT: 1000000001243680656318820312,
         pctBAT: 4 * 1000,
         lineSAI: mul(10000000, RAD),
-        lineGlobal: mul(123000000, RAD),
-        saiCap: mul(30000000, WAD),
-        saiFee: 1000000002877801985002875644,
-        saiPct: 9.5 * 1000
+        lineGlobal: mul(125000000, RAD),
+        saiCap: mul(25000000, WAD),
+        saiFee: 1000000002293273137447730714,
+        saiPct: 7.5 * 1000
     });
 
     Hevm hevm;
@@ -290,6 +290,21 @@ contract DssSpellTest is DSTest, DSMath {
         // Vow hump amount
         assertEq(uint256(eflip.ttl()), 3 hours);
         assertEq(uint256(bflip.ttl()), 3 hours);
+    }
+
+    function testFlipTAU() public {
+        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        // Vow hump amount precheck
+        assertEq(uint256(eflip.tau()), 3 days);
+        assertEq(uint256(bflip.tau()), 3 days);
+
+        vote();
+        scheduleWaitAndCast();
+
+        // Vow hump amount
+        assertEq(uint256(eflip.tau()), 1 days);
+        assertEq(uint256(bflip.tau()), 1 days);
     }
 
     function testFlopTTL() public {

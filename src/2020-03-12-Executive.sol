@@ -7,6 +7,7 @@ import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
+import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -35,7 +36,6 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
     uint256 constant public FOUR_PCT_RATE = 1000000001243680656318820312;
 
     uint256 constant public RAD = 10**45;
@@ -58,8 +58,8 @@ contract SpellAction {
         //  ex. an 8% annual rate will be 1000000002440418608258400030
         //
         // Existing Rate: 8%
-        // New Rate: 0%
-        uint256 DSR_RATE = ZERO_PCT_RATE;
+        // New Rate: 4%
+        uint256 DSR_RATE = FOUR_PCT_RATE;
         PotAbstract(MCD_POT).file("dsr", DSR_RATE);
 
 
@@ -110,8 +110,8 @@ contract SpellAction {
         //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
         //
         // Existing Ceiling: 183m
-        // New Ceiling: 143m
-        uint256 GLOBAL_AMOUNT = 123 * MILLION;
+        // New Ceiling: 125m
+        uint256 GLOBAL_AMOUNT = 125 * MILLION;
         VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
 
 
@@ -153,6 +153,24 @@ contract SpellAction {
         uint256 BAT_FLIP_TTL = 3 hours;
         FlipAbstract(MCD_FLIP_BAT_A).file(bytes32("ttl"), BAT_FLIP_TTL);
 
+        // Set the ETH-A Flip tau
+        //
+        // ETH_FLIP_TAU is the bid lifetime
+        //
+        // Existing tau: 3 days
+        // New tau: 1 day
+        uint256 ETH_FLIP_TAU = 1 days;
+        FlipAbstract(MCD_FLIP_ETH_A).file(bytes32("tau"), ETH_FLIP_TAU);
+
+        // Set the BAT-A Flip tau
+        //
+        // BAT_FLIP_TAU is the bid lifetime
+        //
+        // Existing tau: 3 days
+        // New tau: 1 day
+        uint256 BAT_FLIP_TAU = 1 days;
+        FlipAbstract(MCD_FLIP_BAT_A).file(bytes32("tau"), BAT_FLIP_TAU);
+
 
         // Set the Flop ttl
         //
@@ -162,6 +180,8 @@ contract SpellAction {
         // New ttl: 3 hours
         uint256 FLOP_TTL = 3 hours;
         FlopAbstract(MCD_FLOP).file(bytes32("ttl"), FLOP_TTL);
+
+
     }
 }
 
@@ -177,6 +197,7 @@ contract DssSpell {
     uint256          public expiration;
     bool             public done;
 
+    uint256 constant internal MILLION = 10**6;
     uint256 constant internal WAD = 10**18;
 
     constructor() public {
@@ -201,6 +222,28 @@ contract DssSpell {
 
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
         // preventing these SCD changes from being executed again.
+
+        // Set the Sai stability fee
+        // SAI_FEE is a value determined by the rate accumulator calculation (see above)
+        //  ex. an 10% annual rate will be 1000000003022265980097387650
+        //
+        // Existing Rate: 9.5%
+        // New Rate: 7.5%
+        uint256 SAI_FEE = 1000000002293273137447730714;
+        SaiMomAbstract(SAI_MOM).setFee(SAI_FEE);
+
+        // Set the Sai debt ceiling
+        //
+        // SAI_AMOUNT is the total number of Sai that can be created in SCD
+        //  as a whole number
+        //  ex. a 15 million Sai global ceiling will be GLOBAL_AMOUNT = 15000000
+        //
+        // <Add link to weekly poll authorizing change>
+        //
+        // Existing ceiling: 30m
+        // New ceiling: 25m
+        uint256 SAI_AMOUNT = 25 * MILLION;
+        SaiMomAbstract(SAI_MOM).setCap(SAI_AMOUNT * WAD);
     }
 
     function cast() public {
