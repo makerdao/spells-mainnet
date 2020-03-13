@@ -9,6 +9,7 @@ import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -191,6 +192,7 @@ contract DssSpell {
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address constant public SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
     address          public action;
     bytes32          public tag;
     uint256          public eta;
@@ -224,6 +226,9 @@ contract DssSpell {
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
         // preventing these SCD changes from being executed again.
 
+        // stop the OSM price feed
+        OsmMomAbstract(OSM_MOM).stop("ETH-A");
+        OsmMomAbstract(OSM_MOM).stop("BAT-A");
 
         // Set the Sai stability fee
         // SAI_FEE is a value determined by the rate accumulator calculation (see above)
