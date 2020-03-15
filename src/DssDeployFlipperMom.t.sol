@@ -34,7 +34,7 @@ contract DssSpellTest is DSTest, DSMath {
         0xbE286431454714F511008713973d3B053A2d38f3
     );
     DSChiefAbstract chief = DSChiefAbstract(
-        0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2
+        MCD_ADM
     );
     MKRAbstract gov = MkrAbstract(
         0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2
@@ -121,7 +121,7 @@ contract DssSpellTest is DSTest, DSMath {
         FlipMomLike(FLIPPER_MOM).setAuthority(address(this));
     }
 
-    function testFailOnUnAuthRely() public {
+    function testFailOnUnAuthRely_ETH_A() public {
         spell = MAINNET_SPELL != address(0) ? 
             DssDeployFlipperMom(MAINNET_SPELL) :
             new DssDeployFlipperMom();
@@ -129,11 +129,10 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
 
-        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_ETH_A, address(this));
-        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_BAT_A, address(this));
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_ETH_A);
     }
 
-    function testFailOnUnAuthDeny() public {
+    function testFailOnUnAuthRely_BAT_A() public {
         spell = MAINNET_SPELL != address(0) ? 
             DssDeployFlipperMom(MAINNET_SPELL) :
             new DssDeployFlipperMom();
@@ -141,7 +140,28 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
 
-        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_ETH_A, MCD_CAT);
-        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A, MCD_CAT);
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_BAT_A);
+    }
+
+    function testFailOnUnAuthDeny_ETH_A() public {
+        spell = MAINNET_SPELL != address(0) ? 
+            DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_ETH_A);
+    }
+
+    function testFailOnUnAuthDeny_BAT_A() public {
+        spell = MAINNET_SPELL != address(0) ? 
+            DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A);
     }
 }
