@@ -17,6 +17,7 @@ contract FlipMomLike {
     function deny(address) external;
     function authority() public returns (address);
     function owner() public returns (address);
+    function cat() public returns (address);
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -165,5 +166,35 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
 
         FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A);
+    }
+
+    function testMomActuallyWorks() public {
+        spell = MAINNET_SPELL != 
+            address(0) ? DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
+        address[] memory yays = new address[](1);
+        yays[0] = address(this);
+        chief.vote(yays);
+
+        // become the hat
+        chief.lift(address(this));
+
+        assertTrue(MCD_CAT == FlipMomLike(FLIPPER_MOM).cat());
+
+        assertEq(FlipAbstract(MCD_FLIP_ETH_A).wards(MCD_CAT), 1);
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_ETH_A);
+        assertEq(FlipAbstract(MCD_FLIP_ETH_A).wards(MCD_CAT), 0);
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_ETH_A);
+        assertEq(FlipAbstract(MCD_FLIP_ETH_A).wards(MCD_CAT), 1);
+
+        assertEq(FlipAbstract(MCD_FLIP_BAT_A).wards(MCD_CAT), 1);
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A);
+        assertEq(FlipAbstract(MCD_FLIP_BAT_A).wards(MCD_CAT), 0);
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_BAT_A);
+        assertEq(FlipAbstract(MCD_FLIP_BAT_A).wards(MCD_CAT), 1);
     }
 }
