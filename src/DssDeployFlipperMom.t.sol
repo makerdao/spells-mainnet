@@ -93,17 +93,10 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
 
-        address flipChief = FlipMomLike(FLIPPER_MOM).authority();
-        assertEq(flipChief, MCD_ADM);
-
-        address flipMomOwner = FlipMomLike(FLIPPER_MOM).owner();
-        assertEq(flipMomOwner, MCD_PAUSE_PROXY);
-
-        uint256 flipEthAWard = FlipAbstract(MCD_FLIP_ETH_A).wards(FLIPPER_MOM);
-        assertEq(flipEthAWard, 1);
-
-        uint256 flipBatAWard = FlipAbstract(MCD_FLIP_BAT_A).wards(FLIPPER_MOM);
-        assertEq(flipBatAWard, 1);
+        assertEq(FlipMomLike(FLIPPER_MOM).authority(), MCD_ADM);
+        assertEq(FlipMomLike(FLIPPER_MOM).owner(), MCD_PAUSE_PROXY);
+        assertEq(FlipAbstract(MCD_FLIP_ETH_A).wards(FLIPPER_MOM), 1);
+        assertEq(FlipAbstract(MCD_FLIP_BAT_A).wards(FLIPPER_MOM), 1);
     }
 
     function testFailOnSetOwner() public {
@@ -126,5 +119,29 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
 
         FlipMomLike(FLIPPER_MOM).setAuthority(address(this));
+    }
+
+    function testFailOnUnAuthRely() public {
+        spell = MAINNET_SPELL != address(0) ? 
+            DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_ETH_A, address(this));
+        FlipMomLike(FLIPPER_MOM).rely(MCD_FLIP_BAT_A, address(this));
+    }
+
+    function testFailOnUnAuthDeny() public {
+        spell = MAINNET_SPELL != address(0) ? 
+            DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_ETH_A, MCD_CAT);
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A, MCD_CAT);
     }
 }
