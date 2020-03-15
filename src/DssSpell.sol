@@ -1,8 +1,5 @@
 pragma solidity 0.5.12;
 
-import {Flipper} from "dss/flip.sol";
-import {FlipperMom} from "flipper-mom/FlipperMom.sol";
-
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
