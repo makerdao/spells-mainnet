@@ -24,7 +24,7 @@ contract SpellAction {
     // ------------ MAINNET ADDRESSES ------------
     // -------------------------------------------
     // address constant public pauseProxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    // address constant public flipper = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    // address constant public flipper = 0xd8a04F5412223F513DC55F839574430f5EC15531;
     // address constant public auth = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
     // address constant public chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
 
