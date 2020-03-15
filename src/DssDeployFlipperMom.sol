@@ -42,12 +42,12 @@ contract SpellAction {
 
     function execute() public {
         // set flipper mom auth to MCD_ADM
-        FlipMomLike(flipMom).setAuthority(chief);
+        FlipMomLike(flipperMom).setAuthority(chief);
         // set flipper mom owner to MCD_PAUSE_PROXY
-        FlipMomLike(flipMom).setOwner(pauseProxy);
+        FlipMomLike(flipperMom).setOwner(pauseProxy);
         // rely the flipper mom on both ETH-A and BAT-A flippers
-        FlipAbstract(flipperEthA).rely(address(flipMom));
-        FlipAbstract(flipperBatA).rely(address(flipMom));
+        FlipAbstract(flipperEthA).rely(address(flipperMom));
+        FlipAbstract(flipperBatA).rely(address(flipperMom));
     }
 }
 
