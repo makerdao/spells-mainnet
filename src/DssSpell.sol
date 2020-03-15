@@ -124,8 +124,6 @@ contract DssSpell {
         //  as a whole number
         //  ex. a 15 million Sai global ceiling will be GLOBAL_AMOUNT = 15000000
         //
-        // <Add link to weekly poll authorizing change>
-        //
         // Existing ceiling: 25m
         // New ceiling: 20m
         uint256 SAI_AMOUNT = 20 * MILLION;
