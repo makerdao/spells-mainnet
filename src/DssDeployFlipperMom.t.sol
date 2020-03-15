@@ -21,7 +21,7 @@ contract FlipMomLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = 0xfB071acf2F89Ba0f0Fc1Da3DD188c3361cbC2fA3;
+    address constant MAINNET_SPELL = 0x3778e388A5CF2778E0fE5fC6205738BeCe9Cb99d;
 
     address constant MCD_PAUSE_PROXY = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     address constant MCD_ADM = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
