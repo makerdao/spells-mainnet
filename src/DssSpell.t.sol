@@ -75,7 +75,7 @@ contract DssSpellTest is DSTest, DSMath {
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002293273137447730714,
         saiPct: 7.5 * 1000,
-        pauseDelay: 60 * 60 * 8
+        pauseDelay: 60 * 60 * 4
     });
 
     Hevm hevm;

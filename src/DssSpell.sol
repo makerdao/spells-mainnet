@@ -74,8 +74,8 @@ contract SpellAction {
         uint256 BAT_FEE = ZERO_FIVE_PCT_RATE;
         JugAbstract(MCD_JUG).file("BAT-A", "duty", BAT_FEE);
 
-        // Set Pause Delay to 8 hours
-        DSPauseAbstract(MCD_PAUSE).setDelay(8 hours);
+        // Set Pause Delay to 4 hours
+        DSPauseAbstract(MCD_PAUSE).setDelay(4 hours);
 
         // Add FlipperMom
         // Set flipper mom auth to MCD_ADM
