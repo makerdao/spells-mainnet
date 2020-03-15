@@ -18,6 +18,8 @@ contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0); 
 
+    // address constant FLIPPER_MOM = ;
+
     // -------------------------------------------
     // ------------ MAINNET ADDRESSES ------------
     // -------------------------------------------

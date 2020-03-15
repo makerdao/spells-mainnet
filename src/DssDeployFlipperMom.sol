@@ -28,6 +28,7 @@ contract SpellAction {
     // address constant public flipperBatA = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
     // address constant public auth = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
     // address constant public chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
+    // address constant public flipperMom = ;
 
     // -------------------------------------------
     // ------------- KOVAN ADDRESSES -------------
@@ -37,16 +38,13 @@ contract SpellAction {
     address constant public flipperBatA = 0xC94014A032cA5fCc01271F4519Add7E87a16b94C;
     address constant public auth = 0xE50303C6B67a2d869684EFb09a62F6aaDD06387B;
     address constant public chief = 0xbBFFC76e94B34F72D96D054b31f6424249c1337d;
+    // address constant public flipperMom = ;
 
     function execute() public {
-        // deploy the flipper mom
-        FlipperMom flipMom = new FlipperMom();
-
         // set flipper mom auth to MCD_ADM
-        flipMom.setAuthority(chief);
+        FlipMomLike(flipMom).setAuthority(chief);
         // set flipper mom owner to MCD_PAUSE_PROXY
-        flipMom.setOwner(pauseProxy);
-
+        FlipMomLike(flipMom).setOwner(pauseProxy);
         // rely the flipper mom on both ETH-A and BAT-A flippers
         FlipAbstract(flipperEthA).rely(address(flipMom));
         FlipAbstract(flipperBatA).rely(address(flipMom));
