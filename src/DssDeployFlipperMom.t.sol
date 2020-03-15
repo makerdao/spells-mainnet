@@ -13,10 +13,10 @@ contract Hevm {
 contract FlipMomLike {
     function setOwner(address) external;
     function setAuthority(address) external;
-    function rely(address, address) external;
-    function deny(address, address) external;
-    function authority() public;
-    function owner() public;
+    function rely(address) external;
+    function deny(address) external;
+    function authority() public returns (address);
+    function owner() public returns (address);
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -95,8 +95,8 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
 
-        //assertEq(FlipMomLike(FLIPPER_MOM).authority(), MCD_ADM);
-        // assertEq(FlipMomLike(FLIPPER_MOM).owner(), MCD_PAUSE_PROXY);
+        assertEq(FlipMomLike(FLIPPER_MOM).authority(), MCD_ADM);
+        assertEq(FlipMomLike(FLIPPER_MOM).owner(), MCD_PAUSE_PROXY);
         assertEq(FlipAbstract(MCD_FLIP_ETH_A).wards(FLIPPER_MOM), 1);
         assertEq(FlipAbstract(MCD_FLIP_BAT_A).wards(FLIPPER_MOM), 1);
     }
