@@ -2,6 +2,7 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import {Flipper} from "dss/flip.sol";
+import {FlipperMom} from "flipper-mom/FlipperMom.sol";
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
@@ -9,45 +10,52 @@ import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/EndAbstract.sol";
 
+contract MkrAuthLike {
+    function rely(address) public;
+    function deny(address) public;
+}
+
+contract FlipMomLike {
+    function setOwner(address) external;
+    function setAuthority(address) external;
+    function rely(address, address) external;
+    function deny(address, address) external;
+}
+
 contract SpellAction {
     // -------------------------------------------
     // ------------ MAINNET ADDRESSES ------------
     // -------------------------------------------
-    // address constant public cat = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
-    // address constant public vow = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
-    // address constant public vat = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    // address constant public end = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    // address constant public oldFlipper = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    // address constant public pauseProxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    // address constant public flipper = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    // address constant public auth = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
+    // address constant public chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
 
     // -------------------------------------------
     // ------------- KOVAN ADDRESSES -------------
     // -------------------------------------------
-    address constant public cat = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
-    address constant public vow = 0x0F4Cbe6CBA918b7488C26E29d9ECd7368F38EA3b;
-    address constant public vat = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
-    address constant public end = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
-    address constant public oldFlipper = 0xB40139Ea36D35d0C9F6a2e62601B616F1FfbBD1b;
+    address constant public pauseProxy = 0x0e4725db88Bb038bBa4C4723e91Ba183BE11eDf3;
+    address constant public flipper = 0xB40139Ea36D35d0C9F6a2e62601B616F1FfbBD1b;
+    address constant public auth = 0xE50303C6B67a2d869684EFb09a62F6aaDD06387B;
+    address constant public chief = 0xbBFFC76e94B34F72D96D054b31f6424249c1337d;
 
     function execute() public {
-        Flipper newFlipper = new Flipper(vat, "ETH-A");
+        // deploy the flipper mom
+        FlipperMom flipMom = new FlipperMom();
 
-        // file ETH-A ilk type to update cat to new flipper
-        CatAbstract(cat).file("ETH-A", "flip", address(newFlipper));
+        // set flipper mom auth to MCD_ADM
+        flipMom.setAuthority(chief);
+        // set flipper mom owner to MCD_PAUSE_PROXY
+        flipMom.setOwner(pauseProxy);
+        // deny the spell action address on the pause
+        flipMom.deny(address(this));
 
-        // rely the cat and end on the new flipper
-        newFlipper.rely(cat);
-        newFlipper.rely(end);
-
-        // rely the new flipper on the end
-        EndAbstract(end).rely(address(newFlipper));
-
-        // deny the end and cat on the old flipper
-        FlipAbstract(oldFlipper).deny(end);
-        FlipAbstract(oldFlipper).deny(cat);
+        // rely the flipper mom on the flipper
+        FlipAbstract(flipper).rely(address(flipMom));
     }
 }
 
-contract DssReplaceFlipper is DSMath {
+contract DssDeployFlipperMom is DSMath {
     // MAINNET ADDRESS
     // DSPauseAbstract public pause = DSPauseAbstract(
     //     0xbE286431454714F511008713973d3B053A2d38f3

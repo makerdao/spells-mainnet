@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssReplaceFlipper} from "./DssReplaceFlipper.sol";
+import {DssDeployFlipperMom} from "./DssDeployFlipperMom.sol";
 
 contract Hevm {
     function warp(uint256) public;
@@ -20,9 +20,6 @@ contract DssSpellTest is DSTest, DSMath {
     // DSPauseAbstract pause = DSPauseAbstract(
     //     0xbE286431454714F511008713973d3B053A2d38f3
     // );
-    // VatAbstract vat = VatAbstract(
-    //     0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B
-    // );
     // DSChiefAbstract chief = DSChiefAbstract(
     //     0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2
     // );
@@ -35,9 +32,6 @@ contract DssSpellTest is DSTest, DSMath {
     // -------------------------------------------
     DSPauseAbstract pause = DSPauseAbstract(
         0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189
-    );
-    VatAbstract vat = VatAbstract(
-        0xbA987bDB501d131f766fEe8180Da5d81b34b69d9
     );
     DSChiefAbstract chief = DSChiefAbstract(
         0xbBFFC76e94B34F72D96D054b31f6424249c1337d
@@ -85,6 +79,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell = MAINNET_SPELL != 
             address(0) ? DssReplaceFlipper(MAINNET_SPELL) : 
             new DssReplaceFlipper();
+
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
