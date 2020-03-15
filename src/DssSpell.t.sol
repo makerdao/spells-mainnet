@@ -22,7 +22,7 @@ contract FlipMomLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf);
 
     struct SystemValues {
         uint256 dsr;
@@ -94,7 +94,7 @@ contract DssSpellTest is DSTest, DSMath {
     FlipAbstract  eflip     = FlipAbstract(0xd8a04F5412223F513DC55F839574430f5EC15531);
     FlipAbstract  bflip     = FlipAbstract(0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
     FlopAbstract   flop     = FlopAbstract(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
-    address  flipperMom     = 0xFF7bb16C5767694C767422912b516d9c8E94E392;
+    address  flipperMom     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
     DssSpell spell;
 
