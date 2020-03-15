@@ -23,7 +23,7 @@ contract SpellAction {
     address constant public MCD_FLIP_ETH_A = 0xd8a04F5412223F513DC55F839574430f5EC15531;
     address constant public MCD_FLIP_BAT_A = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
     address constant public MCD_ADM = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
-    address constant public FLIPPER_MOM = 0xFF7bb16C5767694C767422912b516d9c8E94E392;
+    address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
