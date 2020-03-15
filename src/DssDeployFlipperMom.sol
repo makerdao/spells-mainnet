@@ -6,9 +6,6 @@ import {FlipperMom} from "flipper-mom/FlipperMom.sol";
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/EndAbstract.sol";
 
 contract MkrAuthLike {
     function rely(address) public;
