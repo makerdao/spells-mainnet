@@ -24,8 +24,6 @@ contract SpellAction {
     function execute() public {
         // set flipper mom auth to MCD_ADM
         FlipMomLike(FLIPPER_MOM).setAuthority(MCD_ADM);
-        // set flipper mom owner to MCD_PAUSE_PROXY
-        FlipMomLike(FLIPPER_MOM).setOwner(DS_PAUSE_PROXY);
         // rely the flipper mom on both ETH-A and BAT-A flippers
         FlipAbstract(MCD_FLIP_ETH_A).rely(address(FLIPPER_MOM));
         FlipAbstract(MCD_FLIP_BAT_A).rely(address(FLIPPER_MOM));
