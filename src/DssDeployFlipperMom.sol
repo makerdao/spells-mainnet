@@ -20,24 +20,11 @@ contract FlipMomLike {
 }
 
 contract SpellAction {
-    // -------------------------------------------
-    // ------------ MAINNET ADDRESSES ------------
-    // -------------------------------------------
-    // address constant public pauseProxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    // address constant public flipperEthA = 0xd8a04F5412223F513DC55F839574430f5EC15531;
-    // address constant public flipperBatA = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
-    // address constant public auth = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
-    // address constant public chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
-    // address constant public flipperMom = ;
-
-    // -------------------------------------------
-    // ------------- KOVAN ADDRESSES -------------
-    // -------------------------------------------
-    address constant public pauseProxy = 0x0e4725db88Bb038bBa4C4723e91Ba183BE11eDf3;
-    address constant public flipperEthA = 0xB40139Ea36D35d0C9F6a2e62601B616F1FfbBD1b;
-    address constant public flipperBatA = 0xC94014A032cA5fCc01271F4519Add7E87a16b94C;
-    address constant public auth = 0xE50303C6B67a2d869684EFb09a62F6aaDD06387B;
-    address constant public chief = 0xbBFFC76e94B34F72D96D054b31f6424249c1337d;
+    address constant public pauseProxy = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    address constant public flipperEthA = 0xd8a04F5412223F513DC55F839574430f5EC15531;
+    address constant public flipperBatA = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
+    address constant public auth = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
+    address constant public chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
     // address constant public flipperMom = ;
 
     function execute() public {
@@ -53,13 +40,8 @@ contract SpellAction {
 
 contract DssDeployFlipperMom is DSMath {
     // MAINNET ADDRESS
-    // DSPauseAbstract public pause = DSPauseAbstract(
-    //     0xbE286431454714F511008713973d3B053A2d38f3
-    // );
-
-    // KOVAN ADDRESS
     DSPauseAbstract public pause = DSPauseAbstract(
-        0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189
+        0xbE286431454714F511008713973d3B053A2d38f3
     );
 
     address public action;
