@@ -44,8 +44,6 @@ contract SpellAction {
         flipMom.setAuthority(chief);
         // set flipper mom owner to MCD_PAUSE_PROXY
         flipMom.setOwner(pauseProxy);
-        // deny the spell action address on the pause
-        flipMom.deny(address(this));
 
         // rely the flipper mom on the flipper
         FlipAbstract(flipper).rely(address(flipMom));

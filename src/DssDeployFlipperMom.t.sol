@@ -10,6 +10,10 @@ contract Hevm {
     function warp(uint256) public;
 }
 
+contract FlipMomLike {
+    
+}
+
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0); 
@@ -27,6 +31,7 @@ contract DssSpellTest is DSTest, DSMath {
     //     0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2
     // );
     
+
     // -------------------------------------------
     // ------------- KOVAN ADDRESSES -------------
     // -------------------------------------------
@@ -40,7 +45,7 @@ contract DssSpellTest is DSTest, DSMath {
         0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD
     );
     
-    DssReplaceFlipper spell;
+    DssDeployFlipperMom spell;
 
     Hevm hevm;
 
@@ -77,11 +82,21 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testSpellIsCast() public {
         spell = MAINNET_SPELL != 
-            address(0) ? DssReplaceFlipper(MAINNET_SPELL) : 
-            new DssReplaceFlipper();
+            address(0) ? DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
 
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
+    }
+
+    function testWards() public {
+        spell = MAINNET_SPELL != 
+            address(0) ? DssDeployFlipperMom(MAINNET_SPELL) :
+            new DssDeployFlipperMom();
+
+        vote();
+        scheduleWaitAndCast();
+
     }
 }
