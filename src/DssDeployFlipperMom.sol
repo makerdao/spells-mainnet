@@ -19,16 +19,16 @@ contract SpellAction {
     address constant public MCD_FLIP_ETH_A = 0xd8a04F5412223F513DC55F839574430f5EC15531;
     address constant public MCD_FLIP_BAT_A = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
     address constant public MCD_ADM = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
-    // address constant public flipperMom = ;
+    address constant public FLIPPER_MOM = 0xFF7bb16C5767694C767422912b516d9c8E94E392;
 
     function execute() public {
         // set flipper mom auth to MCD_ADM
-        FlipMomLike(flipperMom).setAuthority(MCD_ADM);
+        FlipMomLike(FLIPPER_MOM).setAuthority(MCD_ADM);
         // set flipper mom owner to MCD_PAUSE_PROXY
-        FlipMomLike(flipperMom).setOwner(DS_PAUSE_PROXY);
+        FlipMomLike(FLIPPER_MOM).setOwner(DS_PAUSE_PROXY);
         // rely the flipper mom on both ETH-A and BAT-A flippers
-        FlipAbstract(MCD_FLIP_ETH_A).rely(address(flipperMom));
-        FlipAbstract(MCD_FLIP_BAT_A).rely(address(flipperMom));
+        FlipAbstract(MCD_FLIP_ETH_A).rely(address(FLIPPER_MOM));
+        FlipAbstract(MCD_FLIP_BAT_A).rely(address(FLIPPER_MOM));
     }
 }
 
