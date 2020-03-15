@@ -4,7 +4,7 @@ SPELL="DssDeployFlipperMom"
 SPELLFILE="${SPELL}.sol"
 TESTFILE="${SPELL}.t.sol"
 
-dapp --use solc:0.5.12 build --extract
+dapp --use solc:0.5.12 build
 
 # mainnet multisig
 export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
