@@ -64,10 +64,10 @@ contract SpellAction {
         // Allow FlipperMom to access to the USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(FLIPPER_MOM);
 
-        // Set the global debt ceiling
-        VatAbstract(MCD_VAT).file("Line", 138 * MILLION * RAD);
-        // Set the USDC-A debt ceiling
-        VatAbstract(MCD_VAT).file(ilk, "line", 25 * MILLION * RAD);
+        // Set the global debt ceiling to 133 MM
+        VatAbstract(MCD_VAT).file("Line", 133 * MILLION * RAD);
+        // Set the USDC-A debt ceiling to 20 MM
+        VatAbstract(MCD_VAT).file(ilk, "line", 20 * MILLION * RAD);
         // Set the USDC-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
         // Set the Lot size to 50K USDC-A

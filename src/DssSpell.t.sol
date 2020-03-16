@@ -138,7 +138,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // USDC-A line and dust
         (,,, uint256 lineUSDC, uint256 dustUSDC) = vat.ilks("USDC-A");
-        assertEq(lineUSDC, 25 * MILLION * RAD);
+        assertEq(lineUSDC, 20 * MILLION * RAD);
         assertEq(dustUSDC, 20 * RAD);
 
         // USDC-A liquidation penalty and lot size
@@ -159,7 +159,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mat, 125 * RAY / 100);
 
         // Line
-        assertEq(vat.Line(), 138 * MILLION * RAD);
+        assertEq(vat.Line(), 133 * MILLION * RAD);
 
         // USDC Pip => 1 USDC == 1 DAI
         assertEq(uint256(uPip.read()), 1 * WAD);
