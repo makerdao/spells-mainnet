@@ -42,6 +42,7 @@ contract DssSpellTest is DSTest, DSMath {
     EndAbstract     end     = EndAbstract(0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     address  flipperMom     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     GemAbstract     usdc    = GemAbstract(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    DSValueAbstract uPip    = DSValueAbstract(0x77b68899b99b686F415d074278a9a16b336085A0);
 
     DssSpell spell;
 
@@ -165,7 +166,15 @@ contract DssSpellTest is DSTest, DSMath {
         // Line
         assertEq(vat.Line(), 138 * MILLION * RAD);
 
+        // USDC Pip => 1 USDC == 1 DAI
+        assertEq(uint256(uPip.read()), 1 * WAD);
+        // USDC Pip Owner
+        assertEq(uPip.owner(), pauseProxy);
+        // USDC Pip Authority
+        assertEq(uPip.authority(), address(0));
+
         // Authorization
+        assertEq(uJoin.wards(pauseProxy), 1);
         assertEq(vat.wards(address(uJoin)), 1);
         assertEq(uFlip.wards(address(cat)), 1);
         assertEq(uFlip.wards(address(end)), 1);
