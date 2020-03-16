@@ -20,7 +20,7 @@ contract SpellAction {
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     address constant public FLIP_FAB = 0xBAB4FbeA257ABBfe84F4588d4Eedc43656E46Fc5;
 
-    address constant public MCD_JOIN_USDC_A = 0x4bCD9B34560a383fFadEdD4887e05bBA3009080B;
+    address constant public MCD_JOIN_USDC_A = 0xA191e578a6736167326d05c119CE0c90849E84B7;
     address constant public PIP_USDC = 0x77b68899b99b686F415d074278a9a16b336085A0;
 
     uint256 constant public THOUSAND = 10**3;
