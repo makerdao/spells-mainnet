@@ -144,7 +144,7 @@ contract DssSpellTest is DSTest, DSMath {
         // USDC-A liquidation penalty and lot size
         (address aux, uint256 chop, uint256 lump) = cat.ilks("USDC-A");
         FlipAbstract uFlip = FlipAbstract(aux);
-        assertEq(chop, 105 * RAY / 100);
+        assertEq(chop, 113 * RAY / 100);
         assertEq(lump, 50 * THOUSAND * WAD);
 
         // USDC-A percentage between bids
