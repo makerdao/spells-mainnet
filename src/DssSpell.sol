@@ -6,6 +6,7 @@ import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 
 contract FlipFabAbstract {
     function newFlip(address, bytes32) public returns (address);
@@ -56,7 +57,7 @@ contract SpellAction {
 
         // Allow USDC-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_USDC_A);
-        // Allow Cat to kick auctions in USDC-A Flipper
+        // Allow Cat to kick auctions in USDC-A Flipper (which will be denied at the end, just doing this for explicitness)
         FlipAbstract(MCD_FLIP_USDC_A).rely(MCD_CAT);
         // Allow End to yank auctions in USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(MCD_END);
@@ -86,6 +87,9 @@ contract SpellAction {
 
         // Update USDC-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
+
+        // Deny Cat in the USDC-A Flipper via FlipperMom
+        FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_A);
     }
 }
 
