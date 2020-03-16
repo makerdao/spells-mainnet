@@ -12,16 +12,16 @@ contract FlipFabAbstract {
 }
 
 contract SpellAction {
-    address constant public MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant public MCD_CAT = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
-    address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant public MCD_SPOT = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant public MCD_END = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    address constant public FLIP_FAB = 0xBAB4FbeA257ABBfe84F4588d4Eedc43656E46Fc5;
+    address constant public MCD_VAT = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
+    address constant public MCD_CAT = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
+    address constant public MCD_JUG = 0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD;
+    address constant public MCD_SPOT = 0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D;
+    address constant public MCD_END = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
+    //address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    address constant public FLIP_FAB = 0xFfB0382CA7Cfdc4Fc4d5Cc8913af1393d7eE1EF1;
 
     address constant public MCD_JOIN_USDC_A = 0xA191e578a6736167326d05c119CE0c90849E84B7;
-    address constant public PIP_USDC = 0x77b68899b99b686F415d074278a9a16b336085A0;
+    address constant public PIP_USDC = 0x4c51c2584309b7BF328F89609FDd03B3b95fC677;
 
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION = 10**6;
@@ -61,7 +61,7 @@ contract SpellAction {
         // Allow End to yank auctions in USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(MCD_END);
         // Allow FlipperMom to access to the USDC-A Flipper
-        FlipAbstract(MCD_FLIP_USDC_A).rely(FLIPPER_MOM);
+        //FlipAbstract(MCD_FLIP_USDC_A).rely(FLIPPER_MOM);
 
         // Set the global debt ceiling
         VatAbstract(MCD_VAT).file("Line", 138 * MILLION * RAD);
@@ -92,7 +92,7 @@ contract SpellAction {
 contract DssSpell {
     // MAINNET ADDRESS
     DSPauseAbstract public pause = DSPauseAbstract(
-        0xbE286431454714F511008713973d3B053A2d38f3
+        0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189
     );
 
     address public action;
@@ -116,7 +116,7 @@ contract DssSpell {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "spell-already-scheduled");
         // Only plot it when the time delay is set to 4 hours
-        require(pause.delay() == 4 hours, "spell-not-4-hours-delay");
+        //require(pause.delay() == 4 hours, "spell-not-4-hours-delay");
 
         eta = now + pause.delay();
         pause.plot(action, tag, sig, eta);
