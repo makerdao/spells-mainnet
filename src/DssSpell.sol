@@ -33,9 +33,9 @@ contract SpellAction {
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 0.5%):
     //
-    // $ bc -l <<< 'scale=27; e( l(1.005)/(60 * 60 * 24 * 365) )'
+    // $ bc -l <<< 'scale=27; e( l(1.2)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant public ZERO_FIVE_PCT_RATE = 1000000000158153903837946257;
+    uint256 constant public TWENTY_PCT_RATE = 1000000005781378656804591712;
 
     function execute() public {
         bytes32 ilk = "USDC-A";
@@ -54,17 +54,25 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_USDC_A).rely(FLIPPER_MOM);
 
         // Set the global debt ceiling
-        VatAbstract(MCD_VAT).file("Line", 163 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file("Line", 138 * MILLION * RAD);
         // Set the USDC-A debt ceiling
-        VatAbstract(MCD_VAT).file(ilk, "line", 50 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ilk, "line", 25 * MILLION * RAD);
+        // Set the USDC-A dust
+        VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
         // Set the Lot size to 50K USDC-A
         CatAbstract(MCD_CAT).file(ilk, "lump", 50 * THOUSAND * WAD);
         // Set the USDC-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
-        // Set the USDC-A stability fee to 0.5%
-        JugAbstract(MCD_JUG).file(ilk, "duty", ZERO_FIVE_PCT_RATE);
-        // Set the USDC-A min collateralization ratio to 110%
-        SpotAbstract(MCD_SPOT).file(ilk, "mat", 110 * RAY / 100);
+        // Set the USDC-A stability fee to 20%
+        JugAbstract(MCD_JUG).file(ilk, "duty", TWENTY_PCT_RATE);
+        // Set the USDC-A percentage between bids to 2%
+        FlipAbstract(MCD_FLIP_USDC_A).file("beg", 102 * WAD / 100);
+        // Set the USDC-A time max time between bids to 6 hours
+        FlipAbstract(MCD_FLIP_USDC_A).file("ttl", 6 hours);
+        // Set the USDC-A max auction duration to 6 hours
+        FlipAbstract(MCD_FLIP_USDC_A).file("tau", 6 hours);
+        // Set the USDC-A min collateralization ratio to 125%
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 125 * RAY / 100);
         // Update USDC-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
     }

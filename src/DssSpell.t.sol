@@ -137,12 +137,13 @@ contract DssSpellTest is DSTest, DSMath {
 
         // USDC-A fee
         (uint256 dutyUSDC,) = jug.ilks("USDC-A");
-        assertEq(dutyUSDC, 1000000000158153903837946257);
-        assertTrue(diffCalc(expectedRate(0.5 * 1000), yearlyYield(dutyUSDC)) <= TOLERANCE);
+        assertEq(dutyUSDC, 1000000005781378656804591712);
+        assertTrue(diffCalc(expectedRate(20 * 1000), yearlyYield(dutyUSDC)) <= TOLERANCE);
 
-        // USDC-A line
-        (,,, uint256 lineUSDC,) = vat.ilks("USDC-A");
-        assertEq(lineUSDC, 50 * MILLION * RAD);
+        // USDC-A line and dust
+        (,,, uint256 lineUSDC, uint256 dustUSDC) = vat.ilks("USDC-A");
+        assertEq(lineUSDC, 25 * MILLION * RAD);
+        assertEq(dustUSDC, 20 * RAD);
 
         // USDC-A liquidation penalty and lot size
         (address aux, uint256 chop, uint256 lump) = cat.ilks("USDC-A");
@@ -150,12 +151,19 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(chop, 113 * RAY / 100);
         assertEq(lump, 50 * THOUSAND * WAD);
 
-        // USDC-A collateralization ratio
+        // USDC-A percentage between bids
+        assertEq(uFlip.beg(), 102 * WAD / 100);
+        // USDC-A max time between bids
+        assertEq(uint256(uFlip.ttl()), 6 hours);
+        // USDC-A max auction duration
+        assertEq(uint256(uFlip.tau()), 6 hours);
+
+        // USDC-A min collateralization ratio
         (, uint256 mat) = spot.ilks("USDC-A");
-        assertEq(mat, 110 * RAY / 100);
+        assertEq(mat, 125 * RAY / 100);
 
         // Line
-        assertEq(vat.Line(), 163 * MILLION * RAD);
+        assertEq(vat.Line(), 138 * MILLION * RAD);
 
         // Authorization
         assertEq(vat.wards(address(uJoin)), 1);
