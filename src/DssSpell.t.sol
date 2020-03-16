@@ -27,28 +27,28 @@ contract DssSpellTest is DSTest, DSMath {
     Hevm hevm;
 
     // MAINNET ADDRESSES
-    DSPauseAbstract pause   = DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
-    address pauseProxy      = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    DSChiefAbstract chief   = DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
-    VatAbstract     vat     = VatAbstract(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    CatAbstract     cat     = CatAbstract(0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
-    VowAbstract     vow     = VowAbstract(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    PotAbstract     pot     = PotAbstract(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
-    JugAbstract     jug     = JugAbstract(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
-    SpotAbstract   spot     = SpotAbstract(0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
-    MKRAbstract     gov     = MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    SaiTubAbstract  tub     = SaiTubAbstract(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
-    GemJoinAbstract uJoin   = GemJoinAbstract(0xA191e578a6736167326d05c119CE0c90849E84B7);
-    EndAbstract     end     = EndAbstract(0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
-    address  flipperMom     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    GemAbstract     usdc    = GemAbstract(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    DSPauseAbstract pause   = DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
+    address pauseProxy      = 0x0e4725db88Bb038bBa4C4723e91Ba183BE11eDf3;
+    DSChiefAbstract chief   = DSChiefAbstract(0xbBFFC76e94B34F72D96D054b31f6424249c1337d);
+    VatAbstract     vat     = VatAbstract(0xbA987bDB501d131f766fEe8180Da5d81b34b69d9);
+    CatAbstract     cat     = CatAbstract(0x0511674A67192FE51e86fE55Ed660eB4f995BDd6);
+    VowAbstract     vow     = VowAbstract(0x0F4Cbe6CBA918b7488C26E29d9ECd7368F38EA3b);
+    PotAbstract     pot     = PotAbstract(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
+    JugAbstract     jug     = JugAbstract(0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD);
+    SpotAbstract   spot     = SpotAbstract(0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D);
+    MKRAbstract     gov     = MKRAbstract(0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD);
+    SaiTubAbstract  tub     = SaiTubAbstract(0xa71937147b55Deb8a530C7229C442Fd3F31b7db2);
+    GemJoinAbstract uJoin   = GemJoinAbstract(0x4c514656E7dB7B859E994322D2b511d99105C1Eb);
+    EndAbstract     end     = EndAbstract(0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F);
+    //address  flipperMom     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    GemAbstract     usdc    = GemAbstract(0x4c514656E7dB7B859E994322D2b511d99105C1Eb);
 
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
         bytes20(uint160(uint256(keccak256('hevm cheat code'))));
-    
+
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION = 10**6;
     uint256 constant WAD = 10**18;
@@ -96,13 +96,13 @@ contract DssSpellTest is DSTest, DSMath {
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-        gov.mint(address(this), 300000 ether);
+        //gov.mint(address(this), 300000 ether);
 
         // If the spell which changes the delay to 4 hours haven't run yet, warp the time and do it
-        if (!DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).done()) {
-            hevm.warp(1584386127);
-            DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).cast();
-        }
+        //if (!DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).done()) {
+        //    hevm.warp(1584386127);
+        //    DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).cast();
+        //}
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
     }
 
@@ -169,7 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vat.wards(address(uJoin)), 1);
         assertEq(uFlip.wards(address(cat)), 1);
         assertEq(uFlip.wards(address(end)), 1);
-        assertEq(uFlip.wards(flipperMom), 1);
+        //assertEq(uFlip.wards(flipperMom), 1);
 
         // Start testing Vault
 
