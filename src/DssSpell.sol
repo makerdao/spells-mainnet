@@ -76,12 +76,12 @@ contract SpellAction {
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
         // Set the USDC-A stability fee to 20%
         JugAbstract(MCD_JUG).file(ilk, "duty", TWENTY_PCT_RATE);
-        // Set the USDC-A percentage between bids to 2%
-        FlipAbstract(MCD_FLIP_USDC_A).file("beg", 102 * WAD / 100);
+        // Set the USDC-A percentage between bids to 3%
+        FlipAbstract(MCD_FLIP_USDC_A).file("beg", 103 * WAD / 100);
         // Set the USDC-A time max time between bids to 6 hours
         FlipAbstract(MCD_FLIP_USDC_A).file("ttl", 6 hours);
-        // Set the USDC-A max auction duration to 6 hours
-        FlipAbstract(MCD_FLIP_USDC_A).file("tau", 6 hours);
+        // Set the USDC-A max auction duration to 3 days
+        FlipAbstract(MCD_FLIP_USDC_A).file("tau", 3 days);
         // Set the USDC-A min collateralization ratio to 125%
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 125 * RAY / 100);
 
@@ -119,8 +119,6 @@ contract DssSpell {
     function schedule() public {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "spell-already-scheduled");
-        // Only plot it when the time delay is set to 4 hours
-        require(pause.delay() == 4 hours, "spell-not-4-hours-delay");
 
         eta = now + pause.delay();
         pause.plot(action, tag, sig, eta);

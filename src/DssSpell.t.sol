@@ -99,11 +99,6 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
         gov.mint(address(this), 300000 ether);
 
-        // If the spell which changes the delay to 4 hours haven't run yet, warp the time and do it
-        if (!DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).done()) {
-            hevm.warp(1584386127);
-            DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).cast();
-        }
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
     }
 
@@ -153,11 +148,11 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lump, 50 * THOUSAND * WAD);
 
         // USDC-A percentage between bids
-        assertEq(uFlip.beg(), 102 * WAD / 100);
+        assertEq(uFlip.beg(), 103 * WAD / 100);
         // USDC-A max time between bids
         assertEq(uint256(uFlip.ttl()), 6 hours);
         // USDC-A max auction duration
-        assertEq(uint256(uFlip.tau()), 6 hours);
+        assertEq(uint256(uFlip.tau()), 3 days);
 
         // USDC-A min collateralization ratio
         (, uint256 mat) = spot.ilks("USDC-A");
