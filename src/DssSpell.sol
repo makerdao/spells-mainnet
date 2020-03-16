@@ -40,17 +40,27 @@ contract SpellAction {
     function execute() public {
         bytes32 ilk = "USDC-A";
 
+        // Create the USDC-A Flipper via the original FlipFab
         address MCD_FLIP_USDC_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
 
+        // Set the USDC PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_USDC);
 
+        // Set the USDC-A Flipper in the Cat
         CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_USDC_A);
+
+        // Init USDC-A ilk in Vat
         VatAbstract(MCD_VAT).init(ilk);
+        // Init USDC-A ilk in Jug
         JugAbstract(MCD_JUG).init(ilk);
 
+        // Allow USDC-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_USDC_A);
+        // Allow Cat to kick auctions in USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(MCD_CAT);
+        // Allow End to yank auctions in USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(MCD_END);
+        // Allow FlipperMom to access to the USDC-A Flipper
         FlipAbstract(MCD_FLIP_USDC_A).rely(FLIPPER_MOM);
 
         // Set the global debt ceiling
@@ -73,6 +83,7 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_USDC_A).file("tau", 6 hours);
         // Set the USDC-A min collateralization ratio to 125%
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 125 * RAY / 100);
+
         // Update USDC-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
     }
