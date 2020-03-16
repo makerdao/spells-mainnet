@@ -41,6 +41,7 @@ contract DssSpellTest is DSTest, DSMath {
     GemJoinAbstract uJoin   = GemJoinAbstract(0x4bCD9B34560a383fFadEdD4887e05bBA3009080B);
     EndAbstract     end     = EndAbstract(0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     address  flipperMom     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    GemAbstract     usdc    = GemAbstract(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
 
     DssSpell spell;
 
@@ -97,6 +98,11 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
         gov.mint(address(this), 300000 ether);
 
+        // If the spell which changes the delay to 4 hours haven't run yet, warp the time and do it
+        if (!DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).done()) {
+            hevm.warp(1584386127);
+            DSSpellAbstract(0xd77ad957fcF536d13A17f5D1FfFA3987F83376cf).cast();
+        }
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
     }
 
@@ -151,11 +157,36 @@ contract DssSpellTest is DSTest, DSMath {
         // Line
         assertEq(vat.Line(), 163 * MILLION * RAD);
 
-
         // Authorization
         assertEq(vat.wards(address(uJoin)), 1);
         assertEq(uFlip.wards(address(cat)), 1);
         assertEq(uFlip.wards(address(end)), 1);
         assertEq(uFlip.wards(flipperMom), 1);
+
+        // Start testing Vault
+
+        // // Join to adapter
+        // assertEq(usdc.balanceOf(address(this)), 40 * 10 ** 6);
+        // assertEq(vat.gem("USDC-A", address(this)), 0);
+        // usdc.approve(address(uJoin), 40 * 10 ** 6);
+        // uJoin.join(address(this), 40 * 10 ** 6);
+        // assertEq(usdc.balanceOf(address(this)), 0);
+        // assertEq(vat.gem("USDC-A", address(this)), 40 * WAD);
+
+        // // Deposit collateral, generate DAI
+        // assertEq(vat.dai(address(this)), 0);
+        // vat.frob("USDC-A", address(this), address(this), address(this), int(40 * WAD), int(25 * WAD));
+        // assertEq(vat.gem("USDC-A", address(this)), 0);
+        // assertEq(vat.dai(address(this)), 25 * RAD);
+
+        // // Payback DAI, withdraw collateral
+        // vat.frob("USDC-A", address(this), address(this), address(this), -int(40 * WAD), -int(25 * WAD));
+        // assertEq(vat.gem("USDC-A", address(this)), 40 * WAD);
+        // assertEq(vat.dai(address(this)), 0);
+
+        // // Withdraw from adapter
+        // uJoin.exit(address(this), 40 * 10 ** 6);
+        // assertEq(usdc.balanceOf(address(this)), 40 * 10 ** 6);
+        // assertEq(vat.gem("USDC-A", address(this)), 0);
     }
 }

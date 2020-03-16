@@ -96,6 +96,9 @@ contract DssSpell {
     function schedule() public {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "spell-already-scheduled");
+        // Only plot it when the time delay is set to 4 hours
+        require(pause.delay() == 4 hours, "spell-not-4-hours-delay");
+
         eta = now + pause.delay();
         pause.plot(action, tag, sig, eta);
     }
