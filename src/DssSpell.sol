@@ -72,8 +72,8 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
         // Set the Lot size to 50K USDC-A
         CatAbstract(MCD_CAT).file(ilk, "lump", 50 * THOUSAND * WAD);
-        // Set the USDC-A liquidation penalty to 13%
-        CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
+        // Set the USDC-A liquidation penalty to 5%
+        CatAbstract(MCD_CAT).file(ilk, "chop", 105 * RAY / 100);
         // Set the USDC-A stability fee to 20%
         JugAbstract(MCD_JUG).file(ilk, "duty", TWENTY_PCT_RATE);
         // Set the USDC-A percentage between bids to 3%
