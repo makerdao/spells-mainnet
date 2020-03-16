@@ -125,7 +125,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function scheduleWaitAndCast() public {
         spell.schedule();
-        hevm.warp(add(now, pause.delay()));
+        hevm.warp(now + pause.delay());
         spell.cast();
     }
 
@@ -205,5 +205,15 @@ contract DssSpellTest is DSTest, DSMath {
         uJoin.exit(address(this), 40 * 10 ** 6);
         assertEq(usdc.balanceOf(address(this)), 40 * 10 ** 6);
         assertEq(vat.gem("USDC-A", address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        usdc.approve(address(uJoin), 40 * 10 ** 6);
+        uJoin.join(address(this), 40 * 10 ** 6);
+        vat.frob("USDC-A", address(this), address(this), address(this), int(40 * WAD), int(32 * WAD)); // Max amount of DAI
+        hevm.warp(now + 1);
+        jug.drip("USDC-A");
+        assertEq(uFlip.kicks(), 0);
+        cat.bite("USDC-A", address(this));
+        assertEq(uFlip.kicks(), 1);
     }
 }
