@@ -22,6 +22,7 @@ contract DisableLiquidationSpellTest is DSTest, DSMath {
     MKRAbstract     gov     = MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     FlipAbstract  eflip     = FlipAbstract(0xd8a04F5412223F513DC55F839574430f5EC15531);
     FlipAbstract  bflip     = FlipAbstract(0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
+    FlipAbstract  uflip     = FlipAbstract(0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1);
 
     DisableLiquidationSpell spell;
 
@@ -53,9 +54,6 @@ contract DisableLiquidationSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast() public {
-        assertEq(eflip.wards(address(cat)), 1);
-        assertEq(bflip.wards(address(cat)), 1);
-
         vote();
         spell.cast();
 
@@ -64,6 +62,7 @@ contract DisableLiquidationSpellTest is DSTest, DSMath {
 
         assertEq(eflip.wards(address(cat)), 0);
         assertEq(bflip.wards(address(cat)), 0);
+        assertEq(uflip.wards(address(cat)), 0);
     }
 
     function testFailCanOnlyCastOnce() public {

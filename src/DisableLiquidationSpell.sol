@@ -10,6 +10,7 @@ contract FlipMomLike {
 contract DisableLiquidationSpell is DSMath {
     address constant public MCD_FLIP_ETH_A = 0xd8a04F5412223F513DC55F839574430f5EC15531;
     address constant public MCD_FLIP_BAT_A = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
+    address constant public MCD_FLIP_USDC_A = 0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1;
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
     uint256 constant lifetime = 30 days;
@@ -28,5 +29,6 @@ contract DisableLiquidationSpell is DSMath {
         done = true;
         FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_ETH_A);
         FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_BAT_A);
+        FlipMomLike(FLIPPER_MOM).deny(MCD_FLIP_USDC_A);
     }
 }
