@@ -1,13 +1,11 @@
 pragma solidity ^0.5.12;
 
-import "ds-math/math.sol";
-
 contract FlipMomLike {
     function rely(address) external;
     function deny(address) external;
 }
 
-contract DisableLiquidationSpell is DSMath {
+contract DisableLiquidationSpell {
     address constant public MCD_FLIP_ETH_A = 0xd8a04F5412223F513DC55F839574430f5EC15531;
     address constant public MCD_FLIP_BAT_A = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
     address constant public MCD_FLIP_USDC_A = 0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1;
@@ -18,8 +16,12 @@ contract DisableLiquidationSpell is DSMath {
     uint256 public exp;
     bool    public done;
 
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "overflow");
+    }
+
     constructor() public {
-        exp = now + lifetime;
+        exp = add(now, lifetime);
         done = false;
     }
 
