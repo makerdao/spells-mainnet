@@ -31,7 +31,7 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant public ZERO_PCT_RATE = 0;
+    uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
 
     uint256 constant public WAD = 10**18;
     uint256 constant public RAD = 10**45;
