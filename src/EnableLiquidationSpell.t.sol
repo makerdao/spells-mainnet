@@ -12,7 +12,7 @@ contract Hevm {
 
 contract EnableLiquidationSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = 0xd36DF11cF6855b616a36eAdBcf9290f7953D90FD;
 
     Hevm hevm;
 
