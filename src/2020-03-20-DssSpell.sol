@@ -111,7 +111,7 @@ contract DssSpell {
         // SAI_FEE is a value determined by the rate accumulator calculation (see above)
         //  ex. an 10% annual rate will be 1000000003022265980097387650
         //
-        // Existing Rate: 4.0%
+        // Existing Rate: 7.5%
         // New Rate: 3.5%
         uint256 SAI_FEE = 1000000001090862085746321732;
         SaiMomAbstract(SAI_MOM).setFee(SAI_FEE);
