@@ -51,7 +51,7 @@ contract DssSpellTest is DSTest, DSMath {
         lineGlobal: mul(133000000, RAD),
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002293273137447730714,
-        saiPct: 4.0 * 1000
+        saiPct: 7.5 * 1000
     });
 
     SystemValues thisWeek = SystemValues({
