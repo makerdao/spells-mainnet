@@ -4,10 +4,6 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/VowAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 
 contract SpellAction {
