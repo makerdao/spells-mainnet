@@ -42,6 +42,8 @@ contract DssSpellTest is DSTest, DSMath {
         VatAbstract(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     VowAbstract     vow =
         VowAbstract(0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    FlopAbstract    flop =
+        FlopAbstract(0x4D95A049d5B0b7d32058cd3F2163015747522e99);
     MKRAbstract     gov =
         MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
 
@@ -104,12 +106,13 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (now + 30 days));
         }
 
-        uint256 pre_debt = vat.debt();
-        uint256 pre_vice = vat.vice();
-        uint256 pre_Awe  = vat.sin(address(vow));
-        uint256 pre_joy  = vat.dai(address(vow));
-        uint256 pre_Ash  = vow.Ash();
-        uint256 pre_Sin  = vow.Sin();
+        uint256 pre_debt  = vat.debt();
+        uint256 pre_vice  = vat.vice();
+        uint256 pre_Awe   = vat.sin(address(vow));
+        uint256 pre_joy   = vat.dai(address(vow));
+        uint256 pre_Ash   = vow.Ash();
+        uint256 pre_Sin   = vow.Sin();
+        uint256 pre_kicks = flop.kicks();
 
         vote();
         scheduleWaitAndCast();
@@ -117,18 +120,16 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        uint256 delta;
-        if (pre_joy >= pre_Ash) {
-            delta = pre_Ash;
-        } else {
-            delta = pre_joy;
-        }
-        assertEq(vat.debt(), sub(pre_debt, delta));
-        assertEq(vat.vice(), sub(pre_vice, delta));
-        assertEq(vat.sin(address(vow)), sub(pre_Awe, delta));
-        assertEq(vat.dai(address(vow)), sub(pre_joy, delta));
-        assertEq(vow.Ash(), 0);
+        assertEq(vat.debt(), sub(pre_debt, pre_joy));
+        assertEq(vat.vice(), sub(pre_vice, pre_joy));
+        assertEq(vat.sin(address(vow)), sub(pre_Awe, pre_joy));
+        assertEq(vat.dai(address(vow)), 0);
         assertEq(vow.Sin(), pre_Sin);
+
+        uint256 nFlops = sub(pre_Ash, pre_joy) / vow.sump();
+
+        assertEq(vow.Ash(), mul(nFlops, vow.sump()));
+        assertEq(flop.kicks(), add(pre_kicks, nFlops));
     }
 
 }

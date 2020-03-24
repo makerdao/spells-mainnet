@@ -33,15 +33,20 @@ contract SpellAction {
         uint256 joy = VatAbstract(MCD_VAT).dai(MCD_VOW);
         uint256 Ash = VowAbstract(MCD_VOW).Ash();
 
-        if (joy >= Ash) {
-            VowAbstract(MCD_VOW).kiss(Ash);
-        } else {
-            VowAbstract(MCD_VOW).kiss(joy);
-            Ash = Ash - joy;  // safe because kiss did not revert
+        require(joy < Ash);
+        VowAbstract(MCD_VOW).kiss(joy);
+        Ash = Ash - joy;  // safe because kiss did not revert
 
-            // The remaining Ash is stuck; convert it to woe.
-            VatAbstract(MCD_VAT).suck(MCD_VOW, MCD_VOW, Ash);
-            VowAbstract(MCD_VOW).kiss(Ash);
+        // The remaining Ash is stuck; convert it to woe.
+        VatAbstract(MCD_VAT).suck(MCD_VOW, MCD_VOW, Ash);
+        VowAbstract(MCD_VOW).kiss(Ash);
+
+        // Ash is zero now, so woe is just Awe - Sin
+        uint256 woe  = VatAbstract(MCD_VAT).sin(MCD_VOW) - VowAbstract(MCD_VOW).Sin();
+        uint256 sump = VowAbstract(MCD_VOW).sump();
+        while (woe >= sump) {
+            VowAbstract(MCD_VOW).flop();
+            woe -= sump;
         }
     }
 }
