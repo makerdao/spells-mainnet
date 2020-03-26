@@ -24,15 +24,28 @@ contract SpellAction {
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
     uint256 constant public HOUR = 3600; // in seconds
+    uint256 constant public DAY = 24 * HOUR; // in seconds
+
+    uint256 constant public T2020_03_27_1200EDT = 1585324800;
 
     function execute() external {
+        // Must start after noon EDT on 2020/03/27
+        require(now >= T2020_03_27_1200EDT, "too-soon");
+
+        uint256 diff = now - T2020_03_27_1200EDT;
+
+        // Must start within a one hour window of the daily start time
+        require(diff % DAY <= HOUR, "not within an hour of noon EDT");
+
+        // Must start on a weekday
+        require((diff / DAY) != 1 && (diff / DAY) != 2, "not a weekday");
+
         // This check ensures there are no unbid flops active
         require(FlopAbstract(MCD_FLOP).kicks() == 86, "possibility-of-unbid-flops");
 
         // reconcile as much Ash as possible, then unstick
         uint256 joy = VatAbstract(MCD_VAT).dai(MCD_VOW);
         uint256 Ash = VowAbstract(MCD_VOW).Ash();
-
         require(joy < Ash);
         VowAbstract(MCD_VOW).kiss(joy);
         Ash = Ash - joy;  // safe because kiss did not revert

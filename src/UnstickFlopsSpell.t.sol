@@ -49,14 +49,18 @@ contract DssSpellTest is DSTest, DSMath {
 
     DssSpell spell;
 
+    // this spell is intended to run as the MkrAuthority
+    function canCall(address, address, bytes4) public returns (bool) {
+        return true;
+    }
+
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
         bytes20(uint160(uint256(keccak256('hevm cheat code'))));
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-        // Using the Flopper test address, mint enough MKR to overcome the
-        // current hat.
+        // mint enough MKR to overcome the current hat.
         gov.mint(address(this), 300000 ether);
     }
 
@@ -78,7 +82,10 @@ contract DssSpellTest is DSTest, DSMath {
 
     function scheduleWaitAndCast() public {
         spell.schedule();
-        hevm.warp(add(now, pause.delay()));
+
+        // warp to 2020-03-27 1200 EDT
+        hevm.warp(1585324800);
+
         spell.cast();
     }
 
@@ -131,5 +138,4 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vow.Ash(), mul(nFlops, vow.sump()));
         assertEq(flop.kicks(), add(pre_kicks, nFlops));
     }
-
 }
