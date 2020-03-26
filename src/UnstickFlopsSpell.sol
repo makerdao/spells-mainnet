@@ -68,7 +68,6 @@ contract DssSpell {
 
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
-    address constant public SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
     address          public action;
     bytes32          public tag;
     uint256          public eta;
