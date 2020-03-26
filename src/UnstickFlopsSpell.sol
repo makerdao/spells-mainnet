@@ -35,7 +35,7 @@ contract SpellAction {
         uint256 diff = now - T2020_03_27_1200EDT;
 
         // Must start within a one hour window of the daily start time
-        require(diff % DAY <= HOUR, "not within an hour of noon EDT");
+        require(diff % DAY <= 2*HOUR, "not within two hours of noon EDT");
 
         // Must start on a weekday
         require((diff / DAY) != 1 && (diff / DAY) != 2, "not a weekday");

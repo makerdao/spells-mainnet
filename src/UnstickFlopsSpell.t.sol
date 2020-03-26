@@ -139,14 +139,14 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flop.kicks(), add(pre_kicks, nFlops));
     }
 
-    function testFailNotAfter1300EDT() public {
+    function testFailNotAfter1400EDT() public {
         spell = MAINNET_SPELL != address(0) ?
             DssSpell(MAINNET_SPELL) : new DssSpell();
         vote();
         spell.schedule();
 
-        // warp to 2020-03-27 1301 EDT
-        hevm.warp(1585328401);
+        // warp to 2020-03-27 1401 EDT
+        hevm.warp(1585332001);
 
         spell.cast();
     }
