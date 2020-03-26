@@ -138,4 +138,52 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vow.Ash(), mul(nFlops, vow.sump()));
         assertEq(flop.kicks(), add(pre_kicks, nFlops));
     }
+
+    function testFailNotAfter1300EDT() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+        vote();
+        spell.schedule();
+
+        // warp to 2020-03-27 1301 EDT
+        hevm.warp(1585328401);
+
+        spell.cast();
+    }
+
+    function testFailNotOnSaturday() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+        vote();
+        spell.schedule();
+
+        // warp to 2020-03-28 1200 EDT
+        hevm.warp(1585411200);
+
+        spell.cast();
+    }
+
+    function testFailNotOnSunday() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+        vote();
+        spell.schedule();
+
+        // warp to 2020-03-29 1200 EDT
+        hevm.warp(1585497600);
+
+        spell.cast();
+    }
+
+    function testMondayIsOkay() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+        vote();
+        spell.schedule();
+
+        // warp to 2020-03-30 1200 EDT
+        hevm.warp(1585584000);
+
+        spell.cast();
+    }
 }
