@@ -29,10 +29,8 @@ contract SpellAction {
     //
     uint256 constant public SIXTEEN_PCT_RATE = 1000000004706367499604668374;
 
-    uint256 constant public WAD = 10**18;
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
-    uint256 constant public HOUR = 3600; // in seconds
 
     function execute() external {
 
@@ -96,7 +94,6 @@ contract DssSpell {
     bool             public done;
 
     uint256 constant internal MILLION = 10**6;
-    uint256 constant internal WAD = 10**18;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
