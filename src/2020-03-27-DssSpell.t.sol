@@ -93,7 +93,7 @@ contract DssSpellTest is DSTest, DSMath {
     DssSpell spell;
 
     // this spell is intended to run as the MkrAuthority
-    function canCall(address, address, bytes4) public returns (bool) {
+    function canCall(address, address, bytes4) public pure returns (bool) {
         return true;
     }
 
