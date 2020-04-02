@@ -167,6 +167,7 @@ contract DssSpell {
         0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
     uint256 constant internal MILLION = 10**6;
+    uint256 constant public T2020_07_01_1200UTC = 1593604800;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -175,7 +176,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = T2020_07_01_1200UTC;
     }
 
     function description() public view returns (string memory) {

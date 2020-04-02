@@ -12,6 +12,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Replace with mainnet spell address to test against live
     address constant MAINNET_SPELL = address(0);
+    uint256 constant public T2020_07_01_1200UTC = 1593604800;
 
     struct SystemValues {
         uint256 dsr;
@@ -213,7 +214,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test expiration
         // TODO fix this for deployed contract
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
+            assertEq(spell.expiration(), (T2020_07_01_1200UTC));
         }
 
         // (ETH-A, USDC-A, BAT-A, DSR)
