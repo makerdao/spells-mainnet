@@ -19,12 +19,15 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 lineETH;
         uint256 dutyETH;
         uint256 pctETH;
+        uint48  tauETH;
         uint256 lineUSDC;
         uint256 dutyUSDC;
         uint256 pctUSDC;
+        uint48  tauUSDC;
         uint256 lineBAT;
         uint256 dutyBAT;
         uint256 pctBAT;
+        uint48  tauBAT;
         uint256 lineSAI;
         uint256 lineGlobal;
         uint256 saiCap;
@@ -33,20 +36,23 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     // If last week's spell was cast successfully, you can copy the
-    //  the values from that week's `thisWeek` var into this week's
-    //  `lastWeek` var. Or go back to the last successful executive.
-    SystemValues lastWeek = SystemValues({
+    //  the values from that week's `afterSpell` var into this week's
+    //  `beforeSpell` var. Or go back to the last successful executive.
+    SystemValues beforeSpell = SystemValues({
         dsr: 1000000000000000000000000000,
         dsrPct: 0 * 1000,
         lineETH: mul(90000000, RAD),
         dutyETH: 1000000000158153903837946257,
         pctETH: 0.5 * 1000,
+        tauETH: 6 hours,
         lineUSDC: mul(20000000, RAD),
         dutyUSDC: 1000000004706367499604668374,
         pctUSDC: 16 * 1000,
+        tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000000158153903837946257,
         pctBAT: 0.5 * 1000,
+        tauBAT: 6 hours,
         lineSAI: mul(10000000, RAD),
         lineGlobal: mul(123000000, RAD),
         saiCap: mul(20000000, WAD),
@@ -54,18 +60,21 @@ contract DssSpellTest is DSTest, DSMath {
         saiPct: 7.5 * 1000
     });
 
-    SystemValues thisWeek = SystemValues({
+    SystemValues afterSpell = SystemValues({
         dsr: 1000000000000000000000000000,
         dsrPct: 0 * 1000,
         lineETH: mul(90000000, RAD),
         dutyETH: 1000000000000000000000000000,
         pctETH: 0 * 1000,
+        tauETH: 24 hours,
         lineUSDC: mul(40000000, RAD),
         dutyUSDC: 1000000012857214317438491659,
         pctUSDC: 50 * 1000,
+        tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000000000000000000000000,
         pctBAT: 0 * 1000,
+        tauBAT: 24 hours,
         lineSAI: mul(10000000, RAD),
         lineGlobal: mul(143000000, RAD),
         saiCap: mul(20000000, WAD),
@@ -211,40 +220,45 @@ contract DssSpellTest is DSTest, DSMath {
         (uint dutyETH,)  = jug.ilks("ETH-A");
         (uint dutyUSDC,) = jug.ilks("USDC-A");
         (uint dutyBAT,)  = jug.ilks("BAT-A");
-        assertEq(dutyETH,   lastWeek.dutyETH);
-        assertTrue(diffCalc(expectedRate(lastWeek.pctETH), yearlyYield(lastWeek.dutyETH)) <= TOLERANCE);
-        assertEq(dutyUSDC,   lastWeek.dutyUSDC);
-        assertTrue(diffCalc(expectedRate(lastWeek.pctUSDC), yearlyYield(lastWeek.dutyUSDC)) <= TOLERANCE);
-        assertEq(dutyBAT,   lastWeek.dutyBAT);
-        assertTrue(diffCalc(expectedRate(lastWeek.pctBAT), yearlyYield(lastWeek.dutyBAT)) <= TOLERANCE);
-        assertEq(pot.dsr(), lastWeek.dsr);
-        assertTrue(diffCalc(expectedRate(lastWeek.dsrPct), yearlyYield(lastWeek.dsr)) <= TOLERANCE);
+        assertEq(dutyETH,   beforeSpell.dutyETH);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctETH), yearlyYield(beforeSpell.dutyETH)) <= TOLERANCE);
+        assertEq(dutyUSDC,   beforeSpell.dutyUSDC);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctUSDC), yearlyYield(beforeSpell.dutyUSDC)) <= TOLERANCE);
+        assertEq(dutyBAT,   beforeSpell.dutyBAT);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctBAT), yearlyYield(beforeSpell.dutyBAT)) <= TOLERANCE);
+        assertEq(pot.dsr(), beforeSpell.dsr);
+        assertTrue(diffCalc(expectedRate(beforeSpell.dsrPct), yearlyYield(beforeSpell.dsr)) <= TOLERANCE);
 
         // ETH-A line
         (,,, uint256 lineETH,) = vat.ilks("ETH-A");
-        assertEq(lineETH, lastWeek.lineETH);
+        assertEq(lineETH, beforeSpell.lineETH);
 
         // USDC-A line
         (,,, uint256 lineUSDC,) = vat.ilks("USDC-A");
-        assertEq(lineUSDC, lastWeek.lineUSDC);
+        assertEq(lineUSDC, beforeSpell.lineUSDC);
 
         // BAT-A line
         (,,, uint256 lineBAT,) = vat.ilks("BAT-A");
-        assertEq(lineBAT, lastWeek.lineBAT);
+        assertEq(lineBAT, beforeSpell.lineBAT);
 
         // SAI line
         (,,, uint256 lineSAI,) = vat.ilks("SAI");
-        assertEq(lineSAI, lastWeek.lineSAI);
+        assertEq(lineSAI, beforeSpell.lineSAI);
 
         // Line
-        assertEq(vat.Line(), lastWeek.lineGlobal);
+        assertEq(vat.Line(), beforeSpell.lineGlobal);
 
         // SCD DC
-        assertEq(tub.cap(), lastWeek.saiCap);
+        assertEq(tub.cap(), beforeSpell.saiCap);
 
         // SCD Fee
-        assertEq(tub.fee(), lastWeek.saiFee);
-        assertTrue(diffCalc(expectedRate(lastWeek.saiPct), yearlyYield(lastWeek.saiFee)) <= TOLERANCE);
+        assertEq(tub.fee(), beforeSpell.saiFee);
+        assertTrue(diffCalc(expectedRate(beforeSpell.saiPct), yearlyYield(beforeSpell.saiFee)) <= TOLERANCE);
+
+        // flip tau amount precheck
+        assertEq(uint256(eflip.tau()), beforeSpell.tauETH);
+        assertEq(uint256(uflip.tau()), beforeSpell.tauUSDC);
+        assertEq(uint256(bflip.tau()), beforeSpell.tauBAT);
 
         vote();
 
@@ -254,62 +268,51 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // dsr
-        assertEq(pot.dsr(), thisWeek.dsr);
-        assertTrue(diffCalc(expectedRate(thisWeek.dsrPct), yearlyYield(thisWeek.dsr)) <= TOLERANCE);
+        assertEq(pot.dsr(), afterSpell.dsr);
+        assertTrue(diffCalc(expectedRate(afterSpell.dsrPct), yearlyYield(afterSpell.dsr)) <= TOLERANCE);
 
         // (ETH-A, USDC-A, BAT-A)
         (dutyETH,)  = jug.ilks("ETH-A");
         (dutyUSDC,) = jug.ilks("USDC-A");
         (dutyBAT,)  = jug.ilks("BAT-A");
-        assertEq(dutyETH, thisWeek.dutyETH);
-        assertTrue(diffCalc(expectedRate(thisWeek.pctETH), yearlyYield(thisWeek.dutyETH)) <= TOLERANCE);
-        assertEq(dutyUSDC, thisWeek.dutyUSDC);
-        assertTrue(diffCalc(expectedRate(thisWeek.pctUSDC), yearlyYield(thisWeek.dutyUSDC)) <= TOLERANCE);
-        assertEq(dutyBAT, thisWeek.dutyBAT);
-        assertTrue(diffCalc(expectedRate(thisWeek.pctBAT), yearlyYield(thisWeek.dutyBAT)) <= TOLERANCE);
+        assertEq(dutyETH, afterSpell.dutyETH);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctETH), yearlyYield(afterSpell.dutyETH)) <= TOLERANCE);
+        assertEq(dutyUSDC, afterSpell.dutyUSDC);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctUSDC), yearlyYield(afterSpell.dutyUSDC)) <= TOLERANCE);
+        assertEq(dutyBAT, afterSpell.dutyBAT);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctBAT), yearlyYield(afterSpell.dutyBAT)) <= TOLERANCE);
 
         // ETH-A line
         (,,, lineETH,) = vat.ilks("ETH-A");
-        assertEq(lineETH, thisWeek.lineETH);
+        assertEq(lineETH, afterSpell.lineETH);
 
         // USDC-A line
         (,,, lineUSDC,) = vat.ilks("USDC-A");
-        assertEq(lineUSDC, thisWeek.lineUSDC);
+        assertEq(lineUSDC, afterSpell.lineUSDC);
 
         // BAT-A line
         (,,, lineBAT,) = vat.ilks("BAT-A");
-        assertEq(lineBAT, thisWeek.lineBAT);
+        assertEq(lineBAT, afterSpell.lineBAT);
 
         // SAI line
         (,,, lineSAI,) = vat.ilks("SAI");
-        assertEq(lineSAI, thisWeek.lineSAI);
+        assertEq(lineSAI, afterSpell.lineSAI);
 
         // Line
-        assertEq(vat.Line(), thisWeek.lineGlobal);
+        assertEq(vat.Line(), afterSpell.lineGlobal);
 
         // SCD DC
-        assertEq(tub.cap(), thisWeek.saiCap);
+        assertEq(tub.cap(), afterSpell.saiCap);
 
         // SCD Fee
-        assertEq(tub.fee(), thisWeek.saiFee);
-        assertTrue(diffCalc(expectedRate(thisWeek.saiPct), yearlyYield(thisWeek.saiFee)) <= TOLERANCE);
+        assertEq(tub.fee(), afterSpell.saiFee);
+        assertTrue(diffCalc(expectedRate(afterSpell.saiPct), yearlyYield(afterSpell.saiFee)) <= TOLERANCE);
 
-    }
+        // flip tau amount
+        assertEq(uint256(eflip.tau()), afterSpell.tauETH);
+        assertEq(uint256(uflip.tau()), afterSpell.tauUSDC);
+        assertEq(uint256(bflip.tau()), afterSpell.tauBAT);
 
-    function testFlipTAU() public {
-        spell = MAINNET_SPELL != address(0) ?
-            DssSpell(MAINNET_SPELL) : new DssSpell();
-
-        // Vow hump amount precheck
-        assertEq(uint256(eflip.tau()), 6 hours);
-        assertEq(uint256(bflip.tau()), 6 hours);
-
-        vote();
-        scheduleWaitAndCast();
-
-        // Vow hump amount
-        assertEq(uint256(eflip.tau()), 24 hours);
-        assertEq(uint256(bflip.tau()), 24 hours);
     }
 
     function testCircuitBreaker() public {
