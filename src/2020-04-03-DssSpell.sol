@@ -65,17 +65,6 @@ contract SpellAction {
         uint256 USDC_FEE = TWELVE_PCT_RATE;
         JugAbstract(MCD_JUG).file("USDC-A", "duty", USDC_FEE);
 
-        // Set the ETH-A stability fee
-        // ETH_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
-        //
-        // https://vote.makerdao.com/polling-proposal/qmqwxmewwpjqhpaxlxhvlya6zre8ipkcvpp1s2thkucbn3
-        //
-        // Existing Rate: 0%
-        // New Rate: 0.5%
-        uint256 ETH_FEE = ZERO_FIVE_PCT_RATE;
-        JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
-
         // Set the Sai debt ceiling for the migration contract
         // SAI_LINE is the number of Dai that can be created with Sai token collateral
         //  ex. a 10 million Dai ETH ceiling will be SAI_LINE = 10000000
