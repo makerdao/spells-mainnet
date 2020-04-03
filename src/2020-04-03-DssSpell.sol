@@ -76,17 +76,6 @@ contract SpellAction {
         uint256 ETH_FEE = ZERO_FIVE_PCT_RATE;
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
 
-        // Set the Dai Savings Rate
-        // DSR_RATE is a value determined by teh rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
-        //
-        // https://vote.makerdao.com/polling-proposal/qmxserdepavbbfzytxbr2hwadknm1lfiruovwuojhvwjcx
-        //
-        // Existing rate: 0%
-        // New Rate: 1%
-        uint256 DSR_RATE = ONE_PCT_RATE;
-        PotAbstract(MCD_POT).file("dsr", DSR_RATE);
-
         // Set the Sai debt ceiling for the migration contract
         // SAI_LINE is the number of Dai that can be created with Sai token collateral
         //  ex. a 10 million Dai ETH ceiling will be SAI_LINE = 10000000
