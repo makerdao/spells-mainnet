@@ -39,6 +39,7 @@ contract SpellAction {
     //
     uint256 constant public TWELVE_PCT_RATE = 1000000003593629043335673582;
     uint256 constant public ZERO_FIVE_PCT_RATE = 1000000000158153903837946257;
+    uint256 constant public ONE_PCT_RATE = 1000000000315522921573372069;
 
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
@@ -57,7 +58,7 @@ contract SpellAction {
         // USDC_FEE is a value determined by the rate accumulator calculation (see above)
         //  ex. an 8% annual rate will be 1000000002440418608258400030
         //
-        // https://vote.makerdao.com/polling-proposal/qmtmgczpt4fnayxqxggwxansej9f8wqs8mqwzwttvr2anx
+        // https://vote.makerdao.com/polling-proposal/qmc2ebl5rbvdq3vcgypyhjshwqakxw9rwwowrvzulpnmho
         //
         // Existing Rate: 16%
         // New Rate: 12%
@@ -68,27 +69,34 @@ contract SpellAction {
         // ETH_FEE is a value determined by the rate accumulator calculation (see above)
         //  ex. an 8% annual rate will be 1000000002440418608258400030
         //
+        // https://vote.makerdao.com/polling-proposal/qmqwxmewwpjqhpaxlxhvlya6zre8ipkcvpp1s2thkucbn3
+        //
         // Existing Rate: 0%
         // New Rate: 0.5%
         uint256 ETH_FEE = ZERO_FIVE_PCT_RATE;
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
 
+        // Set the Dai Savings Rate
+        // DSR_RATE is a value determined by teh rate accumulator calculation (see above)
+        //  ex. an 8% annual rate will be 1000000002440418608258400030
+        //
+        // https://vote.makerdao.com/polling-proposal/qmxserdepavbbfzytxbr2hwadknm1lfiruovwuojhvwjcx
+        //
+        // Existing rate: 0%
+        // New Rate: 1%
+        uint256 DSR_RATE = ONE_PCT_RATE;
+        PotAbstract(MCD_POT).file("dsr", DSR_RATE);
+
         // Set the Sai debt ceiling for the migration contract
         // SAI_LINE is the number of Dai that can be created with Sai token collateral
         //  ex. a 10 million Dai ETH ceiling will be SAI_LINE = 10000000
+        //
+        // https://vote.makerdao.com/polling-proposal/qmz4ttjnhbwsmwmlip73hpxsl7uuybk371cgb4kyxyujst
+        //
+        // Existing Line: 10m
+        // New Line: 0
         uint256 SAI_LINE = 0;
         VatAbstract(MCD_VAT).file("SAI", "line", SAI_LINE);
-
-        // Set the ETH-A debt ceiling
-        // ETH_LINE is the number of Dai that can be created with WETH token collateral
-        //  ex. a 100 million Dai ETH ceiling will be ETH_LINE = 100000000
-        //
-        // https://vote.makerdao.com/polling-proposal/qmqbhuhuw6fhhtjw4k5rchcsvkeowhrgw2g1aaqafg96dp
-        //
-        // Existing Line: 100m
-        // New Line: 90m
-        uint256 ETH_LINE = 90 * MILLION;
-        VatAbstract(MCD_VAT).file("ETH-A", "line", ETH_LINE * RAD);
 
         // Set the global debt ceiling
         //
@@ -96,7 +104,7 @@ contract SpellAction {
         //  as a whole number
         //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
         //
-        // https://vote.makerdao.com/polling-proposal/qmz4ttjnhbwsmwmlip73hpxsl7uuybk371cgb4kyxyujst
+        // subtract 10m from global ceiling due to reduction of SAI DC
         //
         // Existing Ceiling: 123m
         // New Ceiling: 113m
@@ -141,7 +149,12 @@ contract DssSpell is SaiConstants {
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
         // preventing these SCD changes from being executed again.
 
-        // Lower Stability Fee in SCD to 8%
+        // Raise Stability Fee in SCD from to 8% (from 7.5%)
+        //
+        // https://vote.makerdao.com/polling-proposal/qmuenso3mq7ndchi5qdgyjzt3zwstibabbga64g3npihrh
+        // 
+        // Existing Rate: 7.5%
+        // New Rate: 8%
         SaiMomLike(SAIMOM).setFee(SCD_EIGHT_PCT_FEE);
     }
 

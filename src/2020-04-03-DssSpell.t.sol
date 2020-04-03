@@ -55,8 +55,8 @@ contract DssSpellTest is DSTest, DSMath {
     });
 
     SystemValues thisWeek = SystemValues({
-        dsr: 1000000000000000000000000000,
-        dsrPct: 0 * 1000,
+        dsr: 1000000000315522921573372069,
+        dsrPct: 1 * 1000,
         lineETH: mul(90000000, RAD),
         dutyETH: 1000000000158153903837946257,
         pctETH: 0.5 * 1000,
