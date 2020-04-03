@@ -10,11 +10,6 @@ contract SaiMomLike {
     function setFee(uint256) external;
 }
 
-contract SaiConstants {
-    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
-    uint256 constant SCD_EIGHT_PCT_FEE = 1000000002440418608258400030;
-}
-
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -30,7 +25,6 @@ contract SpellAction {
     address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
 
-
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -38,8 +32,6 @@ contract SpellAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     uint256 constant public TWELVE_PCT_RATE = 1000000003593629043335673582;
-    uint256 constant public ZERO_FIVE_PCT_RATE = 1000000000158153903837946257;
-    uint256 constant public ONE_PCT_RATE = 1000000000315522921573372069;
 
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
@@ -91,7 +83,7 @@ contract SpellAction {
     }
 }
 
-contract DssSpell is SaiConstants {
+contract DssSpell {
 
     DSPauseAbstract  public pause =
         DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
@@ -103,6 +95,9 @@ contract DssSpell is SaiConstants {
     bool             public done;
 
     uint256 constant internal MILLION = 10**6;
+
+    address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    uint256 constant SCD_EIGHT_PCT_FEE = 1000000002440418608258400030;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
