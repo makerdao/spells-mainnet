@@ -4,18 +4,14 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-03-27-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-04-03-DssSpell.sol";
 
 contract Hevm { function warp(uint) public; }
 
 contract DssSpellTest is DSTest, DSMath {
 
     // Replace with mainnet spell address to test against live
-<<<<<<< HEAD
-    address constant MAINNET_SPELL = 0x64976C5B5062C56d91dafe661cb85dCf7E349C9D;
-=======
-    address constant MAINNET_SPELL = address(0);
->>>>>>> upstream/master
+    address constant MAINNET_SPELL = 0x91e556E3Cb1E2842a0A3626a768B7E67199F7589;
 
     struct SystemValues {
         uint256 dsr;
@@ -42,25 +38,6 @@ contract DssSpellTest is DSTest, DSMath {
     SystemValues lastWeek = SystemValues({
         dsr: 1000000000000000000000000000,
         dsrPct: 0 * 1000,
-        lineETH: mul(100000000, RAD),
-        dutyETH: 1000000000158153903837946257,
-        pctETH: 0.5 * 1000,
-        lineUSDC: mul(20000000, RAD),
-        dutyUSDC: 1000000005781378656804591712,
-        pctUSDC: 20 * 1000,
-        lineBAT: mul(3000000, RAD),
-        dutyBAT: 1000000000158153903837946257,
-        pctBAT: 0.5 * 1000,
-        lineSAI: mul(10000000, RAD),
-        lineGlobal: mul(133000000, RAD),
-        saiCap: mul(20000000, WAD),
-        saiFee: 1000000002293273137447730714,
-        saiPct: 7.5 * 1000
-    });
-
-    SystemValues thisWeek = SystemValues({
-        dsr: 1000000000000000000000000000,
-        dsrPct: 0 * 1000,
         lineETH: mul(90000000, RAD),
         dutyETH: 1000000000158153903837946257,
         pctETH: 0.5 * 1000,
@@ -75,6 +52,25 @@ contract DssSpellTest is DSTest, DSMath {
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002293273137447730714,
         saiPct: 7.5 * 1000
+    });
+
+    SystemValues thisWeek = SystemValues({
+        dsr: 1000000000000000000000000000,
+        dsrPct: 0 * 1000,
+        lineETH: mul(90000000, RAD),
+        dutyETH: 1000000000158153903837946257,
+        pctETH: 0.5 * 1000,
+        lineUSDC: mul(20000000, RAD),
+        dutyUSDC: 1000000003593629043335673582,
+        pctUSDC: 12 * 1000,
+        lineBAT: mul(3000000, RAD),
+        dutyBAT: 1000000000158153903837946257,
+        pctBAT: 0.5 * 1000,
+        lineSAI: mul(0, RAD),
+        lineGlobal: mul(113000000, RAD),
+        saiCap: mul(20000000, WAD),
+        saiFee: 1000000002440418608258400030,
+        saiPct: 8 * 1000
     });
 
     Hevm hevm;
@@ -96,7 +92,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     DssSpell spell;
 
-    // this spell is intended to run as the MkrAuthority
     function canCall(address, address, bytes4) public pure returns (bool) {
         return true;
     }
