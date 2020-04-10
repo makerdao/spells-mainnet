@@ -55,6 +55,13 @@ contract SpellAction {
         uint256 ETH_FEE = ONE_PCT_RATE;
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
 
+        // Set the BAT-A stability fee
+        // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
+        // Existing Rate: 0.5%
+        // New Rate: 1%
+        uint256 BAT_FEE = ONE_PCT_RATE;
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", BAT_FEE);
+
         // Set the Dai Savings Rate
         // Updating DSR to maintain DSR spread of 0.5% with updated ETH-A Stability Fee
         // Existing Rate: 0%
