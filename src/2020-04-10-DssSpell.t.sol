@@ -4,14 +4,14 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-04-03-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-04-10-DssSpell.sol";
 
 contract Hevm { function warp(uint) public; }
 
 contract DssSpellTest is DSTest, DSMath {
 
     // Replace with mainnet spell address to test against live
-    address constant MAINNET_SPELL = 0x91e556E3Cb1E2842a0A3626a768B7E67199F7589;
+    address constant MAINNET_SPELL = address(0);
 
     struct SystemValues {
         uint256 dsr;
@@ -42,25 +42,6 @@ contract DssSpellTest is DSTest, DSMath {
         dutyETH: 1000000000158153903837946257,
         pctETH: 0.5 * 1000,
         lineUSDC: mul(20000000, RAD),
-        dutyUSDC: 1000000004706367499604668374,
-        pctUSDC: 16 * 1000,
-        lineBAT: mul(3000000, RAD),
-        dutyBAT: 1000000000158153903837946257,
-        pctBAT: 0.5 * 1000,
-        lineSAI: mul(10000000, RAD),
-        lineGlobal: mul(123000000, RAD),
-        saiCap: mul(20000000, WAD),
-        saiFee: 1000000002293273137447730714,
-        saiPct: 7.5 * 1000
-    });
-
-    SystemValues thisWeek = SystemValues({
-        dsr: 1000000000000000000000000000,
-        dsrPct: 0 * 1000,
-        lineETH: mul(90000000, RAD),
-        dutyETH: 1000000000158153903837946257,
-        pctETH: 0.5 * 1000,
-        lineUSDC: mul(20000000, RAD),
         dutyUSDC: 1000000003593629043335673582,
         pctUSDC: 12 * 1000,
         lineBAT: mul(3000000, RAD),
@@ -71,6 +52,25 @@ contract DssSpellTest is DSTest, DSMath {
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002440418608258400030,
         saiPct: 8 * 1000
+    });
+
+    SystemValues thisWeek = SystemValues({
+        dsr: 1000000000158153903837946257,
+        dsrPct: 0.5 * 1000,
+        lineETH: mul(90000000, RAD),
+        dutyETH: 1000000000315522921573372069,
+        pctETH: 1 * 1000,
+        lineUSDC: mul(20000000, RAD),
+        dutyUSDC: 1000000004706367499604668374,
+        pctUSDC: 16 * 1000,
+        lineBAT: mul(3000000, RAD),
+        dutyBAT: 1000000000158153903837946257,
+        pctBAT: 0.5 * 1000,
+        lineSAI: mul(0, RAD),
+        lineGlobal: mul(113000000, RAD),
+        saiCap: mul(20000000, WAD),
+        saiFee: 1000000002586884420913935572,
+        saiPct: 8.5 * 1000
     });
 
     Hevm hevm;

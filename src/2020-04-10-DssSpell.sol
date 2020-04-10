@@ -31,7 +31,9 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant public TWELVE_PCT_RATE = 1000000003593629043335673582;
+    uint256 constant public ZERO_FIVE_PCT_RATE = 1000000000158153903837946257;
+    uint256 constant public ONE_PCT_RATE =       1000000000315522921573372069;
+    uint256 constant public SIXTEEN_PCT_RATE =   1000000004706367499604668374;
 
     uint256 constant public RAD = 10**45;
     uint256 constant public MILLION = 10**6;
@@ -46,40 +48,27 @@ contract SpellAction {
 
         // MCD Modifications
 
+        // Set the ETH-A stability fee
+        // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
+        // Existing Rate: 0.5%
+        // New Rate: 1%
+        uint256 ETH_FEE = ONE_PCT_RATE;
+        JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
+
+        // Set the Dai Savings Rate
+        // Updating DSR to maintain DSR spread of 0.5% with updated ETH-A Stability Fee
+        // Existing Rate: 0%
+        // New Rate: 0.5%
+        uint256 DSR_RATE = ZERO_FIVE_PCT_RATE;
+        PotAbstract(MCD_POT).file("dsr", DSR_RATE);
+
         // Set the USDC stability fee
-        // USDC_FEE is a value determined by the rate accumulator calculation (see above)
-        //  ex. an 8% annual rate will be 1000000002440418608258400030
-        //
-        // https://vote.makerdao.com/polling-proposal/qmc2ebl5rbvdq3vcgypyhjshwqakxw9rwwowrvzulpnmho
-        //
-        // Existing Rate: 16%
-        // New Rate: 12%
-        uint256 USDC_FEE = TWELVE_PCT_RATE;
+        // https://vote.makerdao.com/polling-proposal/qmwtwpa8fxd7r4x2dhdauo2gpb1kfrc3gt7mhdtzmv4e2o
+        // Existing Rate: 12%
+        // New Rate: 16%
+        uint256 USDC_FEE = SIXTEEN_PCT_RATE;
         JugAbstract(MCD_JUG).file("USDC-A", "duty", USDC_FEE);
 
-        // Set the Sai debt ceiling for the migration contract
-        // SAI_LINE is the number of Dai that can be created with Sai token collateral
-        //  ex. a 10 million Dai ETH ceiling will be SAI_LINE = 10000000
-        //
-        // https://vote.makerdao.com/polling-proposal/qmz4ttjnhbwsmwmlip73hpxsl7uuybk371cgb4kyxyujst
-        //
-        // Existing Line: 10m
-        // New Line: 0
-        uint256 SAI_LINE = 0;
-        VatAbstract(MCD_VAT).file("SAI", "line", SAI_LINE);
-
-        // Set the global debt ceiling
-        //
-        // GLOBAL_AMOUNT is the total number of Dai that can be created by all collateral types
-        //  as a whole number
-        //  ex. a 100 million Dai global ceiling will be GLOBAL_AMOUNT = 100000000
-        //
-        // subtract 10m from global ceiling due to reduction of SAI DC
-        //
-        // Existing Ceiling: 123m
-        // New Ceiling: 113m
-        uint256 GLOBAL_AMOUNT = 113 * MILLION;
-        VatAbstract(MCD_VAT).file("Line", GLOBAL_AMOUNT * RAD);
     }
 }
 
@@ -97,7 +86,7 @@ contract DssSpell {
     uint256 constant internal MILLION = 10**6;
 
     address constant public SAIMOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
-    uint256 constant SCD_EIGHT_PCT_FEE = 1000000002440418608258400030;
+    uint256 constant SCD_EIGHT_FIVE_PCT_FEE = 1000000002586884420913935572;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -122,13 +111,11 @@ contract DssSpell {
         // NOTE: 'eta' check should mimic the old behavior of 'done', thus
         // preventing these SCD changes from being executed again.
 
-        // Raise Stability Fee in SCD from to 8% (from 7.5%)
-        //
-        // https://vote.makerdao.com/polling-proposal/qmuenso3mq7ndchi5qdgyjzt3zwstibabbga64g3npihrh
-        // 
-        // Existing Rate: 7.5%
-        // New Rate: 8%
-        SaiMomLike(SAIMOM).setFee(SCD_EIGHT_PCT_FEE);
+        // Raise Stability Fee in SCD to 8.5% (from 8%)
+        // https://vote.makerdao.com/polling-proposal/qmej8jxjscw9wznah7rrccgkrmsy4bcyt3bfhpwr1qwwyv
+        // Existing Rate: 8%
+        // New Rate: 8.5%
+        SaiMomLike(SAIMOM).setFee(SCD_EIGHT_FIVE_PCT_FEE);
     }
 
     function cast() public {
