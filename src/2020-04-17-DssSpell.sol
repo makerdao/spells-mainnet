@@ -62,24 +62,17 @@ contract SpellAction {
 
         // Set the ETH-A stability fee
         // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
-        // Existing Rate: 1%
+        // Existing Rate: 0.5%
         // New Rate: 0%
         uint256 ETH_FEE = ZERO_PCT_RATE;
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
 
         // Set the BAT-A stability fee
         // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
-        // Existing Rate: 1%
+        // Existing Rate: 0.5%
         // New Rate: 0%
         uint256 BAT_FEE = ZERO_PCT_RATE;
         JugAbstract(MCD_JUG).file("BAT-A", "duty", BAT_FEE);
-
-        // Set the Dai Savings Rate
-        // Updating DSR to maintain DSR spread of 0.5% with updated ETH-A Stability Fee
-        // Existing Rate: 0.5%
-        // New Rate: 0%
-        uint256 DSR_RATE = ZERO_PCT_RATE;
-        PotAbstract(MCD_POT).file("dsr", DSR_RATE);
 
         // Set the USDC stability fee
         // https://vote.makerdao.com/polling-proposal/qmwtwpa8fxd7r4x2dhdauo2gpb1kfrc3gt7mhdtzmv4e2o
