@@ -81,6 +81,12 @@ contract SpellAction {
         uint256 USDC_FEE = EIGHT_PCT_RATE;
         JugAbstract(MCD_JUG).file("USDC-A", "duty", USDC_FEE);
 
+        // Set the Dai Savings Rate
+        // Updating DSR to maintain DSR spread of 0% with updated ETH-A Stability Fee
+        // Existing Rate: 0%
+        // New Rate: 0%
+        uint256 DSR_RATE = ZERO_PCT_RATE;
+        PotAbstract(MCD_POT).file("dsr", DSR_RATE);
     }
 }
 
