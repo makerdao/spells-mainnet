@@ -61,21 +61,21 @@ contract SpellAction {
         // MCD Modifications
 
         // Set the ETH-A stability fee
-        // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
+        // https://vote.makerdao.com/polling-proposal/qmxzfqgn6oxwnz4xmuhcjltymzw3jetm56qkhdisyks5u8
         // Existing Rate: 0.5%
         // New Rate: 0%
         uint256 ETH_FEE = ZERO_PCT_RATE;
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ETH_FEE);
 
         // Set the BAT-A stability fee
-        // https://vote.makerdao.com/polling-proposal/qmcdbetspgy9jkfrfdvgzbwtemrkfgfmeaysudlruz2j5r
+        // https://vote.makerdao.com/polling-proposal/qmxzfqgn6oxwnz4xmuhcjltymzw3jetm56qkhdisyks5u8
         // Existing Rate: 0.5%
         // New Rate: 0%
         uint256 BAT_FEE = ZERO_PCT_RATE;
         JugAbstract(MCD_JUG).file("BAT-A", "duty", BAT_FEE);
 
         // Set the USDC stability fee
-        // https://vote.makerdao.com/polling-proposal/qmwtwpa8fxd7r4x2dhdauo2gpb1kfrc3gt7mhdtzmv4e2o
+        // https://vote.makerdao.com/polling-proposal/qmrdmj78a6es5vas3e6vwncmhqx1txugc8myufh1xhadcj
         // Existing Rate: 12%
         // New Rate: 8%
         uint256 USDC_FEE = EIGHT_PCT_RATE;
