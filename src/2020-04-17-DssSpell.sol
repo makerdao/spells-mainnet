@@ -18,11 +18,7 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-
-contract SaiMomLike {
-    function setCap(uint256) external;
-    function setFee(uint256) external;
-}
+import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -133,7 +129,7 @@ contract DssSpell {
         // https://vote.makerdao.com/polling-proposal/qmslmbd8pxjnadxxq2gezdd56fd11dpvcwxdfeevnrew96
         // Existing Rate: 8%
         // New Rate: 8.5%
-        SaiMomLike(SAIMOM).setFee(SCD_EIGHT_FIVE_PCT_FEE);
+        SaiMomAbstract(SAIMOM).setFee(SCD_EIGHT_FIVE_PCT_FEE);
     }
 
     function cast() public {
