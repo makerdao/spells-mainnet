@@ -21,7 +21,7 @@ import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiTopAbstract.sol";
 
-contract SaiKiller {
+contract SaiSlayer {
     uint256 constant public T2020_05_12_1600UTC = 1589299200;
     SaiTopAbstract constant public SAITOP = SaiTopAbstract(0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3);
 
@@ -65,7 +65,7 @@ contract DssSpell {
     bytes            public sig;
     uint256          public expiration;
     bool             public done;
-    SaiKiller        public saiKiller;
+    SaiSlayer        public saiSlayer;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -76,7 +76,7 @@ contract DssSpell {
         tag = _tag;
         expiration = now + 30 days;
 
-        saiKiller = new SaiKiller();
+        saiSlayer = new SaiSlayer();
     }
 
     function description() public view returns (string memory) {
@@ -89,8 +89,8 @@ contract DssSpell {
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
 
-        // Set SaiKiller to cage the system after May 12th, 2020 at 16:00 UTC
-        saiKiller.SAITOP().setOwner(address(saiKiller));
+        // Set SaiSlayer to cage the system after May 12th, 2020 at 16:00 UTC
+        saiSlayer.SAITOP().setOwner(address(saiSlayer));
     }
 
     function cast() public {

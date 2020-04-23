@@ -332,42 +332,42 @@ contract DssSpellTest is DSTest, DSMath {
 
     // }
 
-    function testSaiKiller() public {
+    function testSaiSlayer() public {
         spell = MAINNET_SPELL != address(0) ?
             DssSpell(MAINNET_SPELL) : new DssSpell();
         
         vote();
         assertEq(top.owner(), address(0));
         spell.schedule();
-        assertEq(top.owner(), address(spell.saiKiller()));
+        assertEq(top.owner(), address(spell.saiSlayer()));
         
         hevm.warp(1589299200);
 
         assertEq(top.caged(), 0);
-        spell.saiKiller().cage();
+        spell.saiSlayer().cage();
         assertEq(top.caged(), now);
     }
 
-    function testFailSaiKillerNoTimePassed() public {
+    function testFailSaiSlayerNoTimePassed() public {
         spell = MAINNET_SPELL != address(0) ?
             DssSpell(MAINNET_SPELL) : new DssSpell();
         
         vote();
         assertEq(top.owner(), address(0));
         spell.schedule();
-        assertEq(top.owner(), address(spell.saiKiller()));
+        assertEq(top.owner(), address(spell.saiSlayer()));
         
         hevm.warp(1589299199);
 
-        spell.saiKiller().cage();
+        spell.saiSlayer().cage();
     }
 
-    function testFailSaiKillerNoOwnership() public {
+    function testFailSaiSlayerNoOwnership() public {
         spell = MAINNET_SPELL != address(0) ?
             DssSpell(MAINNET_SPELL) : new DssSpell();
         
         hevm.warp(1589299200);
 
-        spell.saiKiller().cage();
+        spell.saiSlayer().cage();
     }
 }
