@@ -18,6 +18,7 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
 import "lib/dss-interfaces/src/sai/SaiTopAbstract.sol";
 
@@ -44,6 +45,12 @@ contract SpellAction {
     //     https://github.com/makerdao/sai#dai-v1-current-deployments
     address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    address constant public ETHUSD = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant public BTCUSD = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+
+    address constant public SET_ETHUSD = 0x97C3e595e8f80169266B5534e4d7A1bB58BB45ab;
+    address constant public DYDX_BTCUSD = 0xbf63446ecF3341e04c6569b226a57860B188edBc;
+    address constant public SET_BTCUSD = 0x538038E526517680735568f9C5342c6E68bbDA12;
 
     function execute() external {
 
@@ -52,6 +59,10 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("ETH-A");
         JugAbstract(MCD_JUG).drip("BAT-A");
         JugAbstract(MCD_JUG).drip("USDC-A");
+
+        OsmAbstract(ETHUSD).kiss(SET_ETHUSD);
+        OsmAbstract(BTCUSD).kiss(DYDX_BTCUSD);
+        OsmAbstract(BTCUSD).kiss(SET_BTCUSD);
     }
 }
 

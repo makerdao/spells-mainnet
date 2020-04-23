@@ -123,6 +123,10 @@ contract DssSpellTest is DSTest, DSMath {
         FlipAbstract(0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1);
     SaiTopAbstract  top =
         SaiTopAbstract(0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3);
+    OsmAbstract     ethusd = 
+        OsmAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
+    OsmAbstract     btcusd = 
+        OsmAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
 
     DssSpell spell;
 
@@ -331,6 +335,22 @@ contract DssSpellTest is DSTest, DSMath {
     //     assertEq(uint256(bflip.tau()), afterSpell.tauBAT);
 
     // }
+
+    function testBuds() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+        
+        vote();
+        spell.schedule();
+        
+        hevm.warp(1589299200);
+
+        spell.cast();
+
+        assertEq(ethusd.bud(0x97C3e595e8f80169266B5534e4d7A1bB58BB45ab), 1);
+        assertEq(btcusd.bud(0xbf63446ecF3341e04c6569b226a57860B188edBc), 1);
+        assertEq(btcusd.bud(0x538038E526517680735568f9C5342c6E68bbDA12), 1);
+    }
 
     function testSaiSlayer() public {
         spell = MAINNET_SPELL != address(0) ?
