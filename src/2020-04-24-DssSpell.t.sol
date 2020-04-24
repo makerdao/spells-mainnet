@@ -427,4 +427,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         spell.saiSlayer().cage();
     }
+
+    function testNewMKRFeed() public {
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
+
+        vote();
+        assertEq(tub.pep(), 0x99041F808D598B782D5a3e498681C2452A31da08);
+        spell.schedule();
+        assertEq(tub.pep(), address(spell.newMkrOracle()));
+    }
 }
