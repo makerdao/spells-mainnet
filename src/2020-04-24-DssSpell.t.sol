@@ -78,12 +78,12 @@ contract DssSpellTest is DSTest, DSMath {
     SystemValues afterSpell = SystemValues({
         dsr: 1000000000000000000000000000,
         dsrPct: 0 * 1000,
-        lineETH: mul(90000000, RAD),
+        lineETH: mul(100000000, RAD),
         dutyETH: 1000000000000000000000000000,
         pctETH: 0 * 1000,
         tauETH: 6 hours,
         lineUSDC: mul(20000000, RAD),
-        dutyUSDC: 1000000002440418608258400030,
+        dutyUSDC: 1000000001847694957439350562,
         pctUSDC: 8 * 1000,
         tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
@@ -91,7 +91,7 @@ contract DssSpellTest is DSTest, DSMath {
         pctBAT: 0 * 1000,
         tauBAT: 6 hours,
         lineSAI: mul(0, RAD),
-        lineGlobal: mul(113000000, RAD),
+        lineGlobal: mul(123000000, RAD),
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002586884420913935572,
         saiPct: 8.5 * 1000
@@ -219,137 +219,126 @@ contract DssSpellTest is DSTest, DSMath {
         return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
-    // function testSpellIsCast() public {
+    function testSpellIsCast() public {
 
-    //     spell = MAINNET_SPELL != address(0) ?
-    //         DssSpell(MAINNET_SPELL) : new DssSpell();
-
-    //     // Test description
-    //     string memory description = new SpellAction().description();
-    //     assertTrue(bytes(description).length > 0);
-    //     // DS-Test can't handle strings directly, so cast to a bytes32.
-    //     assertEq(stringToBytes32(spell.description()),
-    //         stringToBytes32(description));
-
-    //     // Test expiration
-    //     // TODO fix this for deployed contract
-    //     if(address(spell) != address(MAINNET_SPELL)) {
-    //         assertEq(spell.expiration(), (now + 30 days));
-    //     }
-
-    //     // (ETH-A, USDC-A, BAT-A, DSR)
-    //     (uint dutyETH,)  = jug.ilks("ETH-A");
-    //     (uint dutyUSDC,) = jug.ilks("USDC-A");
-    //     (uint dutyBAT,)  = jug.ilks("BAT-A");
-    //     assertEq(dutyETH,   beforeSpell.dutyETH);
-    //     assertTrue(diffCalc(expectedRate(beforeSpell.pctETH), yearlyYield(beforeSpell.dutyETH)) <= TOLERANCE);
-    //     assertEq(dutyUSDC,   beforeSpell.dutyUSDC);
-    //     assertTrue(diffCalc(expectedRate(beforeSpell.pctUSDC), yearlyYield(beforeSpell.dutyUSDC)) <= TOLERANCE);
-    //     assertEq(dutyBAT,   beforeSpell.dutyBAT);
-    //     assertTrue(diffCalc(expectedRate(beforeSpell.pctBAT), yearlyYield(beforeSpell.dutyBAT)) <= TOLERANCE);
-    //     assertEq(pot.dsr(), beforeSpell.dsr);
-    //     assertTrue(diffCalc(expectedRate(beforeSpell.dsrPct), yearlyYield(beforeSpell.dsr)) <= TOLERANCE);
-
-    //     // ETH-A line
-    //     (,,, uint256 lineETH,) = vat.ilks("ETH-A");
-    //     assertEq(lineETH, beforeSpell.lineETH);
-
-    //     // USDC-A line
-    //     (,,, uint256 lineUSDC,) = vat.ilks("USDC-A");
-    //     assertEq(lineUSDC, beforeSpell.lineUSDC);
-
-    //     // BAT-A line
-    //     (,,, uint256 lineBAT,) = vat.ilks("BAT-A");
-    //     assertEq(lineBAT, beforeSpell.lineBAT);
-
-    //     // SAI line
-    //     (,,, uint256 lineSAI,) = vat.ilks("SAI");
-    //     assertEq(lineSAI, beforeSpell.lineSAI);
-
-    //     // Line
-    //     assertEq(vat.Line(), beforeSpell.lineGlobal);
-
-    //     // SCD DC
-    //     assertEq(tub.cap(), beforeSpell.saiCap);
-
-    //     // SCD Fee
-    //     assertEq(tub.fee(), beforeSpell.saiFee);
-    //     assertTrue(diffCalc(expectedRate(beforeSpell.saiPct), yearlyYield(beforeSpell.saiFee)) <= TOLERANCE);
-
-    //     // flip tau amount precheck
-    //     assertEq(uint256(eflip.tau()), beforeSpell.tauETH);
-    //     assertEq(uint256(uflip.tau()), beforeSpell.tauUSDC);
-    //     assertEq(uint256(bflip.tau()), beforeSpell.tauBAT);
-
-    //     vote();
-
-    //     scheduleWaitAndCast();
-
-    //     // spell done
-    //     assertTrue(spell.done());
-
-    //     // dsr
-    //     assertEq(pot.dsr(), afterSpell.dsr);
-    //     assertTrue(diffCalc(expectedRate(afterSpell.dsrPct), yearlyYield(afterSpell.dsr)) <= TOLERANCE);
-
-    //     // (ETH-A, USDC-A, BAT-A)
-    //     (dutyETH,)  = jug.ilks("ETH-A");
-    //     (dutyUSDC,) = jug.ilks("USDC-A");
-    //     (dutyBAT,)  = jug.ilks("BAT-A");
-    //     assertEq(dutyETH, afterSpell.dutyETH);
-    //     assertTrue(diffCalc(expectedRate(afterSpell.pctETH), yearlyYield(afterSpell.dutyETH)) <= TOLERANCE);
-    //     assertEq(dutyUSDC, afterSpell.dutyUSDC);
-    //     assertTrue(diffCalc(expectedRate(afterSpell.pctUSDC), yearlyYield(afterSpell.dutyUSDC)) <= TOLERANCE);
-    //     assertEq(dutyBAT, afterSpell.dutyBAT);
-    //     assertTrue(diffCalc(expectedRate(afterSpell.pctBAT), yearlyYield(afterSpell.dutyBAT)) <= TOLERANCE);
-
-    //     // ETH-A line
-    //     (,,, lineETH,) = vat.ilks("ETH-A");
-    //     assertEq(lineETH, afterSpell.lineETH);
-
-    //     // USDC-A line
-    //     (,,, lineUSDC,) = vat.ilks("USDC-A");
-    //     assertEq(lineUSDC, afterSpell.lineUSDC);
-
-    //     // BAT-A line
-    //     (,,, lineBAT,) = vat.ilks("BAT-A");
-    //     assertEq(lineBAT, afterSpell.lineBAT);
-
-    //     // SAI line
-    //     (,,, lineSAI,) = vat.ilks("SAI");
-    //     assertEq(lineSAI, afterSpell.lineSAI);
-
-    //     // Line
-    //     assertEq(vat.Line(), afterSpell.lineGlobal);
-
-    //     // SCD DC
-    //     assertEq(tub.cap(), afterSpell.saiCap);
-
-    //     // SCD Fee
-    //     assertEq(tub.fee(), afterSpell.saiFee);
-    //     assertTrue(diffCalc(expectedRate(afterSpell.saiPct), yearlyYield(afterSpell.saiFee)) <= TOLERANCE);
-
-    //     // flip tau amount
-    //     assertEq(uint256(eflip.tau()), afterSpell.tauETH);
-    //     assertEq(uint256(uflip.tau()), afterSpell.tauUSDC);
-    //     assertEq(uint256(bflip.tau()), afterSpell.tauBAT);
-
-    // }
-
-    function testBuds() public {
         spell = MAINNET_SPELL != address(0) ?
             DssSpell(MAINNET_SPELL) : new DssSpell();
-        
+
+        // Test description
+        string memory description = new SpellAction().description();
+        assertTrue(bytes(description).length > 0);
+        // DS-Test can't handle strings directly, so cast to a bytes32.
+        assertEq(stringToBytes32(spell.description()),
+            stringToBytes32(description));
+
+        // Test expiration
+        // TODO fix this for deployed contract
+        if(address(spell) != address(MAINNET_SPELL)) {
+            assertEq(spell.expiration(), (now + 30 days));
+        }
+
+        // (ETH-A, USDC-A, BAT-A, DSR)
+        (uint dutyETH,)  = jug.ilks("ETH-A");
+        (uint dutyUSDC,) = jug.ilks("USDC-A");
+        (uint dutyBAT,)  = jug.ilks("BAT-A");
+        assertEq(dutyETH,   beforeSpell.dutyETH);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctETH), yearlyYield(beforeSpell.dutyETH)) <= TOLERANCE);
+        assertEq(dutyUSDC,   beforeSpell.dutyUSDC);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctUSDC), yearlyYield(beforeSpell.dutyUSDC)) <= TOLERANCE);
+        assertEq(dutyBAT,   beforeSpell.dutyBAT);
+        assertTrue(diffCalc(expectedRate(beforeSpell.pctBAT), yearlyYield(beforeSpell.dutyBAT)) <= TOLERANCE);
+        assertEq(pot.dsr(), beforeSpell.dsr);
+        assertTrue(diffCalc(expectedRate(beforeSpell.dsrPct), yearlyYield(beforeSpell.dsr)) <= TOLERANCE);
+
+        // ETH-A line
+        (,,, uint256 lineETH,) = vat.ilks("ETH-A");
+        assertEq(lineETH, beforeSpell.lineETH);
+
+        // USDC-A line
+        (,,, uint256 lineUSDC,) = vat.ilks("USDC-A");
+        assertEq(lineUSDC, beforeSpell.lineUSDC);
+
+        // BAT-A line
+        (,,, uint256 lineBAT,) = vat.ilks("BAT-A");
+        assertEq(lineBAT, beforeSpell.lineBAT);
+
+        // SAI line
+        (,,, uint256 lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, beforeSpell.lineSAI);
+
+        // Line
+        assertEq(vat.Line(), beforeSpell.lineGlobal);
+
+        // SCD DC
+        assertEq(tub.cap(), beforeSpell.saiCap);
+
+        // SCD Fee
+        assertEq(tub.fee(), beforeSpell.saiFee);
+        assertTrue(diffCalc(expectedRate(beforeSpell.saiPct), yearlyYield(beforeSpell.saiFee)) <= TOLERANCE);
+
+        // flip tau amount precheck
+        assertEq(uint256(eflip.tau()), beforeSpell.tauETH);
+        assertEq(uint256(uflip.tau()), beforeSpell.tauUSDC);
+        assertEq(uint256(bflip.tau()), beforeSpell.tauBAT);
+
         vote();
-        spell.schedule();
-        
-        hevm.warp(1589299200);
 
-        spell.cast();
+        scheduleWaitAndCast();
 
+        // spell done
+        assertTrue(spell.done());
+
+        // dsr
+        assertEq(pot.dsr(), afterSpell.dsr);
+        assertTrue(diffCalc(expectedRate(afterSpell.dsrPct), yearlyYield(afterSpell.dsr)) <= TOLERANCE);
+
+        // (ETH-A, USDC-A, BAT-A)
+        (dutyETH,)  = jug.ilks("ETH-A");
+        (dutyUSDC,) = jug.ilks("USDC-A");
+        (dutyBAT,)  = jug.ilks("BAT-A");
+        assertEq(dutyETH, afterSpell.dutyETH);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctETH), yearlyYield(afterSpell.dutyETH)) <= TOLERANCE);
+        assertEq(dutyUSDC, afterSpell.dutyUSDC);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctUSDC), yearlyYield(afterSpell.dutyUSDC)) <= TOLERANCE);
+        assertEq(dutyBAT, afterSpell.dutyBAT);
+        assertTrue(diffCalc(expectedRate(afterSpell.pctBAT), yearlyYield(afterSpell.dutyBAT)) <= TOLERANCE);
+
+        // ETH-A line
+        (,,, lineETH,) = vat.ilks("ETH-A");
+        assertEq(lineETH, afterSpell.lineETH);
+
+        // USDC-A line
+        (,,, lineUSDC,) = vat.ilks("USDC-A");
+        assertEq(lineUSDC, afterSpell.lineUSDC);
+
+        // BAT-A line
+        (,,, lineBAT,) = vat.ilks("BAT-A");
+        assertEq(lineBAT, afterSpell.lineBAT);
+
+        // SAI line
+        (,,, lineSAI,) = vat.ilks("SAI");
+        assertEq(lineSAI, afterSpell.lineSAI);
+
+        // Line
+        assertEq(vat.Line(), afterSpell.lineGlobal);
+
+        // SCD DC
+        assertEq(tub.cap(), afterSpell.saiCap);
+
+        // SCD Fee
+        assertEq(tub.fee(), afterSpell.saiFee);
+        assertTrue(diffCalc(expectedRate(afterSpell.saiPct), yearlyYield(afterSpell.saiFee)) <= TOLERANCE);
+
+        // Oracles
         assertEq(ethusd.bud(0x97C3e595e8f80169266B5534e4d7A1bB58BB45ab), 1);
         assertEq(btcusd.bud(0xbf63446ecF3341e04c6569b226a57860B188edBc), 1);
         assertEq(btcusd.bud(0x538038E526517680735568f9C5342c6E68bbDA12), 1);
+
+        // flip tau amount
+        assertEq(uint256(eflip.tau()), afterSpell.tauETH);
+        assertEq(uint256(uflip.tau()), afterSpell.tauUSDC);
+        assertEq(uint256(bflip.tau()), afterSpell.tauBAT);
+
     }
 
     function testSaiSlayer() public {
