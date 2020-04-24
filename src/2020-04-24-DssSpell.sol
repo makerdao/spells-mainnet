@@ -118,14 +118,15 @@ contract SpellAction {
 
         // Set the ETH-A debt ceiling
         // ETH_LINE is the number of Dai that can be created with WETH token collateral
-        //  ex. a 100 million Dai ETH ceiling will be ETH_LINE = 100000000
+        //  ex. a 100 million Dai ETH ceiling will be ETH_LINE = 100,000,000
         // Existing Line: 90m
         // New Line: 100m
         uint256 ETH_LINE = 100 * MILLION;
         VatAbstract(MCD_VAT).file("ETH-A", "line", ETH_LINE * RAD);
 
         // set the global debt ceiling to 123,000,000
-        VatAbstract(MCD_VAT).file("Line", 123000000 * RAD);
+        uint256 GLOBAL_LINE = 123 * MILLION;
+        VatAbstract(MCD_VAT).file("Line", GLOBAL_LINE * RAD);
 
         // Set the USDC-A liquidation ratio
         // USDC_MAT is the percentage ratio at which a USDC-A Vault can be liquidated
@@ -134,12 +135,15 @@ contract SpellAction {
         // New Mat: 120%
         uint256 USDC_MAT = 1.2 * 10 ** 27;
         SpotAbstract(MCD_SPOT).file("USDC-A", "mat", USDC_MAT);
+        SpotAbstract(MCD_SPOT).poke("USDC-A");
 
+        // Whitelist Set and dydx addresses to read the osms
         OsmAbstract(ETHUSD).kiss(SET_ETHUSD);
         OsmAbstract(BTCUSD).kiss(DYDX_BTCUSD);
         OsmAbstract(BTCUSD).kiss(SET_BTCUSD);
 
-        DSPauseAbstract(MCD_PAUSE).setDelay(60 * 60 * 12);
+        // Set delay to 12 hours
+        DSPauseAbstract(MCD_PAUSE).setDelay(12 hours);
     }
 }
 

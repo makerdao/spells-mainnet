@@ -34,20 +34,24 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 lineETH;
         uint256 dutyETH;
         uint256 pctETH;
+        uint256 matETH;
         uint48  tauETH;
         uint256 lineUSDC;
         uint256 dutyUSDC;
         uint256 pctUSDC;
+        uint256 matUSDC;
         uint48  tauUSDC;
         uint256 lineBAT;
         uint256 dutyBAT;
         uint256 pctBAT;
+        uint256 matBAT;
         uint48  tauBAT;
         uint256 lineSAI;
         uint256 lineGlobal;
         uint256 saiCap;
         uint256 saiFee;
         uint256 saiPct;
+        uint256 pauseDelay;
     }
 
     // If last week's spell was cast successfully, you can copy the
@@ -59,20 +63,24 @@ contract DssSpellTest is DSTest, DSMath {
         lineETH: mul(90000000, RAD),
         dutyETH: 1000000000000000000000000000,
         pctETH: 0 * 1000,
+        matETH: mul(150, RAY) / 100,
         tauETH: 6 hours,
         lineUSDC: mul(20000000, RAD),
         dutyUSDC: 1000000002440418608258400030,
         pctUSDC: 8 * 1000,
+        matUSDC: mul(125, RAY) / 100,
         tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000000000000000000000000,
         pctBAT: 0 * 1000,
+        matBAT: mul(150, RAY) / 100,
         tauBAT: 6 hours,
         lineSAI: mul(0, RAD),
         lineGlobal: mul(113000000, RAD),
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002586884420913935572,
-        saiPct: 8.5 * 1000
+        saiPct: 8.5 * 1000,
+        pauseDelay: 4 * 60 * 60
     });
 
     SystemValues afterSpell = SystemValues({
@@ -81,20 +89,24 @@ contract DssSpellTest is DSTest, DSMath {
         lineETH: mul(100000000, RAD),
         dutyETH: 1000000000000000000000000000,
         pctETH: 0 * 1000,
+        matETH: mul(150, RAY) / 100,
         tauETH: 6 hours,
         lineUSDC: mul(20000000, RAD),
         dutyUSDC: 1000000001847694957439350562,
         pctUSDC: 6 * 1000,
+        matUSDC: mul(120, RAY) / 100,
         tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000000000000000000000000,
         pctBAT: 0 * 1000,
+        matBAT: mul(150, RAY) / 100,
         tauBAT: 6 hours,
         lineSAI: mul(0, RAD),
         lineGlobal: mul(123000000, RAD),
         saiCap: mul(20000000, WAD),
         saiFee: 1000000002586884420913935572,
-        saiPct: 8.5 * 1000
+        saiPct: 8.5 * 1000,
+        pauseDelay: 12 * 60 * 60
     });
 
     Hevm hevm;
@@ -111,6 +123,8 @@ contract DssSpellTest is DSTest, DSMath {
         PotAbstract(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract     jug =
         JugAbstract(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
+    SpotAbstract   spot =
+        SpotAbstract(0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
     MKRAbstract     gov =
         MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     SaiTubAbstract  tub =
@@ -269,6 +283,18 @@ contract DssSpellTest is DSTest, DSMath {
         // Line
         assertEq(vat.Line(), beforeSpell.lineGlobal);
 
+        // ETH-A mat
+        (,uint256 matETH) = spot.ilks("ETH-A");
+        assertEq(matETH, beforeSpell.matETH);
+
+        // USDC-A mat
+        (,uint256 matUSDC) = spot.ilks("USDC-A");
+        assertEq(matUSDC, beforeSpell.matUSDC);
+
+        // BAT-A mat
+        (,uint256 matBAT) = spot.ilks("BAT-A");
+        assertEq(matBAT, beforeSpell.matBAT);
+
         // SCD DC
         assertEq(tub.cap(), beforeSpell.saiCap);
 
@@ -280,6 +306,14 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(eflip.tau()), beforeSpell.tauETH);
         assertEq(uint256(uflip.tau()), beforeSpell.tauUSDC);
         assertEq(uint256(bflip.tau()), beforeSpell.tauBAT);
+
+        // Pause delay
+        assertEq(pause.delay(), beforeSpell.pauseDelay);
+
+        // Oracles
+        assertEq(ethusd.bud(0x97C3e595e8f80169266B5534e4d7A1bB58BB45ab), 0);
+        assertEq(btcusd.bud(0xbf63446ecF3341e04c6569b226a57860B188edBc), 0);
+        assertEq(btcusd.bud(0x538038E526517680735568f9C5342c6E68bbDA12), 0);
 
         vote();
 
@@ -322,12 +356,27 @@ contract DssSpellTest is DSTest, DSMath {
         // Line
         assertEq(vat.Line(), afterSpell.lineGlobal);
 
+        // ETH-A mat
+        (, matETH) = spot.ilks("ETH-A");
+        assertEq(matETH, afterSpell.matETH);
+
+        // USDC-A mat
+        (, matUSDC) = spot.ilks("USDC-A");
+        assertEq(matUSDC, afterSpell.matUSDC);
+
+        // BAT-A mat
+        (, matBAT) = spot.ilks("BAT-A");
+        assertEq(matBAT, afterSpell.matBAT);
+
         // SCD DC
         assertEq(tub.cap(), afterSpell.saiCap);
 
         // SCD Fee
         assertEq(tub.fee(), afterSpell.saiFee);
         assertTrue(diffCalc(expectedRate(afterSpell.saiPct), yearlyYield(afterSpell.saiFee)) <= TOLERANCE);
+
+        // Pause delay
+        assertEq(pause.delay(), afterSpell.pauseDelay);
 
         // Oracles
         assertEq(ethusd.bud(0x97C3e595e8f80169266B5534e4d7A1bB58BB45ab), 1);
@@ -338,7 +387,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(eflip.tau()), afterSpell.tauETH);
         assertEq(uint256(uflip.tau()), afterSpell.tauUSDC);
         assertEq(uint256(bflip.tau()), afterSpell.tauBAT);
-
     }
 
     function testSaiSlayer() public {
