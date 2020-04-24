@@ -84,7 +84,7 @@ contract DssSpellTest is DSTest, DSMath {
         tauETH: 6 hours,
         lineUSDC: mul(20000000, RAD),
         dutyUSDC: 1000000001847694957439350562,
-        pctUSDC: 8 * 1000,
+        pctUSDC: 6 * 1000,
         tauUSDC: 3 days,
         lineBAT: mul(3000000, RAD),
         dutyBAT: 1000000000000000000000000000,
