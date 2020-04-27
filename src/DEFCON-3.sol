@@ -10,7 +10,7 @@ import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    string  constant public description = "DEFCON-2 Emergency Spell";
+    string  constant public description = "DEFCON-3 Emergency Spell";
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
