@@ -359,12 +359,6 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         spell.schedule();
 
-        // collateral liquidations enabled/disabled
-        assertEq(eflip.wards(address(cat)), 0);
-        assertEq(bflip.wards(address(cat)), 0);
-        assertEq(btcflip.wards(address(cat)), 0);
-        assertEq(uflip.wards(address(cat)), 0);
-
         waitAndCast();
 
         // collateral liquidations enabled/disabled
