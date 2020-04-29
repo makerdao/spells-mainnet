@@ -17,12 +17,6 @@ pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/PotAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/sai/SaiMomAbstract.sol";
-import "lib/dss-interfaces/src/sai/SaiTopAbstract.sol";
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
