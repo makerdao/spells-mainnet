@@ -49,7 +49,7 @@ contract SpellAction {
     address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
 
     address constant public MCD_JOIN_WBTC_A = ;
-    address constant public PIP_WBTC = ;
+    address constant public PIP_WBTC = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
 
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION = 10**6;
