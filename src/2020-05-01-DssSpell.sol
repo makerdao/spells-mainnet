@@ -96,14 +96,14 @@ contract SpellAction {
         // Set WBTC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_WBTC);
 
-        // Set the global debt ceiling to 143 MM
-        VatAbstract(MCD_VAT).file("Line", 143 * MILLION * RAD);
-        // Set the WBTC-A debt ceiling to 20 MM
-        VatAbstract(MCD_VAT).file(ilk, "line", 20 * MILLION * RAD);
+        // Set the global debt ceiling to 153 MM
+        VatAbstract(MCD_VAT).file("Line", 153 * MILLION * RAD);
+        // Set the WBTC-A debt ceiling to 10 MM
+        VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
         // Set the WBTC-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
-        // Set the Lot size to 6 WBTC-A
-        CatAbstract(MCD_CAT).file(ilk, "lump", 6 * WAD);
+        // Set the Lot size to 1 WBTC-A
+        CatAbstract(MCD_CAT).file(ilk, "lump", 1 * WAD);
         // Set the WBTC-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
         // Set the WBTC-A stability fee to 1%
@@ -112,8 +112,8 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_WBTC_A).file("beg", 103 * WAD / 100);
         // Set the WBTC-A time max time between bids to 6 hours
         FlipAbstract(MCD_FLIP_WBTC_A).file("ttl", 6 hours);
-        // Set the WBTC-A max auction duration to 3 days
-        FlipAbstract(MCD_FLIP_WBTC_A).file("tau", 3 days);
+        // Set the WBTC-A max auction duration to 6 hours
+        FlipAbstract(MCD_FLIP_WBTC_A).file("tau", 6 hours);
         // Set the WBTC-A min collateralization ratio to 150%
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
 
