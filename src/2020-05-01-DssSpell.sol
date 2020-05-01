@@ -19,6 +19,7 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
@@ -44,6 +45,7 @@ contract SpellAction {
     address constant public MCD_CAT = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
     address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_SPOT = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
     address constant public MCD_END = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
@@ -64,6 +66,7 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
+    uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
     uint256 constant public ONE_PCT_RATE =  1000000000315522921573372069;
 
     function execute() external {
@@ -129,6 +132,19 @@ contract SpellAction {
 
         // Update WBTC-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
+
+        // MCD Risk Parameter Modifications
+        PotAbstract(MCD_POT).drip();
+        JugAbstract(MCD_JUG).drip("ETH-A");
+        JugAbstract(MCD_JUG).drip("BAT-A");
+        JugAbstract(MCD_JUG).drip("USDC-A");
+
+        // Set the USDC stability fee
+        // https://vote.makerdao.com/polling-proposal/qmc9jj1dyycrmft3pe1yyq6zzz8xdjxzw1gxqzkaogiawe
+        // Existing Rate: 6%
+        // New Rate: 0%
+        uint256 USDC_FEE = ZERO_PCT_RATE;
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", USDC_FEE);
     }
 }
 

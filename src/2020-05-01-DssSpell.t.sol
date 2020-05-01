@@ -134,14 +134,14 @@ contract DssSpellTest is DSTest, DSMath {
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
             lineSAI: 0,
-            Line: 123 * MILLION * RAD,
+            Line: 143 * MILLION * RAD,
             saiCap: 20 * MILLION * WAD,
             saiFee: 1000000002586884420913935572,
             saiPct: 8.5 * 1000,
             pauseDelay: 12 * 60 * 60
         });
         beforeSpell.collaterals["ETH-A"] = CollateralValues({
-            line: 100 * MILLION * RAD,
+            line: 120 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
             pct: 0 * 1000,
@@ -200,7 +200,7 @@ contract DssSpellTest is DSTest, DSMath {
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line: 100 * MILLION * RAD,
+            line: 120 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
             pct: 0 * 1000,
@@ -226,8 +226,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-A"] = CollateralValues({
             line: 20 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000001847694957439350562,
-            pct: 6 * 1000,
+            duty: 1000000000000000000000000000,
+            pct: 0 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
             mat: 120 * RAY / 100,
