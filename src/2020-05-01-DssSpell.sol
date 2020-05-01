@@ -19,13 +19,14 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 
-contract FlipFabAbstract {
-    function newFlip(address, bytes32) public returns (address);
+contract MedianAbstract {
+    function kiss(address) public;
 }
 
 contract SpellAction {
@@ -45,10 +46,10 @@ contract SpellAction {
     address constant public MCD_SPOT = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
     address constant public MCD_END = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    address constant public FLIP_FAB = 0xBAB4FbeA257ABBfe84F4588d4Eedc43656E46Fc5;
     address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
 
-    address constant public MCD_JOIN_WBTC_A = ;
+    address constant public MCD_JOIN_WBTC_A = 0xBF72Da2Bd84c5170618Fbe5914B0ECA9638d5eb5;
+    address constant public MCD_FLIP_WBTC_A = 0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603;
     address constant public PIP_WBTC = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
 
     uint256 constant public THOUSAND = 10**3;
@@ -68,8 +69,13 @@ contract SpellAction {
     function execute() external {
         bytes32 ilk = "WBTC-A";
 
-        // Create the WBTC-A Flipper via the original FlipFab
-        address MCD_FLIP_WBTC_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).vat() == MCD_VAT, "");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).ilk() == ilk, "");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).gem() == 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, "");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).dec() == 8, "");
+        require(FlipAbstract(MCD_FLIP_WBTC_A).vat() == MCD_VAT, "");
+        require(FlipAbstract(MCD_FLIP_WBTC_A).ilk() == ilk, "");
 
         // Set the WBTC PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_WBTC);
@@ -91,8 +97,12 @@ contract SpellAction {
         // Allow FlipperMom to access to the WBTC-A Flipper
         FlipAbstract(MCD_FLIP_WBTC_A).rely(FLIPPER_MOM);
 
+        // Allow the Osm to access the median data
+        MedianAbstract(OsmAbstract(PIP_WBTC).src()).kiss(PIP_WBTC);
         // Allow OsmMom to access to the WBTC Osm
         OsmAbstract(PIP_WBTC).rely(OSM_MOM);
+        // Whitelist Spotter to be able to read from Osm
+        OsmAbstract(PIP_WBTC).kiss(MCD_SPOT);
         // Set WBTC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_WBTC);
 
