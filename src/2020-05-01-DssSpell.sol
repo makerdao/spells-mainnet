@@ -50,6 +50,7 @@ contract SpellAction {
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     address constant public OSM_MOM = 0x76416A4d5190d071bfed309861527431304aA14f;
 
+    address constant public WBTC = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address constant public MCD_JOIN_WBTC_A = 0xBF72Da2Bd84c5170618Fbe5914B0ECA9638d5eb5;
     address constant public MCD_FLIP_WBTC_A = 0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603;
     address constant public PIP_WBTC = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
@@ -79,12 +80,12 @@ contract SpellAction {
         bytes32 ilk = "WBTC-A";
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_WBTC_A).vat() == MCD_VAT, "");
-        require(GemJoinAbstract(MCD_JOIN_WBTC_A).ilk() == ilk, "");
-        require(GemJoinAbstract(MCD_JOIN_WBTC_A).gem() == 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, "");
-        require(GemJoinAbstract(MCD_JOIN_WBTC_A).dec() == 8, "");
-        require(FlipAbstract(MCD_FLIP_WBTC_A).vat() == MCD_VAT, "");
-        require(FlipAbstract(MCD_FLIP_WBTC_A).ilk() == ilk, "");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).ilk() == ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).gem() == WBTC, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_WBTC_A).dec() == 8, "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_WBTC_A).vat() == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_WBTC_A).ilk() == ilk, "flip-ilk-not-match");
 
         // Set the WBTC PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_WBTC);
@@ -106,11 +107,11 @@ contract SpellAction {
         // Allow FlipperMom to access to the WBTC-A Flipper
         FlipAbstract(MCD_FLIP_WBTC_A).rely(FLIPPER_MOM);
 
-        // Allow the Osm to access the median data
+        // Whitelist the Osm to read the Median data
         MedianAbstract(OsmAbstract(PIP_WBTC).src()).kiss(PIP_WBTC);
         // Allow OsmMom to access to the WBTC Osm
         OsmAbstract(PIP_WBTC).rely(OSM_MOM);
-        // Whitelist Spotter to be able to read from Osm
+        // Whitelist Spotter to read the Osm data
         OsmAbstract(PIP_WBTC).kiss(MCD_SPOT);
         // Set WBTC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_WBTC);
@@ -139,7 +140,7 @@ contract SpellAction {
         // Execute the first poke in the Osm for the next value
         OsmAbstract(PIP_WBTC).poke();
 
-        // Update WBTC-A spot value in Vat
+        // Update WBTC-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
 
         // MCD Risk Parameter Modifications

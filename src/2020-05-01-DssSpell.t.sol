@@ -32,8 +32,8 @@ contract DssSpellTest is DSTest, DSMath {
     // Replace with mainnet spell address to test against live
     address constant MAINNET_SPELL = address(0);
 
-    uint256 constant THOUSAND = 1000;
-    uint256 constant MILLION = 1000000;
+    uint256 constant THOUSAND = 10**3;
+    uint256 constant MILLION = 10**6;
 
     struct CollateralValues {
         uint256 line;
@@ -51,11 +51,7 @@ contract DssSpellTest is DSTest, DSMath {
     struct SystemValues {
         uint256 dsr;
         uint256 dsrPct;
-        uint256 lineSAI;
         uint256 Line;
-        uint256 saiCap;
-        uint256 saiFee;
-        uint256 saiPct;
         uint256 pauseDelay;
         mapping (bytes32 => CollateralValues) collaterals;
     }
@@ -133,11 +129,7 @@ contract DssSpellTest is DSTest, DSMath {
         beforeSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            lineSAI: 0,
             Line: 143 * MILLION * RAD,
-            saiCap: 20 * MILLION * WAD,
-            saiFee: 1000000002586884420913935572,
-            saiPct: 8.5 * 1000,
             pauseDelay: 12 * 60 * 60
         });
         beforeSpell.collaterals["ETH-A"] = CollateralValues({
@@ -192,11 +184,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            lineSAI: 0,
             Line: 153 * MILLION * RAD,
-            saiCap: 20 * MILLION * WAD,
-            saiFee: 1000000002586884420913935572,
-            saiPct: 8.5 * 1000,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = CollateralValues({
@@ -294,7 +282,19 @@ contract DssSpellTest is DSTest, DSMath {
         return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
-    function checkValues(bytes32 ilk, SystemValues storage values) internal {
+    function checkSystemValues(SystemValues storage values) internal {
+        // dsr
+        assertEq(pot.dsr(), values.dsr);
+        assertTrue(diffCalc(expectedRate(values.dsrPct), yearlyYield(values.dsr)) <= TOLERANCE);
+
+        // Line
+        assertEq(vat.Line(), values.Line);
+
+        // Pause delay
+        assertEq(pause.delay(), values.pauseDelay);
+    }
+
+    function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
         (uint duty,)  = jug.ilks(ilk);
         assertEq(duty,   values.collaterals[ilk].duty);
         assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(values.collaterals[ilk].duty)) <= TOLERANCE);
@@ -329,28 +329,14 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (now + 30 days));
         }
 
-        // dsr
-        assertEq(pot.dsr(), beforeSpell.dsr);
-        assertTrue(diffCalc(expectedRate(beforeSpell.dsrPct), yearlyYield(beforeSpell.dsr)) <= TOLERANCE);
-
-        // Line
-        assertEq(vat.Line(), beforeSpell.Line);
-
-        // Pause delay
-        assertEq(pause.delay(), beforeSpell.pauseDelay);
+        // General System values
+        checkSystemValues(beforeSpell);
 
         // Collateral values
-        checkValues("ETH-A", beforeSpell);
-        checkValues("BAT-A", beforeSpell);
-        checkValues("USDC-A", beforeSpell);
-        // checkValues("WBTC-A", beforeSpell);
-        
-        // SCD DC
-        assertEq(tub.cap(), beforeSpell.saiCap);
-
-        // SCD Fee
-        assertEq(tub.fee(), beforeSpell.saiFee);
-        assertTrue(diffCalc(expectedRate(beforeSpell.saiPct), yearlyYield(beforeSpell.saiFee)) <= TOLERANCE);
+        checkCollateralValues("ETH-A", beforeSpell);
+        checkCollateralValues("BAT-A", beforeSpell);
+        checkCollateralValues("USDC-A", beforeSpell);
+        // checkCollateralValues("WBTC-A", beforeSpell);
 
         // -------------------
         vote();
@@ -359,28 +345,14 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
         // -------------------
 
-        // dsr
-        assertEq(pot.dsr(), afterSpell.dsr);
-        assertTrue(diffCalc(expectedRate(afterSpell.dsrPct), yearlyYield(afterSpell.dsr)) <= TOLERANCE);
-
-        // Line
-        assertEq(vat.Line(), afterSpell.Line);
-
-        // Pause delay
-        assertEq(pause.delay(), afterSpell.pauseDelay);
+        // General System values
+        checkSystemValues(afterSpell);
 
         // Collateral values
-        checkValues("ETH-A", afterSpell);
-        checkValues("BAT-A", afterSpell);
-        checkValues("USDC-A", afterSpell);
-        checkValues("WBTC-A", afterSpell);
-
-        // SCD DC
-        assertEq(tub.cap(), afterSpell.saiCap);
-
-        // SCD Fee
-        assertEq(tub.fee(), afterSpell.saiFee);
-        assertTrue(diffCalc(expectedRate(afterSpell.saiPct), yearlyYield(afterSpell.saiFee)) <= TOLERANCE);
+        checkCollateralValues("ETH-A", afterSpell);
+        checkCollateralValues("BAT-A", afterSpell);
+        checkCollateralValues("USDC-A", afterSpell);
+        checkCollateralValues("WBTC-A", afterSpell);
     }
 
     function testNewCollateral() public {
