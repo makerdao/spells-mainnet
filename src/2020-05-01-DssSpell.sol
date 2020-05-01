@@ -130,6 +130,9 @@ contract SpellAction {
         // Set the WBTC-A min collateralization ratio to 150%
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
 
+        // Execute the first poke in the Osm for the next value
+        OsmAbstract(PIP_WBTC).poke();
+
         // Update WBTC-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
 
