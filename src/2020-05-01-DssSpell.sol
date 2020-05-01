@@ -70,6 +70,12 @@ contract SpellAction {
     uint256 constant public ONE_PCT_RATE =  1000000000315522921573372069;
 
     function execute() external {
+        // perform drips
+        PotAbstract(MCD_POT).drip();
+        JugAbstract(MCD_JUG).drip("ETH-A");
+        JugAbstract(MCD_JUG).drip("BAT-A");
+        JugAbstract(MCD_JUG).drip("USDC-A");
+
         bytes32 ilk = "WBTC-A";
 
         // Sanity checks
@@ -137,10 +143,6 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).poke(ilk);
 
         // MCD Risk Parameter Modifications
-        PotAbstract(MCD_POT).drip();
-        JugAbstract(MCD_JUG).drip("ETH-A");
-        JugAbstract(MCD_JUG).drip("BAT-A");
-        JugAbstract(MCD_JUG).drip("USDC-A");
 
         // Set the USDC stability fee
         // https://vote.makerdao.com/polling-proposal/qmc9jj1dyycrmft3pe1yyq6zzz8xdjxzw1gxqzkaogiawe
