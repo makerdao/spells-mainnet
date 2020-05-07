@@ -26,7 +26,7 @@ contract SpellAction {
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.0.5/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.0.6/contracts.json
     //
     // Contract addresses pertaining to the SCD ecosystem can be found at:
     //     https://github.com/makerdao/sai#dai-v1-current-deployments
