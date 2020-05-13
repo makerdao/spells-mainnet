@@ -47,8 +47,6 @@ contract SpellAction {
     address constant public MCD_JOIN_SAI = 0xad37fd42185Ba63009177058208dd1be4b136e6b;
     address constant public MCD_FLIP_SAI = 0x5432b2f3c0DFf95AA191C45E5cbd539E2820aE72;
 
-    address constant public MCD_JOIN_DAI = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
-
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION = 10**6;
     uint256 constant public WAD = 10**18;
