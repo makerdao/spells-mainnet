@@ -30,18 +30,20 @@ contract DssSpellTest is DSTest, DSMath {
         PotAbstract(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract     jug =
         JugAbstract(0x19c0976f590D67707E62397C87829d896Dc0f1F1);
+    EndAbstract     end =
+        EndAbstract(0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     MKRAbstract     gov =
         MKRAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     SaiTubAbstract  tub =
         SaiTubAbstract(0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
-    FlipAbstract  eflip =
-        FlipAbstract(0xd8a04F5412223F513DC55F839574430f5EC15531);
-    FlipAbstract  bflip =
-        FlipAbstract(0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
-    FlipAbstract  uflip =
-        FlipAbstract(0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1);
-    SpotAbstract   spot =
+    FlipAbstract    saiflip =
+        FlipAbstract(0x5432b2f3c0DFf95AA191C45E5cbd539E2820aE72);
+    GemJoinAbstract saijoin =
+        GemJoinAbstract(0xad37fd42185Ba63009177058208dd1be4b136e6b);
+    SpotAbstract    spot =
         SpotAbstract(0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
+    FlipperMomAbstract fmom =
+        FlipperMomAbstract(0x9BdDB99625A711bf9bda237044924E34E8570f75);
 
     DssSpell spell;
 
@@ -133,6 +135,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vline, 0);
         assertEq(vdust, 0);
 
+        assertEq(saijoin.live(), 1);
+
+        assertEq(saiflip.wards(address(cat)), 1);
+        assertEq(saiflip.wards(address(end)), 1);
+        assertEq(saiflip.wards(address(fmom)), 0);
+
         vote();
         spell.schedule();
         waitAndCast();
@@ -147,7 +155,11 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vline, 0);
         assertEq(vdust, 0);
 
+        assertEq(saijoin.live(), 0);
 
+        assertEq(saiflip.wards(address(cat)), 0);
+        assertEq(saiflip.wards(address(end)), 0);
+        assertEq(saiflip.wards(address(fmom)), 0);
     }
 
 }
