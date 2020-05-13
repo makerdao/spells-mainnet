@@ -80,10 +80,6 @@ contract SpellAction {
         // Set the SAI liquidation penalty to 0%
         CatAbstract(MCD_CAT).file(ilk, "chop", 0);
 
-        // Deny the SAI Flip
-        // TODO: Deny msg.sender or MKR authority?
-        FlipAbstract(MCD_FLIP_SAI).deny(msg.sender);
-
         // Cage the Sai join adapter
         GemJoinAbstract(MCD_JOIN_SAI).cage();
 
