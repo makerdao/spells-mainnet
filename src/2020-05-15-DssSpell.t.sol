@@ -26,7 +26,7 @@ contract Hevm { function warp(uint) public; }
 contract DssSpellTest is DSTest, DSMath {
 
     // Replace with mainnet spell address to test against live
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = 0x8Afa02a56336202B9a0B1d451f2039D76dA4E0bE;
 
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION = 10**6;
@@ -283,7 +283,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
             // TODO: change timestamp once spell is deployed
-            assertEq(spell.expiration(), (1588912371 + 30 days));
+            assertEq(spell.expiration(), (1589548016 + 30 days));
         }
 
         // General System values
