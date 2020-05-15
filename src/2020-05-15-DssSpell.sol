@@ -33,12 +33,6 @@ contract SpellAction {
     address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
 
-    uint256 constant public THOUSAND = 10**3;
-    uint256 constant public MILLION = 10**6;
-    uint256 constant public WAD = 10**18;
-    uint256 constant public RAY = 10**27;
-    uint256 constant public RAD = 10**45;
-
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -56,7 +50,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("WBTC-A");
 
         // MCD Risk Parameter Modifications
-        // Set the WBTC-A stability fee to 1% 
+        // Set the WBTC-A stability fee to 1%
         // https://vote.makerdao.com/polling-proposal/qmz9b5czkitcqo5mfgcdrmpbqvcxyjz4t1wweyjqqcakgj
         // Existing Rate: 1%
         // New Rate: 0%

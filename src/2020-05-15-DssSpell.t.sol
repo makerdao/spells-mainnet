@@ -19,7 +19,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-05-08-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-05-15-DssSpell.sol";
 
 contract Hevm { function warp(uint) public; }
 
@@ -167,8 +167,8 @@ contract DssSpellTest is DSTest, DSMath {
         beforeSpell.collaterals["WBTC-A"] = CollateralValues({
             line: 10 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000000000000000000000000,
-            pct: 0 * 1000,
+            duty: 1000000000315522921573372069,
+            pct: 1 * 1000,
             chop: 113 * RAY / 100,
             lump: 1 * WAD,
             mat: 150 * RAY / 100,
@@ -189,7 +189,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
 
         afterSpell.collaterals["WBTC-A"].duty = 1000000000000000000000000000;
-        afterSpell.collaterals["WBTC-A"].pct  = 1 * 1000;
+        afterSpell.collaterals["WBTC-A"].pct  = 0 * 1000;
     }
 
     function vote() private {
