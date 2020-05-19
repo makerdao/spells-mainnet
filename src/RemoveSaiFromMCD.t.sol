@@ -137,6 +137,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(saijoin.live(), 1);
 
+        assertEq(vat.wards(address(saijoin)), 1);
         assertEq(saiflip.wards(address(cat)), 1);
         assertEq(saiflip.wards(address(end)), 1);
         assertEq(saiflip.wards(address(fmom)), 0);
@@ -157,6 +158,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(saijoin.live(), 0);
 
+        assertEq(vat.wards(address(saijoin)), 0);
         assertEq(saiflip.wards(address(cat)), 0);
         assertEq(saiflip.wards(address(end)), 0);
         assertEq(saiflip.wards(address(fmom)), 0);
