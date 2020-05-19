@@ -67,8 +67,8 @@ contract SpellAction {
         // Remove the SAI Flipper in the Cat
         CatAbstract(MCD_CAT).file(ilk, "flip", address(0));
 
-        // Set the SAI debt ceiling to 0
-        VatAbstract(MCD_VAT).file(ilk, "line", 0);
+        // Set the SAI debt ceiling to 0 (Already Done)
+        // VatAbstract(MCD_VAT).file(ilk, "line", 0);
         // Set the SAI dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 0);
 
