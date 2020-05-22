@@ -190,7 +190,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
 
         afterSpell.collaterals["USDC-A"].duty = 1000000000236936036262880196;
-        afterSpell.collaterals["USDC-A"].pct = 75 * 100;
+        afterSpell.collaterals["USDC-A"].pct = 75 * 10;
         afterSpell.collaterals["WBTC-A"].duty = 1000000000315522921573372069;
         afterSpell.collaterals["WBTC-A"].pct = 1 * 1000;
     }
