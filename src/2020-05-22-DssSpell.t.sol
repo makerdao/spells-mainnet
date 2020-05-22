@@ -19,14 +19,15 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-05-08-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-05-22-DssSpell.sol";
 
 contract Hevm { function warp(uint) public; }
 
 contract DssSpellTest is DSTest, DSMath {
 
-    // Replace with mainnet spell address to test against live
-    address constant MAINNET_SPELL = 0xD0DD71814cC2185C3092a477217c9d64E7f3A38E;
+    // Replace with mainnet spell address and creation timestamp to test against live
+    address constant MAINNET_SPELL = 0xdB20f2e864bfb7658ae78383D55aD4b488851fe4;
+    uint256 constant SPELL_CREATED = 1590157873;
 
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION = 10**6;
@@ -186,9 +187,12 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"]  = beforeSpell.collaterals["ETH-A"];
         afterSpell.collaterals["BAT-A"]  = beforeSpell.collaterals["BAT-A"];
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-A"].duty = 1000000000315522921573372069;
-        afterSpell.collaterals["USDC-A"].pct  = 1 * 1000;
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
+
+        afterSpell.collaterals["USDC-A"].duty = 1000000000236936036262880196;
+        afterSpell.collaterals["USDC-A"].pct = 75 * 10;
+        afterSpell.collaterals["WBTC-A"].duty = 1000000000315522921573372069;
+        afterSpell.collaterals["WBTC-A"].pct = 1 * 1000;
     }
 
     function vote() private {
@@ -281,8 +285,7 @@ contract DssSpellTest is DSTest, DSMath {
         if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
-            // TODO: change timestamp once spell is deployed
-            assertEq(spell.expiration(), (1588912371 + 30 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
         // General System values
