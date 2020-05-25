@@ -23,7 +23,7 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    string constant public description = '2020-05-25 MakerDAO Executive Spell | Officially Ratify the MIP0c12-SP2 Subproposal | 0x3a455a89a6c006b851db62c135e9050b5cef77cf01ee66db98e02c5116f519c8';
+    string constant public description = "2020-05-25 MakerDAO Executive Spell | Officially Ratify the MIP0c12-SP2 Subproposal | 0x3a455a89a6c006b851db62c135e9050b5cef77cf01ee66db98e02c5116f519c8";
 
     function execute() external {
         // Proving the Pause Proxy has access to the MCD core system at the execution time
