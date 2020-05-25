@@ -90,9 +90,9 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Test expiration
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 4 days));
+            assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
         }
         // -------------------
         vote();

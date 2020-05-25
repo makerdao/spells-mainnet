@@ -49,7 +49,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 4 days;
+        expiration = now + 4 days + 2 hours; // Extra window of 2 hours to get the spell set up in the Governance Portal and communicated
     }
 
     function description() public view returns (string memory) {
