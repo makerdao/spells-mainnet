@@ -43,7 +43,6 @@ contract SpellAction {
     address constant public MCD_CAT             = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
     address constant public MCD_JUG             = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT             = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-    // test 
 
     address constant public MCD_SPOT            = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
     address constant public MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
@@ -51,17 +50,16 @@ contract SpellAction {
     address constant public FLIP_FAB            = 0xBAB4FbeA257ABBfe84F4588d4Eedc43656E46Fc5;
 
     // USDC specific addresses
-    address constant public USDC                = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address constant public MCD_JOIN_USDC_B     = 0x2600004fd1585f7270756DDc88aD9cfA10dD0428;
     address constant public PIP_USDC            = 0x77b68899b99b686F415d074278a9a16b336085A0;
     address constant public MCD_FLIP_USDC_B     = 0xec25Ca3fFa512afbb1784E17f1D414E16D01794F;
 
     // TUSD specific addresses
-    address constant public TUSD                = 0x0000000000085d4780B73119b644AE5ecd22b376;
     address constant public MCD_JOIN_TUSD_A     = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
     address constant public PIP_TUSD            = 0xeE13831ca96d191B688A670D47173694ba98f1e5;
     address constant public MCD_FLIP_TUSD_A     = 0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61;
     
+    // decimals & precision
     uint256 constant public THOUSAND            = 10 ** 3;
     uint256 constant public MILLION             = 10 ** 6;
     uint256 constant public WAD                 = 10 ** 18;
@@ -129,9 +127,9 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_USDC_B).file(   "ttl"   , 6 hours              ); // 6 hours ttl
         FlipAbstract(MCD_FLIP_USDC_B).file(   "tau"   , 3 days               ); // 3 days tau
         SpotAbstract(MCD_SPOT).file(usdcBIlk, "mat"   , 120 * RAY / 100      ); // 120% coll. ratio
-
         SpotAbstract(MCD_SPOT).poke(usdcBIlk);
 
+        // consequently, deny TUSD-A Flipper
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_B);
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +138,6 @@ contract SpellAction {
         // Init TUSD-A in Vat & Jug
         VatAbstract(MCD_VAT).init(tusdAIlk);
         JugAbstract(MCD_JUG).init(tusdAIlk);
-
 
         // Allow TUSD-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_TUSD_A);
@@ -168,21 +165,6 @@ contract SpellAction {
 
         // consequently, deny TUSD-A Flipper
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_TUSD_A);
-
-//         // Set the USDC-A stability fee to 0.75%
-//         // https://vote.makerdao.com/polling-proposal/qmfhclbxzjypk4aatyvwqthtuqr5842xnrytj8q89ajb6z
-//         // Existing Rate: 0%
-//         // New Rate: 0.75%
-//         uint256 USDC_FEE = THREE_FOURTHS_PCT_RATE;
-//         JugAbstract(MCD_JUG).file("USDC-A", "duty", USDC_FEE);
-// 
-//         // MCD Risk Parameter Modifications
-//         // Set the WBTC-A stability fee to 1%
-//         // https://vote.makerdao.com/polling-proposal/qmz9b5czkitcqo5mfgcdrmpbqvcxyjz4t1wweyjqqcakgj
-//         // Existing Rate: 1%
-//         // New Rate: 1%
-//         uint256 WBTCA_FEE = ONE_PCT_RATE;
-//         JugAbstract(MCD_JUG).file("WBTC-A", "duty", WBTCA_FEE);
     }
 }
 

@@ -477,7 +477,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
         vat.frob("TUSD-A", address(this), address(this), address(this), int(40 * WAD), int(25 * WAD));
-        assertEq(vat.gem("USDC-B", address(this)), 0);
+        assertEq(vat.gem("TUSD-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 25 * RAD);
 
         // Payback DAI, withdraw collateral
@@ -486,13 +486,13 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        tusdA_Join.exit(address(this), 40 * 10 ** 6);
-        assertEq(tusd.balanceOf(address(this)), 40 * 10 ** 6);
+        tusdA_Join.exit(address(this), 40 * 10 ** 18);
+        assertEq(tusd.balanceOf(address(this)), 40 * 10 ** 18);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
 
         // // Generate new DAI to force a liquidation
-        // tusd.approve(address(usdcB_Join), 40 * 10 ** 6);
-        // tusdA_Join.join(address(this), 40 * 10 ** 6);
+        // tusd.approve(address(usdcB_Join), 40 * 10 ** 18);
+        // tusdA_Join.join(address(this), 40 * 10 ** 18);
         // vat.frob("TUSD-A", address(this), address(this), address(this), int(40 * WAD), int(32 * WAD)); // Max amount of DAI
         // hevm.warp(now + 1);
         // jug.drip("TUSD-A");
