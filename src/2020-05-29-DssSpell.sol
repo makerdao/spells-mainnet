@@ -43,6 +43,7 @@ contract SpellAction {
     address constant public MCD_CAT             = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
     address constant public MCD_JUG             = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT             = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    // test 
 
     address constant public MCD_SPOT            = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
     address constant public MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
@@ -162,7 +163,7 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_TUSD_A).file(   "beg"   , 103 * WAD / 100      ); // 3% bid increase
         FlipAbstract(MCD_FLIP_TUSD_A).file(   "ttl"   , 6 hours              ); // 6 hours ttl
         FlipAbstract(MCD_FLIP_TUSD_A).file(   "tau"   , 3 days               ); // 3 days tau
-        SpotAbstract(MCD_SPOT).file(tusdAIlk, "mat"   , 120 * RAY / 100      ); // 125% coll. ratio
+        SpotAbstract(MCD_SPOT).file(tusdAIlk, "mat"   , 120 * RAY / 100      ); // 120% coll. ratio
         SpotAbstract(MCD_SPOT).poke(tusdAIlk);
 
         // consequently, deny TUSD-A Flipper
