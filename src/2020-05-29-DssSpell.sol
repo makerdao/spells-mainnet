@@ -24,9 +24,9 @@ import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 
-contract FlipFabAbstract {
-    function newFlip(address, bytes32) public returns (address);
-}
+// contract FlipFabAbstract {
+//     function newFlip(address, bytes32) public returns (address);
+// }
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption

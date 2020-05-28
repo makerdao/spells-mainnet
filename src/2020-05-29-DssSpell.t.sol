@@ -342,7 +342,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dust, 20 * RAD);
 
         // USDC-B liquidation penalty and lot size
-        (address aux, uint256 chop, uint256 lump) = cat.ilks("USDC-B");
+        (, uint256 chop, uint256 lump) = cat.ilks("USDC-B");
         // FlipAbstract uFlip = FlipAbstract(aux);
         assertEq(chop, 113 * RAY / 100);
         assertEq(lump, 50 * THOUSAND * WAD);
