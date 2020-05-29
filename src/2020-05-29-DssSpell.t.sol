@@ -64,7 +64,7 @@ contract DssSpellTest is DSTest, DSMath {
     SaiTubAbstract  tub         = SaiTubAbstract(   0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
     FlipAbstract    eFlip       = FlipAbstract(     0xd8a04F5412223F513DC55F839574430f5EC15531);
     FlipAbstract    bFlip       = FlipAbstract(     0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
-    FlipAbstract    uFlip       = FlipAbstract(     0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1);
+    FlipAbstract    uBFlip      = FlipAbstract(     0xec25Ca3fFa512afbb1784E17f1D414E16D01794F);
     FlipAbstract    wFlip       = FlipAbstract(     0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603);
     FlipAbstract    tFlip       = FlipAbstract(     0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61);
 
@@ -344,9 +344,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(usdcB_Join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(usdcB_Join)), 1);
-        assertEq(uFlip.wards(address(cat)), 0); // FlipperMom denied it at the end of the spell (no liquidations on first phase)
-        assertEq(uFlip.wards(address(end)), 1);
-        assertEq(uFlip.wards(flipperMom), 1);
+        assertEq(uBFlip.wards(address(cat)), 0); // FlipperMom denied it at end of the spell (no liquidations on first phase)
+        assertEq(uBFlip.wards(address(end)), 1);
+        assertEq(uBFlip.wards(flipperMom), 1);
 
         // Start testing Vault
 
@@ -380,9 +380,9 @@ contract DssSpellTest is DSTest, DSMath {
         // vat.frob("USDC-B", address(this), address(this), address(this), int(40 * WAD), int(32 * WAD)); // Max amount of DAI
         // hevm.warp(now + 1);
         // jug.drip("USDC-B");
-        // assertEq(uFlip.kicks(), 0);
+        // assertEq(uBFlip.kicks(), 0);
         // cat.bite("USDC-B", address(this));
-        // assertEq(uFlip.kicks(), 1);
+        // assertEq(uBFlip.kicks(), 1);
     }
 
     function testSpellIsCastTUSDA() public {
