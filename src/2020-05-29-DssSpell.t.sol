@@ -66,6 +66,7 @@ contract DssSpellTest is DSTest, DSMath {
     FlipAbstract    bFlip       = FlipAbstract(     0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
     FlipAbstract    uFlip       = FlipAbstract(     0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1);
     FlipAbstract    wFlip       = FlipAbstract(     0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603);
+    FlipAbstract    tFlip       = FlipAbstract(     0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61);
 
     GemJoinAbstract usdcB_Join  = GemJoinAbstract(  0x2600004fd1585f7270756DDc88aD9cfA10dD0428);
     GemJoinAbstract tusdA_Join  = GemJoinAbstract(  0x4454aF7C8bb9463203b66C816220D41ED7837f44);
@@ -189,30 +190,6 @@ contract DssSpellTest is DSTest, DSMath {
             ttl: 6 hours,
             tau: 6 hours
         });
-        // beforeSpell.collaterals["USDC-B"] = CollateralValues({
-        //     line: 10 * MILLION * RAD,
-        //     dust: 20 * RAD,
-        //     duty: 1000000012857214317438491659,
-        //     pct: 50 * 1000,
-        //     chop: 113 * RAY / 100,
-        //     lump: 50 * THOUSAND * WAD,
-        //     mat: 120 * RAY / 100,
-        //     beg: 103 * WAD / 100,
-        //     ttl: 6 hours,
-        //     tau: 3 days
-        // });
-        // beforeSpell.collaterals["TUSD-A"] = CollateralValues({
-        //     line: 2 * MILLION * RAD,
-        //     dust: 20 * RAD,
-        //     duty: 1000000000000000000000000000,
-        //     pct: 0 * 1000,
-        //     chop: 113 * RAY / 100,
-        //     lump: 50 * THOUSAND * WAD,
-        //     mat: 120 * RAY / 100,
-        //     beg: 103 * WAD / 100,
-        //     ttl: 6 hours,
-        //     tau: 3 days
-        // });
 
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
@@ -225,7 +202,30 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
-        // afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
+        afterSpell.collaterals["USDC-B"] = CollateralValues({
+            line: 10 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000012857214317438491659,
+            pct: 50 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 50 * THOUSAND * WAD,
+            mat: 120 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 3 days
+        });
+        afterSpell.collaterals["TUSD-A"] = CollateralValues({
+            line: 2 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000000000000000000000000,
+            pct: 0 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 50 * THOUSAND * WAD,
+            mat: 120 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 3 days
+        });
     }
 
     function vote() private {
@@ -330,42 +330,15 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // USDC-B fee
-        (uint256 duty,) = jug.ilks("USDC-B");
-        // 50% stability fee
-        assertEq(duty, 1000000012857214317438491659);
-        assertTrue(diffCalc(expectedRate(50 * 1000), yearlyYield(duty)) <= TOLERANCE);
+        // check afterSpell parameters
+        checkSystemValues(afterSpell);
+        checkCollateralValues("USDC-B", afterSpell);
 
-        // USDC-B line and dust
-        (,,, uint256 line, uint256 dust) = vat.ilks("USDC-B");
-        assertEq(line, 10 * MILLION * RAD);
-        assertEq(dust, 20 * RAD);
-
-        // USDC-B liquidation penalty and lot size
-        (, uint256 chop, uint256 lump) = cat.ilks("USDC-B");
-        // FlipAbstract uFlip = FlipAbstract(aux);
-        assertEq(chop, 113 * RAY / 100);
-        assertEq(lump, 50 * THOUSAND * WAD);
-
-        // USDC-B percentage between bids
-        assertEq(uFlip.beg(), 103 * WAD / 100);
-        // USDC-B max time between bids
-        assertEq(uint256(uFlip.ttl()), 6 hours);
-        // USDC-B max auction duration
-        assertEq(uint256(uFlip.tau()), 3 days);
-
-        // USDC-B min collateralization ratio
-        (, uint256 mat) = spot.ilks("USDC-B");
-        assertEq(mat, 120 * RAY / 100);
-
-        // Line
-        assertEq(vat.Line(), 165 * MILLION * RAD);
-
-        // USDC Pip => 1 USDC == 1 DAI
+        // USDC-B Pip => 1 USDC == 1 DAI
         assertEq(uint256(usdcAPip.read()), 1 * WAD);
-        // USDC Pip Owner
+        // USDC-B Pip Owner
         assertEq(usdcAPip.owner(), pauseProxy);
-        // USDC Pip Authority
+        // USDC-B Pip Authority
         assertEq(usdcAPip.authority(), address(0));
 
         // Authorization
@@ -419,36 +392,9 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // USDC-B fee
-        (uint256 duty,) = jug.ilks("TUSD-A");
-        // 0% stability fee
-        assertEq(duty, 1000000000000000000000000000);
-        assertTrue(diffCalc(expectedRate(0 * 1000), yearlyYield(duty)) <= TOLERANCE);
-
-        // USDC-B line and dust
-        (,,, uint256 line, uint256 dust) = vat.ilks("TUSD-A");
-        assertEq(line, 2 * MILLION * RAD);
-        assertEq(dust, 20 * RAD);
-
-        // USDC-B liquidation penalty and lot size
-        (address aux, uint256 chop, uint256 lump) = cat.ilks("TUSD-A");
-        FlipAbstract tFlip = FlipAbstract(aux);
-        assertEq(chop, 113 * RAY / 100);
-        assertEq(lump, 50 * THOUSAND * WAD);
-
-        // USDC-B percentage between bids
-        assertEq(tFlip.beg(), 103 * WAD / 100);
-        // USDC-B max time between bids
-        assertEq(uint256(tFlip.ttl()), 6 hours);
-        // USDC-B max auction duration
-        assertEq(uint256(tFlip.tau()), 3 days);
-
-        // USDC-B min collateralization ratio
-        (, uint256 mat) = spot.ilks("TUSD-A");
-        assertEq(mat, 120 * RAY / 100);
-
-        // Line
-        assertEq(vat.Line(), 165 * MILLION * RAD);
+        // check afterSpell parameters
+        checkSystemValues(afterSpell);
+        checkCollateralValues("TUSD-A", afterSpell);
 
         // USDC Pip => 1 USDC == 1 DAI
         assertEq(uint256(tusdAPip.read()), 1 * WAD);
