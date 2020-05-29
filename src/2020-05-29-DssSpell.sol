@@ -125,7 +125,7 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file(usdcBIlk, "mat"   , 120 * RAY / 100      ); // 120% coll. ratio
         SpotAbstract(MCD_SPOT).poke(usdcBIlk);
 
-        // consequently, deny TUSD-A Flipper
+        // consequently, deny USDC-A Flipper
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_B);
 
         ////////////////////////////////////////////////////////////////////////////////
