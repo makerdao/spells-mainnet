@@ -56,16 +56,11 @@ contract DssSpellTest is DSTest, DSMath {
     DSChiefAbstract chief       = DSChiefAbstract(  0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     VatAbstract     vat         = VatAbstract(      0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     CatAbstract     cat         = CatAbstract(      0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
-    VowAbstract     vow         = VowAbstract(      0xA950524441892A31ebddF91d3cEEFa04Bf454466);
     PotAbstract     pot         = PotAbstract(      0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract     jug         = JugAbstract(      0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract    spot        = SpotAbstract(     0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
     MKRAbstract     gov         = MKRAbstract(      0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    // SaiTubAbstract  tub         = SaiTubAbstract(   0x448a5065aeBB8E423F0896E6c5D525C040f59af3);
-    // FlipAbstract    eFlip       = FlipAbstract(     0xd8a04F5412223F513DC55F839574430f5EC15531);
-    // FlipAbstract    bFlip       = FlipAbstract(     0xaA745404d55f88C108A28c86abE7b5A1E7817c07);
     FlipAbstract    uBFlip      = FlipAbstract(     0xec25Ca3fFa512afbb1784E17f1D414E16D01794F);
-    // FlipAbstract    wFlip       = FlipAbstract(     0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603);
     FlipAbstract    tAFlip      = FlipAbstract(     0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61);
 
     GemJoinAbstract usdcB_Join  = GemJoinAbstract(  0x2600004fd1585f7270756DDc88aD9cfA10dD0428);
@@ -131,7 +126,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-        // gov.mint(address(this), 300000 ether);
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -405,7 +399,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Authorization
         assertEq(tusdA_Join.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(usdcB_Join)), 1);
+        assertEq(vat.wards(address(tusdA_Join)), 1);
         assertEq(tAFlip.wards(address(cat)), 0); // FlipperMom denied it at the end of the spell (no liquidations on first phase)
         assertEq(tAFlip.wards(address(end)), 1);
         assertEq(tAFlip.wards(flipperMom), 1);
