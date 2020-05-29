@@ -47,7 +47,6 @@ contract SpellAction {
     address constant public MCD_SPOT            = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
     address constant public MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
     address constant public FLIPPER_MOM         = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    address constant public FLIP_FAB            = 0xBAB4FbeA257ABBfe84F4588d4Eedc43656E46Fc5;
 
     // USDC specific addresses
     address constant public MCD_JOIN_USDC_B     = 0x2600004fd1585f7270756DDc88aD9cfA10dD0428;
@@ -73,12 +72,9 @@ contract SpellAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     uint256 constant public ZERO_PCT_RATE       = 1000000000000000000000000000;
-    uint256 constant public ONE_PCT_RATE        = 1000000000315522921573372069;
     uint256 constant public FIFTY_PCT_RATE      = 1000000012857214317438491659;
 
     function execute() external {
-        bytes32 usdcBIlk = "USDC-B";
-        bytes32 tusdAIlk = "TUSD-A";
 
         PotAbstract(MCD_POT).drip();
         JugAbstract(MCD_JUG).drip("ETH-A");
@@ -86,17 +82,8 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("USDC-A");
         JugAbstract(MCD_JUG).drip("WBTC-A");
 
-        // set price feed for USDC-B & TUSD-A
-        SpotAbstract(MCD_SPOT).file(usdcBIlk, "pip", PIP_USDC);
-        SpotAbstract(MCD_SPOT).file(tusdAIlk, "pip", PIP_TUSD);
-
-        // set the flippers in the cat
-        CatAbstract(MCD_CAT).file(usdcBIlk, "flip", MCD_FLIP_USDC_B);
-        CatAbstract(MCD_CAT).file(tusdAIlk, "flip", MCD_FLIP_TUSD_A);
-
-        // Init USDC-B in Vat & Jug
-        VatAbstract(MCD_VAT).init(usdcBIlk);
-        JugAbstract(MCD_JUG).init(usdcBIlk);
+        ////////////////////////////////////////////////////////////////////////////////
+        // GLOBAL 
 
         // set the global debt ceiling to 165,000,000
         // 153 (current DC) + 10 (USDC-B) + 2 (TUSD-A)
@@ -105,8 +92,21 @@ contract SpellAction {
         ////////////////////////////////////////////////////////////////////////////////
         // USDC-B 
 
+        // set ilk bytes32 variable
+        bytes32 usdcBIlk = "USDC-B";
+
+        // Init USDC-B in Vat & Jug
+        VatAbstract(MCD_VAT).init(usdcBIlk);
+        JugAbstract(MCD_JUG).init(usdcBIlk);
+
         // Allow USDC-B Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_USDC_B);
+
+        // set price feed for USDC-B
+        SpotAbstract(MCD_SPOT).file(usdcBIlk, "pip", PIP_USDC);
+
+        // set the USDC-B flipper in the cat
+        CatAbstract(MCD_CAT).file(usdcBIlk, "flip", MCD_FLIP_USDC_B);
 
         // Allow cat to kick auctions in USDC-B Flipper 
         // NOTE: this will be reverse later in spell, and is done only for explicitness.
@@ -135,12 +135,21 @@ contract SpellAction {
         ////////////////////////////////////////////////////////////////////////////////
         // TUSD-A 
 
+        // set ilk bytes32 variable
+        bytes32 tusdAIlk = "TUSD-A";
+
         // Init TUSD-A in Vat & Jug
         VatAbstract(MCD_VAT).init(tusdAIlk);
         JugAbstract(MCD_JUG).init(tusdAIlk);
 
         // Allow TUSD-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_TUSD_A);
+
+        // set price feed for TUSD-A
+        SpotAbstract(MCD_SPOT).file(tusdAIlk, "pip", PIP_TUSD);
+
+        // set the TUSD-A flipper in the cat
+        CatAbstract(MCD_CAT).file(tusdAIlk, "flip", MCD_FLIP_TUSD_A);
 
         // Allow cat to kick auctions in TUSD-A Flipper
         // NOTE: this will be reverse later in spell, and is done only for explicitness.
