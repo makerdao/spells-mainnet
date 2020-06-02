@@ -129,6 +129,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         (uint256 vArt, uint256 vrate, uint256 vspot, uint256 vline, uint256 vdust)
           = vat.ilks(ilk);
+
+        (uint256 jduty, uint256 jrho) = jug.ilks(ilk);
         // These are already 0 due to previous actions,
         //   they probabaly don't need to be called.
         assertEq(vline, 0);
@@ -147,13 +149,20 @@ contract DssSpellTest is DSTest, DSMath {
 
         (spip, smat) = spot.ilks(ilk);
         assertEq(spip, address(0));
+        assertEq(smat, 0);
 
         (cflip, cchop, clump) = cat.ilks(ilk);
-        assertEq(spip, address(0));
+        assertEq(cflip, address(0));
+        assertEq(cchop, 0);
+        assertEq(clump, 0);
 
         (vArt, vrate, vspot, vline, vdust) = vat.ilks(ilk);
         assertEq(vline, 0);
         assertEq(vdust, 0);
+        assertEq(vspot, 0);
+
+        (jduty, jrho) = jug.ilks(ilk);
+        assertEq(jduty, 0);
 
         assertEq(saijoin.live(), 0);
 
