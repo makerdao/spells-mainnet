@@ -15,7 +15,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     bytes32 ilk = "SAI";
 
-
     Hevm hevm;
 
     DSPauseAbstract pause =

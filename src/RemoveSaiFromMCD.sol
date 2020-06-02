@@ -18,13 +18,10 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
+import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-
-contract MedianAbstract {
-    function kiss(address) public;
-}
 
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
@@ -40,6 +37,7 @@ contract SpellAction {
     address constant public MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public MCD_CAT = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
     address constant public MCD_SPOT = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_END = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
     address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
@@ -64,6 +62,9 @@ contract SpellAction {
         // Remove the SAI PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", address(0));
 
+        // Set SAI mat to 0 in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 0);
+
         // Remove the SAI Flipper in the Cat
         CatAbstract(MCD_CAT).file(ilk, "flip", address(0));
 
@@ -72,11 +73,20 @@ contract SpellAction {
         // Set the SAI dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 0);
 
+        // Set the SAI spot
+        VatAbstract(MCD_VAT).file(ilk, "spot", 0);
+
         // Set the Lot size to 0 SAI
         CatAbstract(MCD_CAT).file(ilk, "lump", 0);
 
         // Set the SAI liquidation penalty to 0%
         CatAbstract(MCD_CAT).file(ilk, "chop", 0);
+
+        // Drip the Jug
+        JugAbstract(MCD_JUG).drip(ilk);
+
+        // Set Jug duty to 0
+        JugAbstract(MCD_JUG).file(ilk, "duty", 0);
 
         // Cage the Sai join adapter
         GemJoinAbstract(MCD_JOIN_SAI).cage();
