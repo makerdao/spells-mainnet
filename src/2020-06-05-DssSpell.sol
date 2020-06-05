@@ -27,14 +27,14 @@ contract SpellAction {
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.0.6/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.0.7/contracts.json
     //
     // Contract addresses pertaining to the SCD ecosystem can be found at:
     //     https://github.com/makerdao/sai#dai-v1-current-deployments
     address constant public MCD_VAT             = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public MCD_JUG             = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_POT             = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-    
+
     // decimals & precision
     uint256 constant public MILLION             = 10 ** 6;
     uint256 constant public RAD                 = 10 ** 45;
@@ -50,7 +50,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("TUSD-A");
 
         ////////////////////////////////////////////////////////////////////////////////
-        // GLOBAL 
+        // GLOBAL
 
         // set the global debt ceiling to 185,000,000
         // 165 (current DC) + 20 (ETH-A)

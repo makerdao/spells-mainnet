@@ -22,7 +22,7 @@ contract FlipMomLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = 0x261086981FC6c57EF4679Af6aC253C3755850362;
 
     struct CollateralValues {
         uint256 line;
@@ -309,7 +309,7 @@ contract DssSpellTest is DSTest, DSMath {
         if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (1590773091 + 30 days));
+            assertEq(spell.expiration(), (1591372986 + 30 days));
         }
 
         checkSystemValues(beforeSpell);
