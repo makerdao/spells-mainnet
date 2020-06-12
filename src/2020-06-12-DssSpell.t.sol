@@ -12,7 +12,7 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = 0x7b540CF92de1b5697F3cC1DdA39437027288C929;
 
     struct CollateralValues {
         uint256 line;
@@ -362,7 +362,7 @@ contract DssSpellTest is DSTest, DSMath {
         if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (1591372986 + 30 days));
+            assertEq(spell.expiration(), (1591975805 + 30 days));
         }
 
         checkSystemValues(beforeSpell);
