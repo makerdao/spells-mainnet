@@ -87,7 +87,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
         // Using the MkrAuthority test address, mint enough MKR to overcome the
         // current hat.
-        //gov.mint(address(this), 300000 ether);
+        gov.mint(address(this), 300000 ether);
     }
 
     function vote() private {
