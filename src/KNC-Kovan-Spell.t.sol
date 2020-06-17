@@ -76,7 +76,7 @@ contract DssSpellTest is DSTest, DSMath {
     EndAbstract     end     = EndAbstract(0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F);
     GemAbstract     knc     = GemAbstract(0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2);
     address    flipperMom   = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
-    OsmAbstract    kPip     = OsmAbstract(0x4616F2faAc94103977DcD0C595BC3a1D2dAa8bB2);
+    OsmAbstract    kPip     = OsmAbstract(0x4C511ae3FFD63c0DE35D4A138Ff2b584FF450466);
     address      osmMom     = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
 
     
@@ -112,12 +112,9 @@ contract DssSpellTest is DSTest, DSMath {
         }
       }
     }
-    // 10^-5 (tenth of a basis point) as a RAY
-    uint256 TOLERANCE = 10 ** 22;
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
     }
 

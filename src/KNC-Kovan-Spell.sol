@@ -59,7 +59,7 @@ contract SpellAction {
     address constant public KNC = 0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2;
     address constant public MCD_JOIN_KNC_A = 0xF97Ef6cb76c5E27c79703683daA4A4166116c95f;
     // address constant public MCD_FLIP_KNC_A = 0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603;
-    address constant public PIP_KNC = 0x4616F2faAc94103977DcD0C595BC3a1D2dAa8bB2;
+    address constant public PIP_KNC = 0x4C511ae3FFD63c0DE35D4A138Ff2b584FF450466;
 
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION = 10**6;
@@ -120,7 +120,7 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_KNC_A).rely(FLIPPER_MOM);
 
         // Whitelist the Osm to read the Median data
-        MedianAbstract(OsmAbstract(PIP_KNC).src()).kiss(PIP_KNC);
+        // MedianAbstract(OsmAbstract(PIP_KNC).src()).kiss(PIP_KNC);
         // Allow OsmMom to access to the KNC Osm
         OsmAbstract(PIP_KNC).rely(OSM_MOM);
         // Whitelist Spotter to read the Osm data
@@ -160,7 +160,7 @@ contract SpellAction {
 contract DssSpell {
 
     DSPauseAbstract  public pause =
-        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+        DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
     address          public action;
     bytes32          public tag;
     uint256          public eta;
