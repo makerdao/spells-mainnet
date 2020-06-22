@@ -19,7 +19,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./ZRX-Kovan-Spell.sol";
+import {DssSpell, SpellAction} from "./KNC-Kovan-Spell.sol";
 
 contract MedianAbstract {
     function bud(address) public view returns (uint256);
@@ -73,11 +73,11 @@ contract DssSpellTest is DSTest, DSMath {
     SpotAbstract   spot     = SpotAbstract(0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D);
     MKRAbstract     gov     = MKRAbstract(0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD);
     SaiTubAbstract  tub     = SaiTubAbstract(0xa71937147b55Deb8a530C7229C442Fd3F31b7db2);
-    GemJoinAbstract zJoin   = GemJoinAbstract(0x28b12c7386DacD5A4cCC5Bab9535403584AdC101);
+    GemJoinAbstract kJoin   = GemJoinAbstract(0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42);
     EndAbstract     end     = EndAbstract(0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F);
-    GemAbstract     zrx     = GemAbstract(0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd);
+    GemAbstract     knc     = GemAbstract(0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e);
     address    flipperMom   = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
-    OsmAbstract    zPip     = OsmAbstract(0x9d309ef37Ce287C220E636475178dD9469f0D960); // DSValue
+    OsmAbstract    kPip     = OsmAbstract(0x9d309ef37Ce287C220E636475178dD9469f0D960); // DSValue
     // address      osmMom     = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
 
     
@@ -146,62 +146,61 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        (address aux, uint256 chop, uint256 lump) = cat.ilks("ZRX-A");
-        FlipAbstract zFlip = FlipAbstract(aux);
+        (address aux, uint256 chop, uint256 lump) = cat.ilks("KNC-A");
+        FlipAbstract kFlip = FlipAbstract(aux);
 
         // Authorization
-        // assertEq(zJoin.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(zJoin)), 1);
-        assertEq(zFlip.wards(address(cat)), 1);
-        assertEq(zFlip.wards(address(end)), 1);
-        assertEq(zFlip.wards(flipperMom), 1);
-        // assertEq(zPip.wards(osmMom), 1);
-        // assertEq(zPip.bud(address(spot)), 1);
-        // assertEq(MedianAbstract(zPip.src()).bud(address(zPip)), 1);
+        // assertEq(kJoin.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(kJoin)), 1);
+        assertEq(kFlip.wards(address(cat)), 1);
+        assertEq(kFlip.wards(address(end)), 1);
+        assertEq(kFlip.wards(flipperMom), 1);
+        // assertEq(kPip.wards(osmMom), 1);
+        // assertEq(kPip.bud(address(spot)), 1);
+        // assertEq(MedianAbstract(kPip.src()).bud(address(kPip)), 1);
 
         // Start testing Vault
 
         // Join to adapter
         assertEq(address(this), 0xdB33dFD3D61308C33C63209845DaD3e6bfb2c674);
-        assertEq(zrx.balanceOf(address(this)), 25 * WAD);
-        assertEq(vat.gem("ZRX-A", address(this)), 0);
-        zrx.approve(address(zJoin), 25 * WAD);
-        zJoin.join(address(this), 25 * WAD);
-        assertEq(zrx.balanceOf(address(this)), 0);
-        assertEq(vat.gem("ZRX-A", address(this)), 25 * WAD); // NOTE: Changed from 25 * WAD =>  25 * 10 ** 8
+        assertEq(knc.balanceOf(address(this)), 25 * WAD);
+        assertEq(vat.gem("KNC-A", address(this)), 0);
+        knc.approve(address(kJoin), 25 * WAD);
+        kJoin.join(address(this), 25 * WAD);
+        assertEq(knc.balanceOf(address(this)), 0);
+        assertEq(vat.gem("KNC-A", address(this)), 25 * WAD); 
 
         hevm.warp(now + 5000);
 
-        (bytes32 val, bool has) = zPip.peek();
+        (bytes32 val, ) = kPip.peek();
         assertEq(uint(val),  50 * WAD / 100); // Set price in DSValue to $0.50
-        spot.poke("ZRX-A");
-        (uint256 artVal, uint256 rateVal, uint256 spotVal, uint256 lineVal, uint256 dustVal) = vat.ilks("ZRX-A");
+        spot.poke("KNC-A");
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("ZRX-A", address(this), address(this), address(this), int(25 * WAD), int(6 * WAD)); // Max = 8.33, Min = 5
-        assertEq(vat.gem("ZRX-A", address(this)), 0);
+        vat.frob("KNC-A", address(this), address(this), address(this), int(25 * WAD), int(6 * WAD)); // Max = 8.33, Min = 5
+        assertEq(vat.gem("KNC-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 6 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("ZRX-A", address(this), address(this), address(this), -int(25 * WAD), -int(6 * WAD));
-        assertEq(vat.gem("ZRX-A", address(this)), 25 * WAD);
+        vat.frob("KNC-A", address(this), address(this), address(this), -int(25 * WAD), -int(6 * WAD));
+        assertEq(vat.gem("KNC-A", address(this)), 25 * WAD);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        zJoin.exit(address(this), 25 * WAD);
-        assertEq(zrx.balanceOf(address(this)), 25 * WAD);
-        assertEq(vat.gem("ZRX-A", address(this)), 0);
+        kJoin.exit(address(this), 25 * WAD);
+        assertEq(knc.balanceOf(address(this)), 25 * WAD);
+        assertEq(vat.gem("KNC-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        zrx.approve(address(zJoin), 25 * WAD);
-        zJoin.join(address(this), 25 * WAD);
-        (, uint256 rateV, uint256 spotV,,) = vat.ilks("ZRX-A");
-        vat.frob("ZRX-A", address(this), address(this), address(this), int(25 * WAD), int(25 * WAD * spotV / rateV)); // Max amount of DAI
+        knc.approve(address(kJoin), 25 * WAD);
+        kJoin.join(address(this), 25 * WAD);
+        (, uint256 rateV, uint256 spotV,,) = vat.ilks("KNC-A");
+        vat.frob("KNC-A", address(this), address(this), address(this), int(25 * WAD), int(25 * WAD * spotV / rateV)); // Max amount of DAI
         hevm.warp(now + 100);
-        jug.drip("ZRX-A");
-        assertEq(zFlip.kicks(), 0);
-        cat.bite("ZRX-A", address(this));
-        assertEq(zFlip.kicks(), 1);
+        jug.drip("KNC-A");
+        assertEq(kFlip.kicks(), 0);
+        cat.bite("KNC-A", address(this));
+        assertEq(kFlip.kicks(), 1);
     }
 }
