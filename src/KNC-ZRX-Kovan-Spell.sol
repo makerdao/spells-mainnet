@@ -39,7 +39,7 @@ contract FlipFabAbstract {
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    string constant public description = "Kovan Spell for KNC";
+    string constant public description = "Kovan Spell for KNC and ZRX";
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
@@ -47,25 +47,29 @@ contract SpellAction {
     //
     // Contract addresses pertaining to the SCD ecosystem can be found at:
     //     https://github.com/makerdao/sai#dai-v1-current-deployments
-    address constant public MCD_VAT = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
-    address constant public MCD_CAT = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
-    address constant public MCD_JUG = 0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD;
-    address constant public MCD_SPOT = 0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D;
-    address constant public MCD_POT = 0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb;
-    address constant public MCD_END = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
-    address constant public FLIPPER_MOM = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
-    // address constant public OSM_MOM = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
-    address constant public FLIP_FAB = 0xFfB0382CA7Cfdc4Fc4d5Cc8913af1393d7eE1EF1;
+    address constant public MCD_VAT        = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
+    address constant public MCD_CAT        = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
+    address constant public MCD_JUG        = 0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD;
+    address constant public MCD_SPOT       = 0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D;
+    address constant public MCD_POT        = 0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb;
+    address constant public MCD_END        = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
+    address constant public FLIPPER_MOM    = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
+    address constant public OSM_MOM        = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
+    address constant public FLIP_FAB       = 0xFfB0382CA7Cfdc4Fc4d5Cc8913af1393d7eE1EF1;
 
-    address constant public KNC = 0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e;
+    address constant public KNC            = 0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e;
     address constant public MCD_JOIN_KNC_A = 0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42;
-    address constant public PIP_KNC = 0x9d309ef37Ce287C220E636475178dD9469f0D960; // DSValue contract
+    address constant public PIP_KNC        = 0x10799280EF9d7e2d037614F5165eFF2cB8522651;
+
+    address constant public ZRX            = 0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd;
+    address constant public MCD_JOIN_ZRX_A = 0x28b12c7386DacD5A4cCC5Bab9535403584AdC101;
+    address constant public PIP_ZRX        = 0x218037a42947E634191A231fcBAEAE8b16a39b3f;
 
     uint256 constant public THOUSAND = 10**3;
-    uint256 constant public MILLION = 10**6;
-    uint256 constant public WAD = 10**18;
-    uint256 constant public RAY = 10**27;
-    uint256 constant public RAD = 10**45;
+    uint256 constant public MILLION  = 10**6;
+    uint256 constant public WAD      = 10**18;
+    uint256 constant public RAY      = 10**27;
+    uint256 constant public RAD      = 10**45;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -74,10 +78,10 @@ contract SpellAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
-    uint256 constant public ONE_PCT_RATE =  1000000000315522921573372069;
+    uint256 constant public ONE_PCT_RATE  = 1000000000315522921573372069;
 
     function execute() external {
-        // perform drips
+        // Perform drips
         PotAbstract(MCD_POT).drip();
         JugAbstract(MCD_JUG).drip("ETH-A");
         JugAbstract(MCD_JUG).drip("BAT-A");
@@ -86,8 +90,11 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("USDC-B");
         JugAbstract(MCD_JUG).drip("WBTC-A");
 
-        bytes32 ilk = "KNC-A";
+        bytes32 ilk;
 
+        
+        /* ---- KNC Collateral Onboarding Spell ---- */
+        ilk = "KNC-A";
         address MCD_FLIP_KNC_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
 
         // Sanity checks
@@ -95,8 +102,8 @@ contract SpellAction {
         require(GemJoinAbstract(MCD_JOIN_KNC_A).ilk() == ilk,     "join-ilk-not-match");
         require(GemJoinAbstract(MCD_JOIN_KNC_A).gem() == KNC,     "join-gem-not-match");
         require(GemJoinAbstract(MCD_JOIN_KNC_A).dec() == 18,      "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_KNC_A).vat() == MCD_VAT,    "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_KNC_A).ilk() == ilk,        "flip-ilk-not-match");
+        require(FlipAbstract(MCD_FLIP_KNC_A).vat()    == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_KNC_A).ilk()    == ilk,     "flip-ilk-not-match");
 
         // Set the KNC PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_KNC);
@@ -119,20 +126,20 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_KNC_A).rely(FLIPPER_MOM);
 
         // Whitelist the Osm to read the Median data
-        // MedianAbstract(OsmAbstract(PIP_KNC).src()).kiss(PIP_KNC);
+        MedianAbstract(OsmAbstract(PIP_KNC).src()).kiss(PIP_KNC);
         // Allow OsmMom to access to the KNC Osm
-        // OsmAbstract(PIP_KNC).rely(OSM_MOM);
+        OsmAbstract(PIP_KNC).rely(OSM_MOM);
         // Whitelist Spotter to read the Osm data
-        // OsmAbstract(PIP_KNC).kiss(MCD_SPOT);
+        OsmAbstract(PIP_KNC).kiss(MCD_SPOT);
         // Set KNC Osm in the OsmMom for new ilk
-        // OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_KNC);
+        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_KNC);
 
-        // Set the global debt ceiling to 153 MM
+        // Set the global debt ceiling to 195 MM
         VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
         // Set the KNC-A debt ceiling to 10 MM
         VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
         // Set the KNC-A dust
-        VatAbstract(MCD_VAT).file(ilk, "dust", 5 * RAD);
+        VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
         // Set the Lot size to 1 KNC-A
         CatAbstract(MCD_CAT).file(ilk, "lump", 1 * WAD);
         // Set the KNC-A liquidation penalty to 13%
@@ -147,11 +154,70 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_KNC_A).file("tau", 6 hours);
         // Set the KNC-A min collateralization ratio to 150%
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
-
-        // // Execute the first poke in the Osm for the next value 
-        // PipAbstract(PIP_KNC).poke(bytes32(35 * WAD / 100)); // KNC price of $0.35
-
         // Update KNC-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
+        SpotAbstract(MCD_SPOT).poke(ilk);
+
+
+        /* ---- ZRX Collateral Onboarding Spell ---- */
+        ilk = "ZRX-A";
+        address MCD_FLIP_ZRX_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_ZRX_A).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ZRX_A).ilk() == ilk,     "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ZRX_A).gem() == ZRX,     "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ZRX_A).dec() == 18,      "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_ZRX_A).vat()    == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_ZRX_A).ilk()    == ilk,     "flip-ilk-not-match");
+
+        // Set the ZRX PIP in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_ZRX);
+
+        // Set the ZRX-A Flipper in the Cat
+        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_ZRX_A);
+
+        // Init ZRX-A ilk in Vat
+        VatAbstract(MCD_VAT).init(ilk);
+        // Init ZRX-A ilk in Jug
+        JugAbstract(MCD_JUG).init(ilk);
+
+        // Allow ZRX-A Join to modify Vat registry
+        VatAbstract(MCD_VAT).rely(MCD_JOIN_ZRX_A);
+        // Allow Cat to kick auctions in ZRX-A Flipper
+        FlipAbstract(MCD_FLIP_ZRX_A).rely(MCD_CAT);
+        // Allow End to yank auctions in ZRX-A Flipper
+        FlipAbstract(MCD_FLIP_ZRX_A).rely(MCD_END);
+        // Allow FlipperMom to access to the ZRX-A Flipper
+        FlipAbstract(MCD_FLIP_ZRX_A).rely(FLIPPER_MOM);
+
+        // Whitelist the Osm to read the Median data
+        MedianAbstract(OsmAbstract(PIP_ZRX).src()).kiss(PIP_ZRX);
+        // Allow OsmMom to access to the ZRX Osm
+        OsmAbstract(PIP_ZRX).rely(OSM_MOM);
+        // Whitelist Spotter to read the Osm data
+        OsmAbstract(PIP_ZRX).kiss(MCD_SPOT);
+        // Set ZRX Osm in the OsmMom for new ilk
+        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_ZRX);
+
+        // Set the ZRX-A debt ceiling to 10 MM
+        VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
+        // Set the ZRX-A dust
+        VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
+        // Set the Lot size to 1 ZRX-A
+        CatAbstract(MCD_CAT).file(ilk, "lump", 1 * WAD);
+        // Set the ZRX-A liquidation penalty to 13%
+        CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
+        // Set the ZRX-A stability fee to 1%
+        JugAbstract(MCD_JUG).file(ilk, "duty", ONE_PCT_RATE);
+        // Set the ZRX-A percentage between bids to 3%
+        FlipAbstract(MCD_FLIP_ZRX_A).file("beg", 103 * WAD / 100);
+        // Set the ZRX-A time max time between bids to 6 hours
+        FlipAbstract(MCD_FLIP_ZRX_A).file("ttl", 6 hours);
+        // Set the ZRX-A max auction duration to 6 hours
+        FlipAbstract(MCD_FLIP_ZRX_A).file("tau", 6 hours);
+        // Set the ZRX-A min collateralization ratio to 150%
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
+        // Update ZRX-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
     }
 }
