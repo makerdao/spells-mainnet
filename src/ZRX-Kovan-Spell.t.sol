@@ -168,14 +168,13 @@ contract DssSpellTest is DSTest, DSMath {
         zrx.approve(address(zJoin), 25 * WAD);
         zJoin.join(address(this), 25 * WAD);
         assertEq(zrx.balanceOf(address(this)), 0);
-        assertEq(vat.gem("ZRX-A", address(this)), 25 * WAD); // NOTE: Changed from 25 * WAD =>  25 * 10 ** 8
+        assertEq(vat.gem("ZRX-A", address(this)), 25 * WAD);
 
         hevm.warp(now + 5000);
 
         (bytes32 val, bool has) = zPip.peek();
         assertEq(uint(val),  50 * WAD / 100); // Set price in DSValue to $0.50
         spot.poke("ZRX-A");
-        (uint256 artVal, uint256 rateVal, uint256 spotVal, uint256 lineVal, uint256 dustVal) = vat.ilks("ZRX-A");
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
