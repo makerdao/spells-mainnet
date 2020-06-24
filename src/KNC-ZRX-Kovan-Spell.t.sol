@@ -260,9 +260,6 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        (address aux, ,) = cat.ilks("KNC-A");
-        FlipAbstract kFlip = FlipAbstract(aux);
-
         // Authorization
         assertEq(kJoin.wards(pauseProxy), 1);
         assertEq(vat.wards(address(kJoin)), 1);
@@ -319,9 +316,6 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
-
-        (address aux, ,) = cat.ilks("ZRX-A");
-        FlipAbstract zFlip = FlipAbstract(aux);
 
         // Authorization
         assertEq(zJoin.wards(pauseProxy), 1);
