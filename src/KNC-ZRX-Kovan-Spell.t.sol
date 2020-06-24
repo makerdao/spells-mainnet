@@ -134,7 +134,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr:        1000000000000000000000000000,
             dsrPct:     0 * 1000,
-            Line:       195 * MILLION * RAD,
+            Line:       122 * MILLION * RAD,
             pauseDelay: 60
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({

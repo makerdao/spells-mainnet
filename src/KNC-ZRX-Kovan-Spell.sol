@@ -217,8 +217,8 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).poke(ilk);
         /* ---- End ---- */
 
-        // Set the global debt ceiling to 195 MM
-        VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
+        // Set the global debt ceiling to 122 MM
+        VatAbstract(MCD_VAT).file("Line", 122 * MILLION * RAD);
 
         // WBTC (missing permission): Add whitelist End to read the Osm data
         OsmAbstract(PIP_WBTC).kiss(MCD_END);
