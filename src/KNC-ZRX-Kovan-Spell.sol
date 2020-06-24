@@ -59,10 +59,12 @@ contract SpellAction {
 
     address constant public KNC            = 0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e;
     address constant public MCD_JOIN_KNC_A = 0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42;
+    address constant public MCD_FLIP_KNC_A = 0xf14Ec3538C86A31bBf576979783a8F6dbF16d571;
     address constant public PIP_KNC        = 0x10799280EF9d7e2d037614F5165eFF2cB8522651;
 
     address constant public ZRX            = 0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd;
     address constant public MCD_JOIN_ZRX_A = 0x28b12c7386DacD5A4cCC5Bab9535403584AdC101;
+    address constant public MCD_FLIP_ZRX_A = 0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F;
     address constant public PIP_ZRX        = 0x218037a42947E634191A231fcBAEAE8b16a39b3f;
 
     uint256 constant public THOUSAND = 10**3;
@@ -94,7 +96,6 @@ contract SpellAction {
 
         /* ---- KNC Collateral Onboarding Spell ---- */
         ilk = "KNC-A";
-        address MCD_FLIP_KNC_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
 
         // Sanity checks
         require(GemJoinAbstract(MCD_JOIN_KNC_A).vat() == MCD_VAT, "join-vat-not-match");
@@ -159,7 +160,6 @@ contract SpellAction {
 
         /* ---- ZRX Collateral Onboarding Spell ---- */
         ilk = "ZRX-A";
-        address MCD_FLIP_ZRX_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
 
         // Sanity checks
         require(GemJoinAbstract(MCD_JOIN_ZRX_A).vat() == MCD_VAT, "join-vat-not-match");

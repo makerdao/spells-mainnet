@@ -82,10 +82,12 @@ contract DssSpellTest is DSTest, DSMath {
 
     GemAbstract              knc = GemAbstract(0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e);
     GemJoinAbstract        kJoin = GemJoinAbstract(0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42);
+    FlipAbstract           kFlip = FlipAbstract(0xf14Ec3538C86A31bBf576979783a8F6dbF16d571);
     OsmAbstract             kPip = OsmAbstract(0x10799280EF9d7e2d037614F5165eFF2cB8522651);
 
     GemAbstract              zrx = GemAbstract(0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd);
     GemJoinAbstract        zJoin = GemJoinAbstract(0x28b12c7386DacD5A4cCC5Bab9535403584AdC101);
+    FlipAbstract           zFlip = FlipAbstract(0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F);
     OsmAbstract             zPip = OsmAbstract(0x218037a42947E634191A231fcBAEAE8b16a39b3f);
 
     DssSpell spell;
@@ -212,7 +214,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(pause.delay(), values.pauseDelay);
     }
 
-    function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
+    function checkCollateralValues(bytes32 ilk, SystemValues storage values, FlipAbstract flip) internal {
         (uint duty,) = jug.ilks(ilk);
         assertEq(duty, values.collaterals[ilk].duty);
         assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(values.collaterals[ilk].duty)) <= TOLERANCE);
@@ -229,9 +231,9 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mat, values.collaterals[ilk].mat);
 
         // Commented out because FlipFab is used on Kovan
-        // assertEq(uint256(eFlip.beg()), values.collaterals[ilk].beg);
-        // assertEq(uint256(eFlip.ttl()), values.collaterals[ilk].ttl);
-        // assertEq(uint256(eFlip.tau()), values.collaterals[ilk].tau);
+        assertEq(uint256(flip.beg()), values.collaterals[ilk].beg);
+        assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
+        assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
     }
 
     function testSpellIsCast() public {
@@ -249,8 +251,8 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         // Collateral values
-        checkCollateralValues("KNC-A", afterSpell);
-        checkCollateralValues("ZRX-A", afterSpell);
+        checkCollateralValues("KNC-A", afterSpell, kFlip);
+        checkCollateralValues("ZRX-A", afterSpell, zFlip);
     }
 
     function testNewCollateralKNC() public {
