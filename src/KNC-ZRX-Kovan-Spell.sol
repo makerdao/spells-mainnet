@@ -22,18 +22,12 @@ import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/PipAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss/lib/ds-value/src/value.sol";
 
 contract MedianAbstract {
     function kiss(address) public;
-}
-
-contract FlipFabAbstract {
-    function newFlip(address, bytes32) public returns (address);
 }
 
 contract SpellAction {
