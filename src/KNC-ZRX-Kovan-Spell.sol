@@ -137,8 +137,6 @@ contract SpellAction {
         // Set KNC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_KNC);
 
-        // Set the global debt ceiling to 195 MM
-        VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
         // Set the KNC-A debt ceiling to 10 MM
         VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
         // Set the KNC-A dust
@@ -159,7 +157,7 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
         // Update KNC-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
-
+        /* ---- End ---- */
 
         /* ---- ZRX Collateral Onboarding Spell ---- */
         ilk = "ZRX-A";
@@ -223,6 +221,10 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
         // Update ZRX-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
+        /* ---- End ---- */
+
+        // Set the global debt ceiling to 195 MM
+        VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
 
         // WBTC (missing permission): Add whitelist End to read the Osm data
         OsmAbstract(PIP_WBTC).kiss(MCD_END);
