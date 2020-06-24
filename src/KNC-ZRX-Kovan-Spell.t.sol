@@ -30,7 +30,8 @@ contract Hevm { function warp(uint) public; }
 contract DssSpellTest is DSTest, DSMath {
 
     // Replace with mainnet spell address to test against live
-    address constant MAINNET_SPELL = address(0);
+    address constant KOVAN_SPELL = address(0xf66ABcF8Bd8943Ccbd42Fa758Ee136f4D446c774);
+    uint256 constant SPELL_CREATED = 1593024548;
 
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION = 10**6;
@@ -129,7 +130,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
-        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+        spell = KOVAN_SPELL != address(0) ? DssSpell(KOVAN_SPELL) : new DssSpell();
 
         afterSpell = SystemValues({
             dsr:        1000000000000000000000000000,
@@ -239,15 +240,21 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
         // Test description
         string memory description = new SpellAction().description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()), stringToBytes32(description));
+
+        if(address(spell) != address(KOVAN_SPELL)) {
+            assertEq(spell.expiration(), (now + 30 days));
+        } else {
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+        }
+
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
         // General System values
         checkSystemValues(afterSpell);
