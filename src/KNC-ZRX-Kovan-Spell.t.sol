@@ -90,6 +90,8 @@ contract DssSpellTest is DSTest, DSMath {
     FlipAbstract           zFlip = FlipAbstract(0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F);
     OsmAbstract             zPip = OsmAbstract(0x218037a42947E634191A231fcBAEAE8b16a39b3f);
 
+    OsmAbstract             wPip = OsmAbstract(0x2f38a1bD385A9B395D01f2Cbf767b4527663edDB);
+
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -253,6 +255,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Collateral values
         checkCollateralValues("KNC-A", afterSpell, kFlip);
         checkCollateralValues("ZRX-A", afterSpell, zFlip);
+
+        // Check previously missing WBTC permission is now set
+        assertEq(wPip.bud(address(end)), 1);
     }
 
     function testNewCollateralKNC() public {
@@ -268,6 +273,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(kFlip.wards(flipperMom), 1);
         assertEq(kPip.wards(osmMom), 1);
         assertEq(kPip.bud(address(spot)), 1);
+        assertEq(kPip.bud(address(end)), 1);
         assertEq(MedianAbstract(kPip.src()).bud(address(kPip)), 1);
 
         // Start testing Vault
@@ -325,6 +331,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(zFlip.wards(flipperMom), 1);
         assertEq(zPip.wards(osmMom), 1);
         assertEq(zPip.bud(address(spot)), 1);
+        assertEq(zPip.bud(address(end)), 1);
         assertEq(MedianAbstract(zPip.src()).bud(address(zPip)), 1);
 
         // Start testing Vault

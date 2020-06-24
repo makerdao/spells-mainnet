@@ -66,6 +66,8 @@ contract SpellAction {
     address constant public MCD_FLIP_ZRX_A = 0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F;
     address constant public PIP_ZRX        = 0x218037a42947E634191A231fcBAEAE8b16a39b3f;
 
+    address constant public PIP_WBTC       = 0x2f38a1bD385A9B395D01f2Cbf767b4527663edDB;
+
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION  = 10**6;
     uint256 constant public WAD      = 10**18;
@@ -130,6 +132,8 @@ contract SpellAction {
         OsmAbstract(PIP_KNC).rely(OSM_MOM);
         // Whitelist Spotter to read the Osm data
         OsmAbstract(PIP_KNC).kiss(MCD_SPOT);
+        // Whitelist End to read the Osm data
+        OsmAbstract(PIP_KNC).kiss(MCD_END);
         // Set KNC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_KNC);
 
@@ -194,6 +198,8 @@ contract SpellAction {
         OsmAbstract(PIP_ZRX).rely(OSM_MOM);
         // Whitelist Spotter to read the Osm data
         OsmAbstract(PIP_ZRX).kiss(MCD_SPOT);
+        // Whitelist End to read the Osm data
+        OsmAbstract(PIP_ZRX).kiss(MCD_END);
         // Set ZRX Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_ZRX);
 
@@ -217,6 +223,9 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
         // Update ZRX-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
+
+        // WBTC (missing permission): Add whitelist End to read the Osm data
+        OsmAbstract(PIP_WBTC).kiss(MCD_END);
     }
 }
 
