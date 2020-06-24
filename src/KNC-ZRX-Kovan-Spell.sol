@@ -55,15 +55,14 @@ contract SpellAction {
     address constant public MCD_END        = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
     address constant public FLIPPER_MOM    = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
     address constant public OSM_MOM        = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
-    address constant public FLIP_FAB       = 0xFfB0382CA7Cfdc4Fc4d5Cc8913af1393d7eE1EF1;
 
-    address constant public KNC            = 0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e;
-    address constant public MCD_JOIN_KNC_A = 0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42;
+    address constant public KNC            = 0x9800a0a3c7e9682e1AEb7CAA3200854eFD4E9327;
+    address constant public MCD_JOIN_KNC_A = 0xE42427325A0e4c8e194692FfbcACD92C2C381598;
     address constant public MCD_FLIP_KNC_A = 0xf14Ec3538C86A31bBf576979783a8F6dbF16d571;
     address constant public PIP_KNC        = 0x10799280EF9d7e2d037614F5165eFF2cB8522651;
 
-    address constant public ZRX            = 0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd;
-    address constant public MCD_JOIN_ZRX_A = 0x28b12c7386DacD5A4cCC5Bab9535403584AdC101;
+    address constant public ZRX            = 0xC2C08A566aD44129E69f8FC98684EAA28B01a6e7;
+    address constant public MCD_JOIN_ZRX_A = 0x85D38fF6a6FCf98bD034FB5F9D72cF15e38543f2;
     address constant public MCD_FLIP_ZRX_A = 0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F;
     address constant public PIP_ZRX        = 0x218037a42947E634191A231fcBAEAE8b16a39b3f;
 

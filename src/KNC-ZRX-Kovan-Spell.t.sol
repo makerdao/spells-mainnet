@@ -80,13 +80,13 @@ contract DssSpellTest is DSTest, DSMath {
     address           flipperMom = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
     address               osmMom = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
 
-    GemAbstract              knc = GemAbstract(0x51faa3a085C56F8dCAAfacA3d6a710BF61761c1e);
-    GemJoinAbstract        kJoin = GemJoinAbstract(0xcdC21A59438BB8970E1231E9FdB2a57BCe1F7d42);
+    GemAbstract              knc = GemAbstract(0x9800a0a3c7e9682e1AEb7CAA3200854eFD4E9327);
+    GemJoinAbstract        kJoin = GemJoinAbstract(0xE42427325A0e4c8e194692FfbcACD92C2C381598);
     FlipAbstract           kFlip = FlipAbstract(0xf14Ec3538C86A31bBf576979783a8F6dbF16d571);
     OsmAbstract             kPip = OsmAbstract(0x10799280EF9d7e2d037614F5165eFF2cB8522651);
 
-    GemAbstract              zrx = GemAbstract(0x8d30A2E1Fb98E87ada72e86b22817d684E95bddd);
-    GemJoinAbstract        zJoin = GemJoinAbstract(0x28b12c7386DacD5A4cCC5Bab9535403584AdC101);
+    GemAbstract              zrx = GemAbstract(0xC2C08A566aD44129E69f8FC98684EAA28B01a6e7);
+    GemJoinAbstract        zJoin = GemJoinAbstract(0x85D38fF6a6FCf98bD034FB5F9D72cF15e38543f2);
     FlipAbstract           zFlip = FlipAbstract(0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F);
     OsmAbstract             zPip = OsmAbstract(0x218037a42947E634191A231fcBAEAE8b16a39b3f);
 
