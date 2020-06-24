@@ -128,7 +128,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
         afterSpell = SystemValues({
-            dsr:        1000000000627937192491029810,
+            dsr:        1000000000000000000000000000,
             dsrPct:     0 * 1000,
             Line:       195 * MILLION * RAD,
             pauseDelay: 60
@@ -254,6 +254,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testNewCollateralKNC() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
         (address aux, ,) = cat.ilks("KNC-A");
         FlipAbstract kFlip = FlipAbstract(aux);
 
@@ -310,6 +314,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testNewCollateralZRX() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
         (address aux, ,) = cat.ilks("ZRX-A");
         FlipAbstract zFlip = FlipAbstract(aux);
 

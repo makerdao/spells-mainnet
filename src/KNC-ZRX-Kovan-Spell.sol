@@ -92,7 +92,6 @@ contract SpellAction {
 
         bytes32 ilk;
 
-        
         /* ---- KNC Collateral Onboarding Spell ---- */
         ilk = "KNC-A";
         address MCD_FLIP_KNC_A = FlipFabAbstract(FLIP_FAB).newFlip(MCD_VAT, ilk);
