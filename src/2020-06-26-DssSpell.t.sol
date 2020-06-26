@@ -207,7 +207,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 215 * MILLION * RAD,
+            Line: 195 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
@@ -229,26 +229,26 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["TUSD-A"].duty = 1000000000079175551708715274;
         afterSpell.collaterals["TUSD-A"].pct = 0.25 * 1000;
 
-        afterSpell.collaterals["ZRX-A"] = CollateralValues({
-            line: 10 * MILLION * RAD,
+        afterSpell.collaterals["KNC-A"] = CollateralValues({
+            line: 5 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000000315522921573372069,
-            pct: 1 * 1000,
+            duty: 1000000001243680656318820312,
+            pct: 4 * 1000,
             chop: 113 * RAY / 100,
-            lump: 1 * WAD,
-            mat: 150 * RAY / 100,
+            lump: 50000 * WAD,
+            mat: 175 * RAY / 100,
             beg: 103 * WAD / 100,
             ttl: 6 hours,
             tau: 6 hours
         });
-        afterSpell.collaterals["KNC-A"] = CollateralValues({
-            line: 10 * MILLION * RAD,
+        afterSpell.collaterals["ZRX-A"] = CollateralValues({
+            line: 5 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000000315522921573372069,
-            pct: 1 * 1000,
+            duty: 1000000001243680656318820312,
+            pct: 4 * 1000,
             chop: 113 * RAY / 100,
-            lump: 1 * WAD,
-            mat: 150 * RAY / 100,
+            lump: 100000 * WAD,
+            mat: 175 * RAY / 100,
             beg: 103 * WAD / 100,
             ttl: 6 hours,
             tau: 6 hours
