@@ -10,6 +10,10 @@ contract Hevm {
     function warp(uint256) public;
 }
 
+contract MedianAbstract {
+    function bud(address) public view returns (uint256);
+}
+
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
@@ -51,13 +55,15 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract     jug         = JugAbstract(      0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract    spot        = SpotAbstract(     0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
     MKRAbstract     gov         = MKRAbstract(      0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    FlipAbstract    uBFlip      = FlipAbstract(     0xec25Ca3fFa512afbb1784E17f1D414E16D01794F);
-    FlipAbstract    tAFlip      = FlipAbstract(     0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61);
-
-    GemJoinAbstract usdcB_Join  = GemJoinAbstract(  0x2600004fd1585f7270756DDc88aD9cfA10dD0428);
-    GemJoinAbstract tusdA_Join  = GemJoinAbstract(  0x4454aF7C8bb9463203b66C816220D41ED7837f44);
+    FlipAbstract    zFlip       = FlipAbstract(     0x08c89251FC058cC97d5bA5F06F95026C0A5CF9B0);
+    GemJoinAbstract zJoin       = GemJoinAbstract(  0xc7e8Cd72BDEe38865b4F5615956eF47ce1a7e5D0);
+    OsmAbstract     zPip        = OsmAbstract(      0x7382c066801E7Acb2299aC8562847B9883f5CD3c);
+    FlipAbstract    kFlip       = FlipAbstract(     0xAbBCB9Ae89cDD3C27E02D279480C7fF33083249b);
+    GemJoinAbstract kJoin       = GemJoinAbstract(  0x475F1a89C1ED844A08E8f6C50A00228b5E59E4A9);
+    OsmAbstract     kPip        = OsmAbstract(      0xf36B79BD4C0904A5F350F1e4f776B81208c13069);
     EndAbstract     end         = EndAbstract(      0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     address  flipperMom         =                   0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    address  osmMom             =                   0x76416A4d5190d071bfed309861527431304aA14f;
 
     FlipAbstract    saiflip =
         FlipAbstract(0x5432b2f3c0DFf95AA191C45E5cbd539E2820aE72);
@@ -361,55 +367,89 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("KNC-A", afterSpell);
     }
 
-    // function testSaiRemoval() public {
-    //     bytes32 ilk = "SAI";
-    //     (address spip, uint256 smat) = spot.ilks(ilk);
-    //     assertEq(spip, 0x54003DBf6ae6CBa6DDaE571CcdC34d834b44Ab1e);
+    function testSaiRemoval() public {
+        bytes32 ilk = "SAI";
+        (address spip, uint256 smat) = spot.ilks(ilk);
+        assertEq(spip, 0x54003DBf6ae6CBa6DDaE571CcdC34d834b44Ab1e);
 
-    //     (address sflip, uint256 cchop, uint256 clump) = cat.ilks(ilk);
-    //     assertEq(sflip, address(saiflip));
+        (address sflip, uint256 cchop, uint256 clump) = cat.ilks(ilk);
+        assertEq(sflip, address(saiflip));
 
-    //     (uint256 vArt, uint256 vrate, uint256 vspot, uint256 vline, uint256 vdust)
-    //       = vat.ilks(ilk);
+        (uint256 vArt, uint256 vrate, uint256 vspot, uint256 vline, uint256 vdust)
+          = vat.ilks(ilk);
 
-    //     (uint256 jduty, uint256 jrho) = jug.ilks(ilk);
-    //     // These are already 0 due to previous actions,
-    //     //   they probabaly don't need to be called.
-    //     assertEq(vline, 0);
-    //     assertEq(vdust, 0);
+        (uint256 jduty, uint256 jrho) = jug.ilks(ilk);
+        // These are already 0 due to previous actions,
+        //   they probabaly don't need to be called.
+        assertEq(vline, 0);
+        assertEq(vdust, 0);
 
-    //     assertEq(saijoin.live(), 1);
+        assertEq(saijoin.live(), 1);
 
-    //     assertEq(vat.wards(address(saijoin)), 1);
-    //     assertEq(saiflip.wards(address(cat)), 1);
-    //     assertEq(saiflip.wards(address(end)), 1);
-    //     assertEq(saiflip.wards(flipperMom), 0);
+        assertEq(vat.wards(address(saijoin)), 1);
+        assertEq(saiflip.wards(address(cat)), 1);
+        assertEq(saiflip.wards(address(end)), 1);
+        assertEq(saiflip.wards(flipperMom), 0);
 
-    //     vote();
-    //     scheduleWaitAndCast();
+        vote();
+        scheduleWaitAndCast();
 
-    //     (spip, smat) = spot.ilks(ilk);
-    //     assertEq(spip, address(0));
-    //     assertEq(smat, 0);
+        (spip, smat) = spot.ilks(ilk);
+        assertEq(spip, address(0));
+        assertEq(smat, 0);
 
-    //     (sflip, cchop, clump) = cat.ilks(ilk);
-    //     assertEq(sflip, address(0));
-    //     assertEq(cchop, 0);
-    //     assertEq(clump, 0);
+        (sflip, cchop, clump) = cat.ilks(ilk);
+        assertEq(sflip, address(0));
+        assertEq(cchop, 0);
+        assertEq(clump, 0);
 
-    //     (vArt, vrate, vspot, vline, vdust) = vat.ilks(ilk);
-    //     assertEq(vline, 0);
-    //     assertEq(vdust, 0);
-    //     assertEq(vspot, 0);
+        (vArt, vrate, vspot, vline, vdust) = vat.ilks(ilk);
+        assertEq(vline, 0);
+        assertEq(vdust, 0);
+        assertEq(vspot, 0);
 
-    //     (jduty, jrho) = jug.ilks(ilk);
-    //     assertEq(jduty, 0);
+        (jduty, jrho) = jug.ilks(ilk);
+        assertEq(jduty, 0);
 
-    //     assertEq(saijoin.live(), 0);
+        assertEq(saijoin.live(), 0);
 
-    //     assertEq(vat.wards(address(saijoin)), 0);
-    //     assertEq(saiflip.wards(address(cat)), 0);
-    //     assertEq(saiflip.wards(address(end)), 0);
-    //     assertEq(saiflip.wards(flipperMom), 0);
-    // }
+        assertEq(vat.wards(address(saijoin)), 0);
+        assertEq(saiflip.wards(address(cat)), 0);
+        assertEq(saiflip.wards(address(end)), 0);
+        assertEq(saiflip.wards(flipperMom), 0);
+    }
+
+    function testNewCollateralKNC() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        // Authorization
+        assertEq(kJoin.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(kJoin)), 1);
+        assertEq(kFlip.wards(address(cat)), 1);
+        assertEq(kFlip.wards(address(end)), 1);
+        assertEq(kFlip.wards(flipperMom), 1);
+        assertEq(kPip.wards(osmMom), 1);
+        assertEq(kPip.bud(address(spot)), 1);
+        assertEq(kPip.bud(address(end)), 1);
+        assertEq(MedianAbstract(kPip.src()).bud(address(kPip)), 1);
+    }
+
+    function testNewCollateralZRX() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        // Authorization
+        assertEq(zJoin.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(zJoin)), 1);
+        assertEq(zFlip.wards(address(cat)), 1);
+        assertEq(zFlip.wards(address(end)), 1);
+        assertEq(zFlip.wards(flipperMom), 1);
+        assertEq(zPip.wards(osmMom), 1);
+        assertEq(zPip.bud(address(spot)), 1);
+        assertEq(zPip.bud(address(end)), 1);
+        assertEq(MedianAbstract(zPip.src()).bud(address(zPip)), 1);
+    }
 }
