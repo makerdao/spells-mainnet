@@ -238,8 +238,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line: 5 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000001243680656318820312,
-            pct: 4 * 1000,
+            duty: 1000000001319814647332759691,
+            pct: 4.25 * 1000,
             chop: 113 * RAY / 100,
             lump: 50000 * WAD,
             mat: 175 * RAY / 100,
@@ -250,8 +250,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line: 5 * MILLION * RAD,
             dust: 20 * RAD,
-            duty: 1000000001243680656318820312,
-            pct: 4 * 1000,
+            duty: 1000000001319814647332759691,
+            pct: 4.25 * 1000,
             chop: 113 * RAY / 100,
             lump: 100000 * WAD,
             mat: 175 * RAY / 100,

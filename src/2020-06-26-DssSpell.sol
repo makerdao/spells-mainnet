@@ -81,7 +81,7 @@ contract SpellAction {
     uint256 constant public ONE_PCT_RATE  = 1000000000315522921573372069;
     uint256 constant public ONE_TWENTYFIVE_PCT_RATE = 1000000000393915525145987602;
     uint256 constant public FIFTY_TWENTYFIVE_PCT_RATE = 1000000012910019978921115695;
-    uint256 constant public FOUR_PCT_RATE =  1000000001243680656318820312;
+    uint256 constant public FOUR_TWENTYFIVE_PCT_RATE =  1000000001319814647332759691;
 
     function execute() external {
         // Perform drips
@@ -191,8 +191,8 @@ contract SpellAction {
         CatAbstract(MCD_CAT).file(ilk, "lump", 50000 * WAD);
         // Set the KNC-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
-        // Set the KNC-A stability fee to 4%
-        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_PCT_RATE);
+        // Set the KNC-A stability fee to 4.25%
+        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_TWENTYFIVE_PCT_RATE);
         // Set the KNC-A percentage between bids to 3%
         FlipAbstract(MCD_FLIP_KNC_A).file("beg", 103 * WAD / 100);
         // Set the KNC-A time max time between bids to 6 hours
@@ -255,8 +255,8 @@ contract SpellAction {
         CatAbstract(MCD_CAT).file(ilk, "lump", 100000 * WAD);
         // Set the ZRX-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
-        // Set the ZRX-A stability fee to 4%
-        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_PCT_RATE);
+        // Set the ZRX-A stability fee to 4.25%
+        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_TWENTYFIVE_PCT_RATE);
         // Set the ZRX-A percentage between bids to 3%
         FlipAbstract(MCD_FLIP_ZRX_A).file("beg", 103 * WAD / 100);
         // Set the ZRX-A time max time between bids to 6 hours
