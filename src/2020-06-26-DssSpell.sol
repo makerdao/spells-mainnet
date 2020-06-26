@@ -33,7 +33,7 @@ contract MedianAbstract {
 contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    string constant public description = "Kovan Spell for KNC and ZRX";
+    string constant public description = "2020-06-26 MakerDAO Executive Spell";
 
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
@@ -41,26 +41,26 @@ contract SpellAction {
     //
     // Contract addresses pertaining to the SCD ecosystem can be found at:
     //     https://github.com/makerdao/sai#dai-v1-current-deployments
-    address constant public MCD_VAT        = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
-    address constant public MCD_CAT        = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
-    address constant public MCD_JUG        = 0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD;
-    address constant public MCD_SPOT       = 0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D;
-    address constant public MCD_POT        = 0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb;
-    address constant public MCD_END        = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
-    address constant public FLIPPER_MOM    = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
-    address constant public OSM_MOM        = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
+    address constant public MCD_VAT        = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public MCD_CAT        = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
+    address constant public MCD_JUG        = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant public MCD_SPOT       = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant public MCD_POT        = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    address constant public MCD_END        = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    address constant public FLIPPER_MOM    = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    address constant public OSM_MOM        = 0x76416A4d5190d071bfed309861527431304aA14f;
 
-    address constant public KNC            = 0x9800a0a3c7e9682e1AEb7CAA3200854eFD4E9327;
-    address constant public MCD_JOIN_KNC_A = 0xE42427325A0e4c8e194692FfbcACD92C2C381598;
-    address constant public MCD_FLIP_KNC_A = 0xf14Ec3538C86A31bBf576979783a8F6dbF16d571;
-    address constant public PIP_KNC        = 0x10799280EF9d7e2d037614F5165eFF2cB8522651;
+    address constant public KNC            = 0xdd974D5C2e2928deA5F71b9825b8b646686BD200;
+    address constant public MCD_JOIN_KNC_A = 0x475F1a89C1ED844A08E8f6C50A00228b5E59E4A9;
+    address constant public MCD_FLIP_KNC_A = 0xAbBCB9Ae89cDD3C27E02D279480C7fF33083249b;
+    address constant public PIP_KNC        = 0xf36B79BD4C0904A5F350F1e4f776B81208c13069;
 
-    address constant public ZRX            = 0xC2C08A566aD44129E69f8FC98684EAA28B01a6e7;
-    address constant public MCD_JOIN_ZRX_A = 0x85D38fF6a6FCf98bD034FB5F9D72cF15e38543f2;
-    address constant public MCD_FLIP_ZRX_A = 0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F;
-    address constant public PIP_ZRX        = 0x218037a42947E634191A231fcBAEAE8b16a39b3f;
+    address constant public ZRX            = 0xE41d2489571d322189246DaFA5ebDe1F4699F498;
+    address constant public MCD_JOIN_ZRX_A = 0xc7e8Cd72BDEe38865b4F5615956eF47ce1a7e5D0;
+    address constant public MCD_FLIP_ZRX_A = 0x08c89251FC058cC97d5bA5F06F95026C0A5CF9B0;
+    address constant public PIP_ZRX        = 0x7382c066801E7Acb2299aC8562847B9883f5CD3c;
 
-    address constant public PIP_WBTC       = 0x2f38a1bD385A9B395D01f2Cbf767b4527663edDB;
+    address constant public PIP_WBTC       = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
 
     uint256 constant public THOUSAND = 10**3;
     uint256 constant public MILLION  = 10**6;
@@ -74,8 +74,10 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant public ZERO_PCT_RATE = 1000000000000000000000000000;
+    uint256 constant public ZERO_TWENTYFIVE_PCT_RATE = 1000000000079175551708715274;
     uint256 constant public ONE_PCT_RATE  = 1000000000315522921573372069;
+    uint256 constant public ONE_TWENTYFIVE_PCT_RATE = 1000000000393915525145987602;
+    uint256 constant public FIFTY_TWENTYFIVE_PCT_RATE = 1000000012910019978921115695;
 
     function execute() external {
         // Perform drips
@@ -86,6 +88,14 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("TUSD-A");
         JugAbstract(MCD_JUG).drip("USDC-B");
         JugAbstract(MCD_JUG).drip("WBTC-A");
+
+        // Set base rate +0.25%
+        JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", ONE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_TWENTYFIVE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("WBTC-A", "duty", ONE_TWENTYFIVE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
 
         bytes32 ilk;
 
@@ -217,8 +227,8 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).poke(ilk);
         /* ---- End ---- */
 
-        // Set the global debt ceiling to 122 MM
-        VatAbstract(MCD_VAT).file("Line", 122 * MILLION * RAD);
+        // Set the global debt ceiling to 215 MM
+        VatAbstract(MCD_VAT).file("Line", 215 * MILLION * RAD);
 
         // WBTC (missing permission): Add whitelist End to read the Osm data
         OsmAbstract(PIP_WBTC).kiss(MCD_END);
@@ -228,7 +238,7 @@ contract SpellAction {
 contract DssSpell {
 
     DSPauseAbstract  public pause =
-        DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address          public action;
     bytes32          public tag;
     uint256          public eta;
