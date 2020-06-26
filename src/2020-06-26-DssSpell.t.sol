@@ -58,11 +58,11 @@ contract DssSpellTest is DSTest, DSMath {
     GemJoinAbstract tusdA_Join  = GemJoinAbstract(  0x4454aF7C8bb9463203b66C816220D41ED7837f44);
     EndAbstract     end         = EndAbstract(      0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     address  flipperMom         =                   0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    GemAbstract     usdc        = GemAbstract(      0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    GemAbstract     tusd        = GemAbstract(      0x0000000000085d4780B73119b644AE5ecd22b376);
 
-    DSValueAbstract usdcAPip    = DSValueAbstract(  0x77b68899b99b686F415d074278a9a16b336085A0);
-    DSValueAbstract tusdAPip    = DSValueAbstract(  0xeE13831ca96d191B688A670D47173694ba98f1e5); 
+    FlipAbstract    saiflip =
+        FlipAbstract(0x5432b2f3c0DFf95AA191C45E5cbd539E2820aE72);
+    GemJoinAbstract saijoin =
+        GemJoinAbstract(0xad37fd42185Ba63009177058208dd1be4b136e6b);
 
     DssSpell spell;
 
@@ -228,6 +228,31 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
         afterSpell.collaterals["TUSD-A"].duty = 1000000000079175551708715274;
         afterSpell.collaterals["TUSD-A"].pct = 0.25 * 1000;
+
+        beforeSpell.collaterals["ZRX-A"] = CollateralValues({
+            line: 10 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000000315522921573372069,
+            pct: 1 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 1 * WAD,
+            mat: 150 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 6 hours
+        });
+        beforeSpell.collaterals["KNC-A"] = CollateralValues({
+            line: 10 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000000315522921573372069,
+            pct: 1 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 1 * WAD,
+            mat: 150 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 6 hours
+        });
     }
 
     function vote() private {
@@ -332,7 +357,59 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("USDC-B", afterSpell);
         checkCollateralValues("WBTC-A", afterSpell);
         checkCollateralValues("TUSD-A", afterSpell);
-        // checkCollateralValues("ZRX-A", afterSpell);
-        // checkCollateralValues("KNC-A", afterSpell);
+        checkCollateralValues("ZRX-A", afterSpell);
+        checkCollateralValues("KNC-A", afterSpell);
     }
+
+    // function testSaiRemoval() public {
+    //     bytes32 ilk = "SAI";
+    //     (address spip, uint256 smat) = spot.ilks(ilk);
+    //     assertEq(spip, 0x54003DBf6ae6CBa6DDaE571CcdC34d834b44Ab1e);
+
+    //     (address sflip, uint256 cchop, uint256 clump) = cat.ilks(ilk);
+    //     assertEq(sflip, address(saiflip));
+
+    //     (uint256 vArt, uint256 vrate, uint256 vspot, uint256 vline, uint256 vdust)
+    //       = vat.ilks(ilk);
+
+    //     (uint256 jduty, uint256 jrho) = jug.ilks(ilk);
+    //     // These are already 0 due to previous actions,
+    //     //   they probabaly don't need to be called.
+    //     assertEq(vline, 0);
+    //     assertEq(vdust, 0);
+
+    //     assertEq(saijoin.live(), 1);
+
+    //     assertEq(vat.wards(address(saijoin)), 1);
+    //     assertEq(saiflip.wards(address(cat)), 1);
+    //     assertEq(saiflip.wards(address(end)), 1);
+    //     assertEq(saiflip.wards(flipperMom), 0);
+
+    //     vote();
+    //     scheduleWaitAndCast();
+
+    //     (spip, smat) = spot.ilks(ilk);
+    //     assertEq(spip, address(0));
+    //     assertEq(smat, 0);
+
+    //     (sflip, cchop, clump) = cat.ilks(ilk);
+    //     assertEq(sflip, address(0));
+    //     assertEq(cchop, 0);
+    //     assertEq(clump, 0);
+
+    //     (vArt, vrate, vspot, vline, vdust) = vat.ilks(ilk);
+    //     assertEq(vline, 0);
+    //     assertEq(vdust, 0);
+    //     assertEq(vspot, 0);
+
+    //     (jduty, jrho) = jug.ilks(ilk);
+    //     assertEq(jduty, 0);
+
+    //     assertEq(saijoin.live(), 0);
+
+    //     assertEq(vat.wards(address(saijoin)), 0);
+    //     assertEq(saiflip.wards(address(cat)), 0);
+    //     assertEq(saiflip.wards(address(end)), 0);
+    //     assertEq(saiflip.wards(flipperMom), 0);
+    // }
 }
