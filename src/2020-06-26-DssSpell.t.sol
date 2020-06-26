@@ -229,7 +229,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["TUSD-A"].duty = 1000000000079175551708715274;
         afterSpell.collaterals["TUSD-A"].pct = 0.25 * 1000;
 
-        beforeSpell.collaterals["ZRX-A"] = CollateralValues({
+        afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line: 10 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000315522921573372069,
@@ -241,7 +241,7 @@ contract DssSpellTest is DSTest, DSMath {
             ttl: 6 hours,
             tau: 6 hours
         });
-        beforeSpell.collaterals["KNC-A"] = CollateralValues({
+        afterSpell.collaterals["KNC-A"] = CollateralValues({
             line: 10 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000315522921573372069,
