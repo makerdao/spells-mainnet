@@ -16,8 +16,8 @@ contract MedianAbstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
-    uint256 constant SPELL_CREATED = 1593024548;
+    address constant MAINNET_SPELL = 0x9Ef95251233e0586bf3b17F14D31E2A756454a0D;
+    uint256 constant SPELL_CREATED = 1593184883;
 
     struct CollateralValues {
         uint256 line;
