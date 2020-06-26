@@ -78,6 +78,7 @@ contract SpellAction {
     uint256 constant public ONE_PCT_RATE  = 1000000000315522921573372069;
     uint256 constant public ONE_TWENTYFIVE_PCT_RATE = 1000000000393915525145987602;
     uint256 constant public FIFTY_TWENTYFIVE_PCT_RATE = 1000000012910019978921115695;
+    uint256 constant public FOUR_PCT_RATE =  1000000001243680656318820312;
 
     function execute() external {
         // Perform drips
@@ -141,24 +142,24 @@ contract SpellAction {
         // Set KNC Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_KNC);
 
-        // Set the KNC-A debt ceiling to 10 MM
-        VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
+        // Set the KNC-A debt ceiling to 5 MM
+        VatAbstract(MCD_VAT).file(ilk, "line", 5 * MILLION * RAD);
         // Set the KNC-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
-        // Set the Lot size to 1 KNC-A
-        CatAbstract(MCD_CAT).file(ilk, "lump", 1 * WAD);
+        // Set the Lot size to 50,000 KNC-A
+        CatAbstract(MCD_CAT).file(ilk, "lump", 50000 * WAD);
         // Set the KNC-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
-        // Set the KNC-A stability fee to 1%
-        JugAbstract(MCD_JUG).file(ilk, "duty", ONE_PCT_RATE);
+        // Set the KNC-A stability fee to 4%
+        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_PCT_RATE);
         // Set the KNC-A percentage between bids to 3%
         FlipAbstract(MCD_FLIP_KNC_A).file("beg", 103 * WAD / 100);
         // Set the KNC-A time max time between bids to 6 hours
         FlipAbstract(MCD_FLIP_KNC_A).file("ttl", 6 hours);
         // Set the KNC-A max auction duration to 6 hours
         FlipAbstract(MCD_FLIP_KNC_A).file("tau", 6 hours);
-        // Set the KNC-A min collateralization ratio to 150%
-        SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
+        // Set the KNC-A min collateralization ratio to 175%
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
         // Update KNC-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
         /* ---- End ---- */
@@ -205,30 +206,30 @@ contract SpellAction {
         // Set ZRX Osm in the OsmMom for new ilk
         OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_ZRX);
 
-        // Set the ZRX-A debt ceiling to 10 MM
-        VatAbstract(MCD_VAT).file(ilk, "line", 10 * MILLION * RAD);
+        // Set the ZRX-A debt ceiling to 5 MM
+        VatAbstract(MCD_VAT).file(ilk, "line", 5 * MILLION * RAD);
         // Set the ZRX-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);
-        // Set the Lot size to 1 ZRX-A
-        CatAbstract(MCD_CAT).file(ilk, "lump", 1 * WAD);
+        // Set the Lot size to 100,000 ZRX-A
+        CatAbstract(MCD_CAT).file(ilk, "lump", 100000 * WAD);
         // Set the ZRX-A liquidation penalty to 13%
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);
-        // Set the ZRX-A stability fee to 1%
-        JugAbstract(MCD_JUG).file(ilk, "duty", ONE_PCT_RATE);
+        // Set the ZRX-A stability fee to 4%
+        JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_PCT_RATE);
         // Set the ZRX-A percentage between bids to 3%
         FlipAbstract(MCD_FLIP_ZRX_A).file("beg", 103 * WAD / 100);
         // Set the ZRX-A time max time between bids to 6 hours
         FlipAbstract(MCD_FLIP_ZRX_A).file("ttl", 6 hours);
         // Set the ZRX-A max auction duration to 6 hours
         FlipAbstract(MCD_FLIP_ZRX_A).file("tau", 6 hours);
-        // Set the ZRX-A min collateralization ratio to 150%
-        SpotAbstract(MCD_SPOT).file(ilk, "mat", 150 * RAY / 100);
+        // Set the ZRX-A min collateralization ratio to 175%
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
         // Update ZRX-A spot value in Vat (will be zero as the Osm will not have any value as current yet)
         SpotAbstract(MCD_SPOT).poke(ilk);
         /* ---- End ---- */
 
-        // Set the global debt ceiling to 215 MM
-        VatAbstract(MCD_VAT).file("Line", 215 * MILLION * RAD);
+        // Set the global debt ceiling to 195 MM
+        VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
 
         // WBTC (missing permission): Add whitelist End to read the Osm data
         OsmAbstract(PIP_WBTC).kiss(MCD_END);
