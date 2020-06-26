@@ -50,6 +50,9 @@ contract SpellAction {
     address constant public FLIPPER_MOM    = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     address constant public OSM_MOM        = 0x76416A4d5190d071bfed309861527431304aA14f;
 
+    address constant public MCD_JOIN_SAI   = 0xad37fd42185Ba63009177058208dd1be4b136e6b;
+    address constant public MCD_FLIP_SAI   = 0x5432b2f3c0DFf95AA191C45E5cbd539E2820aE72;
+
     address constant public KNC            = 0xdd974D5C2e2928deA5F71b9825b8b646686BD200;
     address constant public MCD_JOIN_KNC_A = 0x475F1a89C1ED844A08E8f6C50A00228b5E59E4A9;
     address constant public MCD_FLIP_KNC_A = 0xAbBCB9Ae89cDD3C27E02D279480C7fF33083249b;
@@ -89,6 +92,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("TUSD-A");
         JugAbstract(MCD_JUG).drip("USDC-B");
         JugAbstract(MCD_JUG).drip("WBTC-A");
+        JugAbstract(MCD_JUG).drip("SAI");
 
         // Set base rate +0.25%
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
@@ -99,6 +103,43 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
 
         bytes32 ilk;
+
+        /* ---- SAIC Collateral Housekeeping ---- */
+
+        ilk = "SAI";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_SAI).ilk() == ilk, "join-ilk-not-match");
+        require(FlipAbstract(MCD_FLIP_SAI).ilk() == ilk,    "flip-ilk-not-match");
+
+        // Remove the SAI PIP in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "pip", address(0));
+        // Set SAI mat to 0 in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 0);
+        // Remove the SAI Flipper in the Cat
+        CatAbstract(MCD_CAT).file(ilk, "flip", address(0));
+        // Set the SAI debt ceiling to 0 (Already Done)
+        // VatAbstract(MCD_VAT).file(ilk, "line", 0);
+        // Set the SAI dust
+        VatAbstract(MCD_VAT).file(ilk, "dust", 0);
+        // Set the SAI spot
+        VatAbstract(MCD_VAT).file(ilk, "spot", 0);
+        // Set the Lot size to 0 SAI
+        CatAbstract(MCD_CAT).file(ilk, "lump", 0);
+        // Set the SAI liquidation penalty to 0%
+        CatAbstract(MCD_CAT).file(ilk, "chop", 0);
+        // Set Jug duty to 0
+        JugAbstract(MCD_JUG).file(ilk, "duty", 0);
+        // Cage the Sai join adapter
+        GemJoinAbstract(MCD_JOIN_SAI).cage();
+        // Disallow SAI to modify Vat registry
+        VatAbstract(MCD_VAT).deny(MCD_JOIN_SAI);
+        // Disallow Cat to kick auctions in SAI Flipper
+        FlipAbstract(MCD_FLIP_SAI).deny(MCD_CAT);
+        // Disallow End to yank auctions in SAI Flipper
+        FlipAbstract(MCD_FLIP_SAI).deny(MCD_END);
+        // Disallow FlipperMom to access to the SAI Flipper
+        FlipAbstract(MCD_FLIP_SAI).deny(FLIPPER_MOM);
 
         /* ---- KNC Collateral Onboarding Spell ---- */
         ilk = "KNC-A";
