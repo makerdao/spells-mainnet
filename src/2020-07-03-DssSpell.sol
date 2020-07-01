@@ -98,7 +98,7 @@ contract SpellAction {
         // JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
         // JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
-        address[] memory lightFeeds = new address[](3);
+        address[] memory lightFeeds = new address[](4);
         lightFeeds[0] = ETHERSCAN;
         lightFeeds[1] = GITCOIN;
         lightFeeds[2] = KYBER;
