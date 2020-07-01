@@ -46,8 +46,9 @@ contract SpellAction {
     address constant ZRXUSD = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
 
     address constant ETHERSCAN = 0x71eCFF5261bAA115dcB1D9335c88678324b8A987;
-    address constant GITCOIN = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
-    address constant KYBER = 0xD09506dAC64aaA718b45346a032F934602e29cca;
+    address constant GITCOIN   = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
+    address constant KYBER     = 0xD09506dAC64aaA718b45346a032F934602e29cca;
+    address constant INFURA    = 0x8ff6a38A1CD6a42cAac45F08eB0c802253f68dfD;
 
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION  = 10**6;
@@ -101,6 +102,7 @@ contract SpellAction {
         lightFeeds[0] = ETHERSCAN;
         lightFeeds[1] = GITCOIN;
         lightFeeds[2] = KYBER;
+        lightFeeds[3] = INFURA;
 
         // Add Etherscan, Gitcoin and Kyber as Light Feeds
         MedianAbstract(BATUSD).lift(lightFeeds);
