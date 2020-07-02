@@ -65,7 +65,7 @@ contract SpellAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
-    uint256 constant ONE_PCT_RATE  = 1000000000315522921573372069;
+    uint256 constant ZERO_SEVENTYFIVE_PCT_RATE  = 1000000000236936036262880196;
     uint256 constant TWO_PCT_RATE = 1000000000627937192491029810;
     uint256 constant FOUR_PCT_RATE =  1000000001243680656318820312;
     uint256 constant FIFTY_PCT_RATE = 1000000012857214317438491659;
@@ -100,7 +100,7 @@ contract SpellAction {
         // https://vote.makerdao.com/polling-proposal/qmzbjhbvompj77ud2yw3f1zatxgitt72q7cukx3mqtath9
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
         JugAbstract(MCD_JUG).file("BAT-A", "duty", ZERO_PCT_RATE);
-        JugAbstract(MCD_JUG).file("USDC-A", "duty", ONE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", ZERO_SEVENTYFIVE_PCT_RATE);
         JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
         JugAbstract(MCD_JUG).file("WBTC-A", "duty", TWO_PCT_RATE);
         JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_PCT_RATE);
