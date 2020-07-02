@@ -45,10 +45,12 @@ contract SpellAction {
     address constant KNCUSD = 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
     address constant ZRXUSD = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
 
-    address constant ETHERSCAN = 0x71eCFF5261bAA115dcB1D9335c88678324b8A987;
-    address constant GITCOIN   = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
-    address constant KYBER     = 0xD09506dAC64aaA718b45346a032F934602e29cca;
-    address constant INFURA    = 0x8ff6a38A1CD6a42cAac45F08eB0c802253f68dfD;
+    address constant ETHERSCAN  = 0x71eCFF5261bAA115dcB1D9335c88678324b8A987;
+    address constant GITCOIN    = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
+    address constant KYBER      = 0xD09506dAC64aaA718b45346a032F934602e29cca;
+    address constant INFURA     = 0x8ff6a38A1CD6a42cAac45F08eB0c802253f68dfD;
+    address constant DEFI_SAVER = 0xeAa474cbFFA87Ae0F1a6f68a3aBA6C77C656F72c;
+    address constant MCDEX      = 0x12Ee7E3369272CeE4e9843F36331561DBF9Ae6b4;
 
     uint256 constant THOUSAND = 10**3;
     uint256 constant MILLION  = 10**6;
@@ -62,11 +64,11 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant ZERO_TWENTYFIVE_PCT_RATE = 1000000000079175551708715274;
+    uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
     uint256 constant ONE_PCT_RATE  = 1000000000315522921573372069;
-    uint256 constant ONE_TWENTYFIVE_PCT_RATE = 1000000000393915525145987602;
-    uint256 constant FIFTY_TWENTYFIVE_PCT_RATE = 1000000012910019978921115695;
-    uint256 constant FOUR_TWENTYFIVE_PCT_RATE =  1000000001319814647332759691;
+    uint256 constant TWO_PCT_RATE = 1000000000627937192491029810;
+    uint256 constant FOUR_PCT_RATE =  1000000001243680656318820312;
+    uint256 constant FIFTY_PCT_RATE = 1000000012857214317438491659;
 
     function execute() external {
         // Perform drips
@@ -75,28 +77,35 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("ETH-A");
         JugAbstract(MCD_JUG).drip("BAT-A");
         JugAbstract(MCD_JUG).drip("USDC-A");
-        JugAbstract(MCD_JUG).drip("TUSD-A");
         JugAbstract(MCD_JUG).drip("USDC-B");
+        JugAbstract(MCD_JUG).drip("TUSD-A");
         JugAbstract(MCD_JUG).drip("WBTC-A");
         JugAbstract(MCD_JUG).drip("KNC-A");
         JugAbstract(MCD_JUG).drip("ZRX-A");
 
-        // WBTC debt ceiling (20m) and risk premium (2%)
+        // Set the global debt ceiling
+        // Existing Line: 195m
+        // New Line: 205m
+        VatAbstract(MCD_VAT).file("Line", 205 * MILLION * RAD);
+
+        // Set the WBTC-A debt ceiling
         // https://vote.makerdao.com/polling-proposal/qmzbjhbvompj77ud2yw3f1zatxgitt72q7cukx3mqtath9
+        // Existing Line: 10m
+        // New Line: 20m
+        VatAbstract(MCD_VAT).file("WBTC-A", "line", 20 * MILLION * RAD);
 
-        // Set the global debt ceiling to 195 MM
-        // VatAbstract(MCD_VAT).file("Line", 195 * MILLION * RAD);
-
+        // Set base rate to 0%
         // https://vote.makerdao.com/polling-proposal/qmtsig9y1zmfwb2eg62mbydqdjh12ftsdoyc9qc1kamkwu
-        // Set base rate +0.25%
-        // JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("BAT-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("USDC-A", "duty", ONE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("WBTC-A", "duty", ONE_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
-        // JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
+        // Set WBTC premium risk to 2%
+        // https://vote.makerdao.com/polling-proposal/qmzbjhbvompj77ud2yw3f1zatxgitt72q7cukx3mqtath9
+        JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", ZERO_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", ONE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
+        JugAbstract(MCD_JUG).file("WBTC-A", "duty", TWO_PCT_RATE);
+        JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_PCT_RATE);
+        JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_PCT_RATE);
 
         address[] memory lightFeeds = new address[](4);
         lightFeeds[0] = ETHERSCAN;
@@ -112,14 +121,14 @@ contract SpellAction {
         MedianAbstract(KNCUSD).lift(lightFeeds);
         MedianAbstract(ZRXUSD).lift(lightFeeds);
 
-        // MIP10c9-SP1 Proposal: Whitelist DeFi Saver on ETHUSD Oracle
-        OsmAbstract(PIP_ETH).kiss(0xeAa474cbFFA87Ae0F1a6f68a3aBA6C77C656F72c);
-        // MIP10c9-SP2 Proposal: Whitelist DeFi Saver on BATUSD Oracle
-        OsmAbstract(PIP_BAT).kiss(0xeAa474cbFFA87Ae0F1a6f68a3aBA6C77C656F72c);
-        // MIP10c9-SP3 Proposal: Whitelist DeFi Saver on WBTCUSD Oracle
-        OsmAbstract(PIP_WBTC).kiss(0xeAa474cbFFA87Ae0F1a6f68a3aBA6C77C656F72c);
-        // MIP10c9-SP4 Proposal: Whitelist MCDEX on ETH/USD Oracle
-        MedianAbstract(ETHUSD).kiss(0x12Ee7E3369272CeE4e9843F36331561DBF9Ae6b4);
+        // MIP10c9-SP1 Proposal: Whitelist DeFi Saver on ETHUSD Oracle (Osm)
+        OsmAbstract(PIP_ETH).kiss(DEFI_SAVER);
+        // MIP10c9-SP2 Proposal: Whitelist DeFi Saver on BATUSD Oracle (Osm)
+        OsmAbstract(PIP_BAT).kiss(DEFI_SAVER);
+        // MIP10c9-SP3 Proposal: Whitelist DeFi Saver on WBTCUSD Oracle (Osm)
+        OsmAbstract(PIP_WBTC).kiss(DEFI_SAVER);
+        // MIP10c9-SP4 Proposal: Whitelist MCDEX on ETH/USD Oracle (Median)
+        MedianAbstract(ETHUSD).kiss(MCDEX);
     }
 }
 

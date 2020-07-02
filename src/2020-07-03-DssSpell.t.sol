@@ -220,33 +220,34 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 195 * MILLION * RAD,
+            Line: 205 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].duty = 1000000000079175551708715274;
-        afterSpell.collaterals["ETH-A"].pct = 0.25 * 1000;
+        afterSpell.collaterals["ETH-A"].duty = 1000000000000000000000000000;
+        afterSpell.collaterals["ETH-A"].pct = 0 * 1000;
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
-        afterSpell.collaterals["BAT-A"].duty = 1000000000079175551708715274;
-        afterSpell.collaterals["BAT-A"].pct = 0.25 * 1000;
+        afterSpell.collaterals["BAT-A"].duty = 1000000000000000000000000000;
+        afterSpell.collaterals["BAT-A"].pct = 0 * 1000;
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
         afterSpell.collaterals["USDC-A"].duty = 1000000000315522921573372069;
         afterSpell.collaterals["USDC-A"].pct = 1 * 1000;
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
-        afterSpell.collaterals["USDC-B"].duty = 1000000012910019978921115695;
-        afterSpell.collaterals["USDC-B"].pct = 50.25 * 1000;
+        afterSpell.collaterals["USDC-B"].duty = 1000000012857214317438491659;
+        afterSpell.collaterals["USDC-B"].pct = 50 * 1000;
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
-        afterSpell.collaterals["WBTC-A"].duty = 1000000000393915525145987602;
-        afterSpell.collaterals["WBTC-A"].pct = 1.25 * 1000;
+        afterSpell.collaterals["WBTC-A"].duty = 1000000000627937192491029810;
+        afterSpell.collaterals["WBTC-A"].pct = 2 * 1000;
+        afterSpell.collaterals["WBTC-A"].line = 20 * MILLION * RAD;
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
-        afterSpell.collaterals["TUSD-A"].duty = 1000000000079175551708715274;
-        afterSpell.collaterals["TUSD-A"].pct = 0.25 * 1000;
+        afterSpell.collaterals["TUSD-A"].duty = 1000000000000000000000000000;
+        afterSpell.collaterals["TUSD-A"].pct = 0 * 1000;
         afterSpell.collaterals["KNC-A"] = beforeSpell.collaterals["KNC-A"];
-        afterSpell.collaterals["KNC-A"].duty = 1000000001319814647332759691;
-        afterSpell.collaterals["KNC-A"].pct = 4.25 * 1000;
+        afterSpell.collaterals["KNC-A"].duty = 1000000001243680656318820312;
+        afterSpell.collaterals["KNC-A"].pct = 4 * 1000;
         afterSpell.collaterals["ZRX-A"] = beforeSpell.collaterals["ZRX-A"];
-        afterSpell.collaterals["ZRX-A"].duty = 1000000001319814647332759691;
-        afterSpell.collaterals["ZRX-A"].pct = 4.25 * 1000;
+        afterSpell.collaterals["ZRX-A"].duty = 1000000001243680656318820312;
+        afterSpell.collaterals["ZRX-A"].pct = 4 * 1000;
     }
 
     function vote() private {
@@ -345,6 +346,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
+
         checkSystemValues(afterSpell);
 
         checkCollateralValues("ETH-A", afterSpell);
