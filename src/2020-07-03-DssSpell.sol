@@ -93,7 +93,7 @@ contract SpellAction {
         // New Line: 20m
         VatAbstract(MCD_VAT).file("WBTC-A", "line", 20 * MILLION * RAD);
 
-        // Set the USDC-A debt ceiling
+        // (Post-Governance Polling Adjustment) Set the USDC-A debt ceiling
         // https://forum.makerdao.com/t/signal-request-usdc-a-stability-fee-and-debt-ceiling-adjustments/3020
         // Existing Line: 20m
         // New Line: 40m
