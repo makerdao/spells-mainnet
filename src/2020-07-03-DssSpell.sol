@@ -65,7 +65,6 @@ contract SpellAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
-    uint256 constant ZERO_SEVENTYFIVE_PCT_RATE  = 1000000000236936036262880196;
     uint256 constant TWO_PCT_RATE = 1000000000627937192491029810;
     uint256 constant FOUR_PCT_RATE =  1000000001243680656318820312;
     uint256 constant FIFTY_PCT_RATE = 1000000012857214317438491659;
@@ -85,8 +84,8 @@ contract SpellAction {
 
         // Set the global debt ceiling
         // Existing Line: 195m
-        // New Line: 205m
-        VatAbstract(MCD_VAT).file("Line", 205 * MILLION * RAD);
+        // New Line: 225m
+        VatAbstract(MCD_VAT).file("Line", 225 * MILLION * RAD);
 
         // Set the WBTC-A debt ceiling
         // https://vote.makerdao.com/polling-proposal/qmzbjhbvompj77ud2yw3f1zatxgitt72q7cukx3mqtath9
@@ -94,18 +93,27 @@ contract SpellAction {
         // New Line: 20m
         VatAbstract(MCD_VAT).file("WBTC-A", "line", 20 * MILLION * RAD);
 
+        // Set the USDC-A debt ceiling
+        // https://forum.makerdao.com/t/signal-request-usdc-a-stability-fee-and-debt-ceiling-adjustments/3020
+        // Existing Line: 20m
+        // New Line: 40m
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 40 * MILLION * RAD);
+
         // Set base rate to 0%
         // https://vote.makerdao.com/polling-proposal/qmtsig9y1zmfwb2eg62mbydqdjh12ftsdoyc9qc1kamkwu
         // Set WBTC premium risk to 2%
         // https://vote.makerdao.com/polling-proposal/qmzbjhbvompj77ud2yw3f1zatxgitt72q7cukx3mqtath9
         JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
         JugAbstract(MCD_JUG).file("BAT-A", "duty", ZERO_PCT_RATE);
-        JugAbstract(MCD_JUG).file("USDC-A", "duty", ZERO_SEVENTYFIVE_PCT_RATE);
         JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
         JugAbstract(MCD_JUG).file("WBTC-A", "duty", TWO_PCT_RATE);
         JugAbstract(MCD_JUG).file("TUSD-A", "duty", ZERO_PCT_RATE);
         JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_PCT_RATE);
         JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_PCT_RATE);
+
+        // post-governance polling adjustments
+        // https://forum.makerdao.com/t/signal-request-usdc-a-stability-fee-and-debt-ceiling-adjustments/3020
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", FOUR_PCT_RATE);
 
         address[] memory lightFeeds = new address[](4);
         lightFeeds[0] = ETHERSCAN;

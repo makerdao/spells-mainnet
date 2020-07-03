@@ -220,7 +220,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 205 * MILLION * RAD,
+            Line: 225 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
@@ -230,8 +230,9 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["BAT-A"].duty = 1000000000000000000000000000;
         afterSpell.collaterals["BAT-A"].pct = 0 * 1000;
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-A"].duty = 1000000000236936036262880196;
-        afterSpell.collaterals["USDC-A"].pct = 0.75 * 1000;
+        afterSpell.collaterals["USDC-A"].duty = 1000000001243680656318820312;
+        afterSpell.collaterals["USDC-A"].pct = 4 * 1000;
+        afterSpell.collaterals["USDC-A"].line = 40 * MILLION * RAD;
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
         afterSpell.collaterals["USDC-B"].duty = 1000000012857214317438491659;
         afterSpell.collaterals["USDC-B"].pct = 50 * 1000;
