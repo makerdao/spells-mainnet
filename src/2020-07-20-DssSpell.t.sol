@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-07-10-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-07-20-DssSpell.sol";
 
 contract Hevm {
     function warp(uint256) public;
@@ -12,7 +12,8 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = 0xaE6edD381095E5C110a274FfC80871c72949795a;
+    address constant MAINNET_SPELL = address(0);
+    // this needs to be updated
     uint256 constant SPELL_CREATED = 1595003412;
 
     struct CollateralValues {
@@ -116,12 +117,12 @@ contract DssSpellTest is DSTest, DSMath {
         beforeSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 245 * MILLION * RAD,
+            Line: 265 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
 
         beforeSpell.collaterals["ETH-A"] = CollateralValues({
-            line: 160 * MILLION * RAD,
+            line: 180 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
             pct: 0 * 1000,
@@ -220,13 +221,14 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 265 * MILLION * RAD,
+            Line: 325 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].line = 180 * MILLION * RAD;
+        afterSpell.collaterals["ETH-A"].line = 220 * MILLION * RAD;
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
+        afterSpell.collaterals["USDC-A"].line = 60 * MILLION * RAD;
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
