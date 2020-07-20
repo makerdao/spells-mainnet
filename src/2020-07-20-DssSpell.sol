@@ -59,8 +59,8 @@ contract SpellAction {
 
         // Set the global debt ceiling
         // Existing Line: 265m
-        // New Line: 325m
-        VatAbstract(MCD_VAT).file("Line", 325 * MILLION * RAD);
+        // New Line: 345m
+        VatAbstract(MCD_VAT).file("Line", 345 * MILLION * RAD);
 
         // Set the ETH-A debt ceiling
         // Existing Line: 180m
@@ -69,8 +69,8 @@ contract SpellAction {
 
         // Set the USDC-A debt ceiling
         // Existing Line: 40m
-        // New Line: 60m
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 60 * MILLION * RAD);
+        // New Line: 80m
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 80 * MILLION * RAD);
     }
 }
 

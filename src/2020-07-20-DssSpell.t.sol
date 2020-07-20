@@ -221,14 +221,14 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 325 * MILLION * RAD,
+            Line: 345 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
         afterSpell.collaterals["ETH-A"].line = 220 * MILLION * RAD;
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-A"].line = 60 * MILLION * RAD;
+        afterSpell.collaterals["USDC-A"].line = 80 * MILLION * RAD;
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
