@@ -34,59 +34,59 @@ import "lib/dss-interfaces/src/dss/MkrAuthorityAbstract.sol";
 
 contract SpellAction {
 
-    // KOVAN ADDRESSES
+    // MAINNET ADDRESSES
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/kovan/1.0.8/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.0.8/contracts.json
 
-    address constant public MCD_VAT             = 0xbA987bDB501d131f766fEe8180Da5d81b34b69d9;
-    address constant public MCD_VOW             = 0x0F4Cbe6CBA918b7488C26E29d9ECd7368F38EA3b;
-    address constant public MCD_CAT             = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
-    address constant public MCD_JUG             = 0xcbB7718c9F39d05aEEDE1c472ca8Bf804b2f1EaD;
-    address constant public MCD_POT             = 0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb;
-    address constant public GOV_GUARD           = 0xE50303C6B67a2d869684EFb09a62F6aaDD06387B;
+    address constant public MCD_VAT             = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant public MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant public MCD_CAT             = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
+    address constant public MCD_JUG             = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant public MCD_POT             = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    address constant public GOV_GUARD           = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
 
-    address constant public MCD_SPOT            = 0x3a042de6413eDB15F2784f2f97cC68C7E9750b2D;
-    address constant public MCD_END             = 0x24728AcF2E2C403F5d2db4Df6834B8998e56aA5F;
-    address constant public FLIPPER_MOM         = 0xf3828caDb05E5F22844f6f9314D99516D68a0C84;
-    address constant public OSM_MOM             = 0x5dA9D1C3d4f1197E5c52Ff963916Fe84D2F5d8f3;
+    address constant public MCD_SPOT            = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant public MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    address constant public FLIPPER_MOM         = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
+    address constant public OSM_MOM             = 0x76416A4d5190d071bfed309861527431304aA14f;
 
-    address constant public MCD_JOIN_MANA_A     = 0xdC9Fe394B27525e0D9C827EE356303b49F607aaF;
-    address constant public PIP_MANA            = 0xE97D2b077Fe19c80929718d377981d9F754BF36e;
-    address constant public MCD_FLIP_MANA_A     = 0x5CB9D33A9fE5244019e6F5f45e68F18600805264;
-    address constant public MANA                = 0x221F4D62636b7B51b99e36444ea47Dc7831c2B2f;
+    address constant public MCD_JOIN_MANA_A     = 0xA6EA3b9C04b8a38Ff5e224E7c3D6937ca44C0ef9;
+    address constant public PIP_MANA            = 0xE97D2b077Fe19c80929718d377981d9F754BF36e; // KOVAN
+    address constant public MCD_FLIP_MANA_A     = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
+    address constant public MANA                = 0x0F5D2fB29fb7d3CFeE444a200298f468908cC942;
 
-    address constant public MCD_FLAP            = 0xc6d3C83A080e2Ef16E4d7d4450A869d0891024F5;
-    address constant public MCD_FLOP            = 0x52482a3100F79FC568eb2f38C4a45ba457FBf5fA;
-    address constant public MCD_FLAP_OLD        = 0x064cd5f762851b1af81Fd8fcA837227cb3eC84b4;
-    address constant public MCD_FLOP_OLD        = 0x145B00b1AC4F01E84594EFa2972Fce1f5Beb5CED;
+    address constant public MCD_FLAP            = 0xC4269cC7acDEdC3794b221aA4D9205F564e27f0d;
+    address constant public MCD_FLOP            = 0xA41B6EF151E06da0e34B009B86E828308986736D;
+    address constant public MCD_FLAP_OLD        = 0xdfE0fb1bE2a52CDBf8FB962D5701d7fd0902db9f;
+    address constant public MCD_FLOP_OLD        = 0x4D95A049d5B0b7d32058cd3F2163015747522e99;
 
-    address constant public MCD_FLIP_ETH_A      = 0xc78EdADA7e8bEa29aCc3a31bBA1D516339deD350;
-    address constant public MCD_FLIP_ETH_A_OLD  = 0xB40139Ea36D35d0C9F6a2e62601B616F1FfbBD1b;
+    address constant public MCD_FLIP_ETH_A      = 0x0F398a2DaAa134621e4b687FCcfeE4CE47599Cc1;
+    address constant public MCD_FLIP_ETH_A_OLD  = 0xd8a04F5412223F513DC55F839574430f5EC15531;
 
-    address constant public MCD_FLIP_BAT_A      = 0xc0126c3383777bDc175E659A51020E56307dDe21;
-    address constant public MCD_FLIP_BAT_A_OLD  = 0xC94014A032cA5fCc01271F4519Add7E87a16b94C;
+    address constant public MCD_FLIP_BAT_A      = 0x5EdF770FC81E7b8C2c89f71F30f211226a4d7495;
+    address constant public MCD_FLIP_BAT_A_OLD  = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
 
-    address constant public MCD_FLIP_USDC_A     = 0xc29Ad1913C3B415497fdA1eA15c132502B8fa372;
-    address constant public MCD_FLIP_USDC_A_OLD = 0x45d5b4A304f554262539cfd167dd05e331Da686E;
+    address constant public MCD_FLIP_USDC_A     = 0x545521e0105C5698f75D6b3C3050CfCC62FB0C12;
+    address constant public MCD_FLIP_USDC_A_OLD = 0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1;
 
-    address constant public MCD_FLIP_USDC_B     = 0x3c9eF711B68882d9732F60758e7891AcEae2Aa7c;
-    address constant public MCD_FLIP_USDC_B_OLD = 0x93AE217b0C6bF52E9FFea6Ab191cCD438d9EC0de;
+    address constant public MCD_FLIP_USDC_B     = 0x6002d3B769D64A9909b0B26fC00361091786fe48;
+    address constant public MCD_FLIP_USDC_B_OLD = 0xec25Ca3fFa512afbb1784E17f1D414E16D01794F;
 
-    address constant public MCD_FLIP_WBTC_A     = 0x28dd4263e1FcE04A9016Bd7BF71a4f0F7aB93810;
-    address constant public MCD_FLIP_WBTC_A_OLD = 0xc45A1b76D3316D56a0225fB02Ab6b7637403fF67;
+    address constant public MCD_FLIP_WBTC_A     = 0xF70590Fa4AaBe12d3613f5069D02B8702e058569;
+    address constant public MCD_FLIP_WBTC_A_OLD = 0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603;
 
-    address constant public MCD_FLIP_ZRX_A      = 0xe07F1219f7d6ccD59431a6b151179A9181e3902c;
-    address constant public MCD_FLIP_ZRX_A_OLD  = 0x1341E0947D03Fd2C24e16aaEDC347bf9D9af002F;
+    address constant public MCD_FLIP_ZRX_A      = 0x92645a34d07696395b6e5b8330b000D0436A9aAD;
+    address constant public MCD_FLIP_ZRX_A_OLD  = 0x08c89251FC058cC97d5bA5F06F95026C0A5CF9B0;
 
-    address constant public MCD_FLIP_KNC_A      = 0x644699674D06cF535772D0DC19Ad5EA695000F51;
-    address constant public MCD_FLIP_KNC_A_OLD  = 0xf14Ec3538C86A31bBf576979783a8F6dbF16d571;
+    address constant public MCD_FLIP_KNC_A      = 0xAD4a0B5F3c6Deb13ADE106Ba6E80Ca6566538eE6;
+    address constant public MCD_FLIP_KNC_A_OLD  = 0xAbBCB9Ae89cDD3C27E02D279480C7fF33083249b;
 
-    address constant public MCD_FLIP_TUSD_A     = 0xD4A145d161729A4B43B7Ab7DD683cB9A16E01a1b;
-    address constant public MCD_FLIP_TUSD_A_OLD = 0x51a8fB578E830c932A2D49927584C643Ad08d9eC;
+    address constant public MCD_FLIP_TUSD_A     = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
+    address constant public MCD_FLIP_TUSD_A_OLD = 0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61;
 
-    // decimals & precision
+    // Decimals & precision
     uint256 constant public THOUSAND = 10 ** 3;
     uint256 constant public MILLION  = 10 ** 6;
     uint256 constant public WAD      = 10 ** 18;
@@ -120,15 +120,15 @@ contract SpellAction {
         bytes32 MANA_A_ILK = "MANA-A";
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).vat() == MCD_VAT,    "join-vat-not-match");
         require(GemJoinAbstract(MCD_JOIN_MANA_A).ilk() == MANA_A_ILK, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).gem() == MANA, "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).dec() == 18, "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_MANA_A).vat() == MCD_VAT, "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_MANA_A).ilk() == MANA_A_ILK, "flip-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).gem() == MANA,       "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).dec() == 18,         "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_MANA_A).vat() == MCD_VAT,       "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_MANA_A).ilk() == MANA_A_ILK,    "flip-ilk-not-match");
 
         // Set price feed for MANA-A
-        SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "pip", PIP_MANA);
+        // SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "pip", PIP_MANA);
 
         // Set the MANA-A flipper in the cat
         CatAbstract(MCD_CAT).file(MANA_A_ILK, "flip", MCD_FLIP_MANA_A);
@@ -151,11 +151,11 @@ contract SpellAction {
         FlipAbstract(MCD_FLIP_MANA_A).rely(FLIPPER_MOM);
 
         // Update OSM
-        MedianAbstract(OsmAbstract(PIP_MANA).src()).kiss(PIP_MANA);
-        OsmAbstract(PIP_MANA).rely(OSM_MOM);
-        OsmAbstract(PIP_MANA).kiss(MCD_SPOT);
-        OsmAbstract(PIP_MANA).kiss(MCD_END);
-        OsmMomAbstract(OSM_MOM).setOsm(MANA_A_ILK, PIP_MANA);
+        // MedianAbstract(OsmAbstract(PIP_MANA).src()).kiss(PIP_MANA);
+        // OsmAbstract(PIP_MANA).rely(OSM_MOM);
+        // OsmAbstract(PIP_MANA).kiss(MCD_SPOT);
+        // OsmAbstract(PIP_MANA).kiss(MCD_END);
+        // OsmMomAbstract(OSM_MOM).setOsm(MANA_A_ILK, PIP_MANA);
 
         VatAbstract(MCD_VAT).file(MANA_A_ILK, "line", 1 * MILLION * RAD);    // 1 MM debt ceiling
         VatAbstract(MCD_VAT).file(MANA_A_ILK, "dust", 20 * RAD);             // 20 Dai dust
@@ -163,15 +163,15 @@ contract SpellAction {
         CatAbstract(MCD_CAT).file(MANA_A_ILK, "chop", 113 * RAY / 100);      // 13% liq. penalty
         JugAbstract(MCD_JUG).file(MANA_A_ILK, "duty", TWELVE_PCT_RATE);      // 12% stability fee
 
-        FlipAbstract(MCD_FLIP_MANA_A).file("beg",  103 * WAD / 100); // 3% bid increase
-        FlipAbstract(MCD_FLIP_MANA_A).file("ttl",  6 hours);         // 6 hours ttl
-        FlipAbstract(MCD_FLIP_MANA_A).file("tau",  6 hours);         // 6 hours tau
+        FlipAbstract(MCD_FLIP_MANA_A).file("beg",  103 * WAD / 100);         // 3% bid increase
+        FlipAbstract(MCD_FLIP_MANA_A).file("ttl",  6 hours);                 // 6 hours ttl
+        FlipAbstract(MCD_FLIP_MANA_A).file("tau",  6 hours);                 // 6 hours tau
 
-        SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "mat",  175 * RAY / 100); // 175% coll. ratio
+        SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "mat",  175 * RAY / 100);    // 175% coll. ratio
         SpotAbstract(MCD_SPOT).poke(MANA_A_ILK);
 
         // Execute the first poke in the Osm for the next value
-        OsmAbstract(PIP_MANA).poke();
+        // OsmAbstract(PIP_MANA).poke();
 
         // Update MANA-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(MANA_A_ILK);
@@ -372,14 +372,14 @@ contract SpellAction {
 }
 
 contract DssSpell {
-    DSPauseAbstract  public pause =
-        DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
-    address          public action;
-    bytes32          public tag;
-    uint256          public eta;
-    bytes            public sig;
-    uint256          public expiration;
-    bool             public done;
+    DSPauseAbstract public pause = 
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address         public action;
+    bytes32         public tag;
+    uint256         public eta;
+    bytes           public sig;
+    uint256         public expiration;
+    bool            public done;
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
