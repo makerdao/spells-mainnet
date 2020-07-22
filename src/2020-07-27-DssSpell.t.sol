@@ -54,8 +54,7 @@ contract DssSpellTest is DSTest, DSMath {
     // MAINNET ADDRESSES
     DSPauseAbstract      pause        = DSPauseAbstract(     0xbE286431454714F511008713973d3B053A2d38f3);
     address              pauseProxy   =                      0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    // DSChiefAbstract      chief        = DSChiefAbstract(     0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
-    // address chief = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
+    DSChiefAbstract      chief        = DSChiefAbstract(     0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     VatAbstract          vat          = VatAbstract(         0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     CatAbstract          cat          = CatAbstract(         0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
     PotAbstract          pot          = PotAbstract(         0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
@@ -169,7 +168,6 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function vote() private {
-        DSChiefAbstract chief = DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
         if (chief.hat() != address(spell)) {
             gov.approve(address(chief), uint256(-1));
             chief.lock(sub(gov.balanceOf(address(this)), 1 ether));
