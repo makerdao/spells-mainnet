@@ -8,6 +8,7 @@ import {DssSpell, SpellAction} from "./2020-07-27-DssSpell.sol";
 
 contract Hevm {
     function warp(uint256) public;
+    function store(address,bytes32,bytes32) public;
 }
 
 contract FlipMomLike {
@@ -115,6 +116,14 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    uint256 constant public TWELVE_PCT_RATE = 1000000003593629043335673582;
+
     // not provided in DSMath
     function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
       assembly {
@@ -159,11 +168,31 @@ contract DssSpellTest is DSTest, DSMath {
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
+        beforeSpell = SystemValues({
+            dsr: 1000000000000000000000000000,
+            dsrPct: 0 * 1000,
+            Line: 345000 * THOUSAND * RAD,
+            pauseDelay: 43200 // 12 hours
+        });
+
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 172050 * THOUSAND * RAD,
-            pauseDelay: 60
+            Line: 346000 * THOUSAND * RAD,
+            pauseDelay: 43200 // 12 hours
+        });
+
+        afterSpell.collaterals["MANA-A"] = CollateralValues({
+            line: 1 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: TWELVE_PCT_RATE,
+            pct: 0 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 500 * THOUSAND * WAD,
+            mat: 175 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 6 hours
         });
     }
 
@@ -261,7 +290,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
-        // checkSystemValues(beforeSpell);
+        checkSystemValues(beforeSpell);
 
         vote();
         scheduleWaitAndCast();
@@ -269,9 +298,29 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
+        // assertEq(pip.bud(address(this)), 0);
+        // hevm.store(
+        //     address(pip),
+        //     keccak256(abi.encode(address(this), uint(5))),
+        //     bytes32(uint(1))
+        // );
+        // assertEq(pip.bud(address(this)), 1);
+
+        hevm.warp(now + 3601);
+        // pip.poke();
+        spot.poke("MANA-A");
+
+        assertEq(mana.balanceOf(address(this)), 0);
+        hevm.store(
+            address(mana),
+            keccak256(abi.encode(address(this), uint(1))),
+            bytes32(uint(1000000 ether))
+        );
+        assertEq(mana.balanceOf(address(this)), 1000000 ether);
+
         // check afterSpell parameters
-        // checkSystemValues(afterSpell);
-        // checkCollateralValues("MANA-A", afterSpell);
+        checkSystemValues(afterSpell);
+        checkCollateralValues("MANA-A", afterSpell);
 
         // Authorization
         assertEq(manajoin.wards(pauseProxy), 1);
@@ -290,44 +339,37 @@ contract DssSpellTest is DSTest, DSMath {
         // Join to adapter
         uint256 initialManaBalance = mana.balanceOf(address(this));
         assertEq(vat.gem("MANA-A", address(this)), 0);
-        mana.approve(address(manajoin), 1500 ether);
-        assertEq(address(this), address(0));
-        manajoin.join(address(this), 1500 ether);
-        // assertEq(mana.balanceOf(address(this)), initialManaBalance - 1500 ether);
-        // assertEq(vat.gem("MANA-A", address(this)), 1500 ether);
+        mana.approve(address(manajoin), 15000 ether);
+        manajoin.join(address(this), 15000 ether);
+        assertEq(mana.balanceOf(address(this)), initialManaBalance - 15000 ether);
+        assertEq(vat.gem("MANA-A", address(this)), 15000 ether);
 
-        // // Deposit collateral, generate DAI
-        // assertEq(vat.dai(address(this)), initialDAIBalance);
-        // vat.frob("MANA-A", address(this), address(this), address(this), int(1500 ether), int(25 ether));
-        // assertEq(vat.gem("MANA-A", address(this)), 0);
-        // assertEq(vat.dai(address(this)), add(initialDAIBalance, 25 * RAD));
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), initialDAIBalance);
+        vat.frob("MANA-A", address(this), address(this), address(this), int(15000 ether), int(25 ether));
+        assertEq(vat.gem("MANA-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), add(initialDAIBalance, 25 * RAD));
 
-        // // Payback DAI, withdraw collateral
-        // vat.frob("MANA-A", address(this), address(this), address(this), -int(1500 ether), -int(25 ether));
-        // assertEq(vat.gem("MANA-A", address(this)), 1500 ether);
-        // assertEq(vat.dai(address(this)), initialDAIBalance);
+        // Payback DAI, withdraw collateral
+        vat.frob("MANA-A", address(this), address(this), address(this), -int(15000 ether), -int(25 ether));
+        assertEq(vat.gem("MANA-A", address(this)), 15000 ether);
+        assertEq(vat.dai(address(this)), initialDAIBalance);
 
-        // // Withdraw from adapter
-        // manajoin.exit(address(this), 1500 ether);
-        // assertEq(mana.balanceOf(address(this)), initialManaBalance);
-        // assertEq(vat.gem("MANA-A", address(this)), 0);
+        // Withdraw from adapter
+        manajoin.exit(address(this), 15000 ether);
+        assertEq(mana.balanceOf(address(this)), initialManaBalance);
+        assertEq(vat.gem("MANA-A", address(this)), 0);
 
-        // // Generate new DAI to force a liquidation
-        // mana.approve(address(manajoin), 1000 ether);
-        // manajoin.join(address(this), 1000 ether);
-        // (,,uint spotV,,) = vat.ilks("MANA-A");
-        // vat.frob("MANA-A", address(this), address(this), address(this), int(1000 ether), int(mul(1000 ether, spotV) / RAY)); // Max amount of DAI
-        // hevm.warp(now + 1);
-        // jug.drip("MANA-A");
-        // assertEq(manaFlip.kicks(), 0);
-        // cat.bite("MANA-A", address(this));
-        // assertEq(manaFlip.kicks(), 1);
-
-
-
-
-
-
+        // Generate new DAI to force a liquidation
+        mana.approve(address(manajoin), 1000 ether);
+        manajoin.join(address(this), 1000 ether);
+        (,,uint spotV,,) = vat.ilks("MANA-A");
+        vat.frob("MANA-A", address(this), address(this), address(this), int(1000 ether), int(mul(1000 ether, spotV) / RAY)); // Max amount of DAI
+        hevm.warp(now + 1);
+        jug.drip("MANA-A");
+        assertEq(manaFlip.kicks(), 0);
+        cat.bite("MANA-A", address(this));
+        assertEq(manaFlip.kicks(), 1);
 
         // bytes32[] memory ilks = new bytes32[](8);
         // ilks[0] = "ETH-A";
