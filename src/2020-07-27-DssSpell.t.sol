@@ -64,14 +64,14 @@ contract DssSpellTest is DSTest, DSMath {
     VowAbstract          vow          = VowAbstract(         0xA950524441892A31ebddF91d3cEEFa04Bf454466);
     MkrAuthorityAbstract mkrAuthority = MkrAuthorityAbstract(0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8);
 
-    // FlipAbstract         flip         = FlipAbstract(        0x5CB9D33A9fE5244019e6F5f45e68F18600805264); ??
+    FlipAbstract         manaFlip     = FlipAbstract(        0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a); 
 
     GemJoinAbstract      manajoin     = GemJoinAbstract(     0xA6EA3b9C04b8a38Ff5e224E7c3D6937ca44C0ef9);
     EndAbstract          end          = EndAbstract(         0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     address              flipperMom   =                      0x9BdDB99625A711bf9bda237044924E34E8570f75;
     GemAbstract          mana         = GemAbstract(         0x0F5D2fB29fb7d3CFeE444a200298f468908cC942);
 
-    // OsmAbstract          pip          = OsmAbstract(         0xE97D2b077Fe19c80929718d377981d9F754BF36e);
+    OsmAbstract          pip          = OsmAbstract(         0x8067259EA630601f319FccE477977E55C6078C13);
     OsmMomAbstract       osmMom       = OsmMomAbstract(      0x76416A4d5190d071bfed309861527431304aA14f);
 
     address constant public MCD_FLAP            = 0xC4269cC7acDEdC3794b221aA4D9205F564e27f0d;
@@ -269,29 +269,30 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // // check afterSpell parameters
+        // check afterSpell parameters
         // checkSystemValues(afterSpell);
         // checkCollateralValues("MANA-A", afterSpell);
 
-        // // Authorization
-        // assertEq(manajoin.wards(pauseProxy), 1);
-        // assertEq(vat.wards(address(manajoin)), 1);
-        // assertEq(flip.wards(address(cat)), 1);
-        // assertEq(flip.wards(address(end)), 1);
-        // assertEq(flip.wards(flipperMom), 1);
-        // assertEq(pip.wards(address(osmMom)), 1);
-        // assertEq(pip.bud(address(spot)), 1);
-        // assertEq(pip.bud(address(end)), 1);
-        // assertEq(MedianAbstract(pip.src()).bud(address(pip)), 1);
+        // Authorization
+        assertEq(manajoin.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(manajoin)), 1);
+        assertEq(manaFlip.wards(address(cat)), 1);
+        assertEq(manaFlip.wards(address(end)), 1);
+        assertEq(manaFlip.wards(flipperMom), 1);
+        assertEq(pip.wards(address(osmMom)), 1);
+        assertEq(pip.bud(address(spot)), 1);
+        assertEq(pip.bud(address(end)), 1);
+        assertEq(MedianAbstract(pip.src()).bud(address(pip)), 1);
 
-        // // Start testing Vault
-        // uint256 initialDAIBalance = vat.dai(address(this));
+        // Start testing Vault
+        uint256 initialDAIBalance = vat.dai(address(this));
 
-        // // Join to adapter
-        // uint256 initialManaBalance = mana.balanceOf(address(this));
-        // assertEq(vat.gem("MANA-A", address(this)), 0);
-        // mana.approve(address(manajoin), 1500 ether);
-        // manajoin.join(address(this), 1500 ether);
+        // Join to adapter
+        uint256 initialManaBalance = mana.balanceOf(address(this));
+        assertEq(vat.gem("MANA-A", address(this)), 0);
+        mana.approve(address(manajoin), 1500 ether);
+        assertEq(address(this), address(0));
+        manajoin.join(address(this), 1500 ether);
         // assertEq(mana.balanceOf(address(this)), initialManaBalance - 1500 ether);
         // assertEq(vat.gem("MANA-A", address(this)), 1500 ether);
 
@@ -318,9 +319,15 @@ contract DssSpellTest is DSTest, DSMath {
         // vat.frob("MANA-A", address(this), address(this), address(this), int(1000 ether), int(mul(1000 ether, spotV) / RAY)); // Max amount of DAI
         // hevm.warp(now + 1);
         // jug.drip("MANA-A");
-        // assertEq(flip.kicks(), 0);
+        // assertEq(manaFlip.kicks(), 0);
         // cat.bite("MANA-A", address(this));
-        // assertEq(flip.kicks(), 1);
+        // assertEq(manaFlip.kicks(), 1);
+
+
+
+
+
+
 
         // bytes32[] memory ilks = new bytes32[](8);
         // ilks[0] = "ETH-A";
