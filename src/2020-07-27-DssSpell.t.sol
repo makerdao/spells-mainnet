@@ -198,6 +198,11 @@ contract DssSpellTest is DSTest, DSMath {
 
     function vote() private {
         if (chief.hat() != address(spell)) {
+            hevm.store(
+                address(gov),
+                keccak256(abi.encode(address(this), uint256(1))),
+                bytes32(uint256(999999999999 ether))
+            );
             gov.approve(address(chief), uint256(-1));
             chief.lock(sub(gov.balanceOf(address(this)), 1 ether));
 
@@ -306,8 +311,8 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mana.balanceOf(address(this)), 0);
         hevm.store(
             address(mana),
-            keccak256(abi.encode(address(this), uint(1))),
-            bytes32(uint(1000000 ether))
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1000000 ether))
         );
         assertEq(mana.balanceOf(address(this)), 1000000 ether);
 
@@ -356,7 +361,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Generate new DAI to force a liquidation
         mana.approve(address(manajoin), 1000 ether);
         manajoin.join(address(this), 1000 ether);
-        (,,uint spotV,,) = vat.ilks("MANA-A");
+        (,,uint256 spotV,,) = vat.ilks("MANA-A");
         vat.frob("MANA-A", address(this), address(this), address(this), int(1000 ether), int(mul(1000 ether, spotV) / RAY)); // Max amount of DAI
         hevm.warp(now + 1);
         jug.drip("MANA-A");
