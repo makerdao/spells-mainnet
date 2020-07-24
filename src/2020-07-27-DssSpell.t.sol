@@ -186,7 +186,7 @@ contract DssSpellTest is DSTest, DSMath {
             line: 1 * MILLION * RAD,
             dust: 20 * RAD,
             duty: TWELVE_PCT_RATE,
-            pct: 0 * 1000,
+            pct: 12 * 1000,
             chop: 113 * RAY / 100,
             lump: 500 * THOUSAND * WAD,
             mat: 175 * RAY / 100,
@@ -298,16 +298,9 @@ contract DssSpellTest is DSTest, DSMath {
         // spell done
         assertTrue(spell.done());
 
-        // assertEq(pip.bud(address(this)), 0);
-        // hevm.store(
-        //     address(pip),
-        //     keccak256(abi.encode(address(this), uint(5))),
-        //     bytes32(uint(1))
-        // );
-        // assertEq(pip.bud(address(this)), 1);
-
+        pip.poke();
         hevm.warp(now + 3601);
-        // pip.poke();
+        pip.poke();
         spot.poke("MANA-A");
 
         assertEq(mana.balanceOf(address(this)), 0);

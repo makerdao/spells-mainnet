@@ -117,31 +117,30 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 1 * MILLION * RAD);
 
         // Set ilk bytes32 variable
-        bytes32 MANA_A_ILK = "MANA-A";
+        bytes32 ilk = "MANA-A";
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).vat() == MCD_VAT,    "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).ilk() == MANA_A_ILK, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).gem() == MANA,       "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_MANA_A).dec() == 18,         "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_MANA_A).vat() == MCD_VAT,       "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_MANA_A).ilk() == MANA_A_ILK,    "flip-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).vat() == MCD_VAT,  "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).ilk() == ilk,      "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).gem() == MANA,     "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_MANA_A).dec() == 18,       "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_MANA_A).vat() == MCD_VAT,     "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_MANA_A).ilk() == ilk,         "flip-ilk-not-match");
 
         // Set price feed for MANA-A
-        SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "pip", PIP_MANA);
+        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_MANA);
 
         // Set the MANA-A flipper in the cat
-        CatAbstract(MCD_CAT).file(MANA_A_ILK, "flip", MCD_FLIP_MANA_A);
+        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_MANA_A);
 
         // Init MANA-A in Vat & Jug
-        VatAbstract(MCD_VAT).init(MANA_A_ILK);
-        JugAbstract(MCD_JUG).init(MANA_A_ILK);
+        VatAbstract(MCD_VAT).init(ilk);
+        JugAbstract(MCD_JUG).init(ilk);
 
         // Allow MANA-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_MANA_A);
 
         // Allow cat to kick auctions in MANA-A Flipper
-        // NOTE: this will be reverse later in spell, and is done only for explicitness.
         FlipAbstract(MCD_FLIP_MANA_A).rely(MCD_CAT);
 
         // Allow End to yank auctions in MANA-A Flipper
@@ -155,23 +154,20 @@ contract SpellAction {
         OsmAbstract(PIP_MANA).rely(OSM_MOM);
         OsmAbstract(PIP_MANA).kiss(MCD_SPOT);
         OsmAbstract(PIP_MANA).kiss(MCD_END);
-        OsmMomAbstract(OSM_MOM).setOsm(MANA_A_ILK, PIP_MANA);
+        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_MANA);
 
-        VatAbstract(MCD_VAT).file(MANA_A_ILK, "line", 1 * MILLION * RAD);    // 1 MM debt ceiling
-        VatAbstract(MCD_VAT).file(MANA_A_ILK, "dust", 20 * RAD);             // 20 Dai dust
-        CatAbstract(MCD_CAT).file(MANA_A_ILK, "lump", 500 * THOUSAND * WAD); // 500,000 lot size
-        CatAbstract(MCD_CAT).file(MANA_A_ILK, "chop", 113 * RAY / 100);      // 13% liq. penalty
-        JugAbstract(MCD_JUG).file(MANA_A_ILK, "duty", TWELVE_PCT_RATE);      // 12% stability fee
+        VatAbstract(MCD_VAT).file(ilk, "line", 1 * MILLION * RAD);    // 1 MM debt ceiling
+        VatAbstract(MCD_VAT).file(ilk, "dust", 20 * RAD);             // 20 Dai dust
+        CatAbstract(MCD_CAT).file(ilk, "lump", 500 * THOUSAND * WAD); // 500,000 lot size
+        CatAbstract(MCD_CAT).file(ilk, "chop", 113 * RAY / 100);      // 13% liq. penalty
+        JugAbstract(MCD_JUG).file(ilk, "duty", TWELVE_PCT_RATE);      // 12% stability fee
 
         FlipAbstract(MCD_FLIP_MANA_A).file("beg",  103 * WAD / 100);         // 3% bid increase
         FlipAbstract(MCD_FLIP_MANA_A).file("ttl",  6 hours);                 // 6 hours ttl
         FlipAbstract(MCD_FLIP_MANA_A).file("tau",  6 hours);                 // 6 hours tau
 
-        SpotAbstract(MCD_SPOT).file(MANA_A_ILK, "mat",  175 * RAY / 100);    // 175% coll. ratio
-        SpotAbstract(MCD_SPOT).poke(MANA_A_ILK);
-
-        // Execute the first poke in the Osm for the next value
-        OsmAbstract(PIP_MANA).poke();
+        SpotAbstract(MCD_SPOT).file(ilk, "mat",  175 * RAY / 100);    // 175% coll. ratio
+        SpotAbstract(MCD_SPOT).poke(ilk);
 
         // /*** Add new Flip, Flap, Flop contracts ***/
         // MkrAuthorityAbstract mkrAuthority = MkrAuthorityAbstract(GOV_GUARD);
@@ -211,7 +207,6 @@ contract SpellAction {
 
         // FlipAbstract newFlip;
         // FlipAbstract oldFlip;
-        // bytes32 ilk;
 
         // // /*** ETH-A Flip ***/
         // ilk = "ETH-A";
