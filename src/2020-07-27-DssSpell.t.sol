@@ -364,75 +364,75 @@ contract DssSpellTest is DSTest, DSMath {
         cat.bite("MANA-A", address(this));
         assertEq(manaFlip.kicks(), 1);
 
-        // bytes32[] memory ilks = new bytes32[](8);
-        // ilks[0] = "ETH-A";
-        // ilks[1] = "BAT-A";
-        // ilks[2] = "USDC-A";
-        // ilks[3] = "USDC-B";
-        // ilks[4] = "WBTC-A";
-        // ilks[5] = "ZRX-A";
-        // ilks[6] = "KNC-A";
-        // ilks[7] = "TUSD-A";
+        bytes32[] memory ilks = new bytes32[](8);
+        ilks[0] = "ETH-A";
+        ilks[1] = "BAT-A";
+        ilks[2] = "USDC-A";
+        ilks[3] = "USDC-B";
+        ilks[4] = "WBTC-A";
+        ilks[5] = "ZRX-A";
+        ilks[6] = "KNC-A";
+        ilks[7] = "TUSD-A";
 
-        // address[] memory newFlips = new address[](8);
-        // newFlips[0] = MCD_FLIP_ETH_A;
-        // newFlips[1] = MCD_FLIP_BAT_A;
-        // newFlips[2] = MCD_FLIP_USDC_A;
-        // newFlips[3] = MCD_FLIP_USDC_B;
-        // newFlips[4] = MCD_FLIP_WBTC_A;
-        // newFlips[5] = MCD_FLIP_ZRX_A;
-        // newFlips[6] = MCD_FLIP_KNC_A;
-        // newFlips[7] = MCD_FLIP_TUSD_A;
+        address[] memory newFlips = new address[](8);
+        newFlips[0] = MCD_FLIP_ETH_A;
+        newFlips[1] = MCD_FLIP_BAT_A;
+        newFlips[2] = MCD_FLIP_USDC_A;
+        newFlips[3] = MCD_FLIP_USDC_B;
+        newFlips[4] = MCD_FLIP_WBTC_A;
+        newFlips[5] = MCD_FLIP_ZRX_A;
+        newFlips[6] = MCD_FLIP_KNC_A;
+        newFlips[7] = MCD_FLIP_TUSD_A;
 
-        // address[] memory oldFlips = new address[](8);
-        // oldFlips[0] = MCD_FLIP_ETH_A_OLD;
-        // oldFlips[1] = MCD_FLIP_BAT_A_OLD;
-        // oldFlips[2] = MCD_FLIP_USDC_A_OLD;
-        // oldFlips[3] = MCD_FLIP_USDC_B_OLD;
-        // oldFlips[4] = MCD_FLIP_WBTC_A_OLD;
-        // oldFlips[5] = MCD_FLIP_ZRX_A_OLD;
-        // oldFlips[6] = MCD_FLIP_KNC_A_OLD;
-        // oldFlips[7] = MCD_FLIP_TUSD_A_OLD;
+        address[] memory oldFlips = new address[](8);
+        oldFlips[0] = MCD_FLIP_ETH_A_OLD;
+        oldFlips[1] = MCD_FLIP_BAT_A_OLD;
+        oldFlips[2] = MCD_FLIP_USDC_A_OLD;
+        oldFlips[3] = MCD_FLIP_USDC_B_OLD;
+        oldFlips[4] = MCD_FLIP_WBTC_A_OLD;
+        oldFlips[5] = MCD_FLIP_ZRX_A_OLD;
+        oldFlips[6] = MCD_FLIP_KNC_A_OLD;
+        oldFlips[7] = MCD_FLIP_TUSD_A_OLD;
 
-        // require(
-        //     ilks.length == newFlips.length && ilks.length == oldFlips.length,
-        //     "array-lengths-not-equal"
-        // );
-        // // check flip parameters
-        // for(uint i = 0; i < ilks.length; i++) {
-        //     checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
-        // }
+        require(
+            ilks.length == newFlips.length && ilks.length == oldFlips.length,
+            "array-lengths-not-equal"
+        );
+        // check flip parameters
+        for(uint i = 0; i < ilks.length; i++) {
+            checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
+        }
 
-        // FlapAbstract newFlap = FlapAbstract(MCD_FLAP);
-        // FlapAbstract oldFlap = FlapAbstract(MCD_FLAP_OLD);
+        FlapAbstract newFlap = FlapAbstract(MCD_FLAP);
+        FlapAbstract oldFlap = FlapAbstract(MCD_FLAP_OLD);
 
-        // assertEq(vow.flapper(), address(newFlap));
-        // assertEq(vat.can(address(vow), address(newFlap)), 1);
-        // assertEq(vat.can(address(vow), address(oldFlap)), 0);
+        assertEq(vow.flapper(), address(newFlap));
+        assertEq(vat.can(address(vow), address(newFlap)), 1);
+        assertEq(vat.can(address(vow), address(oldFlap)), 0);
 
-        // assertEq(newFlap.wards(address(vow)), 1);
-        // assertEq(oldFlap.wards(address(vow)), 0);
+        assertEq(newFlap.wards(address(vow)), 1);
+        assertEq(oldFlap.wards(address(vow)), 0);
 
-        // assertEq(uint256(newFlap.beg()), uint256(oldFlap.beg()));
-        // assertEq(uint256(newFlap.ttl()), uint256(oldFlap.ttl()));
-        // assertEq(uint256(newFlap.tau()), uint256(oldFlap.tau()));
+        assertEq(uint256(newFlap.beg()), uint256(oldFlap.beg()));
+        assertEq(uint256(newFlap.ttl()), uint256(oldFlap.ttl()));
+        assertEq(uint256(newFlap.tau()), uint256(oldFlap.tau()));
 
-        // FlopAbstract newFlop = FlopAbstract(MCD_FLOP);
-        // FlopAbstract oldFlop = FlopAbstract(MCD_FLOP_OLD);
+        FlopAbstract newFlop = FlopAbstract(MCD_FLOP);
+        FlopAbstract oldFlop = FlopAbstract(MCD_FLOP_OLD);
 
-        // assertEq(vow.flopper(), address(newFlop));
+        assertEq(vow.flopper(), address(newFlop));
 
-        // assertEq(newFlop.wards(address(vow)), 1);
-        // assertEq(vat.wards(address(newFlop)), 1);
-        // assertEq(mkrAuthority.wards(address(newFlop)), 1);
+        assertEq(newFlop.wards(address(vow)), 1);
+        assertEq(vat.wards(address(newFlop)), 1);
+        assertEq(mkrAuthority.wards(address(newFlop)), 1);
         
-        // assertEq(oldFlop.wards(address(vow)), 0);
-        // assertEq(vat.wards(address(oldFlop)), 0);
-        // assertEq(mkrAuthority.wards(address(oldFlop)), 0);
+        assertEq(oldFlop.wards(address(vow)), 0);
+        assertEq(vat.wards(address(oldFlop)), 0);
+        assertEq(mkrAuthority.wards(address(oldFlop)), 0);
 
-        // assertEq(uint256(newFlop.beg()), uint256(oldFlop.beg()));
-        // assertEq(uint256(newFlop.pad()), uint256(oldFlop.pad()));
-        // assertEq(uint256(newFlop.ttl()), uint256(oldFlop.ttl()));
-        // assertEq(uint256(newFlop.tau()), uint256(oldFlop.tau()));
+        assertEq(uint256(newFlop.beg()), uint256(oldFlop.beg()));
+        assertEq(uint256(newFlop.pad()), uint256(oldFlop.pad()));
+        assertEq(uint256(newFlop.ttl()), uint256(oldFlop.ttl()));
+        assertEq(uint256(newFlop.tau()), uint256(oldFlop.tau()));
     }
 }
