@@ -103,9 +103,9 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20July%2027%2C%202020%20.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/cc819c75fc8f1b622cbe06acfd0d11bf64545622/governance/votes/Executive%20vote%20-%20July%2027%2C%202020%20.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-07-27 MakerDAO Executive Spell | Executive for July Governance Cycle | 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2020-07-27 MakerDAO Executive Spell | Executive for July Governance Cycle | 0x72b73b29a8c49e38b5a23b760f622808a41ed52f584f147b4437e5ad5b5c7ce2";
 
     function execute() external {
 
