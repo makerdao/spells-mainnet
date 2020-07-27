@@ -175,10 +175,23 @@ contract DssSpellTest is DSTest, DSMath {
             pauseDelay: 43200 // 12 hours
         });
 
+        beforeSpell.collaterals["ETH-A"] = CollateralValues({
+            line: 220 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000000000000000000000000,
+            pct: 0 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 500 * WAD,
+            mat: 150 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 6 hours
+        });
+
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 346000 * THOUSAND * RAD,
+            Line: 386000 * THOUSAND * RAD,
             pauseDelay: 43200 // 12 hours
         });
 
@@ -194,6 +207,9 @@ contract DssSpellTest is DSTest, DSMath {
             ttl: 6 hours,
             tau: 6 hours
         });
+
+        afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
+        afterSpell.collaterals["ETH-A"].line = 260 * MILLION * RAD;
     }
 
     function vote() private {
@@ -217,9 +233,61 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(chief.hat(), address(spell));
     }
 
-    function scheduleWaitAndCast() public {
+    function scheduleWaitAndCastFailDay() public {
         spell.schedule();
-        hevm.warp(now + pause.delay());
+
+        uint castTime = now + pause.delay();
+        uint day = (castTime / 1 days + 3) % 7;
+        if (day < 5) {
+            castTime += 5 days - day * 86400;
+        }
+  
+        hevm.warp(castTime);
+        spell.cast();
+    }
+
+    function scheduleWaitAndCastFailEarly() public {
+        spell.schedule();
+
+        uint castTime = now + pause.delay() + 24 hours;
+        uint hour = castTime / 1 hours % 24;
+        if (hour >= 14) {
+            castTime -= hour * 3600 - 13 hours;
+        }
+  
+        hevm.warp(castTime);
+        spell.cast();
+    }
+
+    function scheduleWaitAndCastFailLate() public {
+        spell.schedule();
+
+        uint castTime = now + pause.delay();
+        uint hour = castTime / 1 hours % 24;
+        if (hour < 21) {
+            castTime += 21 hours - hour * 3600;
+        }
+  
+        hevm.warp(castTime);
+        spell.cast();
+    }
+
+    function scheduleWaitAndCast() public {
+        uint castTime = now + pause.delay();
+        uint day = (castTime / 1 days + 3) % 7;
+        if(day >= 5) {
+            castTime += 7 days - day * 86400;
+        }
+
+        uint hour = castTime / 1 hours % 24;
+        if (hour >= 21) {
+            castTime += 24 hours - hour * 3600 + 14 hours;
+        } else if (hour < 14) {
+            castTime += 14 hours - hour * 3600;
+        }
+
+        spell.schedule();
+        hevm.warp(castTime);
         spell.cast();
     }
 
@@ -288,6 +356,21 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(newFlip.tau()), uint256(oldFlip.tau()));
     }
 
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
+
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
+
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
+    }
+
     function testSpellIsCast() public {
         if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
@@ -296,12 +379,18 @@ contract DssSpellTest is DSTest, DSMath {
         }
 
         checkSystemValues(beforeSpell);
+        checkCollateralValues("ETH-A", beforeSpell);
 
         vote();
         scheduleWaitAndCast();
 
         // spell done
         assertTrue(spell.done());
+
+        assertEq(
+            stringToBytes32(spell.description()),
+            stringToBytes32("2020-07-27 MakerDAO Executive Spell | Executive for July Governance Cycle | 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470")
+        );
 
         pip.poke();
         hevm.warp(now + 3601);
@@ -319,6 +408,7 @@ contract DssSpellTest is DSTest, DSMath {
         // check afterSpell parameters
         checkSystemValues(afterSpell);
         checkCollateralValues("MANA-A", afterSpell);
+        checkCollateralValues("ETH-A", afterSpell);
 
         // Authorization
         assertEq(manajoin.wards(pauseProxy), 1);

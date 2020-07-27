@@ -37,8 +37,8 @@ contract SpellAction {
     // MAINNET ADDRESSES
     //
     // The contracts in this list should correspond to MCD core contracts, verify
-    //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.0.8/contracts.json
+    // against the current release list at:
+    //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
 
     address constant public MCD_VAT             = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
@@ -101,6 +101,12 @@ contract SpellAction {
     //
     uint256 constant public TWELVE_PCT_RATE = 1000000003593629043335673582;
 
+    // Provides a descriptive tag for bot consumption
+    // This should be modified weekly to provide a summary of the actions
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20July%2027%2C%202020%20.md -q -O - 2>/dev/null)"
+    string constant public description =
+        "2020-07-27 MakerDAO Executive Spell | Executive for July Governance Cycle | 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+
     function execute() external {
 
         PotAbstract(MCD_POT).drip();
@@ -113,11 +119,15 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("KNC-A");
         JugAbstract(MCD_JUG).drip("TUSD-A");
 
-        // Raise the global debt ceiling by 1 million
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 1 * MILLION * RAD);
+        // Raise the global debt ceiling by 41 million (40 million for ETH-A, 1 million for MANA-A)
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 41 * MILLION * RAD);
+
+        // Raise the ETH-A deby ceiling by 40 million to 260 million
+        bytes32 ilk = "ETH-A";
+        VatAbstract(MCD_VAT).file(ilk, "line", 260 * MILLION * RAD); // 260 MM debt ceiling
 
         // Set ilk bytes32 variable
-        bytes32 ilk = "MANA-A";
+        ilk = "MANA-A";
 
         // Sanity checks
         require(GemJoinAbstract(MCD_JOIN_MANA_A).vat() == MCD_VAT,  "join-vat-not-match");
@@ -383,6 +393,18 @@ contract DssSpell {
         expiration = now + 30 days;
     }
 
+    modifier officeHours {
+        uint day = (now / 1 days + 3) % 7;
+        require(day < 5, "Can only be cast on a weekday");
+        uint hour = now / 1 hours % 24;
+        require(hour >= 14 && hour < 21, "Outside office hours");
+        _;
+    }
+
+    function description() public view returns (string memory) {
+        return SpellAction(action).description();
+    }
+
     function schedule() public {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "This spell has already been scheduled");
@@ -390,7 +412,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
+    function cast() public officeHours {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
