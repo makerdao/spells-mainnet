@@ -373,9 +373,9 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testSpellIsCast() public {
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
+            assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
         }
 
         checkSystemValues(beforeSpell);
