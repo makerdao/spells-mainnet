@@ -27,7 +27,6 @@ import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 import "lib/dss-interfaces/src/dss/MkrAuthorityAbstract.sol";
