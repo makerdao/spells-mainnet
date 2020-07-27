@@ -384,7 +384,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
 
-        // spell done
+        // Spell done
         assertTrue(spell.done());
 
         assertEq(
@@ -493,7 +493,7 @@ contract DssSpellTest is DSTest, DSMath {
             ilks.length == newFlips.length && ilks.length == oldFlips.length,
             "array-lengths-not-equal"
         );
-        // check flip parameters
+        // Check flip parameters
         for(uint i = 0; i < ilks.length; i++) {
             checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
         }

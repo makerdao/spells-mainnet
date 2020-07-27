@@ -218,7 +218,7 @@ contract SpellAction {
         FlipAbstract newFlip;
         FlipAbstract oldFlip;
 
-        // /*** ETH-A Flip ***/
+        /*** ETH-A Flip ***/
         ilk = "ETH-A";
         newFlip = FlipAbstract(MCD_FLIP_ETH_A);
         oldFlip = FlipAbstract(MCD_FLIP_ETH_A_OLD);
