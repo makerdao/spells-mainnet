@@ -122,7 +122,7 @@ contract SpellAction {
         // Raise the global debt ceiling by 41 million (40 million for ETH-A, 1 million for MANA-A)
         VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 41 * MILLION * RAD);
 
-        // Raise the ETH-A deby ceiling by 40 million to 260 million
+        // Raise the ETH-A debt ceiling by 40 million to 260 million
         bytes32 ilk = "ETH-A";
         VatAbstract(MCD_VAT).file(ilk, "line", 260 * MILLION * RAD); // 260 MM debt ceiling
 
