@@ -40,8 +40,8 @@ contract SpellAction {
     function execute() external {
         // Set the global debt ceiling
         // Existing Line: 386m
-        // New Line: 550m
-        VatAbstract(MCD_VAT).file("Line", 550 * MILLION * RAD);
+        // New Line: 568m
+        VatAbstract(MCD_VAT).file("Line", 568 * MILLION * RAD);
 
         // Set the ETH-A debt ceiling
         // Existing line: 260m
@@ -108,4 +108,3 @@ contract DssSpell {
         pause.exec(action, tag, sig, eta);
     }
 }
-
