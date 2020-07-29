@@ -14,8 +14,8 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
-    uint256 constant SPELL_CREATED = 1594043077;
+    address constant MAINNET_SPELL = address(0x4fF0258545528b01902d826368246F330eEABD2c);
+    uint256 constant SPELL_CREATED = 1596058053;
 
     struct CollateralValues {
         uint256 line;
