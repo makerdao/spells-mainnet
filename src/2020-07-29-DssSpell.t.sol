@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 
-import {DssSpell, SpellAction} from "./2020-07-24-DssSpell.sol";
+import {DssSpell, SpellAction} from "./2020-07-29-DssSpell.sol";
 
 contract Hevm {
     function warp(uint256) public;
@@ -12,9 +12,8 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = 0x84f411093AED2E88e3D7f62A457CF77b3032Ff2b;
-    // this needs to be updated
-    uint256 constant SPELL_CREATED = 1595606944;
+    address constant MAINNET_SPELL = address(0);
+    uint256 constant SPELL_CREATED = 1594043077;
 
     struct CollateralValues {
         uint256 line;
@@ -54,22 +53,12 @@ contract DssSpellTest is DSTest, DSMath {
     MKRAbstract     gov         = MKRAbstract(      0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract     end         = EndAbstract(      0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
 
-    MedianAbstract BATUSD = MedianAbstract(0x18B4633D6E39870f398597f3c1bA8c4A41294966);
-    MedianAbstract BTCUSD = MedianAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
-    MedianAbstract ETHBTC = MedianAbstract(0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED);
-    MedianAbstract ETHUSD = MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
-    MedianAbstract KNCUSD = MedianAbstract(0x83076a2F42dc1925537165045c9FDe9A4B71AD97);
-    MedianAbstract ZRXUSD = MedianAbstract(0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e);
-
-    address GITCOIN_OLD = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
-    address GITCOIN     = 0x77EB6CF8d732fe4D92c427fCdd83142DB3B742f7;
-
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
         bytes20(uint160(uint256(keccak256('hevm cheat code'))));
-
+    
     uint256 constant THOUSAND   = 10 ** 3;
     uint256 constant MILLION    = 10 ** 6;
     uint256 constant WAD        = 10 ** 18;
@@ -127,12 +116,12 @@ contract DssSpellTest is DSTest, DSMath {
         beforeSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 345 * MILLION * RAD,
+            Line: 386 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
 
         beforeSpell.collaterals["ETH-A"] = CollateralValues({
-            line: 220 * MILLION * RAD,
+            line: 260 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
             pct: 0 * 1000,
@@ -162,10 +151,10 @@ contract DssSpellTest is DSTest, DSMath {
             pct: 4 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 120 * RAY / 100,
+            mat: 110 * RAY / 100,
             beg: 103 * WAD / 100,
             ttl: 6 hours,
-            tau: 3 days
+            tau: 3 days 
         });
         beforeSpell.collaterals["USDC-B"] = CollateralValues({
             line: 10 * MILLION * RAD,
@@ -227,22 +216,54 @@ contract DssSpellTest is DSTest, DSMath {
             ttl: 6 hours,
             tau: 6 hours
         });
+        beforeSpell.collaterals["MANA-A"] = CollateralValues({
+            line: 1 * MILLION * RAD,
+            dust: 20 * RAD,
+            duty: 1000000003593629043335673582,
+            pct: 12 * 1000,
+            chop: 113 * RAY / 100,
+            lump: 500 * THOUSAND * WAD,
+            mat: 175 * RAY / 100,
+            beg: 103 * WAD / 100,
+            ttl: 6 hours,
+            tau: 6 hours
+        });
+
 
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 345 * MILLION * RAD,
+            Line: 245 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
+
+        // ETH-A
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
+        afterSpell.collaterals["ETH-A"].line = 160 * MILLION * RAD;
+
+        // BAT-A no change
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
+
+        // USDC-A
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-A"].mat = 110 * RAY / 100;
+        afterSpell.collaterals["USDC-A"].line = ;
+
+        // USDC-B
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
+        afterSpell.collaterals["USDC-B"].line = ;
+
+        // WBTC-A
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
+        afterSpell.collaterals["WBTC-A"].line = ;
+
+        // TUSD-A no change
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
+        // KNC-A no change
         afterSpell.collaterals["KNC-A"] = beforeSpell.collaterals["KNC-A"];
+        // ZRX-A no change
         afterSpell.collaterals["ZRX-A"] = beforeSpell.collaterals["ZRX-A"];
+        // MANA-A no change
+        afterSpell.collaterals["MANA-A"] = beforeSpell.collaterals["MANA-A"];
     }
 
     function vote() private {
@@ -283,7 +304,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Pause delay
         assertEq(pause.delay(), values.pauseDelay);
-
+                        
     }
 
     function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
@@ -303,10 +324,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mat, values.collaterals[ilk].mat);
 
         (address flipper,,) = cat.ilks(ilk);
-        FlipAbstract flip = FlipAbstract(flipper);
-        assertEq(uint256(flip.beg()), values.collaterals[ilk].beg);
-        assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
-        assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
+        FlipAbstract tempflip = FlipAbstract(flipper);
+        assertEq(uint256(tempflip.beg()), values.collaterals[ilk].beg);
+        assertEq(uint256(tempflip.ttl()), values.collaterals[ilk].ttl);
+        assertEq(uint256(tempflip.tau()), values.collaterals[ilk].tau);
     }
 
     // this spell is intended to run as the MkrAuthority
@@ -337,20 +358,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("TUSD-A", beforeSpell);
         checkCollateralValues("ZRX-A", beforeSpell);
         checkCollateralValues("KNC-A", beforeSpell);
-
-        assertEq(BATUSD.orcl(GITCOIN_OLD), 1);
-        assertEq(BTCUSD.orcl(GITCOIN_OLD), 1);
-        assertEq(ETHBTC.orcl(GITCOIN_OLD), 1);
-        assertEq(ETHUSD.orcl(GITCOIN_OLD), 1);
-        assertEq(KNCUSD.orcl(GITCOIN_OLD), 1);
-        assertEq(ZRXUSD.orcl(GITCOIN_OLD), 1);
-
-        assertEq(BATUSD.orcl(GITCOIN), 0);
-        assertEq(BTCUSD.orcl(GITCOIN), 0);
-        assertEq(ETHBTC.orcl(GITCOIN), 0);
-        assertEq(ETHUSD.orcl(GITCOIN), 0);
-        assertEq(KNCUSD.orcl(GITCOIN), 0);
-        assertEq(ZRXUSD.orcl(GITCOIN), 0);
+        checkCollateralValues("MANA-A", beforeSpell);
 
         vote();
         scheduleWaitAndCast();
@@ -365,20 +373,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("WBTC-A", afterSpell);
         checkCollateralValues("TUSD-A", afterSpell);
         checkCollateralValues("ZRX-A", afterSpell);
-        checkCollateralValues("KNC-A", afterSpell);
-
-        assertEq(BATUSD.orcl(GITCOIN_OLD), 0);
-        assertEq(BTCUSD.orcl(GITCOIN_OLD), 0);
-        assertEq(ETHBTC.orcl(GITCOIN_OLD), 0);
-        assertEq(ETHUSD.orcl(GITCOIN_OLD), 0);
-        assertEq(KNCUSD.orcl(GITCOIN_OLD), 0);
-        assertEq(ZRXUSD.orcl(GITCOIN_OLD), 0);
-
-        assertEq(BATUSD.orcl(GITCOIN), 1);
-        assertEq(BTCUSD.orcl(GITCOIN), 1);
-        assertEq(ETHBTC.orcl(GITCOIN), 1);
-        assertEq(ETHUSD.orcl(GITCOIN), 1);
-        assertEq(KNCUSD.orcl(GITCOIN), 1);
-        assertEq(ZRXUSD.orcl(GITCOIN), 1);
+        checkCollateralValues("MANA-A", afterSpell);
     }
 }
+
