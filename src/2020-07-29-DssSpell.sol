@@ -51,7 +51,7 @@ contract SpellAction {
         // Set the BAT-A debt ceiling
         // Existing line: 3m
         // New line: 5m
-        VatAbstract(MCD_VAT).file("ETH-A", "line", 5 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file("BAT-A", "line", 5 * MILLION * RAD);
 
         // Set the USDC-A debt ceiling
         // Existing line: 80m

@@ -232,7 +232,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 245 * MILLION * RAD,
+            Line: 550 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60
         });
 
@@ -378,6 +378,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("WBTC-A", afterSpell);
         checkCollateralValues("TUSD-A", afterSpell);
         checkCollateralValues("ZRX-A", afterSpell);
+        checkCollateralValues("KNC-A", afterSpell);
         checkCollateralValues("MANA-A", afterSpell);
     }
 }
