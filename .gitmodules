@@ -10,6 +10,3 @@
 [submodule "lib/flipper-mom"]
 	path = lib/flipper-mom
 	url = https://github.com/makerdao/flipper-mom.git
-[submodule "lib/dss-interfaces"]
-	path = lib/dss-interfaces
-	url = https://github.com/makerdao/dss-interfaces.git
