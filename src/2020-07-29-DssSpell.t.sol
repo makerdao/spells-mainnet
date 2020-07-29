@@ -3,11 +3,13 @@ pragma solidity 0.5.12;
 import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
+import "lib/dss-interfaces/src/dss/MKRAbstract.sol";
 
 import {DssSpell, SpellAction} from "./2020-07-29-DssSpell.sol";
 
 contract Hevm {
     function warp(uint256) public;
+    function store(address,bytes32,bytes32) public;
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -51,7 +53,7 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract     jug         = JugAbstract(      0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract    spot        = SpotAbstract(     0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
-    MKRAbstract     gov         = MKRAbstract(      0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    DSTokenAbstract gov         = DSTokenAbstract(  0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract     end         = EndAbstract(      0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
 
     DssSpell spell;
@@ -109,10 +111,6 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
-
-        // Using the MkrAuthority test address, mint enough MKR to overcome the
-        // current hat.
-        gov.mint(address(this), 300000 ether);
 
         beforeSpell = SystemValues({
             dsr: 1000000000000000000000000000,
@@ -270,6 +268,11 @@ contract DssSpellTest is DSTest, DSMath {
 
     function vote() private {
         if (chief.hat() != address(spell)) {
+            hevm.store(
+                address(gov),
+                keccak256(abi.encode(address(this), uint256(1))),
+                bytes32(uint256(999999999999 ether))
+            );
             gov.approve(address(chief), uint256(-1));
             chief.lock(sub(gov.balanceOf(address(this)), 1 ether));
 
@@ -326,10 +329,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mat, values.collaterals[ilk].mat);
 
         (address flipper,,) = cat.ilks(ilk);
-        FlipAbstract tempflip = FlipAbstract(flipper);
-        assertEq(uint256(tempflip.beg()), values.collaterals[ilk].beg);
-        assertEq(uint256(tempflip.ttl()), values.collaterals[ilk].ttl);
-        assertEq(uint256(tempflip.tau()), values.collaterals[ilk].tau);
+        FlipAbstract flip = FlipAbstract(flipper);
+        assertEq(uint256(flip.beg()), values.collaterals[ilk].beg);
+        assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
+        assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
     }
 
     // this spell is intended to run as the MkrAuthority
