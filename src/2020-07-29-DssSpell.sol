@@ -23,7 +23,7 @@ contract SpellAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     string constant public description =
-        "2020-07-29 MakerDAO Executive Spell | Off-cycle Executive";
+        "2020-07-29 MakerDAO Executive Spell | Off-Cycle Executive";
 
     // MAINNET ADDRESSES
     //
@@ -34,8 +34,8 @@ contract SpellAction {
     address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
     // Decimals & precision
-    uint256 constant MILLION  = 10 ** 6;
-    uint256 constant RAD      = 10 ** 45;
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant RAD     = 10 ** 45;
 
     function execute() external {
         // Set the global debt ceiling

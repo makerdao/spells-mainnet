@@ -44,17 +44,17 @@ contract DssSpellTest is DSTest, DSMath {
     Hevm hevm;
 
     // MAINNET ADDRESSES
-    DSPauseAbstract pause       = DSPauseAbstract(  0xbE286431454714F511008713973d3B053A2d38f3);
-    address pauseProxy          =                   0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    DSChiefAbstract chief       = DSChiefAbstract(  0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
-    VatAbstract     vat         = VatAbstract(      0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    CatAbstract     cat         = CatAbstract(      0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
-    PotAbstract     pot         = PotAbstract(      0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
-    JugAbstract     jug         = JugAbstract(      0x19c0976f590D67707E62397C87829d896Dc0f1F1);
-    SpotAbstract    spot        = SpotAbstract(     0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
+    DSPauseAbstract      pause = DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    address         pauseProxy =                 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    DSChiefAbstract      chief = DSChiefAbstract(0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
+    VatAbstract            vat = VatAbstract(    0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    CatAbstract            cat = CatAbstract(    0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
+    PotAbstract            pot = PotAbstract(    0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    JugAbstract            jug = JugAbstract(    0x19c0976f590D67707E62397C87829d896Dc0f1F1);
+    SpotAbstract          spot = SpotAbstract(   0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
-    DSTokenAbstract gov         = DSTokenAbstract(  0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    EndAbstract     end         = EndAbstract(      0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    DSTokenAbstract        gov = DSTokenAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    EndAbstract            end = EndAbstract(    0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
 
     DssSpell spell;
 
@@ -62,13 +62,13 @@ contract DssSpellTest is DSTest, DSMath {
     bytes20 constant CHEAT_CODE =
         bytes20(uint160(uint256(keccak256('hevm cheat code'))));
     
-    uint256 constant THOUSAND   = 10 ** 3;
-    uint256 constant MILLION    = 10 ** 6;
-    uint256 constant WAD        = 10 ** 18;
-    uint256 constant RAY        = 10 ** 27;
-    uint256 constant RAD        = 10 ** 45;
+    uint256 constant THOUSAND = 10 ** 3;
+    uint256 constant MILLION  = 10 ** 6;
+    uint256 constant WAD      = 10 ** 18;
+    uint256 constant RAY      = 10 ** 27;
+    uint256 constant RAD      = 10 ** 45;
 
-    // not provided in DSMath
+    // Not provided in DSMath
     function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
       assembly {
         switch x case 0 {switch n case 0 {z := b} default {z := 0}}
@@ -123,109 +123,109 @@ contract DssSpellTest is DSTest, DSMath {
             line: 260 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
-            pct: 0 * 1000,
+            pct:  0 * 1000,
             chop: 113 * RAY / 100,
             lump: 500 * WAD,
-            mat: 150 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  150 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
         beforeSpell.collaterals["BAT-A"] = CollateralValues({
             line: 3 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
-            pct: 0 * 1000,
+            pct:  0 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 150 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  150 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
         beforeSpell.collaterals["USDC-A"] = CollateralValues({
             line: 80 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000001243680656318820312,
-            pct: 4 * 1000,
+            pct:  4 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 110 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 3 days 
+            mat:  110 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  3 days 
         });
         beforeSpell.collaterals["USDC-B"] = CollateralValues({
             line: 10 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000012857214317438491659,
-            pct: 50 * 1000,
+            pct:  50 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 120 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 3 days
+            mat:  120 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  3 days
         });
         beforeSpell.collaterals["WBTC-A"] = CollateralValues({
             line: 20 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000627937192491029810,
-            pct: 2 * 1000,
+            pct:  2 * 1000,
             chop: 113 * RAY / 100,
             lump: 1 * WAD,
-            mat: 150 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  150 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
         beforeSpell.collaterals["TUSD-A"] = CollateralValues({
             line: 2 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000000000000000000000000,
-            pct: 0 * 1000,
+            pct:  0 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 120 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 3 days
+            mat:  120 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  3 days
         });
         beforeSpell.collaterals["KNC-A"] = CollateralValues({
             line: 5 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000001243680656318820312,
-            pct: 4 * 1000,
+            pct:  4 * 1000,
             chop: 113 * RAY / 100,
             lump: 50 * THOUSAND * WAD,
-            mat: 175 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  175 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
         beforeSpell.collaterals["ZRX-A"] = CollateralValues({
             line: 5 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000001243680656318820312,
-            pct: 4 * 1000,
+            pct:  4 * 1000,
             chop: 113 * RAY / 100,
             lump: 100 * THOUSAND * WAD,
-            mat: 175 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  175 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
         beforeSpell.collaterals["MANA-A"] = CollateralValues({
             line: 1 * MILLION * RAD,
             dust: 20 * RAD,
             duty: 1000000003593629043335673582,
-            pct: 12 * 1000,
+            pct:  12 * 1000,
             chop: 113 * RAY / 100,
             lump: 500 * THOUSAND * WAD,
-            mat: 175 * RAY / 100,
-            beg: 103 * WAD / 100,
-            ttl: 6 hours,
-            tau: 6 hours
+            mat:  175 * RAY / 100,
+            beg:  103 * WAD / 100,
+            ttl:  6 hours,
+            tau:  6 hours
         });
 
 
@@ -259,9 +259,9 @@ contract DssSpellTest is DSTest, DSMath {
         // TUSD-A no change
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
         // KNC-A no change
-        afterSpell.collaterals["KNC-A"] = beforeSpell.collaterals["KNC-A"];
+        afterSpell.collaterals["KNC-A"]  = beforeSpell.collaterals["KNC-A"];
         // ZRX-A no change
-        afterSpell.collaterals["ZRX-A"] = beforeSpell.collaterals["ZRX-A"];
+        afterSpell.collaterals["ZRX-A"]  = beforeSpell.collaterals["ZRX-A"];
         // MANA-A no change
         afterSpell.collaterals["MANA-A"] = beforeSpell.collaterals["MANA-A"];
     }
@@ -335,7 +335,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
     }
 
-    // this spell is intended to run as the MkrAuthority
+    // This spell is intended to run as the MkrAuthority
     function canCall(address, address, bytes4) public pure returns (bool) {
         return true;
     }
@@ -355,14 +355,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkSystemValues(beforeSpell);
 
-        checkCollateralValues("ETH-A", beforeSpell);
-        checkCollateralValues("BAT-A", beforeSpell);
+        checkCollateralValues("ETH-A",  beforeSpell);
+        checkCollateralValues("BAT-A",  beforeSpell);
         checkCollateralValues("USDC-A", beforeSpell);
         checkCollateralValues("USDC-B", beforeSpell);
         checkCollateralValues("WBTC-A", beforeSpell);
         checkCollateralValues("TUSD-A", beforeSpell);
-        checkCollateralValues("ZRX-A", beforeSpell);
-        checkCollateralValues("KNC-A", beforeSpell);
+        checkCollateralValues("ZRX-A",  beforeSpell);
+        checkCollateralValues("KNC-A",  beforeSpell);
         checkCollateralValues("MANA-A", beforeSpell);
 
         vote();
@@ -371,14 +371,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkSystemValues(afterSpell);
 
-        checkCollateralValues("ETH-A", afterSpell);
-        checkCollateralValues("BAT-A", afterSpell);
+        checkCollateralValues("ETH-A",  afterSpell);
+        checkCollateralValues("BAT-A",  afterSpell);
         checkCollateralValues("USDC-A", afterSpell);
         checkCollateralValues("USDC-B", afterSpell);
         checkCollateralValues("WBTC-A", afterSpell);
         checkCollateralValues("TUSD-A", afterSpell);
-        checkCollateralValues("ZRX-A", afterSpell);
-        checkCollateralValues("KNC-A", afterSpell);
+        checkCollateralValues("ZRX-A",  afterSpell);
+        checkCollateralValues("KNC-A",  afterSpell);
         checkCollateralValues("MANA-A", afterSpell);
     }
 }
