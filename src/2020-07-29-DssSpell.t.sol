@@ -239,22 +239,23 @@ contract DssSpellTest is DSTest, DSMath {
 
         // ETH-A
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].line = 160 * MILLION * RAD;
+        afterSpell.collaterals["ETH-A"].line = 340 * MILLION * RAD;
 
-        // BAT-A no change
+        // BAT-A 
         afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
+        afterSpell.collaterals["BAT-A"].line = 5 * MILLION * RAD;
 
         // USDC-A
         afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-A"].line = ;
+        afterSpell.collaterals["USDC-A"].line = 140 * MILLION * RAD;
 
         // USDC-B
         afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
-        afterSpell.collaterals["USDC-B"].line = ;
+        afterSpell.collaterals["USDC-B"].line = 30 * MILLION * RAD;
 
         // WBTC-A
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
-        afterSpell.collaterals["WBTC-A"].line = ;
+        afterSpell.collaterals["WBTC-A"].line = 40 * MILLION * RAD;
 
         // TUSD-A no change
         afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];

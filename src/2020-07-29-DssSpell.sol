@@ -17,19 +17,8 @@ pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlapAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/VowAbstract.sol";
-import "lib/dss-interfaces/src/dss/MkrAuthorityAbstract.sol";
+import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 
 contract SpellAction {
 
@@ -77,29 +66,34 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("MANA-A");
 
         // Set the global debt ceiling
-        // Existing Line: 
+        // Existing Line: 386m
         // New Line:
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 41 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file("Line", 550 * MILLION * RAD);
 
         // Set the ETH-A debt ceiling
-        // Existing line: 
-        // New line:
-        VatAbstract(MCD_VAT).file("ETH-A", "line", 260 * MILLION * RAD); // 260 MM debt ceiling
+        // Existing line: 260m
+        // New line: 340m
+        VatAbstract(MCD_VAT).file("ETH-A", "line", 340 * MILLION * RAD); // 260 MM debt ceiling
+
+        // Set the BAT-A debt ceiling
+        // Existing line: 3m
+        // New line: 5m
+        VatAbstract(MCD_VAT).file("ETH-A", "line", 5 * MILLION * RAD); // 260 MM debt ceiling
 
         // Set the USDC-A debt ceiling
-        // Existing line:
-        // New line:
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 260 * MILLION * RAD); // 260 MM debt ceiling
+        // Existing line: 80m
+        // New line: 140m
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 140 * MILLION * RAD); // 260 MM debt ceiling
 
         // Set the WBTC-A debt ceiling
-        // Existing line:
-        // New line:
-        VatAbstract(MCD_VAT).file("WBTC-A", "line", 260 * MILLION * RAD); // 260 MM debt ceiling
+        // Existing line: 20m
+        // New line: 40m
+        VatAbstract(MCD_VAT).file("WBTC-A", "line", 40 * MILLION * RAD); // 260 MM debt ceiling
 
         // Set the USDC-B debt ceiling
-        // Existing line:
-        // New line:
-        VatAbstract(MCD_VAT).file("USDC-B", "line", 260 * MILLION * RAD); // 260 MM debt ceiling
+        // Existing line: 10m
+        // New line: 30m
+        VatAbstract(MCD_VAT).file("USDC-B", "line", 30 * MILLION * RAD); // 260 MM debt ceiling
 
     }
 }
