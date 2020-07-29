@@ -115,15 +115,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 4 days + 2 hours; // Extra window of 2 hours to get the spell set up in the Governance Portal and communicated
-    }
-
-    modifier officeHours {
-        uint day = (now / 1 days + 3) % 7;
-        require(day < 5, "Can only be cast on a weekday");
-        uint hour = now / 1 hours % 24;
-        require(hour >= 14 && hour < 21, "Outside office hours");
-        _;
+        expiration = now + 30 days;
     }
 
     function description() public view returns (string memory) {
