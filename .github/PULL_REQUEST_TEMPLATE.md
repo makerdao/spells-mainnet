@@ -2,8 +2,8 @@
 
 # Contribution Checklist
 
-- [ ] First commit title starts with 'SC-<ticket number>:'
-- [ ] Fixes <ticket number link>
+- [ ] First commit title starts with 'SC-**TICKET_NUMBER**:'
+- [ ] Fixes **TICKET_NUMBER_LINK**
 - [ ] Code approved
 - [ ] Tests approved
 
