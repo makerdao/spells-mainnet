@@ -384,7 +384,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function try_bite() internal returns (bool ok) {
-        (ok,) = address(cat).call(abi.encodeWithSignature("ETH-A", address(this)));
+        (ok,) = address(cat).call(abi.encodeWithSignature("bite(bytes32,address)", bytes32("ETH-A"), address(this)));
     }
 
     function testFixLiquidation() public {
