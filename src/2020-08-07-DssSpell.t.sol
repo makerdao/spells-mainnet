@@ -333,11 +333,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
     }
 
-    // This spell is intended to run as the MkrAuthority
-    function canCall(address, address, bytes4) public pure returns (bool) {
-        return true;
-    }
-
     function testSpellIsCast() public {
         string memory description = new SpellAction().description();
         assertTrue(bytes(description).length > 0);

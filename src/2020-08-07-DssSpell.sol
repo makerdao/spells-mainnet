@@ -25,7 +25,7 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20August%207%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/76b4a49deca7ff3c8ea32419d779849f092a6c9a/governance/votes/Executive%20vote%20-%20August%207%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
         "2020-08-07 MakerDAO Weekly Executive Spell | Hash: 0x8c7bdf48dc5e65db0e06bdffedef066c1eaa91413172c0e4c510285595e79019";
 
