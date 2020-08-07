@@ -19,7 +19,6 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 
 
 contract SpellAction {
@@ -39,8 +38,6 @@ contract SpellAction {
     address constant public MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant public MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant public MCD_CAT = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
-    address constant public FLIPPER_MOM = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    address constant public TUSD_FLIP = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
 
     uint256 constant public WAD = 10**18;
     uint256 constant public RAD = 10**45;
@@ -68,10 +65,6 @@ contract SpellAction {
         // Existing Line: 568m
         // New Line: 608m
         VatAbstract(MCD_VAT).file("Line", 608 * MILLION * RAD);
-
-        // Disable TUSD liquidations
-        //
-        FlipperMomAbstract(FLIPPER_MOM).deny(TUSD_FLIP);
     }
 }
 

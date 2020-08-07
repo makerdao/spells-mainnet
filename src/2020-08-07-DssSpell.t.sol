@@ -363,7 +363,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("KNC-A",  beforeSpell);
         checkCollateralValues("MANA-A", beforeSpell);
 
-        assertEq(tusd_a_flip.wards(address(cat)), 1);
+        //assertEq(tusd_a_flip.wards(address(cat)), 1);
 
         vote();
         scheduleWaitAndCast();
@@ -382,6 +382,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues("MANA-A", afterSpell);
 
         // Check liquidations off on TUSD
-        assertEq(tusd_a_flip.wards(address(cat)), 0);
+        // Next week!
+        //assertEq(tusd_a_flip.wards(address(cat)), 0);
     }
 }
