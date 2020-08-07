@@ -49,7 +49,6 @@ contract SpellAction {
         // Existing lump: 500 ETH
         // New lump: 100 ETH
         uint256 ETH_LUMP = 100 * WAD;
-        JugAbstract(MCD_JUG).drip("ETH-A");
         CatAbstract(MCD_CAT).file("ETH-A", "lump", ETH_LUMP);
 
         // Set the WBTC-A debt ceiling
@@ -57,7 +56,6 @@ contract SpellAction {
         // Existing debt: 40 million
         // New debt ceiling: 80 million
         uint256 WBTC_LINE = 80 * MILLION * WAD;
-        JugAbstract(MCD_JUG).drip("WBTC-A");
         VatAbstract(MCD_VAT).file("WBTC-A", "line", WBTC_LINE);
 
         // Set the global debt ceiling
