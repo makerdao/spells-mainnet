@@ -57,6 +57,8 @@ contract DssSpellTest is DSTest, DSMath {
 
     DSTokenAbstract        gov = DSTokenAbstract(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(    0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    DSTokenAbstract       weth = DSTokenAbstract(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    GemJoinAbstract   wethJoin = GemJoinAbstract(0x2F0b23f53734252Bda2277357e97e1517d6B042A);
 
 
     DssSpell spell;
@@ -379,5 +381,46 @@ contract DssSpellTest is DSTest, DSMath {
         // Check liquidations off on TUSD
         // Next week!
         //assertEq(tusd_a_flip.wards(address(cat)), 0);
+    }
+
+    function try_bite() internal returns (bool ok) {
+        (ok,) = address(cat).call(abi.encodeWithSignature("ETH-A", address(this)));
+    }
+
+    function testFixLiquidation() public {
+        uint256 wethAmount = 500 ether;
+        uint256 daiAmount = 102471 * 10 ** 45;
+
+        // Giving WETH balance
+        hevm.store(
+            address(weth),
+            keccak256(abi.encode(address(this), uint256(3))),
+            bytes32(wethAmount)
+        );
+        assertEq(weth.balanceOf(address(this)), wethAmount);
+        //
+
+        weth.approve(address(wethJoin), uint256(-1));
+        wethJoin.join(address(this), wethAmount);
+
+        (, uint256 rate,,,) = vat.ilks("ETH-A");
+
+        vat.frob("ETH-A", address(this), address(this), address(this), int(wethAmount), int(daiAmount / rate));
+
+        // Setting the spot value to the lowest to make all the vaults unsafe
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-A"), uint256(2)))) + 2),
+            bytes32(uint256(1))
+        );
+        //
+
+        assertTrue(!try_bite());
+
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        assertTrue(try_bite());
     }
 }
