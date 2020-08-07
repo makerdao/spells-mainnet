@@ -241,7 +241,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // ETH-A
         afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].lump = 100 * MILLION * WAD;
+        afterSpell.collaterals["ETH-A"].lump = 100 * WAD;
 
         // WBTC-A
         afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];

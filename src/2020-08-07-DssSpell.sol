@@ -48,7 +48,7 @@ contract SpellAction {
         //
         // Existing lump: 500 ETH
         // New lump: 100 ETH
-        uint256 ETH_LUMP = 100 * MILLION * WAD;
+        uint256 ETH_LUMP = 100 * WAD;
         JugAbstract(MCD_JUG).drip("ETH-A");
         CatAbstract(MCD_CAT).file("ETH-A", "lump", ETH_LUMP);
 
