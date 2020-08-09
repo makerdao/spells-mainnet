@@ -39,7 +39,7 @@ contract SpellAction {
     function execute() external {
         // Set the WBTC-A debt ceiling
         //
-        // Existing debt: 40 million
+        // Existing debt: ~0 (error in last executive)
         // New debt ceiling: 80 million
         uint256 WBTC_LINE = 80 * MILLION * RAD;
         VatAbstract(MCD_VAT).file("WBTC-A", "line", WBTC_LINE);
