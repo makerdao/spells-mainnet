@@ -407,8 +407,6 @@ contract DssSpellTest is DSTest, DSMath {
             checkCollateralValues(ilks[i],  beforeSpell);
         }
 
-        //assertEq(tusd_a_flip.wards(address(cat)), 1);
-
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
@@ -418,10 +416,5 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
         }
-
-        // Check liquidations off on TUSD
-        // Next week!
-        //assertEq(tusd_a_flip.wards(address(cat)), 0);
     }
-
 }
