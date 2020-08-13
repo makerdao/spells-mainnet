@@ -356,34 +356,38 @@ contract DssSpellTest is DSTest, DSMath {
         // make sure duty is less than 1000% APR
         // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
         // 1000000073014496989316680335
-        assertTrue(duty >= RAY && duty < 1000000073014496989316680335);
+        assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
         assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(values.collaterals[ilk].duty)) <= TOLERANCE);
-        assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);
+        assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
 
         (,,, uint line, uint dust) = vat.ilks(ilk);
         assertEq(line, values.collaterals[ilk].line);
-        assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);
+        assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
         assertEq(dust, values.collaterals[ilk].dust);
-        assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0);
+        assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
 
         (, uint chop, uint lump) = cat.ilks(ilk);
         assertEq(chop, values.collaterals[ilk].chop);
         // make sure chop is less than 100%
-        assertTrue(chop >= RAY && chop < 2 * RAY);
+        assertTrue(chop >= RAY && chop < 2 * RAY);   // penalty gt eq 0% and lt 100%
         assertEq(lump, values.collaterals[ilk].lump);
         // put back in after LIQ-1.2
         // assertTrue(lump >= WAD && lump < MILLION * WAD);
 
         (,uint mat) = spot.ilks(ilk);
         assertEq(mat, values.collaterals[ilk].mat);
+        assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
 
         (address flipper,,) = cat.ilks(ilk);
         FlipAbstract flip = FlipAbstract(flipper);
         assertEq(uint(flip.beg()), values.collaterals[ilk].beg);
+        assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
         assertEq(uint(flip.ttl()), values.collaterals[ilk].ttl);
+        assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
         assertEq(uint(flip.tau()), values.collaterals[ilk].tau);
+        assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
-        assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);
+        assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
 
     function testSpellIsCast() public {
