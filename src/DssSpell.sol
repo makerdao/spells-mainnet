@@ -48,7 +48,7 @@ contract SpellAction {
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 0%):
+    // To check this yourself, use the following rate calculation (example 6%):
     //
     // $ bc -l <<< 'scale=27; e( l(1.06)/(60 * 60 * 24 * 365) )'
     //
