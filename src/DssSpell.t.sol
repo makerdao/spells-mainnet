@@ -255,7 +255,7 @@ contract DssSpellTest is DSTest, DSMath {
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          3 days,
-            liquidations: 0
+            liquidations: 1 // This is an Error, liquidations should be off
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line:         5 * MILLION * RAD,

@@ -19,7 +19,6 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 
 contract SpellAction {
@@ -39,8 +38,6 @@ contract SpellAction {
     address constant MCD_VAT         = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
     address constant MCD_VOW         = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
-    address constant MCD_FLIP_TUSD_A = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
-    address constant FLIPPER_MOM     = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
     address constant ILK_REGISTRY    = 0xbE4F921cdFEf2cF5080F9Cf00CC2c14F1F96Bd07;
 
     uint256 constant MILLION  = 10 ** 6;
@@ -83,13 +80,6 @@ contract SpellAction {
 
         // Sets the system surplus buffer from 500k Dai to 2mm Dai
         VowAbstract(MCD_VOW).file("hump", 2 * MILLION * RAD);
-
-        // Easter Egg, if you see this first Mariano will send you DAI
-        // Our improved testing caught that TUSD-A liquidations are set "on"
-        // when they should be "off".  We are fixing this misconfiguration here.
-        //
-        // Disable TUSD-A liquidations
-        FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_TUSD_A);
     }
 }
 
