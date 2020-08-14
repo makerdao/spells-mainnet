@@ -334,7 +334,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkSystemValues(SystemValues storage values) internal {
         // dsr
         assertEq(pot.dsr(), values.dsr);
-        // make sure duty is less than 100% APR
+        // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
