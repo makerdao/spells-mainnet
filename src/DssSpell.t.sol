@@ -58,6 +58,7 @@ contract DssSpellTest is DSTest, DSMath {
     PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
+    address         flipperMom =                     0x9BdDB99625A711bf9bda237044924E34E8570f75;
 
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
@@ -384,6 +385,30 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
 
+    function checkFlipValues(bytes32 ilk, address _newFlip, address _oldFlip) internal {
+        FlipAbstract newFlip = FlipAbstract(_newFlip);
+        FlipAbstract oldFlip = FlipAbstract(_oldFlip);
+
+        assertEq(newFlip.ilk(), ilk);
+        assertEq(newFlip.vat(), address(vat));
+
+        (address flip,,) = cat.ilks(ilk);
+
+        assertEq(flip, address(newFlip));
+
+        assertEq(newFlip.wards(address(cat)), (ilk == "USDC-A" || ilk == "USDC-B" || ilk == "TUSD-A") ? 0 : 1);
+        assertEq(newFlip.wards(address(end)), 1);
+        assertEq(newFlip.wards(address(flipperMom)), 1);
+
+        assertEq(oldFlip.wards(address(cat)), 0);
+        assertEq(oldFlip.wards(address(end)), 0);
+        assertEq(oldFlip.wards(address(flipperMom)), 0);
+
+        assertEq(uint256(newFlip.beg()), uint256(oldFlip.beg()));
+        assertEq(uint256(newFlip.ttl()), uint256(oldFlip.ttl()));
+        assertEq(uint256(newFlip.tau()), uint256(oldFlip.tau()));
+    }
+
     function testSpellIsCast() public {
 		// SpellAction() -> DssSpell()
         string memory description = new DssSpell().description();
@@ -395,7 +420,19 @@ contract DssSpellTest is DSTest, DSMath {
         if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+        }
+
+        checkSystemValues(beforeSpell);
+
+        bytes32[] memory ilks = reg.list();
+        address[] memory oldFlips = new address[](ilks.length);
+        address[] memory newFlips = new address[](ilks.length);
+
+        for(uint i = 0; i < ilks.length; i++) {
+            checkCollateralValues(ilks[i],  beforeSpell);
+            (address flip_address,,) = cat.ilks(ilks[i]);
+            oldFlips[i] = flip_address;
         }
 
         vote();
@@ -407,6 +444,17 @@ contract DssSpellTest is DSTest, DSMath {
         bytes32[] memory ilks = reg.list();
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
+            (address flip_address,,) = cat.ilks(ilks[i]);
+            newFlips[i] = flip_address;
+        }
+
+        require(
+            ilks.length == newFlips.length && ilks.length == oldFlips.length,
+            "array-lengths-not-equal"
+        );
+        // Check flip parameters
+        for(uint i = 0; i < ilks.length; i++) {
+            checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
         }
     }
 }
