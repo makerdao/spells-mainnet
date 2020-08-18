@@ -31,11 +31,15 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     struct SystemValues {
-        uint dsr;
-        uint dsrPct;
-        uint Line;
-        uint pauseDelay;
-        uint hump;
+        uint pot_dsr;
+        uint pot_dsrPct;
+        uint vat_Line;
+        uint pause_delay;
+        uint vow_wait;
+        uint vow_dump;
+        uint vow_sump;
+        uint vow_bump;
+        uint vow_hump;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -118,11 +122,15 @@ contract DssSpellTest is DSTest, DSMath {
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
         beforeSpell = SystemValues({
-            dsr: 1000000000000000000000000000,
-            dsrPct: 0 * 1000,
-            Line: 608 * MILLION * RAD,
-            pauseDelay: 12 * 60 * 60,
-            hump: 2 * MILLION * RAD
+            pot_dsr: pot.dsr(),
+            pot_dsrPct: 0 * 1000,
+            vat_Line: vat.Line(),
+            pause_delay: pause.delay(),
+            vow_wait: vow.wait(),
+            vow_dump: vow.dump(),
+            vow_sump: vow.sump(),
+            vow_bump: vow.bump(),
+            vow_hump: vow.hump()
         });
 
         bytes32[] memory ilks = reg.list();
@@ -164,11 +172,15 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            dsr: 1000000000000000000000000000,
-            dsrPct: 0 * 1000,
-            Line: 688 * MILLION * RAD,
-            pauseDelay: 12 * 60 * 60,
-            hump: 2 * MILLION * RAD
+            pot_dsr: 1000000000000000000000000000,
+            pot_dsrPct: 0 * 1000,
+            vat_Line: 688 * MILLION * RAD,
+            pause_delay: 12 * 60 * 60,
+            vow_wait: 561600,
+            vow_dump: 250 * WAD,
+            vow_sump: 50000 * RAD,
+            vow_bump: 10000 * RAD,
+            vow_hump: 2 * MILLION * RAD
         });
 
         //
@@ -328,27 +340,51 @@ contract DssSpellTest is DSTest, DSMath {
 
     function checkSystemValues(SystemValues storage values) internal {
         // dsr
-        assertEq(pot.dsr(), values.dsr);
+        assertEq(pot.dsr(), values.pot_dsr);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
         );
-        assertTrue(diffCalc(expectedRate(values.dsrPct), yearlyYield(values.dsr)) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.pot_dsrPct), yearlyYield(values.pot_dsr)) <= TOLERANCE);
 
         // Line
-        assertEq(vat.Line(), values.Line);
+        assertEq(vat.Line(), values.vat_Line);
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < BILLION * RAD) ||
             vat.Line() == 0
         );
 
         // Pause delay
-        assertEq(pause.delay(), values.pauseDelay);
+        assertEq(pause.delay(), values.pause_delay);
+
+        // wait
+        assertEq(vow.wait(), values.vow_wait);
+
+        // dump
+        assertEq(vow.dump(), values.vow_dump);
+        assertTrue(
+            (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
+            vow.dump() == 0
+        );
+
+        // sump
+        assertEq(vow.sump(), values.vow_sump);
+        assertTrue(
+            (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
+            vow.sump() == 0
+        );
+
+        // bump
+        assertEq(vow.bump(), values.vow_bump);
+        assertTrue(
+            (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
+            vow.bump() == 0
+        );
 
         // hump
-        assertEq(vow.hump(), values.hump);
+        assertEq(vow.hump(), values.vow_hump);
         assertTrue(
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
             vow.hump() == 0
