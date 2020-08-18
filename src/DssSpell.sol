@@ -22,9 +22,9 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c8e9f709f4bc5d0384b47e0109eb7555f08b84fc/governance/votes/Executive%20vote%20-%20August%2014%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/bed4423fe0b37ca9902865e69a4b5e14e8595495/governance/votes/Executive%20vote%20-%20August%2018%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-18 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2020-08-18 MakerDAO Executive Spell | Hash: 0xf2d66116128a66c268be1252477cebe8d16a48b599df641a01fbae20010d3277";
 
     // MAINNET ADDRESSES
     //
