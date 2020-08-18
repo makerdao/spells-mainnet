@@ -122,7 +122,7 @@ contract DssSpellTest is DSTest, DSMath {
             dsrPct: 0 * 1000,
             Line: 608 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60,
-            hump: 500 * THOUSAND * RAD
+            hump: 2 * MILLION * RAD
         });
 
         bytes32[] memory ilks = reg.list();
@@ -152,11 +152,11 @@ contract DssSpellTest is DSTest, DSMath {
             });
 
             if (ilks[i] == "USDC-B") {
-                beforeSpell.collaterals[ilks[i]].pct = 46 * 1000;
+                beforeSpell.collaterals[ilks[i]].pct = 44 * 1000;
             }
 
             if (ilks[i] == "MANA-A") {
-                beforeSpell.collaterals[ilks[i]].pct =  8 * 1000;
+                beforeSpell.collaterals[ilks[i]].pct =  6 * 1000;
             }
         }
 
