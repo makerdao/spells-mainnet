@@ -160,28 +160,137 @@ contract DssSpellTest is DSTest, DSMath {
             }
         }
 
+        //
         // Test for all system configuration changes
+        //
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
             Line: 688 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60,
-            hump: 500 * THOUSAND * RAD
+            hump: 2 * MILLION * RAD
         });
 
-        // ETH-A
-        afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].line = 420 * MILLION * RAD;
-
-        // All others no change
-        afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
-        afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
-        afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
-        afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
-        afterSpell.collaterals["KNC-A"]  = beforeSpell.collaterals["KNC-A"];
-        afterSpell.collaterals["ZRX-A"]  = beforeSpell.collaterals["ZRX-A"];
-        afterSpell.collaterals["MANA-A"] = beforeSpell.collaterals["MANA-A"];
+        //
+        // Test for all collateral based changes here
+        //
+        afterSpell.collaterals["ETH-A"] = CollateralValues({
+            line:         420 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         100 * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["BAT-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["USDC-A"] = CollateralValues({
+            line:         140 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          110 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 0
+        });
+        afterSpell.collaterals["USDC-B"] = CollateralValues({
+            line:         30 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000011562757347033522598,
+            pct:          44 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          120 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 0
+        });
+        afterSpell.collaterals["WBTC-A"] = CollateralValues({
+            line:         80 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         1 * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["TUSD-A"] = CollateralValues({
+            line:         2 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          120 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 1 // This is an Error, liquidations should be off
+        });
+        afterSpell.collaterals["KNC-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["ZRX-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         100 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["MANA-A"] = CollateralValues({
+            line:         1 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000001847694957439350562,
+            pct:          6 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         500 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
     }
 
     function vote() private {
