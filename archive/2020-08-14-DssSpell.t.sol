@@ -13,7 +13,7 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = 0x9e361d75bDBccD061ce01ACC5265646C19778140;
     uint constant SPELL_CREATED = 1597425754;
 
     struct CollateralValues {
@@ -55,9 +55,14 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
+    FlipAbstract   tusd_a_flip = FlipAbstract(       0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3);
+
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    DSTokenAbstract       weth = DSTokenAbstract(    0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    GemJoinAbstract   wethJoin = GemJoinAbstract(    0x2F0b23f53734252Bda2277357e97e1517d6B042A);
     IlkRegistryAbstract    reg = IlkRegistryAbstract(0xbE4F921cdFEf2cF5080F9Cf00CC2c14F1F96Bd07);
+
 
     DssSpell spell;
 
@@ -160,28 +165,137 @@ contract DssSpellTest is DSTest, DSMath {
             }
         }
 
+        //
         // Test for all system configuration changes
+        //
         afterSpell = SystemValues({
             dsr: 1000000000000000000000000000,
             dsrPct: 0 * 1000,
-            Line: 688 * MILLION * RAD,
+            Line: 608 * MILLION * RAD,
             pauseDelay: 12 * 60 * 60,
-            hump: 500 * THOUSAND * RAD
+            hump: 2 * MILLION * RAD
         });
 
-        // ETH-A
-        afterSpell.collaterals["ETH-A"] = beforeSpell.collaterals["ETH-A"];
-        afterSpell.collaterals["ETH-A"].line = 420 * MILLION * RAD;
-
-        // All others no change
-        afterSpell.collaterals["BAT-A"] = beforeSpell.collaterals["BAT-A"];
-        afterSpell.collaterals["USDC-A"] = beforeSpell.collaterals["USDC-A"];
-        afterSpell.collaterals["USDC-B"] = beforeSpell.collaterals["USDC-B"];
-        afterSpell.collaterals["WBTC-A"] = beforeSpell.collaterals["WBTC-A"];
-        afterSpell.collaterals["TUSD-A"] = beforeSpell.collaterals["TUSD-A"];
-        afterSpell.collaterals["KNC-A"]  = beforeSpell.collaterals["KNC-A"];
-        afterSpell.collaterals["ZRX-A"]  = beforeSpell.collaterals["ZRX-A"];
-        afterSpell.collaterals["MANA-A"] = beforeSpell.collaterals["MANA-A"];
+        //
+        // Test for all collateral based changes here
+        //
+        afterSpell.collaterals["ETH-A"] = CollateralValues({
+            line:         340 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         100 * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["BAT-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["USDC-A"] = CollateralValues({
+            line:         140 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          110 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 0
+        });
+        afterSpell.collaterals["USDC-B"] = CollateralValues({
+            line:         30 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000011562757347033522598,
+            pct:          44 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          120 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 0
+        });
+        afterSpell.collaterals["WBTC-A"] = CollateralValues({
+            line:         80 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         1 * WAD,
+            mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["TUSD-A"] = CollateralValues({
+            line:         2 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          120 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          3 days,
+            liquidations: 1 // This is an Error, liquidations should be off
+        });
+        afterSpell.collaterals["KNC-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         50 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["ZRX-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000000000000000000000,
+            pct:          0,
+            chop:         113 * RAY / 100,
+            lump:         100 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["MANA-A"] = CollateralValues({
+            line:         1 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000001847694957439350562,
+            pct:          6 * 1000,
+            chop:         113 * RAY / 100,
+            lump:         500 * THOUSAND * WAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
     }
 
     function vote() private {
