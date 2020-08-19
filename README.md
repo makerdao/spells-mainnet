@@ -20,12 +20,15 @@ $ make build
 Set `ETH_RPC_URL` to a Mainnet node.
 
 ```
-$ ETH_RPC_URL=<Mainnet>
+$ ETH_RPC_URL=<Mainnet URL>
 $ make test
 ```
 
 ### Deploy
 
+Set `ETH_RPC_URL` to a Mainnet node.
+
 ```
+$ ETH_RPC_URL=<Mainnet URL>
 $ make deploy
 ```
