@@ -12,7 +12,7 @@ $ dapp update
 ### Build
 
 ```
-$ make build
+$ make
 ```
 
 ### Test
