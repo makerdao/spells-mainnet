@@ -13,8 +13,8 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xFddEeF69F5961c73ff80a1356a49a504969BA659);
-    uint constant SPELL_CREATED = 1597788299;
+    address constant MAINNET_SPELL = 0x9e361d75bDBccD061ce01ACC5265646C19778140;
+    uint constant SPELL_CREATED = 1597425754;
 
     struct CollateralValues {
         uint line;
@@ -31,18 +31,15 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     struct SystemValues {
-        uint pot_dsr;
-        uint pot_dsrPct;
-        uint vat_Line;
-        uint pause_delay;
-        uint vow_wait;
-        uint vow_dump;
-        uint vow_sump;
-        uint vow_bump;
-        uint vow_hump;
+        uint dsr;
+        uint dsrPct;
+        uint Line;
+        uint pauseDelay;
+        uint hump;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
+    SystemValues beforeSpell;
     SystemValues afterSpell;
 
     Hevm hevm;
@@ -58,9 +55,14 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
+    FlipAbstract   tusd_a_flip = FlipAbstract(       0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3);
+
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    DSTokenAbstract       weth = DSTokenAbstract(    0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    GemJoinAbstract   wethJoin = GemJoinAbstract(    0x2F0b23f53734252Bda2277357e97e1517d6B042A);
     IlkRegistryAbstract    reg = IlkRegistryAbstract(0xbE4F921cdFEf2cF5080F9Cf00CC2c14F1F96Bd07);
+
 
     DssSpell spell;
 
@@ -120,26 +122,65 @@ contract DssSpellTest is DSTest, DSMath {
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
+        beforeSpell = SystemValues({
+            dsr: 1000000000000000000000000000,
+            dsrPct: 0 * 1000,
+            Line: 608 * MILLION * RAD,
+            pauseDelay: 12 * 60 * 60,
+            hump: 500 * THOUSAND * RAD
+        });
+
+        bytes32[] memory ilks = reg.list();
+
+        //
+        // set before spell config
+        //
+        for(uint i = 0; i < ilks.length; i++) {
+            (,,, uint line, uint dust) = vat.ilks(ilks[i]);
+            (address flip_address, uint chop, uint lump) = cat.ilks(ilks[i]);
+            (, uint mat) = spot.ilks(ilks[i]);
+            (uint duty,) = jug.ilks(ilks[i]);
+            FlipAbstract flip = FlipAbstract(flip_address);
+
+            beforeSpell.collaterals[ilks[i]] = CollateralValues({
+                line: line,
+                dust: dust,
+                duty: duty,
+                pct: 0 * 1000,
+                chop: chop,
+                lump: lump,
+                mat: mat,
+                beg: flip.beg(),
+                ttl: flip.ttl(),
+                tau: flip.tau(),
+                liquidations: flip.wards(address(cat))
+            });
+
+            if (ilks[i] == "USDC-B") {
+                beforeSpell.collaterals[ilks[i]].pct = 46 * 1000;
+            }
+
+            if (ilks[i] == "MANA-A") {
+                beforeSpell.collaterals[ilks[i]].pct =  8 * 1000;
+            }
+        }
+
         //
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            pot_dsr: 1000000000000000000000000000,
-            pot_dsrPct: 0 * 1000,
-            vat_Line: 688 * MILLION * RAD,
-            pause_delay: 12 * 60 * 60,
-            vow_wait: 561600,
-            vow_dump: 250 * WAD,
-            vow_sump: 50000 * RAD,
-            vow_bump: 10000 * RAD,
-            vow_hump: 2 * MILLION * RAD
+            dsr: 1000000000000000000000000000,
+            dsrPct: 0 * 1000,
+            Line: 608 * MILLION * RAD,
+            pauseDelay: 12 * 60 * 60,
+            hump: 2 * MILLION * RAD
         });
 
         //
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         420 * MILLION * RAD,
+            line:         340 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
@@ -292,51 +333,27 @@ contract DssSpellTest is DSTest, DSMath {
 
     function checkSystemValues(SystemValues storage values) internal {
         // dsr
-        assertEq(pot.dsr(), values.pot_dsr);
+        assertEq(pot.dsr(), values.dsr);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
         );
-        assertTrue(diffCalc(expectedRate(values.pot_dsrPct), yearlyYield(values.pot_dsr)) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.dsrPct), yearlyYield(values.dsr)) <= TOLERANCE);
 
         // Line
-        assertEq(vat.Line(), values.vat_Line);
+        assertEq(vat.Line(), values.Line);
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < BILLION * RAD) ||
             vat.Line() == 0
         );
 
         // Pause delay
-        assertEq(pause.delay(), values.pause_delay);
-
-        // wait
-        assertEq(vow.wait(), values.vow_wait);
-
-        // dump
-        assertEq(vow.dump(), values.vow_dump);
-        assertTrue(
-            (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
-            vow.dump() == 0
-        );
-
-        // sump
-        assertEq(vow.sump(), values.vow_sump);
-        assertTrue(
-            (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
-            vow.sump() == 0
-        );
-
-        // bump
-        assertEq(vow.bump(), values.vow_bump);
-        assertTrue(
-            (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
-            vow.bump() == 0
-        );
+        assertEq(pause.delay(), values.pauseDelay);
 
         // hump
-        assertEq(vow.hump(), values.vow_hump);
+        assertEq(vow.hump(), values.hump);
         assertTrue(
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
             vow.hump() == 0
@@ -396,13 +413,20 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
+        checkSystemValues(beforeSpell);
+
+        bytes32[] memory ilks = reg.list();
+
+        for(uint i = 0; i < ilks.length; i++) {
+            checkCollateralValues(ilks[i],  beforeSpell);
+        }
+
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
         checkSystemValues(afterSpell);
 
-        bytes32[] memory ilks = reg.list();
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
         }
