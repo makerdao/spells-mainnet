@@ -22,19 +22,22 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/bed4423fe0b37ca9902865e69a4b5e14e8595495/governance/votes/Executive%20vote%20-%20August%2018%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20August%2021%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-21 MakerDAO Executive Spell | Hash: 0xf2d66116128a66c268be1252477cebe8d16a48b599df641a01fbae20010d3277";
+        "2020-08-21 MakerDAO Executive Spell | Hash: 0xa42625339c53b03d0d95ad99ccffc07a1f2cf8ec5f8858d9a0b5578204949609";
 
     // MAINNET ADDRESSES
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
-    address constant MCD_JUG  = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
 
-    uint256 constant EIGHT_PCT       = 1000000002440418608258400030;
-    uint256 constant FOURTY_SIX_PCT  = 1000000012000140727767957524;
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    uint256 constant EIGHT_PCT      = 1000000002440418608258400030;
+    uint256 constant FOURTY_SIX_PCT = 1000000012000140727767957524;
 
     function execute() external {
         // drips
@@ -49,7 +52,7 @@ contract SpellAction {
         // Set the MANA-A stability fee
         // Previous: 6%
         //      New: 8%
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", EIGHT_PCT     );
+        JugAbstract(MCD_JUG).file("MANA-A", "duty", EIGHT_PCT);
     }
 }
 
