@@ -40,18 +40,16 @@ contract SpellAction {
     uint256 constant FOURTY_SIX_PCT = 1000000012000140727767957524;
 
     function execute() external {
-        // drips
-        JugAbstract(MCD_JUG).drip("USDC-B");
-        JugAbstract(MCD_JUG).drip("MANA-A");
-
         // Set the USDC-B stability fee
         // Previous: 44%
         //      New: 46%
+        JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
         JugAbstract(MCD_JUG).file("USDC-B", "duty", FOURTY_SIX_PCT);
 
         // Set the MANA-A stability fee
         // Previous: 6%
         //      New: 8%
+        JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
         JugAbstract(MCD_JUG).file("MANA-A", "duty", EIGHT_PCT);
     }
 }
