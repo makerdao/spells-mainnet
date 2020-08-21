@@ -31,8 +31,6 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
-
-    address constant MCD_VAT  = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant MCD_JUG  = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
 
     uint256 constant EIGHT_PCT       = 1000000002440418608258400030;
