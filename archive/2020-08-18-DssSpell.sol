@@ -16,7 +16,7 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract SpellAction {
 
@@ -24,7 +24,7 @@ contract SpellAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/bed4423fe0b37ca9902865e69a4b5e14e8595495/governance/votes/Executive%20vote%20-%20August%2018%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-21 MakerDAO Executive Spell | Hash: 0xf2d66116128a66c268be1252477cebe8d16a48b599df641a01fbae20010d3277";
+        "2020-08-18 MakerDAO Executive Spell | Hash: 0xf2d66116128a66c268be1252477cebe8d16a48b599df641a01fbae20010d3277";
 
     // MAINNET ADDRESSES
     //
@@ -33,25 +33,20 @@ contract SpellAction {
     //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
 
     address constant MCD_VAT  = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_JUG  = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
 
-    uint256 constant EIGHT_PCT       = 1000000002440418608258400030;
-    uint256 constant FOURTY_SIX_PCT  = 1000000012000140727767957524;
+    uint256 constant MILLION  = 10 ** 6;
+    uint256 constant RAD      = 10 ** 45;
 
     function execute() external {
-        // drips
-        JugAbstract(MCD_JUG).drip("USDC-B");
-        JugAbstract(MCD_JUG).drip("MANA-A");
+        // Set the global debt ceiling
+        // Existing Line: 608m
+        // New Line: 688m
+        VatAbstract(MCD_VAT).file("Line", 688 * MILLION * RAD);
 
-        // Set the USDC-B stability fee
-        // Previous: 44%
-        //      New: 46%
-        JugAbstract(MCD_JUG).file("USDC-B", "duty", FOURTY_SIX_PCT);
-
-        // Set the MANA-A stability fee
-        // Previous: 6%
-        //      New: 8%
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", EIGHT_PCT     );
+        // Set the ETH-A debt ceiling
+        // Existing line: 340m
+        // New line: 420m
+        VatAbstract(MCD_VAT).file("ETH-A", "line", 420 * MILLION * RAD);
     }
 }
 
@@ -92,3 +87,4 @@ contract DssSpell {
         pause.exec(action, tag, sig, eta);
     }
 }
+

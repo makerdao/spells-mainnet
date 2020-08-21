@@ -13,7 +13,7 @@ contract Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0xFddEeF69F5961c73ff80a1356a49a504969BA659);
     uint constant SPELL_CREATED = 1597788299;
 
     struct CollateralValues {
@@ -180,8 +180,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000012000140727767957524,
-            pct:          46 * 1000,
+            duty:         1000000011562757347033522598,
+            pct:          44 * 1000,
             chop:         113 * RAY / 100,
             lump:         50 * THOUSAND * WAD,
             mat:          120 * RAY / 100,
@@ -245,8 +245,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         1 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000002440418608258400030,
-            pct:          8 * 1000,
+            duty:         1000000001847694957439350562,
+            pct:          6 * 1000,
             chop:         113 * RAY / 100,
             lump:         500 * THOUSAND * WAD,
             mat:          175 * RAY / 100,
