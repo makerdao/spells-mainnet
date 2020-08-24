@@ -16,7 +16,7 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract SpellAction {
 
@@ -24,33 +24,24 @@ contract SpellAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/77f94a877eaeeff7eccee0bfdf45cb377ff0a25c/governance/votes/Executive%20vote%20-%20August%2021%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-21 MakerDAO Executive Spell | Hash: 0xa42625339c53b03d0d95ad99ccffc07a1f2cf8ec5f8858d9a0b5578204949609";
+		// removed ; so it won't compile, this needs the hash from the md
+        "2020-08-24 MakerDAO Monthly Executive Spell | Hash: "
+
+    // https://raw.githubusercontent.com/makerdao/mips/RFC/MIP13/MIP13c3-Subproposals/MIP13c3-SP1.md
+	string constant public MIP13C3SP1 = "0xdc1d9ca6751a4f9e138a5852d1bc0372cd175a8007b9f0a05f8e4e8b4213c9a4";
+    // https://raw.githubusercontent.com/makerdao/mips/RFC/MIP0/MIP0c13-Subproposals/MIP0c13-SP1.md
+	string constant public MIP0C13SP1 = "0xf8c9b8e15faf490c1f6b4a3d089453d496f2a27a662a70114b446c76a629172e";
 
     // MAINNET ADDRESSES
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
-    address constant MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    uint256 constant EIGHT_PCT      = 1000000002440418608258400030;
-    uint256 constant FOURTY_SIX_PCT = 1000000012000140727767957524;
+    address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
     function execute() external {
-        // Set the USDC-B stability fee
-        // Previous: 44%
-        //      New: 46%
-        JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
-        JugAbstract(MCD_JUG).file("USDC-B", "duty", FOURTY_SIX_PCT);
-
-        // Set the MANA-A stability fee
-        // Previous: 6%
-        //      New: 8%
-        JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", EIGHT_PCT);
+		// proving the Pause Proxy has access to the MCD core system at the execution time
+		require(VatAbstract(MCD_VAT).wards(address(this)) == 1, "no-access");
     }
 }
 
