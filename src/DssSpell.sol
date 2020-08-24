@@ -45,7 +45,7 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/LongForWisdom/community/fc5bbefb3d304408f6261a8968b7b8b924b53b58/governance/votes/Executive%20vote%20-%20August%2024%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/fc5bbefb3d304408f6261a8968b7b8b924b53b58/governance/votes/Executive%20vote%20-%20August%2024%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
         "2020-08-24 MakerDAO August 2020 Governance Cycle Bundle | Hash: 0xa0d81d0896decfa0e74f1e4d353640d132953c373605e2fe22f1da23a7c3ed6c";
 
