@@ -1,0 +1,16 @@
+sudo: required
+language: python
+python:
+- 3.6
+services:
+- docker
+before_install:
+- git submodule update --init --recursive
+script:
+-  bash docker_test.sh
+notifications:
+  webhooks:
+    urls:
+      - https://chat.makerdao.com/hooks/rz6XmPk8coTQdbkQr/oWRchpxDBGyP8QhPFg23CQDttTbAJMGKTneexL6JZ7FebaM9
+    on_success: always
+    on_failure: always
