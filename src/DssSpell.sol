@@ -22,13 +22,15 @@ contract SpellAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/77f94a877eaeeff7eccee0bfdf45cb377ff0a25c/governance/votes/Executive%20vote%20-%20August%2021%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/LongForWisdom/community/fc5bbefb3d304408f6261a8968b7b8b924b53b58/governance/votes/Executive%20vote%20-%20August%2024%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-		// removed ; so it won't compile, this needs the hash from the md
-        "2020-08-24 MakerDAO Monthly Executive Spell | Hash: "
+        "2020-08-24 MakerDAO August 2020 Governance Cycle Bundle | Hash: 0xa0d81d0896decfa0e74f1e4d353640d132953c373605e2fe22f1da23a7c3ed6c";
 
+    // MIP13c3-SP1 Declaration of Intent (Forward Guidance)
     // https://raw.githubusercontent.com/makerdao/mips/RFC/MIP13/MIP13c3-Subproposals/MIP13c3-SP1.md
 	string constant public MIP13C3SP1 = "0xdc1d9ca6751a4f9e138a5852d1bc0372cd175a8007b9f0a05f8e4e8b4213c9a4";
+
+    // MIP0c13-SP1 Subproposal for Core Personnel Offboarding
     // https://raw.githubusercontent.com/makerdao/mips/RFC/MIP0/MIP0c13-Subproposals/MIP0c13-SP1.md
 	string constant public MIP0C13SP1 = "0xf8c9b8e15faf490c1f6b4a3d089453d496f2a27a662a70114b446c76a629172e";
 
