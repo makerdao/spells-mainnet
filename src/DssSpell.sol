@@ -67,11 +67,6 @@ contract DssSpell {
         expiration = now + 4 days + 2 hours;
     }
 
-	// moved description from SpellAction to DssSpell
-    function description() public view returns (string memory) {
-        return description;
-    }
-
     function schedule() public {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "This spell has already been scheduled");
