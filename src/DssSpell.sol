@@ -18,18 +18,10 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/EndAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlapAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlopAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
-import "lib/dss-interfaces/src/dss/MkrAuthorityAbstract.sol";
 
 contract SpellAction {
 
@@ -39,43 +31,43 @@ contract SpellAction {
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
 
+    // TODO: Deploy new flips, cat, flipper mom and update
+
     address constant MCD_VAT             = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
-    address constant MCD_CAT             = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
-    address constant MCD_JUG             = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant GOV_GUARD           = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
-
-    address constant MCD_SPOT            = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant MCD_ADM             = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
     address constant MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant FLIPPER_MOM         = 0x9BdDB99625A711bf9bda237044924E34E8570f75;
-    address constant OSM_MOM             = 0x76416A4d5190d071bfed309861527431304aA14f;
 
-    address constant MCD_FLIP_ETH_A      = 0x0F398a2DaAa134621e4b687FCcfeE4CE47599Cc1;
-    address constant MCD_FLIP_ETH_A_OLD  = 0xd8a04F5412223F513DC55F839574430f5EC15531;
+    address constant FLIPPER_MOM         = 0x50dC6120c67E456AdA2059cfADFF0601499cf681;
 
-    address constant MCD_FLIP_BAT_A      = 0x5EdF770FC81E7b8C2c89f71F30f211226a4d7495;
-    address constant MCD_FLIP_BAT_A_OLD  = 0xaA745404d55f88C108A28c86abE7b5A1E7817c07;
+    address constant MCD_CAT             = 0xdDb5F7A3A5558b9a6a1f3382BD75E2268d1c6958;
+    address constant MCD_CAT_OLD         = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
 
-    address constant MCD_FLIP_USDC_A     = 0x545521e0105C5698f75D6b3C3050CfCC62FB0C12;
-    address constant MCD_FLIP_USDC_A_OLD = 0xE6ed1d09a19Bd335f051d78D5d22dF3bfF2c28B1;
+    address constant MCD_FLIP_ETH_A      = 0x750295A8db0580F32355f97de7918fF538c818F1;
+    address constant MCD_FLIP_ETH_A_OLD  = 0xc78EdADA7e8bEa29aCc3a31bBA1D516339deD350;
 
-    address constant MCD_FLIP_USDC_B     = 0x6002d3B769D64A9909b0B26fC00361091786fe48;
-    address constant MCD_FLIP_USDC_B_OLD = 0xec25Ca3fFa512afbb1784E17f1D414E16D01794F;
+    address constant MCD_FLIP_BAT_A      = 0x44Acf0eb2C7b9F0B55723e5289437AefE8ef7a1c;
+    address constant MCD_FLIP_BAT_A_OLD  = 0xc0126c3383777bDc175E659A51020E56307dDe21;
 
-    address constant MCD_FLIP_WBTC_A     = 0xF70590Fa4AaBe12d3613f5069D02B8702e058569;
-    address constant MCD_FLIP_WBTC_A_OLD = 0x3E115d85D4d7253b05fEc9C0bB5b08383C2b0603;
+    address constant MCD_FLIP_USDC_A     = 0x17C144eaC1B3D6777eF2C3fA1F98e3BC3c18DB4F;
+    address constant MCD_FLIP_USDC_A_OLD = 0xc29Ad1913C3B415497fdA1eA15c132502B8fa372;
 
-    address constant MCD_FLIP_ZRX_A      = 0x92645a34d07696395b6e5b8330b000D0436A9aAD;
-    address constant MCD_FLIP_ZRX_A_OLD  = 0x08c89251FC058cC97d5bA5F06F95026C0A5CF9B0;
+    address constant MCD_FLIP_USDC_B     = 0x6DCd745D91AB422e962d08Ed1a9242adB47D8d0C;
+    address constant MCD_FLIP_USDC_B_OLD = 0x3c9eF711B68882d9732F60758e7891AcEae2Aa7c;
 
-    address constant MCD_FLIP_KNC_A      = 0xAD4a0B5F3c6Deb13ADE106Ba6E80Ca6566538eE6;
-    address constant MCD_FLIP_KNC_A_OLD  = 0xAbBCB9Ae89cDD3C27E02D279480C7fF33083249b;
+    address constant MCD_FLIP_WBTC_A     = 0x80Fb08f2EF268f491D6B58438326a3006C1a0e09;
+    address constant MCD_FLIP_WBTC_A_OLD = 0x28dd4263e1FcE04A9016Bd7BF71a4f0F7aB93810;
 
-    address constant MCD_FLIP_TUSD_A     = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
-    address constant MCD_FLIP_TUSD_A_OLD = 0xba3f6a74BD12Cf1e48d4416c7b50963cA98AfD61;
+    address constant MCD_FLIP_ZRX_A      = 0x798eB3126f1d5cb54743E3e93D3512C58f461084;
+    address constant MCD_FLIP_ZRX_A_OLD  = 0xe07F1219f7d6ccD59431a6b151179A9181e3902c;
 
-    address constant MCD_FLIP_MANA_A     = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
-    address constant MCD_FLIP_MANA_A_OLD = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
+    address constant MCD_FLIP_KNC_A      = 0xF2c21882Bd14A5F7Cb46291cf3c86E53057FaD06;
+    address constant MCD_FLIP_KNC_A_OLD  = 0x644699674D06cF535772D0DC19Ad5EA695000F51;
+
+    address constant MCD_FLIP_TUSD_A     = 0x867711f695e11663eC8adCFAAD2a152eFBA56dfD;
+    address constant MCD_FLIP_TUSD_A_OLD = 0xD4A145d161729A4B43B7Ab7DD683cB9A16E01a1b;
+
+    address constant MCD_FLIP_MANA_A     = 0xb2B7430D49D2D2e7abb6a6B4699B2659c141A2a6;
+    address constant MCD_FLIP_MANA_A_OLD = 0x5CB9D33A9fE5244019e6F5f45e68F18600805264;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -84,73 +76,110 @@ contract SpellAction {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
-    // Provides a descriptive tag for bot consumption
-    // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/cc819c75fc8f1b622cbe06acfd0d11bf64545622/governance/votes/Executive%20vote%20-%20July%2027%2C%202020%20.md -q -O - 2>/dev/null)"
-    string constant public description =
-        "2020-07-27 MakerDAO Executive Spell | Executive for July Governance Cycle | 0x72b73b29a8c49e38b5a23b760f622808a41ed52f584f147b4437e5ad5b5c7ce2";
-
     function execute() external {
         bytes32 ilk;
         FlipAbstract newFlip;
         FlipAbstract oldFlip;
-        CatAbstract  cat = CatAbstract(MCD_CAT);
+        
+
+        CatAbstract oldCat = CatAbstract(MCD_CAT_OLD);
+        CatAbstract newCat = CatAbstract(MCD_CAT);
+        VatAbstract    vat = VatAbstract(MCD_VAT);
+        VowAbstract    vow = VowAbstract(oldCat.vow());
+        EndAbstract    end = EndAbstract(MCD_END);
+
+        require(newCat.vat() == oldCat.vat(), "non-matching-vat");
+        require(newCat.vat() == address(vat), "non-matching-vat");
+        require(newCat.live() == 1,           "cat-not-live");
+        require(FlipperMomAbstract(FLIPPER_MOM).cat() == address(newCat), "non-matching-cat");
+
+        uint256 box  = 10  * THOUSAND * RAD;
+        uint256 dunk = 500 * RAD;            // Set globally for this spell because constant across all ilks
+        uint256 oldChop;
+        
+        /*** Update Cat ***/
+        newCat.file("vow", address(vow));
+        vat.rely(address(newCat));
+        vat.deny(address(oldCat));
+        vow.rely(address(newCat));
+        vow.deny(address(oldCat));
+        end.file("cat", address(newCat));
+        newCat.rely(address(end));
+        newCat.file("box", box);
+
+        /*** Set Auth in Flipper Mom ***/
+        FlipperMomAbstract(FLIPPER_MOM).setAuthority(MCD_ADM); 
 
         /*** ETH-A Flip ***/
         ilk = "ETH-A";
         newFlip = FlipAbstract(MCD_FLIP_ETH_A);
         oldFlip = FlipAbstract(MCD_FLIP_ETH_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
-
 
         /*** BAT-A Flip ***/
         ilk = "BAT-A";
         newFlip = FlipAbstract(MCD_FLIP_BAT_A);
         oldFlip = FlipAbstract(MCD_FLIP_BAT_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
 
         /*** USDC-A Flip ***/
         ilk = "USDC-A";
         newFlip = FlipAbstract(MCD_FLIP_USDC_A);
         oldFlip = FlipAbstract(MCD_FLIP_USDC_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT); // This will be denied after via FlipperMom, just doing this for explicitness
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat)); // This will be denied after via FlipperMom, just doing this for explicitness
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
+
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_A);
 
 
@@ -158,19 +187,25 @@ contract SpellAction {
         ilk = "USDC-B";
         newFlip = FlipAbstract(MCD_FLIP_USDC_B);
         oldFlip = FlipAbstract(MCD_FLIP_USDC_B_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT); // This will be denied after via FlipperMom, just doing this for explicitness
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat)); // This will be denied after via FlipperMom, just doing this for explicitness
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
+
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_B);
 
 
@@ -178,38 +213,49 @@ contract SpellAction {
         ilk = "WBTC-A";
         newFlip = FlipAbstract(MCD_FLIP_WBTC_A);
         oldFlip = FlipAbstract(MCD_FLIP_WBTC_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
 
         /*** TUSD-A Flip ***/
         ilk = "TUSD-A";
         newFlip = FlipAbstract(MCD_FLIP_TUSD_A);
         oldFlip = FlipAbstract(MCD_FLIP_TUSD_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT); // This will be denied after via FlipperMom, just doing this for explicitness
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat)); // This will be denied after via FlipperMom, just doing this for explicitness
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
+
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_TUSD_A); 
 
 
@@ -217,63 +263,78 @@ contract SpellAction {
         ilk = "ZRX-A";
         newFlip = FlipAbstract(MCD_FLIP_ZRX_A);
         oldFlip = FlipAbstract(MCD_FLIP_ZRX_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
 
         /*** KNC-A Flip ***/
         ilk = "KNC-A";
         newFlip = FlipAbstract(MCD_FLIP_KNC_A);
         oldFlip = FlipAbstract(MCD_FLIP_KNC_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
 
         /*** MANA-A Flip ***/
         ilk = "MANA-A";
         newFlip = FlipAbstract(MCD_FLIP_MANA_A);
         oldFlip = FlipAbstract(MCD_FLIP_MANA_A_OLD);
+        require(newFlip.ilk() == oldFlip.ilk(), "non-matching-ilk");
+        require(newFlip.vat() == oldFlip.vat(), "non-matching-vat");
+        require(newFlip.ilk() == ilk, "non-matching-ilk");
+        require(newFlip.cat() == address(newCat), "non-matching-cat");
+        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
 
-        cat.file(ilk, "flip", address(newFlip));
-        newFlip.rely(MCD_CAT);
+        newCat.file(ilk, "flip", address(newFlip));
+        (, oldChop,) = oldCat.ilks(ilk);
+        newCat.file(ilk, "chop", oldChop / 10 ** 9);
+        newCat.file(ilk, "dunk", dunk);
+        newCat.rely(address(newFlip));
+
+        newFlip.rely(address(newCat));
         newFlip.rely(MCD_END);
         newFlip.rely(FLIPPER_MOM);
-        oldFlip.deny(MCD_CAT);
-        oldFlip.deny(MCD_END);
-        oldFlip.deny(FLIPPER_MOM);
         newFlip.file("beg", oldFlip.beg());
         newFlip.file("ttl", oldFlip.ttl());
         newFlip.file("tau", oldFlip.tau());
-        require(newFlip.ilk() == ilk, "non-matching-ilk");
-        require(newFlip.vat() == MCD_VAT, "non-matching-vat");
     }
 }
 
 contract DssSpell {
     DSPauseAbstract public pause = 
-        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+        DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
     address         public action;
     bytes32         public tag;
     uint256         public eta;
@@ -281,19 +342,12 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
+    // TODO: Update this with new hash/date
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/fc5bbefb3d304408f6261a8968b7b8b924b53b58/governance/votes/Executive%20vote%20-%20August%2024%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/77f94a877eaeeff7eccee0bfdf45cb377ff0a25c/governance/votes/Executive%20vote%20-%20August%2021%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-24 MakerDAO August 2020 Governance Cycle Bundle | Hash: 0xa0d81d0896decfa0e74f1e4d353640d132953c373605e2fe22f1da23a7c3ed6c";
-
-    // MIP13c3-SP1 Declaration of Intent (Forward Guidance)
-    // https://raw.githubusercontent.com/makerdao/mips/30e57b376d239a948310a7ff316b1a659d73af02/MIP13/MIP13c3-Subproposals/MIP13c3-SP1.md
-	string constant public MIP13C3SP1 = "0xdc1d9ca6751a4f9e138a5852d1bc0372cd175a8007b9f0a05f8e4e8b4213c9a4";
-
-    // MIP0c13-SP1 Subproposal for Core Personnel Offboarding
-    // https://raw.githubusercontent.com/makerdao/mips/e5b3640087c7c8b5b04527a9562b99c291b17e9b/MIP0/MIP0c13-Subproposals/MIP0c13-SP1.md
-	string constant public MIP0C13SP1 = "0xf8c9b8e15faf490c1f6b4a3d089453d496f2a27a662a70114b446c76a629172e";
+        "2020-08-21 MakerDAO Executive Spell | Hash: 0xa42625339c53b03d0d95ad99ccffc07a1f2cf8ec5f8858d9a0b5578204949609";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -302,7 +356,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 4 days + 2 hours; // Extra window of 2 hours to get the spell set up in the Governance Portal and communicated
+        expiration = now + 30 days;
     }
 
     modifier officeHours {
@@ -311,10 +365,6 @@ contract DssSpell {
         uint hour = now / 1 hours % 24;
         require(hour >= 14 && hour < 21, "Outside office hours");
         _;
-    }
-
-    function description() public view returns (string memory) {
-        return SpellAction(action).description();
     }
 
     function schedule() public {
