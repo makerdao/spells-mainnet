@@ -29,7 +29,7 @@ contract SpellAction {
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.0.9/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.1.0/contracts.json
 
     // TODO: Deploy new flips, cat, flipper mom and update
 
@@ -37,38 +37,36 @@ contract SpellAction {
     address constant MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant MCD_ADM             = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
     address constant MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    address constant FLIPPER_MOM         = 0x0;
+    address constant MCD_CAT             = 0x0;
+    address constant MCD_CAT_OLD         = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
 
-    address constant FLIPPER_MOM         = 0x50dC6120c67E456AdA2059cfADFF0601499cf681;
+    address constant MCD_FLIP_ETH_A      = 0x0;
+    address constant MCD_FLIP_ETH_A_OLD  = 0x0F398a2DaAa134621e4b687FCcfeE4CE47599Cc1;
 
-    address constant MCD_CAT             = 0xdDb5F7A3A5558b9a6a1f3382BD75E2268d1c6958;
-    address constant MCD_CAT_OLD         = 0x0511674A67192FE51e86fE55Ed660eB4f995BDd6;
+    address constant MCD_FLIP_BAT_A      = 0x0;
+    address constant MCD_FLIP_BAT_A_OLD  = 0x5EdF770FC81E7b8C2c89f71F30f211226a4d7495;
 
-    address constant MCD_FLIP_ETH_A      = 0x750295A8db0580F32355f97de7918fF538c818F1;
-    address constant MCD_FLIP_ETH_A_OLD  = 0xc78EdADA7e8bEa29aCc3a31bBA1D516339deD350;
+    address constant MCD_FLIP_USDC_A     = 0x0;
+    address constant MCD_FLIP_USDC_A_OLD = 0x545521e0105C5698f75D6b3C3050CfCC62FB0C12;
 
-    address constant MCD_FLIP_BAT_A      = 0x44Acf0eb2C7b9F0B55723e5289437AefE8ef7a1c;
-    address constant MCD_FLIP_BAT_A_OLD  = 0xc0126c3383777bDc175E659A51020E56307dDe21;
+    address constant MCD_FLIP_USDC_B     = 0x0;
+    address constant MCD_FLIP_USDC_B_OLD = 0x6002d3B769D64A9909b0B26fC00361091786fe48;
 
-    address constant MCD_FLIP_USDC_A     = 0x17C144eaC1B3D6777eF2C3fA1F98e3BC3c18DB4F;
-    address constant MCD_FLIP_USDC_A_OLD = 0xc29Ad1913C3B415497fdA1eA15c132502B8fa372;
+    address constant MCD_FLIP_WBTC_A     = 0x0;
+    address constant MCD_FLIP_WBTC_A_OLD = 0xF70590Fa4AaBe12d3613f5069D02B8702e058569;
 
-    address constant MCD_FLIP_USDC_B     = 0x6DCd745D91AB422e962d08Ed1a9242adB47D8d0C;
-    address constant MCD_FLIP_USDC_B_OLD = 0x3c9eF711B68882d9732F60758e7891AcEae2Aa7c;
+    address constant MCD_FLIP_ZRX_A      = 0x0;
+    address constant MCD_FLIP_ZRX_A_OLD  = 0x92645a34d07696395b6e5b8330b000D0436A9aAD;
 
-    address constant MCD_FLIP_WBTC_A     = 0x80Fb08f2EF268f491D6B58438326a3006C1a0e09;
-    address constant MCD_FLIP_WBTC_A_OLD = 0x28dd4263e1FcE04A9016Bd7BF71a4f0F7aB93810;
+    address constant MCD_FLIP_KNC_A      = 0x0;
+    address constant MCD_FLIP_KNC_A_OLD  = 0xAD4a0B5F3c6Deb13ADE106Ba6E80Ca6566538eE6;
 
-    address constant MCD_FLIP_ZRX_A      = 0x798eB3126f1d5cb54743E3e93D3512C58f461084;
-    address constant MCD_FLIP_ZRX_A_OLD  = 0xe07F1219f7d6ccD59431a6b151179A9181e3902c;
+    address constant MCD_FLIP_TUSD_A     = 0x0;
+    address constant MCD_FLIP_TUSD_A_OLD = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
 
-    address constant MCD_FLIP_KNC_A      = 0xF2c21882Bd14A5F7Cb46291cf3c86E53057FaD06;
-    address constant MCD_FLIP_KNC_A_OLD  = 0x644699674D06cF535772D0DC19Ad5EA695000F51;
-
-    address constant MCD_FLIP_TUSD_A     = 0x867711f695e11663eC8adCFAAD2a152eFBA56dfD;
-    address constant MCD_FLIP_TUSD_A_OLD = 0xD4A145d161729A4B43B7Ab7DD683cB9A16E01a1b;
-
-    address constant MCD_FLIP_MANA_A     = 0xb2B7430D49D2D2e7abb6a6B4699B2659c141A2a6;
-    address constant MCD_FLIP_MANA_A_OLD = 0x5CB9D33A9fE5244019e6F5f45e68F18600805264;
+    address constant MCD_FLIP_MANA_A     = 0x0;
+    address constant MCD_FLIP_MANA_A_OLD = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -85,7 +83,7 @@ contract SpellAction {
         require(CatAbstract(MCD_CAT).live() == 1,                   "cat-not-live");
 
         require(FlipperMomAbstract(FLIPPER_MOM).cat() == MCD_CAT,   "non-matching-cat");
-        
+
         /*** Update Cat ***/
         CatAbstract(MCD_CAT).file("vow", MCD_VOW);
         VatAbstract(MCD_VAT).rely(MCD_CAT);
@@ -94,10 +92,12 @@ contract SpellAction {
         VowAbstract(MCD_VOW).deny(MCD_CAT_OLD);
         EndAbstract(MCD_END).file("cat", MCD_CAT);
         CatAbstract(MCD_CAT).rely(MCD_END);
-        CatAbstract(MCD_CAT).file("box", 10  * THOUSAND * RAD);
+
+        // TODO: get final value from risk
+        CatAbstract(MCD_CAT).file("box", 30 * MILLION * RAD);
 
         /*** Set Auth in Flipper Mom ***/
-        FlipperMomAbstract(FLIPPER_MOM).setAuthority(MCD_ADM); 
+        FlipperMomAbstract(FLIPPER_MOM).setAuthority(MCD_ADM);
 
         /*** ETH-A Flip ***/
         _changeFlip(FlipAbstract(MCD_FLIP_ETH_A), FlipAbstract(MCD_FLIP_ETH_A_OLD));
@@ -141,7 +141,9 @@ contract SpellAction {
         CatAbstract(MCD_CAT).file(ilk, "flip", address(newFlip));
         (, uint oldChop,) = CatAbstract(MCD_CAT_OLD).ilks(ilk);
         CatAbstract(MCD_CAT).file(ilk, "chop", oldChop / 10 ** 9);
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 500 * RAD);
+
+        // TODO: get correct value from risk
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 33 * THOUSAND * RAD);
         CatAbstract(MCD_CAT).rely(address(newFlip));
 
         newFlip.rely(MCD_CAT);
@@ -154,8 +156,8 @@ contract SpellAction {
 }
 
 contract DssSpell {
-    DSPauseAbstract public pause = 
-        DSPauseAbstract(0x8754E6ecb4fe68DaA5132c2886aB39297a5c7189);
+    DSPauseAbstract public pause =
+        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
     address         public action;
     bytes32         public tag;
     uint256         public eta;
@@ -168,7 +170,7 @@ contract DssSpell {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/77f94a877eaeeff7eccee0bfdf45cb377ff0a25c/governance/votes/Executive%20vote%20-%20August%2021%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-08-21 MakerDAO Executive Spell | Hash: 0xa42625339c53b03d0d95ad99ccffc07a1f2cf8ec5f8858d9a0b5578204949609";
+        "2020-08-28 MakerDAO Executive Spell | Hash: 0x0";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");

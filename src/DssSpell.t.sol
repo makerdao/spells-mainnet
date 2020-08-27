@@ -42,6 +42,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint vow_bump;
         uint vow_hump;
         uint cat_box;
+        uint ilk_count;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -55,20 +56,20 @@ contract DssSpellTest is DSTest, DSMath {
     DSChiefAbstract      chief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     VatAbstract            vat = VatAbstract(        0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
     VowAbstract            vow = VowAbstract(        0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    CatAbstract            cat = CatAbstract(        0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
+    // TODO: replace with new cat
+    CatAbstract            cat = CatAbstract(        0x0);
     PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
-    FlipperMomAbstract  newMom = FlipperMomAbstract( 0x50dC6120c67E456AdA2059cfADFF0601499cf681); // TODO: Update address
+    FlipperMomAbstract  newMom = FlipperMomAbstract( 0x0); // TODO: Update address
 
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
-    DSTokenAbstract       weth = DSTokenAbstract(    0xd0A1E359811322d97991E03f863a0C30C2cF029C); // TODO: Update address
-    GemJoinAbstract   wethJoin = GemJoinAbstract(    0x775787933e92b709f2a3C70aa87999696e74A9F8); // TODO: Update address
+    DSTokenAbstract       weth = DSTokenAbstract(    0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    GemJoinAbstract   wethJoin = GemJoinAbstract(    0x2F0b23f53734252Bda2277357e97e1517d6B042A);
     IlkRegistryAbstract    reg = IlkRegistryAbstract(0xbE4F921cdFEf2cF5080F9Cf00CC2c14F1F96Bd07);
 
-    CatAbstract         newCat = CatAbstract(        0xdDb5F7A3A5558b9a6a1f3382BD75E2268d1c6958); // TODO: Update address
-    CatAbstract         oldCat = CatAbstract(        0x0511674A67192FE51e86fE55Ed660eB4f995BDd6); // TODO: Update address
+    CatAbstract         oldCat = CatAbstract(        0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
 
     DssSpell spell;
 
@@ -141,7 +142,8 @@ contract DssSpellTest is DSTest, DSMath {
             vow_sump: 50000 * RAD,
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
-            cat_box: 10 * MILLION * RAD
+            cat_box: 10 * MILLION * RAD,
+            ilk_count: 9
         });
 
         //
@@ -189,8 +191,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000011562757347033522598,
-            pct:          44 * 1000,
+            duty:         1000000012000140727767957524,
+            pct:          46 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
@@ -254,8 +256,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         1 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001847694957439350562,
-            pct:          6 * 1000,
+            duty:         1000000002440418608258400030,
+            pct:          8 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -295,7 +297,7 @@ contract DssSpellTest is DSTest, DSMath {
         if (day < 5) {
             castTime += 5 days - day * 86400;
         }
-  
+
         hevm.warp(castTime);
         spell.cast();
     }
@@ -308,7 +310,7 @@ contract DssSpellTest is DSTest, DSMath {
         if (hour >= 14) {
             castTime -= hour * 3600 - 13 hours;
         }
-  
+
         hevm.warp(castTime);
         spell.cast();
     }
@@ -321,7 +323,7 @@ contract DssSpellTest is DSTest, DSMath {
         if (hour < 21) {
             castTime += 21 hours - hour * 3600;
         }
-  
+
         hevm.warp(castTime);
         spell.cast();
     }
@@ -402,6 +404,9 @@ contract DssSpellTest is DSTest, DSMath {
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
             vow.hump() == 0
         );
+
+        // check number of ilks
+        assertEq(reg.count(), values.ilk_count);
     }
 
     function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
@@ -420,7 +425,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dust, values.collaterals[ilk].dust);
         assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
 
-        (, uint chop, uint dunk) = newCat.ilks(ilk);
+        (, uint chop, uint dunk) = cat.ilks(ilk);
         assertEq(chop, values.collaterals[ilk].chop);
         // make sure chop is less than 100%
         assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
@@ -432,7 +437,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(mat, values.collaterals[ilk].mat);
         assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
 
-        (address flipper,,) = newCat.ilks(ilk);
+        (address flipper,,) = cat.ilks(ilk);
         FlipAbstract flip = FlipAbstract(flipper);
         assertEq(uint(flip.beg()), values.collaterals[ilk].beg);
         assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
@@ -441,7 +446,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint(flip.tau()), values.collaterals[ilk].tau);
         assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
-        assertEq(flip.wards(address(newCat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
+        assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
 
     function checkFlipValues(bytes32 ilk, address _newFlip, address _oldFlip) internal {
@@ -451,13 +456,13 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(newFlip.ilk(), ilk);
         assertEq(newFlip.vat(), address(vat));
 
-        (address flip,,) = newCat.ilks(ilk);
+        (address flip,,) = cat.ilks(ilk);
 
         assertEq(flip, address(newFlip));
 
-        assertEq(newCat.wards(address(newFlip)), 1);
+        assertEq(cat.wards(address(newFlip)), 1);
 
-        assertEq(newFlip.wards(address(newCat)), (ilk == "USDC-A" || ilk == "USDC-B" || ilk == "TUSD-A") ? 0 : 1);
+        assertEq(newFlip.wards(address(cat)), (ilk == "USDC-A" || ilk == "USDC-B" || ilk == "TUSD-A") ? 0 : 1);
         assertEq(newFlip.wards(address(end)), 1);
         assertEq(newFlip.wards(address(newMom)), 1);
 
@@ -511,22 +516,23 @@ contract DssSpellTest is DSTest, DSMath {
 
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
-            (address flip_address,,) = newCat.ilks(ilks[i]);
+            (address flip_address,,) = cat.ilks(ilks[i]);
             newFlips[i] = flip_address;
         }
 
-        assertEq(newCat.vow(), oldCat.vow());
-        assertEq(vat.wards(address(newCat)), 1);
+        assertEq(cat.vow(), oldCat.vow());
+        assertEq(vat.wards(address(cat)), 1);
         assertEq(vat.wards(address(oldCat)), 0);
-        assertEq(vow.wards(address(newCat)), 1);
+        assertEq(vow.wards(address(cat)), 1);
         assertEq(vow.wards(address(oldCat)), 0);
-        assertEq(end.cat(), address(newCat));
-        assertEq(newCat.wards(address(end)), 1);
+        assertEq(end.cat(), address(cat));
+        assertEq(cat.wards(address(end)), 1);
 
         require(
             ilks.length == newFlips.length && ilks.length == oldFlips.length,
             "array-lengths-not-equal"
         );
+
         // Check flip parameters
         for(uint i = 0; i < ilks.length; i++) {
             checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
