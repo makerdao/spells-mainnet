@@ -37,35 +37,35 @@ contract SpellAction {
     address constant MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant MCD_ADM             = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
     address constant MCD_END             = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant FLIPPER_MOM         = 0x0;
-    address constant MCD_CAT             = 0x0;
+    address constant FLIPPER_MOM         = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
+    address constant MCD_CAT             = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
     address constant MCD_CAT_OLD         = 0x78F2c2AF65126834c51822F56Be0d7469D7A523E;
 
-    address constant MCD_FLIP_ETH_A      = 0x0;
+    address constant MCD_FLIP_ETH_A      = 0xF32836B9E1f47a0515c6Ec431592D5EbC276407f;
     address constant MCD_FLIP_ETH_A_OLD  = 0x0F398a2DaAa134621e4b687FCcfeE4CE47599Cc1;
 
-    address constant MCD_FLIP_BAT_A      = 0x0;
+    address constant MCD_FLIP_BAT_A      = 0xF7C569B2B271354179AaCC9fF1e42390983110BA;
     address constant MCD_FLIP_BAT_A_OLD  = 0x5EdF770FC81E7b8C2c89f71F30f211226a4d7495;
 
-    address constant MCD_FLIP_USDC_A     = 0x0;
+    address constant MCD_FLIP_USDC_A     = 0xbe359e53038E41a1ffA47DAE39645756C80e557a;
     address constant MCD_FLIP_USDC_A_OLD = 0x545521e0105C5698f75D6b3C3050CfCC62FB0C12;
 
-    address constant MCD_FLIP_USDC_B     = 0x0;
+    address constant MCD_FLIP_USDC_B     = 0x77282aD36aADAfC16bCA42c865c674F108c4a616;
     address constant MCD_FLIP_USDC_B_OLD = 0x6002d3B769D64A9909b0B26fC00361091786fe48;
 
-    address constant MCD_FLIP_WBTC_A     = 0x0;
+    address constant MCD_FLIP_WBTC_A     = 0x58CD24ac7322890382eE45A3E4F903a5B22Ee930;
     address constant MCD_FLIP_WBTC_A_OLD = 0xF70590Fa4AaBe12d3613f5069D02B8702e058569;
 
-    address constant MCD_FLIP_ZRX_A      = 0x0;
+    address constant MCD_FLIP_ZRX_A      = 0xa4341cAf9F9F098ecb20fb2CeE2a0b8C78A18118;
     address constant MCD_FLIP_ZRX_A_OLD  = 0x92645a34d07696395b6e5b8330b000D0436A9aAD;
 
-    address constant MCD_FLIP_KNC_A      = 0x0;
+    address constant MCD_FLIP_KNC_A      = 0x57B01F1B3C59e2C0bdfF3EC9563B71EEc99a3f2f;
     address constant MCD_FLIP_KNC_A_OLD  = 0xAD4a0B5F3c6Deb13ADE106Ba6E80Ca6566538eE6;
 
-    address constant MCD_FLIP_TUSD_A     = 0x0;
+    address constant MCD_FLIP_TUSD_A     = 0x9E4b213C4defbce7564F2Ac20B6E3bF40954C440;
     address constant MCD_FLIP_TUSD_A_OLD = 0x04C42fAC3e29Fd27118609a5c36fD0b3Cb8090b3;
 
-    address constant MCD_FLIP_MANA_A     = 0x0;
+    address constant MCD_FLIP_MANA_A     = 0x0a1D75B4f49BA80724a214599574080CD6B68357;
     address constant MCD_FLIP_MANA_A_OLD = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
 
     // Decimals & precision
