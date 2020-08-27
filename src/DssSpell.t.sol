@@ -471,6 +471,46 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint256(newFlip.tau()), uint256(oldFlip.tau()));
     }
 
+    function checkLiquidations(bytes32 ilk, address _flip) internal {
+        uint slot;
+        FlipAbstract flip = FlipAbstract(_flip);
+
+        if (ilk == "WBTC-A" || ilk == "ZRX-A") slot = 0;
+        else if (ilk == "ETH-A") slot = 3;
+        else slot = 1;
+
+        (,address _gem,, address _join,,,,) = reg.ilkData(ilk);
+        GemAbstract      gem = GemAbstract(_gem);
+        GemJoinAbstract join = GemJoinAbstract(_join);
+
+        // Give this address a balance of gem
+        assertEq(gem.balanceOf(address(this)), 0);
+        hevm.store(
+            address(gem),
+            keccak256(abi.encode(address(this), uint256(slot))),
+            bytes32(uint256(1000000 ether))
+        );
+        assertEq(gem.balanceOf(address(this)), 1000000 ether);
+
+        // Generate new DAI to force a liquidation
+        gem.approve(address(join), 100 ether);
+        join.join(address(this), 100 ether);
+
+        vat.file(ilk, "spot", 2 * RAY); 
+        vat.frob(ilk, address(this), address(this), address(this), int(100 ether), int(120 ether)); 
+        vat.file(ilk, "spot", 1 * RAY);  // Now unsafe
+
+        uint256 beforeLitter = cat.litter();
+        (, uint256 chop,)    = cat.ilks(ilk);
+        (, uint256 rate,,,)  = vat.ilks(ilk);
+        (, uint256 art)      = vat.urns(ilk, address(this));
+
+        assertEq(flip.kicks(), 0);
+        cat.bite(ilk, address(this));
+        assertEq(flip.kicks(), 1);
+        assertEq(cat.litter() - beforeLitter, art * rate * chop / WAD);
+    }
+
     function testFailWrongDay() public {
         vote();
         scheduleWaitAndCastFailDay();
@@ -514,10 +554,21 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkSystemValues(afterSpell);
 
+        // Give this address auth to file spot in the vat (for liquidation testing)
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1))
+        );
+        assertEq(vat.wards(address(this)), 1);
+
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
             (address flip_address,,) = cat.ilks(ilks[i]);
             newFlips[i] = flip_address;
+            if(ilks[i] != "TUSD-A" && ilks[i] != "USDC-A" && ilks[i] != "USDC-B") {
+                checkLiquidations(ilks[i], flip_address);
+            }
         }
 
         assertEq(cat.vow(), oldCat.vow());
