@@ -143,6 +143,10 @@ contract SpellAction {
 
         /*** Risk Parameter Adjustments ***/
 
+        // set the global debt ceiling to 588,000,000
+        // 688 (current DC) - 100 (USDC-A decrease)
+        VatAbstract(MCD_VAT).file("Line", 588 * MILLION * RAD);
+
         // Set the USDC-A debt ceiling
         //
         // Existing debt: 140 million
