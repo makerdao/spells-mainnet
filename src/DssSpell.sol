@@ -33,8 +33,6 @@ contract SpellAction {
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.0/contracts.json
 
-    // TODO: Deploy new flips, cat, flipper mom and update
-
     address constant MCD_VAT             = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant MCD_VOW             = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant MCD_ADM             = 0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5;
