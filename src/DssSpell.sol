@@ -88,6 +88,8 @@ contract SpellAction {
         require(CatAbstract(MCD_CAT_OLD).vow() == MCD_VOW,          "non-matching-vow");
 
         require(CatAbstract(MCD_CAT).vat() == MCD_VAT,              "non-matching-vat");
+        require(CatAbstract(MCD_CAT).live() == 1,                   "cat-not-live");
+
         require(FlipperMomAbstract(FLIPPER_MOM).cat() == MCD_CAT,   "non-matching-cat");
 
         /*** Update Cat ***/
