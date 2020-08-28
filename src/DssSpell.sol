@@ -76,6 +76,11 @@ contract SpellAction {
     uint256 constant RAD      = 10 ** 45;
 
     function execute() external {
+
+        // ************************
+        // *** Liquidations 1.2 ***
+        // ************************
+
         require(CatAbstract(MCD_CAT_OLD).vat() == MCD_VAT,          "non-matching-vat");
         require(CatAbstract(MCD_CAT_OLD).vow() == MCD_VOW,          "non-matching-vow");
 
@@ -129,6 +134,18 @@ contract SpellAction {
         /*** MANA-A Flip ***/
         _changeFlip(FlipAbstract(MCD_FLIP_MANA_A), FlipAbstract(MCD_FLIP_MANA_A_OLD));
 
+        // *********************
+        // *** Other Changes ***
+        // *********************
+
+        /*** Risk Parameter Adjustments ***/
+
+        // Set the USDC-A debt ceiling
+        //
+        // Existing debt: 140 million
+        // New debt ceiling: 40 million
+        uint256 USDC_A_LINE = 40 * MILLION * RAD;
+        VatAbstract(MCD_VAT).file("USDC-A", "line", USDC_A_LINE);
     }
 
     function _changeFlip(FlipAbstract newFlip, FlipAbstract oldFlip) internal {

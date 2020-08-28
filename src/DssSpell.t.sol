@@ -176,7 +176,7 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            line:         140 * MILLION * RAD,
+            line:         40 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000000000000000000000,
             pct:          0,
