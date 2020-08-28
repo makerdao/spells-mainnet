@@ -60,7 +60,7 @@ contract DssSpellTest is DSTest, DSMath {
     PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
-    FlipperMomAbstract  newMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472); 
+    FlipperMomAbstract  newMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
@@ -155,7 +155,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -168,7 +168,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -181,7 +181,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          110 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -194,7 +194,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000011562757347033522598,
             pct:          44 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -207,7 +207,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -220,7 +220,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -233,7 +233,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -246,7 +246,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -259,7 +259,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000001847694957439350562,
             pct:          6 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         33 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -496,8 +496,8 @@ contract DssSpellTest is DSTest, DSMath {
         gem.approve(address(join), 100 ether);
         join.join(address(this), 100 ether);
 
-        vat.file(ilk, "spot", 2 * RAY); 
-        vat.frob(ilk, address(this), address(this), address(this), int(100 ether), int(120 ether)); 
+        vat.file(ilk, "spot", 2 * RAY);
+        vat.frob(ilk, address(this), address(this), address(this), int(100 ether), int(120 ether));
         vat.file(ilk, "spot", 1 * RAY);  // Now unsafe
 
         uint256 beforeLitter = cat.litter();

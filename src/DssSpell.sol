@@ -101,7 +101,6 @@ contract SpellAction {
         EndAbstract(MCD_END).file("cat", MCD_CAT);
         CatAbstract(MCD_CAT).rely(MCD_END);
 
-        // TODO: get final value from risk
         CatAbstract(MCD_CAT).file("box", 30 * MILLION * RAD);
 
         /*** Set Auth in Flipper Mom ***/
@@ -169,8 +168,7 @@ contract SpellAction {
         (, uint oldChop,) = CatAbstract(MCD_CAT_OLD).ilks(ilk);
         CatAbstract(MCD_CAT).file(ilk, "chop", oldChop / 10 ** 9);
 
-        // TODO: get correct value from risk
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 33 * THOUSAND * RAD);
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
         CatAbstract(MCD_CAT).rely(address(newFlip));
 
         newFlip.rely(MCD_CAT);
