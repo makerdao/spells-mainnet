@@ -190,7 +190,6 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
-    // TODO: Update this with new hash/date
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6304d5d461f6a0811699eb04fa48b95d68515d8f/governance/votes/Executive%20vote%20-%20August%2028%2C%202020.md -q -O - 2>/dev/null)"
