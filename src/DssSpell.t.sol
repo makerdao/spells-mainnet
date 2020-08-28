@@ -71,6 +71,9 @@ contract DssSpellTest is DSTest, DSMath {
 
     CatAbstract         oldCat = CatAbstract(        0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
 
+    OsmAbstract     ethusd_osm = OsmAbstract(        0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763);
+    address              yearn =                     0xCF63089A8aD2a9D8BD6Bb8022f3190EB7e1eD0f1;
+
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -553,6 +556,8 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         checkSystemValues(afterSpell);
+
+        assertEq(ethusd_osm.bud(yearn), 1);
 
         // Give this address auth to file spot in the vat (for liquidation testing)
         hevm.store(

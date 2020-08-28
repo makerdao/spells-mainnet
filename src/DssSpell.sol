@@ -22,6 +22,7 @@ import "lib/dss-interfaces/src/dss/EndAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/VowAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 contract SpellAction {
 
@@ -68,6 +69,9 @@ contract SpellAction {
     address constant MCD_FLIP_MANA_A     = 0x0a1D75B4f49BA80724a214599574080CD6B68357;
     address constant MCD_FLIP_MANA_A_OLD = 0x4bf9D2EBC4c57B9B783C12D30076507660B58b3a;
 
+    address constant public YEARN        = 0xCF63089A8aD2a9D8BD6Bb8022f3190EB7e1eD0f1;
+    address constant public OSM_ETHUSD   = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
+
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
     uint256 constant MILLION  = 10 ** 6;
@@ -85,8 +89,6 @@ contract SpellAction {
         require(CatAbstract(MCD_CAT_OLD).vow() == MCD_VOW,          "non-matching-vow");
 
         require(CatAbstract(MCD_CAT).vat() == MCD_VAT,              "non-matching-vat");
-        require(CatAbstract(MCD_CAT).live() == 1,                   "cat-not-live");
-
         require(FlipperMomAbstract(FLIPPER_MOM).cat() == MCD_CAT,   "non-matching-cat");
 
         /*** Update Cat ***/
@@ -146,6 +148,9 @@ contract SpellAction {
         // New debt ceiling: 40 million
         uint256 USDC_A_LINE = 40 * MILLION * RAD;
         VatAbstract(MCD_VAT).file("USDC-A", "line", USDC_A_LINE);
+
+        /*** Whitelist yearn on ETHUSD Oracle ***/
+        OsmAbstract(OSM_ETHUSD).kiss(YEARN);
     }
 
     function _changeFlip(FlipAbstract newFlip, FlipAbstract oldFlip) internal {
