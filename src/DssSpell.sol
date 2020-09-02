@@ -30,10 +30,10 @@ contract SpellAction {
     address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
     // Decimals & precision
-    // uint256 constant THOUSAND = 10 ** 3;
+    uint256 constant THOUSAND = 10 ** 3;
     uint256 constant MILLION  = 10 ** 6;
-    // uint256 constant WAD      = 10 ** 18;
-    // uint256 constant RAY      = 10 ** 27;
+    uint256 constant WAD      = 10 ** 18;
+    uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
     function execute() external {
@@ -65,9 +65,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20September%202%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/b95693cd9ac1150669e4477fd1a5faef1c79bf98/governance/votes/Executive%20vote%20-%20September%202%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-02 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2020-09-02 MakerDAO Executive Spell | Hash: 0xf870017b12e881587834d2de36a5cebe4c53e0d120efcc1fdbb4002bd2f15317";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
