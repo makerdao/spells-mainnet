@@ -15,7 +15,7 @@ contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
     // update below
-    uint constant SPELL_CREATED = 1598631194;
+    uint constant SPELL_CREATED = 1599062545;
 
     struct CollateralValues {
         uint line;
