@@ -13,7 +13,7 @@ interface Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = 0xF8085d74Ad616D48c225f3812a610f5Cd5F676dA;
+    address constant MAINNET_SPELL = address(0);
     // update below
     uint constant SPELL_CREATED = 1598631194;
 
@@ -60,16 +60,10 @@ contract DssSpellTest is DSTest, DSMath {
     PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
-    FlipperMomAbstract  newMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
     IlkRegistryAbstract    reg = IlkRegistryAbstract(0xbE4F921cdFEf2cF5080F9Cf00CC2c14F1F96Bd07);
-
-    CatAbstract         oldCat = CatAbstract(        0x78F2c2AF65126834c51822F56Be0d7469D7A523E);
-
-    OsmAbstract     ethusd_osm = OsmAbstract(        0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763);
-    address              yearn =                     0xCF63089A8aD2a9D8BD6Bb8022f3190EB7e1eD0f1;
 
     DssSpell spell;
 
@@ -135,7 +129,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 588 * MILLION * RAD,
+            vat_Line: 708 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -150,7 +144,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         420 * MILLION * RAD,
+            line:         540 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
@@ -449,68 +443,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
 
-    function checkFlipValues(bytes32 ilk, address _newFlip, address _oldFlip) internal {
-        FlipAbstract newFlip = FlipAbstract(_newFlip);
-        FlipAbstract oldFlip = FlipAbstract(_oldFlip);
-
-        assertEq(newFlip.ilk(), ilk);
-        assertEq(newFlip.vat(), address(vat));
-
-        (address flip,,) = cat.ilks(ilk);
-
-        assertEq(flip, address(newFlip));
-
-        assertEq(cat.wards(address(newFlip)), 1);
-
-        assertEq(newFlip.wards(address(cat)), (ilk == "USDC-A" || ilk == "USDC-B" || ilk == "TUSD-A") ? 0 : 1);
-        assertEq(newFlip.wards(address(end)), 1);
-        assertEq(newFlip.wards(address(newMom)), 1);
-
-        assertEq(uint256(newFlip.beg()), uint256(oldFlip.beg()));
-        assertEq(uint256(newFlip.ttl()), uint256(oldFlip.ttl()));
-        assertEq(uint256(newFlip.tau()), uint256(oldFlip.tau()));
-    }
-
-    function checkLiquidations(bytes32 ilk, address _flip) internal {
-        uint slot;
-        FlipAbstract flip = FlipAbstract(_flip);
-
-        if (ilk == "WBTC-A" || ilk == "ZRX-A") slot = 0;
-        else if (ilk == "ETH-A") slot = 3;
-        else slot = 1;
-
-        (,address _gem,, address _join,,,,) = reg.ilkData(ilk);
-        GemAbstract      gem = GemAbstract(_gem);
-        GemJoinAbstract join = GemJoinAbstract(_join);
-
-        // Give this address a balance of gem
-        assertEq(gem.balanceOf(address(this)), 0);
-        hevm.store(
-            address(gem),
-            keccak256(abi.encode(address(this), uint256(slot))),
-            bytes32(uint256(1000000 ether))
-        );
-        assertEq(gem.balanceOf(address(this)), 1000000 ether);
-
-        // Generate new DAI to force a liquidation
-        gem.approve(address(join), 100 ether);
-        join.join(address(this), 100 ether);
-
-        vat.file(ilk, "spot", 2 * RAY);
-        vat.frob(ilk, address(this), address(this), address(this), int(100 ether), int(120 ether));
-        vat.file(ilk, "spot", 1 * RAY);  // Now unsafe
-
-        uint256 beforeLitter = cat.litter();
-        (, uint256 chop,)    = cat.ilks(ilk);
-        (, uint256 rate,,,)  = vat.ilks(ilk);
-        (, uint256 art)      = vat.urns(ilk, address(this));
-
-        assertEq(flip.kicks(), 0);
-        cat.bite(ilk, address(this));
-        assertEq(flip.kicks(), 1);
-        assertEq(cat.litter() - beforeLitter, art * rate * chop / WAD);
-    }
-
     function testFailWrongDay() public {
         vote();
         scheduleWaitAndCastFailDay();
@@ -540,13 +472,6 @@ contract DssSpellTest is DSTest, DSMath {
         }
 
         bytes32[] memory ilks = reg.list();
-        address[] memory oldFlips = new address[](ilks.length);
-        address[] memory newFlips = new address[](ilks.length);
-
-        for(uint i = 0; i < ilks.length; i++) {
-            (address flip_address,,) = oldCat.ilks(ilks[i]);
-            oldFlips[i] = flip_address;
-        }
 
         vote();
         scheduleWaitAndCast();
@@ -554,41 +479,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkSystemValues(afterSpell);
 
-        assertEq(ethusd_osm.bud(yearn), 1);
-
-        // Give this address auth to file spot in the vat (for liquidation testing)
-        hevm.store(
-            address(vat),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(uint256(1))
-        );
-        assertEq(vat.wards(address(this)), 1);
-
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
-            (address flip_address,,) = cat.ilks(ilks[i]);
-            newFlips[i] = flip_address;
-            if(ilks[i] != "TUSD-A" && ilks[i] != "USDC-A" && ilks[i] != "USDC-B") {
-                checkLiquidations(ilks[i], flip_address);
-            }
-        }
-
-        assertEq(cat.vow(), oldCat.vow());
-        assertEq(vat.wards(address(cat)), 1);
-        assertEq(vat.wards(address(oldCat)), 0);
-        assertEq(vow.wards(address(cat)), 1);
-        assertEq(vow.wards(address(oldCat)), 0);
-        assertEq(end.cat(), address(cat));
-        assertEq(cat.wards(address(end)), 1);
-
-        require(
-            ilks.length == newFlips.length && ilks.length == oldFlips.length,
-            "array-lengths-not-equal"
-        );
-
-        // Check flip parameters
-        for(uint i = 0; i < ilks.length; i++) {
-            checkFlipValues(ilks[i], newFlips[i], oldFlips[i]);
         }
     }
 }
