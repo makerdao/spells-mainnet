@@ -12,6 +12,8 @@
 
 - [ ] Every contract variable/method declared as public/external private/internal
 - [ ] Consider if this PR needs the `officeHours` modifier
+- [ ] Verify expiration (`4 days + 2 hours` monthly and `30 days` for the rest)
+- [ ] Verify hash in the description matches [here](https://emn178.github.io/online-tools/keccak_256.html)
 - [ ] Validate all addresses used are in changelog or known
 - [ ] Deploy spell `SOLC_FLAGS="--optimize --optimize-runs=1" dapp --use solc:0.5.12 build && dapp create DssSpell --gas=2000000 --gas-price="$(seth --to-wei 420 "gwei")"`
 - [ ] Verify `mainnet` contract on etherscan
