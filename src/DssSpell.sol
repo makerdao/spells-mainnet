@@ -39,12 +39,12 @@ contract SpellAction {
     address constant USDT                   = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address constant MCD_JOIN_USDT_A        = ;
     address constant MCD_FLIP_USDT_A        = ;
-    address constant PIP_USDT               = ;
+    address constant PIP_USDT               = 0x7a5918670B0C390aD25f7beE908c1ACc2d314A3C;
 
     address constant PAXUSD                 = 0x8E870D67F660D95d5be530380D0eC0bd388289E1;
     address constant MCD_JOIN_PAXUSD_A      = ;
     address constant MCD_FLIP_PAXUSD_A      = ;
-    address constant PIP_PAXUSD             = ;
+    address constant PIP_PAXUSD             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
