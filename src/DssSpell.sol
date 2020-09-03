@@ -256,6 +256,10 @@ contract DssSpell {
     }
 
     modifier officeHours {
+
+        // Unavailable on Labor Day 2020 (U.S.)
+        require(now < 1599436800 || now > 1599523200);
+
         uint day = (now / 1 days + 3) % 7;
         require(day < 5, "Can only be cast on a weekday");
         uint hour = now / 1 hours % 24;
@@ -270,7 +274,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public /*officeHours*/ {
+    function cast() public officeHours {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
