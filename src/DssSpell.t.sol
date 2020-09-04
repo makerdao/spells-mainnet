@@ -51,6 +51,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_bump;
         uint256 vow_hump;
         uint256 cat_box;
+        uint256 ilk_count;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -172,7 +173,8 @@ contract DssSpellTest is DSTest, DSMath {
             vow_sump: 50000 * RAD,
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
-            cat_box: 10 * MILLION * RAD
+            cat_box: 10 * MILLION * RAD,
+            ilk_count: 11
         });
 
         //
@@ -446,6 +448,9 @@ contract DssSpellTest is DSTest, DSMath {
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
             vow.hump() == 0
         );
+
+        // check number of ilks
+        assertEq(reg.count(), values.ilk_count);
     }
 
     function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
