@@ -389,7 +389,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function scheduleWaitAndCast() public {
         spell.schedule();
-        hevm.warp(now + pause.delay());
+        hevm.warp(1599573601);
         spell.cast();
     }
 

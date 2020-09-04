@@ -27,6 +27,10 @@ import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 
+contract ERC20 {
+    function decimals() external view returns (uint);
+}
+
 contract SpellAction {
 
     // MAINNET ADDRESSES
@@ -60,12 +64,12 @@ contract SpellAction {
     // Medianizers
     address constant USDTUSD                = 0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A;
     address constant MANAUSD                = 0x681c4F8f69cF68852BAd092086ffEaB31F5B812c;
-    address constant BATUSD 				= 0x18B4633D6E39870f398597f3c1bA8c4A41294966;
-    address constant BTCUSD 				= 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
-    address constant ETHBTC 				= 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
-    address constant ETHUSD 				= 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address constant KNCUSD 				= 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
-    address constant ZRXUSD 				= 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
+    address constant BATUSD                 = 0x18B4633D6E39870f398597f3c1bA8c4A41294966;
+    address constant BTCUSD                 = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant ETHBTC                 = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
+    address constant ETHUSD                 = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant KNCUSD                 = 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
+    address constant ZRXUSD                 = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -178,8 +182,8 @@ contract SpellAction {
         // Sanity checks
         require(GemJoinAbstract(MCD_JOIN_USDT_A).vat() == MCD_VAT,  "join-vat-not-match");
         require(GemJoinAbstract(MCD_JOIN_USDT_A).ilk() == ilkUSDTA, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).gem() == USDT,     "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).dec() == 6,        "join-dec-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).gem() == USDT,   	"join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).dec() == ERC20(USDT).decimals(),  "join-dec-not-match");
         require(FlipAbstract(MCD_FLIP_USDT_A).vat()    == MCD_VAT,  "flip-vat-not-match");
         require(FlipAbstract(MCD_FLIP_USDT_A).ilk()    == ilkUSDTA, "flip-ilk-not-match");
 
@@ -238,7 +242,7 @@ contract SpellAction {
         require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).vat() == MCD_VAT,    "join-vat-not-match");
         require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).ilk() == ilkPAXUSDA, "join-ilk-not-match");
         require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).gem() == PAXUSD,     "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).dec() == 18,         "join-dec-not-match");
+        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).dec() == ERC20(PAXUSD).decimals(),  "join-dec-not-match");
         require(FlipAbstract(MCD_FLIP_PAXUSD_A).vat()    == MCD_VAT,    "flip-vat-not-match");
         require(FlipAbstract(MCD_FLIP_PAXUSD_A).ilk()    == ilkPAXUSDA, "flip-ilk-not-match");
 
@@ -266,7 +270,6 @@ contract SpellAction {
         // Allow FlipperMom to access the PAXUSD-A Flipper
         FlipAbstract(MCD_FLIP_PAXUSD_A).rely(FLIPPER_MOM);
 
-        // TODO: update these, we still don't have variables yet
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "line"  , 5 * MILLION * RAD    ); // 5 MM debt ceiling
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "dust"  , 100 * RAD            ); // 100 Dai dust
         CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "dunk"  , 50 * THOUSAND * RAD  ); // 50,000 dunk
@@ -330,7 +333,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
+    function cast() officeHours public {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
