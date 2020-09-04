@@ -21,7 +21,7 @@ interface USDTAbstract {
 }
 
 contract DssSpellTest is DSTest, DSMath {
-    // populate with mainnt spell if needed
+    // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1599139568;
