@@ -183,12 +183,12 @@ contract SpellAction {
         bytes32 ilkUSDTA = "USDT-A";
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).vat() == MCD_VAT,  "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).ilk() == ilkUSDTA, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).gem() == USDT,   	"join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_USDT_A).dec() == ERC20(USDT).decimals(),  "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_USDT_A).vat()    == MCD_VAT,  "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_USDT_A).ilk()    == ilkUSDTA, "flip-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).vat() == MCD_VAT,                  "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).ilk() == ilkUSDTA,                 "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).gem() == USDT,   	                "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_USDT_A).dec() == ERC20(USDT).decimals(),   "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_USDT_A).vat()    == MCD_VAT,                  "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_USDT_A).ilk()    == ilkUSDTA,                 "flip-ilk-not-match");
 
         // Set price feed for USDT-A
         SpotAbstract(MCD_SPOT).file(ilkUSDTA, "pip", PIP_USDT);
@@ -245,12 +245,12 @@ contract SpellAction {
         bytes32 ilkPAXUSDA = "PAXUSD-A";
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).vat() == MCD_VAT,    "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).ilk() == ilkPAXUSDA, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).gem() == PAXUSD,     "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).dec() == ERC20(PAXUSD).decimals(),  "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_PAXUSD_A).vat()    == MCD_VAT,    "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_PAXUSD_A).ilk()    == ilkPAXUSDA, "flip-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).vat() == MCD_VAT,                    "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).ilk() == ilkPAXUSDA,                 "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).gem() == PAXUSD,                     "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_PAXUSD_A).dec() == ERC20(PAXUSD).decimals(),   "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_PAXUSD_A).vat()    == MCD_VAT,                    "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_PAXUSD_A).ilk()    == ilkPAXUSDA,                 "flip-ilk-not-match");
 
         // Set price feed for PAXUSD-A
         SpotAbstract(MCD_SPOT).file(ilkPAXUSDA, "pip", PIP_PAXUSD);
