@@ -34,7 +34,6 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.0/contracts.json
-
     address constant MCD_VAT                = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant MCD_CAT                = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
     address constant MCD_JUG                = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
@@ -70,8 +69,8 @@ contract SpellAction {
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // set the global debt ceiling to 708,000,000
-        // 588 (current DC) + 120 (ETH-A increase)
+        // set the global debt ceiling to 748,000,000
+        // 708 (current DC) + 40 (WBTC-A increase)
         VatAbstract(MCD_VAT).file("Line", 748 * MILLION * RAD);
 
         // Set the WBTC-A debt ceiling
@@ -94,7 +93,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("USDC-A", "duty", TWO_PCT_RATE);
 
         // Set the USDC-B stability fee
-        // Previous: 46%
+        // Previous: 44%
         // New: 48%
         JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
         JugAbstract(MCD_JUG).file("USDC-B", "duty", FOURTY_EIGHT_PCT_RATE);
@@ -118,7 +117,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("ZRX-A", "duty", TWO_PCT_RATE);
 
         // Set the MANA-A stability fee
-        // Previous: 8%
+        // Previous: 6%
         // New: 10%
         JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
         JugAbstract(MCD_JUG).file("MANA-A", "duty", TEN_PCT_RATE);
