@@ -53,6 +53,20 @@ contract SpellAction {
     address constant MCD_FLIP_PAXUSD_A      = 0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7;
     address constant PIP_PAXUSD             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
 
+    // light feeds
+    address constant ARGENT                 = 0x130431b4560Cd1d74A990AE86C337a33171FF3c6;
+    address constant MYCRYPTO               = 0x3CB645a8f10Fb7B0721eaBaE958F77a878441Cb9;
+
+    // Medianizers
+    address constant USDTUSD                = 0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A;
+    address constant MANAUSD                = 0x681c4F8f69cF68852BAd092086ffEaB31F5B812c;
+    address constant BATUSD 				= 0x18B4633D6E39870f398597f3c1bA8c4A41294966;
+    address constant BTCUSD 				= 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant ETHBTC 				= 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
+    address constant ETHUSD 				= 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant KNCUSD 				= 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
+    address constant ZRXUSD 				= 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
+
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
     uint256 constant MILLION  = 10 ** 6;
@@ -121,6 +135,34 @@ contract SpellAction {
         // New: 10%
         JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
         JugAbstract(MCD_JUG).file("MANA-A", "duty", TEN_PCT_RATE);
+
+        // argent address array
+        address[] memory argent = new address[](1);
+        argent[0] = ARGENT;
+
+        // mycrypto address array
+        address[] memory mycrypto = new address[](1);
+        mycrypto[0] = MYCRYPTO;
+
+        // Lift New Argent light feed
+        MedianAbstract(BATUSD).lift(argent);
+        MedianAbstract(BTCUSD).lift(argent);
+        MedianAbstract(ETHBTC).lift(argent);
+        MedianAbstract(ETHUSD).lift(argent);
+        MedianAbstract(KNCUSD).lift(argent);
+        MedianAbstract(ZRXUSD).lift(argent);
+        MedianAbstract(USDTUSD).lift(argent);
+        MedianAbstract(MANAUSD).lift(argent);
+
+        // Lift New MyCrypto light feed
+        MedianAbstract(BATUSD).lift(mycrypto);
+        MedianAbstract(BTCUSD).lift(mycrypto);
+        MedianAbstract(ETHBTC).lift(mycrypto);
+        MedianAbstract(ETHUSD).lift(mycrypto);
+        MedianAbstract(KNCUSD).lift(mycrypto);
+        MedianAbstract(ZRXUSD).lift(mycrypto);
+        MedianAbstract(USDTUSD).lift(mycrypto);
+        MedianAbstract(MANAUSD).lift(mycrypto);
 
         ////////////////////////////////////////////////////////////////////////////////
         // USDT-A collateral deploy

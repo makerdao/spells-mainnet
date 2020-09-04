@@ -79,7 +79,6 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
-
     // USDT-A specific
     USDTAbstract usdt            = USDTAbstract(     0xdAC17F958D2ee523a2206206994597C13D831ec7);
     GemJoinAbstract joinUSDTA    = GemJoinAbstract(  0x0Ac6A1D74E84C2dF9063bDDc31699FF2a2BB22A2);
@@ -92,6 +91,19 @@ contract DssSpellTest is DSTest, DSMath {
     GemJoinAbstract  joinPAXUSDA = GemJoinAbstract(  0x7e62B7E279DFC78DEB656E34D6a435cC08a44666);
     DSValueAbstract    pipPAXUSD = DSValueAbstract(  0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC);
     FlipAbstract     flipPAXUSDA = FlipAbstract(     0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7);
+
+
+    // lightfeed addresses
+    address constant ARGENT     = 0x130431b4560Cd1d74A990AE86C337a33171FF3c6;
+    address constant MYCRYPTO   = 0x3CB645a8f10Fb7B0721eaBaE958F77a878441Cb9;
+
+	MedianAbstract BATUSD = MedianAbstract(0x18B4633D6E39870f398597f3c1bA8c4A41294966);
+    MedianAbstract BTCUSD = MedianAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
+    MedianAbstract ETHBTC = MedianAbstract(0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED);
+    MedianAbstract ETHUSD = MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
+    MedianAbstract KNCUSD = MedianAbstract(0x83076a2F42dc1925537165045c9FDe9A4B71AD97);
+    MedianAbstract ZRXUSD = MedianAbstract(0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e);
+    MedianAbstract MANAUSD = MedianAbstract(0x681c4F8f69cF68852BAd092086ffEaB31F5B812c);
 
     DssSpell spell;
 
@@ -157,7 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 748 * MILLION * RAD,
+            vat_Line: 763 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -518,6 +530,26 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
         }
+
+        // argent oracle assertions
+        assertEq(BATUSD.orcl(ARGENT), 1);
+        assertEq(BTCUSD.orcl(ARGENT), 1);
+        assertEq(ETHBTC.orcl(ARGENT), 1);
+        assertEq(ETHUSD.orcl(ARGENT), 1);
+        assertEq(KNCUSD.orcl(ARGENT), 1);
+        assertEq(ZRXUSD.orcl(ARGENT), 1);
+        assertEq(medUSDTA.orcl(ARGENT), 1);
+        assertEq(MANAUSD.orcl(ARGENT), 1);
+
+        // mycrypto oracle assertions
+        assertEq(BATUSD.orcl(MYCRYPTO), 1);
+        assertEq(BTCUSD.orcl(MYCRYPTO), 1);
+        assertEq(ETHBTC.orcl(MYCRYPTO), 1);
+        assertEq(ETHUSD.orcl(MYCRYPTO), 1);
+        assertEq(KNCUSD.orcl(MYCRYPTO), 1);
+        assertEq(ZRXUSD.orcl(MYCRYPTO), 1);
+        assertEq(medUSDTA.orcl(MYCRYPTO), 1);
+        assertEq(MANAUSD.orcl(MYCRYPTO), 1);
     }
 
     function testSpellIsCast_USDTA_INTEGRATION() public {
