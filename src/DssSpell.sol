@@ -58,7 +58,10 @@ contract SpellAction {
     address constant PIP_PAXUSD             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
 
     // light feeds
+    //
+    // https://forum.makerdao.com/t/mip10c14-sp5-proposal-appoint-argent-as-a-light-feed/3015
     address constant ARGENT                 = 0x130431b4560Cd1d74A990AE86C337a33171FF3c6;
+    // https://forum.makerdao.com/t/mip10c14-sp6-proposal-appoint-mycrypto-as-a-light-feed/3383
     address constant MYCRYPTO               = 0x3CB645a8f10Fb7B0721eaBaE958F77a878441Cb9;
 
     // Medianizers
