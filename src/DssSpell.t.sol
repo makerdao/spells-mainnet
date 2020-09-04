@@ -22,9 +22,9 @@ interface USDTAbstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0x2D72e95685c39A7f85327d7A7F8D752AA82B62E9);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1599139568;
+    uint256 constant SPELL_CREATED = 1599241188;
 
     struct CollateralValues {
         uint256 line;
