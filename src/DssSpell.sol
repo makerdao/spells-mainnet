@@ -64,12 +64,12 @@ contract SpellAction {
     // Medianizers
     address constant USDTUSD                = 0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A;
     address constant MANAUSD                = 0x681c4F8f69cF68852BAd092086ffEaB31F5B812c;
-    address constant BATUSD 				= 0x18B4633D6E39870f398597f3c1bA8c4A41294966;
-    address constant BTCUSD 				= 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
-    address constant ETHBTC 				= 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
-    address constant ETHUSD 				= 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address constant KNCUSD 				= 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
-    address constant ZRXUSD 				= 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
+    address constant BATUSD                 = 0x18B4633D6E39870f398597f3c1bA8c4A41294966;
+    address constant BTCUSD                 = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant ETHBTC                 = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
+    address constant ETHUSD                 = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant KNCUSD                 = 0x83076a2F42dc1925537165045c9FDe9A4B71AD97;
+    address constant ZRXUSD                 = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
