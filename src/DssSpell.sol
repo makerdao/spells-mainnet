@@ -325,8 +325,8 @@ contract DssSpell {
 
     modifier officeHours {
 
-        // Unavailable on Labor Day 2020 (U.S.)
-        require(now < 1599436800 || now > 1599523200);
+        // Available after 14:00 UTC (10:00 am EDT) 2020/09/08
+        require(now > 1599573600);
 
         uint day = (now / 1 days + 3) % 7;
         require(day < 5, "Can only be cast on a weekday");
