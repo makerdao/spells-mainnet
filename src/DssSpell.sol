@@ -279,6 +279,9 @@ contract SpellAction {
         // Allow FlipperMom to access the PAXUSD-A Flipper
         FlipAbstract(MCD_FLIP_PAXUSD_A).rely(FLIPPER_MOM);
 
+        // Consequently, deny PAXUSD-A Flipper
+        FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_PAXUSD_A);
+
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "line"  , 5 * MILLION * RAD    ); // 5 MM debt ceiling
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "dust"  , 100 * RAD            ); // 100 Dai dust
         CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "dunk"  , 50 * THOUSAND * RAD  ); // 50,000 dunk
@@ -291,9 +294,6 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).poke(ilkPAXUSDA);
 
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_PAXUSD_A);
-
-        // Consequently, deny PAXUSD-A Flipper
-        FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_PAXUSD_A);
     }
 }
 
