@@ -63,17 +63,17 @@ contract DssSpellTest is DSTest, DSMath {
     address         pauseProxy =                     0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     DSChiefAbstract      chief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     VatAbstract            vat = VatAbstract(        0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    CatAbstract            cat = CatAbstract(        0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea);
     VowAbstract            vow = VowAbstract(        0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    CatAbstract            cat = CatAbstract(        0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea);
     PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
     JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
     SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
     DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
     EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    IlkRegistryAbstract    reg = IlkRegistryAbstract(0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24);
     DSTokenAbstract       weth = DSTokenAbstract(    0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     GemJoinAbstract   wethJoin = GemJoinAbstract(    0x2F0b23f53734252Bda2277357e97e1517d6B042A);
-    IlkRegistryAbstract    reg = IlkRegistryAbstract(0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24);
 
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
@@ -91,12 +91,11 @@ contract DssSpellTest is DSTest, DSMath {
     DSValueAbstract    pipPAXUSD = DSValueAbstract(  0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC);
     FlipAbstract     flipPAXUSDA = FlipAbstract(     0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7);
 
-
     // lightfeed addresses
     address constant ARGENT     = 0x130431b4560Cd1d74A990AE86C337a33171FF3c6;
     address constant MYCRYPTO   = 0x3CB645a8f10Fb7B0721eaBaE958F77a878441Cb9;
 
-	MedianAbstract BATUSD = MedianAbstract(0x18B4633D6E39870f398597f3c1bA8c4A41294966);
+    MedianAbstract BATUSD = MedianAbstract(0x18B4633D6E39870f398597f3c1bA8c4A41294966);
     MedianAbstract BTCUSD = MedianAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
     MedianAbstract ETHBTC = MedianAbstract(0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED);
     MedianAbstract ETHUSD = MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
