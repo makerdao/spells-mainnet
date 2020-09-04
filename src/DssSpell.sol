@@ -91,8 +91,7 @@ contract SpellAction {
         //
         // Existing debt: 80 million
         // New debt ceiling: 120 million
-        uint256 WBTC_A_LINE = 120 * MILLION * RAD;
-        VatAbstract(MCD_VAT).file("WBTC-A", "line", WBTC_A_LINE);
+        VatAbstract(MCD_VAT).file("WBTC-A", "line", 120 * MILLION * RAD);
 
         // Set the BAT-A stability fee
         // Previous: 0%
