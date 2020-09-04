@@ -302,8 +302,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDT-A"] = CollateralValues({
             line:         10 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000002440418608258400030, // 8% SF
-            pct:          8 * 1000,
+            duty:         1000000001847694957439350562, // 6% SF w/ base
+            pct:          6 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -315,8 +315,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF
-            pct:          4 * 1000,
+            duty:         1000000000627937192491029810, // 2% SF w/ base
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,

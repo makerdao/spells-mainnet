@@ -89,7 +89,7 @@ contract SpellAction {
     //
     uint256 constant TWO_PCT_RATE           = 1000000000627937192491029810;
     uint256 constant FOUR_PCT_RATE          = 1000000001243680656318820312;
-    uint256 constant EIGHT_PCT_RATE         = 1000000002440418608258400030;
+    uint256 constant SIX_PCT_RATE           = 1000000001847694957439350562;
     uint256 constant TEN_PCT_RATE           = 1000000003022265980097387650;
     uint256 constant FOURTY_EIGHT_PCT_RATE  = 1000000012431573129530493155;
 
@@ -225,7 +225,7 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file( ilkUSDTA, "dust", 100 * RAD            ); // 100 Dai dust
         CatAbstract(MCD_CAT).file( ilkUSDTA, "dunk", 50 * THOUSAND * RAD  ); // 50,000 dunk
         CatAbstract(MCD_CAT).file( ilkUSDTA, "chop", 113 * WAD / 100      ); // 13% liq. penalty
-        JugAbstract(MCD_JUG).file( ilkUSDTA, "duty", EIGHT_PCT_RATE       ); // 8% stability fee
+        JugAbstract(MCD_JUG).file( ilkUSDTA, "duty", SIX_PCT_RATE         ); // 6% stability fee
 
         FlipAbstract(MCD_FLIP_USDT_A).file(  "beg" , 103 * WAD / 100      ); // 3% bid increase
         FlipAbstract(MCD_FLIP_USDT_A).file(  "ttl" , 6 hours              ); // 6 hours ttl
@@ -277,7 +277,7 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "dust"  , 100 * RAD            ); // 100 Dai dust
         CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "dunk"  , 50 * THOUSAND * RAD  ); // 50,000 dunk
         CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "chop"  , 113 * WAD / 100      ); // 13% liq. penalty
-        JugAbstract(MCD_JUG).file(ilkPAXUSDA,   "duty"  , FOUR_PCT_RATE        ); // 4% stability fee
+        JugAbstract(MCD_JUG).file(ilkPAXUSDA,   "duty"  , TWO_PCT_RATE         ); // 2% stability fee
         FlipAbstract(MCD_FLIP_PAXUSD_A).file(   "beg"   , 103 * WAD / 100      ); // 3% bid increase
         FlipAbstract(MCD_FLIP_PAXUSD_A).file(   "ttl"   , 6 hours              ); // 6 hours ttl
         FlipAbstract(MCD_FLIP_PAXUSD_A).file(   "tau"   , 6 hours              ); // 6 hours tau
