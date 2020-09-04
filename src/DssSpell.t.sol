@@ -81,17 +81,17 @@ contract DssSpellTest is DSTest, DSMath {
 
 
     // USDT-A specific
-    USDTAbstract usdt            = USDTAbstract(     );
-    GemJoinAbstract joinUSDTA    = GemJoinAbstract(  );
+    USDTAbstract usdt            = USDTAbstract(     0xdAC17F958D2ee523a2206206994597C13D831ec7);
+    GemJoinAbstract joinUSDTA    = GemJoinAbstract(  0x0Ac6A1D74E84C2dF9063bDDc31699FF2a2BB22A2);
     OsmAbstract pipUSDT          = OsmAbstract(      0x7a5918670B0C390aD25f7beE908c1ACc2d314A3C);
-    FlipAbstract flipUSDTA       = FlipAbstract(     );
+    FlipAbstract flipUSDTA       = FlipAbstract(     0x667F41d0fDcE1945eE0f56A79dd6c142E37fCC26);
     MedianAbstract medUSDTA      = MedianAbstract(   0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A);
 
     // PAXUSD-A specific
-    GemAbstract      paxusd      = GemAbstract(      );
-    GemJoinAbstract  joinPAXUSDA = GemJoinAbstract(  );
+    GemAbstract      paxusd      = GemAbstract(      0x8E870D67F660D95d5be530380D0eC0bd388289E1);
+    GemJoinAbstract  joinPAXUSDA = GemJoinAbstract(  0x7e62B7E279DFC78DEB656E34D6a435cC08a44666);
     DSValueAbstract    pipPAXUSD = DSValueAbstract(  0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC);
-    FlipAbstract     flipPAXUSDA = FlipAbstract(     );
+    FlipAbstract     flipPAXUSDA = FlipAbstract(     0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7);
 
     DssSpell spell;
 
@@ -164,8 +164,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_sump: 50000 * RAD,
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
-            cat_box: 10 * MILLION * RAD,
-            ilk_count: 9
+            cat_box: 10 * MILLION * RAD
         });
 
         //
@@ -175,65 +174,65 @@ contract DssSpellTest is DSTest, DSMath {
             line:         540 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000000000000000000000,
-            pct:          8 * 1000,
+            pct:          0 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
-            pct:          0 * 1000,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            line:         140 * MILLION * RAD,
+            line:         40 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
-            pct:          0,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          110 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          3 days,
             liquidations: 0
         });
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000011562757347033522598,
-            pct:          44 * 1000,
+            duty:         1000000012431573129530493155,
+            pct:          48 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          3 days,
             liquidations: 0
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
-            line:         80 * MILLION * RAD,
+            line:         120 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
-            pct:          0,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
@@ -242,50 +241,50 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000000000000000000000000,
             pct:          0 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          3 days,
             liquidations: 0
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
-            pct:          0,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
-            pct:          0,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         1 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000000627937192491029810,
-            pct:          6 * 1000,
+            duty:         1000000003022265980097387650,
+            pct:          10 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
             beg:          103 * WAD / 100,
-            ttl:          1 hours,
-            tau:          1 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 1
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
@@ -294,7 +293,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000002440418608258400030, // 8% SF
             pct:          8 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -307,7 +306,7 @@ contract DssSpellTest is DSTest, DSMath {
             duty:         1000000001243680656318820312, // 4% SF
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
-            dunk:         500 * RAD,
+            dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
@@ -335,6 +334,45 @@ contract DssSpellTest is DSTest, DSMath {
             chief.lift(address(spell));
         }
         assertEq(chief.hat(), address(spell));
+    }
+
+    function scheduleWaitAndCastFailDay() public {
+        spell.schedule();
+
+        uint castTime = now + pause.delay();
+        uint day = (castTime / 1 days + 3) % 7;
+        if (day < 5) {
+            castTime += 5 days - day * 86400;
+        }
+
+        hevm.warp(castTime);
+        spell.cast();
+    }
+
+    function scheduleWaitAndCastFailEarly() public {
+        spell.schedule();
+
+        uint castTime = now + pause.delay() + 24 hours;
+        uint hour = castTime / 1 hours % 24;
+        if (hour >= 14) {
+            castTime -= hour * 3600 - 13 hours;
+        }
+
+        hevm.warp(castTime);
+        spell.cast();
+    }
+
+    function scheduleWaitAndCastFailLate() public {
+        spell.schedule();
+
+        uint castTime = now + pause.delay();
+        uint hour = castTime / 1 hours % 24;
+        if (hour < 21) {
+            castTime += 21 hours - hour * 3600;
+        }
+
+        hevm.warp(castTime);
+        spell.cast();
     }
 
     function scheduleWaitAndCast() public {
@@ -437,9 +475,24 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(uint(flip.ttl()), values.collaterals[ilk].ttl);
         assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
         assertEq(uint(flip.tau()), values.collaterals[ilk].tau);
-        assertTrue(flip.tau() >= 600 && flip.tau() <= 1 hours);          // gt eq 10 minutes and lt eq 1 hours
+        assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
+    }
+
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
+
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
+
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
     }
 
     function testSpellIsCast() public {

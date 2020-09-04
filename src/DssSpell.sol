@@ -14,10 +14,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.5.12;
-
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/CatAbstract.sol";
+import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
+import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
+import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
+import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
+import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 
 contract SpellAction {
 
@@ -37,13 +45,13 @@ contract SpellAction {
     address constant ILK_REGISTRY           = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
 
     address constant USDT                   = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    address constant MCD_JOIN_USDT_A        = ;
-    address constant MCD_FLIP_USDT_A        = ;
+    address constant MCD_JOIN_USDT_A        = 0x0Ac6A1D74E84C2dF9063bDDc31699FF2a2BB22A2;
+    address constant MCD_FLIP_USDT_A        = 0x667F41d0fDcE1945eE0f56A79dd6c142E37fCC26;
     address constant PIP_USDT               = 0x7a5918670B0C390aD25f7beE908c1ACc2d314A3C;
 
     address constant PAXUSD                 = 0x8E870D67F660D95d5be530380D0eC0bd388289E1;
-    address constant MCD_JOIN_PAXUSD_A      = ;
-    address constant MCD_FLIP_PAXUSD_A      = ;
+    address constant MCD_JOIN_PAXUSD_A      = 0x7e62B7E279DFC78DEB656E34D6a435cC08a44666;
+    address constant MCD_FLIP_PAXUSD_A      = 0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7;
     address constant PIP_PAXUSD             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
 
     // Decimals & precision
@@ -54,6 +62,8 @@ contract SpellAction {
     uint256 constant RAD      = 10 ** 45;
 
     uint256 constant TWO_PCT_RATE           = 1000000000627937192491029810;
+    uint256 constant FOUR_PCT_RATE          = 1000000001243680656318820312;
+    uint256 constant EIGHT_PCT_RATE         = 1000000002440418608258400030;
     uint256 constant TEN_PCT_RATE           = 1000000003022265980097387650;
     uint256 constant FOURTY_EIGHT_PCT_RATE  = 1000000012431573129530493155;
 
@@ -160,7 +170,7 @@ contract SpellAction {
         // since we're adding 2 collateral types in this spell, global line is at beginning
         VatAbstract(MCD_VAT).file( ilkUSDTA, "line", 10 * MILLION * RAD   ); // 10m debt ceiling
         VatAbstract(MCD_VAT).file( ilkUSDTA, "dust", 100 * RAD            ); // 100 Dai dust
-        CatAbstract(MCD_CAT).file( ilkUSDTA, "dunk", 500 * RAD            ); // 50,000 dunk
+        CatAbstract(MCD_CAT).file( ilkUSDTA, "dunk", 50 * THOUSAND * RAD  ); // 50,000 dunk
         CatAbstract(MCD_CAT).file( ilkUSDTA, "chop", 113 * WAD / 100      ); // 13% liq. penalty
         JugAbstract(MCD_JUG).file( ilkUSDTA, "duty", EIGHT_PCT_RATE       ); // 8% stability fee
 
@@ -213,7 +223,7 @@ contract SpellAction {
         // TODO: update these, we still don't have variables yet
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "line"  , 5 * MILLION * RAD    ); // 5 MM debt ceiling
         VatAbstract(MCD_VAT).file(ilkPAXUSDA,   "dust"  , 100 * RAD            ); // 100 Dai dust
-        CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "dunk"  , 500 * RAD            ); // 50,000 dunk
+        CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "dunk"  , 50 * THOUSAND * RAD  ); // 50,000 dunk
         CatAbstract(MCD_CAT).file(ilkPAXUSDA,   "chop"  , 113 * WAD / 100      ); // 13% liq. penalty
         JugAbstract(MCD_JUG).file(ilkPAXUSDA,   "duty"  , FOUR_PCT_RATE        ); // 4% stability fee
         FlipAbstract(MCD_FLIP_PAXUSD_A).file(   "beg"   , 103 * WAD / 100      ); // 3% bid increase
@@ -274,7 +284,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public officeHours {
+    function cast() public {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
