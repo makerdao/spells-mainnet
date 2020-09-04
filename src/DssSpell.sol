@@ -309,7 +309,7 @@ contract DssSpell {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/b9569... -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-04 MakerDAO Executive Spell | Hash: 0x0";
+        "2020-09-04 MakerDAO Executive Spell | Hash: 0x3c35701633399b48090f4c805686ebeeebcc86f6d05b354531f3bd0059ee48dd";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
