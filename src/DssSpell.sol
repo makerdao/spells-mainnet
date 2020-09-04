@@ -326,7 +326,7 @@ contract DssSpell {
     modifier officeHours {
 
         // Available after 14:00 UTC (10:00 am EDT) 2020/09/08
-        require(now > 1599573600);
+        require(now >= 1599573600);
 
         uint day = (now / 1 days + 3) % 7;
         require(day < 5, "Can only be cast on a weekday");
