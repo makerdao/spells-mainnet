@@ -203,6 +203,7 @@ contract SpellAction {
 
         // Allow USDT-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_USDT_A);
+
         // Allow USDT-A Flipper on the Cat
         CatAbstract(MCD_CAT).rely(MCD_FLIP_USDT_A);
 
@@ -264,6 +265,7 @@ contract SpellAction {
 
         // Allow PAXUSD-A Join to modify Vat registry
         VatAbstract(MCD_VAT).rely(MCD_JOIN_PAXUSD_A);
+
         // Allow PAXUSD-A Flipper on the Cat
         CatAbstract(MCD_CAT).rely(MCD_FLIP_PAXUSD_A);
 
