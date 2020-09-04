@@ -74,6 +74,12 @@ contract SpellAction {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
     uint256 constant TWO_PCT_RATE           = 1000000000627937192491029810;
     uint256 constant FOUR_PCT_RATE          = 1000000001243680656318820312;
     uint256 constant EIGHT_PCT_RATE         = 1000000002440418608258400030;
