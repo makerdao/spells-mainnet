@@ -69,9 +69,9 @@ contract SpellAction {
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // set the global debt ceiling to 748,000,000
-        // 708 (current DC) + 40 (WBTC-A increase)
-        VatAbstract(MCD_VAT).file("Line", 748 * MILLION * RAD);
+        // set the global debt ceiling to 763,000,000
+        // 708 (current DC) + 40 (WBTC-A increase) + 10 (tether DC) + 5 (paxusd DC)
+        VatAbstract(MCD_VAT).file("Line", 763 * MILLION * RAD);
 
         // Set the WBTC-A debt ceiling
         //
