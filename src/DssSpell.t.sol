@@ -349,8 +349,8 @@ contract DssSpellTest is DSTest, DSMath {
     function scheduleWaitAndCastFailDay() public {
         spell.schedule();
 
-        uint castTime = now + pause.delay();
-        uint day = (castTime / 1 days + 3) % 7;
+        uint256 castTime = now + pause.delay();
+        uint256 day = (castTime / 1 days + 3) % 7;
         if (day < 5) {
             castTime += 5 days - day * 86400;
         }
@@ -362,8 +362,8 @@ contract DssSpellTest is DSTest, DSMath {
     function scheduleWaitAndCastFailEarly() public {
         spell.schedule();
 
-        uint castTime = now + pause.delay() + 24 hours;
-        uint hour = castTime / 1 hours % 24;
+        uint256 castTime = now + pause.delay() + 24 hours;
+        uint256 hour = castTime / 1 hours % 24;
         if (hour >= 14) {
             castTime -= hour * 3600 - 13 hours;
         }
@@ -375,8 +375,8 @@ contract DssSpellTest is DSTest, DSMath {
     function scheduleWaitAndCastFailLate() public {
         spell.schedule();
 
-        uint castTime = now + pause.delay();
-        uint hour = castTime / 1 hours % 24;
+        uint256 castTime = now + pause.delay();
+        uint256 hour = castTime / 1 hours % 24;
         if (hour < 21) {
             castTime += 21 hours - hour * 3600;
         }
@@ -387,7 +387,22 @@ contract DssSpellTest is DSTest, DSMath {
 
     function scheduleWaitAndCast() public {
         spell.schedule();
-        hevm.warp(1599573601);
+
+        uint256 castTime = now + pause.delay();
+        uint256 day = (castTime / 1 days + 3) % 7;
+        if(day >= 5) {
+            castTime += 7 days - day * 86400;
+        }
+
+        uint256 hour = castTime / 1 hours % 24;
+        if (hour >= 21) {
+            castTime += 24 hours - hour * 3600 + 14 hours;
+        } else if (hour < 14) {
+            castTime += 14 hours - hour * 3600;
+        }
+
+        castTime = 1599573601; // TODO: be removed in a next spell, this is specific to avoid 7th September
+        hevm.warp(castTime);
         spell.cast();
     }
 
