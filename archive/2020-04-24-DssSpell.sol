@@ -66,8 +66,8 @@ contract SpellAction {
     // Lines 67 and 68 were modified after the spell was cast to prevent future confusion.
     //  The mainnet spell transposed these values but the end result did not change.
     //  We've edited this in post to properly label the addresses.
-    address constant public SET_BTCUSD = 0xbf63446ecF3341e04c6569b226a57860B188edBc;
-    address constant public DYDX_BTCUSD = 0x538038E526517680735568f9C5342c6E68bbDA12;
+    address constant public SET_BTCUSD = 0x538038E526517680735568f9C5342c6E68bbDA12;
+    address constant public DYDX_BTCUSD = 0xbf63446ecF3341e04c6569b226a57860B188edBc;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
