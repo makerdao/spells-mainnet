@@ -65,9 +65,9 @@ contract SpellAction {
         // New debt ceiling: 100 million
         VatAbstract(MCD_VAT).file("USDC-A", "line", 100 * MILLION * RAD);
 
+        // https://forum.makerdao.com/t/mip10c9-subproposal-to-whitelist-new-tbtc-oracle-access/3805
         // Whitelist tBTC address to read ETHBTC median
         MedianAbstract(ETHBTC).kiss(tBTC);
-
         // Remove previous tBTC address from ETHBTC median whitelist
         MedianAbstract(ETHBTC).diss(tBTC_OLD);
     }
