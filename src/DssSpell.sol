@@ -40,10 +40,10 @@ contract SpellAction {
     //     https://changelog.makerdao.com/releases/mainnet/1.1.0/contracts.json
     address constant MCD_VAT     = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
-    address constant BTCUSD      = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant ETHBTC      = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
 
     address constant tBTC        = 0xA3F68d722FBa26173aB64697B4625d4aD0F4C818;
-    address constant tBTC_OLD    = ;
+    address constant tBTC_OLD    = 0x3b995E9f719Cb5F4b106F795B01760a11d083823;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -65,11 +65,11 @@ contract SpellAction {
         // New debt ceiling: 100 million
         VatAbstract(MCD_VAT).file("USDC-A", "line", 100 * MILLION * RAD);
 
-        // Whitelist tBTC address to read BTCUSD median
-        MedianAbstract(BTCUSD).kiss(tBTC);
+        // Whitelist tBTC address to read ETHBTC median
+        MedianAbstract(ETHBTC).kiss(tBTC);
 
-        // Remove previous tBTC address from BTCUSD median whitelist
-        MedianAbstract(BTCUSD).diss(tBTC_OLD);
+        // Remove previous tBTC address from ETHBTC median whitelist
+        MedianAbstract(ETHBTC).diss(tBTC_OLD);
     }
 }
 

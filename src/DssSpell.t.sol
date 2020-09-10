@@ -78,9 +78,9 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
     // Specific for this spell
-    address constant BTCUSD    = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant ETHBTC    = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
     address constant tBTC      = 0xA3F68d722FBa26173aB64697B4625d4aD0F4C818;
-    address constant tBTC_OLD  = ;
+    address constant tBTC_OLD  = 0x3b995E9f719Cb5F4b106F795B01760a11d083823;
     //
 
     DssSpell spell;
@@ -516,8 +516,8 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
-        assertEq(MedianAbstract(BTCUSD).bud(tBTC), 0);
-        assertEq(MedianAbstract(BTCUSD).bud(tBTC_OLD), 1);
+        assertEq(MedianAbstract(ETHBTC).bud(tBTC), 0);
+        assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 1);
 
         vote();
         scheduleWaitAndCast();
@@ -530,7 +530,7 @@ contract DssSpellTest is DSTest, DSMath {
             checkCollateralValues(ilks[i],  afterSpell);
         }
 
-        assertEq(MedianAbstract(BTCUSD).bud(tBTC), 1);
-        assertEq(MedianAbstract(BTCUSD).bud(tBTC_OLD), 0);
+        assertEq(MedianAbstract(ETHBTC).bud(tBTC), 1);
+        assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 0);
     }
 }
