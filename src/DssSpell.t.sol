@@ -81,7 +81,6 @@ contract DssSpellTest is DSTest, DSMath {
     address constant ETHBTC    = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
     address constant tBTC      = 0xA3F68d722FBa26173aB64697B4625d4aD0F4C818;
     address constant tBTC_OLD  = 0x3b995E9f719Cb5F4b106F795B01760a11d083823;
-    //
 
     DssSpell spell;
 
