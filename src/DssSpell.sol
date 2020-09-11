@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.5.12;
+
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
@@ -85,9 +86,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c6b12fcd90c6c59795fa34e3bd573f2d2d7eb832/governance/votes/Executive%20vote%20-%20September%2011%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-11 MakerDAO Executive Spell | Hash: ";
+        "2020-09-11 MakerDAO Executive Spell | Hash: 0x54ead845e3b3dda69b7b5eede7c0150cd37f68302b7379deba19cbaee56a1ca6";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
