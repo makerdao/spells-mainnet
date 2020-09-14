@@ -17,6 +17,8 @@ pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
+import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 
 contract SpellAction {
@@ -27,11 +29,8 @@ contract SpellAction {
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.1/contracts.json
     address constant MCD_VAT     = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-
-    address constant ETHBTC      = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
-
-    address constant tBTC        = 0xA3F68d722FBa26173aB64697B4625d4aD0F4C818;
-    address constant tBTC_OLD    = 0x3b995E9f719Cb5F4b106F795B01760a11d083823;
+    address constant MCD_SPOT    = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant MCD_CAT     = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -43,21 +42,38 @@ contract SpellAction {
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // Set the global debt ceiling to 823,000,000
-        // 763 (current DC) + 60 (USDC-A increase)
-        VatAbstract(MCD_VAT).file("Line", 823 * MILLION * RAD);
+        // Set the global debt ceiling to 923,000,000
+        // 823 (current DC) + 100 (USDC-A increase) + 25 (PAXUSD-A increase)
+        VatAbstract(MCD_VAT).file("Line", 948 * MILLION * RAD);
 
-        // Set the USDC-A debt ceiling
+		// Set the USDC-A debt ceiling
         //
-        // Existing debt ceiling: 40 million
-        // New debt ceiling: 100 million
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 100 * MILLION * RAD);
+        // Existing debt ceiling: 100 million
+        // New debt ceiling: 200 million
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 200 * MILLION * RAD);
+		
+		// Set the PAXUSD-A debt ceiling
+        //
+        // Existing debt ceiling: 5 million
+        // New debt ceiling: 30 million
+        VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 30 * MILLION * RAD);
+		
+		// Set USDC-A collateralization ratio
+		// Existing ratio: 150%
+		// New ratio: 103%
+		SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("USDC-A");
+		
+		// Set PAXUSD-A collateralization ratio
+		// Existing ratio: 150%
+		// New ratio: 103%
+		SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
 
-        // https://forum.makerdao.com/t/mip10c9-subproposal-to-whitelist-new-tbtc-oracle-access/3805
-        // Whitelist tBTC address to read ETHBTC median
-        MedianAbstract(ETHBTC).kiss(tBTC);
-        // Remove previous tBTC address from ETHBTC median whitelist
-        MedianAbstract(ETHBTC).diss(tBTC_OLD);
+		// Set Cat box variable
+        // Existing box: 30m
+        // New box: 15m    
+        CatAbstract(MCD_CAT).file("box", 15 * MILLION * RAD);
     }
 }
 
@@ -74,6 +90,9 @@ contract DssSpell {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c6b12fcd90c6c59795fa34e3bd573f2d2d7eb832/governance/votes/Executive%20vote%20-%20September%2011%2C%202020.md -q -O - 2>/dev/null)"
+    
+
+    // change hash
     string constant public description =
         "2020-09-11 MakerDAO Executive Spell | Hash: 0x54ead845e3b3dda69b7b5eede7c0150cd37f68302b7379deba19cbaee56a1ca6";
 
