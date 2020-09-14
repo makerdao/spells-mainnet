@@ -22,7 +22,7 @@ interface USDTAbstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x223735DeF0eD8b129429Fb580cA0A91cefC3aE02);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1599838814;
 
@@ -76,11 +76,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
-
-    // Specific for this spell
-    address constant ETHBTC    = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
-    address constant tBTC      = 0xA3F68d722FBa26173aB64697B4625d4aD0F4C818;
-    address constant tBTC_OLD  = 0x3b995E9f719Cb5F4b106F795B01760a11d083823;
 
     DssSpell spell;
 
@@ -146,14 +141,14 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 823 * MILLION * RAD,
+            vat_Line: 948 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
             vow_sump: 50000 * RAD,
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
-            cat_box: 10 * MILLION * RAD,
+            cat_box: 15 * MILLION * RAD,
             ilk_count: 11
         });
 
@@ -187,13 +182,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            line:         100 * MILLION * RAD,
+            line:         200 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810,
             pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
-            mat:          110 * RAY / 100,
+            mat:          103 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          3 days,
@@ -291,13 +286,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
-            line:         5 * MILLION * RAD,
+            line:         30 * MILLION * RAD,
             dust:         100 * RAD,
             duty:         1000000000627937192491029810, // 2% SF w/ base
             pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
-            mat:          120 * RAY / 100,
+            mat:          103 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -443,6 +438,8 @@ contract DssSpellTest is DSTest, DSMath {
             vow.hump() == 0
         );
 
+        assertEq(cat.box(), values.cat_box);
+
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
     }
@@ -509,14 +506,14 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(stringToBytes32(spell.description()),
                 stringToBytes32(description));
 
-        if(address(spell) != address(MAINNET_SPELL)) {
+                if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
-        assertEq(MedianAbstract(ETHBTC).bud(tBTC), 0);
-        assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 1);
+        // assertEq(MedianAbstract(ETHBTC).bud(tBTC), 0);
+        // assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 1);
 
         vote();
         scheduleWaitAndCast();
@@ -529,7 +526,7 @@ contract DssSpellTest is DSTest, DSMath {
             checkCollateralValues(ilks[i],  afterSpell);
         }
 
-        assertEq(MedianAbstract(ETHBTC).bud(tBTC), 1);
-        assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 0);
+        // assertEq(MedianAbstract(ETHBTC).bud(tBTC), 1);
+        // assertEq(MedianAbstract(ETHBTC).bud(tBTC_OLD), 0);
     }
 }
