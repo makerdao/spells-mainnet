@@ -19,7 +19,6 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 
 contract SpellAction {
 
@@ -89,12 +88,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c6b12fcd90c6c59795fa34e3bd573f2d2d7eb832/governance/votes/Executive%20vote%20-%20September%2011%2C%202020.md -q -O - 2>/dev/null)"
-    
-
-    // change hash
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20September%2014%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-11 MakerDAO Executive Spell | Hash: 0x54ead845e3b3dda69b7b5eede7c0150cd37f68302b7379deba19cbaee56a1ca6";
+        "2020-09-14 MakerDAO Executive Spell | Hash: 0xf0155120204be06c56616181ea82bbfa93f48494455c6d0b3c0ab1d581464657";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
