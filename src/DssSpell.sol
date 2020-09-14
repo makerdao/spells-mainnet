@@ -41,7 +41,7 @@ contract SpellAction {
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // Set the global debt ceiling to 923,000,000
+        // Set the global debt ceiling to 948,000,000
         // 823 (current DC) + 100 (USDC-A increase) + 25 (PAXUSD-A increase)
         VatAbstract(MCD_VAT).file("Line", 948 * MILLION * RAD);
 
@@ -58,13 +58,13 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 30 * MILLION * RAD);
 
         // Set USDC-A collateralization ratio
-        // Existing ratio: 150%
+        // Existing ratio: 110%
         // New ratio: 103%
         SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 103% coll. ratio
         SpotAbstract(MCD_SPOT).poke("USDC-A");
 
         // Set PAXUSD-A collateralization ratio
-        // Existing ratio: 150%
+        // Existing ratio: 120%
         // New ratio: 103%
         SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 103% coll. ratio
         SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
@@ -88,7 +88,7 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20September%2014%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/15215ebaf8bbb4a20567b3233383788a68afb58b/governance/votes/Executive%20vote%20-%20September%2014%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
         "2020-09-14 MakerDAO Executive Spell | Hash: 0xf0155120204be06c56616181ea82bbfa93f48494455c6d0b3c0ab1d581464657";
 
