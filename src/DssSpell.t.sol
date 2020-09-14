@@ -506,7 +506,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(stringToBytes32(spell.description()),
                 stringToBytes32(description));
 
-                if(address(spell) != address(MAINNET_SPELL)) {
+        if(address(spell) != address(MAINNET_SPELL)) {
             assertEq(spell.expiration(), (now + 30 days));
         } else {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
