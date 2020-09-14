@@ -62,11 +62,13 @@ contract SpellAction {
 		// Existing ratio: 150%
 		// New ratio: 103%
 		SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("USDC-A");
 		
 		// Set PAXUSD-A collateralization ratio
 		// Existing ratio: 150%
 		// New ratio: 103%
 		SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
 
 		// Set Cat box variable
         // Existing box: 30m
