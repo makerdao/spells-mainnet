@@ -46,31 +46,31 @@ contract SpellAction {
         // 823 (current DC) + 100 (USDC-A increase) + 25 (PAXUSD-A increase)
         VatAbstract(MCD_VAT).file("Line", 948 * MILLION * RAD);
 
-		// Set the USDC-A debt ceiling
+        // Set the USDC-A debt ceiling
         //
         // Existing debt ceiling: 100 million
         // New debt ceiling: 200 million
         VatAbstract(MCD_VAT).file("USDC-A", "line", 200 * MILLION * RAD);
-		
-		// Set the PAXUSD-A debt ceiling
+
+        // Set the PAXUSD-A debt ceiling
         //
         // Existing debt ceiling: 5 million
         // New debt ceiling: 30 million
         VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 30 * MILLION * RAD);
-		
-		// Set USDC-A collateralization ratio
-		// Existing ratio: 150%
-		// New ratio: 103%
-		SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+
+        // Set USDC-A collateralization ratio
+        // Existing ratio: 150%
+        // New ratio: 103%
+        SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("USDC-A");
-		
-		// Set PAXUSD-A collateralization ratio
-		// Existing ratio: 150%
-		// New ratio: 103%
-		SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 101% coll. ratio
+
+        // Set PAXUSD-A collateralization ratio
+        // Existing ratio: 150%
+        // New ratio: 103%
+        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
 
-		// Set Cat box variable
+        // Set Cat box variable
         // Existing box: 30m
         // New box: 15m    
         CatAbstract(MCD_CAT).file("box", 15 * MILLION * RAD);
