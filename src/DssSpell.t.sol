@@ -11,15 +11,6 @@ interface Hevm {
     function store(address,bytes32,bytes32) external;
 }
 
-interface USDTAbstract {
-    function totalSupply() external view returns (uint256);
-    function balanceOf(address) external view returns (uint256);
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external;               // nonstandard
-    function transfer(address, uint256) external;              // nonstandard
-    function transferFrom(address, address, uint256) external; // nonstandard
-}
-
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
