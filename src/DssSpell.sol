@@ -16,9 +16,16 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+
+import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+
+// TODO: add to dss-interfaces?
+interface GemJoin6Like {
+    function setImplementation(address, uint256) external;
+}
 
 contract SpellAction {
 
@@ -27,9 +34,14 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.1/contracts.json
-    address constant MCD_VAT     = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_SPOT    = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant MCD_CAT     = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
+    address constant MCD_JOIN_TUSD_A  = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
+    address constant MCD_JUG          = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_SPOT         = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant MCD_VAT          = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant TUSD_IMPL_NEW    = 0x7a9701453249e84fd0D5AfE5951e9cBe9ed2E90f;
+    address constant MEDIAN_MANAUSD   = 0x681c4F8f69cF68852BAd092086ffEaB31F5B812c;
+    address constant GITCOIN_FEED_OLD = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
+    address constant GITCOIN_FEED_NEW = 0x77EB6CF8d732fe4D92c427fCdd83142DB3B742f7;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -38,41 +50,140 @@ contract SpellAction {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    uint256 constant FOUR_PCT_RATE   = 1000000001243680656318820312;
+    uint256 constant EIGHT_PCT_RATE  = 1000000002440418608258400030;
+    uint256 constant TWELVE_PCT_RATE = 1000000003593629043335673582;
+    uint256 constant FIFTY_PCT_RATE  = 1000000012857214317438491659;
+
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // Set the global debt ceiling to 948,000,000
-        // 823 (current DC) + 100 (USDC-A increase) + 25 (PAXUSD-A increase)
-        VatAbstract(MCD_VAT).file("Line", 948 * MILLION * RAD);
+        // Set the global debt ceiling to 1,196,000,000
+        // 948 (current DC) + 200 (USDC-A increase) + 48 (TUSD-A increase)
+        VatAbstract(MCD_VAT).file("Line", 1196 * MILLION * RAD);
 
         // Set the USDC-A debt ceiling
         //
-        // Existing debt ceiling: 100 million
-        // New debt ceiling: 200 million
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 200 * MILLION * RAD);
+        // Existing debt ceiling: 200 million
+        // New debt ceiling: 400 million
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 400 * MILLION * RAD);
 
-        // Set the PAXUSD-A debt ceiling
+        // Set the TUSD-A debt ceiling
         //
-        // Existing debt ceiling: 5 million
-        // New debt ceiling: 30 million
-        VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 30 * MILLION * RAD);
+        // Existing debt ceiling: 2 million
+        // New debt ceiling: 50 million
+        VatAbstract(MCD_VAT).file("TUSD-A", "line", 50 * MILLION * RAD);
 
         // Set USDC-A collateralization ratio
-        // Existing ratio: 110%
-        // New ratio: 103%
-        SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 103 * RAY / 100); // 103% coll. ratio
+        //
+        // Existing ratio: 103%
+        // New ratio: 101%
+        SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 101 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("USDC-A");
 
         // Set PAXUSD-A collateralization ratio
-        // Existing ratio: 120%
-        // New ratio: 103%
-        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 103 * RAY / 100); // 103% coll. ratio
+        //
+        // Existing ratio: 103%
+        // New ratio: 101%
+        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
 
-        // Set Cat box variable
-        // Existing box: 30m
-        // New box: 15m    
-        CatAbstract(MCD_CAT).file("box", 15 * MILLION * RAD);
+        // Set TUSD-A collateralization ratio
+        //
+        // Existing ratio: 120%
+        // New ratio: 101%
+        SpotAbstract(MCD_SPOT).file("TUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("TUSD-A");
+
+        // Set the TUSD-A stability fee
+        //
+        // Previous: 0%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("TUSD-A"); // drip right before
+        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_PCT_RATE);
+
+        // Set the USDT-A stability fee
+        //
+        // Previous: 6%
+        // New: 8%
+        JugAbstract(MCD_JUG).drip("USDT-A"); // drip right before
+        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_PCT_RATE);
+
+        // Set the PAXUSD-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("PAXUSD-A"); // drip right before
+        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_PCT_RATE);
+
+        // Set the USDC-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("USDC-A"); // drip right before
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", FOUR_PCT_RATE);
+
+        // Set the USDC-B stability fee
+        //
+        // Previous: 48%
+        // New: 50%
+        JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
+        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
+
+        // Set the BAT-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("BAT-A"); // drip right before
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_PCT_RATE);
+
+        // Set the WBTC-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("WBTC-A"); // drip right before
+        JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_PCT_RATE);
+
+        // Set the KNC-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("KNC-A"); // drip right before
+        JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_PCT_RATE);
+
+        // Set the ZRX-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("ZRX-A"); // drip right before
+        JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_PCT_RATE);
+
+        // Set the MANA-A stability fee
+        //
+        // Previous: 10%
+        // New: 12%
+        JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
+        JugAbstract(MCD_JUG).file("MANA-A", "duty", TWELVE_PCT_RATE);
+
+        /*** Maintenance Actions ***/
+
+        // Whitelist new TUSD implementation
+        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPL_NEW, 1);        
+
+        // Replace Gitcoin feed key on MANAUSD Oracle
+        address[] memory drops = new address[](1);
+        drops[0] = GITCOIN_FEED_OLD;
+        MedianAbstract(MEDIAN_MANAUSD).drop(drops);
+
+        address[] memory lifts = new address[](1);
+        lifts[0] = GITCOIN_FEED_NEW;
+        MedianAbstract(MEDIAN_MANAUSD).lift(lifts);
     }
 }
 
@@ -88,9 +199,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/15215ebaf8bbb4a20567b3233383788a68afb58b/governance/votes/Executive%20vote%20-%20September%2014%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/9fe29a1704a7885305774bbb31ab04fedd363259/governance/votes/Executive%20vote%20-%20September%2018%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-14 MakerDAO Executive Spell | Hash: 0xf0155120204be06c56616181ea82bbfa93f48494455c6d0b3c0ab1d581464657";
+        "2020-09-18 MakerDAO Executive Spell | Hash: 0xe942f72e80295685e39e303f8979560523beae8569daccfcea2f000b14a14abf";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
