@@ -87,13 +87,6 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 101 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("USDC-A");
 
-        // Set PAXUSD-A collateralization ratio
-        //
-        // Existing ratio: 103%
-        // New ratio: 101%
-        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
-        SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
-
         // Set TUSD-A collateralization ratio
         //
         // Existing ratio: 120%
@@ -101,26 +94,19 @@ contract SpellAction {
         SpotAbstract(MCD_SPOT).file("TUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
         SpotAbstract(MCD_SPOT).poke("TUSD-A");
 
-        // Set the TUSD-A stability fee
+        // Set PAXUSD-A collateralization ratio
         //
-        // Previous: 0%
-        // New: 4%
-        JugAbstract(MCD_JUG).drip("TUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_PCT_RATE);
+        // Existing ratio: 103%
+        // New ratio: 101%
+        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
+        SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
 
-        // Set the USDT-A stability fee
-        //
-        // Previous: 6%
-        // New: 8%
-        JugAbstract(MCD_JUG).drip("USDT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_PCT_RATE);
-
-        // Set the PAXUSD-A stability fee
+        // Set the BAT-A stability fee
         //
         // Previous: 2%
         // New: 4%
-        JugAbstract(MCD_JUG).drip("PAXUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).drip("BAT-A"); // drip right before
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_PCT_RATE);
 
         // Set the USDC-A stability fee
         //
@@ -136,19 +122,19 @@ contract SpellAction {
         JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
         JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
 
-        // Set the BAT-A stability fee
-        //
-        // Previous: 2%
-        // New: 4%
-        JugAbstract(MCD_JUG).drip("BAT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_PCT_RATE);
-
         // Set the WBTC-A stability fee
         //
         // Previous: 2%
         // New: 4%
         JugAbstract(MCD_JUG).drip("WBTC-A"); // drip right before
         JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_PCT_RATE);
+
+        // Set the TUSD-A stability fee
+        //
+        // Previous: 0%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("TUSD-A"); // drip right before
+        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_PCT_RATE);
 
         // Set the KNC-A stability fee
         //
@@ -170,6 +156,20 @@ contract SpellAction {
         // New: 12%
         JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
         JugAbstract(MCD_JUG).file("MANA-A", "duty", TWELVE_PCT_RATE);
+
+        // Set the USDT-A stability fee
+        //
+        // Previous: 6%
+        // New: 8%
+        JugAbstract(MCD_JUG).drip("USDT-A"); // drip right before
+        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_PCT_RATE);
+
+        // Set the PAXUSD-A stability fee
+        //
+        // Previous: 2%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("PAXUSD-A"); // drip right before
+        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_PCT_RATE);
 
         /*** Maintenance Actions ***/
 
