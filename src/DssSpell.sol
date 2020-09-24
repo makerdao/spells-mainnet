@@ -19,13 +19,8 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-
-// TODO: add to dss-interfaces?
-interface GemJoin6Like {
-    function setImplementation(address, uint256) external;
-}
 
 contract SpellAction {
 
@@ -34,14 +29,17 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.1/contracts.json
-    address constant MCD_JOIN_TUSD_A  = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
-    address constant MCD_JUG          = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant MCD_SPOT         = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant MCD_VAT          = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant TUSD_IMPL_NEW    = 0x7a9701453249e84fd0D5AfE5951e9cBe9ed2E90f;
-    address constant MEDIAN_MANAUSD   = 0x681c4F8f69cF68852BAd092086ffEaB31F5B812c;
-    address constant GITCOIN_FEED_OLD = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
-    address constant GITCOIN_FEED_NEW = 0x77EB6CF8d732fe4D92c427fCdd83142DB3B742f7;
+    address constant MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+
+    address constant ETHUSD     = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant BTCUSD     = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant PIP_WBTC   = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
+
+    address constant KYBER      = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
+    address constant DDEX       = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
+    address constant ETHUSDv1   = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
+    address constant YEARN      = 0x82c93333e4E295AA17a05B15092159597e823e8a;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -56,134 +54,135 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant FOUR_PCT_RATE   = 1000000001243680656318820312;
-    uint256 constant EIGHT_PCT_RATE  = 1000000002440418608258400030;
-    uint256 constant TWELVE_PCT_RATE = 1000000003593629043335673582;
-    uint256 constant FIFTY_PCT_RATE  = 1000000012857214317438491659;
+    uint256 constant TWO_TWENTYFIVE_PCT_RATE    = 1000000000705562181084137268;
+    uint256 constant FOUR_TWENTYFIVE_PCT_RATE   = 1000000001319814647332759691;
+    uint256 constant EIGHT_TWENTYFIVE_PCT_RATE  = 1000000002513736079215619839;
+    uint256 constant TWELVE_TWENTYFIVE_PCT_RATE = 1000000003664330950215446102;
+    uint256 constant FIFTY_TWENTYFIVE_PCT_RATE  = 1000000012910019978921115695;
 
     function execute() external {
         /*** Risk Parameter Adjustments ***/
 
-        // Set the global debt ceiling to 1,196,000,000
-        // 948 (current DC) + 200 (USDC-A increase) + 48 (TUSD-A increase)
-        VatAbstract(MCD_VAT).file("Line", 1196 * MILLION * RAD);
+        // Set the global debt ceiling to 1,401,000,000
+        // 1,196 (current DC) + 85 (USDC-A increase) + 85 (TUSD-A increase) + 30 (PAXUSD-A increase)
+        VatAbstract(MCD_VAT).file("Line", 1401 * MILLION * RAD);
+
+        // Set the BAT-A debt ceiling
+        //
+        // Existing debt ceiling: 5 million
+        // New debt ceiling: 10 million
+        VatAbstract(MCD_VAT).file("BAT-A", "line", 10 * MILLION * RAD);
 
         // Set the USDC-A debt ceiling
         //
-        // Existing debt ceiling: 200 million
-        // New debt ceiling: 400 million
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 400 * MILLION * RAD);
+        // Existing debt ceiling: 400 million
+        // New debt ceiling: 485 million
+        VatAbstract(MCD_VAT).file("USDC-A", "line", 485 * MILLION * RAD);
 
         // Set the TUSD-A debt ceiling
         //
-        // Existing debt ceiling: 2 million
-        // New debt ceiling: 50 million
-        VatAbstract(MCD_VAT).file("TUSD-A", "line", 50 * MILLION * RAD);
+        // Existing debt ceiling: 50 million
+        // New debt ceiling: 135 million
+        VatAbstract(MCD_VAT).file("TUSD-A", "line", 135 * MILLION * RAD);
 
-        // Set USDC-A collateralization ratio
+        // Set the PAXUSD-A debt ceiling
         //
-        // Existing ratio: 103%
-        // New ratio: 101%
-        SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 101 * RAY / 100); // 101% coll. ratio
-        SpotAbstract(MCD_SPOT).poke("USDC-A");
+        // Existing debt ceiling: 30 million
+        // New debt ceiling: 60 million
+        VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 60 * MILLION * RAD);
 
-        // Set TUSD-A collateralization ratio
-        //
-        // Existing ratio: 120%
-        // New ratio: 101%
-        SpotAbstract(MCD_SPOT).file("TUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
-        SpotAbstract(MCD_SPOT).poke("TUSD-A");
 
-        // Set PAXUSD-A collateralization ratio
+        // Set the ETH-A stability fee
         //
-        // Existing ratio: 103%
-        // New ratio: 101%
-        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 101 * RAY / 100); // 101% coll. ratio
-        SpotAbstract(MCD_SPOT).poke("PAXUSD-A");
+        // Previous: 0%
+        // New: 2.25%
+        JugAbstract(MCD_JUG).drip("ETH-A"); // drip right before
+        JugAbstract(MCD_JUG).file("ETH-A", "duty", TWO_TWENTYFIVE_PCT_RATE);
 
         // Set the BAT-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("BAT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the USDC-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("USDC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("USDC-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the USDC-B stability fee
         //
-        // Previous: 48%
-        // New: 50%
+        // Previous: 50%
+        // New: 50.25%
         JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
-        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_TWENTYFIVE_PCT_RATE);
 
         // Set the WBTC-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("WBTC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the TUSD-A stability fee
         //
-        // Previous: 0%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("TUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the KNC-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("KNC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the ZRX-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("ZRX-A"); // drip right before
-        JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
         // Set the MANA-A stability fee
         //
-        // Previous: 10%
-        // New: 12%
+        // Previous: 12%
+        // New: 12.25%
         JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", TWELVE_PCT_RATE);
+        JugAbstract(MCD_JUG).file("MANA-A", "duty", TWELVE_TWENTYFIVE_PCT_RATE);
 
         // Set the USDT-A stability fee
         //
-        // Previous: 6%
-        // New: 8%
+        // Previous: 8%
+        // New: 8.25%
         JugAbstract(MCD_JUG).drip("USDT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_PCT_RATE);
+        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_TWENTYFIVE_PCT_RATE);
 
         // Set the PAXUSD-A stability fee
         //
-        // Previous: 2%
-        // New: 4%
+        // Previous: 4%
+        // New: 4.25%
         JugAbstract(MCD_JUG).drip("PAXUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_PCT_RATE);
+        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_TWENTYFIVE_PCT_RATE);
 
-        /*** Maintenance Actions ***/
+        // Whitelisting:
 
-        // Whitelist new TUSD implementation
-        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPL_NEW, 1);        
+        // https://forum.makerdao.com/t/mip10c9-sp11-whitelist-kybers-promo-token-pricing-contract-on-ethusd-oracle/4193
+        // https://forum.makerdao.com/t/mip10c9-sp8-whitelist-ddex-on-wbtcusd-oracle/4094
+        address[] memory addrs = new address[](2);
+        addrs[0] = KYBER;
+        addrs[1] = ETHUSDv1;
+        MedianAbstract(ETHUSD).kiss(addrs);
 
-        // Replace Gitcoin feed key on MANAUSD Oracle
-        address[] memory drops = new address[](1);
-        drops[0] = GITCOIN_FEED_OLD;
-        MedianAbstract(MEDIAN_MANAUSD).drop(drops);
+        // https://forum.makerdao.com/t/mip10c9-sp7-whitelist-opyn-on-ethusd-oracle/4061
+        MedianAbstract(BTCUSD).kiss(DDEX);
 
-        address[] memory lifts = new address[](1);
-        lifts[0] = GITCOIN_FEED_NEW;
-        MedianAbstract(MEDIAN_MANAUSD).lift(lifts);
+        // https://forum.makerdao.com/t/mip10c9-sp10-whitelist-yearn-finance-on-btcusd-oracle/4192
+        OsmAbstract(PIP_WBTC).kiss(YEARN);
     }
 }
 
@@ -199,9 +198,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/9fe29a1704a7885305774bbb31ab04fedd363259/governance/votes/Executive%20vote%20-%20September%2018%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5a218a515a6c9aeab9c3fb8a769f1f4fdfe93809/governance/votes/Executive%20vote%20-%20September%2025%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-18 MakerDAO Executive Spell | Hash: 0xe942f72e80295685e39e303f8979560523beae8569daccfcea2f000b14a14abf";
+        "2020-09-25 MakerDAO Executive Spell | Hash: 0x284a8265fd8cd425ab4fa4014670675f51babd0e125076e588cd4b352435a058";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");

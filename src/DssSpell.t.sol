@@ -17,9 +17,9 @@ interface Hevm {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x7E47c04a41A78F355C33a94cD3889E4551121ae1);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1600440978;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -73,11 +73,13 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
     // spell-specific addresses (remove for next spell if unneeded)
-    GemJoin6Like tusd_adapter     = GemJoin6Like(0x4454aF7C8bb9463203b66C816220D41ED7837f44);
-    address TUSD_IMPL_NEW         = 0x7a9701453249e84fd0D5AfE5951e9cBe9ed2E90f;
-    MedianAbstract manausd_median = MedianAbstract(0x681c4F8f69cF68852BAd092086ffEaB31F5B812c);
-    address GITCOIN_FEED_OLD      = 0xA4188B523EccECFbAC49855eB52eA0b55c4d56dd;
-    address GITCOIN_FEED_NEW      = 0x77EB6CF8d732fe4D92c427fCdd83142DB3B742f7;
+    MedianAbstract ethusd_median  = MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
+    MedianAbstract btcusd_median  = MedianAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
+    OsmAbstract pip_wbtc          = OsmAbstract(0xf185d0682d50819263941e5f4EacC763CC5C6C42);
+    address KYBER                 = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
+    address DDEX                  = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
+    address ETHUSDv1              = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
+    address YEARN                 = 0x82c93333e4E295AA17a05B15092159597e823e8a;
 
     DssSpell spell;
 
@@ -143,7 +145,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 1196 * MILLION * RAD,
+            vat_Line: 1401 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -160,8 +162,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             line:         540 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000000000000000000000000,
-            pct:          0 * 1000,
+            duty:         1000000000705562181084137268,
+            pct:          2.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -171,10 +173,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
-            line:         5 * MILLION * RAD,
+            line:         10 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -184,10 +186,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            line:         400 * MILLION * RAD,
+            line:         485 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          101 * RAY / 100,
@@ -199,8 +201,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000012857214317438491659, // 50% SF w/ base
-            pct:          50 * 1000,
+            duty:         1000000012910019978921115695,
+            pct:          50.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          120 * RAY / 100,
@@ -212,8 +214,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             line:         120 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -223,10 +225,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
-            line:         50 * MILLION * RAD,
+            line:         135 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          101 * RAY / 100,
@@ -238,8 +240,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -251,8 +253,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -264,8 +266,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         1 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000003593629043335673582, // 12% SF w/ base
-            pct:          12 * 1000,
+            duty:         1000000003664330950215446102,
+            pct:          12.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -277,8 +279,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDT-A"] = CollateralValues({
             line:         10 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000002440418608258400030, // 8% SF w/ base
-            pct:          8 * 1000,
+            duty:         1000000002513736079215619839,
+            pct:          8.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -288,10 +290,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
-            line:         30 * MILLION * RAD,
+            line:         60 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001243680656318820312, // 4% SF w/ base
-            pct:          4 * 1000,
+            duty:         1000000001319814647332759691,
+            pct:          4.25 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          101 * RAY / 100,
@@ -515,6 +517,13 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
+        // spell-specific checks (remove if unneeded):
+        assertEq(ethusd_median.bud(KYBER), 0);
+        assertEq(ethusd_median.bud(ETHUSDv1), 0);
+        assertEq(btcusd_median.bud(DDEX), 0);
+        assertEq(pip_wbtc.bud(YEARN), 0);
+        //
+
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
@@ -527,8 +536,10 @@ contract DssSpellTest is DSTest, DSMath {
         }
 
         // spell-specific checks (remove if unneeded):
-        assertEq(tusd_adapter.implementations(TUSD_IMPL_NEW), 1);
-        assertEq(manausd_median.orcl(GITCOIN_FEED_OLD), 0);
-        assertEq(manausd_median.orcl(GITCOIN_FEED_NEW), 1);
+        assertEq(ethusd_median.bud(KYBER), 1);
+        assertEq(ethusd_median.bud(ETHUSDv1), 1);
+        assertEq(btcusd_median.bud(DDEX), 1);
+        assertEq(pip_wbtc.bud(YEARN), 1);
+        //
     }
 }
