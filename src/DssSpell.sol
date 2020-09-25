@@ -48,19 +48,19 @@ contract SpellAction {
     address constant COMP            = 0xc00e94Cb662C3520282E6f5717214004A7f26888;
     address constant MCD_JOIN_COMP_A = 0xBEa7cDfB4b49EC154Ae1c0D731E4DC773A3265aA;
     address constant MCD_FLIP_COMP_A = 0x524826F84cB3A19B6593370a5889A58c00554739;
-    address constant PIP_COMP        = ;
+    address constant PIP_COMP        = 0xBED0879953E633135a48a157718Aa791AC0108E4;
 
     // LRC-A specific addresses
     address constant LRC             = 0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD;
     address constant MCD_JOIN_LRC_A  = 0x6C186404A7A238D3d6027C0299D1822c1cf5d8f1;
     address constant MCD_FLIP_LRC_A  = 0x7FdDc36dcdC435D8F54FDCB3748adcbBF70f3dAC;
-    address constant PIP_LRC         = ;
+    address constant PIP_LRC         = 0x9eb923339c24c40Bef2f4AF4961742AA7C23EF3a;
 
     // LINK specific addresses
     address constant LINK            = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
     address constant MCD_JOIN_LINK_A = 0xdFccAf8fDbD2F4805C174f856a317765B49E4a50;
     address constant MCD_FLIP_LINK_A = 0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85;
-    address constant PIP_LINK        = ;
+    address constant PIP_LINK        = 0x9B0C694C6939b5EA9584e9b61C7815E8d97D9cC7;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -75,8 +75,10 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.01)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant    TWO_TWENTYFIVE_PERCENT_RATE = 1000000000705562181084137268;
-    uint256 constant  THREE_TWENTYFIVE_PERCENT_RATE = 1000000001014175731521720677;
+    // uint256 constant    TWO_TWENTYFIVE_PERCENT_RATE = 1000000000705562181084137268;
+    // uint256 constant  THREE_TWENTYFIVE_PERCENT_RATE = 1000000001014175731521720677;
+    uint256 constant    TWO_PERCENT_RATE = 1000000000627937192491029810;
+    uint256 constant  THREE_PERCENT_RATE = 1000000000937303470807876289;
 
     function execute() external {
         // Set the global debt ceiling to 1,416,000,000
@@ -141,7 +143,8 @@ contract SpellAction {
         // Set the COMP-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the COMP-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_PERCENT_RATE);
+        // JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the COMP-A percentage between bids 
         FlipAbstract(MCD_FLIP_COMP_A).file("beg", 103 * WAD / 100);
         // Set the COMP-A time max time between bids
@@ -213,7 +216,8 @@ contract SpellAction {
         // Set the LRC-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LRC-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_PERCENT_RATE);
+        // JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the LRC-A percentage between bids 
         FlipAbstract(MCD_FLIP_LRC_A).file("beg", 103 * WAD / 100);
         // Set the LRC-A time max time between bids
@@ -286,7 +290,8 @@ contract SpellAction {
         // Set the LINK-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LINK-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_PERCENT_RATE);
+        // JugAbstract(MCD_JUG).file(ilk, "duty", TWO_TWENTYFIVE_PERCENT_RATE);
         // Set the LINK-A percentage between bids 
         FlipAbstract(MCD_FLIP_LINK_A).file("beg", 103 * WAD / 100);
         // Set the LINK-A time max time between bids
@@ -322,6 +327,34 @@ contract DssSpell {
 	// get link here: https://github.com/makerdao/community/tree/master/governance/votes
     string constant public description =
         "2020-09-28 MakerDAO Executive Spell | Hash: ";
+
+    // MIP15: Dark Spell Mechanism
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP15/mip15.md -q -O - 2>/dev/null)"
+    string constant public MIP15 = "0x081b03146714fbba3d6ed78b59fef50577adb87f33d214d68639d917be794726";
+
+    // MIP12c2-SP4: LRC Collateral Onboarding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP12/MIP12c2-Subproposals/MIP12c2-SP4.md -q -O - 2>/dev/null)"
+    string constant public MIP12c2SP4 = "0x43d4abcabb8838f7708ebe51ff35fd6655ba7153006906388898615ac082a87d";
+
+    // MIP12c2-SP5: COMP Collateral Onboarding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP12/MIP12c2-Subproposals/MIP12c2-SP5.md -q -O - 2>/dev/null)"
+    string constant public MIP12c2SP5 = "0xdb6c5e10409435219e99b37ef1ec18f1d265246d1e4e8d2dcca14ed86513fe38";
+
+    // MIP12c2-SP6: LINK Collateral Onboarding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP12/MIP12c2-Subproposals/MIP12c2-SP6.md -q -O - 2>/dev/null)"
+    string constant public MIP12c2SP6 = "0x05896bb330f113b498c2d84c9c120d7e0cd65609b064895dd2b550162211221d";
+
+    // MIP7c3-SP3: Domain Team Onboarding (Risk Domain Team)
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP7/MIP7c3-Subproposals/MIP7c3-SP3.md -q -O - 2>/dev/null)"
+    string constant public MIP7c3SP3 = "0x75dff1d98dc14ddc85c4325fb75ce14f06857f5f09b0e321df91f4416f29ba7c";
+
+    // MIP7c3-SP4: Subproposal Template for Smart Contracts Domain Team Onboarding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP7/MIP7c3-Subproposals/MIP7c3-SP4.md -q -O - 2>/dev/null)"
+    string constant public MIP7c3SP4 = "0x6ee0230b3ec6f25bb4c59b295ce8650db2400919fe6c4aae2bf1255106c621e4";
+
+    // MIP13c3-SP2: Declaration of Intent - Dai Flash Mint Module
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP13/MIP13c3-Subproposals/MIP13c3-SP2.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP2 = "0x6e2a266ed710c4a6999c91833d04e195f3bcbc29cff7bf252cb112241400cc43";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
