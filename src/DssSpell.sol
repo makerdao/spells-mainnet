@@ -22,6 +22,12 @@ import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
+interface MedianizerV1Abstract {
+    function setMin(uint96) external;
+    function setNext(bytes12) external;
+    function set(bytes12, address) external;
+}
+
 contract SpellAction {
 
     // MAINNET ADDRESSES
@@ -196,6 +202,9 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
+    address constant ETHUSD   = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant ETHUSDv1 = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
+
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5a218a515a6c9aeab9c3fb8a769f1f4fdfe93809/governance/votes/Executive%20vote%20-%20September%2025%2C%202020.md -q -O - 2>/dev/null)"
@@ -225,6 +234,11 @@ contract DssSpell {
         require(eta == 0, "This spell has already been scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
+
+        // Add the new median as the only src of the old medianizer
+        MedianizerV1Abstract(ETHUSDv1).setMin(1);
+        MedianizerV1Abstract(ETHUSDv1).setNext(0x000000000000000000000002);
+        MedianizerV1Abstract(ETHUSDv1).set(0x000000000000000000000001, ETHUSD);
     }
 
     function cast() public /*officeHours*/ {

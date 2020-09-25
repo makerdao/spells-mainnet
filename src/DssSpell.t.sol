@@ -6,13 +6,14 @@ import "lib/dss-interfaces/src/Interfaces.sol";
 
 import {DssSpell, SpellAction} from "./DssSpell.sol";
 
-interface GemJoin6Like {
-    function implementations(address) external returns (uint256);
-}
-
 interface Hevm {
     function warp(uint) external;
     function store(address,bytes32,bytes32) external;
+}
+
+interface MedianizerV1Abstract {
+    function peek() external view returns (bytes32, bool);
+    function poke() external;
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -533,6 +534,11 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ethusd_median.bud(ETHUSDv1), 1);
         assertEq(btcusd_median.bud(DDEX), 1);
         assertEq(pip_wbtc.bud(YEARN), 1);
+
+        MedianizerV1Abstract(ETHUSDv1).poke();
+        (bytes32 value, bool ok) = MedianizerV1Abstract(ETHUSDv1).peek();
+        assertTrue(ok);
+        assertTrue(uint256(value) > 300 ether);
         //
     }
 }
