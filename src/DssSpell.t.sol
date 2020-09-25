@@ -12,6 +12,8 @@ interface Hevm {
 }
 
 interface MedianizerV1Abstract {
+    function authority() external view returns (address);
+    function owner() external view returns (address);
     function peek() external view returns (bytes32, bool);
     function poke() external;
 }
@@ -79,7 +81,7 @@ contract DssSpellTest is DSTest, DSMath {
     OsmAbstract pip_wbtc          = OsmAbstract(0xf185d0682d50819263941e5f4EacC763CC5C6C42);
     address KYBER                 = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
     address DDEX                  = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
-    address ETHUSDv1              = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
+    MedianizerV1Abstract ETHUSDv1 = MedianizerV1Abstract(0x729D19f657BD0614b4985Cf1D82531c67569197B);
     address YEARN                 = 0x82c93333e4E295AA17a05B15092159597e823e8a;
 
     DssSpell spell;
@@ -531,12 +533,15 @@ contract DssSpellTest is DSTest, DSMath {
 
         // spell-specific checks (remove if unneeded):
         assertEq(ethusd_median.bud(KYBER), 1);
-        assertEq(ethusd_median.bud(ETHUSDv1), 1);
+        assertEq(ethusd_median.bud(address(ETHUSDv1)), 1);
         assertEq(btcusd_median.bud(DDEX), 1);
         assertEq(pip_wbtc.bud(YEARN), 1);
 
-        MedianizerV1Abstract(ETHUSDv1).poke();
-        (bytes32 value, bool ok) = MedianizerV1Abstract(ETHUSDv1).peek();
+        assertEq(ETHUSDv1.owner(), pauseProxy);
+        assertEq(ETHUSDv1.authority(), address(0));
+
+        ETHUSDv1.poke();
+        (bytes32 value, bool ok) = ETHUSDv1.peek();
         assertTrue(ok);
         assertTrue(uint256(value) > 300 ether);
         //

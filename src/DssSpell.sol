@@ -23,6 +23,8 @@ import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 interface MedianizerV1Abstract {
+    function setAuthority(address) external;
+    function setOwner(address) external;
     function setMin(uint96) external;
     function setNext(bytes12) external;
     function set(bytes12, address) external;
@@ -183,6 +185,10 @@ contract SpellAction {
         addrs[0] = KYBER;
         addrs[1] = ETHUSDv1;
         MedianAbstract(ETHUSD).kiss(addrs);
+        // Add the new median as the only src of the old medianizer
+        MedianizerV1Abstract(ETHUSDv1).setMin(1);
+        MedianizerV1Abstract(ETHUSDv1).setNext(0x000000000000000000000002);
+        MedianizerV1Abstract(ETHUSDv1).set(0x000000000000000000000001, ETHUSD);
 
         // https://forum.makerdao.com/t/mip10c9-sp8-whitelist-ddex-on-wbtcusd-oracle/4094
         MedianAbstract(BTCUSD).kiss(DDEX);
@@ -202,7 +208,6 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
-    address constant ETHUSD   = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
     address constant ETHUSDv1 = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
 
     // Provides a descriptive tag for bot consumption
@@ -235,10 +240,11 @@ contract DssSpell {
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
 
-        // Add the new median as the only src of the old medianizer
-        MedianizerV1Abstract(ETHUSDv1).setMin(1);
-        MedianizerV1Abstract(ETHUSDv1).setNext(0x000000000000000000000002);
-        MedianizerV1Abstract(ETHUSDv1).set(0x000000000000000000000001, ETHUSD);
+        // Set the ownership of the medianizer v1 to the pause proxy and remove the direct
+        // access from the chief (this way it will need to pass via governance delay) and
+        // can be executed during cast (coded in the SpellAction)
+        MedianizerV1Abstract(ETHUSDv1).setOwner(pause.proxy());
+        MedianizerV1Abstract(ETHUSDv1).setAuthority(address(0));
     }
 
     function cast() public /*officeHours*/ {
