@@ -14,7 +14,7 @@ interface Hevm {
 interface MedianizerV1Abstract {
     function authority() external view returns (address);
     function owner() external view returns (address);
-    function peek() external view returns (bytes32, bool);
+    function peek() external view returns (uint256, bool);
     function poke() external;
 }
 
@@ -540,10 +540,19 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ETHUSDv1.owner(), pauseProxy);
         assertEq(ETHUSDv1.authority(), address(0));
 
+        // Whitelist address(this) in v2 median in order to read the actual price
+        hevm.store(
+            address(ethusd_median),
+            keccak256(abi.encode(address(this), uint256(4))),
+            bytes32(uint256(1))
+        );
+        (uint256 valueV2, bool okV2) = ethusd_median.peek();
+        assertTrue(okV2);
+
         ETHUSDv1.poke();
-        (bytes32 value, bool ok) = ETHUSDv1.peek();
-        assertTrue(ok);
-        assertTrue(uint256(value) > 300 ether);
+        (uint256 valueV1, bool okV1) = ETHUSDv1.peek();
+        assertTrue(okV1);
+        assertEq(valueV1, valueV2);
         //
     }
 }
