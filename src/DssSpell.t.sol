@@ -517,13 +517,6 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
-        // spell-specific checks (remove if unneeded):
-        assertEq(ethusd_median.bud(KYBER), 0);
-        assertEq(ethusd_median.bud(ETHUSDv1), 0);
-        assertEq(btcusd_median.bud(DDEX), 0);
-        assertEq(pip_wbtc.bud(YEARN), 0);
-        //
-
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
