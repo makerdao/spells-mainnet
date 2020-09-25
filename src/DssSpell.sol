@@ -46,19 +46,19 @@ contract SpellAction {
 
     // COMP-A specific addresses
     address constant COMP            = 0xc00e94Cb662C3520282E6f5717214004A7f26888;
-    address constant MCD_JOIN_COMP_A = ;
+    address constant MCD_JOIN_COMP_A = 0xBEa7cDfB4b49EC154Ae1c0D731E4DC773A3265aA;
     address constant MCD_FLIP_COMP_A = ;
     address constant PIP_COMP        = ;
 
     // LRC-A specific addresses
     address constant LRC             = 0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD;
-    address constant MCD_JOIN_LRC_A  = ;
+    address constant MCD_JOIN_LRC_A  = 0x6C186404A7A238D3d6027C0299D1822c1cf5d8f1;
     address constant MCD_FLIP_LRC_A  = ;
     address constant PIP_LRC         = ;
 
     // LINK specific addresses
     address constant LINK            = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
-    address constant MCD_JOIN_LINK_A = ;
+    address constant MCD_JOIN_LINK_A = 0xdFccAf8fDbD2F4805C174f856a317765B49E4a50;
     address constant MCD_FLIP_LINK_A = ;
     address constant PIP_LINK        = ;
 
