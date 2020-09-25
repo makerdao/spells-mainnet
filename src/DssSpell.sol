@@ -185,6 +185,7 @@ contract SpellAction {
         addrs[0] = KYBER;
         addrs[1] = ETHUSDv1;
         MedianAbstract(ETHUSD).kiss(addrs);
+
         // Add the new median as the only src of the old medianizer
         MedianizerV1Abstract(ETHUSDv1).setMin(1);
         MedianizerV1Abstract(ETHUSDv1).setNext(0x000000000000000000000002);
