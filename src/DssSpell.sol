@@ -29,17 +29,17 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     // against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.1/contracts.json
-    address constant MCD_JUG = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant MCD_JUG  = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_VAT  = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
-    address constant ETHUSD     = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address constant BTCUSD     = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
-    address constant PIP_WBTC   = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
+    address constant ETHUSD   = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant BTCUSD   = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address constant PIP_WBTC = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
 
-    address constant KYBER      = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
-    address constant DDEX       = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
-    address constant ETHUSDv1   = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
-    address constant YEARN      = 0x82c93333e4E295AA17a05B15092159597e823e8a;
+    address constant KYBER    = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
+    address constant DDEX     = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
+    address constant ETHUSDv1 = 0x729D19f657BD0614b4985Cf1D82531c67569197B;
+    address constant YEARN    = 0x82c93333e4E295AA17a05B15092159597e823e8a;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
