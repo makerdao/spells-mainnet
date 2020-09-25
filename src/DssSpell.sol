@@ -81,9 +81,13 @@ contract SpellAction {
     uint256 constant  THREE_PERCENT_RATE = 1000000000937303470807876289;
 
     function execute() external {
-        // Set the global debt ceiling to 1,416,000,000
-        // 1,401 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
-        VatAbstract(MCD_VAT).file("Line", 1416 * MILLION * RAD);
+        // // Set the global debt ceiling to 1,416,000,000
+        // // 1,401 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
+        // VatAbstract(MCD_VAT).file("Line", 1416 * MILLION * RAD);
+
+        // Set the global debt ceiling to 1,211,000,000
+        // 1,196 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
+        VatAbstract(MCD_VAT).file("Line", 1211 * MILLION * RAD);
 
         // TODO: Define if DSR needs to be increased
 

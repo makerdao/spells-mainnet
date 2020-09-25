@@ -161,7 +161,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 1401 * MILLION * RAD,
+            // vat_Line: 1416 * MILLION * RAD,
+            vat_Line: 1211 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -191,7 +192,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
-            line:         10 * MILLION * RAD,
+            // line:         10 * MILLION * RAD,
+            line:         5 * MILLION * RAD,
             dust:         100 * RAD,
             // duty:         1000000001319814647332759691,
             // pct:          4.25 * 1000,
@@ -206,7 +208,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            line:         485 * MILLION * RAD,
+            // line:         485 * MILLION * RAD,
+            line:         400 * MILLION * RAD,
             dust:         100 * RAD,
             // duty:         1000000001319814647332759691,
             // pct:          4.25 * 1000,
@@ -251,7 +254,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
-            line:         135 * MILLION * RAD,
+            // line:         135 * MILLION * RAD,
+            line:         50 * MILLION * RAD,
             dust:         100 * RAD,
             // duty:         1000000001319814647332759691,
             // pct:          4.25 * 1000,
@@ -326,7 +330,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
-            line:         60 * MILLION * RAD,
+            // line:         60 * MILLION * RAD,
+            line:         30 * MILLION * RAD,
             dust:         100 * RAD,
             // duty:         1000000001319814647332759691,
             // pct:          4.25 * 1000,
@@ -572,227 +577,218 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
 
-    // function testFailWrongDay() public {
-    //     vote();
-    //     scheduleWaitAndCastFailDay();
-    // }
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
 
-    // function testFailTooEarly() public {
-    //     vote();
-    //     scheduleWaitAndCastFailEarly();
-    // }
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
 
-    // function testFailTooLate() public {
-    //     vote();
-    //     scheduleWaitAndCastFailLate();
-    // }
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
+    }
 
-    // function testSpellIsCast_COMP_INTEGRATION() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+    function testSpellIsCast_COMP_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    //     pipCOMP.poke();
-    //     hevm.warp(now + 3601); 
-    //     pipCOMP.poke();
-    //     spot.poke("COMP-A");
+        pipCOMP.poke();
+        hevm.warp(now + 3601); 
+        pipCOMP.poke();
+        spot.poke("COMP-A");
 
-    //     hevm.store(
-    //         address(comp),
-    //         keccak256(abi.encode(address(this), uint256(1))),
-    //         bytes32(uint256(1 * THOUSAND * WAD))
-    //     );
+        hevm.store(
+            address(comp),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1 * THOUSAND * WAD))
+        );
 
-    //     // Check faucet amount
-    //     assertEq(faucet.amt(address(comp)), 2 * WAD);
+        // Check median matches pip.src()
+        assertEq(pipCOMP.src(), address(medCOMPA)); 
 
-    //     // Check median matches pip.src()
-    //     assertEq(pipCOMP.src(), address(medCOMPA)); 
+        // Authorization
+        assertEq(joinCOMPA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinCOMPA)), 1);
+        assertEq(flipCOMPA.wards(address(end)), 1);
+        assertEq(flipCOMPA.wards(address(flipMom)), 1);
+        assertEq(pipCOMP.wards(address(osmMom)), 1);
+        assertEq(pipCOMP.bud(address(spot)), 1);
+        assertEq(pipCOMP.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipCOMP.src()).bud(address(pipCOMP)), 1);
 
-    //     // Authorization
-    //     assertEq(joinCOMPA.wards(pauseProxy), 1);
-    //     assertEq(vat.wards(address(joinCOMPA)), 1);
-    //     assertEq(flipCOMPA.wards(address(end)), 1);
-    //     assertEq(flipCOMPA.wards(address(flipMom)), 1);
-    //     assertEq(pipCOMP.wards(address(osmMom)), 1);
-    //     assertEq(pipCOMP.bud(address(spot)), 1);
-    //     assertEq(pipCOMP.bud(address(end)), 1);
-    //     assertEq(MedianAbstract(pipCOMP.src()).bud(address(pipCOMP)), 1);
+        // Join to adapter
+        assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("COMP-A", address(this)), 0);
+        comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
+        joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
+        assertEq(comp.balanceOf(address(this)), 0);
+        assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
 
-    //     // Join to adapter
-    //     assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("COMP-A", address(this)), 0);
-    //     comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
-    //     joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(comp.balanceOf(address(this)), 0);
-    //     assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
+        assertEq(vat.gem("COMP-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
-    //     // Deposit collateral, generate DAI
-    //     assertEq(vat.dai(address(this)), 0);
-    //     vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-    //     assertEq(vat.gem("COMP-A", address(this)), 0);
-    //     assertEq(vat.dai(address(this)), 100 * RAD);
+        // Payback DAI, withdraw collateral
+        vat.frob("COMP-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
+        assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.dai(address(this)), 0);
 
-    //     // Payback DAI, withdraw collateral
-    //     vat.frob("COMP-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-    //     assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.dai(address(this)), 0);
+        // Withdraw from adapter
+        joinCOMPA.exit(address(this), 1 * THOUSAND * WAD);
+        assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("COMP-A", address(this)), 0);
 
-    //     // Withdraw from adapter
-    //     joinCOMPA.exit(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("COMP-A", address(this)), 0);
+        // Generate new DAI to force a liquidation
+        comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
+        joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
+        (,,uint256 spotV,,) = vat.ilks("COMP-A");
+        // dart max amount of DAI
+        vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("COMP-A");
+        assertEq(flipCOMPA.kicks(), 0);
+        cat.bite("COMP-A", address(this));
+        assertEq(flipCOMPA.kicks(), 1);
+    }
 
-    //     // Generate new DAI to force a liquidation
-    //     comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
-    //     joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
-    //     (,,uint256 spotV,,) = vat.ilks("COMP-A");
-    //     // dart max amount of DAI
-    //     vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-    //     hevm.warp(now + 1);
-    //     jug.drip("COMP-A");
-    //     assertEq(flipCOMPA.kicks(), 0);
-    //     cat.bite("COMP-A", address(this));
-    //     assertEq(flipCOMPA.kicks(), 1);
-    // }
+    function testSpellIsCast_LRC_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    // function testSpellIsCast_LRC_INTEGRATION() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+        pipLRC.poke();
+        hevm.warp(now + 3601); 
+        pipLRC.poke();
+        spot.poke("LRC-A");
 
-    //     pipLRC.poke();
-    //     hevm.warp(now + 3601); 
-    //     pipLRC.poke();
-    //     spot.poke("LRC-A");
+        hevm.store(
+            address(lrc),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1 * THOUSAND * WAD))
+        );
 
-    //     hevm.store(
-    //         address(lrc),
-    //         keccak256(abi.encode(address(this), uint256(0))),
-    //         bytes32(uint256(1 * THOUSAND * WAD))
-    //     );
+        // Check median matches pip.src()
+        assertEq(pipLRC.src(), address(medLRCA)); 
 
-    //     // Check faucet amount
-    //     assertEq(faucet.amt(address(lrc)), 2000 * WAD);
+        // Authorization
+        assertEq(joinLRCA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinLRCA)), 1);
+        assertEq(flipLRCA.wards(address(end)), 1);
+        assertEq(flipLRCA.wards(address(flipMom)), 1);
+        assertEq(pipLRC.wards(address(osmMom)), 1);
+        assertEq(pipLRC.bud(address(spot)), 1);
+        assertEq(pipLRC.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipLRC.src()).bud(address(pipLRC)), 1);
 
-    //     // Check median matches pip.src()
-    //     assertEq(pipLRC.src(), address(medLRCA)); 
+        // Join to adapter
+        assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("LRC-A", address(this)), 0);
+        lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
+        joinLRCA.join(address(this), 1 * THOUSAND * WAD);
+        assertEq(lrc.balanceOf(address(this)), 0);
+        assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
 
-    //     // Authorization
-    //     assertEq(joinLRCA.wards(pauseProxy), 1);
-    //     assertEq(vat.wards(address(joinLRCA)), 1);
-    //     assertEq(flipLRCA.wards(address(end)), 1);
-    //     assertEq(flipLRCA.wards(address(flipMom)), 1);
-    //     assertEq(pipLRC.wards(address(osmMom)), 1);
-    //     assertEq(pipLRC.bud(address(spot)), 1);
-    //     assertEq(pipLRC.bud(address(end)), 1);
-    //     assertEq(MedianAbstract(pipLRC.src()).bud(address(pipLRC)), 1);
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
+        assertEq(vat.gem("LRC-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
-    //     // Join to adapter
-    //     assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("LRC-A", address(this)), 0);
-    //     lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
-    //     joinLRCA.join(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(lrc.balanceOf(address(this)), 0);
-    //     assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
+        // Payback DAI, withdraw collateral
+        vat.frob("LRC-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
+        assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.dai(address(this)), 0);
 
-    //     // Deposit collateral, generate DAI
-    //     assertEq(vat.dai(address(this)), 0);
-    //     vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-    //     assertEq(vat.gem("LRC-A", address(this)), 0);
-    //     assertEq(vat.dai(address(this)), 100 * RAD);
+        // Withdraw from adapter
+        joinLRCA.exit(address(this), 1 * THOUSAND * WAD);
+        assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("LRC-A", address(this)), 0);
 
-    //     // Payback DAI, withdraw collateral
-    //     vat.frob("LRC-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-    //     assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.dai(address(this)), 0);
+        // Generate new DAI to force a liquidation
+        lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
+        joinLRCA.join(address(this), 1 * THOUSAND * WAD);
+        (,,uint256 spotV,,) = vat.ilks("LRC-A");
+        // dart max amount of DAI
+        vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("LRC-A");
+        assertEq(flipLRCA.kicks(), 0);
+        cat.bite("LRC-A", address(this));
+        assertEq(flipLRCA.kicks(), 1);
+    }
 
-    //     // Withdraw from adapter
-    //     joinLRCA.exit(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("LRC-A", address(this)), 0);
+    function testSpellIsCast_LINK_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    //     // Generate new DAI to force a liquidation
-    //     lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
-    //     joinLRCA.join(address(this), 1 * THOUSAND * WAD);
-    //     (,,uint256 spotV,,) = vat.ilks("LRC-A");
-    //     // dart max amount of DAI
-    //     vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-    //     hevm.warp(now + 1);
-    //     jug.drip("LRC-A");
-    //     assertEq(flipLRCA.kicks(), 0);
-    //     cat.bite("LRC-A", address(this));
-    //     assertEq(flipLRCA.kicks(), 1);
-    // }
+        pipLINK.poke();
+        hevm.warp(now + 3601); 
+        pipLINK.poke();
+        spot.poke("LINK-A");
 
-    // function testSpellIsCast_LINK_INTEGRATION() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+        hevm.store(
+            address(link),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1 * THOUSAND * WAD))
+        );
 
-    //     pipLINK.poke();
-    //     hevm.warp(now + 3601); 
-    //     pipLINK.poke();
-    //     spot.poke("LINK-A");
+        // Check median matches pip.src()
+        assertEq(pipLINK.src(), address(medLINKA)); 
 
-    //     hevm.store(
-    //         address(link),
-    //         keccak256(abi.encode(address(this), uint256(1))),
-    //         bytes32(uint256(1 * THOUSAND * WAD))
-    //     );
+        // Authorization
+        assertEq(joinLINKA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinLINKA)), 1);
+        assertEq(flipLINKA.wards(address(end)), 1);
+        assertEq(flipLINKA.wards(address(flipMom)), 1);
+        assertEq(pipLINK.wards(address(osmMom)), 1);
+        assertEq(pipLINK.bud(address(spot)), 1);
+        assertEq(pipLINK.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipLINK.src()).bud(address(pipLINK)), 1);
 
-    //     // Check faucet amount
-    //     assertEq(faucet.amt(address(link)), 30 * WAD);
+        // Join to adapter
+        assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("LINK-A", address(this)), 0);
+        link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
+        joinLINKA.join(address(this), 1 * THOUSAND * WAD);
+        assertEq(link.balanceOf(address(this)), 0);
+        assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
 
-    //     // Check median matches pip.src()
-    //     assertEq(pipLINK.src(), address(medLINKA)); 
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
+        assertEq(vat.gem("LINK-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
-    //     // Authorization
-    //     assertEq(joinLINKA.wards(pauseProxy), 1);
-    //     assertEq(vat.wards(address(joinLINKA)), 1);
-    //     assertEq(flipLINKA.wards(address(end)), 1);
-    //     assertEq(flipLINKA.wards(address(flipMom)), 1);
-    //     assertEq(pipLINK.wards(address(osmMom)), 1);
-    //     assertEq(pipLINK.bud(address(spot)), 1);
-    //     assertEq(pipLINK.bud(address(end)), 1);
-    //     assertEq(MedianAbstract(pipLINK.src()).bud(address(pipLINK)), 1);
+        // Payback DAI, withdraw collateral
+        vat.frob("LINK-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
+        assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.dai(address(this)), 0);
 
-    //     // Join to adapter
-    //     assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("LINK-A", address(this)), 0);
-    //     link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
-    //     joinLINKA.join(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(link.balanceOf(address(this)), 0);
-    //     assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
+        // Withdraw from adapter
+        joinLINKA.exit(address(this), 1 * THOUSAND * WAD);
+        assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("LINK-A", address(this)), 0);
 
-    //     // Deposit collateral, generate DAI
-    //     assertEq(vat.dai(address(this)), 0);
-    //     vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-    //     assertEq(vat.gem("LINK-A", address(this)), 0);
-    //     assertEq(vat.dai(address(this)), 100 * RAD);
-
-    //     // Payback DAI, withdraw collateral
-    //     vat.frob("LINK-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-    //     assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.dai(address(this)), 0);
-
-    //     // Withdraw from adapter
-    //     joinLINKA.exit(address(this), 1 * THOUSAND * WAD);
-    //     assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
-    //     assertEq(vat.gem("LINK-A", address(this)), 0);
-
-    //     // Generate new DAI to force a liquidation
-    //     link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
-    //     joinLINKA.join(address(this), 1 * THOUSAND * WAD);
-    //     (,,uint256 spotV,,) = vat.ilks("LINK-A");
-    //     // dart max amount of DAI
-    //     vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-    //     hevm.warp(now + 1);
-    //     jug.drip("LINK-A");
-    //     assertEq(flipLINKA.kicks(), 0);
-    //     cat.bite("LINK-A", address(this));
-    //     assertEq(flipLINKA.kicks(), 1);
-    // }
+        // Generate new DAI to force a liquidation
+        link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
+        joinLINKA.join(address(this), 1 * THOUSAND * WAD);
+        (,,uint256 spotV,,) = vat.ilks("LINK-A");
+        // dart max amount of DAI
+        vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("LINK-A");
+        assertEq(flipLINKA.kicks(), 0);
+        cat.bite("LINK-A", address(this));
+        assertEq(flipLINKA.kicks(), 1);
+    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
