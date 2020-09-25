@@ -20,9 +20,9 @@ interface MedianizerV1Abstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0xB1f7c0E7100d0bb36ef3e63416484F3b4b12719c);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 0;
+    uint256 constant SPELL_CREATED = 1601045606;
 
     struct CollateralValues {
         uint256 line;
