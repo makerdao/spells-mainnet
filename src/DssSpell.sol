@@ -64,7 +64,7 @@ contract SpellAction {
         /*** Risk Parameter Adjustments ***/
 
         // Set the global debt ceiling to 1,401,000,000
-        // 1,196 (current DC) + 85 (USDC-A increase) + 85 (TUSD-A increase) + 30 (PAXUSD-A increase)
+        // 1,196 (current DC) + 85 (USDC-A increase) + 85 (TUSD-A increase) + 30 (PAXUSD-A increase) + 5 (BAT-A increase)
         VatAbstract(MCD_VAT).file("Line", 1401 * MILLION * RAD);
 
         // Set the BAT-A debt ceiling
