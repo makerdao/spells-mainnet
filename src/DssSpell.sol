@@ -47,19 +47,19 @@ contract SpellAction {
     // COMP-A specific addresses
     address constant COMP            = 0xc00e94Cb662C3520282E6f5717214004A7f26888;
     address constant MCD_JOIN_COMP_A = 0xBEa7cDfB4b49EC154Ae1c0D731E4DC773A3265aA;
-    address constant MCD_FLIP_COMP_A = ;
+    address constant MCD_FLIP_COMP_A = 0x524826F84cB3A19B6593370a5889A58c00554739;
     address constant PIP_COMP        = ;
 
     // LRC-A specific addresses
     address constant LRC             = 0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD;
     address constant MCD_JOIN_LRC_A  = 0x6C186404A7A238D3d6027C0299D1822c1cf5d8f1;
-    address constant MCD_FLIP_LRC_A  = ;
+    address constant MCD_FLIP_LRC_A  = 0x7FdDc36dcdC435D8F54FDCB3748adcbBF70f3dAC;
     address constant PIP_LRC         = ;
 
     // LINK specific addresses
     address constant LINK            = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
     address constant MCD_JOIN_LINK_A = 0xdFccAf8fDbD2F4805C174f856a317765B49E4a50;
-    address constant MCD_FLIP_LINK_A = ;
+    address constant MCD_FLIP_LINK_A = 0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85;
     address constant PIP_LINK        = ;
 
     // Decimals & precision
@@ -75,87 +75,15 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.01)/(60 * 60 * 24 * 365) )'
     //
-    uint256 constant   ZERO_PERCENT_RATE = 1000000000000000000000000000;
-    uint256 constant    ONE_PERCENT_RATE = 1000000000315522921573372069;
-    uint256 constant    TWO_PERCENT_RATE = 1000000000627937192491029810;
-    uint256 constant  THREE_PERCENT_RATE = 1000000000937303470807876289;
-    uint256 constant   FOUR_PERCENT_RATE = 1000000001243680656318820312;
-    uint256 constant  EIGHT_PERCENT_RATE = 1000000002440418608258400030;
-    uint256 constant TWELVE_PERCENT_RATE = 1000000003593629043335673582;
-    uint256 constant  FIFTY_PERCENT_RATE = 1000000012857214317438491659;
+    uint256 constant    TWO_TWENTYFIVE_PERCENT_RATE = 1000000000705562181084137268;
+    uint256 constant  THREE_TWENTYFIVE_PERCENT_RATE = 1000000001014175731521720677;
 
     function execute() external {
-        /*** Risk Parameter Adjustments ***/
-        
-        /*** ETH-A ***/
-        // Set Stability Fee to 0%
-        JugAbstract(MCD_JUG).drip("ETH-A");
-        JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PERCENT_RATE);
+        // Set the global debt ceiling to 1,416,000,000
+        // 1,401 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
+        VatAbstract(MCD_VAT).file("Line", 1416 * MILLION * RAD);
 
-        /*** BAT-A ***/
-        // Set Stability Fee to 4%
-        JugAbstract(MCD_JUG).drip("BAT-A");
-        JugAbstract(MCD_JUG).file("BAT-A", "duty", FOUR_PERCENT_RATE);
-
-        /*** USDC-A ***/
-        // Set Stability Fee to 0%
-        JugAbstract(MCD_JUG).drip("USDC-A");
-        JugAbstract(MCD_JUG).file("USDC-A", "duty", FOUR_PERCENT_RATE);
-        // Set Debt Ceiling to $400 million
-        VatAbstract(MCD_VAT).file("USDC-A", "line", 400 * MILLION * RAD);
-        // Set Liquidation Ratio to 101%
-        SpotAbstract(MCD_SPOT).file("USDC-A", "mat", 101 * RAY / 100);
-
-        /*** USDC-B ***/
-        // Set Stability Fee to 50%
-        JugAbstract(MCD_JUG).drip("USDC-B");
-        JugAbstract(MCD_JUG).file("USDC-B", "duty", FIFTY_PERCENT_RATE);
-
-        /*** WBTC-A ***/
-        // Set Stability Fee to 4%
-        JugAbstract(MCD_JUG).drip("WBTC-A");
-        JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_PERCENT_RATE);
-
-        /*** TUSD-A ***/
-        // Set Stability Fee to 0%
-        JugAbstract(MCD_JUG).drip("TUSD-A");
-        JugAbstract(MCD_JUG).file("TUSD-A", "duty", FOUR_PERCENT_RATE);
-        // Set Debt Ceiling to $400 million
-        VatAbstract(MCD_VAT).file("TUSD-A", "line", 50 * MILLION * RAD);
-        // Set Liquidation Ratio to 101%
-        SpotAbstract(MCD_SPOT).file("TUSD-A", "mat", 101 * RAY / 100);
-
-        /*** KNC-A ***/
-        // Set Stability Fee to 4%
-        JugAbstract(MCD_JUG).drip("KNC-A");
-        JugAbstract(MCD_JUG).file("KNC-A", "duty", FOUR_PERCENT_RATE);
-
-        /*** ZRX-A ***/
-        // Set Stability Fee to 4%
-        JugAbstract(MCD_JUG).drip("ZRX-A");
-        JugAbstract(MCD_JUG).file("ZRX-A", "duty", FOUR_PERCENT_RATE);
-
-        /*** MANA-A ***/
-        // Set Stability Fee to 12%
-        JugAbstract(MCD_JUG).drip("MANA-A");
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", TWELVE_PERCENT_RATE);
-
-        /*** USDT-A ***/
-        // Set Stability Fee to 8%
-        JugAbstract(MCD_JUG).drip("USDT-A");
-        JugAbstract(MCD_JUG).file("USDT-A", "duty", EIGHT_PERCENT_RATE);
-
-        /*** PAXUSD-A ***/
-        // Set Stability Fee to 0%
-        JugAbstract(MCD_JUG).drip("PAXUSD-A");
-        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", FOUR_PERCENT_RATE);
-        // Set Debt Ceiling to $400 million
-        VatAbstract(MCD_VAT).file("PAXUSD-A", "line", 30 * MILLION * RAD);
-        // Set Liquidation Ratio to 101%
-        SpotAbstract(MCD_SPOT).file("PAXUSD-A", "mat", 101 * RAY / 100);
-
-        // Set the global debt ceiling
-        VatAbstract(MCD_VAT).file("Line", 1196 * MILLION * RAD);
+        // TODO: Define if DSR needs to be increased
 
         /************************************/
         /*** COMP-A COLLATERAL ONBOARDING ***/
@@ -209,17 +137,17 @@ contract SpellAction {
         // Set the COMP-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
         // Set the COMP-A dunk
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 500 * RAD);
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
         // Set the COMP-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the COMP-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", ONE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the COMP-A percentage between bids 
         FlipAbstract(MCD_FLIP_COMP_A).file("beg", 103 * WAD / 100);
         // Set the COMP-A time max time between bids
-        FlipAbstract(MCD_FLIP_COMP_A).file("ttl", 1 hours);
+        FlipAbstract(MCD_FLIP_COMP_A).file("ttl", 6 hours);
         // Set the COMP-A max auction duration to
-        FlipAbstract(MCD_FLIP_COMP_A).file("tau", 1 hours);
+        FlipAbstract(MCD_FLIP_COMP_A).file("tau", 6 hours);
         // Set the COMP-A min collateralization ratio 
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
 
@@ -228,10 +156,6 @@ contract SpellAction {
 
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_COMP_A);
-
-        // Set Faucet amount
-        FaucetAbstract(FAUCET).setAmt(COMP, 2 * WAD);
-
 
         /***********************************/
         /*** LRC-A COLLATERAL ONBOARDING ***/
@@ -285,17 +209,17 @@ contract SpellAction {
         // Set the LRC-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
         // Set the LRC-A dunk
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 500 * RAD);
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
         // Set the LRC-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LRC-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the LRC-A percentage between bids 
         FlipAbstract(MCD_FLIP_LRC_A).file("beg", 103 * WAD / 100);
         // Set the LRC-A time max time between bids
-        FlipAbstract(MCD_FLIP_LRC_A).file("ttl", 1 hours);
+        FlipAbstract(MCD_FLIP_LRC_A).file("ttl", 6 hours);
         // Set the LRC-A max auction duration to
-        FlipAbstract(MCD_FLIP_LRC_A).file("tau", 1 hours);
+        FlipAbstract(MCD_FLIP_LRC_A).file("tau", 6 hours);
         // Set the LRC-A min collateralization ratio 
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
 
@@ -304,9 +228,6 @@ contract SpellAction {
 
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_LRC_A);
-
-        // Set Faucet amount
-        FaucetAbstract(FAUCET).setAmt(LRC, 2000 * WAD);
 
 
         /************************************/
@@ -361,17 +282,17 @@ contract SpellAction {
         // Set the LINK-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
         // Set the LINK-A dunk
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 500 * RAD);
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
         // Set the LINK-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LINK-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_TWENTYFIVE_PERCENT_RATE);
         // Set the LINK-A percentage between bids 
         FlipAbstract(MCD_FLIP_LINK_A).file("beg", 103 * WAD / 100);
         // Set the LINK-A time max time between bids
-        FlipAbstract(MCD_FLIP_LINK_A).file("ttl", 1 hours);
+        FlipAbstract(MCD_FLIP_LINK_A).file("ttl", 6 hours);
         // Set the LINK-A max auction duration to
-        FlipAbstract(MCD_FLIP_LINK_A).file("tau", 1 hours);
+        FlipAbstract(MCD_FLIP_LINK_A).file("tau", 6 hours);
         // Set the LINK-A min collateralization ratio 
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
 
@@ -380,9 +301,6 @@ contract SpellAction {
 
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_LINK_A);
-
-        // Set Faucet amount
-        FaucetAbstract(FAUCET).setAmt(LINK, 30 * WAD);
     }
 }
 
@@ -412,16 +330,16 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = now + 4 days + 2 hours;
     }
 
-    // modifier officeHours {
-    //     uint day = (now / 1 days + 3) % 7;
-    //     require(day < 5, "Can only be cast on a weekday");
-    //     uint hour = now / 1 hours % 24;
-    //     require(hour >= 14 && hour < 21, "Outside office hours");
-    //     _;
-    // }
+    modifier officeHours {
+        uint day = (now / 1 days + 3) % 7;
+        require(day < 5, "Can only be cast on a weekday");
+        uint hour = now / 1 hours % 24;
+        require(hour >= 14 && hour < 21, "Outside office hours");
+        _;
+    }
 
     function schedule() public {
         require(now <= expiration, "This contract has expired");
@@ -430,7 +348,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
+    function cast() public officeHours {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);

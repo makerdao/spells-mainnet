@@ -75,14 +75,27 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
-    // spell-specific addresses (remove for next spell if unneeded)
-    MedianAbstract ethusd_median  = MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
-    MedianAbstract btcusd_median  = MedianAbstract(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
-    OsmAbstract pip_wbtc          = OsmAbstract(0xf185d0682d50819263941e5f4EacC763CC5C6C42);
-    address KYBER                 = 0xe1BDEb1F71b1CD855b95D4Ec2d1BFdc092E00E4F;
-    address DDEX                  = 0x4935B1188EB940C39e22172cc5fe595E267706a1;
-    MedianizerV1Abstract ETHUSDv1 = MedianizerV1Abstract(0x729D19f657BD0614b4985Cf1D82531c67569197B);
-    address YEARN                 = 0x82c93333e4E295AA17a05B15092159597e823e8a;
+    // COMP-A specific
+    DSTokenAbstract       comp = DSTokenAbstract(    0xc00e94Cb662C3520282E6f5717214004A7f26888);
+    GemJoinAbstract  joinCOMPA = GemJoinAbstract(    0xBEa7cDfB4b49EC154Ae1c0D731E4DC773A3265aA);
+    OsmAbstract        pipCOMP = OsmAbstract(        );
+    FlipAbstract     flipCOMPA = FlipAbstract(       0x524826F84cB3A19B6593370a5889A58c00554739);
+    MedianAbstract    medCOMPA = MedianAbstract(     );
+
+    // LRC-A specific
+    GemAbstract            lrc = GemAbstract(        0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD);
+    GemJoinAbstract   joinLRCA = GemJoinAbstract(    0x6C186404A7A238D3d6027C0299D1822c1cf5d8f1);
+    OsmAbstract         pipLRC = OsmAbstract(        );
+    FlipAbstract      flipLRCA = FlipAbstract(       0x7FdDc36dcdC435D8F54FDCB3748adcbBF70f3dAC);
+    MedianAbstract     medLRCA = MedianAbstract(     );
+
+    // LINK-A specific
+    DSTokenAbstract       link = DSTokenAbstract(    0x514910771AF9Ca656af840dff83E8264EcF986CA);
+    GemJoinAbstract  joinLINKA = GemJoinAbstract(    0xdFccAf8fDbD2F4805C174f856a317765B49E4a50);
+    OsmAbstract        pipLINK = OsmAbstract(        );
+    FlipAbstract     flipLINKA = FlipAbstract(       0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85);
+    MedianAbstract    medLINKA = MedianAbstract(     );
+
 
     DssSpell spell;
 
@@ -156,7 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
             cat_box: 15 * MILLION * RAD,
-            ilk_count: 11
+            ilk_count: 14
         });
 
         //
@@ -304,6 +317,45 @@ contract DssSpellTest is DSTest, DSMath {
             ttl:          6 hours,
             tau:          6 hours,
             liquidations: 0
+        });
+        afterSpell.collaterals["COMP-A"] = CollateralValues({
+            line:         7 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000001014175731521720677,
+            pct:          3.25 * 1000,
+            chop:         113 * WAD / 100,
+            dunk:         50 * THOUSAND * RAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["LRC-A"] = CollateralValues({
+            line:         3 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000001014175731521720677,
+            pct:          3.25 * 1000,
+            chop:         113 * WAD / 100,
+            dunk:         50 * THOUSAND * RAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["LINK-A"] = CollateralValues({
+            line:         5 * MILLION * RAD,
+            dust:         100 * RAD,
+            duty:         1000000000705562181084137268,
+            pct:          2.25 * 1000,
+            chop:         113 * WAD / 100,
+            dunk:         50 * THOUSAND * RAD,
+            mat:          175 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
         });
     }
 
@@ -722,9 +774,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
+            assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
         }
 
         vote();
@@ -737,29 +789,5 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
         }
-
-        // spell-specific checks (remove if unneeded):
-        assertEq(ethusd_median.bud(KYBER), 1);
-        assertEq(ethusd_median.bud(address(ETHUSDv1)), 1);
-        assertEq(btcusd_median.bud(DDEX), 1);
-        assertEq(pip_wbtc.bud(YEARN), 1);
-
-        assertEq(ETHUSDv1.owner(), pauseProxy);
-        assertEq(ETHUSDv1.authority(), address(0));
-
-        // Whitelist address(this) in v2 median in order to read the actual price
-        hevm.store(
-            address(ethusd_median),
-            keccak256(abi.encode(address(this), uint256(4))),
-            bytes32(uint256(1))
-        );
-        (uint256 valueV2, bool okV2) = ethusd_median.peek();
-        assertTrue(okV2);
-
-        ETHUSDv1.poke();
-        (uint256 valueV1, bool okV1) = ETHUSDv1.peek();
-        assertTrue(okV1);
-        assertEq(valueV1, valueV2);
-        //
     }
 }
