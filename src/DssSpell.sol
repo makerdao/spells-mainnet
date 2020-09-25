@@ -172,13 +172,13 @@ contract SpellAction {
         // Whitelisting:
 
         // https://forum.makerdao.com/t/mip10c9-sp11-whitelist-kybers-promo-token-pricing-contract-on-ethusd-oracle/4193
-        // https://forum.makerdao.com/t/mip10c9-sp8-whitelist-ddex-on-wbtcusd-oracle/4094
+        // https://forum.makerdao.com/t/mip10c9-sp7-whitelist-opyn-on-ethusd-oracle/4061
         address[] memory addrs = new address[](2);
         addrs[0] = KYBER;
         addrs[1] = ETHUSDv1;
         MedianAbstract(ETHUSD).kiss(addrs);
 
-        // https://forum.makerdao.com/t/mip10c9-sp7-whitelist-opyn-on-ethusd-oracle/4061
+        // https://forum.makerdao.com/t/mip10c9-sp8-whitelist-ddex-on-wbtcusd-oracle/4094
         MedianAbstract(BTCUSD).kiss(DDEX);
 
         // https://forum.makerdao.com/t/mip10c9-sp10-whitelist-yearn-finance-on-btcusd-oracle/4192
