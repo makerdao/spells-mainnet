@@ -96,7 +96,6 @@ contract DssSpellTest is DSTest, DSMath {
     FlipAbstract     flipLINKA = FlipAbstract(       0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85);
     MedianAbstract    medLINKA = MedianAbstract(     0xbAd4212d73561B240f10C56F27e6D9608963f17b);
 
-
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
