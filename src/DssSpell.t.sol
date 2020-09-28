@@ -607,6 +607,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(joinCOMPA.wards(pauseProxy), 1);
         assertEq(vat.wards(address(joinCOMPA)), 1);
+        assertEq(cat.wards(address(flipCOMPA)), 1);
+        assertEq(flipCOMPA.wards(address(cat)), 1);
+        assertEq(flipCOMPA.wards(pauseProxy), 1);
         assertEq(flipCOMPA.wards(address(end)), 1);
         assertEq(flipCOMPA.wards(address(flipMom)), 1);
         assertEq(pipCOMP.wards(address(osmMom)), 1);
@@ -673,6 +676,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(joinLRCA.wards(pauseProxy), 1);
         assertEq(vat.wards(address(joinLRCA)), 1);
+        assertEq(cat.wards(address(flipLRCA)), 1);
+        assertEq(flipLRCA.wards(address(cat)), 1);
+        assertEq(flipLRCA.wards(pauseProxy), 1);
         assertEq(flipLRCA.wards(address(end)), 1);
         assertEq(flipLRCA.wards(address(flipMom)), 1);
         assertEq(pipLRC.wards(address(osmMom)), 1);
@@ -739,6 +745,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(joinLINKA.wards(pauseProxy), 1);
         assertEq(vat.wards(address(joinLINKA)), 1);
+        assertEq(cat.wards(address(flipLINKA)), 1);
+        assertEq(flipLINKA.wards(address(cat)), 1);
+        assertEq(flipLINKA.wards(pauseProxy), 1);
         assertEq(flipLINKA.wards(address(end)), 1);
         assertEq(flipLINKA.wards(address(flipMom)), 1);
         assertEq(pipLINK.wards(address(osmMom)), 1);
