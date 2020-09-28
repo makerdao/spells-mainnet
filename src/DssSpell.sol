@@ -75,21 +75,13 @@ contract SpellAction {
     //
     // $ bc -l <<< 'scale=27; e( l(1.01)/(60 * 60 * 24 * 365) )'
     //
-    // uint256 constant    TWO_TWENTYFIVE_PERCENT_RATE = 1000000000705562181084137268;
-    // uint256 constant  THREE_TWENTYFIVE_PERCENT_RATE = 1000000001014175731521720677;
-    uint256 constant    TWO_PERCENT_RATE = 1000000000627937192491029810;
-    uint256 constant  THREE_PERCENT_RATE = 1000000000937303470807876289;
+    uint256 constant    TWO_TWENTYFIVE_PERCENT_RATE = 1000000000705562181084137268;
+    uint256 constant  THREE_TWENTYFIVE_PERCENT_RATE = 1000000001014175731521720677;
 
     function execute() external {
-        // // Set the global debt ceiling to 1,416,000,000
-        // // 1,401 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
-        // VatAbstract(MCD_VAT).file("Line", 1416 * MILLION * RAD);
-
-        // Set the global debt ceiling to 1,211,000,000
-        // 1,196 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
-        VatAbstract(MCD_VAT).file("Line", 1211 * MILLION * RAD);
-
-        // TODO: Define if DSR needs to be increased
+        // Set the global debt ceiling to 1,416,000,000
+        // 1,401 (current DC) + 7 (COMP-A) + 3 (LRC-A) + 5 (LINK-A)
+        VatAbstract(MCD_VAT).file("Line", 1416 * MILLION * RAD);
 
         /************************************/
         /*** COMP-A COLLATERAL ONBOARDING ***/
@@ -147,8 +139,7 @@ contract SpellAction {
         // Set the COMP-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the COMP-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_PERCENT_RATE);
-        // JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the COMP-A percentage between bids 
         FlipAbstract(MCD_FLIP_COMP_A).file("beg", 103 * WAD / 100);
         // Set the COMP-A time max time between bids
@@ -220,8 +211,7 @@ contract SpellAction {
         // Set the LRC-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LRC-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_PERCENT_RATE);
-        // JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", THREE_TWENTYFIVE_PERCENT_RATE);
         // Set the LRC-A percentage between bids 
         FlipAbstract(MCD_FLIP_LRC_A).file("beg", 103 * WAD / 100);
         // Set the LRC-A time max time between bids
@@ -294,8 +284,7 @@ contract SpellAction {
         // Set the LINK-A liquidation penalty 
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the LINK-A stability fee 
-        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_PERCENT_RATE);
-        // JugAbstract(MCD_JUG).file(ilk, "duty", TWO_TWENTYFIVE_PERCENT_RATE);
+        JugAbstract(MCD_JUG).file(ilk, "duty", TWO_TWENTYFIVE_PERCENT_RATE);
         // Set the LINK-A percentage between bids 
         FlipAbstract(MCD_FLIP_LINK_A).file("beg", 103 * WAD / 100);
         // Set the LINK-A time max time between bids
@@ -326,11 +315,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/9fe29a1704a7885305774bbb31ab04fedd363259/governance/votes/Executive%20vote%20-%20September%2018%2C%202020.md -q -O - 2>/dev/null)"
-
-	// get link here: https://github.com/makerdao/community/tree/master/governance/votes
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/8980cdc055642f8aa56756d39606cc55bfe7caf6/governance/votes/Executive%20vote%20-%20September%2028%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-09-28 MakerDAO Executive Spell | Hash: ";
+        "2020-09-28 MakerDAO Executive Spell | Hash: 0xc19a4f25cf049ac24f56e5fd042d95691de62e583f238279752db1ad516d4e99";
 
     // MIP15: Dark Spell Mechanism
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/eb6d36a1007ded0a5126181f5a86276ea78a91d3/MIP15/mip15.md -q -O - 2>/dev/null)"
