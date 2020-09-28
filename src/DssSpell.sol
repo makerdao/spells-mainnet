@@ -227,7 +227,6 @@ contract SpellAction {
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_LRC_A);
 
-
         /************************************/
         /*** LINK-A COLLATERAL ONBOARDING ***/
         /************************************/
