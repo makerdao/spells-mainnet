@@ -20,7 +20,7 @@ interface MedianizerV1Abstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x85652B397a5E7B5D92e7c0F4158D2b1c6761F280);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1601307611;
 
@@ -74,27 +74,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
-
-    // COMP-A specific
-    DSTokenAbstract       comp = DSTokenAbstract(    0xc00e94Cb662C3520282E6f5717214004A7f26888);
-    GemJoinAbstract  joinCOMPA = GemJoinAbstract(    0xBEa7cDfB4b49EC154Ae1c0D731E4DC773A3265aA);
-    OsmAbstract        pipCOMP = OsmAbstract(        0xBED0879953E633135a48a157718Aa791AC0108E4);
-    FlipAbstract     flipCOMPA = FlipAbstract(       0x524826F84cB3A19B6593370a5889A58c00554739);
-    MedianAbstract    medCOMPA = MedianAbstract(     0xA3421Be733125405Ea20aA853839D34b364eB524);
-
-    // LRC-A specific
-    GemAbstract            lrc = GemAbstract(        0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD);
-    GemJoinAbstract   joinLRCA = GemJoinAbstract(    0x6C186404A7A238D3d6027C0299D1822c1cf5d8f1);
-    OsmAbstract         pipLRC = OsmAbstract(        0x9eb923339c24c40Bef2f4AF4961742AA7C23EF3a);
-    FlipAbstract      flipLRCA = FlipAbstract(       0x7FdDc36dcdC435D8F54FDCB3748adcbBF70f3dAC);
-    MedianAbstract     medLRCA = MedianAbstract(     0xcCe92282d9fe310F4c232b0DA9926d5F24611C7B);
-
-    // LINK-A specific
-    DSTokenAbstract       link = DSTokenAbstract(    0x514910771AF9Ca656af840dff83E8264EcF986CA);
-    GemJoinAbstract  joinLINKA = GemJoinAbstract(    0xdFccAf8fDbD2F4805C174f856a317765B49E4a50);
-    OsmAbstract        pipLINK = OsmAbstract(        0x9B0C694C6939b5EA9584e9b61C7815E8d97D9cC7);
-    FlipAbstract     flipLINKA = FlipAbstract(       0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85);
-    MedianAbstract    medLINKA = MedianAbstract(     0xbAd4212d73561B240f10C56F27e6D9608963f17b);
 
     DssSpell spell;
 
@@ -160,7 +139,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 1416 * MILLION * RAD,
+            vat_Line: 1456 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -177,10 +156,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             line:         540 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000000705562181084137268,
-            // pct:          2.25 * 1000,
-            duty:         1000000000000000000000000000,
-            pct:          0 * 1000,
+            duty:         1000000000627937192491029810,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
@@ -190,11 +167,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
-            // line:         10 * MILLION * RAD,
-            line:         5 * MILLION * RAD,
+            line:         10 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -206,11 +180,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
-            // line:         485 * MILLION * RAD,
-            line:         400 * MILLION * RAD,
+            line:         485 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -224,8 +195,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000012910019978921115695,
-            // pct:          50.25 * 1000,
             duty:         1000000012857214317438491659,
             pct:          50 * 1000,
             chop:         113 * WAD / 100,
@@ -239,8 +208,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             line:         120 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -252,11 +219,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
-            // line:         135 * MILLION * RAD,
-            line:         50 * MILLION * RAD,
+            line:         135 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -270,8 +234,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -285,8 +247,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -300,8 +260,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         1 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000003664330950215446102,
-            // pct:          12.25 * 1000,
             duty:         1000000003593629043335673582,
             pct:          12 * 1000,
             chop:         113 * WAD / 100,
@@ -315,8 +273,6 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDT-A"] = CollateralValues({
             line:         10 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000002513736079215619839,
-            // pct:          8.25 * 1000,
             duty:         1000000002440418608258400030,
             pct:          8 * 1000,
             chop:         113 * WAD / 100,
@@ -328,11 +284,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
-            // line:         60 * MILLION * RAD,
-            line:         30 * MILLION * RAD,
+            line:         100 * MILLION * RAD,
             dust:         100 * RAD,
-            // duty:         1000000001319814647332759691,
-            // pct:          4.25 * 1000,
             duty:         1000000001243680656318820312,
             pct:          4 * 1000,
             chop:         113 * WAD / 100,
@@ -346,8 +299,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["COMP-A"] = CollateralValues({
             line:         7 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001014175731521720677,
-            pct:          3.25 * 1000,
+            duty:         1000000000937303470807876289,
+            pct:          3 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -359,8 +312,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["LRC-A"] = CollateralValues({
             line:         3 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000001014175731521720677,
-            pct:          3.25 * 1000,
+            duty:         1000000000937303470807876289,
+            pct:          3 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -372,8 +325,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["LINK-A"] = CollateralValues({
             line:         5 * MILLION * RAD,
             dust:         100 * RAD,
-            duty:         1000000000705562181084137268,
-            pct:          2.25 * 1000,
+            duty:         1000000000627937192491029810,
+            pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          175 * RAY / 100,
@@ -567,228 +520,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-    }
-
-    function testFailWrongDay() public {
-        vote();
-        scheduleWaitAndCastFailDay();
-    }
-
-    function testFailTooEarly() public {
-        vote();
-        scheduleWaitAndCastFailEarly();
-    }
-
-    function testFailTooLate() public {
-        vote();
-        scheduleWaitAndCastFailLate();
-    }
-
-    function testSpellIsCast_COMP_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipCOMP.poke();
-        hevm.warp(now + 3601); 
-        pipCOMP.poke();
-        spot.poke("COMP-A");
-
-        hevm.store(
-            address(comp),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1 * THOUSAND * WAD))
-        );
-
-        // Check median matches pip.src()
-        assertEq(pipCOMP.src(), address(medCOMPA)); 
-
-        // Authorization
-        assertEq(joinCOMPA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinCOMPA)), 1);
-        assertEq(cat.wards(address(flipCOMPA)), 1);
-        assertEq(flipCOMPA.wards(address(cat)), 1);
-        assertEq(flipCOMPA.wards(pauseProxy), 1);
-        assertEq(flipCOMPA.wards(address(end)), 1);
-        assertEq(flipCOMPA.wards(address(flipMom)), 1);
-        assertEq(pipCOMP.wards(address(osmMom)), 1);
-        assertEq(pipCOMP.bud(address(spot)), 1);
-        assertEq(pipCOMP.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipCOMP.src()).bud(address(pipCOMP)), 1);
-
-        // Join to adapter
-        assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("COMP-A", address(this)), 0);
-        comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
-        joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
-        assertEq(comp.balanceOf(address(this)), 0);
-        assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-        assertEq(vat.gem("COMP-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("COMP-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-        assertEq(vat.gem("COMP-A", address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinCOMPA.exit(address(this), 1 * THOUSAND * WAD);
-        assertEq(comp.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("COMP-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        comp.approve(address(joinCOMPA), 1 * THOUSAND * WAD);
-        joinCOMPA.join(address(this), 1 * THOUSAND * WAD);
-        (,,uint256 spotV,,) = vat.ilks("COMP-A");
-        // dart max amount of DAI
-        vat.frob("COMP-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("COMP-A");
-        assertEq(flipCOMPA.kicks(), 0);
-        cat.bite("COMP-A", address(this));
-        assertEq(flipCOMPA.kicks(), 1);
-    }
-
-    function testSpellIsCast_LRC_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipLRC.poke();
-        hevm.warp(now + 3601); 
-        pipLRC.poke();
-        spot.poke("LRC-A");
-
-        hevm.store(
-            address(lrc),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(uint256(1 * THOUSAND * WAD))
-        );
-
-        // Check median matches pip.src()
-        assertEq(pipLRC.src(), address(medLRCA)); 
-
-        // Authorization
-        assertEq(joinLRCA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinLRCA)), 1);
-        assertEq(cat.wards(address(flipLRCA)), 1);
-        assertEq(flipLRCA.wards(address(cat)), 1);
-        assertEq(flipLRCA.wards(pauseProxy), 1);
-        assertEq(flipLRCA.wards(address(end)), 1);
-        assertEq(flipLRCA.wards(address(flipMom)), 1);
-        assertEq(pipLRC.wards(address(osmMom)), 1);
-        assertEq(pipLRC.bud(address(spot)), 1);
-        assertEq(pipLRC.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipLRC.src()).bud(address(pipLRC)), 1);
-
-        // Join to adapter
-        assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("LRC-A", address(this)), 0);
-        lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
-        joinLRCA.join(address(this), 1 * THOUSAND * WAD);
-        assertEq(lrc.balanceOf(address(this)), 0);
-        assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-        assertEq(vat.gem("LRC-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("LRC-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-        assertEq(vat.gem("LRC-A", address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinLRCA.exit(address(this), 1 * THOUSAND * WAD);
-        assertEq(lrc.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("LRC-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        lrc.approve(address(joinLRCA), 1 * THOUSAND * WAD);
-        joinLRCA.join(address(this), 1 * THOUSAND * WAD);
-        (,,uint256 spotV,,) = vat.ilks("LRC-A");
-        // dart max amount of DAI
-        vat.frob("LRC-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("LRC-A");
-        assertEq(flipLRCA.kicks(), 0);
-        cat.bite("LRC-A", address(this));
-        assertEq(flipLRCA.kicks(), 1);
-    }
-
-    function testSpellIsCast_LINK_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipLINK.poke();
-        hevm.warp(now + 3601); 
-        pipLINK.poke();
-        spot.poke("LINK-A");
-
-        hevm.store(
-            address(link),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1 * THOUSAND * WAD))
-        );
-
-        // Check median matches pip.src()
-        assertEq(pipLINK.src(), address(medLINKA)); 
-
-        // Authorization
-        assertEq(joinLINKA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinLINKA)), 1);
-        assertEq(cat.wards(address(flipLINKA)), 1);
-        assertEq(flipLINKA.wards(address(cat)), 1);
-        assertEq(flipLINKA.wards(pauseProxy), 1);
-        assertEq(flipLINKA.wards(address(end)), 1);
-        assertEq(flipLINKA.wards(address(flipMom)), 1);
-        assertEq(pipLINK.wards(address(osmMom)), 1);
-        assertEq(pipLINK.bud(address(spot)), 1);
-        assertEq(pipLINK.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipLINK.src()).bud(address(pipLINK)), 1);
-
-        // Join to adapter
-        assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("LINK-A", address(this)), 0);
-        link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
-        joinLINKA.join(address(this), 1 * THOUSAND * WAD);
-        assertEq(link.balanceOf(address(this)), 0);
-        assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(100 * WAD));
-        assertEq(vat.gem("LINK-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("LINK-A", address(this), address(this), address(this), -int(1 * THOUSAND * WAD), -int(100 * WAD));
-        assertEq(vat.gem("LINK-A", address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinLINKA.exit(address(this), 1 * THOUSAND * WAD);
-        assertEq(link.balanceOf(address(this)), 1 * THOUSAND * WAD);
-        assertEq(vat.gem("LINK-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        link.approve(address(joinLINKA), 1 * THOUSAND * WAD);
-        joinLINKA.join(address(this), 1 * THOUSAND * WAD);
-        (,,uint256 spotV,,) = vat.ilks("LINK-A");
-        // dart max amount of DAI
-        vat.frob("LINK-A", address(this), address(this), address(this), int(1 * THOUSAND * WAD), int(mul(1 * THOUSAND * WAD, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("LINK-A");
-        assertEq(flipLINKA.kicks(), 0);
-        cat.bite("LINK-A", address(this));
-        assertEq(flipLINKA.kicks(), 1);
     }
 
     function testSpellIsCast() public {
