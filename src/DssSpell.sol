@@ -197,9 +197,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/8980cdc055642f8aa56756d39606cc55bfe7caf6/governance/votes/Executive%20vote%20-%20September%2028%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://github.com/makerdao/community/blob/cbf3dd1eab77cb3c5fe3b8db22a08b55a8d4aeaf/governance/votes/Executive%20vote%20-%20October%202%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-02 MakerDAO Executive Spell | Hash: 0xc19a4f25cf049ac24f56e5fd042d95691de62e583f238279752db1ad516d4e99";
+        "2020-10-02 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -208,7 +208,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 4 days + 2 hours;
+        expiration = now + 30 days;
     }
 
     function schedule() public {

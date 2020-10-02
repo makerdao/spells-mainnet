@@ -361,45 +361,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(chief.hat(), address(spell));
     }
 
-    function scheduleWaitAndCastFailDay() public {
-        spell.schedule();
-
-        uint256 castTime = now + pause.delay();
-        uint256 day = (castTime / 1 days + 3) % 7;
-        if (day < 5) {
-            castTime += 5 days - day * 86400;
-        }
-
-        hevm.warp(castTime);
-        spell.cast();
-    }
-
-    function scheduleWaitAndCastFailEarly() public {
-        spell.schedule();
-
-        uint256 castTime = now + pause.delay() + 24 hours;
-        uint256 hour = castTime / 1 hours % 24;
-        if (hour >= 14) {
-            castTime -= hour * 3600 - 13 hours;
-        }
-
-        hevm.warp(castTime);
-        spell.cast();
-    }
-
-    function scheduleWaitAndCastFailLate() public {
-        spell.schedule();
-
-        uint256 castTime = now + pause.delay();
-        uint256 hour = castTime / 1 hours % 24;
-        if (hour < 21) {
-            castTime += 21 hours - hour * 3600;
-        }
-
-        hevm.warp(castTime);
-        spell.cast();
-    }
-
     function scheduleWaitAndCast() public {
         spell.schedule();
 
