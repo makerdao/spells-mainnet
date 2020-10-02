@@ -22,7 +22,7 @@ contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1601307611;
+    uint256 constant SPELL_CREATED = 1601644658;
 
     struct CollateralValues {
         uint256 line;
@@ -340,6 +340,45 @@ contract DssSpellTest is DSTest, DSMath {
         });
     }
 
+    // function scheduleWaitAndCastFailDay() public {
+    //     spell.schedule();
+
+    //     uint256 castTime = now + pause.delay();
+    //     uint256 day = (castTime / 1 days + 3) % 7;
+    //     if (day < 5) {
+    //         castTime += 5 days - day * 86400;
+    //     }
+
+    //     hevm.warp(castTime);
+    //     spell.cast();
+    // }
+
+    // function scheduleWaitAndCastFailEarly() public {
+    //     spell.schedule();
+
+    //     uint256 castTime = now + pause.delay() + 24 hours;
+    //     uint256 hour = castTime / 1 hours % 24;
+    //     if (hour >= 14) {
+    //         castTime -= hour * 3600 - 13 hours;
+    //     }
+
+    //     hevm.warp(castTime);
+    //     spell.cast();
+    // }
+
+    // function scheduleWaitAndCastFailLate() public {
+    //     spell.schedule();
+
+    //     uint256 castTime = now + pause.delay();
+    //     uint256 hour = castTime / 1 hours % 24;
+    //     if (hour < 21) {
+    //         castTime += 21 hours - hour * 3600;
+    //     }
+
+    //     hevm.warp(castTime);
+    //     spell.cast();
+    // }
+
     function vote() private {
         if (chief.hat() != address(spell)) {
             hevm.store(
@@ -365,17 +404,6 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
 
         uint256 castTime = now + pause.delay();
-        uint256 day = (castTime / 1 days + 3) % 7;
-        if(day >= 5) {
-            castTime += 7 days - day * 86400;
-        }
-
-        uint256 hour = castTime / 1 hours % 24;
-        if (hour >= 21) {
-            castTime += 24 hours - hour * 3600 + 14 hours;
-        } else if (hour < 14) {
-            castTime += 14 hours - hour * 3600;
-        }
 
         hevm.warp(castTime);
         spell.cast();
@@ -514,9 +542,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 4 days + 2 hours));
+            assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
         vote();

@@ -16,16 +16,8 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinImplementationAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract SpellAction {
@@ -33,17 +25,10 @@ contract SpellAction {
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.1.1/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.1.2/contracts.json
 
     address constant MCD_VAT         = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_CAT         = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
     address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant MCD_SPOT        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant MCD_POT         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-    address constant MCD_END         = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
-    address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
-    address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
 
     // TUSD-A specific addresses
     address constant TUSD_IMPL       = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
@@ -180,7 +165,6 @@ contract SpellAction {
 
         // Unblock TUSD
         GemJoinImplementationAbstract(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPL, 1);
-       
     }
 }
 
@@ -197,7 +181,7 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://github.com/makerdao/community/blob/cbf3dd1eab77cb3c5fe3b8db22a08b55a8d4aeaf/governance/votes/Executive%20vote%20-%20October%202%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/blob/cbf3dd1eab77cb3c5fe3b8db22a08b55a8d4aeaf/governance/votes/Executive%20vote%20-%20October%202%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
         "2020-10-02 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
 
@@ -210,6 +194,14 @@ contract DssSpell {
         tag = _tag;
         expiration = now + 30 days;
     }
+
+    // modifier officeHours {
+    //     uint day = (now / 1 days + 3) % 7;
+    //     require(day < 5, "Can only be cast on a weekday");
+    //     uint hour = now / 1 hours % 24;
+    //     require(hour >= 14 && hour < 21, "Outside office hours");
+    //     _;
+    // }
 
     function schedule() public {
         require(now <= expiration, "This contract has expired");
