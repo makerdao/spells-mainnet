@@ -546,6 +546,13 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
+        hevm.store(
+            address(tusd),
+            keccak256(abi.encode(address(this), uint256(14))),
+            bytes32(uint256(40 * WAD))
+        );
+        assertEq(tusd.balanceOf(address(this)), 40 * WAD);
+
         // Join to adapter
         assertEq(tusd.balanceOf(address(this)), 40 * WAD);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
@@ -559,7 +566,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(tusd.balanceOf(address(this)), 40 * WAD);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
     }
-
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();

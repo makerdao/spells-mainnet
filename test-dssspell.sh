@@ -5,7 +5,6 @@ set -e
 
 SOLC_FLAGS="--optimize --optimize-runs 1" dapp --use solc:0.5.12 build
 
-export DAPP_TEST_ADDRESS=0x8EE7D9235e01e6B42345120b5d270bdB763624C7
 export DAPP_TEST_TIMESTAMP=$(seth block latest timestamp)
 export DAPP_TEST_NUMBER=$(seth block latest number)
 
