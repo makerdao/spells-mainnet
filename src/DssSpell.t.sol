@@ -404,6 +404,18 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
 
         uint256 castTime = now + pause.delay();
+        
+        // uint256 day = (castTime / 1 days + 3) % 7;
+        // if(day >= 5) {
+        //     castTime += 7 days - day * 86400;
+        // }
+
+        // uint256 hour = castTime / 1 hours % 24;
+        // if (hour >= 21) {
+        //     castTime += 24 hours - hour * 3600 + 14 hours;
+        // } else if (hour < 14) {
+        //     castTime += 14 hours - hour * 3600;
+        // }
 
         hevm.warp(castTime);
         spell.cast();
@@ -513,6 +525,21 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
+
+    // function testFailWrongDay() public {
+    //     vote();
+    //     scheduleWaitAndCastFailDay();
+    // }
+
+    // function testFailTooEarly() public {
+    //     vote();
+    //     scheduleWaitAndCastFailEarly();
+    // }
+
+    // function testFailTooLate() public {
+    //     vote();
+    //     scheduleWaitAndCastFailLate();
+    // }
 
     function testSpellIsCast_TUSD_INTEGRATION() public {
         vote();

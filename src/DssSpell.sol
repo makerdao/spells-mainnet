@@ -56,7 +56,7 @@ contract SpellAction {
 
     function execute() external {
         // Set the global debt ceiling to 1,456,000,000
-        // 1,416 (current DC) + 40 (PAX-A)
+        // 1,416 (current DC) + 40 (PAXUSD-A)
         VatAbstract(MCD_VAT).file("Line", 1456 * MILLION * RAD);
 
         // Set the PAXUSD-A debt ceiling
@@ -181,9 +181,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/blob/cbf3dd1eab77cb3c5fe3b8db22a08b55a8d4aeaf/governance/votes/Executive%20vote%20-%20October%202%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/cbf3dd1eab77cb3c5fe3b8db22a08b55a8d4aeaf/governance/votes/Executive%20vote%20-%20October%202%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-02 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2020-10-02 MakerDAO Executive Spell | Hash: 0xbf384941515f3594205f47f8e4675883118fead22472792119cf051ed37f29a8";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
