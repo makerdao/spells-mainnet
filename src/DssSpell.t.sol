@@ -551,7 +551,6 @@ contract DssSpellTest is DSTest, DSMath {
             keccak256(abi.encode(address(this), uint256(14))),
             bytes32(uint256(40 * WAD))
         );
-        assertEq(tusd.balanceOf(address(this)), 40 * WAD);
 
         // Join to adapter
         assertEq(tusd.balanceOf(address(this)), 40 * WAD);
