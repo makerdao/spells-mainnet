@@ -75,7 +75,7 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
-    GemAbstract           tusd = GemAbstract(        0xffc40F39806F1400d8278BfD33823705b5a4c196);
+    GemAbstract           tusd = GemAbstract(        0x0000000000085d4780B73119b644AE5ecd22b376);
     GemJoinAbstract  joinTUSDA = GemJoinAbstract(    0x4454aF7C8bb9463203b66C816220D41ED7837f44);
 
     DssSpell spell;
@@ -530,23 +530,17 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        hevm.store(
-            address(tusd),
-            keccak256(abi.encode(address(this), uint256(17))),
-            bytes32(uint256(1 * THOUSAND * WAD))
-        );
-
         // Join to adapter
-        assertEq(tusd.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(tusd.balanceOf(address(this)), 40 * WAD);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
-        tusd.approve(address(joinTUSDA), 1 * THOUSAND * WAD);
-        joinTUSDA.join(address(this), 1 * THOUSAND * WAD);
+        tusd.approve(address(joinTUSDA), 40 * WAD);
+        joinTUSDA.join(address(this), 40 * WAD);
         assertEq(tusd.balanceOf(address(this)), 0);
-        assertEq(vat.gem("TUSD-A", address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("TUSD-A", address(this)), 40 * WAD);
 
         // Withdraw from adapter
-        joinTUSDA.exit(address(this), 1 * THOUSAND * WAD);
-        assertEq(tusd.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        joinTUSDA.exit(address(this), 40 * WAD);
+        assertEq(tusd.balanceOf(address(this)), 40 * WAD);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
     }
 

@@ -46,7 +46,7 @@ contract SpellAction {
     address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
 
     // TUSD-A specific addresses
-    address constant TUSD            = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
+    address constant TUSD_IMPL       = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
     address constant MCD_JOIN_TUSD_A = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
 
     // Decimals & precision
@@ -179,7 +179,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("COMP-A", "duty", THREE);    
 
         // Unblock TUSD
-        GemJoinImplementationAbstract(MCD_JOIN_TUSD_A).setImplementation(TUSD, 1);
+        GemJoinImplementationAbstract(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPL, 1);
        
     }
 }
