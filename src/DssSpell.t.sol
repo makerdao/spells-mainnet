@@ -75,6 +75,9 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
+    GemAbstract           tusd = GemAbstract(        0xffc40F39806F1400d8278BfD33823705b5a4c196);
+    GemJoinAbstract  joinTUSDA = GemJoinAbstract(    0x4454aF7C8bb9463203b66C816220D41ED7837f44);
+
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -521,6 +524,32 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
     }
+
+    function testSpellIsCast_TUSD_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        hevm.store(
+            address(tusd),
+            keccak256(abi.encode(address(this), uint256(17))),
+            bytes32(uint256(1 * THOUSAND * WAD))
+        );
+
+        // Join to adapter
+        assertEq(tusd.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("TUSD-A", address(this)), 0);
+        tusd.approve(address(joinTUSDA), 1 * THOUSAND * WAD);
+        joinTUSDA.join(address(this), 1 * THOUSAND * WAD);
+        assertEq(tusd.balanceOf(address(this)), 0);
+        assertEq(vat.gem("TUSD-A", address(this)), 1 * THOUSAND * WAD);
+
+        // Withdraw from adapter
+        joinTUSDA.exit(address(this), 1 * THOUSAND * WAD);
+        assertEq(tusd.balanceOf(address(this)), 1 * THOUSAND * WAD);
+        assertEq(vat.gem("TUSD-A", address(this)), 0);
+    }
+
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
