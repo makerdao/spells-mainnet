@@ -11,6 +11,6 @@ script:
 notifications:
   webhooks:
     urls:
-      - https://chat.makerdao.com/hooks/rz6XmPk8coTQdbkQr/oWRchpxDBGyP8QhPFg23CQDttTbAJMGKTneexL6JZ7FebaM9
+      - secure: "S4hSgEzOvbakHXBMeZtveY89dThpsFu6fSDvvjy86xPg917trJiAz2v03yAkDP4tbEFNm3c9cRa1vDV16zg4JTOs+rZKqNFNHUHX+1hTa4zSEErvBNcgnWjO91H/tzYNZ/XXKQ5Ql2YN7Tx1JIWJk/sg25Yr9vevdfGWt9yRLSoJ34eSaXjQV1M/hRF+tBiTgVu+o2qBM9d9NaIO2D83DWTBDMFb0FrcQ5++8tW2KBYDaiReo9+Id9BIXvaIiXos7sNkKNyl5vambIQ1pQJZI7llLcN070ZUlMIgyr2luIW0ajlTSoBug8Ifj2eViaXBkbaOMTfTqN8REVJsTAczpbWOba2fv9kzU/tMMR+4pfnrnILax+Bora08gCU/4Cdsx5NS7/QGqcY44nvT2QuYuOXFfBa/sA/OE0bLi3pJbKRwnCC7zHnwDfkDdZ4WWPtgG6006V1ufNYW/vnLt9+Jk2OJPrfbeD95e0uQeM6P8VDgR47O0lh9+A7qrvzgTTzyRKLBEWPizNNxMFSozHImIdziqCjAN2lA8qky74uMUfBjxtzOeiYaMx3mFNEfwSLmrKz+eJ9un7VV8ukMK/Bw8hDFW8ZD499esmJW5m+cdO6XrtaFrTV20StDqoFR6J079X+8aZFIU8UDojcdXdFPqyZmhno+HdtLjZn4z7L6Tvw="
     on_success: always
     on_failure: always
