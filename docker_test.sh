@@ -11,4 +11,4 @@ function message() {
 }
 
 message RUNNING TESTS
-docker build -t makerdao/dss-launch-test . && docker run --rm -it -e ETH_RPC_URL=${ETH_RPC_URL} makerdao/dss-launch-test
+docker build -t makerdao/spells-mainnet-test . && docker run --rm -it -e ETH_RPC_URL=${ETH_RPC_URL} makerdao/spells-mainnet-test
