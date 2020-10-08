@@ -1,11 +1,11 @@
-# dss-launch
+# spells-mainnet
 
 Staging repo for MakerDAO weekly executive spells.
 
 ### Getting Started
 
 ```
-$ git clone git@github.com:makerdao/dss-launch.git
+$ git clone git@github.com:makerdao/spells-mainnet.git
 $ dapp update
 ```
 
