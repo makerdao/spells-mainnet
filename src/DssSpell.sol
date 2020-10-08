@@ -25,7 +25,7 @@ contract SpellAction {
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.2/contracts.json
 
-    address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    //address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
 
     // Decimals & precision
     //uint256 constant THOUSAND = 10 ** 3;
@@ -55,99 +55,9 @@ contract SpellAction {
         //
         // Previous: 2%
         // New: 0%
-        JugAbstract(MCD_JUG).drip("ETH-A"); // drip right before
-        JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
+        //JugAbstract(MCD_JUG).drip("ETH-A"); // drip right before
+        //JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
 
-        // Set the BAT-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("BAT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("BAT-A", "duty", TWO_PCT_RATE);
-
-        // Set the USDC-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("USDC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("USDC-A", "duty", TWO_PCT_RATE);
-
-        // Set the USDC-B stability fee
-        //
-        // Previous: 50%
-        // New: 48%
-        JugAbstract(MCD_JUG).drip("USDC-B"); // drip right before
-        JugAbstract(MCD_JUG).file("USDC-B", "duty", FOURTYEIGHT_PCT_RATE);
-
-        // Set the WBTC-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("WBTC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("WBTC-A", "duty", TWO_PCT_RATE);
-
-        // Set the TUSD-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("TUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("TUSD-A", "duty", TWO_PCT_RATE);
-
-        // Set the KNC-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("KNC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("KNC-A", "duty", TWO_PCT_RATE);
-
-        // Set the ZRX-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("ZRX-A"); // drip right before
-        JugAbstract(MCD_JUG).file("ZRX-A", "duty", TWO_PCT_RATE);
-
-        // Set the MANA-A stability fee
-        //
-        // Previous: 12%
-        // New: 10%
-        JugAbstract(MCD_JUG).drip("MANA-A"); // drip right before
-        JugAbstract(MCD_JUG).file("MANA-A", "duty", TEN_PCT_RATE);
-
-        // Set the USDT-A stability fee
-        //
-        // Previous: 8%
-        // New: 6%
-        JugAbstract(MCD_JUG).drip("USDT-A"); // drip right before
-        JugAbstract(MCD_JUG).file("USDT-A", "duty", SIX_PCT_RATE);
-
-        // Set the PAXUSD-A stability fee
-        //
-        // Previous: 4%
-        // New: 2%
-        JugAbstract(MCD_JUG).drip("PAXUSD-A"); // drip right before
-        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", TWO_PCT_RATE);
-
-        // Set the LINK-A stability fee
-        //
-        // Previous: 2%
-        // New: 0%
-        JugAbstract(MCD_JUG).drip("LINK-A"); // drip right before
-        JugAbstract(MCD_JUG).file("LINK-A", "duty", ZERO_PCT_RATE);
-
-        // Set the LRC-A stability fee
-        //
-        // Previous: 3%
-        // New: 1%
-        JugAbstract(MCD_JUG).drip("LRC-A"); // drip right before
-        JugAbstract(MCD_JUG).file("LRC-A", "duty", ONE_PCT_RATE);
-
-        // Set the COMP-A stability fee
-        //
-        // Previous: 3%
-        // New: 1%
-        JugAbstract(MCD_JUG).drip("COMP-A"); // drip right before
-        JugAbstract(MCD_JUG).file("COMP-A", "duty", ONE_PCT_RATE);
     }
 }
 
