@@ -144,7 +144,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 1456 * MILLION * RAD,
+            vat_Line: 1476 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -152,7 +152,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
             cat_box: 15 * MILLION * RAD,
-            ilk_count: 14
+            ilk_count: 15
         });
 
         //
@@ -165,6 +165,18 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
             mat:          150 * RAY / 100,
+            beg:          103 * WAD / 100,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["ETH-B"] = CollateralValues({
+            line:         20 * MILLION * RAD,
+            dust:         100 * RAD,
+            pct:          6 * 1000,
+            chop:         113 * WAD / 100,
+            dunk:         50 * THOUSAND * RAD,
+            mat:          130 * RAY / 100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,

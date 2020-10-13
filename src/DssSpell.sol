@@ -16,7 +16,16 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
+import "lib/dss-interfaces/src/dss/CatAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
+import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
+import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
+import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
+import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -25,14 +34,28 @@ contract SpellAction {
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.2/contracts.json
 
-    //address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_VAT         = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant MCD_CAT         = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
+    address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
+    address constant MCD_SPOT        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
+    address constant MCD_POT         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
+    address constant MCD_END         = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
+    address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
+    address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
+    address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
+
+    // ETH-B specific addresses
+    address constant ETH            = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address constant MCD_JOIN_ETH_B = 0x08638eF1A205bE6762A8b935F5da9b700Cf7322c;
+    address constant MCD_FLIP_ETH_B = 0xD499d71bE9e9E5D236A07ac562F7B6CeacCa624c;
+    address constant PIP_ETH        = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763; // OSM
 
     // Decimals & precision
-    //uint256 constant THOUSAND = 10 ** 3;
-    //uint256 constant MILLION  = 10 ** 6;
-    //uint256 constant WAD      = 10 ** 18;
-    //uint256 constant RAY      = 10 ** 27;
-    //uint256 constant RAD      = 10 ** 45;
+    uint256 constant THOUSAND = 10 ** 3;
+    uint256 constant MILLION  = 10 ** 6;
+    uint256 constant WAD      = 10 ** 18;
+    uint256 constant RAY      = 10 ** 27;
+    uint256 constant RAD      = 10 ** 45;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -42,22 +65,91 @@ contract SpellAction {
     //
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    uint256 constant        ZERO_PCT_RATE = 1000000000000000000000000000;
-    uint256 constant         ONE_PCT_RATE = 1000000000315522921573372069;
-    uint256 constant         TWO_PCT_RATE = 1000000000627937192491029810;
     uint256 constant         SIX_PCT_RATE = 1000000001847694957439350562;
-    uint256 constant         TEN_PCT_RATE = 1000000003022265980097387650;
-    uint256 constant FOURTYEIGHT_PCT_RATE = 1000000012431573129530493155;
 
     function execute() external {
 
-        // Set the ETH-A stability fee
-        //
-        // Previous: 2%
-        // New: 0%
-        //JugAbstract(MCD_JUG).drip("ETH-A"); // drip right before
-        //JugAbstract(MCD_JUG).file("ETH-A", "duty", ZERO_PCT_RATE);
+        /*** ETH-B Collateral Onboarding ***/
 
+        //   $ seth --to-bytes32 $(seth --from-ascii "ETH-B")
+        //   0x4554482d42000000000000000000000000000000000000000000000000000000
+        bytes32 ilk = "ETH-B";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_ETH_B).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ETH_B).ilk() == ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ETH_B).gem() == ETH, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_ETH_B).dec() == 18, "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_ETH_B).vat() == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_ETH_B).cat() == MCD_CAT, "flip-cat-not-match");
+        require(FlipAbstract(MCD_FLIP_ETH_B).ilk() == ilk, "flip-ilk-not-match");
+
+        // Set the TOKEN PIP in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_ETH);
+
+        // Set the TOKEN-LETTER Flipper in the Cat
+        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_ETH_B);
+
+        // Init TOKEN-LETTER ilk in Vat & Jug
+        VatAbstract(MCD_VAT).init(ilk);
+        JugAbstract(MCD_JUG).init(ilk);
+
+        // Allow TOKEN-LETTER Join to modify Vat registry
+        VatAbstract(MCD_VAT).rely(MCD_JOIN_ETH_B);
+        // Allow the TOKEN-LETTER Flipper to reduce the Cat litterbox on deal()
+        CatAbstract(MCD_CAT).rely(MCD_FLIP_ETH_B);
+        // Allow Cat to kick auctions in TOKEN-LETTER Flipper
+        FlipAbstract(MCD_FLIP_ETH_B).rely(MCD_CAT);
+        // Allow End to yank auctions in TOKEN-LETTER Flipper
+        FlipAbstract(MCD_FLIP_ETH_B).rely(MCD_END);
+        // Allow FlipperMom to access to the TOKEN-LETTER Flipper
+        FlipAbstract(MCD_FLIP_ETH_B).rely(FLIPPER_MOM);
+        // Disallow Cat to kick auctions in TOKEN-LETTER Flipper
+        // !!!!!!!! Only for certain collaterals that do not trigger liquidations like USDC-A)
+        //FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_ETH_B);
+
+        // Allow OsmMom to access to the TOKEN Osm
+        // !!!!!!!! Only if PIP_TOKEN = Osm and hasn't been already relied due a previous deployed ilk
+        //OsmAbstract(PIP_TOKEN).rely(OSM_MOM);
+        // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_TOKEN = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
+        //MedianAbstract(OsmAbstract(PIP_TOKEN).src()).kiss(PIP_TOKEN);
+        // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_TOKEN = Osm or PIP_TOKEN = Median and hasn't been already whitelisted due a previous deployed ilk
+        //OsmAbstract(PIP_TOKEN).kiss(MCD_SPOT);
+        // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_TOKEN = Osm or PIP_TOKEN = Median and hasn't been already whitelisted due a previous deployed ilk
+        //OsmAbstract(PIP_TOKEN).kiss(MCD_END);
+        // Set TOKEN Osm in the OsmMom for new ilk
+        // !!!!!!!! Only if PIP_TOKEN = Osm
+        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_ETH);
+
+        // Set the global debt ceiling
+        VatAbstract(MCD_VAT).file("Line", 1476 * MILLION * RAD);
+        // Set the TOKEN-LETTER debt ceiling
+        VatAbstract(MCD_VAT).file(ilk, "line", 20 * MILLION * RAD);
+        // Set the TOKEN-LETTER dust
+        VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
+        // Set the Lot size
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
+        // Set the TOKEN-LETTER liquidation penalty (e.g. 13% => X = 113)
+        CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
+        // Set the TOKEN-LETTER stability fee (e.g. 1% = 1000000000315522921573372069)
+        JugAbstract(MCD_JUG).file(ilk, "duty", SIX_PCT_RATE);
+        // Set the TOKEN-LETTER percentage between bids (e.g. 3% => X = 103)
+        FlipAbstract(MCD_FLIP_ETH_B).file("beg", 103 * WAD / 100);
+        // Set the TOKEN-LETTER time max time between bids
+        FlipAbstract(MCD_FLIP_ETH_B).file("ttl", 6 hours);
+        // Set the TOKEN-LETTER max auction duration to
+        FlipAbstract(MCD_FLIP_ETH_B).file("tau", 6 hours);
+        // Set the TOKEN-LETTER min collateralization ratio (e.g. 150% => X = 150)
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 130 * RAY / 100);
+
+        // Update TOKEN-LETTER spot value in Vat
+        SpotAbstract(MCD_SPOT).poke(ilk);
+
+        // Add new ilk to the IlkRegistry
+        IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_ETH_B);
     }
 }
 
@@ -76,7 +168,7 @@ contract DssSpell {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<tbd> -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-09 MakerDAO Executive Spell | Hash: 0x0";
+        "2020-10-16 MakerDAO Executive Spell | Hash: 0x0";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
