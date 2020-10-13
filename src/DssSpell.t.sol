@@ -76,8 +76,7 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
-    GemAbstract           tusd = GemAbstract(        0x0000000000085d4780B73119b644AE5ecd22b376);
-    GemJoinAbstract  joinTUSDA = GemJoinAbstract(    0x4454aF7C8bb9463203b66C816220D41ED7837f44);
+    address    makerDeployer05 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457;
 
     DssSpell spell;
 
@@ -525,6 +524,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
         assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
+        assertEq(flip.wards(address(makerDeployer05)), 0); // Check deployer denied
+        assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+
+        GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
+        assertEq(join.wards(address(makerDeployer05)), 0); // Check deployer denied
+        assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
     }
 
     // function testFailWrongDay() public {
