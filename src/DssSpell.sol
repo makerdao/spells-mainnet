@@ -187,13 +187,13 @@ contract DssSpell {
         expiration = now + 30 days;
     }
 
-    // modifier officeHours {
-    //     uint day = (now / 1 days + 3) % 7;
-    //     require(day < 5, "Can only be cast on a weekday");
-    //     uint hour = now / 1 hours % 24;
-    //     require(hour >= 14 && hour < 21, "Outside office hours");
-    //     _;
-    // }
+    modifier officeHours {
+        uint day = (now / 1 days + 3) % 7;
+        require(day < 5, "Can only be cast on a weekday");
+        uint hour = now / 1 hours % 24;
+        require(hour >= 14 && hour < 21, "Outside office hours");
+        _;
+    }
 
     function schedule() public {
         require(now <= expiration, "This contract has expired");
@@ -202,7 +202,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
+    function cast() public officeHours {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
