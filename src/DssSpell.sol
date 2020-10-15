@@ -26,6 +26,7 @@ import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -43,6 +44,7 @@ contract SpellAction {
     address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
     address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
     address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
+    address constant CHAINLOG        = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
     // ETH-B specific addresses
     address constant ETH            = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -83,6 +85,11 @@ contract SpellAction {
         require(FlipAbstract(MCD_FLIP_ETH_B).vat() == MCD_VAT, "flip-vat-not-match");
         require(FlipAbstract(MCD_FLIP_ETH_B).cat() == MCD_CAT, "flip-cat-not-match");
         require(FlipAbstract(MCD_FLIP_ETH_B).ilk() == ilk, "flip-ilk-not-match");
+
+        // Add the new flip and join to the Chainlog
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_ETH_B", MCD_JOIN_ETH_B);
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_FLIP_ETH_B", MCD_FLIP_ETH_B);
+        ChainlogAbstract(CHAINLOG).setVersion("1.1.3");
 
         // Set the TOKEN PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_ETH);

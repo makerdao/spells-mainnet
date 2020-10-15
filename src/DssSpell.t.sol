@@ -76,6 +76,8 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
     FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
 
+    ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+
     address    makerDeployer05 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457;
 
     DssSpell spell;
@@ -546,6 +548,20 @@ contract DssSpellTest is DSTest, DSMath {
     //     vote();
     //     scheduleWaitAndCastFailLate();
     // }
+
+    function testChainlogAdditions() public {
+
+        assertEq(chainlog.count(), 89);
+
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        assertEq(chainlog.count(), 91);
+        assertEq(chainlog.version(), "1.1.3");
+        assertEq(chainlog.getAddress("MCD_JOIN_ETH_B"), 0x08638eF1A205bE6762A8b935F5da9b700Cf7322c);
+        assertEq(chainlog.getAddress("MCD_FLIP_ETH_B"), 0xD499d71bE9e9E5D236A07ac562F7B6CeacCa624c);
+    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
