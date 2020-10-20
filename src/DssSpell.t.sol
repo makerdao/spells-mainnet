@@ -1,14 +1,19 @@
-pragma solidity 0.5.12;
+pragma solidity ^0.6.7;
 
 import "ds-math/math.sol";
 import "ds-test/test.sol";
-import "lib/dss-interfaces/src/Interfaces.sol";
+import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 
-import {DssSpell, SpellAction} from "./DssSpell.sol";
+
+
+import {DssExec} from "dss-exec-lib/DssExec.sol";
+import {DssExecLib} from "dss-exec-lib/DssExecLib.sol";
+
+import {SpellAction} from "./SpellAction.sol";
 
 interface Hevm {
-    function warp(uint) external;
+    function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
 }
 
@@ -21,9 +26,9 @@ interface MedianizerV1Abstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x96F6CD23fd450D30A12eA0D14FCECc8aE8b4Bc25);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1602860406;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -80,7 +85,8 @@ contract DssSpellTest is DSTest, DSMath {
 
     address    makerDeployer05 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457;
 
-    DssSpell spell;
+    DssExec spell;
+    address execlib;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
@@ -90,8 +96,6 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant THOUSAND   = 10 ** 3;
     uint256 constant MILLION    = 10 ** 6;
     uint256 constant BILLION    = 10 ** 9;
-    uint256 constant WAD        = 10 ** 18;
-    uint256 constant RAY        = 10 ** 27;
     uint256 constant RAD        = 10 ** 45;
 
     // not provided in DSMath
@@ -137,7 +141,17 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
         rates = new Rates();
 
-        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+        execlib = address(new DssExecLib()); // This would be deployed only once
+
+        spell = 
+            MAINNET_SPELL != address(0) ? 
+            DssExec(MAINNET_SPELL) : 
+            new DssExec(
+                "A test dss exec spell",                    // Description
+                now + 30 days,                              // Expiration
+                true,                                       // OfficeHours enabled
+                address(new SpellAction(execlib))
+            );
 
         //
         // Test for all system configuration changes
@@ -145,7 +159,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr: 1000000000000000000000000000,
             pot_dsrPct: 0 * 1000,
-            vat_Line: 1476 * MILLION * RAD,
+            vat_Line: 1500 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
             vow_dump: 250 * WAD,
@@ -160,8 +174,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         540 * MILLION * RAD,
-            dust:         100 * RAD,
+            line:         10 * MILLION * RAD,
+            dust:         100 * RAD, 
             pct:          2 * 1000,
             chop:         113 * WAD / 100,
             dunk:         50 * THOUSAND * RAD,
@@ -549,22 +563,27 @@ contract DssSpellTest is DSTest, DSMath {
     //     scheduleWaitAndCastFailLate();
     // }
 
-    function testChainlogAdditions() public {
+    // function testChainlogAdditions() public {
 
-        assertEq(chainlog.count(), 89);
+    //     assertEq(chainlog.count(), 89);
 
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
+    //     vote();
+    //     scheduleWaitAndCast();
+    //     assertTrue(spell.done());
 
-        assertEq(chainlog.count(), 91);
-        assertEq(chainlog.version(), "1.1.3");
-        assertEq(chainlog.getAddress("MCD_JOIN_ETH_B"), 0x08638eF1A205bE6762A8b935F5da9b700Cf7322c);
-        assertEq(chainlog.getAddress("MCD_FLIP_ETH_B"), 0xD499d71bE9e9E5D236A07ac562F7B6CeacCa624c);
-    }
+    //     assertEq(chainlog.count(), 91);
+    //     assertEq(chainlog.version(), "1.1.3");
+    //     assertEq(chainlog.getAddress("MCD_JOIN_ETH_B"), 0x08638eF1A205bE6762A8b935F5da9b700Cf7322c);
+    //     assertEq(chainlog.getAddress("MCD_FLIP_ETH_B"), 0xD499d71bE9e9E5D236A07ac562F7B6CeacCa624c);
+    // }
 
     function testSpellIsCast() public {
-        string memory description = new DssSpell().description();
+        string memory description = new DssExec(
+                "A test dss exec spell",                    // Description
+                now + 30 days,                              // Expiration
+                true,                                       // OfficeHours enabled
+                address(new SpellAction(execlib))
+            ).description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
