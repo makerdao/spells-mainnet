@@ -164,19 +164,19 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          200,             // In basis points
             chop:         1300,            // In basis points
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,   // In Dai
             mat:          15000,           // In basis points
             beg:          10300,           // In basis points
             ttl:          6 hours,         // In seconds
             tau:          6 hours,         // In seconds
-            liquidations: 1                // 1 if true
+            liquidations: 1                // 1 if enabled
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
             line:         20 * MILLION * RAD,
             dust:         100 * RAD,
             pct:          600,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          13000,
             beg:          10300,
             ttl:          6 hours,
@@ -188,7 +188,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          10300,
             ttl:          6 hours,
@@ -200,7 +200,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          10100,
             beg:          10300,
             ttl:          6 hours,
@@ -212,7 +212,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          5000,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          12000,
             beg:          10300,
             ttl:          6 hours,
@@ -224,7 +224,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          10300,
             ttl:          6 hours,
@@ -236,7 +236,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          10100,
             beg:          10300,
             ttl:          6 hours,
@@ -248,7 +248,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -260,7 +260,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -272,7 +272,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          1200,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -284,7 +284,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          800,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          10300,
             ttl:          6 hours,
@@ -296,7 +296,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          400,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          10100,
             beg:          10300,
             ttl:          6 hours,
@@ -308,7 +308,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          300,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -320,7 +320,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          300,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -332,7 +332,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         100 * RAD,
             pct:          200,
             chop:         1300,
-            dunk:         50 * THOUSAND * RAD,
+            dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          10300,
             ttl:          6 hours,
@@ -497,12 +497,13 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
         assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct * 10), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
         assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
-
+        {
         (,,, uint line, uint dust) = vat.ilks(ilk);
         assertEq(line, values.collaterals[ilk].line);
         assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
         assertEq(dust, values.collaterals[ilk].dust);
         assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
+        }
         {
         (, uint chop, uint dunk) = cat.ilks(ilk);
         // Convert BP to system expected value
@@ -510,7 +511,9 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(chop, normalizedTestChop);
         // make sure chop is less than 100%
         assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
-        assertEq(dunk, values.collaterals[ilk].dunk);
+        // Convert whole Dai units to expected RAD
+        uint normalizedTestDunk = values.collaterals[ilk].dunk * RAD;
+        assertEq(dunk, normalizedTestDunk);
         // put back in after LIQ-1.2
         assertTrue(dunk >= RAD && dunk < MILLION * RAD);
         }
