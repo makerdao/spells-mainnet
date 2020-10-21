@@ -39,8 +39,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     struct SystemValues {
-        uint256 pot_dsr;
-        uint256 pot_dsrPct;
+        uint256 dsr_rate;
         uint256 vat_Line;
         uint256 pause_delay;
         uint256 vow_wait;
@@ -94,6 +93,10 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant RAY        = 10 ** 27;
     uint256 constant RAD        = 10 ** 45;
 
+    event Debug(uint256 index, uint256 val);
+    event Debug(uint256 index, address addr);
+    event Debug(uint256 index, bytes32 what);
+
     // not provided in DSMath
     function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
       assembly {
@@ -143,8 +146,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            pot_dsr: 1000000000000000000000000000,
-            pot_dsrPct: 0,          // In basis points
+            dsr_rate: 0,                 // In basis points
             vat_Line: 1476 * MILLION * RAD,
             pause_delay: 12 * 60 * 60,
             vow_wait: 561600,
@@ -430,14 +432,14 @@ contract DssSpellTest is DSTest, DSMath {
 
     function checkSystemValues(SystemValues storage values) internal {
         // dsr
-        assertEq(pot.dsr(), values.pot_dsr);
+        uint expectedDSRRate = rates.rates(values.dsr_rate);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
         );
-        assertTrue(diffCalc(expectedRate(values.pot_dsrPct), yearlyYield(values.pot_dsr)) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.dsr_rate * 10), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
         // Line
         assertEq(vat.Line(), values.vat_Line);
