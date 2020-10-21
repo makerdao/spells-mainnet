@@ -147,8 +147,8 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             dsr_rate: 0,                   // In basis points
-            vat_Line: 1476 * MILLION,      // In Dai units
-            pause_delay: 12 * 60 * 60,
+            vat_Line: 1476 * MILLION,      // In whole Dai units
+            pause_delay: 12 hours,         // In seconds
             vow_wait: 561600,
             vow_dump: 250 * WAD,
             vow_sump: 50000 * RAD,
@@ -162,11 +162,11 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         540 * MILLION,   // In Dai units
-            dust:         100,             // In Dai units
+            line:         540 * MILLION,   // In whole Dai units
+            dust:         100,             // In whole Dai units
             pct:          200,             // In basis points
             chop:         1300,            // In basis points
-            dunk:         50 * THOUSAND,   // In whole Dai
+            dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
             beg:          10300,           // In basis points
             ttl:          6 hours,         // In seconds
@@ -441,8 +441,9 @@ contract DssSpellTest is DSTest, DSMath {
         );
         assertTrue(diffCalc(expectedRate(values.dsr_rate * 10), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
-        // Line
-        assertEq(vat.Line(), values.vat_Line * RAD);
+        // Line values in RAD
+        uint normalizedLine = values.vat_Line * RAD;
+        assertEq(vat.Line(), normalizedLine);
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < 100 * BILLION * RAD) ||
             vat.Line() == 0
