@@ -152,10 +152,10 @@ contract DssSpellTest is DSTest, DSMath {
             vow_wait: 156 hours,           // In seconds
             vow_dump: 250,                 // In whole Dai units
             vow_sump: 50000,               // In whole Dai units
-            vow_bump: 10000 * RAD,
-            vow_hump: 2 * MILLION * RAD,
-            cat_box: 15 * MILLION * RAD,
-            ilk_count: 15
+            vow_bump: 10000,               // In whole Dai units
+            vow_hump: 2 * MILLION,         // In whole Dai units
+            cat_box: 15 * MILLION,         // In whole Dai units
+            ilk_count: 15                  // Num expected in system
         });
 
         //
@@ -475,23 +475,30 @@ contract DssSpellTest is DSTest, DSMath {
             vow.sump() == 0
         );
         }
-
-        // bump
-        assertEq(vow.bump(), values.vow_bump);
+        {
+        // bump values in RAD
+        uint normalizedBump = values.vow_bump * RAD;
+        assertEq(vow.bump(), normalizedBump);
         assertTrue(
             (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
             vow.bump() == 0
         );
-
-        // hump
-        assertEq(vow.hump(), values.vow_hump);
+        }
+        {
+        // hump values in RAD
+        uint normalizedHump = values.vow_hump * RAD;
+        assertEq(vow.hump(), normalizedHump);
         assertTrue(
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
             vow.hump() == 0
         );
+        }
 
-        // box
-        assertEq(cat.box(), values.cat_box);
+        // box values in RAD
+        {
+            uint normalizedBox = values.cat_box * RAD;
+            assertEq(cat.box(), normalizedBox);
+        }
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
