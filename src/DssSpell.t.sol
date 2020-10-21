@@ -165,7 +165,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          200,      // In basis points
             chop:         1300,     // In basis points
             dunk:         50 * THOUSAND * RAD,
-            mat:          150 * RAY / 100,
+            mat:          15000,    // In basis points
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -177,7 +177,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          600,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          130 * RAY / 100,
+            mat:          13000,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -189,7 +189,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          150 * RAY / 100,
+            mat:          15000,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -201,7 +201,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          101 * RAY / 100,
+            mat:          10100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          3 days,
@@ -213,7 +213,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          5000,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          120 * RAY / 100,
+            mat:          12000,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          3 days,
@@ -225,7 +225,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          150 * RAY / 100,
+            mat:          15000,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -237,7 +237,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          101 * RAY / 100,
+            mat:          10100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          3 days,
@@ -249,7 +249,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -261,7 +261,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -273,7 +273,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          1200,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -285,7 +285,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          800,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          150 * RAY / 100,
+            mat:          15000,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -297,7 +297,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          101 * RAY / 100,
+            mat:          10100,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -309,7 +309,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -321,7 +321,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -333,7 +333,7 @@ contract DssSpellTest is DSTest, DSMath {
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND * RAD,
-            mat:          175 * RAY / 100,
+            mat:          17500,
             beg:          103 * WAD / 100,
             ttl:          6 hours,
             tau:          6 hours,
@@ -505,6 +505,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
 
         (, uint chop, uint dunk) = cat.ilks(ilk);
+        // Convert BP to system expected value
         uint normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
         assertEq(chop, normalizedTestChop);
         // make sure chop is less than 100%
@@ -514,7 +515,9 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(dunk >= RAD && dunk < MILLION * RAD);
 
         (,uint mat) = spot.ilks(ilk);
-        assertEq(mat, values.collaterals[ilk].mat);
+        // Convert BP to system expected value
+        uint normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
+        assertEq(mat, normalizedTestMat);
         assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
 
         (address flipper,,) = cat.ilks(ilk);
