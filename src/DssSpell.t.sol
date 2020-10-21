@@ -146,16 +146,16 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            dsr_rate: 0,                   // In basis points
-            vat_Line: 1476 * MILLION,      // In whole Dai units
-            pause_delay: 12 hours,         // In seconds
-            vow_wait: 156 hours,           // In seconds
-            vow_dump: 250,                 // In whole Dai units
-            vow_sump: 50000,               // In whole Dai units
-            vow_bump: 10000,               // In whole Dai units
-            vow_hump: 2 * MILLION,         // In whole Dai units
-            cat_box: 15 * MILLION,         // In whole Dai units
-            ilk_count: 15                  // Num expected in system
+            dsr_rate:     0,               // In basis points
+            vat_Line:     1476 * MILLION,  // In whole Dai units
+            pause_delay:  12 hours,        // In seconds
+            vow_wait:     156 hours,       // In seconds
+            vow_dump:     250,             // In whole Dai units
+            vow_sump:     50000,           // In whole Dai units
+            vow_bump:     10000,           // In whole Dai units
+            vow_hump:     2 * MILLION,     // In whole Dai units
+            cat_box:      15 * MILLION,    // In whole Dai units
+            ilk_count:    15               // Num expected in system
         });
 
         //
