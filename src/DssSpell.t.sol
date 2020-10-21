@@ -151,7 +151,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_delay: 12 hours,         // In seconds
             vow_wait: 156 hours,           // In seconds
             vow_dump: 250,                 // In whole Dai units
-            vow_sump: 50000 * RAD,
+            vow_sump: 50000,               // In whole Dai units
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
             cat_box: 15 * MILLION * RAD,
@@ -441,6 +441,7 @@ contract DssSpellTest is DSTest, DSMath {
         );
         assertTrue(diffCalc(expectedRate(values.dsr_rate * 10), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
+        {
         // Line values in RAD
         uint normalizedLine = values.vat_Line * RAD;
         assertEq(vat.Line(), normalizedLine);
@@ -448,6 +449,7 @@ contract DssSpellTest is DSTest, DSMath {
             (vat.Line() >= RAD && vat.Line() < 100 * BILLION * RAD) ||
             vat.Line() == 0
         );
+        }
 
         // Pause delay
         assertEq(pause.delay(), values.pause_delay);
@@ -455,6 +457,7 @@ contract DssSpellTest is DSTest, DSMath {
         // wait
         assertEq(vow.wait(), values.vow_wait);
 
+        {
         // dump values in WAD
         uint normalizedDump = values.vow_dump * WAD;
         assertEq(vow.dump(), normalizedDump);
@@ -462,13 +465,16 @@ contract DssSpellTest is DSTest, DSMath {
             (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
             vow.dump() == 0
         );
-
-        // sump
-        assertEq(vow.sump(), values.vow_sump);
+        }
+        {
+        // sump values in RAD
+        uint normalizedSump = values.vow_sump * RAD;
+        assertEq(vow.sump(), normalizedSump);
         assertTrue(
             (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
             vow.sump() == 0
         );
+        }
 
         // bump
         assertEq(vow.bump(), values.vow_bump);
