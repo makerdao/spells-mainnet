@@ -149,8 +149,8 @@ contract DssSpellTest is DSTest, DSMath {
             dsr_rate: 0,                   // In basis points
             vat_Line: 1476 * MILLION,      // In whole Dai units
             pause_delay: 12 hours,         // In seconds
-            vow_wait: 561600,
-            vow_dump: 250 * WAD,
+            vow_wait: 156 hours,           // In seconds
+            vow_dump: 250,                 // In whole Dai units
             vow_sump: 50000 * RAD,
             vow_bump: 10000 * RAD,
             vow_hump: 2 * MILLION * RAD,
@@ -455,8 +455,9 @@ contract DssSpellTest is DSTest, DSMath {
         // wait
         assertEq(vow.wait(), values.vow_wait);
 
-        // dump
-        assertEq(vow.dump(), values.vow_dump);
+        // dump values in WAD
+        uint normalizedDump = values.vow_dump * WAD;
+        assertEq(vow.dump(), normalizedDump);
         assertTrue(
             (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
             vow.dump() == 0
