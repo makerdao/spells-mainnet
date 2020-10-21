@@ -129,7 +129,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function expectedRate(uint256 percentValue) public pure returns (uint256) {
-        return (100000 + percentValue) * (10 ** 22);
+        return (10000 + percentValue) * (10 ** 23);
     }
 
     function diffCalc(uint256 expectedRate_, uint256 yearlyYield_) public pure returns (uint256) {
@@ -439,7 +439,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
         );
-        assertTrue(diffCalc(expectedRate(values.dsr_rate * 10), yearlyYield(expectedDSRRate)) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.dsr_rate), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
         {
         // Line values in RAD
@@ -512,7 +512,7 @@ contract DssSpellTest is DSTest, DSMath {
         // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
         // 1000000073014496989316680335
         assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
-        assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct * 10), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
         assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
         {
         (,,, uint line, uint dust) = vat.ilks(ilk);
