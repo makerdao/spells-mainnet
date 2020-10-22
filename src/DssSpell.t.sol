@@ -153,7 +153,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_dump:     250,             // In whole Dai units
             vow_sump:     50000,           // In whole Dai units
             vow_bump:     10000,           // In whole Dai units
-            vow_hump:     2 * MILLION,     // In whole Dai units
+            vow_hump:     4 * MILLION,     // In whole Dai units
             cat_box:      15 * MILLION,    // In whole Dai units
             ilk_count:    15               // Num expected in system
         });
@@ -605,5 +605,10 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint i = 0; i < ilks.length; i++) {
             checkCollateralValues(ilks[i],  afterSpell);
         }
+
+        // Verify that B Protocol has been whitelisted on the ETHUSD Medianizer and OSM
+        address B_PROTOCOL_BUD_CONNECTOR = 0x2325aa20DEAa9770a978f1dc7C073589ffC79DC3;
+        assertEq(1, MedianAbstract(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85).bud(B_PROTOCOL_BUD_CONNECTOR));
+        assertEq(1,    OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(B_PROTOCOL_BUD_CONNECTOR));
     }
 }

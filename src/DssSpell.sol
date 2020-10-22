@@ -16,17 +16,9 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
+import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -35,22 +27,14 @@ contract SpellAction {
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.2/contracts.json
 
-    address constant MCD_VAT         = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_CAT         = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
-    address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant MCD_SPOT        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant MCD_POT         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-    address constant MCD_END         = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
-    address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
-    address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
-    address constant CHAINLOG        = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
+    address constant MCD_VOW       = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant ETHUSD_MEDIAN = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
 
-    // ETH-B specific addresses
-    address constant ETH            = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    address constant MCD_JOIN_ETH_B = 0x08638eF1A205bE6762A8b935F5da9b700Cf7322c;
-    address constant MCD_FLIP_ETH_B = 0xD499d71bE9e9E5D236A07ac562F7B6CeacCa624c;
-    address constant PIP_ETH        = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763; // OSM
+    // spell-specific addresses
+
+    // B Protocol
+    address constant B_PROTOCOL_BUD_CONNECTOR = 0x2325aa20DEAa9770a978f1dc7C073589ffC79DC3;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -67,11 +51,18 @@ contract SpellAction {
     //
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    uint256 constant         SIX_PCT_RATE = 1000000001847694957439350562;
+
+    // No rate chagnes this week.
 
     function execute() external {
+        // Set the surplus buffer to 4,000,000 DAI
+        VowAbstract(MCD_VOW).file("hump", 4 * MILLION * RAD);
 
+        // Whitelist B Protocol to access the ETHUSD Medianizer
+        MedianAbstract(ETHUSD_MEDIAN).kiss(B_PROTOCOL_BUD_CONNECTOR);
 
+        // Whitelist B Protocol to access the ETHUSD OSM
+        OsmAbstract(ETHUSD_OSM).kiss(B_PROTOCOL_BUD_CONNECTOR);
     }
 }
 
@@ -85,12 +76,11 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
-
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6a97b8f1f145d86b2ea898826cd3232a5abc7c1d/governance/votes/Executive%20vote%20-%20October%2016%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20October%2023%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-16 MakerDAO Executive Spell | Hash: 0xbaf455a1f3360f0d9f9941f79626e38344c5c58e96c4d2cf03461995fa1fe913";
+        "2020-10-23 MakerDAO Executive Spell | Hash: 0x500dd161a37646be178bb4a33a1bbef78443f5e60aa660d6d3b480791326c964";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -117,7 +107,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public officeHours {
+    function cast() public /* officeHours */ {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
