@@ -25,7 +25,7 @@ contract SpellAction {
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.1.2/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/1.1.3/contracts.json
 
     address constant MCD_VOW       = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant ETHUSD_MEDIAN = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
@@ -78,7 +78,7 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20October%2023%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/10f4fb51d9d6b292d7ffd3f852cbbc97bd920e84/governance/votes/Executive%20vote%20-%20October%2023%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
         "2020-10-23 MakerDAO Executive Spell | Hash: 0x500dd161a37646be178bb4a33a1bbef78443f5e60aa660d6d3b480791326c964";
 
