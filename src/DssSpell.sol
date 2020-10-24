@@ -16,9 +16,6 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/VowAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -26,15 +23,6 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.3/contracts.json
-
-    address constant MCD_VOW       = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
-    address constant ETHUSD_MEDIAN = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
-
-    // spell-specific addresses
-
-    // B Protocol
-    address constant B_PROTOCOL_BUD_CONNECTOR = 0x2325aa20DEAa9770a978f1dc7C073589ffC79DC3;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -52,18 +40,7 @@ contract SpellAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
 
-    // No rate chagnes this week.
-
-    function execute() external {
-        // Set the surplus buffer to 4,000,000 DAI
-        VowAbstract(MCD_VOW).file("hump", 4 * MILLION * RAD);
-
-        // Whitelist B Protocol to access the ETHUSD Medianizer
-        MedianAbstract(ETHUSD_MEDIAN).kiss(B_PROTOCOL_BUD_CONNECTOR);
-
-        // Whitelist B Protocol to access the ETHUSD OSM
-        OsmAbstract(ETHUSD_OSM).kiss(B_PROTOCOL_BUD_CONNECTOR);
-    }
+    function execute() external { }
 }
 
 contract DssSpell {
@@ -78,9 +55,41 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/10f4fb51d9d6b292d7ffd3f852cbbc97bd920e84/governance/votes/Executive%20vote%20-%20October%2023%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<commit>/governance/votes/Executive%20vote%20-%20October%2026%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-23 MakerDAO Executive Spell | Hash: 0x500dd161a37646be178bb4a33a1bbef78443f5e60aa660d6d3b480791326c964";
+        "2020-10-26 MakerDAO Executive Spell | Hash: ";
+
+    // MIP14: Protocol Dai Transfer
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/482a316c96428beae899e0c90a8a75e59a1cb180/MIP14/MIP14c2-Subproposal-Template.md -q -O - 2>/dev/null)"
+    string constant public MIP15 = "0x61591fd490f5b8939622986bf66eb3c3e817c3f7789032fa30bc4fe516c4a3d8";
+
+    // MIP20: Target Price Adjustment Module (Vox)
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c8efd2826274a4eb175ee68606887d602e644989/MIP20/mip20.md -q -O - 2>/dev/null)"
+    string constant public MIP20 = "0xfec4da66f1c567bc0fdaeab074f2568932953e82ddb0e4b256815ad38918802f";
+
+    // MIP21: Real World Assets - Off-Chain Asset Backed Lender
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/f4647ee2d5f8d16b92b45402c273996fb45ecced/MIP21/MIP21.md -q -O - 2>/dev/null)"
+    string constant public MIP21 = "0x6cee952dc6fbbf871e00193cc3958171f64884d7b260bc4401be862afd8b0ce3";
+
+    // MIP22: Centrifuge Direct Liquidation Module
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/06a9cb1607ab79b0c0d57dd40b1ba6be4c21f8de/MIP22/mip22.md -q -O - 2>/dev/null)"
+    string constant public MIP22 = "0xa6f24c19ac911679da2873a5f6d8f127034eb43e88fd8d9bde3ad32931376087";
+
+    // MIP23: Domain Structure and Roles
+    // Hash: seth keccak -- "$(wget <link> -q -O - 2>/dev/null)"
+    string constant public MIP23 = "";
+
+    // MIP13c3-SP3: Declaration of Intent - Strategic Reserves Fund
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/060d1d144ca216558399b4ad89c8c7eb82884669/MIP13/MIP13c3-Subproposals/MIP13c3-SP3.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP3 = "0xa3b7bd40055d7577b9be079bc4bce063d7b2863cf8ee54c9b8b530c410746d7c";
+
+    // MIP13c3-SP4: Declaration of Intent & Commercial Points - Off-Chain Asset Backed Lender to onboard Real World Assets as Collateral for a DAI loan
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/8dd2d714065476a53635e87cc861e07de8a74a83/MIP13/MIP13c3-Subproposals/MIP13c3-SP4.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP4 = "0x8d852d29031a1bc7caabe642e1010880fc6b22e5f659b38ed73e0d5c9d7680b0";
+
+    // MIP13c3-SP5: Declaration of Intent: Maker to commence onboarding work of Centrifuge based Collateral
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/60ee14995e61ba0bf52f2a863d430c3fcac19a29/MIP13/MIP13c3-Subproposals/MIP13c3-SP5.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP5 = "0xda7fc22f756a2b0535c44d187fd0316d986adcacd397ee2060007d20b515956c";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
