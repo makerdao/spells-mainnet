@@ -55,40 +55,40 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<commit>/governance/votes/Executive%20vote%20-%20October%2026%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d5e2a373bf043380dffd958a8e09339927e988f0/governance/votes/Executive%20vote%20-%20October%2026%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-10-26 MakerDAO Executive Spell | Hash: ";
+        "2020-10-26 MakerDAO Executive Spell | Hash: 0xf4c67a6aa3a86d8378010ffc320219938f2f96ef16ca718284e16e52ccff30b7";
 
     // MIP14: Protocol Dai Transfer
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/482a316c96428beae899e0c90a8a75e59a1cb180/MIP14/MIP14c2-Subproposal-Template.md -q -O - 2>/dev/null)"
-    string constant public MIP15 = "0x61591fd490f5b8939622986bf66eb3c3e817c3f7789032fa30bc4fe516c4a3d8";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/3eb4e3d26ac79d93874dea07d095a0d991a14d20/MIP14/mip14.md -q -O - 2>/dev/null)"
+    string constant public MIP15 = "0x70f6c28c1b5ef1657a8a901636f31f9479ff5d32c251dd4eda84b8c00655fdba";
 
     // MIP20: Target Price Adjustment Module (Vox)
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c8efd2826274a4eb175ee68606887d602e644989/MIP20/mip20.md -q -O - 2>/dev/null)"
-    string constant public MIP20 = "0xfec4da66f1c567bc0fdaeab074f2568932953e82ddb0e4b256815ad38918802f";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/f6515e96cf4dae6b7e22fb11f5acac81fa5e1d9f/MIP20/mip20.md -q -O - 2>/dev/null)"
+    string constant public MIP20 = "0x35330368b523195aa63e235f5879e9f3d9a0f0d81437d477261dc00a35cda463";
 
     // MIP21: Real World Assets - Off-Chain Asset Backed Lender
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/f4647ee2d5f8d16b92b45402c273996fb45ecced/MIP21/MIP21.md -q -O - 2>/dev/null)"
-    string constant public MIP21 = "0x6cee952dc6fbbf871e00193cc3958171f64884d7b260bc4401be862afd8b0ce3";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/945da898f0f2ab8d7ebf3ff1672c66d05894dd2a/MIP21/MIP21.md -q -O - 2>/dev/null)"
+    string constant public MIP21 = "0xb538ef266caf65ccb76e8c49a74b57ca50fc4e0d9a303370ad4b0bb277a8164c";
 
     // MIP22: Centrifuge Direct Liquidation Module
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/06a9cb1607ab79b0c0d57dd40b1ba6be4c21f8de/MIP22/mip22.md -q -O - 2>/dev/null)"
-    string constant public MIP22 = "0xa6f24c19ac911679da2873a5f6d8f127034eb43e88fd8d9bde3ad32931376087";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/00dae04b115863517d90e1e1b898c2ace59ad19b/MIP22/mip22.md -q -O - 2>/dev/null)"
+    string constant public MIP22 = "0xc6945ad6c8c2a5842f8335737eb2f9ea3abdf865a301d14111d6fe802b06f034";
 
     // MIP23: Domain Structure and Roles
-    // Hash: seth keccak -- "$(wget <link> -q -O - 2>/dev/null)"
-    string constant public MIP23 = "";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/3eb4e3d26ac79d93874dea07d095a0d991a14d20/MIP23/mip23.md -q -O - 2>/dev/null)"
+    string constant public MIP23 = "0xa94258d039103585da7a3c8de095e9907215ce431141fcfdd9b4f5986e07d59a";
 
     // MIP13c3-SP3: Declaration of Intent - Strategic Reserves Fund
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/060d1d144ca216558399b4ad89c8c7eb82884669/MIP13/MIP13c3-Subproposals/MIP13c3-SP3.md -q -O - 2>/dev/null)"
-    string constant public MIP13c3SP3 = "0xa3b7bd40055d7577b9be079bc4bce063d7b2863cf8ee54c9b8b530c410746d7c";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7d402e6bdf8ce914063acb0a2bf1b7f3ddf1b844/MIP13/MIP13c3-Subproposals/MIP13c3-SP3.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP3 = "0x9ebab3236920efbb2f82f4e37eca51dc8b50895d8b1fa592daaa6441eec682e9";
 
     // MIP13c3-SP4: Declaration of Intent & Commercial Points - Off-Chain Asset Backed Lender to onboard Real World Assets as Collateral for a DAI loan
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/8dd2d714065476a53635e87cc861e07de8a74a83/MIP13/MIP13c3-Subproposals/MIP13c3-SP4.md -q -O - 2>/dev/null)"
-    string constant public MIP13c3SP4 = "0x8d852d29031a1bc7caabe642e1010880fc6b22e5f659b38ed73e0d5c9d7680b0";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/b7d3edcbf11d60c8babecf46eaccdc0abf815867/MIP13/MIP13c3-Subproposals/MIP13c3-SP4.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP4 = "0x39ff7fa18f4f9845d214a37823f2f6dfd24bf93540785483b0332d1286307bc6";
 
     // MIP13c3-SP5: Declaration of Intent: Maker to commence onboarding work of Centrifuge based Collateral
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/60ee14995e61ba0bf52f2a863d430c3fcac19a29/MIP13/MIP13c3-Subproposals/MIP13c3-SP5.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c07e3641f0a45dac2835ac24ec28a9d17a639a23/MIP13/MIP13c3-Subproposals/MIP13c3-SP5.md -q -O - 2>/dev/null)"
     string constant public MIP13c3SP5 = "0xda7fc22f756a2b0535c44d187fd0316d986adcacd397ee2060007d20b515956c";
 
     constructor() public {
