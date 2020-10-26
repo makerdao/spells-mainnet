@@ -3,7 +3,7 @@
 # Purpose:
 #  To compare the runtime bytecode of the current spell (src/DssSpell.sol) as
 #  output by the compiler against the onchain bytecode of a provided contract
-#  address. Can be used to verify that the deployed bytecode is correct even 
+#  address. Can be used to verify that the deployed bytecode is correct even
 #  if Etherscan is down.
 #
 # Prerequisites:
@@ -22,8 +22,10 @@
 
 make all &> /dev/null
 COMPILED_BYTECODE=0x`jq '.contracts|.["src/DssSpell.sol:DssSpell"]|.["bin-runtime"]' ./out/dapp.sol.json | sed 's/"//g'`
+CB=${COMPILED_BYTECODE::-104}  # Trim swarm hash
 ONCHAIN_BYTECODE=`curl -s --data '{"method": "eth_getCode", "params":["'${1}'", "latest"], "id":1, "jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST ${ETH_RPC_URL} | jq '.result' | sed 's/"//g'`
-if [ "$COMPILED_BYTECODE" = "$ONCHAIN_BYTECODE" ] ; then
+OB=${ONCHAIN_BYTECODE::-104}  # Trim swarm hash
+if [ "$CB" = "$OB" ] ; then
     echo -e "\e[32mSUCCESS! \e[39mBytecodes match."
 else
     echo -e "\e[31mFAILURE. \e[39mBytecodes do NOT match."
