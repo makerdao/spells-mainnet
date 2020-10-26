@@ -147,13 +147,13 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             dsr_rate:     0,               // In basis points
-            vat_Line:     1476 * MILLION,  // In whole Dai units
+            vat_Line:     1487 * MILLION,  // In whole Dai units
             pause_delay:  12 hours,        // In seconds
             vow_wait:     156 hours,       // In seconds
             vow_dump:     250,             // In whole Dai units
             vow_sump:     50000,           // In whole Dai units
             vow_bump:     10000,           // In whole Dai units
-            vow_hump:     2 * MILLION,     // In whole Dai units
+            vow_hump:     4 * MILLION,     // In whole Dai units
             cat_box:      15 * MILLION,    // In whole Dai units
             ilk_count:    15               // Num expected in system
         });
@@ -341,46 +341,70 @@ contract DssSpellTest is DSTest, DSMath {
             tau:          6 hours,
             liquidations: 1
         });
+        afterSpell.collaterals["BAL-A"] = CollateralValues({
+            line:         4 * MILLION,
+            dust:         100,
+            pct:          500,
+            chop:         1300,
+            dunk:         50000,
+            mat:          17500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["YFI-A"] = CollateralValues({
+            line:         7 * MILLION,
+            dust:         100,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          17500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
     }
 
-    // function scheduleWaitAndCastFailDay() public {
-    //     spell.schedule();
+    function scheduleWaitAndCastFailDay() public {
+        spell.schedule();
 
-    //     uint256 castTime = now + pause.delay();
-    //     uint256 day = (castTime / 1 days + 3) % 7;
-    //     if (day < 5) {
-    //         castTime += 5 days - day * 86400;
-    //     }
+        uint256 castTime = now + pause.delay();
+        uint256 day = (castTime / 1 days + 3) % 7;
+        if (day < 5) {
+            castTime += 5 days - day * 86400;
+        }
 
-    //     hevm.warp(castTime);
-    //     spell.cast();
-    // }
+        hevm.warp(castTime);
+        spell.cast();
+    }
 
-    // function scheduleWaitAndCastFailEarly() public {
-    //     spell.schedule();
+    function scheduleWaitAndCastFailEarly() public {
+        spell.schedule();
 
-    //     uint256 castTime = now + pause.delay() + 24 hours;
-    //     uint256 hour = castTime / 1 hours % 24;
-    //     if (hour >= 14) {
-    //         castTime -= hour * 3600 - 13 hours;
-    //     }
+        uint256 castTime = now + pause.delay() + 24 hours;
+        uint256 hour = castTime / 1 hours % 24;
+        if (hour >= 14) {
+            castTime -= hour * 3600 - 13 hours;
+        }
 
-    //     hevm.warp(castTime);
-    //     spell.cast();
-    // }
+        hevm.warp(castTime);
+        spell.cast();
+    }
 
-    // function scheduleWaitAndCastFailLate() public {
-    //     spell.schedule();
+    function scheduleWaitAndCastFailLate() public {
+        spell.schedule();
 
-    //     uint256 castTime = now + pause.delay();
-    //     uint256 hour = castTime / 1 hours % 24;
-    //     if (hour < 21) {
-    //         castTime += 21 hours - hour * 3600;
-    //     }
+        uint256 castTime = now + pause.delay();
+        uint256 hour = castTime / 1 hours % 24;
+        if (hour < 21) {
+            castTime += 21 hours - hour * 3600;
+        }
 
-    //     hevm.warp(castTime);
-    //     spell.cast();
-    // }
+        hevm.warp(castTime);
+        spell.cast();
+    }
 
     function vote() private {
         if (chief.hat() != address(spell)) {
@@ -567,20 +591,20 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    // function testFailWrongDay() public {
-    //     vote();
-    //     scheduleWaitAndCastFailDay();
-    // }
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
 
-    // function testFailTooEarly() public {
-    //     vote();
-    //     scheduleWaitAndCastFailEarly();
-    // }
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
 
-    // function testFailTooLate() public {
-    //     vote();
-    //     scheduleWaitAndCastFailLate();
-    // }
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
+    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
@@ -590,9 +614,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 4 days + 2 hours));
+            assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
         vote();
@@ -606,4 +630,137 @@ contract DssSpellTest is DSTest, DSMath {
             checkCollateralValues(ilks[i],  afterSpell);
         }
     }
+
+    function testSpellIsCast_BAL_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        pipBAL.poke();
+        hevm.warp(now + 3601);
+        pipBAL.poke();
+        spot.poke("BAL-A");
+
+        // TODO: replace faucet with tokens magiced with hevm.store()
+        // Check faucet amount
+        uint256 faucetAmount = faucet.amt(address(bal));
+        assertTrue(faucetAmount > 0);
+        faucet.gulp(address(bal));
+        assertEq(bal.balanceOf(address(this)), faucetAmount);
+
+        // Check median matches pip.src()
+        assertEq(pipBAL.src(), address(medBALA));
+
+        // Authorization
+        assertEq(joinBALA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinBALA)), 1);
+        assertEq(flipBALA.wards(address(end)), 1);
+        assertEq(flipBALA.wards(address(flipMom)), 1);
+        assertEq(pipBAL.wards(address(osmMom)), 1);
+        assertEq(pipBAL.bud(address(spot)), 1);
+        assertEq(pipBAL.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
+
+        // Join to adapter
+        assertEq(vat.gem("BAL-A", address(this)), 0);
+        bal.approve(address(joinBALA), faucetAmount);
+        joinBALA.join(address(this), faucetAmount);
+        assertEq(bal.balanceOf(address(this)), 0);
+        assertEq(vat.gem("BAL-A", address(this)), faucetAmount);
+
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("BAL-A", address(this), address(this), address(this), int(faucetAmount), int(100 * WAD));
+        assertEq(vat.gem("BAL-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
+
+        // Payback DAI, withdraw collateral
+        vat.frob("BAL-A", address(this), address(this), address(this), -int(faucetAmount), -int(100 * WAD));
+        assertEq(vat.gem("BAL-A", address(this)), faucetAmount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        joinBALA.exit(address(this), faucetAmount);
+        assertEq(bal.balanceOf(address(this)), faucetAmount);
+        assertEq(vat.gem("BAL-A", address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        bal.approve(address(joinBALA), faucetAmount);
+        joinBALA.join(address(this), faucetAmount);
+        (,,uint256 spotV,,) = vat.ilks("BAL-A");
+        // dart max amount of DAI
+        vat.frob("BAL-A", address(this), address(this), address(this), int(faucetAmount), int(mul(faucetAmount, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("BAL-A");
+        assertEq(flipBALA.kicks(), 0);
+        cat.bite("BAL-A", address(this));
+        assertEq(flipBALA.kicks(), 1);
+    }
+
+    function testSpellIsCast_YFI_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        pipBAL.poke();
+        hevm.warp(now + 3601);
+        pipYFI.poke();
+        spot.poke("YFI-A");
+
+        // TODO: replace faucet with tokens magiced with hevm.store()
+        // Check faucet amount
+        uint256 faucetAmount = faucet.amt(address(yfi));
+        assertTrue(faucetAmount > 0);
+        faucet.gulp(address(yfi));
+        assertEq(yfi.balanceOf(address(this)), faucetAmount);
+
+        // Check median matches pip.src()
+        assertEq(pipYFI.src(), address(medYFIA));
+
+        // Authorization
+        assertEq(joinYFIA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinYFIA)), 1);
+        assertEq(flipYFIA.wards(address(end)), 1);
+        assertEq(flipYFIA.wards(address(flipMom)), 1);
+        assertEq(pipYFI.wards(address(osmMom)), 1);
+        assertEq(pipYFI.bud(address(spot)), 1);
+        assertEq(pipYFI.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
+
+        // Join to adapter
+        assertEq(vat.gem("YFI-A", address(this)), 0);
+        yfi.approve(address(joinYFIA), faucetAmount);
+        joinYFIA.join(address(this), faucetAmount);
+        assertEq(yfi.balanceOf(address(this)), 0);
+        assertEq(vat.gem("YFI-A", address(this)), faucetAmount);
+
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("YFI-A", address(this), address(this), address(this), int(faucetAmount), int(100 * WAD));
+        assertEq(vat.gem("YFI-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
+
+        // Payback DAI, withdraw collateral
+        vat.frob("YFI-A", address(this), address(this), address(this), -int(faucetAmount), -int(100 * WAD));
+        assertEq(vat.gem("YFI-A", address(this)), faucetAmount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        joinYFIA.exit(address(this), faucetAmount);
+        assertEq(yfi.balanceOf(address(this)), faucetAmount);
+        assertEq(vat.gem("YFI-A", address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        yfi.approve(address(joinYFIA), faucetAmount);
+        joinYFIA.join(address(this), faucetAmount);
+        (,,uint256 spotV,,) = vat.ilks("YFI-A");
+        // dart max amount of DAI
+        vat.frob("YFI-A", address(this), address(this), address(this), int(faucetAmount), int(mul(faucetAmount, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("YFI-A");
+        assertEq(flipYFIA.kicks(), 0);
+        cat.bite("YFI-A", address(this));
+        assertEq(flipYFIA.kicks(), 1);
+    }
+
 }
