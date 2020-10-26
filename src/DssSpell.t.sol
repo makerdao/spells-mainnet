@@ -153,7 +153,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_dump:     250,             // In whole Dai units
             vow_sump:     50000,           // In whole Dai units
             vow_bump:     10000,           // In whole Dai units
-            vow_hump:     4 * MILLION,     // In whole Dai units
+            vow_hump:     2 * MILLION,     // In whole Dai units
             cat_box:      15 * MILLION,    // In whole Dai units
             ilk_count:    15               // Num expected in system
         });
@@ -590,9 +590,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
+            assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
         }
 
         vote();

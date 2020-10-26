@@ -16,6 +16,7 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -23,6 +24,8 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.3/contracts.json
+
+    address constant MCD_VAT = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -40,7 +43,10 @@ contract SpellAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
 
-    function execute() external { }
+    function execute() external {
+        // Proving the Pause Proxy has access to the MCD core system at the execution time
+        require(VatAbstract(MCD_VAT).wards(address(this)) == 1, "no-access");
+    }
 }
 
 contract DssSpell {
@@ -98,7 +104,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = now + 4 days + 2 hours;
     }
 
     modifier officeHours {
