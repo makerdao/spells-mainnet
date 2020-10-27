@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Purpose:
 #  To compare the runtime bytecode of the current spell (src/DssSpell.sol) as
 #  output by the compiler against the onchain bytecode of a provided contract
@@ -22,9 +21,12 @@
 
 make all &> /dev/null
 COMPILED_BYTECODE=0x`jq '.contracts|.["src/DssSpell.sol:DssSpell"]|.["bin-runtime"]' ./out/dapp.sol.json | sed 's/"//g'`
-CB=${COMPILED_BYTECODE::-104}  # Trim swarm hash
-ONCHAIN_BYTECODE=`curl -s --data '{"method": "eth_getCode", "params":["'${1}'", "latest"], "id":1, "jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST ${ETH_RPC_URL} | jq '.result' | sed 's/"//g'`
-OB=${ONCHAIN_BYTECODE::-104}  # Trim swarm hash
+CB=${COMPILED_BYTECODE::${#COMPILED_BYTECODE}-104}  # Trim swarm hash
+DEPLOYED_ADDRESS=`cat src/DssSpell.t.sol | grep "address constant MAINNET_SPELL" | sed -e 's#.*address(\(\)#\1#' | sed 's/);.*//'`
+ONCHAIN_BYTECODE=`curl -s --data '{"method": "eth_getCode", "params":["'${1-$DEPLOYED_ADDRESS}'", "latest"], "id":1, "jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST ${ETH_RPC_URL} | jq '.result' | sed 's/"//g'`
+OB=${ONCHAIN_BYTECODE::${#ONCHAIN_BYTECODE}-104}  # Trim swarm hash
+echo "Compiled Bytecode: ${CB:0:40}..."
+echo "On-Chain Bytecode: ${OB:0:40}..."
 if [ "$CB" = "$OB" ] ; then
     echo -e "\e[32mSUCCESS! \e[39mBytecodes match."
 else
