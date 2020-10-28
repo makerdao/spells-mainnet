@@ -16,7 +16,6 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 
