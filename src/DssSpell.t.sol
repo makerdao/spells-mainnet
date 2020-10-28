@@ -21,7 +21,7 @@ interface MedianizerV1Abstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xBc59B45F54f88EfD5f8f5cf0FbcBf5970A9255cc);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1603729151;
 
@@ -49,6 +49,8 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_hump;
         uint256 cat_box;
         uint256 ilk_count;
+        address osm_mom_authority;
+        address flipper_mom_authority;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -146,16 +148,18 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            dsr_rate:     0,               // In basis points
-            vat_Line:     1476 * MILLION,  // In whole Dai units
-            pause_delay:  12 hours,        // In seconds
-            vow_wait:     156 hours,       // In seconds
-            vow_dump:     250,             // In whole Dai units
-            vow_sump:     50000,           // In whole Dai units
-            vow_bump:     10000,           // In whole Dai units
-            vow_hump:     4 * MILLION,     // In whole Dai units
-            cat_box:      15 * MILLION,    // In whole Dai units
-            ilk_count:    15               // Num expected in system
+            dsr_rate:              0,               // In basis points
+            vat_Line:              1476 * MILLION,  // In whole Dai units
+            pause_delay:           72 hours,        // In seconds
+            vow_wait:              156 hours,       // In seconds
+            vow_dump:              250,             // In whole Dai units
+            vow_sump:              50000,           // In whole Dai units
+            vow_bump:              10000,           // In whole Dai units
+            vow_hump:              4 * MILLION,     // In whole Dai units
+            cat_box:               15 * MILLION,    // In whole Dai units
+            ilk_count:             15,              // Num expected in system
+            osm_mom_authority:     address(0),      // OsmMom authority
+            flipper_mom_authority: address(0)       // FlipperMom authority
         });
 
         //
@@ -502,6 +506,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
+
+        // check OsmMom authority
+        assertEq(osmMom.authority(), values.osm_mom_authority);
+
+        // check FlipperMom authority
+        assertEq(flipMom.authority(), values.flipper_mom_authority);
     }
 
     function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
@@ -590,9 +600,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 4 days + 2 hours));
+            assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
         vote();
@@ -606,4 +616,5 @@ contract DssSpellTest is DSTest, DSMath {
             checkCollateralValues(ilks[i],  afterSpell);
         }
     }
+
 }
