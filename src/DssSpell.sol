@@ -47,15 +47,15 @@ contract SpellAction {
 
     // TODO: replace with mainnet addressess after deploy
     address constant BAL            = 0xba100000625a3754423978a60c9317c58a424e3D;
-    address constant MCD_JOIN_BAL_A = 0x0;
-    address constant MCD_FLIP_BAL_A = 0x0;
-    address constant PIP_BAL        = 0x0;
+    address constant MCD_JOIN_BAL_A = 0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55;
+    address constant MCD_FLIP_BAL_A = 0xb2b9bd446eE5e58036D2876fce62b7Ab7334583e;
+    address constant PIP_BAL        = 0x3ff860c0F28D69F392543A16A397D0dAe85D16dE;
 
     // TODO: replace with mainnet addressess after deploy
     address constant YFI            = 0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e;
-    address constant MCD_JOIN_YFI_A = 0x0;
-    address constant MCD_FLIP_YFI_A = 0x0;
-    address constant PIP_YFI        = 0x0;
+    address constant MCD_JOIN_YFI_A = 0x3ff33d9162aD47660083D7DC4bC02Fb231c81677;
+    address constant MCD_FLIP_YFI_A = 0xEe4C9C36257afB8098059a4763A374a4ECFE28A7;
+    address constant PIP_YFI        = 0x5F122465bCf86F45922036970Be6DD7F58820214;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -95,7 +95,6 @@ contract SpellAction {
         ChainlogAbstract(CHAINLOG).setAddress("PIP_BAL", PIP_BAL);
         ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_BAL_A", MCD_JOIN_BAL_A);
         ChainlogAbstract(CHAINLOG).setAddress("MCD_FLIP_BAL_A", MCD_FLIP_BAL_A);
-        ChainlogAbstract(CHAINLOG).setVersion("1.1.4");
 
         // Set the BAL PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_BAL);
@@ -152,9 +151,9 @@ contract SpellAction {
         // Set the BAL-A percentage between bids (e.g. 3% => X = 103)
         FlipAbstract(MCD_FLIP_BAL_A).file("beg", 103 * WAD / 100);
         // Set the BAL-A time max time between bids
-        FlipAbstract(MCD_FLIP_BAL_A).file("ttl", 1 hours);
+        FlipAbstract(MCD_FLIP_BAL_A).file("ttl", 6 hours);
         // Set the BAL-A max auction duration to
-        FlipAbstract(MCD_FLIP_BAL_A).file("tau", 1 hours);
+        FlipAbstract(MCD_FLIP_BAL_A).file("tau", 6 hours);
         // Set the BAL-A min collateralization ratio (e.g. 150% => X = 150)
         SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
 

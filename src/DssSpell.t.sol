@@ -22,10 +22,10 @@ interface MedianizerV1Abstract {
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(
-        0xF1079CA834758b1082FB94412BbB0C9f024EA7d6
+        0
     );
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1603985435;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -51,8 +51,6 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_hump;
         uint256 cat_box;
         uint256 ilk_count;
-        address osm_mom_authority;
-        address flipper_mom_authority;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -82,6 +80,20 @@ contract DssSpellTest is DSTest, DSMath {
     ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     address    makerDeployer05 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457;
+
+    // BAL-A specific
+    DSTokenAbstract       bal = DSTokenAbstract(    0xba100000625a3754423978a60c9317c58a424e3D);
+    GemJoinAbstract  joinBALA = GemJoinAbstract(    0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55);
+    OsmAbstract        pipBAL = OsmAbstract(        0x3ff860c0F28D69F392543A16A397D0dAe85D16dE);
+    FlipAbstract     flipBALA = FlipAbstract(       0xb2b9bd446eE5e58036D2876fce62b7Ab7334583e);
+    MedianAbstract    medBALA = MedianAbstract(     0x1D36d59e5a22cB51B30Bb6fA73b62D73f4A11745);
+
+    // YFI-A specific
+    DSTokenAbstract       yfi = DSTokenAbstract(    0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e);
+    GemJoinAbstract  joinYFIA = GemJoinAbstract(    0x3ff33d9162aD47660083D7DC4bC02Fb231c81677);
+    OsmAbstract        pipYFI = OsmAbstract(        0x5F122465bCf86F45922036970Be6DD7F58820214);
+    FlipAbstract     flipYFIA = FlipAbstract(       0xEe4C9C36257afB8098059a4763A374a4ECFE28A7);
+    MedianAbstract    medYFIA = MedianAbstract(     0x89AC26C0aFCB28EC55B6CD2F6b7DAD867Fa24639);
 
     DssSpell spell;
 
@@ -151,7 +163,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             dsr_rate:              0,               // In basis points
-            vat_Line:              1476 * MILLION,  // In whole Dai units
+            vat_Line:              1487 * MILLION,  // In whole Dai units
             pause_delay:           72 hours,        // In seconds
             vow_wait:              156 hours,       // In seconds
             vow_dump:              250,             // In whole Dai units
@@ -159,7 +171,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump:              10000,           // In whole Dai units
             vow_hump:              4 * MILLION,     // In whole Dai units
             cat_box:               15 * MILLION,    // In whole Dai units
-            ilk_count:             15               // Num expected in system
+            ilk_count:             17               // Num expected in system
         });
 
         //
@@ -530,12 +542,6 @@ contract DssSpellTest is DSTest, DSMath {
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
-
-        // check OsmMom authority
-        assertEq(osmMom.authority(), values.osm_mom_authority);
-
-        // check FlipperMom authority
-        assertEq(flipMom.authority(), values.flipper_mom_authority);
     }
 
     function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
@@ -651,12 +657,14 @@ contract DssSpellTest is DSTest, DSMath {
         pipBAL.poke();
         spot.poke("BAL-A");
 
-        // TODO: replace faucet with tokens magiced with hevm.store()
-        // Check faucet amount
-        uint256 faucetAmount = faucet.amt(address(bal));
-        assertTrue(faucetAmount > 0);
-        faucet.gulp(address(bal));
-        assertEq(bal.balanceOf(address(this)), faucetAmount);
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        hevm.store(
+            address(bal),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(ilkAmt)
+        );
+        assertEq(bal.balanceOf(address(this)), ilkAmt);
 
         // Check median matches pip.src()
         assertEq(pipBAL.src(), address(medBALA));
@@ -673,33 +681,33 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Join to adapter
         assertEq(vat.gem("BAL-A", address(this)), 0);
-        bal.approve(address(joinBALA), faucetAmount);
-        joinBALA.join(address(this), faucetAmount);
+        bal.approve(address(joinBALA), ilkAmt);
+        joinBALA.join(address(this), ilkAmt);
         assertEq(bal.balanceOf(address(this)), 0);
-        assertEq(vat.gem("BAL-A", address(this)), faucetAmount);
+        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("BAL-A", address(this), address(this), address(this), int(faucetAmount), int(100 * WAD));
+        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
         assertEq(vat.gem("BAL-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("BAL-A", address(this), address(this), address(this), -int(faucetAmount), -int(100 * WAD));
-        assertEq(vat.gem("BAL-A", address(this)), faucetAmount);
+        vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinBALA.exit(address(this), faucetAmount);
-        assertEq(bal.balanceOf(address(this)), faucetAmount);
+        joinBALA.exit(address(this), ilkAmt);
+        assertEq(bal.balanceOf(address(this)), ilkAmt);
         assertEq(vat.gem("BAL-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        bal.approve(address(joinBALA), faucetAmount);
-        joinBALA.join(address(this), faucetAmount);
+        bal.approve(address(joinBALA), ilkAmt);
+        joinBALA.join(address(this), ilkAmt);
         (,,uint256 spotV,,) = vat.ilks("BAL-A");
         // dart max amount of DAI
-        vat.frob("BAL-A", address(this), address(this), address(this), int(faucetAmount), int(mul(faucetAmount, spotV) / RAY));
+        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip("BAL-A");
         assertEq(flipBALA.kicks(), 0);
@@ -712,17 +720,19 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        pipBAL.poke();
+        pipYFI.poke();
         hevm.warp(now + 3601);
         pipYFI.poke();
         spot.poke("YFI-A");
 
-        // TODO: replace faucet with tokens magiced with hevm.store()
-        // Check faucet amount
-        uint256 faucetAmount = faucet.amt(address(yfi));
-        assertTrue(faucetAmount > 0);
-        faucet.gulp(address(yfi));
-        assertEq(yfi.balanceOf(address(this)), faucetAmount);
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        hevm.store(
+            address(yfi),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(ilkAmt)
+        );
+        assertEq(yfi.balanceOf(address(this)), ilkAmt);
 
         // Check median matches pip.src()
         assertEq(pipYFI.src(), address(medYFIA));
@@ -739,33 +749,33 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Join to adapter
         assertEq(vat.gem("YFI-A", address(this)), 0);
-        yfi.approve(address(joinYFIA), faucetAmount);
-        joinYFIA.join(address(this), faucetAmount);
+        yfi.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
         assertEq(yfi.balanceOf(address(this)), 0);
-        assertEq(vat.gem("YFI-A", address(this)), faucetAmount);
+        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("YFI-A", address(this), address(this), address(this), int(faucetAmount), int(100 * WAD));
+        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
         assertEq(vat.gem("YFI-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("YFI-A", address(this), address(this), address(this), -int(faucetAmount), -int(100 * WAD));
-        assertEq(vat.gem("YFI-A", address(this)), faucetAmount);
+        vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinYFIA.exit(address(this), faucetAmount);
-        assertEq(yfi.balanceOf(address(this)), faucetAmount);
+        joinYFIA.exit(address(this), ilkAmt);
+        assertEq(yfi.balanceOf(address(this)), ilkAmt);
         assertEq(vat.gem("YFI-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        yfi.approve(address(joinYFIA), faucetAmount);
-        joinYFIA.join(address(this), faucetAmount);
+        yfi.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
         (,,uint256 spotV,,) = vat.ilks("YFI-A");
         // dart max amount of DAI
-        vat.frob("YFI-A", address(this), address(this), address(this), int(faucetAmount), int(mul(faucetAmount, spotV) / RAY));
+        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip("YFI-A");
         assertEq(flipYFIA.kicks(), 0);
