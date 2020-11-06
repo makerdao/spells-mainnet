@@ -562,7 +562,7 @@ contract DssSpellTest is DSTest, DSMath {
             (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
             // Convert whole Dai units to expected RAD
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
-            sumlines += normalizedTestLine;
+            sumlines += values.collaterals[ilk].line;
             assertEq(line, normalizedTestLine);
             assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
