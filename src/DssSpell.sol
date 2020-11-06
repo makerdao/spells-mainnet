@@ -43,7 +43,7 @@ contract SpellAction {
     address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
     address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
     address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
-    address constant CHAINLOG        = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
+    address constant CHANGELOG       = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
     address constant BAL            = 0xba100000625a3754423978a60c9317c58a424e3D;
     address constant MCD_JOIN_BAL_A = 0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55;
@@ -123,7 +123,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("ETH-B", "duty", FOUR_PERCENT_RATE);
 
         // Version bump chainlog (due new collateral types)
-        ChainlogAbstract(CHAINLOG).setVersion("1.1.4");
+        ChainlogAbstract(CHANGELOG).setVersion("1.1.4");
 
         //
         // Add BAL-A
@@ -140,10 +140,10 @@ contract SpellAction {
         require(FlipAbstract(MCD_FLIP_BAL_A).ilk() == ilk, "flip-ilk-not-match");
 
         // Add the new flip and join to the Chainlog
-        ChainlogAbstract(CHAINLOG).setAddress("BAL", BAL);
-        ChainlogAbstract(CHAINLOG).setAddress("PIP_BAL", PIP_BAL);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_BAL_A", MCD_JOIN_BAL_A);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_FLIP_BAL_A", MCD_FLIP_BAL_A);
+        ChainlogAbstract(CHANGELOG).setAddress("BAL", BAL);
+        ChainlogAbstract(CHANGELOG).setAddress("PIP_BAL", PIP_BAL);
+        ChainlogAbstract(CHANGELOG).setAddress("MCD_JOIN_BAL_A", MCD_JOIN_BAL_A);
+        ChainlogAbstract(CHANGELOG).setAddress("MCD_FLIP_BAL_A", MCD_FLIP_BAL_A);
 
         // Set the BAL PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_BAL);
@@ -228,10 +228,10 @@ contract SpellAction {
         require(FlipAbstract(MCD_FLIP_YFI_A).ilk() == ilk, "flip-ilk-not-match");
 
         // Add the new flip and join to the Chainlog
-        ChainlogAbstract(CHAINLOG).setAddress("YFI", YFI);
-        ChainlogAbstract(CHAINLOG).setAddress("PIP_YFI", PIP_YFI);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_YFI_A", MCD_JOIN_YFI_A);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_FLIP_YFI_A", MCD_FLIP_YFI_A);
+        ChainlogAbstract(CHANGELOG).setAddress("YFI", YFI);
+        ChainlogAbstract(CHANGELOG).setAddress("PIP_YFI", PIP_YFI);
+        ChainlogAbstract(CHANGELOG).setAddress("MCD_JOIN_YFI_A", MCD_JOIN_YFI_A);
+        ChainlogAbstract(CHANGELOG).setAddress("MCD_FLIP_YFI_A", MCD_FLIP_YFI_A);
 
         // Set the YFI PIP in the Spotter
         SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_YFI);
