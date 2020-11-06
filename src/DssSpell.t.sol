@@ -171,6 +171,8 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump:              10000,                   // In whole Dai units
             vow_hump:              4 * MILLION,             // In whole Dai units
             cat_box:               15 * MILLION,            // In whole Dai units
+            osm_mom_authority:     address(0),              // OsmMom authority
+            flipper_mom_authority: address(0),              // FlipperMom authority
             ilk_count:             17                       // Num expected in system
         });
 
@@ -539,6 +541,12 @@ contract DssSpellTest is DSTest, DSMath {
             uint256 normalizedBox = values.cat_box * RAD;
             assertEq(cat.box(), normalizedBox);
         }
+
+        // check OsmMom authority
+        assertEq(osmMom.authority(), values.osm_mom_authority);
+
+        // check FlipperMom authority
+        assertEq(flipMom.authority(), values.flipper_mom_authority);
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
