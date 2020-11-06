@@ -50,6 +50,8 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_bump;
         uint256 vow_hump;
         uint256 cat_box;
+        address osm_mom_authority;
+        address flipper_mom_authority;
         uint256 ilk_count;
         mapping (bytes32 => CollateralValues) collaterals;
     }
