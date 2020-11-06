@@ -614,20 +614,20 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, values.vat_Line);
     }
 
-    // function testFailWrongDay() public {
-    //     vote();
-    //     scheduleWaitAndCastFailDay();
-    // }
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
 
-    // function testFailTooEarly() public {
-    //     vote();
-    //     scheduleWaitAndCastFailEarly();
-    // }
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
 
-    // function testFailTooLate() public {
-    //     vote();
-    //     scheduleWaitAndCastFailLate();
-    // }
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
+    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
@@ -651,139 +651,139 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    // function testSpellIsCast_BAL_INTEGRATION() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+    function testSpellIsCast_BAL_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    //     pipBAL.poke();
-    //     hevm.warp(now + 3601);
-    //     pipBAL.poke();
-    //     spot.poke("BAL-A");
+        pipBAL.poke();
+        hevm.warp(now + 3601);
+        pipBAL.poke();
+        spot.poke("BAL-A");
 
-    //     // Add balance to the test address
-    //     uint256 ilkAmt = 1 * THOUSAND * WAD;
-    //     hevm.store(
-    //         address(bal),
-    //         keccak256(abi.encode(address(this), uint256(1))),
-    //         bytes32(ilkAmt)
-    //     );
-    //     assertEq(bal.balanceOf(address(this)), ilkAmt);
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        hevm.store(
+            address(bal),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(ilkAmt)
+        );
+        assertEq(bal.balanceOf(address(this)), ilkAmt);
 
-    //     // Check median matches pip.src()
-    //     assertEq(pipBAL.src(), address(medBALA));
+        // Check median matches pip.src()
+        assertEq(pipBAL.src(), address(medBALA));
 
-    //     // Authorization
-    //     assertEq(joinBALA.wards(pauseProxy), 1);
-    //     assertEq(vat.wards(address(joinBALA)), 1);
-    //     assertEq(flipBALA.wards(address(end)), 1);
-    //     assertEq(flipBALA.wards(address(flipMom)), 1);
-    //     assertEq(pipBAL.wards(address(osmMom)), 1);
-    //     assertEq(pipBAL.bud(address(spot)), 1);
-    //     assertEq(pipBAL.bud(address(end)), 1);
-    //     assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
+        // Authorization
+        assertEq(joinBALA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinBALA)), 1);
+        assertEq(flipBALA.wards(address(end)), 1);
+        assertEq(flipBALA.wards(address(flipMom)), 1);
+        assertEq(pipBAL.wards(address(osmMom)), 1);
+        assertEq(pipBAL.bud(address(spot)), 1);
+        assertEq(pipBAL.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
 
-    //     // Join to adapter
-    //     assertEq(vat.gem("BAL-A", address(this)), 0);
-    //     bal.approve(address(joinBALA), ilkAmt);
-    //     joinBALA.join(address(this), ilkAmt);
-    //     assertEq(bal.balanceOf(address(this)), 0);
-    //     assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+        // Join to adapter
+        assertEq(vat.gem("BAL-A", address(this)), 0);
+        bal.approve(address(joinBALA), ilkAmt);
+        joinBALA.join(address(this), ilkAmt);
+        assertEq(bal.balanceOf(address(this)), 0);
+        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
 
-    //     // Deposit collateral, generate DAI
-    //     assertEq(vat.dai(address(this)), 0);
-    //     vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-    //     assertEq(vat.gem("BAL-A", address(this)), 0);
-    //     assertEq(vat.dai(address(this)), 100 * RAD);
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
+        assertEq(vat.gem("BAL-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
-    //     // Payback DAI, withdraw collateral
-    //     vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-    //     assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
-    //     assertEq(vat.dai(address(this)), 0);
+        // Payback DAI, withdraw collateral
+        vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+        assertEq(vat.dai(address(this)), 0);
 
-    //     // Withdraw from adapter
-    //     joinBALA.exit(address(this), ilkAmt);
-    //     assertEq(bal.balanceOf(address(this)), ilkAmt);
-    //     assertEq(vat.gem("BAL-A", address(this)), 0);
+        // Withdraw from adapter
+        joinBALA.exit(address(this), ilkAmt);
+        assertEq(bal.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("BAL-A", address(this)), 0);
 
-    //     // Generate new DAI to force a liquidation
-    //     bal.approve(address(joinBALA), ilkAmt);
-    //     joinBALA.join(address(this), ilkAmt);
-    //     (,,uint256 spotV,,) = vat.ilks("BAL-A");
-    //     // dart max amount of DAI
-    //     vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-    //     hevm.warp(now + 1);
-    //     jug.drip("BAL-A");
-    //     assertEq(flipBALA.kicks(), 0);
-    //     cat.bite("BAL-A", address(this));
-    //     assertEq(flipBALA.kicks(), 1);
-    // }
+        // Generate new DAI to force a liquidation
+        bal.approve(address(joinBALA), ilkAmt);
+        joinBALA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("BAL-A");
+        // dart max amount of DAI
+        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("BAL-A");
+        assertEq(flipBALA.kicks(), 0);
+        cat.bite("BAL-A", address(this));
+        assertEq(flipBALA.kicks(), 1);
+    }
 
-    // function testSpellIsCast_YFI_INTEGRATION() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+    function testSpellIsCast_YFI_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    //     pipYFI.poke();
-    //     hevm.warp(now + 3601);
-    //     pipYFI.poke();
-    //     spot.poke("YFI-A");
+        pipYFI.poke();
+        hevm.warp(now + 3601);
+        pipYFI.poke();
+        spot.poke("YFI-A");
 
-    //     // Add balance to the test address
-    //     uint256 ilkAmt = 1 * THOUSAND * WAD;
-    //     hevm.store(
-    //         address(yfi),
-    //         keccak256(abi.encode(address(this), uint256(0))),
-    //         bytes32(ilkAmt)
-    //     );
-    //     assertEq(yfi.balanceOf(address(this)), ilkAmt);
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        hevm.store(
+            address(yfi),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(ilkAmt)
+        );
+        assertEq(yfi.balanceOf(address(this)), ilkAmt);
 
-    //     // Check median matches pip.src()
-    //     assertEq(pipYFI.src(), address(medYFIA));
+        // Check median matches pip.src()
+        assertEq(pipYFI.src(), address(medYFIA));
 
-    //     // Authorization
-    //     assertEq(joinYFIA.wards(pauseProxy), 1);
-    //     assertEq(vat.wards(address(joinYFIA)), 1);
-    //     assertEq(flipYFIA.wards(address(end)), 1);
-    //     assertEq(flipYFIA.wards(address(flipMom)), 1);
-    //     assertEq(pipYFI.wards(address(osmMom)), 1);
-    //     assertEq(pipYFI.bud(address(spot)), 1);
-    //     assertEq(pipYFI.bud(address(end)), 1);
-    //     assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
+        // Authorization
+        assertEq(joinYFIA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinYFIA)), 1);
+        assertEq(flipYFIA.wards(address(end)), 1);
+        assertEq(flipYFIA.wards(address(flipMom)), 1);
+        assertEq(pipYFI.wards(address(osmMom)), 1);
+        assertEq(pipYFI.bud(address(spot)), 1);
+        assertEq(pipYFI.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
 
-    //     // Join to adapter
-    //     assertEq(vat.gem("YFI-A", address(this)), 0);
-    //     yfi.approve(address(joinYFIA), ilkAmt);
-    //     joinYFIA.join(address(this), ilkAmt);
-    //     assertEq(yfi.balanceOf(address(this)), 0);
-    //     assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
+        // Join to adapter
+        assertEq(vat.gem("YFI-A", address(this)), 0);
+        yfi.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
+        assertEq(yfi.balanceOf(address(this)), 0);
+        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
 
-    //     // Deposit collateral, generate DAI
-    //     assertEq(vat.dai(address(this)), 0);
-    //     vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-    //     assertEq(vat.gem("YFI-A", address(this)), 0);
-    //     assertEq(vat.dai(address(this)), 100 * RAD);
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
+        assertEq(vat.gem("YFI-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
-    //     // Payback DAI, withdraw collateral
-    //     vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-    //     assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
-    //     assertEq(vat.dai(address(this)), 0);
+        // Payback DAI, withdraw collateral
+        vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
+        assertEq(vat.dai(address(this)), 0);
 
-    //     // Withdraw from adapter
-    //     joinYFIA.exit(address(this), ilkAmt);
-    //     assertEq(yfi.balanceOf(address(this)), ilkAmt);
-    //     assertEq(vat.gem("YFI-A", address(this)), 0);
+        // Withdraw from adapter
+        joinYFIA.exit(address(this), ilkAmt);
+        assertEq(yfi.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("YFI-A", address(this)), 0);
 
-    //     // Generate new DAI to force a liquidation
-    //     yfi.approve(address(joinYFIA), ilkAmt);
-    //     joinYFIA.join(address(this), ilkAmt);
-    //     (,,uint256 spotV,,) = vat.ilks("YFI-A");
-    //     // dart max amount of DAI
-    //     vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-    //     hevm.warp(now + 1);
-    //     jug.drip("YFI-A");
-    //     assertEq(flipYFIA.kicks(), 0);
-    //     cat.bite("YFI-A", address(this));
-    //     assertEq(flipYFIA.kicks(), 1);
-    // }
+        // Generate new DAI to force a liquidation
+        yfi.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("YFI-A");
+        // dart max amount of DAI
+        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("YFI-A");
+        assertEq(flipYFIA.kicks(), 0);
+        cat.bite("YFI-A", address(this));
+        assertEq(flipYFIA.kicks(), 1);
+    }
 }
