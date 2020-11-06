@@ -8,7 +8,7 @@ import "./test/rates.sol";
 import {DssSpell, SpellAction} from "./DssSpell.sol";
 
 interface Hevm {
-    function warp(uint) external;
+    function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
 }
 
@@ -41,7 +41,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     struct SystemValues {
-        uint256 dsr_rate;
+        uint256 pot_dsr;
         uint256 vat_Line;
         uint256 pause_delay;
         uint256 vow_wait;
@@ -114,7 +114,7 @@ contract DssSpellTest is DSTest, DSMath {
     event Debug(uint256 index, bytes32 what);
 
     // not provided in DSMath
-    function rpow(uint x, uint n, uint b) internal pure returns (uint z) {
+    function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
       assembly {
         switch x case 0 {switch n case 0 {z := b} default {z := 0}}
         default {
@@ -162,23 +162,23 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            dsr_rate:              0,               // In basis points
-            vat_Line:              1487 * MILLION,  // In whole Dai units
-            pause_delay:           72 hours,        // In seconds
-            vow_wait:              156 hours,       // In seconds
-            vow_dump:              250,             // In whole Dai units
-            vow_sump:              50000,           // In whole Dai units
-            vow_bump:              10000,           // In whole Dai units
-            vow_hump:              4 * MILLION,     // In whole Dai units
-            cat_box:               15 * MILLION,    // In whole Dai units
-            ilk_count:             17               // Num expected in system
+            pot_dsr:               0,                       // In basis points
+            vat_Line:              146375 * MILLION / 100,  // In whole Dai units
+            pause_delay:           72 hours,                // In seconds
+            vow_wait:              156 hours,               // In seconds
+            vow_dump:              250,                     // In whole Dai units
+            vow_sump:              50000,                   // In whole Dai units
+            vow_bump:              10000,                   // In whole Dai units
+            vow_hump:              4 * MILLION,             // In whole Dai units
+            cat_box:               15 * MILLION,            // In whole Dai units
+            ilk_count:             17                       // Num expected in system
         });
 
         //
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         540 * MILLION,   // In whole Dai units
+            line:         490 * MILLION,   // In whole Dai units
             dust:         100,             // In whole Dai units
             pct:          200,             // In basis points
             chop:         1300,            // In basis points
@@ -190,9 +190,9 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1                // 1 if enabled
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
-            line:         20 * MILLION,
+            line:         10 * MILLION,
             dust:         100,
-            pct:          600,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
@@ -238,7 +238,7 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
-            line:         120 * MILLION,
+            line:         160 * MILLION,
             dust:         100,
             pct:          400,
             chop:         1300,
@@ -286,7 +286,7 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
-            line:         1 * MILLION,
+            line:         250 * THOUSAND,
             dust:         100,
             pct:          1200,
             chop:         1300,
@@ -298,7 +298,7 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
-            line:         10 * MILLION,
+            line:         25 * MILLION / 10,
             dust:         100,
             pct:          800,
             chop:         1300,
@@ -346,7 +346,7 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
-            line:         5 * MILLION,
+            line:         10 * MILLION,
             dust:         100,
             pct:          200,
             chop:         1300,
@@ -472,18 +472,18 @@ contract DssSpellTest is DSTest, DSMath {
 
     function checkSystemValues(SystemValues storage values) internal {
         // dsr
-        uint expectedDSRRate = rates.rates(values.dsr_rate);
+        uint256 expectedDSRRate = rates.rates(values.pot_dsr);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
         );
-        assertTrue(diffCalc(expectedRate(values.dsr_rate), yearlyYield(expectedDSRRate)) <= TOLERANCE);
+        assertTrue(diffCalc(expectedRate(values.pot_dsr), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
         {
         // Line values in RAD
-        uint normalizedLine = values.vat_Line * RAD;
+        uint256 normalizedLine = values.vat_Line * RAD;
         assertEq(vat.Line(), normalizedLine);
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < 100 * BILLION * RAD) ||
@@ -499,7 +499,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         {
         // dump values in WAD
-        uint normalizedDump = values.vow_dump * WAD;
+        uint256 normalizedDump = values.vow_dump * WAD;
         assertEq(vow.dump(), normalizedDump);
         assertTrue(
             (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
@@ -508,7 +508,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
         {
         // sump values in RAD
-        uint normalizedSump = values.vow_sump * RAD;
+        uint256 normalizedSump = values.vow_sump * RAD;
         assertEq(vow.sump(), normalizedSump);
         assertTrue(
             (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
@@ -526,7 +526,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
         {
         // hump values in RAD
-        uint normalizedHump = values.vow_hump * RAD;
+        uint256 normalizedHump = values.vow_hump * RAD;
         assertEq(vow.hump(), normalizedHump);
         assertTrue(
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
@@ -536,7 +536,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // box values in RAD
         {
-            uint normalizedBox = values.cat_box * RAD;
+            uint256 normalizedBox = values.cat_box * RAD;
             assertEq(cat.box(), normalizedBox);
         }
 
@@ -544,83 +544,90 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(reg.count(), values.ilk_count);
     }
 
-    function checkCollateralValues(bytes32 ilk, SystemValues storage values) internal {
-        (uint duty,)  = jug.ilks(ilk);
+    function checkCollateralValues(SystemValues storage values) internal {
+        uint256 sumlines;
+        bytes32[] memory ilks = reg.list();
+        for(uint256 i = 0; i < ilks.length; i++) {
+            bytes32 ilk = ilks[i];
+            (uint256 duty,)  = jug.ilks(ilk);
 
-        assertEq(duty, rates.rates(values.collaterals[ilk].pct));
-        // make sure duty is less than 1000% APR
-        // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
-        // 1000000073014496989316680335
-        assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
-        assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
-        assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
-        {
-        (,,, uint line, uint dust) = vat.ilks(ilk);
-        // Convert whole Dai units to expected RAD
-        uint normalizedTestLine = values.collaterals[ilk].line * RAD;
-        assertEq(line, normalizedTestLine);
-        assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
-        uint normalizedTestDust = values.collaterals[ilk].dust * RAD;
-        assertEq(dust, normalizedTestDust);
-        assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
-        }
-        {
-        (, uint chop, uint dunk) = cat.ilks(ilk);
-        // Convert BP to system expected value
-        uint normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-        assertEq(chop, normalizedTestChop);
-        // make sure chop is less than 100%
-        assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
-        // Convert whole Dai units to expected RAD
-        uint normalizedTestDunk = values.collaterals[ilk].dunk * RAD;
-        assertEq(dunk, normalizedTestDunk);
-        // put back in after LIQ-1.2
-        assertTrue(dunk >= RAD && dunk < MILLION * RAD);
-        }
-        {
-        (,uint mat) = spot.ilks(ilk);
-        // Convert BP to system expected value
-        uint normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
-        assertEq(mat, normalizedTestMat);
-        assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
-        }
-        {
-        (address flipper,,) = cat.ilks(ilk);
-        FlipAbstract flip = FlipAbstract(flipper);
-        // Convert BP to system expected value
-        uint normalizedTestBeg = (values.collaterals[ilk].beg + 10000)  * 10**14;
-        assertEq(uint(flip.beg()), normalizedTestBeg);
-        assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
-        assertEq(uint(flip.ttl()), values.collaterals[ilk].ttl);
-        assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
-        assertEq(uint(flip.tau()), values.collaterals[ilk].tau);
-        assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
+            assertEq(duty, rates.rates(values.collaterals[ilk].pct));
+            // make sure duty is less than 1000% APR
+            // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
+            // 1000000073014496989316680335
+            assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
+            assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
+            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
+            {
+            (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
+            // Convert whole Dai units to expected RAD
+            uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
+            sumlines += normalizedTestLine;
+            assertEq(line, normalizedTestLine);
+            assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
+            uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
+            assertEq(dust, normalizedTestDust);
+            assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
+            }
+            {
+            (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
+            // Convert BP to system expected value
+            uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
+            assertEq(chop, normalizedTestChop);
+            // make sure chop is less than 100%
+            assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
+            // Convert whole Dai units to expected RAD
+            uint256 normalizedTestDunk = values.collaterals[ilk].dunk * RAD;
+            assertEq(dunk, normalizedTestDunk);
+            // put back in after LIQ-1.2
+            assertTrue(dunk >= RAD && dunk < MILLION * RAD);
+            }
+            {
+            (,uint256 mat) = spot.ilks(ilk);
+            // Convert BP to system expected value
+            uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
+            assertEq(mat, normalizedTestMat);
+            assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
+            }
+            {
+            (address flipper,,) = cat.ilks(ilk);
+            FlipAbstract flip = FlipAbstract(flipper);
+            // Convert BP to system expected value
+            uint256 normalizedTestBeg = (values.collaterals[ilk].beg + 10000)  * 10**14;
+            assertEq(uint256(flip.beg()), normalizedTestBeg);
+            assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
+            assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
+            assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
+            assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
+            assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
-        assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-        assertEq(flip.wards(address(makerDeployer05)), 0); // Check deployer denied
-        assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+            assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
+            assertEq(flip.wards(address(makerDeployer05)), 0); // Check deployer denied
+            assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+            }
+            {
+            GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
+            assertEq(join.wards(address(makerDeployer05)), 0); // Check deployer denied
+            assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+            }
         }
-        {
-        GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-        assertEq(join.wards(address(makerDeployer05)), 0); // Check deployer denied
-        assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
-        }
+        assertEq(sumlines, values.vat_Line);
     }
 
-    function testFailWrongDay() public {
-        vote();
-        scheduleWaitAndCastFailDay();
-    }
+    // function testFailWrongDay() public {
+    //     vote();
+    //     scheduleWaitAndCastFailDay();
+    // }
 
-    function testFailTooEarly() public {
-        vote();
-        scheduleWaitAndCastFailEarly();
-    }
+    // function testFailTooEarly() public {
+    //     vote();
+    //     scheduleWaitAndCastFailEarly();
+    // }
 
-    function testFailTooLate() public {
-        vote();
-        scheduleWaitAndCastFailLate();
-    }
+    // function testFailTooLate() public {
+    //     vote();
+    //     scheduleWaitAndCastFailLate();
+    // }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
@@ -641,146 +648,142 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkSystemValues(afterSpell);
 
-        bytes32[] memory ilks = reg.list();
-        for(uint i = 0; i < ilks.length; i++) {
-            checkCollateralValues(ilks[i],  afterSpell);
-        }
+        checkCollateralValues(afterSpell);
     }
 
-    function testSpellIsCast_BAL_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
+    // function testSpellIsCast_BAL_INTEGRATION() public {
+    //     vote();
+    //     scheduleWaitAndCast();
+    //     assertTrue(spell.done());
 
-        pipBAL.poke();
-        hevm.warp(now + 3601);
-        pipBAL.poke();
-        spot.poke("BAL-A");
+    //     pipBAL.poke();
+    //     hevm.warp(now + 3601);
+    //     pipBAL.poke();
+    //     spot.poke("BAL-A");
 
-        // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
-        hevm.store(
-            address(bal),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(ilkAmt)
-        );
-        assertEq(bal.balanceOf(address(this)), ilkAmt);
+    //     // Add balance to the test address
+    //     uint256 ilkAmt = 1 * THOUSAND * WAD;
+    //     hevm.store(
+    //         address(bal),
+    //         keccak256(abi.encode(address(this), uint256(1))),
+    //         bytes32(ilkAmt)
+    //     );
+    //     assertEq(bal.balanceOf(address(this)), ilkAmt);
 
-        // Check median matches pip.src()
-        assertEq(pipBAL.src(), address(medBALA));
+    //     // Check median matches pip.src()
+    //     assertEq(pipBAL.src(), address(medBALA));
 
-        // Authorization
-        assertEq(joinBALA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinBALA)), 1);
-        assertEq(flipBALA.wards(address(end)), 1);
-        assertEq(flipBALA.wards(address(flipMom)), 1);
-        assertEq(pipBAL.wards(address(osmMom)), 1);
-        assertEq(pipBAL.bud(address(spot)), 1);
-        assertEq(pipBAL.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
+    //     // Authorization
+    //     assertEq(joinBALA.wards(pauseProxy), 1);
+    //     assertEq(vat.wards(address(joinBALA)), 1);
+    //     assertEq(flipBALA.wards(address(end)), 1);
+    //     assertEq(flipBALA.wards(address(flipMom)), 1);
+    //     assertEq(pipBAL.wards(address(osmMom)), 1);
+    //     assertEq(pipBAL.bud(address(spot)), 1);
+    //     assertEq(pipBAL.bud(address(end)), 1);
+    //     assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
 
-        // Join to adapter
-        assertEq(vat.gem("BAL-A", address(this)), 0);
-        bal.approve(address(joinBALA), ilkAmt);
-        joinBALA.join(address(this), ilkAmt);
-        assertEq(bal.balanceOf(address(this)), 0);
-        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+    //     // Join to adapter
+    //     assertEq(vat.gem("BAL-A", address(this)), 0);
+    //     bal.approve(address(joinBALA), ilkAmt);
+    //     joinBALA.join(address(this), ilkAmt);
+    //     assertEq(bal.balanceOf(address(this)), 0);
+    //     assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
 
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-        assertEq(vat.gem("BAL-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
+    //     // Deposit collateral, generate DAI
+    //     assertEq(vat.dai(address(this)), 0);
+    //     vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
+    //     assertEq(vat.gem("BAL-A", address(this)), 0);
+    //     assertEq(vat.dai(address(this)), 100 * RAD);
 
-        // Payback DAI, withdraw collateral
-        vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
-        assertEq(vat.dai(address(this)), 0);
+    //     // Payback DAI, withdraw collateral
+    //     vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+    //     assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+    //     assertEq(vat.dai(address(this)), 0);
 
-        // Withdraw from adapter
-        joinBALA.exit(address(this), ilkAmt);
-        assertEq(bal.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("BAL-A", address(this)), 0);
+    //     // Withdraw from adapter
+    //     joinBALA.exit(address(this), ilkAmt);
+    //     assertEq(bal.balanceOf(address(this)), ilkAmt);
+    //     assertEq(vat.gem("BAL-A", address(this)), 0);
 
-        // Generate new DAI to force a liquidation
-        bal.approve(address(joinBALA), ilkAmt);
-        joinBALA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("BAL-A");
-        // dart max amount of DAI
-        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("BAL-A");
-        assertEq(flipBALA.kicks(), 0);
-        cat.bite("BAL-A", address(this));
-        assertEq(flipBALA.kicks(), 1);
-    }
+    //     // Generate new DAI to force a liquidation
+    //     bal.approve(address(joinBALA), ilkAmt);
+    //     joinBALA.join(address(this), ilkAmt);
+    //     (,,uint256 spotV,,) = vat.ilks("BAL-A");
+    //     // dart max amount of DAI
+    //     vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+    //     hevm.warp(now + 1);
+    //     jug.drip("BAL-A");
+    //     assertEq(flipBALA.kicks(), 0);
+    //     cat.bite("BAL-A", address(this));
+    //     assertEq(flipBALA.kicks(), 1);
+    // }
 
-    function testSpellIsCast_YFI_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
+    // function testSpellIsCast_YFI_INTEGRATION() public {
+    //     vote();
+    //     scheduleWaitAndCast();
+    //     assertTrue(spell.done());
 
-        pipYFI.poke();
-        hevm.warp(now + 3601);
-        pipYFI.poke();
-        spot.poke("YFI-A");
+    //     pipYFI.poke();
+    //     hevm.warp(now + 3601);
+    //     pipYFI.poke();
+    //     spot.poke("YFI-A");
 
-        // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
-        hevm.store(
-            address(yfi),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(ilkAmt)
-        );
-        assertEq(yfi.balanceOf(address(this)), ilkAmt);
+    //     // Add balance to the test address
+    //     uint256 ilkAmt = 1 * THOUSAND * WAD;
+    //     hevm.store(
+    //         address(yfi),
+    //         keccak256(abi.encode(address(this), uint256(0))),
+    //         bytes32(ilkAmt)
+    //     );
+    //     assertEq(yfi.balanceOf(address(this)), ilkAmt);
 
-        // Check median matches pip.src()
-        assertEq(pipYFI.src(), address(medYFIA));
+    //     // Check median matches pip.src()
+    //     assertEq(pipYFI.src(), address(medYFIA));
 
-        // Authorization
-        assertEq(joinYFIA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinYFIA)), 1);
-        assertEq(flipYFIA.wards(address(end)), 1);
-        assertEq(flipYFIA.wards(address(flipMom)), 1);
-        assertEq(pipYFI.wards(address(osmMom)), 1);
-        assertEq(pipYFI.bud(address(spot)), 1);
-        assertEq(pipYFI.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
+    //     // Authorization
+    //     assertEq(joinYFIA.wards(pauseProxy), 1);
+    //     assertEq(vat.wards(address(joinYFIA)), 1);
+    //     assertEq(flipYFIA.wards(address(end)), 1);
+    //     assertEq(flipYFIA.wards(address(flipMom)), 1);
+    //     assertEq(pipYFI.wards(address(osmMom)), 1);
+    //     assertEq(pipYFI.bud(address(spot)), 1);
+    //     assertEq(pipYFI.bud(address(end)), 1);
+    //     assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
 
-        // Join to adapter
-        assertEq(vat.gem("YFI-A", address(this)), 0);
-        yfi.approve(address(joinYFIA), ilkAmt);
-        joinYFIA.join(address(this), ilkAmt);
-        assertEq(yfi.balanceOf(address(this)), 0);
-        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
+    //     // Join to adapter
+    //     assertEq(vat.gem("YFI-A", address(this)), 0);
+    //     yfi.approve(address(joinYFIA), ilkAmt);
+    //     joinYFIA.join(address(this), ilkAmt);
+    //     assertEq(yfi.balanceOf(address(this)), 0);
+    //     assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
 
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-        assertEq(vat.gem("YFI-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
+    //     // Deposit collateral, generate DAI
+    //     assertEq(vat.dai(address(this)), 0);
+    //     vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
+    //     assertEq(vat.gem("YFI-A", address(this)), 0);
+    //     assertEq(vat.dai(address(this)), 100 * RAD);
 
-        // Payback DAI, withdraw collateral
-        vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
-        assertEq(vat.dai(address(this)), 0);
+    //     // Payback DAI, withdraw collateral
+    //     vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+    //     assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
+    //     assertEq(vat.dai(address(this)), 0);
 
-        // Withdraw from adapter
-        joinYFIA.exit(address(this), ilkAmt);
-        assertEq(yfi.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("YFI-A", address(this)), 0);
+    //     // Withdraw from adapter
+    //     joinYFIA.exit(address(this), ilkAmt);
+    //     assertEq(yfi.balanceOf(address(this)), ilkAmt);
+    //     assertEq(vat.gem("YFI-A", address(this)), 0);
 
-        // Generate new DAI to force a liquidation
-        yfi.approve(address(joinYFIA), ilkAmt);
-        joinYFIA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("YFI-A");
-        // dart max amount of DAI
-        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("YFI-A");
-        assertEq(flipYFIA.kicks(), 0);
-        cat.bite("YFI-A", address(this));
-        assertEq(flipYFIA.kicks(), 1);
-    }
-
+    //     // Generate new DAI to force a liquidation
+    //     yfi.approve(address(joinYFIA), ilkAmt);
+    //     joinYFIA.join(address(this), ilkAmt);
+    //     (,,uint256 spotV,,) = vat.ilks("YFI-A");
+    //     // dart max amount of DAI
+    //     vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+    //     hevm.warp(now + 1);
+    //     jug.drip("YFI-A");
+    //     assertEq(flipYFIA.kicks(), 0);
+    //     cat.bite("YFI-A", address(this));
+    //     assertEq(flipYFIA.kicks(), 1);
+    // }
 }

@@ -45,13 +45,11 @@ contract SpellAction {
     address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
     address constant CHAINLOG        = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
-    // TODO: replace with mainnet addressess after deploy
     address constant BAL            = 0xba100000625a3754423978a60c9317c58a424e3D;
     address constant MCD_JOIN_BAL_A = 0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55;
     address constant MCD_FLIP_BAL_A = 0xb2b9bd446eE5e58036D2876fce62b7Ab7334583e;
     address constant PIP_BAL        = 0x3ff860c0F28D69F392543A16A397D0dAe85D16dE;
 
-    // TODO: replace with mainnet addressess after deploy
     address constant YFI            = 0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e;
     address constant MCD_JOIN_YFI_A = 0x3ff33d9162aD47660083D7DC4bC02Fb231c81677;
     address constant MCD_FLIP_YFI_A = 0xEe4C9C36257afB8098059a4763A374a4ECFE28A7;
@@ -76,6 +74,57 @@ contract SpellAction {
     uint256 constant FIVE_PERCENT_RATE = 1000000001547125957863212448;
 
     function execute() external {
+        // Set the global debt ceiling
+        // 1476 (current DC) + 4 (BAL-A) + 7 (YFI-A) - 50 (ETH-A decrease) - 10 (ETH-B decrease)
+        // + 40 (WBTC-A increase) + 5 (LINK-A increase) - 7.5 (USDT-A decrease) - 0.75 (MANA-A decrease)
+        VatAbstract(MCD_VAT).file("Line", (1463 * MILLION + 750 * THOUSAND) * RAD);
+
+        // Set the ETH-A debt ceiling
+        //
+        // Existing debt ceiling: 540 million
+        // New debt ceiling: 490 million
+        VatAbstract(MCD_VAT).file("ETH-A", "line", 490 * MILLION * RAD);
+
+        // Set the ETH-B debt ceiling
+        //
+        // Existing debt ceiling: 20 million
+        // New debt ceiling: 10 million
+        VatAbstract(MCD_VAT).file("ETH-B", "line", 10 * MILLION * RAD);
+
+        // Set the WBTC-A debt ceiling
+        //
+        // Existing debt ceiling: 120 million
+        // New debt ceiling: 160 million
+        VatAbstract(MCD_VAT).file("WBTC-A", "line", 160 * MILLION * RAD);
+
+        // Set the MANA-A debt ceiling
+        //
+        // Existing debt ceiling: 1 million
+        // New debt ceiling: 250 thousand
+        VatAbstract(MCD_VAT).file("MANA-A", "line", 250 * THOUSAND * RAD);
+
+        // Set the USDT-A debt ceiling
+        //
+        // Existing debt ceiling: 10 million
+        // New debt ceiling: 2.5 million
+        VatAbstract(MCD_VAT).file("USDT-A", "line", (2 * MILLION + 500 * THOUSAND) * RAD);
+
+        // Set the LINK-A debt ceiling
+        //
+        // Existing debt ceiling: 5 million
+        // New debt ceiling: 10 million
+        VatAbstract(MCD_VAT).file("LINK-A", "line", 10 * MILLION * RAD);
+
+        // Set the ETH-B stability fee
+        //
+        // Previous: 6%
+        // New: 4%
+        JugAbstract(MCD_JUG).drip("ETH-B");
+        JugAbstract(MCD_JUG).file("ETH-B", "duty", FOUR_PERCENT_RATE);
+
+        // Version bump chainlog (due new collateral types)
+        ChainlogAbstract(CHAINLOG).setVersion("1.1.4");
+
         //
         // Add BAL-A
         //
@@ -250,17 +299,6 @@ contract SpellAction {
 
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_YFI_A);
-
-        //
-        // Set system values once
-        //
-
-        // Set the global debt ceiling
-        // 1476 (current DC) + 4 (BAL-A increase) + 7 (YFI-A increase)
-        VatAbstract(MCD_VAT).file("Line", 1487 * MILLION * RAD);
-
-        // version bump chainlog
-        ChainlogAbstract(CHAINLOG).setVersion("1.1.4");
     }
 }
 
@@ -276,9 +314,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ebcd1fc676177a5dd9df713ee7eded778a6a15d8/governance/votes/Executive%20vote%20-%20November%206%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-11-06 MakerDAO Executive Spell | Hash: 0x0";
+        "2020-11-06 MakerDAO Executive Spell | Hash: 0xb4b03223bcd41de727ee97a2a483eb22c9f019f49434905c6863ecd4941b7054";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
