@@ -20,10 +20,10 @@
 #  contract, or possibly some sort of weird error.
 
 make all &> /dev/null
-COMPILED_BYTECODE=0x`jq '.contracts|.["src/DssSpell.sol:DssSpell"]|.["bin-runtime"]' ./out/dapp.sol.json | sed 's/"//g'`
+COMPILED_BYTECODE=0x$(jq '.contracts|.["src/DssSpell.sol:DssSpell"]|.["bin-runtime"]' ./out/dapp.sol.json | sed 's/"//g')
 CB=${COMPILED_BYTECODE::${#COMPILED_BYTECODE}-104}  # Trim swarm hash
-DEPLOYED_ADDRESS=`cat src/DssSpell.t.sol | grep "address constant MAINNET_SPELL" | sed -e 's#.*address(\(\)#\1#' | sed 's/);.*//'`
-ONCHAIN_BYTECODE=`curl -s --data '{"method": "eth_getCode", "params":["'${1-$DEPLOYED_ADDRESS}'", "latest"], "id":1, "jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST ${ETH_RPC_URL} | jq '.result' | sed 's/"//g'`
+DEPLOYED_ADDRESS=$(< src/DssSpell.t.sol grep "address constant MAINNET_SPELL" | sed -e 's#.*address(\(\)#\1#' | sed 's/);.*//')
+ONCHAIN_BYTECODE=$(curl -s --data '{"method": "eth_getCode", "params":["'"${1-$DEPLOYED_ADDRESS}"'", "latest"], "id":1, "jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST "${ETH_RPC_URL}" | jq '.result' | sed 's/"//g')
 OB=${ONCHAIN_BYTECODE::${#ONCHAIN_BYTECODE}-104}  # Trim swarm hash
 echo "Compiled Bytecode: ${CB:0:40}..."
 echo "On-Chain Bytecode: ${OB:0:40}..."
