@@ -21,7 +21,7 @@ interface MedianizerV1Abstract {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x268C4bb57f18b04a7380e3EeEEcAeC377C31c850);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1604682525;
 
@@ -79,21 +79,16 @@ contract DssSpellTest is DSTest, DSMath {
 
     ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
-    address    makerDeployer05 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457;
+    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
-    // BAL-A specific
-    DSTokenAbstract       bal = DSTokenAbstract(    0xba100000625a3754423978a60c9317c58a424e3D);
-    GemJoinAbstract  joinBALA = GemJoinAbstract(    0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55);
-    OsmAbstract        pipBAL = OsmAbstract(        0x3ff860c0F28D69F392543A16A397D0dAe85D16dE);
-    FlipAbstract     flipBALA = FlipAbstract(       0xb2b9bd446eE5e58036D2876fce62b7Ab7334583e);
-    MedianAbstract    medBALA = MedianAbstract(     0x1D36d59e5a22cB51B30Bb6fA73b62D73f4A11745);
+    // GUSD-A specific
+    DSTokenAbstract       gusd = DSTokenAbstract(    0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd);
+    DSTokenAbstract gusd_store = DSTokenAbstract(    0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0);
+    GemJoinAbstract  joinGUSDA = GemJoinAbstract(    0xe29A14bcDeA40d83675aa43B72dF07f649738C8b);
+    OsmAbstract        pipGUSD = OsmAbstract(        0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5);
+    FlipAbstract     flipGUSDA = FlipAbstract(       0xCAa8D152A8b98229fB77A213BE16b234cA4f612f);
+    //MedianAbstract    medGUSDA = MedianAbstract(     0);
 
-    // YFI-A specific
-    DSTokenAbstract       yfi = DSTokenAbstract(    0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e);
-    GemJoinAbstract  joinYFIA = GemJoinAbstract(    0x3ff33d9162aD47660083D7DC4bC02Fb231c81677);
-    OsmAbstract        pipYFI = OsmAbstract(        0x5F122465bCf86F45922036970Be6DD7F58820214);
-    FlipAbstract     flipYFIA = FlipAbstract(       0xEe4C9C36257afB8098059a4763A374a4ECFE28A7);
-    MedianAbstract    medYFIA = MedianAbstract(     0x89AC26C0aFCB28EC55B6CD2F6b7DAD867Fa24639);
 
     DssSpell spell;
 
@@ -163,7 +158,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              146375 * MILLION / 100,  // In whole Dai units
+            vat_Line:              146875 * MILLION / 100,  // In whole Dai units
             pause_delay:           72 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -173,7 +168,7 @@ contract DssSpellTest is DSTest, DSMath {
             cat_box:               15 * MILLION,            // In whole Dai units
             osm_mom_authority:     address(0),              // OsmMom authority
             flipper_mom_authority: address(0),              // FlipperMom authority
-            ilk_count:             17                       // Num expected in system
+            ilk_count:             18                       // Num expected in system
         });
 
         //
@@ -382,6 +377,18 @@ contract DssSpellTest is DSTest, DSMath {
             ttl:          6 hours,
             tau:          6 hours,
             liquidations: 1
+        });
+        afterSpell.collaterals["GUSD-A"] = CollateralValues({
+            line:         5 * MILLION,
+            dust:         100,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          10100,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 0
         });
     }
 
@@ -610,12 +617,12 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
             assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-            assertEq(flip.wards(address(makerDeployer05)), 0); // Check deployer denied
+            assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
             {
             GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-            assertEq(join.wards(address(makerDeployer05)), 0); // Check deployer denied
+            assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
@@ -659,139 +666,72 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testSpellIsCast_BAL_INTEGRATION() public {
+    function testSpellIsCast_GUSD_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        pipBAL.poke();
+        //pipGUSD.poke();
         hevm.warp(now + 3601);
-        pipBAL.poke();
-        spot.poke("BAL-A");
+        //pipGUSD.poke();
+        spot.poke("GUSD-A");
 
         // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
+
         hevm.store(
-            address(bal),
-            keccak256(abi.encode(address(this), uint256(1))),
+            address(gusd_store),
+            keccak256(abi.encode(address(this), uint256(6))),
             bytes32(ilkAmt)
         );
-        assertEq(bal.balanceOf(address(this)), ilkAmt);
+        assertEq(gusd.balanceOf(address(this)), ilkAmt);
 
         // Check median matches pip.src()
-        assertEq(pipBAL.src(), address(medBALA));
+        //assertEq(pipGUSD.src(), address(medGUSDA));
 
         // Authorization
-        assertEq(joinBALA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinBALA)), 1);
-        assertEq(flipBALA.wards(address(end)), 1);
-        assertEq(flipBALA.wards(address(flipMom)), 1);
-        assertEq(pipBAL.wards(address(osmMom)), 1);
-        assertEq(pipBAL.bud(address(spot)), 1);
-        assertEq(pipBAL.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipBAL.src()).bud(address(pipBAL)), 1);
+        assertEq(joinGUSDA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinGUSDA)), 1);
+        assertEq(flipGUSDA.wards(address(end)), 1);
+        assertEq(flipGUSDA.wards(address(flipMom)), 1);
+        //assertEq(pipGUSD.wards(address(osmMom)), 1);
+        //assertEq(pipGUSD.bud(address(spot)), 1);
+        //assertEq(pipGUSD.bud(address(end)), 1);
+        //assertEq(MedianAbstract(pipGUSD.src()).bud(address(pipGUSD)), 1);
 
         // Join to adapter
-        assertEq(vat.gem("BAL-A", address(this)), 0);
-        bal.approve(address(joinBALA), ilkAmt);
-        joinBALA.join(address(this), ilkAmt);
-        assertEq(bal.balanceOf(address(this)), 0);
-        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+        assertEq(vat.gem("GUSD-A", address(this)), 0);
+        gusd.approve(address(joinGUSDA), ilkAmt);
+        joinGUSDA.join(address(this), ilkAmt);
+        assertEq(gusd.balanceOf(address(this)), 0);
+        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt * 10**16);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-        assertEq(vat.gem("BAL-A", address(this)), 0);
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(100 * WAD));
+        assertEq(vat.gem("GUSD-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("BAL-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-        assertEq(vat.gem("BAL-A", address(this)), ilkAmt);
+        vat.frob("GUSD-A", address(this), address(this), address(this), -int(ilkAmt * 10**16), -int(100 * WAD));
+        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt * 10**16);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinBALA.exit(address(this), ilkAmt);
-        assertEq(bal.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("BAL-A", address(this)), 0);
+        joinGUSDA.exit(address(this), ilkAmt);
+        assertEq(gusd.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("GUSD-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        bal.approve(address(joinBALA), ilkAmt);
-        joinBALA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("BAL-A");
+        gusd.approve(address(joinGUSDA), ilkAmt);
+        joinGUSDA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("GUSD-A");
         // dart max amount of DAI
-        vat.frob("BAL-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(mul(ilkAmt * 10**16, spotV) / RAY));
         hevm.warp(now + 1);
-        jug.drip("BAL-A");
-        assertEq(flipBALA.kicks(), 0);
-        cat.bite("BAL-A", address(this));
-        assertEq(flipBALA.kicks(), 1);
-    }
-
-    function testSpellIsCast_YFI_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipYFI.poke();
-        hevm.warp(now + 3601);
-        pipYFI.poke();
-        spot.poke("YFI-A");
-
-        // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
-        hevm.store(
-            address(yfi),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(ilkAmt)
-        );
-        assertEq(yfi.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        assertEq(pipYFI.src(), address(medYFIA));
-
-        // Authorization
-        assertEq(joinYFIA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinYFIA)), 1);
-        assertEq(flipYFIA.wards(address(end)), 1);
-        assertEq(flipYFIA.wards(address(flipMom)), 1);
-        assertEq(pipYFI.wards(address(osmMom)), 1);
-        assertEq(pipYFI.bud(address(spot)), 1);
-        assertEq(pipYFI.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipYFI.src()).bud(address(pipYFI)), 1);
-
-        // Join to adapter
-        assertEq(vat.gem("YFI-A", address(this)), 0);
-        yfi.approve(address(joinYFIA), ilkAmt);
-        joinYFIA.join(address(this), ilkAmt);
-        assertEq(yfi.balanceOf(address(this)), 0);
-        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
-        assertEq(vat.gem("YFI-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("YFI-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
-        assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinYFIA.exit(address(this), ilkAmt);
-        assertEq(yfi.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("YFI-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        yfi.approve(address(joinYFIA), ilkAmt);
-        joinYFIA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("YFI-A");
-        // dart max amount of DAI
-        vat.frob("YFI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("YFI-A");
-        assertEq(flipYFIA.kicks(), 0);
-        cat.bite("YFI-A", address(this));
-        assertEq(flipYFIA.kicks(), 1);
+        jug.drip("GUSD-A");
+        assertEq(flipGUSDA.kicks(), 0);
+        //cat.bite("GUSD-A", address(this));  // liquidatons off
+        //assertEq(flipGUSDA.kicks(), 1);
     }
 }
