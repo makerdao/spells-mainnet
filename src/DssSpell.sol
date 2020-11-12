@@ -18,6 +18,7 @@ pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
@@ -34,26 +35,14 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.4/contracts.json
-    address constant MCD_VAT         = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    address constant MCD_CAT         = 0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea;
-    address constant MCD_JUG         = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
-    address constant MCD_SPOT        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
-    address constant MCD_POT         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-    address constant MCD_END         = 0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5;
-    address constant FLIPPER_MOM     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
-    address constant OSM_MOM         = 0x76416A4d5190d071bfed309861527431304aA14f;
-    address constant ILK_REGISTRY    = 0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24;
-    address constant CHANGELOG       = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
+    ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
-    address constant BAL            = 0xba100000625a3754423978a60c9317c58a424e3D;
-    address constant MCD_JOIN_BAL_A = 0x4a03Aa7fb3973d8f0221B466EefB53D0aC195f55;
-    address constant MCD_FLIP_BAL_A = 0xb2b9bd446eE5e58036D2876fce62b7Ab7334583e;
-    address constant PIP_BAL        = 0x3ff860c0F28D69F392543A16A397D0dAe85D16dE;
+    address constant FLIP_FAB        = 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b;
 
-    address constant YFI            = 0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e;
-    address constant MCD_JOIN_YFI_A = 0x3ff33d9162aD47660083D7DC4bC02Fb231c81677;
-    address constant MCD_FLIP_YFI_A = 0xEe4C9C36257afB8098059a4763A374a4ECFE28A7;
-    address constant PIP_YFI        = 0x5F122465bCf86F45922036970Be6DD7F58820214;
+    address constant GUSD            = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
+    address constant MCD_JOIN_GUSD_A = 0xe29A14bcDeA40d83675aa43B72dF07f649738C8b;
+    address constant MCD_FLIP_GUSD_A = 0xCAa8D152A8b98229fB77A213BE16b234cA4f612f;
+    address constant PIP_GUSD        = 0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -71,234 +60,103 @@ contract SpellAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     uint256 constant FOUR_PERCENT_RATE = 1000000001243680656318820312;
-    uint256 constant FIVE_PERCENT_RATE = 1000000001547125957863212448;
 
     function execute() external {
+        address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
+        address MCD_CAT      = CHANGELOG.getAddress("MCD_CAT");
+        address MCD_JUG      = CHANGELOG.getAddress("MCD_JUG");
+        address MCD_SPOT     = CHANGELOG.getAddress("MCD_SPOT");
+        address MCD_END      = CHANGELOG.getAddress("MCD_END");
+        address FLIPPER_MOM  = CHANGELOG.getAddress("FLIPPER_MOM");
+        //address OSM_MOM      = CHANGELOG.getAddress("OSM_MOM");
+        address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
+
+        // Add the flipper factory to the changelog
+        CHANGELOG.setAddress("FLIP_FAB", FLIP_FAB);
+
+        // Add GUSD contracts to the changelog
+        CHANGELOG.setAddress("GUSD", GUSD);
+        CHANGELOG.setAddress("MCD_JOIN_GUSD_A", MCD_JOIN_GUSD_A);
+        CHANGELOG.setAddress("MCD_FLIP_GUSD_A", MCD_FLIP_GUSD_A);
+        CHANGELOG.setAddress("PIP_GUSD", PIP_GUSD);
+
+        bytes32 ilk = "GUSD-A";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_GUSD_A).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_GUSD_A).ilk() == ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_GUSD_A).gem() == GUSD, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_GUSD_A).dec() == 2, "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_GUSD_A).vat() == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_GUSD_A).cat() == MCD_CAT, "flip-cat-not-match");
+        require(FlipAbstract(MCD_FLIP_GUSD_A).ilk() == ilk, "flip-ilk-not-match");
+
+        // Set the GUSD PIP in the Spotter
+        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_GUSD);
+
+        // Set the GUSD-A Flipper in the Cat
+        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_GUSD_A);
+
+        // Init GUSD-A ilk in Vat & Jug
+        VatAbstract(MCD_VAT).init(ilk);
+        JugAbstract(MCD_JUG).init(ilk);
+
+        // Allow GUSD-A Join to modify Vat registry
+        VatAbstract(MCD_VAT).rely(MCD_JOIN_GUSD_A);
+        // Allow the GUSD-A Flipper to reduce the Cat litterbox on deal()
+        CatAbstract(MCD_CAT).rely(MCD_FLIP_GUSD_A);
+        // Allow Cat to kick auctions in GUSD-A Flipper
+        FlipAbstract(MCD_FLIP_GUSD_A).rely(MCD_CAT);
+        // Allow End to yank auctions in GUSD-A Flipper
+        FlipAbstract(MCD_FLIP_GUSD_A).rely(MCD_END);
+        // Allow FlipperMom to access to the GUSD-A Flipper
+        FlipAbstract(MCD_FLIP_GUSD_A).rely(FLIPPER_MOM);
+        // Disallow Cat to kick auctions in GUSD-A Flipper
+        // !!!!!!!! Only for certain collaterals that do not trigger liquidations like USDC-A)
+        FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_GUSD_A);
+
+        // Allow OsmMom to access to the GUSD Osm
+        // !!!!!!!! Only if PIP_GUSD = Osm and hasn't been already relied due a previous deployed ilk
+        //OsmAbstract(PIP_GUSD).rely(OSM_MOM);
+        // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_GUSD = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
+        //MedianAbstract(OsmAbstract(PIP_GUSD).src()).kiss(PIP_GUSD);
+        // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_GUSD = Osm or PIP_GUSD = Median and hasn't been already whitelisted due a previous deployed ilk
+        //OsmAbstract(PIP_GUSD).kiss(MCD_SPOT);
+        // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_GUSD = Osm or PIP_GUSD = Median and hasn't been already whitelisted due a previous deployed ilk
+        //OsmAbstract(PIP_GUSD).kiss(MCD_END);
+        // Set GUSD Osm in the OsmMom for new ilk
+        // !!!!!!!! Only if PIP_GUSD = Osm
+        //OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_GUSD);
+
         // Set the global debt ceiling
-        // 1476 (current DC) + 4 (BAL-A) + 7 (YFI-A) - 50 (ETH-A decrease) - 10 (ETH-B decrease)
-        // + 40 (WBTC-A increase) + 5 (LINK-A increase) - 7.5 (USDT-A decrease) - 0.75 (MANA-A decrease)
-        VatAbstract(MCD_VAT).file("Line", (1463 * MILLION + 750 * THOUSAND) * RAD);
-
-        // Set the ETH-A debt ceiling
-        //
-        // Existing debt ceiling: 540 million
-        // New debt ceiling: 490 million
-        VatAbstract(MCD_VAT).file("ETH-A", "line", 490 * MILLION * RAD);
-
-        // Set the ETH-B debt ceiling
-        //
-        // Existing debt ceiling: 20 million
-        // New debt ceiling: 10 million
-        VatAbstract(MCD_VAT).file("ETH-B", "line", 10 * MILLION * RAD);
-
-        // Set the WBTC-A debt ceiling
-        //
-        // Existing debt ceiling: 120 million
-        // New debt ceiling: 160 million
-        VatAbstract(MCD_VAT).file("WBTC-A", "line", 160 * MILLION * RAD);
-
-        // Set the MANA-A debt ceiling
-        //
-        // Existing debt ceiling: 1 million
-        // New debt ceiling: 250 thousand
-        VatAbstract(MCD_VAT).file("MANA-A", "line", 250 * THOUSAND * RAD);
-
-        // Set the USDT-A debt ceiling
-        //
-        // Existing debt ceiling: 10 million
-        // New debt ceiling: 2.5 million
-        VatAbstract(MCD_VAT).file("USDT-A", "line", (2 * MILLION + 500 * THOUSAND) * RAD);
-
-        // Set the LINK-A debt ceiling
-        //
-        // Existing debt ceiling: 5 million
-        // New debt ceiling: 10 million
-        VatAbstract(MCD_VAT).file("LINK-A", "line", 10 * MILLION * RAD);
-
-        // Set the ETH-B stability fee
-        //
-        // Previous: 6%
-        // New: 4%
-        JugAbstract(MCD_JUG).drip("ETH-B");
-        JugAbstract(MCD_JUG).file("ETH-B", "duty", FOUR_PERCENT_RATE);
-
-        // Version bump chainlog (due new collateral types)
-        ChainlogAbstract(CHANGELOG).setVersion("1.1.4");
-
-        //
-        // Add BAL-A
-        //
-        bytes32 ilk = "BAL-A";
-
-        // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_BAL_A).vat() == MCD_VAT, "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_BAL_A).ilk() == ilk, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_BAL_A).gem() == BAL, "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_BAL_A).dec() == 18, "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_BAL_A).vat() == MCD_VAT, "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_BAL_A).cat() == MCD_CAT, "flip-cat-not-match");
-        require(FlipAbstract(MCD_FLIP_BAL_A).ilk() == ilk, "flip-ilk-not-match");
-
-        // Add the new flip and join to the Chainlog
-        ChainlogAbstract(CHANGELOG).setAddress("BAL", BAL);
-        ChainlogAbstract(CHANGELOG).setAddress("PIP_BAL", PIP_BAL);
-        ChainlogAbstract(CHANGELOG).setAddress("MCD_JOIN_BAL_A", MCD_JOIN_BAL_A);
-        ChainlogAbstract(CHANGELOG).setAddress("MCD_FLIP_BAL_A", MCD_FLIP_BAL_A);
-
-        // Set the BAL PIP in the Spotter
-        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_BAL);
-
-        // Set the BAL-A Flipper in the Cat
-        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_BAL_A);
-
-        // Init BAL-A ilk in Vat & Jug
-        VatAbstract(MCD_VAT).init(ilk);
-        JugAbstract(MCD_JUG).init(ilk);
-
-        // Allow BAL-A Join to modify Vat registry
-        VatAbstract(MCD_VAT).rely(MCD_JOIN_BAL_A);
-        // Allow the BAL-A Flipper to reduce the Cat litterbox on deal()
-        CatAbstract(MCD_CAT).rely(MCD_FLIP_BAL_A);
-        // Allow Cat to kick auctions in BAL-A Flipper
-        FlipAbstract(MCD_FLIP_BAL_A).rely(MCD_CAT);
-        // Allow End to yank auctions in BAL-A Flipper
-        FlipAbstract(MCD_FLIP_BAL_A).rely(MCD_END);
-        // Allow FlipperMom to access to the BAL-A Flipper
-        FlipAbstract(MCD_FLIP_BAL_A).rely(FLIPPER_MOM);
-        // Disallow Cat to kick auctions in BAL-A Flipper
-        // !!!!!!!! Only for certain collaterals that do not trigger liquidations like USDC-A)
-        // FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_BAL_A);
-
-        // Allow OsmMom to access to the BAL Osm
-        // !!!!!!!! Only if PIP_BAL = Osm and hasn't been already relied due a previous deployed ilk
-        OsmAbstract(PIP_BAL).rely(OSM_MOM);
-        // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_BAL = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
-        MedianAbstract(OsmAbstract(PIP_BAL).src()).kiss(PIP_BAL);
-        // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_BAL = Osm or PIP_BAL = Median and hasn't been already whitelisted due a previous deployed ilk
-        OsmAbstract(PIP_BAL).kiss(MCD_SPOT);
-        // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_BAL = Osm or PIP_BAL = Median and hasn't been already whitelisted due a previous deployed ilk
-        OsmAbstract(PIP_BAL).kiss(MCD_END);
-        // Set BAL Osm in the OsmMom for new ilk
-        // !!!!!!!! Only if PIP_BAL = Osm
-        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_BAL);
-
-        // Set the global debt ceiling (end of spell)
-        // VatAbstract(MCD_VAT).file("Line", 1220 * MILLION * RAD);
-        // Set the BAL-A debt ceiling
-        VatAbstract(MCD_VAT).file(ilk, "line", 4 * MILLION * RAD);
-        // Set the BAL-A dust
+        VatAbstract(MCD_VAT).file("Line", 1_468_750_000 * RAD);
+        // Set the GUSD-A debt ceiling
+        VatAbstract(MCD_VAT).file(ilk, "line", 5 * MILLION * RAD);
+        // Set the GUSD-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
         // Set the Lot size
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
-        // Set the BAL-A liquidation penalty (e.g. 13% => X = 113)
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50000 * RAD);
+        // Set the GUSD-A liquidation penalty (e.g. 13% => X = 113)
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
-        // Set the BAL-A stability fee (e.g. 1% = 1000000000315522921573372069)
-        JugAbstract(MCD_JUG).file(ilk, "duty", FIVE_PERCENT_RATE);
-        // Set the BAL-A percentage between bids (e.g. 3% => X = 103)
-        FlipAbstract(MCD_FLIP_BAL_A).file("beg", 103 * WAD / 100);
-        // Set the BAL-A time max time between bids
-        FlipAbstract(MCD_FLIP_BAL_A).file("ttl", 6 hours);
-        // Set the BAL-A max auction duration to
-        FlipAbstract(MCD_FLIP_BAL_A).file("tau", 6 hours);
-        // Set the BAL-A min collateralization ratio (e.g. 150% => X = 150)
-        SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
-
-        // Update BAL-A spot value in Vat
-        SpotAbstract(MCD_SPOT).poke(ilk);
-
-        // Add new ilk to the IlkRegistry
-        IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_BAL_A);
-
-
-        //
-        // Add YFI-A
-        //
-        ilk = "YFI-A";
-
-        // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_YFI_A).vat() == MCD_VAT, "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_YFI_A).ilk() == ilk, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_YFI_A).gem() == YFI, "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_YFI_A).dec() == 18, "join-dec-not-match");
-        require(FlipAbstract(MCD_FLIP_YFI_A).vat() == MCD_VAT, "flip-vat-not-match");
-        require(FlipAbstract(MCD_FLIP_YFI_A).cat() == MCD_CAT, "flip-cat-not-match");
-        require(FlipAbstract(MCD_FLIP_YFI_A).ilk() == ilk, "flip-ilk-not-match");
-
-        // Add the new flip and join to the Chainlog
-        ChainlogAbstract(CHANGELOG).setAddress("YFI", YFI);
-        ChainlogAbstract(CHANGELOG).setAddress("PIP_YFI", PIP_YFI);
-        ChainlogAbstract(CHANGELOG).setAddress("MCD_JOIN_YFI_A", MCD_JOIN_YFI_A);
-        ChainlogAbstract(CHANGELOG).setAddress("MCD_FLIP_YFI_A", MCD_FLIP_YFI_A);
-
-        // Set the YFI PIP in the Spotter
-        SpotAbstract(MCD_SPOT).file(ilk, "pip", PIP_YFI);
-
-        // Set the YFI-A Flipper in the Cat
-        CatAbstract(MCD_CAT).file(ilk, "flip", MCD_FLIP_YFI_A);
-
-        // Init YFI-A ilk in Vat & Jug
-        VatAbstract(MCD_VAT).init(ilk);
-        JugAbstract(MCD_JUG).init(ilk);
-
-        // Allow YFI-A Join to modify Vat registry
-        VatAbstract(MCD_VAT).rely(MCD_JOIN_YFI_A);
-        // Allow the YFI-A Flipper to reduce the Cat litterbox on deal()
-        CatAbstract(MCD_CAT).rely(MCD_FLIP_YFI_A);
-        // Allow Cat to kick auctions in YFI-A Flipper
-        FlipAbstract(MCD_FLIP_YFI_A).rely(MCD_CAT);
-        // Allow End to yank auctions in YFI-A Flipper
-        FlipAbstract(MCD_FLIP_YFI_A).rely(MCD_END);
-        // Allow FlipperMom to access to the YFI-A Flipper
-        FlipAbstract(MCD_FLIP_YFI_A).rely(FLIPPER_MOM);
-        // Disallow Cat to kick auctions in YFI-A Flipper
-        // !!!!!!!! Only for certain collaterals that do not trigger liquidations like USDC-A)
-        // FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_YFI_A);
-
-        // Allow OsmMom to access to the YFI Osm
-        // !!!!!!!! Only if PIP_YFI = Osm and hasn't been already relied due a previous deployed ilk
-        OsmAbstract(PIP_YFI).rely(OSM_MOM);
-        // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_YFI = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
-        MedianAbstract(OsmAbstract(PIP_YFI).src()).kiss(PIP_YFI);
-        // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_YFI = Osm or PIP_YFI = Median and hasn't been already whitelisted due a previous deployed ilk
-        OsmAbstract(PIP_YFI).kiss(MCD_SPOT);
-        // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
-        // !!!!!!!! Only if PIP_YFI = Osm or PIP_YFI = Median and hasn't been already whitelisted due a previous deployed ilk
-        OsmAbstract(PIP_YFI).kiss(MCD_END);
-        // Set YFI Osm in the OsmMom for new ilk
-        // !!!!!!!! Only if PIP_YFI = Osm
-        OsmMomAbstract(OSM_MOM).setOsm(ilk, PIP_YFI);
-
-        // Set the global debt ceiling (end of spell)
-        // VatAbstract(MCD_VAT).file("Line", 1227 * MILLION * RAD);
-        // Set the YFI-A debt ceiling
-        VatAbstract(MCD_VAT).file(ilk, "line", 7 * MILLION * RAD);
-        // Set the YFI-A dust
-        VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
-        // Set the Lot size
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
-        // Set the YFI-A liquidation penalty (e.g. 13% => X = 113)
-        CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
-        // Set the YFI-A stability fee (e.g. 1% = 1000000000315522921573372069)
+        // Set the GUSD-A stability fee (e.g. 1% = 1000000000315522921573372069)
         JugAbstract(MCD_JUG).file(ilk, "duty", FOUR_PERCENT_RATE);
-        // Set the YFI-A percentage between bids (e.g. 3% => X = 103)
-        FlipAbstract(MCD_FLIP_YFI_A).file("beg", 103 * WAD / 100);
-        // Set the YFI-A time max time between bids
-        FlipAbstract(MCD_FLIP_YFI_A).file("ttl", 6 hours);
-        // Set the YFI-A max auction duration to
-        FlipAbstract(MCD_FLIP_YFI_A).file("tau", 6 hours);
-        // Set the YFI-A min collateralization ratio (e.g. 150% => X = 150)
-        SpotAbstract(MCD_SPOT).file(ilk, "mat", 175 * RAY / 100);
+        // Set the GUSD-A percentage between bids (e.g. 3% => X = 103)
+        FlipAbstract(MCD_FLIP_GUSD_A).file("beg", 103 * WAD / 100);
+        // Set the GUSD-A time max time between bids
+        FlipAbstract(MCD_FLIP_GUSD_A).file("ttl", 6 hours);
+        // Set the GUSD-A max auction duration to
+        FlipAbstract(MCD_FLIP_GUSD_A).file("tau", 6 hours);
+        // Set the GUSD-A min collateralization ratio (e.g. 150% => X = 150)
+        SpotAbstract(MCD_SPOT).file(ilk, "mat", 101 * RAY / 100);
 
-        // Update YFI-A spot value in Vat
+        // Update GUSD-A spot value in Vat
         SpotAbstract(MCD_SPOT).poke(ilk);
 
         // Add new ilk to the IlkRegistry
-        IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_YFI_A);
+        IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_GUSD_A);
     }
 }
 
@@ -314,9 +172,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/8413dc97baa7b6ccb8eb8fb1a007c15741d8d7e4/governance/votes/Executive%20vote%20-%20November%206%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<tbd> -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-11-06 MakerDAO Executive Spell | Hash: 0x958c24628791d50feb4a0c84fcbe4f88e20c8eefc3c1cb3c7e1af21e5388ebba";
+        "2020-11-13 MakerDAO Executive Spell | Hash: 0x0";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
