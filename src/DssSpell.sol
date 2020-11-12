@@ -80,6 +80,8 @@ contract SpellAction {
         CHANGELOG.setAddress("MCD_FLIP_GUSD_A", MCD_FLIP_GUSD_A);
         CHANGELOG.setAddress("PIP_GUSD", PIP_GUSD);
 
+        CHANGELOG.setVersion("1.1.5");
+
         bytes32 ilk = "GUSD-A";
 
         // Sanity checks
