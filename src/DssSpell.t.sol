@@ -746,4 +746,47 @@ contract DssSpellTest is DSTest, DSMath {
         //cat.bite("GUSD-A", address(this));  // liquidatons off
         //assertEq(flipGUSDA.kicks(), 1);
     }
+
+    function testFail_GUSD_liquidations() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        //pipGUSD.poke();
+        hevm.warp(now + 3601);
+        //pipGUSD.poke();
+        spot.poke("GUSD-A");
+
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
+
+        hevm.store(
+            address(gusd_store),
+            keccak256(abi.encode(address(this), uint256(6))),
+            bytes32(ilkAmt)
+        );
+        assertEq(gusd.balanceOf(address(this)), ilkAmt);
+
+        // Check median matches pip.src()
+        //assertEq(pipGUSD.src(), address(medGUSDA));
+
+        // Authorization
+        assertEq(joinGUSDA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinGUSDA)), 1);
+        assertEq(flipGUSDA.wards(address(end)), 1);
+        assertEq(flipGUSDA.wards(address(flipMom)), 1);
+
+
+        // Generate new DAI to force a liquidation
+        gusd.approve(address(joinGUSDA), ilkAmt);
+        joinGUSDA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("GUSD-A");
+        // dart max amount of DAI
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(mul(ilkAmt * 10**16, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("GUSD-A");
+        assertEq(flipGUSDA.kicks(), 0);
+
+        cat.bite("GUSD-A", address(this));  // fail here
+    }
 }
