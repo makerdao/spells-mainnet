@@ -666,6 +666,18 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
+    function testChainlogValues() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        assertEq(chainlog.getAddress("FLIP_FAB"), 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b);
+        assertEq(chainlog.getAddress("GUSD"), 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd);
+        assertEq(chainlog.getAddress("MCD_JOIN_GUSD_A"), 0xe29A14bcDeA40d83675aa43B72dF07f649738C8b);
+        assertEq(chainlog.getAddress("MCD_FLIP_GUSD_A"), 0xCAa8D152A8b98229fB77A213BE16b234cA4f612f);
+        assertEq(chainlog.getAddress("PIP_GUSD"), 0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5);
+    }
+
     function testSpellIsCast_GUSD_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
