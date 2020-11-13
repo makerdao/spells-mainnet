@@ -140,7 +140,7 @@ contract SpellAction {
         // Set the GUSD-A dust
         VatAbstract(MCD_VAT).file(ilk, "dust", 100 * RAD);
         // Set the Lot size
-        CatAbstract(MCD_CAT).file(ilk, "dunk", 50000 * RAD);
+        CatAbstract(MCD_CAT).file(ilk, "dunk", 50 * THOUSAND * RAD);
         // Set the GUSD-A liquidation penalty (e.g. 13% => X = 113)
         CatAbstract(MCD_CAT).file(ilk, "chop", 113 * WAD / 100);
         // Set the GUSD-A stability fee (e.g. 1% = 1000000000315522921573372069)
