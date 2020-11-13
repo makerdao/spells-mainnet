@@ -690,6 +690,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Add balance to the test address
         uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
+        uint256 ilkAmt18 = ilkAmt * 10**16;
 
         hevm.store(
             address(gusd_store),
@@ -716,17 +717,17 @@ contract DssSpellTest is DSTest, DSMath {
         gusd.approve(address(joinGUSDA), ilkAmt);
         joinGUSDA.join(address(this), ilkAmt);
         assertEq(gusd.balanceOf(address(this)), 0);
-        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt * 10**16);
+        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt18);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(100 * WAD));
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(100 * WAD));
         assertEq(vat.gem("GUSD-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("GUSD-A", address(this), address(this), address(this), -int(ilkAmt * 10**16), -int(100 * WAD));
-        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt * 10**16);
+        vat.frob("GUSD-A", address(this), address(this), address(this), -int(ilkAmt18), -int(100 * WAD));
+        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt18);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
@@ -739,7 +740,7 @@ contract DssSpellTest is DSTest, DSMath {
         joinGUSDA.join(address(this), ilkAmt);
         (,,uint256 spotV,,) = vat.ilks("GUSD-A");
         // dart max amount of DAI
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(mul(ilkAmt * 10**16, spotV) / RAY));
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip("GUSD-A");
         assertEq(flipGUSDA.kicks(), 0);
@@ -759,6 +760,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Add balance to the test address
         uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
+        uint256 ilkAmt18 = ilkAmt * 10**16;
 
         hevm.store(
             address(gusd_store),
@@ -782,7 +784,7 @@ contract DssSpellTest is DSTest, DSMath {
         joinGUSDA.join(address(this), ilkAmt);
         (,,uint256 spotV,,) = vat.ilks("GUSD-A");
         // dart max amount of DAI
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt * 10**16), int(mul(ilkAmt * 10**16, spotV) / RAY));
+        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip("GUSD-A");
         assertEq(flipGUSDA.kicks(), 0);
