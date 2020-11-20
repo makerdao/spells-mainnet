@@ -19,11 +19,16 @@ interface MedianizerV1Abstract {
     function poke() external;
 }
 
+interface SpellLike {
+    function done() external view returns (bool);
+    function cast() external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xa24311446583f22432b335B53282CF8ecbfBC7A9);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1605283866;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -81,14 +86,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
-    // GUSD-A specific
-    DSTokenAbstract       gusd = DSTokenAbstract(    0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd);
-    DSTokenAbstract gusd_store = DSTokenAbstract(    0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0);
-    GemJoinAbstract  joinGUSDA = GemJoinAbstract(    0xe29A14bcDeA40d83675aa43B72dF07f649738C8b);
-    OsmAbstract        pipGUSD = OsmAbstract(        0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5);
-    FlipAbstract     flipGUSDA = FlipAbstract(       0xCAa8D152A8b98229fB77A213BE16b234cA4f612f);
-    //MedianAbstract    medGUSDA = MedianAbstract(     0);
-
+    
 
     DssSpell spell;
 
@@ -132,6 +130,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
       }
     }
+
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
@@ -147,9 +146,21 @@ contract DssSpellTest is DSTest, DSMath {
         return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
+    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
+    SpellLike constant PREV_SPELL = SpellLike(0xa24311446583f22432b335B53282CF8ecbfBC7A9);
+
+    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
+    uint256   constant PREV_SPELL_EXECUTION_TIME = 1606140000;
+
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
         rates = new Rates();
+
+        // warp and cast previous spell so values are up-to-date to test against
+        if (PREV_SPELL != SpellLike(0) && !PREV_SPELL.done()) {
+            hevm.warp(PREV_SPELL_EXECUTION_TIME);
+            PREV_SPELL.cast();
+        }
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -158,7 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              146875 * MILLION / 100,  // In whole Dai units
+            vat_Line:              148175 * MILLION / 100,  // In whole Dai units
             pause_delay:           72 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -176,7 +187,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             line:         490 * MILLION,   // In whole Dai units
-            dust:         100,             // In whole Dai units
+            dust:         500,             // In whole Dai units
             pct:          200,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
@@ -188,7 +199,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
             line:         10 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -200,7 +211,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
             line:         10 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -212,8 +223,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
             line:         485 * MILLION,
-            dust:         100,
-            pct:          400,
+            dust:         500,
+            pct:          100,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -224,7 +235,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             line:         30 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          5000,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -236,7 +247,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             line:         160 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -248,8 +259,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
             line:         135 * MILLION,
-            dust:         100,
-            pct:          400,
+            dust:         500,
+            pct:          100,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -260,7 +271,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             line:         5 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -272,7 +283,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             line:         5 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -284,7 +295,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             line:         250 * THOUSAND,
-            dust:         100,
+            dust:         500,
             pct:          1200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -296,7 +307,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
             line:         25 * MILLION / 10,
-            dust:         100,
+            dust:         500,
             pct:          800,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -308,8 +319,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
             line:         100 * MILLION,
-            dust:         100,
-            pct:          400,
+            dust:         500,
+            pct:          100,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -320,7 +331,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
             line:         7 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -332,7 +343,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
             line:         3 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -344,7 +355,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
             line:         10 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -356,7 +367,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["BAL-A"] = CollateralValues({
             line:         4 * MILLION,
-            dust:         100,
+            dust:         500,
             pct:          500,
             chop:         1300,
             dunk:         50000,
@@ -367,8 +378,8 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
-            line:         7 * MILLION,
-            dust:         100,
+            line:         20 * MILLION,
+            dust:         500,
             pct:          400,
             chop:         1300,
             dunk:         50000,
@@ -380,8 +391,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
             line:         5 * MILLION,
-            dust:         100,
-            pct:          400,
+            dust:         500,
+            pct:          100,
             chop:         1300,
             dunk:         50000,
             mat:          10100,
@@ -629,20 +640,20 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, values.vat_Line);
     }
 
-    function testFailWrongDay() public {
-        vote();
-        scheduleWaitAndCastFailDay();
-    }
+//    function testFailWrongDay() public {
+//        vote();
+//        scheduleWaitAndCastFailDay();
+//    }
 
-    function testFailTooEarly() public {
-        vote();
-        scheduleWaitAndCastFailEarly();
-    }
+//    function testFailTooEarly() public {
+//        vote();
+//        scheduleWaitAndCastFailEarly();
+//    }
 
-    function testFailTooLate() public {
-        vote();
-        scheduleWaitAndCastFailLate();
-    }
+//    function testFailTooLate() public {
+//        vote();
+//        scheduleWaitAndCastFailLate();
+//    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
@@ -664,131 +675,5 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-    }
-
-    function testChainlogValues() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        assertEq(chainlog.getAddress("FLIP_FAB"), 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b);
-        assertEq(chainlog.getAddress("GUSD"), 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd);
-        assertEq(chainlog.getAddress("MCD_JOIN_GUSD_A"), 0xe29A14bcDeA40d83675aa43B72dF07f649738C8b);
-        assertEq(chainlog.getAddress("MCD_FLIP_GUSD_A"), 0xCAa8D152A8b98229fB77A213BE16b234cA4f612f);
-        assertEq(chainlog.getAddress("PIP_GUSD"), 0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5);
-    }
-
-    function testSpellIsCast_GUSD_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        //pipGUSD.poke();
-        hevm.warp(now + 3601);
-        //pipGUSD.poke();
-        spot.poke("GUSD-A");
-
-        // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
-        uint256 ilkAmt18 = ilkAmt * 10**16;
-
-        hevm.store(
-            address(gusd_store),
-            keccak256(abi.encode(address(this), uint256(6))),
-            bytes32(ilkAmt)
-        );
-        assertEq(gusd.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        //assertEq(pipGUSD.src(), address(medGUSDA));
-
-        // Authorization
-        assertEq(joinGUSDA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinGUSDA)), 1);
-        assertEq(flipGUSDA.wards(address(end)), 1);
-        assertEq(flipGUSDA.wards(address(flipMom)), 1);
-        //assertEq(pipGUSD.wards(address(osmMom)), 1);
-        //assertEq(pipGUSD.bud(address(spot)), 1);
-        //assertEq(pipGUSD.bud(address(end)), 1);
-        //assertEq(MedianAbstract(pipGUSD.src()).bud(address(pipGUSD)), 1);
-
-        // Join to adapter
-        assertEq(vat.gem("GUSD-A", address(this)), 0);
-        gusd.approve(address(joinGUSDA), ilkAmt);
-        joinGUSDA.join(address(this), ilkAmt);
-        assertEq(gusd.balanceOf(address(this)), 0);
-        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt18);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(100 * WAD));
-        assertEq(vat.gem("GUSD-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("GUSD-A", address(this), address(this), address(this), -int(ilkAmt18), -int(100 * WAD));
-        assertEq(vat.gem("GUSD-A", address(this)), ilkAmt18);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinGUSDA.exit(address(this), ilkAmt);
-        assertEq(gusd.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("GUSD-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        gusd.approve(address(joinGUSDA), ilkAmt);
-        joinGUSDA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("GUSD-A");
-        // dart max amount of DAI
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("GUSD-A");
-        assertEq(flipGUSDA.kicks(), 0);
-        //cat.bite("GUSD-A", address(this));  // liquidatons off
-        //assertEq(flipGUSDA.kicks(), 1);
-    }
-
-    function testFail_GUSD_liquidations() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        //pipGUSD.poke();
-        hevm.warp(now + 3601);
-        //pipGUSD.poke();
-        spot.poke("GUSD-A");
-
-        // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * 100;  // GUSD has 2 decimals
-        uint256 ilkAmt18 = ilkAmt * 10**16;
-
-        hevm.store(
-            address(gusd_store),
-            keccak256(abi.encode(address(this), uint256(6))),
-            bytes32(ilkAmt)
-        );
-        assertEq(gusd.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        //assertEq(pipGUSD.src(), address(medGUSDA));
-
-        // Authorization
-        assertEq(joinGUSDA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinGUSDA)), 1);
-        assertEq(flipGUSDA.wards(address(end)), 1);
-        assertEq(flipGUSDA.wards(address(flipMom)), 1);
-
-
-        // Generate new DAI to force a liquidation
-        gusd.approve(address(joinGUSDA), ilkAmt);
-        joinGUSDA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("GUSD-A");
-        // dart max amount of DAI
-        vat.frob("GUSD-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("GUSD-A");
-        assertEq(flipGUSDA.kicks(), 0);
-
-        cat.bite("GUSD-A", address(this));  // fail here
     }
 }
