@@ -75,9 +75,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<hash>/governance/votes/Executive%20vote%20-%20November%2020%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/aa1ccb0c0dea66c66a2fd7fba687b0b9e0478098/governance/votes/Executive%20vote%20-%20November%2020%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-11-20 MakerDAO Executive Spell | Hash: ";
+        "2020-11-20 MakerDAO Executive Spell | Hash: 0x132a0053c544cbc2772e17d62b7b1ddcfa0074cc8132597378cc9846168822f5";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
