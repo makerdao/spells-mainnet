@@ -16,7 +16,6 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
@@ -44,14 +43,9 @@ contract SpellAction {
     //
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-//    uint256 constant ZERO_PERCENT_RATE = 1000000000000000000000000000;
-    uint256 constant ONE_PERCENT_RATE = 1000000000315522921573372069;
-//    uint256 constant TWO_PERCENT_RATE = 1000000000627937192491029810;
-//    uint256 constant THREE_PERCENT_RATE = 1000000000937303470807876289;
 
     function execute() external {
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
-        address MCD_JUG      = CHANGELOG.getAddress("MCD_JUG");
         address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
 
         // Set the global debt ceiling
@@ -66,19 +60,6 @@ contract SpellAction {
         for (uint256 i = 0; i < ilks.length; i++) {
             VatAbstract(MCD_VAT).file(ilks[i], "dust", 500 * RAD);
         }
-
-        // Set stablecoin fees to ????
-        JugAbstract(MCD_JUG).drip("USDC-A");
-        JugAbstract(MCD_JUG).file("USDC-A",   "duty", ONE_PERCENT_RATE);
-
-        JugAbstract(MCD_JUG).drip("TUSD-A");
-        JugAbstract(MCD_JUG).file("TUSD-A",   "duty", ONE_PERCENT_RATE);
-
-        JugAbstract(MCD_JUG).drip("PAXUSD-A");
-        JugAbstract(MCD_JUG).file("PAXUSD-A", "duty", ONE_PERCENT_RATE);
-
-        JugAbstract(MCD_JUG).drip("GUSD-A");
-        JugAbstract(MCD_JUG).file("GUSD-A",   "duty", ONE_PERCENT_RATE);
     }
 }
 

@@ -224,7 +224,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["USDC-A"] = CollateralValues({
             line:         485 * MILLION,
             dust:         500,
-            pct:          100,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -260,7 +260,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
             line:         135 * MILLION,
             dust:         500,
-            pct:          100,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -320,7 +320,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
             line:         100 * MILLION,
             dust:         500,
-            pct:          100,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -392,7 +392,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
             line:         5 * MILLION,
             dust:         500,
-            pct:          100,
+            pct:          400,
             chop:         1300,
             dunk:         50000,
             mat:          10100,
