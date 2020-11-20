@@ -73,6 +73,9 @@ contract DssSpell {
     uint256         public expiration;
     bool            public done;
 
+    // Office hours enabled if true
+    bool   constant public officeHours = false;
+
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/aa1ccb0c0dea66c66a2fd7fba687b0b9e0478098/governance/votes/Executive%20vote%20-%20November%2020%2C%202020.md -q -O - 2>/dev/null)"
@@ -89,11 +92,13 @@ contract DssSpell {
         expiration = now + 30 days;
     }
 
-    modifier officeHours {
-        uint day = (now / 1 days + 3) % 7;
-        require(day < 5, "Can only be cast on a weekday");
-        uint hour = now / 1 hours % 24;
-        require(hour >= 14 && hour < 21, "Outside office hours");
+    modifier limited {
+        if (officeHours) {
+            uint day = (now / 1 days + 3) % 7;
+            require(day < 5, "Can only be cast on a weekday");
+            uint hour = now / 1 hours % 24;
+            require(hour >= 14 && hour < 21, "Outside office hours");
+        }
         _;
     }
 
@@ -104,7 +109,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public /* officeHours */ {
+    function cast() public limited {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
