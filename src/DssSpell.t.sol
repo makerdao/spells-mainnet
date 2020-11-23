@@ -152,15 +152,17 @@ contract DssSpellTest is DSTest, DSMath {
     // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
     uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
 
-    function setUp() public {
-        hevm = Hevm(address(CHEAT_CODE));
-        rates = new Rates();
-
+    function castPreviousSpell() internal {
         // warp and cast previous spell so values are up-to-date to test against
         if (PREV_SPELL != SpellLike(0) && !PREV_SPELL.done()) {
             hevm.warp(PREV_SPELL_EXECUTION_TIME);
             PREV_SPELL.cast();
         }
+    }
+
+    function setUp() public {
+        hevm = Hevm(address(CHEAT_CODE));
+        rates = new Rates();
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -482,6 +484,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         hevm.warp(castTime);
         spell.cast();
+
+        castPreviousSpell();
     }
 
     function stringToBytes32(string memory source) public pure returns (bytes32 result) {
