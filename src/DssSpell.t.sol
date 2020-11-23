@@ -446,8 +446,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = now + pause.delay() + 24 hours;
         uint256 hour = castTime / 1 hours % 24;
-        if (hour >= 14) {
-            castTime -= hour * 3600 - 13 hours;
+        if (hour >= 15) {
+            castTime -= hour * 3600 - 14 hours;
         }
 
         hevm.warp(castTime);
@@ -459,8 +459,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = now + pause.delay();
         uint256 hour = castTime / 1 hours % 24;
-        if (hour < 21) {
-            castTime += 21 hours - hour * 3600;
+        if (hour < 22) {
+            castTime += 22 hours - hour * 3600;
         }
 
         hevm.warp(castTime);
@@ -502,10 +502,10 @@ contract DssSpellTest is DSTest, DSMath {
             }
 
             uint256 hour = castTime / 1 hours % 24;
-            if (hour >= 21) {
-                castTime += 24 hours - hour * 3600 + 14 hours;
-            } else if (hour < 14) {
-                castTime += 14 hours - hour * 3600;
+            if (hour >= 22) {
+                castTime += 24 hours - hour * 3600 + 15 hours;
+            } else if (hour < 15) {
+                castTime += 15 hours - hour * 3600;
             }
         }
 
@@ -672,20 +672,25 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, values.vat_Line);
     }
 
-    function testFailWrongDay() public {
-        vote();
-        scheduleWaitAndCastFailDay();
-    }
+   function testFailWrongDay() public {
+       vote();
+       scheduleWaitAndCastFailDay();
+   }
 
-    function testFailTooEarly() public {
-        vote();
-        scheduleWaitAndCastFailEarly();
-    }
+   function testFailTooEarly() public {
+       vote();
+       scheduleWaitAndCastFailEarly();
+   }
 
-    function testFailTooLate() public {
-        vote();
-        scheduleWaitAndCastFailLate();
-    }
+   function testFailTooLate() public {
+       vote();
+       scheduleWaitAndCastFailLate();
+   }
+
+   function testOnTime() public {
+       vote();
+       scheduleWaitAndCast();
+   }
 
     // function testSpellIsCast() public {
     //     string memory description = new DssSpell().description();
