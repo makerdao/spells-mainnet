@@ -72,31 +72,31 @@ contract DssSpell {
         "2020-11-23 MakerDAO Executive Spell | Hash: 0x3567e2282249022428233fe24a48a25ebc34468f2183869109f2bd590f48ef28";
 
     // MIP24: Emergency Voting System
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP24/mip24.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP24/mip24.md -q -O - 2>/dev/null)"
     string constant public MIP24 = "0x6d39f78a3343fb030da792962abdd12ca1b0c9384b92f496e8a070e97cf3c1c6";
 
     // MIP25: Flash Mint Module
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP25/mip25.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP25/mip25.md -q -O - 2>/dev/null)"
     string constant public MIP25 = "0xd2550d2b15464b6bf3e49bc424a85e6411abf27e72247c4325f6d9b2ba4d9100";
 
     // MIP27: Debt Ceiling Instant Access Module
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP27/mip27.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP27/mip27.md -q -O - 2>/dev/null)"
     string constant public MIP27 = "0x2848c1ef785a2182d9ccd7171e90eba847330f3da2106500f0f3e097a3bf5553";
 
     // MIP28: Operational Support Domain Definition
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP28/mip28.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP28/mip28.md -q -O - 2>/dev/null)"
     string constant public MIP28 = "0x63aa04048b723e496190b080d9d25e1ba90c7d8eeb9060404ca50d665506e915";
 
     // MIP4c2-SP6: Calendar Exceptions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP4/MIP4c2-Subproposals/MIP4c2-SP6.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP4/MIP4c2-Subproposals/MIP4c2-SP6.md -q -O - 2>/dev/null)"
     string constant public MIP4c2SP6 = "0xab503375dd94caebafadf3a7eed7809cca49441877cc22056645d6cc94ba4105";
 
     // MIP13c3-SP6: SourceCred Funding
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP13/MIP13c3-Subproposals/MIP13c3-SP6.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP13/MIP13c3-Subproposals/MIP13c3-SP6.md -q -O - 2>/dev/null)"
     string constant public MIP13c3SP6 = "0xe76bd18dfb2eb9aa893e81d4bfa6703e71f17954e4c4800937c672aa6d8b84f6";
 
     // MIP28c7-SP1: Subproposal for Operational Support Domain Facilitator Onboarding
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/e9d0aad1e1fcfafbf21b3358dc778cfc3638a011/MIP28/MIP28c7-Subproposals/MIP28c7-SP1.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP28/MIP28c7-Subproposals/MIP28c7-SP1.md -q -O - 2>/dev/null)"
     string constant public MIP28c7SP1 = "0x685efd19c76135ad5f3313b28c556e5c918ad5e121b11ddd9a60c793ad78cc94";
 
     constructor() public {
