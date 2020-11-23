@@ -119,14 +119,14 @@ contract DssSpell {
         require(eta != 0, "Spell not scheduled");
         uint256 castTime = now > eta ? now : eta;
 
-        if(officeHours) {
+        if (officeHours) {
             uint256 day    = (castTime / 1 days + 3) % 7;
             uint256 hour   = castTime / 1 hours % 24;
             uint256 minute = castTime / 1 minutes % 60;
             uint256 second = castTime % 60;
 
-            if(day >= 5) castTime += 7 days - day * 86400;
-            
+            if (day >= 5) castTime += 7 days - day * 86400;
+
             if (hour >= 22) {
                 castTime += 24 hours - hour * 3600 + 15 hours; // Go to 10am next day
                 castTime -= minute * 60 + second;              // 10am on the hour
