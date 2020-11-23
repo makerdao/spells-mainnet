@@ -687,26 +687,71 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCastFailLate();
     }
 
-    function testSpellIsCast() public {
-        string memory description = new DssSpell().description();
-        assertTrue(bytes(description).length > 0);
-        // DS-Test can't handle strings directly, so cast to a bytes32.
-        assertEq(stringToBytes32(spell.description()),
-                stringToBytes32(description));
+    // function testSpellIsCast() public {
+    //     string memory description = new DssSpell().description();
+    //     assertTrue(bytes(description).length > 0);
+    //     // DS-Test can't handle strings directly, so cast to a bytes32.
+    //     assertEq(stringToBytes32(spell.description()),
+    //             stringToBytes32(description));
 
-        if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
-        } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
-        }
+    //     if(address(spell) != address(MAINNET_SPELL)) {
+    //         assertEq(spell.expiration(), (now + 4 days + 2 hours));
+    //     } else {
+    //         assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+    //     }
+
+    //     vote();
+    //     scheduleWaitAndCast();
+    //     assertTrue(spell.done());
+
+    //     checkSystemValues(afterSpell);
+
+    //     checkCollateralValues(afterSpell);
+    // }
+
+    function test_nextCastTime() public {
+        hevm.warp(1606161600); // Nov 23, 3:00pm (could be cast Nov 26)
 
         vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
+        spell.schedule();
 
-        checkSystemValues(afterSpell);
+        uint256 monday_10am  = 1606748400; // Nov 30
 
-        checkCollateralValues(afterSpell);
+        /*** Day tests */
+        hevm.warp(monday_10am - 1 days); // Sunday, 10am
+        assertEq(spell.nextCastTime(), monday_10am);
+
+        hevm.warp(monday_10am - 2 days); // Saturday, 10am
+        assertEq(spell.nextCastTime(), monday_10am);
+
+        hevm.warp(monday_10am - 3 days); // Friday, 10am
+        assertEq(spell.nextCastTime(), monday_10am - 3 days); // Able to cast
+
+        /*** Time tests ***/
+        uint256 castTime;
+
+        for(uint i = 0; i < 5; i++) {
+            castTime = monday_10am + i * 1 days; // Next day at 10am
+            hevm.warp(castTime - 1 seconds); // 9:59am
+            assertEq(spell.nextCastTime(), castTime);
+
+            hevm.warp(castTime + 7 hours + 1 seconds); // 5:01pm
+            assertEq(spell.nextCastTime(), monday_10am + (i + 1) * 1 days); // Next day at 10am
+        }
+    }
+
+    function testFail_notScheduled() public {
+        spell.nextCastTime();
+    }
+
+    function test_use_eta() public {
+        hevm.warp(1606161600); // Nov 23, 3pm (could be cast Nov 26)
+
+        vote();
+        spell.schedule();
+
+        uint castTime = spell.nextCastTime();
+        assertEq(castTime, spell.eta()); // Nov 26, 3pm
     }
 
     function testRootExecuteSpell() public {
