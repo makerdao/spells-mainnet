@@ -2,7 +2,7 @@
 
 # Contribution Checklist
 
-- [ ] First commit title starts with 'SC-**TICKET_NUMBER**:'
+- [ ] PR title ends with `(SC-<TICKET_NUMBER>)`
 - [ ] Link to clubhouse ticket
 - [ ] Code approved
 - [ ] Tests approved
