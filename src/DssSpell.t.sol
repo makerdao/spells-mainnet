@@ -4,7 +4,7 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
-import "./test/addresses.sol";
+import "./test/addresses_mainnet.sol";
 
 import {DssSpell, SpellAction} from "./DssSpell.sol";
 
