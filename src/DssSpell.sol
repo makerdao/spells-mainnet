@@ -16,9 +16,7 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 
 contract SpellAction {
     // MAINNET ADDRESSES
@@ -45,21 +43,9 @@ contract SpellAction {
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
 
     function execute() external {
-        address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
-        address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
-
-        // Set the global debt ceiling
-        // 1,468,750,000 (DC after 11-13 spell executes) + 13 (YFI-A increase)
-        VatAbstract(MCD_VAT).file("Line", 1_481_750_000 * RAD);
-
-        // Increase YFI debt ceiling to 20MM
-        VatAbstract(MCD_VAT).file("YFI-A", "line", 20 * MILLION * RAD);
-
-        // Set dust to 500 DAI
-        bytes32[] memory ilks = IlkRegistryAbstract(ILK_REGISTRY).list();
-        for (uint256 i = 0; i < ilks.length; i++) {
-            VatAbstract(MCD_VAT).file(ilks[i], "dust", 500 * RAD);
-        }
+        // Proving the Pause Proxy has access to the MCD core system at the execution time
+        address MCD_VAT = CHANGELOG.getAddress("MCD_VAT");
+        require(VatAbstract(MCD_VAT).wards(address(this)) == 1, "no-access");
     }
 }
 
@@ -78,9 +64,37 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/aa1ccb0c0dea66c66a2fd7fba687b0b9e0478098/governance/votes/Executive%20vote%20-%20November%2020%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a7c8ddb3f8d8ea71cb123b9aa45d9d7eaed8d6f0/governance/votes/Executive%20vote%20-%20November%2023%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-11-20 MakerDAO Executive Spell | Hash: 0x132a0053c544cbc2772e17d62b7b1ddcfa0074cc8132597378cc9846168822f5";
+        "2020-11-23 MakerDAO Executive Spell | Hash: 0x3567e2282249022428233fe24a48a25ebc34468f2183869109f2bd590f48ef28";
+
+    // MIP24: Emergency Voting System
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5f81894b407c26373391fe6c18803eb832944d3a/MIP24/mip24.md -q -O - 2>/dev/null)"
+    string constant public MIP24 = "0x6d39f78a3343fb030da792962abdd12ca1b0c9384b92f496e8a070e97cf3c1c6";
+
+    // MIP25: Flash Mint Module
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/bda3f65b83668f2025e69be7897a48cb23af0bd9/MIP25/mip25.md -q -O - 2>/dev/null)"
+    string constant public MIP25 = "0xd2550d2b15464b6bf3e49bc424a85e6411abf27e72247c4325f6d9b2ba4d9100";
+
+    // MIP27: Debt Ceiling Instant Access Module
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c3d5f1dc77c48b858794c2308e630a4c98f7a8e4/MIP27/mip27.md -q -O - 2>/dev/null)"
+    string constant public MIP27 = "0x2848c1ef785a2182d9ccd7171e90eba847330f3da2106500f0f3e097a3bf5553";
+
+    // MIP28: Operational Support Domain Definition
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5f81894b407c26373391fe6c18803eb832944d3a/MIP28/mip28.md -q -O - 2>/dev/null)"
+    string constant public MIP28 = "0x63aa04048b723e496190b080d9d25e1ba90c7d8eeb9060404ca50d665506e915";
+
+    // MIP4c2-SP6: Calendar Exceptions
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5f81894b407c26373391fe6c18803eb832944d3a/MIP4/MIP4c2-Subproposals/MIP4c2-SP6.md -q -O - 2>/dev/null)"
+    string constant public MIP4c2SP6 = "0xab503375dd94caebafadf3a7eed7809cca49441877cc22056645d6cc94ba4105";
+
+    // MIP13c3-SP6: SourceCred Funding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5f81894b407c26373391fe6c18803eb832944d3a/MIP13/MIP13c3-Subproposals/MIP13c3-SP6.md -q -O - 2>/dev/null)"
+    string constant public MIP13c3SP6 = "0xe76bd18dfb2eb9aa893e81d4bfa6703e71f17954e4c4800937c672aa6d8b84f6";
+
+    // MIP28c7-SP1: Subproposal for Operational Support Domain Facilitator Onboarding
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5f81894b407c26373391fe6c18803eb832944d3a/MIP28/MIP28c7-Subproposals/MIP28c7-SP1.md -q -O - 2>/dev/null)"
+    string constant public MIP28c7SP1 = "0x685efd19c76135ad5f3313b28c556e5c918ad5e121b11ddd9a60c793ad78cc94";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");

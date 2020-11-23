@@ -26,9 +26,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x8D602692eE4b5f0ec33A22fe6547822377FDCc4c);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1605888114;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -147,10 +147,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    SpellLike constant PREV_SPELL = SpellLike(0xa24311446583f22432b335B53282CF8ecbfBC7A9);
+    SpellLike constant PREV_SPELL = SpellLike(0x8D602692eE4b5f0ec33A22fe6547822377FDCc4c);
 
     // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256   constant PREV_SPELL_EXECUTION_TIME = 1606140000;
+    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
