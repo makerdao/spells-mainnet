@@ -104,7 +104,7 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = now + 4 days + 2 hours;
     }
 
     modifier limited {
