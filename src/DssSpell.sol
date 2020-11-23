@@ -375,7 +375,36 @@ contract DssSpell {
         address _action = action;
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = now + 4 days + 2 hours;
+    }
+
+    modifier limited {
+        require(nextCastTime() == now, "Outside office hours");
+        _;
+    }
+
+    function nextCastTime() public returns (uint256) {
+        require(eta != 0, "Spell not scheduled");
+        uint256 castTime = now > eta ? now : eta;
+
+        if(officeHours) {
+            uint256 day    = (castTime / 1 days + 3) % 7;
+            uint256 hour   = castTime / 1 hours % 24;
+            uint256 minute = castTime / 1 minutes % 60;
+            uint256 second = castTime % 60;
+
+            if(day >= 5) castTime += 7 days - day * 86400;
+            
+            if (hour >= 22) {
+                castTime += 24 hours - hour * 3600 + 15 hours; // Go to 10am next day
+                castTime -= minute * 60 + second;              // 10am on the hour
+            }
+            else if (hour < 15) {
+                castTime += 15 hours - hour * 3600; // Go to 10am same day
+                castTime -= minute * 60 + second;   // 10am on the hour
+            }
+        }
+        return castTime;
     }
 
     function schedule() external {
