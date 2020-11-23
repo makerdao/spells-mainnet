@@ -65,28 +65,26 @@ contract DssSpellTest is DSTest, DSMath {
     Rates rates;
 
     // MAINNET ADDRESSES
-    DSPauseAbstract      pause = DSPauseAbstract(    0xbE286431454714F511008713973d3B053A2d38f3);
-    address         pauseProxy =                     0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
-    DSChiefAbstract      chief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
-    VatAbstract            vat = VatAbstract(        0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
-    VowAbstract            vow = VowAbstract(        0xA950524441892A31ebddF91d3cEEFa04Bf454466);
-    CatAbstract            cat = CatAbstract(        0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea);
-    PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
-    JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
-    SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
+    ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
-    DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
-    EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
-    IlkRegistryAbstract    reg = IlkRegistryAbstract(0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24);
+    DSPauseAbstract      pause = DSPauseAbstract(    CHANGELOG.getAddress("MCD_PAUSE"));
+    address         pauseProxy =                     CHANGELOG.getAddress("MCD_PAUSE_PROXY");
+    DSChiefAbstract      chief = DSChiefAbstract(    CHANGELOG.getAddress("MCD_ADM"));
+    VatAbstract            vat = VatAbstract(        CHANGELOG.getAddress("MCD_VAT"));
+    VowAbstract            vow = VowAbstract(        CHANGELOG.getAddress("MCD_VOW"));
+    CatAbstract            cat = CatAbstract(        CHANGELOG.getAddress("MCD_CAT"));
+    PotAbstract            pot = PotAbstract(        CHANGELOG.getAddress("MCD_POT"));
+    JugAbstract            jug = JugAbstract(        CHANGELOG.getAddress("MCD_JUG"));
+    SpotAbstract          spot = SpotAbstract(       CHANGELOG.getAddress("MCD_SPOT"));
 
-    OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
-    FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
+    DSTokenAbstract        gov = DSTokenAbstract(    CHANGELOG.getAddress("MCD_GOV"));
+    EndAbstract            end = EndAbstract(        CHANGELOG.getAddress("MCD_END"));
+    IlkRegistryAbstract    reg = IlkRegistryAbstract(CHANGELOG.getAddress("ILK_REGISTRY"));
 
-    ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    OsmMomAbstract      osmMom = OsmMomAbstract(     CHANGELOG.getAddress("OSM_MOM"));
+    FlipperMomAbstract flipMom = FlipperMomAbstract( CHANGELOG.getAddress("FLIPPER_MOM"));
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
-
-    
 
     DssSpell spell;
 

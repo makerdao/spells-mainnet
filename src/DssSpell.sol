@@ -51,8 +51,10 @@ contract SpellAction {
 }
 
 contract DssSpell {
-    DSPauseAbstract public pause =
-        DSPauseAbstract(0xbE286431454714F511008713973d3B053A2d38f3);
+    ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    address MCD_PAUSE = CHANGELOG.getAddress("MCD_PAUSE");
+
+    DSPauseAbstract public pause = DSPauseAbstract(MCD_PAUSE);
     address         public action;
     bytes32         public tag;
     uint256         public eta;
