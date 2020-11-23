@@ -26,9 +26,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0xA2652eb43674bc9cfC517a6FA4CEcE391e29c2d3);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 0;
+    uint256 constant SPELL_CREATED = 1606152054;
 
     struct CollateralValues {
         uint256 line;
