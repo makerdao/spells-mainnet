@@ -546,8 +546,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = now + pause.delay() + 24 hours;
         uint256 hour = castTime / 1 hours % 24;
-        if (hour >= 15) {
-            castTime -= hour * 3600 - 14 hours;
+        if (hour >= 14) {
+            castTime -= hour * 3600 - 13 hours;
         }
 
         hevm.warp(castTime);
@@ -559,8 +559,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = now + pause.delay();
         uint256 hour = castTime / 1 hours % 24;
-        if (hour < 22) {
-            castTime += 22 hours - hour * 3600;
+        if (hour < 21) {
+            castTime += 21 hours - hour * 3600;
         }
 
         hevm.warp(castTime);
@@ -606,25 +606,7 @@ contract DssSpellTest is DSTest, DSMath {
     function scheduleWaitAndCast() public {
         spell.schedule();
 
-        uint256 castTime = now + pause.delay();
-
-        castPreviousSpell();
-
-        if(spell.officeHours()) {
-            uint256 day = (castTime / 1 days + 3) % 7;
-            if(day >= 5) {
-                castTime += 7 days - day * 86400;
-            }
-
-            uint256 hour = castTime / 1 hours % 24;
-            if (hour >= 22) {
-                castTime += 24 hours - hour * 3600 + 15 hours;
-            } else if (hour < 15) {
-                castTime += 15 hours - hour * 3600;
-            }
-        }
-
-        hevm.warp(castTime);
+        hevm.warp(spell.nextCastTime());
         spell.cast();
     }
 
@@ -845,28 +827,35 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         spell.schedule();
 
-        uint256 monday_10am  = 1606748400; // Nov 30
+        uint256 monday_9am  = 1606744800; // Nov 30
 
         /*** Day tests */
-        hevm.warp(monday_10am - 1 days); // Sunday, 10am
-        assertEq(spell.nextCastTime(), monday_10am);
+        hevm.warp(monday_9am); // Monday, 9am
+        assertEq(spell.nextCastTime(), monday_9am);
 
-        hevm.warp(monday_10am - 2 days); // Saturday, 10am
-        assertEq(spell.nextCastTime(), monday_10am);
+        hevm.warp(monday_9am - 1 days); // Sunday, 9am
+        assertEq(spell.nextCastTime(), monday_9am);
 
-        hevm.warp(monday_10am - 3 days); // Friday, 10am
-        assertEq(spell.nextCastTime(), monday_10am - 3 days); // Able to cast
+        hevm.warp(monday_9am - 2 days); // Saturday, 9am
+        assertEq(spell.nextCastTime(), monday_9am);
+
+        hevm.warp(monday_9am - 3 days); // Friday, 9am
+        assertEq(spell.nextCastTime(), monday_9am - 3 days); // Able to cast
 
         /*** Time tests ***/
         uint256 castTime;
 
         for(uint i = 0; i < 5; i++) {
-            castTime = monday_10am + i * 1 days; // Next day at 10am
-            hevm.warp(castTime - 1 seconds); // 9:59am
+            castTime = monday_9am + i * 1 days; // Next day at 9am
+            hevm.warp(castTime - 1 seconds); // 8:59am
             assertEq(spell.nextCastTime(), castTime);
 
-            hevm.warp(castTime + 7 hours + 1 seconds); // 5:01pm
-            assertEq(spell.nextCastTime(), monday_10am + (i + 1) * 1 days); // Next day at 10am
+            hevm.warp(castTime + 7 hours + 1 seconds); // 4:01pm
+            if (i < 4) {
+                assertEq(spell.nextCastTime(), monday_9am + (i + 1) * 1 days); // Next day at 9am
+            } else {
+                assertEq(spell.nextCastTime(), monday_9am + 7 days); // Next monday at 9am (friday case)
+            }
         }
     }
 
