@@ -383,7 +383,7 @@ contract DssSpell {
         _;
     }
 
-    function nextCastTime() public returns (uint256) {
+    function nextCastTime() public view returns (uint256) {
         require(eta != 0, "Spell not scheduled");
         uint256 castTime = now > eta ? now : eta;
 
