@@ -22,6 +22,9 @@ import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 
 contract SpellAction {
+    // Office hours enabled if true
+    bool constant public officeHours = true;
+
     // MAINNET ADDRESSES
     //
     // The contracts in this list should correspond to MCD core contracts, verify
@@ -32,7 +35,17 @@ contract SpellAction {
     address constant MCD_ADM            = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
     address constant VOTE_PROXY_FACTORY = 0x6FCD258af181B3221073A96dD90D1f7AE7eEc408;
 
-    function execute() external {
+    modifier limited {
+        if (officeHours) {
+            uint day = (now / 1 days + 3) % 7;
+            require(day < 5, "Can only be cast on a weekday");
+            uint hour = now / 1 hours % 24;
+            require(hour >= 14 && hour < 21, "Outside office hours");
+        }
+        _;
+    }
+
+    function execute() external limited {
         address MCD_PAUSE   = CHANGELOG.getAddress("MCD_PAUSE");
         address FLIPPER_MOM = CHANGELOG.getAddress("FLIPPER_MOM");
         address OSM_MOM     = CHANGELOG.getAddress("OSM_MOM");
@@ -74,9 +87,7 @@ contract DssSpell {
     bytes           public sig;
     uint256         public expiration;
     bool            public done;
-
-    // Office hours enabled if true
-    bool   constant public officeHours = true;
+    bool            public officeHours;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -92,16 +103,7 @@ contract DssSpell {
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
         expiration = now + 30 days;
-    }
-
-    modifier limited {
-        if (officeHours) {
-            uint day = (now / 1 days + 3) % 7;
-            require(day < 5, "Can only be cast on a weekday");
-            uint hour = now / 1 hours % 24;
-            require(hour >= 14 && hour < 21, "Outside office hours");
-        }
-        _;
+        officeHours = SpellAction(action).officeHours();
     }
 
     function schedule() public {
@@ -114,7 +116,7 @@ contract DssSpell {
         DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
 
-    function cast() public limited {
+    function cast() public {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
