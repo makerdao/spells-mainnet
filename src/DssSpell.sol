@@ -16,7 +16,9 @@
 pragma solidity 0.5.12;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dapp/DSAuthorityAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
+import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 
 contract SpellAction {
@@ -26,6 +28,9 @@ contract SpellAction {
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/1.1.5/contracts.json
     ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+
+    address constant MCD_ADM            = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
+    address constant VOTE_PROXY_FACTORY = 0x6FCD258af181B3221073A96dD90D1f7AE7eEc408;
 
     // Decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -44,15 +49,36 @@ contract SpellAction {
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
 
     function execute() external {
-        // Proving the Pause Proxy has access to the MCD core system at the execution time
-        address MCD_VAT = CHANGELOG.getAddress("MCD_VAT");
-        require(VatAbstract(MCD_VAT).wards(address(this)) == 1, "no-access");
+        address MCD_PAUSE   = CHANGELOG.getAddress("MCD_PAUSE");
+        address FLIPPER_MOM = CHANGELOG.getAddress("FLIPPER_MOM");
+        address OSM_MOM     = CHANGELOG.getAddress("OSM_MOM");
+
+        // Change MCD_ADM address in the changelog (Chief)
+        CHANGELOG.setAddress("MCD_ADM", MCD_ADM);
+
+        // Add VOTE_PROXY_FACTORY to the changelog (previous one was missing)
+        CHANGELOG.setAddress("VOTE_PROXY_FACTORY", VOTE_PROXY_FACTORY);
+
+        // Bump version
+        CHANGELOG.setVersion("1.2.0");
+
+        // Set new Chief in the Pause
+        DSPauseAbstract(MCD_PAUSE).setAuthority(MCD_ADM);
+
+        // Set new Chief in the FlipperMom
+        FlipperMomAbstract(FLIPPER_MOM).setAuthority(MCD_ADM);
+
+        // Set new Chief in the OsmMom
+        OsmMomAbstract(OSM_MOM).setAuthority(MCD_ADM);
     }
 }
 
 contract DssSpell {
     ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
     address MCD_PAUSE = CHANGELOG.getAddress("MCD_PAUSE");
+
+    address constant SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
+    address constant SAI_TOP = 0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3;
 
     DSPauseAbstract public pause = DSPauseAbstract(MCD_PAUSE);
     address         public action;
@@ -63,41 +89,13 @@ contract DssSpell {
     bool            public done;
 
     // Office hours enabled if true
-    bool   constant public officeHours = false;
+    bool   constant public officeHours = true;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a7c8ddb3f8d8ea71cb123b9aa45d9d7eaed8d6f0/governance/votes/Executive%20vote%20-%20November%2023%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-11-23 MakerDAO Executive Spell | Hash: 0x3567e2282249022428233fe24a48a25ebc34468f2183869109f2bd590f48ef28";
-
-    // MIP24: Emergency Voting System
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP24/mip24.md -q -O - 2>/dev/null)"
-    string constant public MIP24 = "0x6d39f78a3343fb030da792962abdd12ca1b0c9384b92f496e8a070e97cf3c1c6";
-
-    // MIP25: Flash Mint Module
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP25/mip25.md -q -O - 2>/dev/null)"
-    string constant public MIP25 = "0xd2550d2b15464b6bf3e49bc424a85e6411abf27e72247c4325f6d9b2ba4d9100";
-
-    // MIP27: Debt Ceiling Instant Access Module
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP27/mip27.md -q -O - 2>/dev/null)"
-    string constant public MIP27 = "0x2848c1ef785a2182d9ccd7171e90eba847330f3da2106500f0f3e097a3bf5553";
-
-    // MIP28: Operational Support Domain Definition
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP28/mip28.md -q -O - 2>/dev/null)"
-    string constant public MIP28 = "0x63aa04048b723e496190b080d9d25e1ba90c7d8eeb9060404ca50d665506e915";
-
-    // MIP4c2-SP6: Calendar Exceptions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP4/MIP4c2-Subproposals/MIP4c2-SP6.md -q -O - 2>/dev/null)"
-    string constant public MIP4c2SP6 = "0xab503375dd94caebafadf3a7eed7809cca49441877cc22056645d6cc94ba4105";
-
-    // MIP13c3-SP6: SourceCred Funding
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP13/MIP13c3-Subproposals/MIP13c3-SP6.md -q -O - 2>/dev/null)"
-    string constant public MIP13c3SP6 = "0xe76bd18dfb2eb9aa893e81d4bfa6703e71f17954e4c4800937c672aa6d8b84f6";
-
-    // MIP28c7-SP1: Subproposal for Operational Support Domain Facilitator Onboarding
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/7ab8f2bbde3f0ec6f8ddb150596454fe2a869454/MIP28/MIP28c7-Subproposals/MIP28c7-SP1.md -q -O - 2>/dev/null)"
-    string constant public MIP28c7SP1 = "0x685efd19c76135ad5f3313b28c556e5c918ad5e121b11ddd9a60c793ad78cc94";
+        "2020-11-27 MakerDAO Executive Spell | Hash: ";
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -124,6 +122,9 @@ contract DssSpell {
         require(eta == 0, "This spell has already been scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
+
+        DSAuthAbstract(SAI_MOM).setAuthority(address(0));
+        DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
 
     function cast() public limited {
