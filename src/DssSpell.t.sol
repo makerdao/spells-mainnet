@@ -867,7 +867,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(newChief.isUserRoot(address(testMomsSpell)));
 
         FlipAbstract flip = FlipAbstract(changelog.getAddress("MCD_FLIP_ETH_A"));
-        OsmAbstract osm   = OsmAbstract(changelog.getAddress("PIP_ETH"));
+        OsmAbstract   osm = OsmAbstract(changelog.getAddress("PIP_ETH"));
 
         assertEq(flip.wards(address(cat)), 1);
         assertEq(osm.stopped(), 0);
