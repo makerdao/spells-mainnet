@@ -27,14 +27,14 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xA2652eb43674bc9cfC517a6FA4CEcE391e29c2d3);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1606152054;
+    uint256 constant SPELL_CREATED = 0;
 
     // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    address constant PREV_SPELL = address(0x8D602692eE4b5f0ec33A22fe6547822377FDCc4c);
+    address constant PREV_SPELL = address(0);
     // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1612108914;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1606152054;
 
     struct CollateralValues {
         uint256 line;
@@ -89,11 +89,9 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract      osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
 
-    ChainlogAbstract chainlog  = ChainlogAbstract(   addr.addr("CHANGELOG"));
+    ChainlogAbstract  chainlog = ChainlogAbstract(   addr.addr("CHANGELOG"));
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
-
-
 
     DssSpell spell;
 
@@ -154,11 +152,11 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function castPreviousSpell() internal {
-        SpellLike _pspell = SpellLike(PREV_SPELL);
+        SpellLike prevSpell = SpellLike(PREV_SPELL);
         // warp and cast previous spell so values are up-to-date to test against
-        if (_pspell != SpellLike(0) && !_pspell.done()) {
+        if (prevSpell != SpellLike(0) && !prevSpell.done()) {
             hevm.warp(PREV_SPELL_EXECUTION_TIME);
-            _pspell.cast();
+            prevSpell.cast();
         }
     }
 
