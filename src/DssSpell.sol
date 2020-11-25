@@ -379,12 +379,12 @@ contract DssSpell {
     }
 
     modifier limited {
-        require(nextCastTime() == now, "Outside office hours");
+        require(nextCastTime() == now, "DSSSpell/outside-office-hours");
         _;
     }
 
     function nextCastTime() public view returns (uint256) {
-        require(eta != 0, "Spell not scheduled");
+        require(eta != 0, "DSSSpell/spell-not-scheduled");
         uint256 castTime = now > eta ? now : eta;
 
         if (officeHours) {
@@ -407,15 +407,15 @@ contract DssSpell {
         return castTime;
     }
 
-    function schedule() external {
-        require(now <= expiration, "This contract has expired");
-        require(eta == 0, "This spell has already been scheduled");
+    function schedule() public {
+        require(now <= expiration, "DSSSpell/spell-has-expired");
+        require(eta == 0, "DSSSpell/spell-already-scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() external {
-        require(!done, "spell-already-cast");
+    function cast() public limited {
+        require(!done, "DSSSpell/spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
     }
