@@ -26,27 +26,11 @@ contract SpellAction {
     //
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
-    //     https://changelog.makerdao.com/releases/mainnet/1.1.5/contracts.json
+    //     https://changelog.makerdao.com/releases/mainnet/active/contracts.json
     ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     address constant MCD_ADM            = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
     address constant VOTE_PROXY_FACTORY = 0x6FCD258af181B3221073A96dD90D1f7AE7eEc408;
-
-    // Decimals & precision
-    uint256 constant THOUSAND = 10 ** 3;
-    uint256 constant MILLION  = 10 ** 6;
-    uint256 constant WAD      = 10 ** 18;
-    uint256 constant RAY      = 10 ** 27;
-    uint256 constant RAD      = 10 ** 45;
-
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
 
     function execute() external {
         address MCD_PAUSE   = CHANGELOG.getAddress("MCD_PAUSE");
