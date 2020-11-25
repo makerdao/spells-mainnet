@@ -129,12 +129,11 @@ contract DssSpell {
 
             if (hour >= 21) {
                 if (day == 4) castTime += 2 days;
-                castTime += 24 hours - hour * 3600 + 14 hours; // Go to 9am next day
-                castTime -= minute * 60 + second;              // 9am on the hour
-            }
-            else if (hour < 14) {
-                castTime += 14 hours - hour * 3600; // Go to 9am same day
-                castTime -= minute * 60 + second;   // 9am on the hour
+                castTime += 24 hours - hour * 3600 + 14 hours; // Go to 14:00 UTC next day
+                castTime -= minute * 60 + second;              // 14:00 UTC on the hour
+            } else if (hour < 14) {
+                castTime += 14 hours - hour * 3600;            // Go to 14:00 UTC same day
+                castTime -= minute * 60 + second;              // 14:00 UTC on the hour
             }
         }
         return castTime;
