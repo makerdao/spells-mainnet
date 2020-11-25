@@ -67,9 +67,6 @@ contract SpellAction {
 
         // Set new Chief in the OsmMom
         OsmMomAbstract(OSM_MOM).setAuthority(MCD_ADM);
-
-        // Set Pause delay to 12 hours
-        DSPauseAbstract(MCD_PAUSE).setDelay(12 * 60 * 60);
     }
 }
 
