@@ -668,20 +668,20 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, values.vat_Line);
     }
 
-   function testFailWrongDay() public {
-       vote();
-       scheduleWaitAndCastFailDay();
-   }
+    function testFailWrongDay() public {
+        vote();
+        scheduleWaitAndCastFailDay();
+    }
 
-   function testFailTooEarly() public {
-       vote();
-       scheduleWaitAndCastFailEarly();
-   }
+    function testFailTooEarly() public {
+        vote();
+        scheduleWaitAndCastFailEarly();
+    }
 
-   function testFailTooLate() public {
-       vote();
-       scheduleWaitAndCastFailLate();
-   }
+    function testFailTooLate() public {
+        vote();
+        scheduleWaitAndCastFailLate();
+    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
