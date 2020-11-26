@@ -26,9 +26,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xA2652eb43674bc9cfC517a6FA4CEcE391e29c2d3);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1606152054;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
@@ -171,7 +171,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              148175 * MILLION / 100,  // In whole Dai units
+            vat_Line:              158175 * MILLION / 100,  // In whole Dai units
             pause_delay:           72 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -188,7 +188,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            line:         490 * MILLION,   // In whole Dai units
+            line:         590 * MILLION,   // In whole Dai units
             dust:         500,             // In whole Dai units
             pct:          200,             // In basis points
             chop:         1300,            // In basis points
@@ -669,9 +669,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 4 days + 2 hours));
+            assertEq(spell.expiration(), (now + 30 days));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
 
         vote();
