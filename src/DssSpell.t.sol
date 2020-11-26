@@ -870,7 +870,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
 
         uint castTime = spell.nextCastTime();
-        assertEq(castTime, spell.eta()); // Nov 26, 20 UTC
+        assertEq(castTime, spell.eta());
     }
 
         // Verify that yearn has been approved on the YFI/USD OSM
