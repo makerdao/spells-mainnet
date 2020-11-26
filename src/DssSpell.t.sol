@@ -79,7 +79,6 @@ contract DssSpellTest is DSTest, DSMath {
     Rates rates;
 
     // MAINNET ADDRESSES
-    ChainlogAbstract changelog = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
     DSPauseAbstract      pause = DSPauseAbstract(    0xbE286431454714F511008713973d3B053A2d38f3);
     address         pauseProxy =                     0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     DSChiefAbstract   oldChief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
@@ -871,8 +870,8 @@ contract DssSpellTest is DSTest, DSMath {
         newChief.lift(address(testMomsSpell));
         assertTrue(newChief.isUserRoot(address(testMomsSpell)));
 
-        FlipAbstract flip = FlipAbstract(changelog.getAddress("MCD_FLIP_ETH_A"));
-        OsmAbstract   osm = OsmAbstract(changelog.getAddress("PIP_ETH"));
+        FlipAbstract flip = FlipAbstract(chainlog.getAddress("MCD_FLIP_ETH_A"));
+        OsmAbstract   osm = OsmAbstract(chainlog.getAddress("PIP_ETH"));
 
         assertEq(flip.wards(address(cat)), 1);
         assertEq(osm.stopped(), 0);
@@ -922,16 +921,16 @@ contract TestSpell {
 }
 
 contract TestMomsSpell {
-    ChainlogAbstract changelog = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    ChainlogAbstract chainlog = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     FlipperMomAbstract public fMom =
-        FlipperMomAbstract(changelog.getAddress("FLIPPER_MOM"));
+        FlipperMomAbstract(chainlog.getAddress("FLIPPER_MOM"));
 
     OsmMomAbstract public oMom =
-        OsmMomAbstract(changelog.getAddress("OSM_MOM"));
+        OsmMomAbstract(chainlog.getAddress("OSM_MOM"));
 
     function cast() public {
-        fMom.deny(changelog.getAddress("MCD_FLIP_ETH_A"));
+        fMom.deny(chainlog.getAddress("MCD_FLIP_ETH_A"));
         oMom.stop("ETH-A");
     }
 }
