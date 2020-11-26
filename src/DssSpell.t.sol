@@ -66,6 +66,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_bump;
         uint256 vow_hump;
         uint256 cat_box;
+        address pause_authority;
         address osm_mom_authority;
         address flipper_mom_authority;
         uint256 ilk_count;
@@ -201,6 +202,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump:              10000,                   // In whole Dai units
             vow_hump:              4 * MILLION,             // In whole Dai units
             cat_box:               15 * MILLION,            // In whole Dai units
+            pause_authority:       address(newChief),       // Pause authority
             osm_mom_authority:     address(newChief),       // OsmMom authority
             flipper_mom_authority: address(newChief),       // FlipperMom authority
             ilk_count:             18                       // Num expected in system
@@ -587,6 +589,9 @@ contract DssSpellTest is DSTest, DSMath {
             uint256 normalizedBox = values.cat_box * RAD;
             assertEq(cat.box(), normalizedBox);
         }
+
+        // check Pause authority
+        assertEq(pause.authority(), values.pause_authority);
 
         // check OsmMom authority
         assertEq(osmMom.authority(), values.osm_mom_authority);
