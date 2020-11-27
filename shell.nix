@@ -9,6 +9,7 @@ mkShell {
     dapp
     hevm
     seth
+    jq
   ];
 
   shellHook = ''
