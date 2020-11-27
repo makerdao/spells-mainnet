@@ -10,6 +10,7 @@ mkShell {
     hevm
     seth
     jq
+    curl
   ];
 
   shellHook = ''
