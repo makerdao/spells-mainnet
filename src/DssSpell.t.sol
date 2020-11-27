@@ -39,7 +39,7 @@ contract Voter {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    address constant MAINNET_SPELL = address(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 0;
 
