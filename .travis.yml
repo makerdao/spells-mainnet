@@ -8,5 +8,6 @@ before_install:
   - cachix use maker
 script:
   - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './test-dssspell.sh'
+script:
   - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './compare-bytecode.sh'
 
