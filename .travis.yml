@@ -7,7 +7,5 @@ before_install:
   - echo "trusted-users = root travis" | sudo tee -a /etc/nix/nix.conf && sudo pkill nix-daemon
   - cachix use maker
 script:
-  - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './test-dssspell.sh'
-script:
-  - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './compare-bytecode.sh'
+  - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './travis-ci.sh'
 
