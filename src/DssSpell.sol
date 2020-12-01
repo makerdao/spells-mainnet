@@ -90,9 +90,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/9014856179684688ae29a8204f557fee53f552d5/governance/votes/Executive%20vote%20-%20December%202%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-12-02 MakerDAO Executive Spell | Hash: ";
+        "2020-12-02 MakerDAO Executive Spell | Hash: 0x2055ba0fea45996d1639e5a272ffaee7c7769422d771111c4cdede15c4c6af5d";
 
     function officeHours() external view returns (bool) {
         return SpellAction(action).officeHours();
