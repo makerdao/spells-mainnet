@@ -194,7 +194,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
             vat_Line:              158175 * MILLION / 100,  // In whole Dai units
-            pause_delay:           72 hours,                // In seconds
+            pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50000,                   // In whole Dai units
