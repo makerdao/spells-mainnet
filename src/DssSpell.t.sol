@@ -169,7 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    SpellLike constant PREV_SPELL = SpellLike(0x8D602692eE4b5f0ec33A22fe6547822377FDCc4c);
+    SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
 
     // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
     uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
