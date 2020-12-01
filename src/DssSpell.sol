@@ -87,13 +87,16 @@ contract DssSpell {
     bytes           public sig;
     uint256         public expiration;
     bool            public done;
-    bool            public officeHours;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ -q -O - 2>/dev/null)"
     string constant public description =
         "2020-12-02 MakerDAO Executive Spell | Hash: ";
+
+    function officeHours() external view returns (bool) {
+        return SpellAction(action).officeHours();
+    }
 
     constructor() public {
         sig = abi.encodeWithSignature("execute()");
@@ -103,10 +106,9 @@ contract DssSpell {
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
         expiration = now + 30 days;
-        officeHours = SpellAction(action).officeHours();
     }
 
-    function schedule() public {
+    function schedule() external {
         require(now <= expiration, "This contract has expired");
         require(eta == 0, "This spell has already been scheduled");
         eta = now + DSPauseAbstract(pause).delay();
@@ -116,7 +118,7 @@ contract DssSpell {
         DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
 
-    function cast() public {
+    function cast() external {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
