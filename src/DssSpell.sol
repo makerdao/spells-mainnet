@@ -77,8 +77,10 @@ contract DssSpell {
     ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
     address MCD_PAUSE = CHANGELOG.getAddress("MCD_PAUSE");
 
+    // SCD contracts that has the old chief as authority
     address constant SAI_MOM = 0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C;
     address constant SAI_TOP = 0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3;
+    //
 
     DSPauseAbstract public pause = DSPauseAbstract(MCD_PAUSE);
     address         public action;
@@ -114,6 +116,9 @@ contract DssSpell {
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
 
+        // The old chief will be removed as authority of the SCD contracts.
+        // This authority shouldn't be able to do anything in these contracts after shutdown,
+        // however as a safety measure it's getting removed.
         DSAuthAbstract(SAI_MOM).setAuthority(address(0));
         DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
