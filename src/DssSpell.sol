@@ -114,7 +114,7 @@ contract DssSpell {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
+    function cast() external {
         require(!done, "DSSSpell/spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
