@@ -827,30 +827,43 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         spell.schedule();
 
-        uint256 monday_1400_UTC  = 1606744800; // Nov 30
+        uint256 monday_1400_UTC = 1606744800; // Nov 30, 2020
+        uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
 
-        /*** Day tests */
-        hevm.warp(monday_1400_UTC); // Monday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        /*** Day tests ***/
+        hevm.warp(monday_1400_UTC);                                // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
-        hevm.warp(monday_1400_UTC - 1 days); // Sunday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        hevm.warp(monday_1400_UTC - 1 days);                       // Sunday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
-        hevm.warp(monday_1400_UTC - 2 days); // Saturday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        hevm.warp(monday_1400_UTC - 2 days);                       // Saturday, 14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC     
 
-        hevm.warp(monday_1400_UTC - 3 days); // Friday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days); // Able to cast
+        hevm.warp(monday_1400_UTC - 3 days);                       // Friday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days);  // Able to cast
+
+        hevm.warp(monday_2100_UTC);                                // Monday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC + 1 days);  // Tuesday,  14:00 UTC
+
+        hevm.warp(monday_2100_UTC - 1 days);                       // Sunday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
+
+        hevm.warp(monday_2100_UTC - 2 days);                       // Saturday, 21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
+
+        hevm.warp(monday_2100_UTC - 3 days);                       // Friday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
         /*** Time tests ***/
         uint256 castTime;
 
         for(uint i = 0; i < 5; i++) {
-            castTime = monday_1400_UTC + i * 1 days; // Next day at 1400 UTC
-            hevm.warp(castTime - 1 seconds); // 13:59 UTC
+            castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
+            hevm.warp(castTime - 1 seconds); // 13:59:59 UTC
             assertEq(spell.nextCastTime(), castTime);
 
-            hevm.warp(castTime + 7 hours + 1 seconds); // 21:01 UTC
+            hevm.warp(castTime + 7 hours + 1 seconds); // 21:00:01 UTC
             if (i < 4) {
                 assertEq(spell.nextCastTime(), monday_1400_UTC + (i + 1) * 1 days); // Next day at 14:00 UTC
             } else {
@@ -871,183 +884,5 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
-    }
-
-        // Verify that yearn has been approved on the YFI/USD OSM
-        address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
-
-        // Verify DssAutoLine is authored to file the Vat
-        assertEq(vat.wards(address(autoLine)), 1);
-    }
-
-    function testSpellIsCast_UNI_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipUNI.poke();
-        hevm.warp(now + 3601);
-        pipUNI.poke();
-        spot.poke("UNI-A");
-
-        // Add balance to the test address
-        uint256 ilkAmt = 10 * THOUSAND * WAD;
-        hevm.store(
-            address(uni),
-            keccak256(abi.encode(address(this), uint256(4))),
-            bytes32(ilkAmt)
-        );
-        assertEq(uni.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        assertEq(pipUNI.src(), address(medUNIA));
-
-        // Authorization
-        assertEq(joinUNIA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinUNIA)), 1);
-        assertEq(flipUNIA.wards(address(end)), 1);
-        assertEq(flipUNIA.wards(address(flipMom)), 1);
-        assertEq(pipUNI.wards(address(osmMom)), 1);
-        assertEq(pipUNI.bud(address(spot)), 1);
-        assertEq(pipUNI.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipUNI.src()).bud(address(pipUNI)), 1);
-
-        // Join to adapter
-        assertEq(vat.gem("UNI-A", address(this)), 0);
-        uni.approve(address(joinUNIA), ilkAmt);
-        joinUNIA.join(address(this), ilkAmt);
-        assertEq(uni.balanceOf(address(this)), 0);
-        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
-        assertEq(vat.gem("UNI-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 500 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("UNI-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
-        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinUNIA.exit(address(this), ilkAmt);
-        assertEq(uni.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("UNI-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        uni.approve(address(joinUNIA), ilkAmt);
-        joinUNIA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("UNI-A");
-        // dart max amount of DAI
-        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("UNI-A");
-        assertEq(flipUNIA.kicks(), 0);
-        cat.bite("UNI-A", address(this));
-        assertEq(flipUNIA.kicks(), 1);
-    }
-
-    function testSpellIsCast_RENBTC_A_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        pipRENBTC.poke();
-        hevm.warp(now + 3601);
-        pipRENBTC.poke();
-        spot.poke("RENBTC-A");
-
-        // Add balance to the test address
-        uint256 ilkAmt = 10**8;
-        uint256 ilkAmt18 = ilkAmt * 10**10;
-        hevm.store(
-            address(renbtc),
-            keccak256(abi.encode(address(this), uint256(102))),
-            bytes32(ilkAmt)
-        );
-        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        assertEq(pipRENBTC.src(), address(medRENBTC));
-
-        // Authorization
-        assertEq(joinRENBTCA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinRENBTCA)), 1);
-        assertEq(flipRENBTCA.wards(address(end)), 1);
-        assertEq(flipRENBTCA.wards(address(flipMom)), 1);
-        assertEq(pipRENBTC.wards(address(osmMom)), 1);
-        assertEq(pipRENBTC.bud(address(spot)), 1);
-        assertEq(pipRENBTC.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipRENBTC.src()).bud(address(pipRENBTC)), 1);
-
-        // Join to adapter
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
-        renbtc.approve(address(joinRENBTCA), ilkAmt);
-        joinRENBTCA.join(address(this), ilkAmt);
-        assertEq(renbtc.balanceOf(address(this)), 0);
-        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(500 * WAD));
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 500 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob("RENBTC-A", address(this), address(this), address(this), -int(ilkAmt18), -int(500 * WAD));
-        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        joinRENBTCA.exit(address(this), ilkAmt);
-        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        renbtc.approve(address(joinRENBTCA), ilkAmt);
-        joinRENBTCA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("RENBTC-A");
-        // dart max amount of DAI
-        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("RENBTC-A");
-        assertEq(flipRENBTCA.kicks(), 0);
-        cat.bite("RENBTC-A", address(this));
-        assertEq(flipRENBTCA.kicks(), 1);
-    }
-
-    function testCastCost() public {
-        vote();
-        spell.schedule();
-
-        uint256 castTime = now + pause.delay();
-
-        castPreviousSpell();
-
-        if(spell.officeHours()) {
-            uint256 day = (castTime / 1 days + 3) % 7;
-            if(day >= 5) {
-                castTime += 7 days - day * 86400;
-            }
-
-            uint256 hour = castTime / 1 hours % 24;
-            if (hour >= 21) {
-                castTime += 24 hours - hour * 3600 + 14 hours;
-            } else if (hour < 14) {
-                castTime += 14 hours - hour * 3600;
-            }
-        }
-
-        hevm.warp(castTime);
-        uint startGas = gasleft();
-        spell.cast();
-        uint endGas = gasleft();
-        uint totalGas = startGas - endGas;
-
-        assertTrue(spell.done());
-        // Fail if cast is too expensive
-        assertTrue(totalGas <= 8 * MILLION);
     }
 }
