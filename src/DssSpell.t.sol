@@ -39,9 +39,9 @@ contract Voter {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xB70fB4eE900650DCaE5dD63Fd06E07F0b3a45d13);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1606928084;
+    uint256 constant SPELL_CREATED = 0;
 
     struct CollateralValues {
         uint256 line;
