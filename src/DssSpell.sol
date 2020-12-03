@@ -110,16 +110,11 @@ contract DssSpell {
         expiration = now + 4 days + 2 hours;
     }
 
-    modifier limited {
-        require(nextCastTime() == now, "DSSSpell/outside-office-hours");
-        _;
-    }
-
     function nextCastTime() public view returns (uint256) {
         require(eta != 0, "DSSSpell/spell-not-scheduled");
         uint256 castTime = now > eta ? now : eta;
 
-        if (officeHours) {
+        if (officeHours()) {
             uint256 day    = (castTime / 1 days + 3) % 7;
             uint256 hour   = castTime / 1 hours % 24;
             uint256 minute = castTime / 1 minutes % 60;
@@ -152,7 +147,7 @@ contract DssSpell {
         DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
 
-    function cast() public limited {
+    function cast() public {
         require(!done, "DSSSpell/spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
