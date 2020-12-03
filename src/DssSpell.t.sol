@@ -40,9 +40,9 @@ contract Voter {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xB70fB4eE900650DCaE5dD63Fd06E07F0b3a45d13);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1606928084;
+    uint256 constant SPELL_CREATED = 0;
 
     // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
     SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
