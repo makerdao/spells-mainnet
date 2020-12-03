@@ -702,30 +702,43 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         spell.schedule();
 
-        uint256 monday_1400_UTC  = 1606744800; // Nov 30
+        uint256 monday_1400_UTC = 1606744800; // Nov 30, 2020
+        uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
 
-        /*** Day tests */
-        hevm.warp(monday_1400_UTC); // Monday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        /*** Day tests ***/
+        hevm.warp(monday_1400_UTC);                                // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
-        hevm.warp(monday_1400_UTC - 1 days); // Sunday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        hevm.warp(monday_1400_UTC - 1 days);                       // Sunday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
-        hevm.warp(monday_1400_UTC - 2 days); // Saturday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);
+        hevm.warp(monday_1400_UTC - 2 days);                       // Saturday, 14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC     
 
-        hevm.warp(monday_1400_UTC - 3 days); // Friday, 14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days); // Able to cast
+        hevm.warp(monday_1400_UTC - 3 days);                       // Friday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days);  // Able to cast
+
+        hevm.warp(monday_2100_UTC);                                // Monday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC + 1 days);  // Tuesday,  14:00 UTC
+
+        hevm.warp(monday_2100_UTC - 1 days);                       // Sunday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
+
+        hevm.warp(monday_2100_UTC - 2 days);                       // Saturday, 21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
+
+        hevm.warp(monday_2100_UTC - 3 days);                       // Friday,   21:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC 
 
         /*** Time tests ***/
         uint256 castTime;
 
         for(uint i = 0; i < 5; i++) {
-            castTime = monday_1400_UTC + i * 1 days; // Next day at 1400 UTC
-            hevm.warp(castTime - 1 seconds); // 13:59 UTC
+            castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
+            hevm.warp(castTime - 1 seconds); // 13:59:59 UTC
             assertEq(spell.nextCastTime(), castTime);
 
-            hevm.warp(castTime + 7 hours + 1 seconds); // 21:01 UTC
+            hevm.warp(castTime + 7 hours + 1 seconds); // 21:00:01 UTC
             if (i < 4) {
                 assertEq(spell.nextCastTime(), monday_1400_UTC + (i + 1) * 1 days); // Next day at 14:00 UTC
             } else {
@@ -746,186 +759,6 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
-    }
-
-    function testRootExecuteSpell() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
-    }
-
-    function testRootExecuteSpellViaVoteProxy() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-
-        Voter voter = new Voter();
-        voteProxyFactory.initiateLink(address(voter));
-        VoteProxyAbstract voteProxy = voter.doApproveLink(voteProxyFactory, address(this));
-
-        gov.approve(address(voteProxy), uint256(-1));
-
-        voteProxy.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        voteProxy.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
-    }
-
-    function testFailExecuteSpellNotLaunched() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
-
-    function _runOldChief() internal {
-        TestSpell testSpell = new TestSpell();
-
-        address[] memory slate = new address[](1);
-        slate[0] = address(testSpell);
-        oldChief.vote(slate);
-        oldChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
-
-    function testExecuteSpellOldChief() public {
-        vote();
-        _runOldChief();
-    }
-
-    function testFailExecuteSpellOldChief() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        _runOldChief();
-    }
-
-    function testMoms() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestMomsSpell testMomsSpell = new TestMomsSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(!newChief.isUserRoot(address(testMomsSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        newChief.launch();
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(newChief.isUserRoot(address(testMomsSpell)));
-
-        FlipAbstract flip = FlipAbstract(chainlog.getAddress("MCD_FLIP_ETH_A"));
-        OsmAbstract   osm = OsmAbstract(chainlog.getAddress("PIP_ETH"));
-
-        assertEq(flip.wards(address(cat)), 1);
-        assertEq(osm.stopped(), 0);
-        testMomsSpell.cast();
-        assertEq(flip.wards(address(cat)), 0);
-        assertEq(osm.stopped(), 1);
-    }
-
-    function testSAIcontractsAuthorityChange() public {
-        assertEq(saiMom.authority(), address(oldChief));
-        assertEq(saiTop.authority(), address(oldChief));
-        vote();
-        spell.schedule();
-        assertEq(saiMom.authority(), address(0));
-        assertEq(saiTop.authority(), address(0));
     }
 }
 

@@ -14,13 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.5.12;
-
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dapp/DSAuthorityAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
-
 contract SpellAction {
     // Office hours enabled if true
     bool constant public officeHours = true;
@@ -30,10 +25,6 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/active/contracts.json
-    ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    address constant MCD_ADM            = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
-    address constant VOTE_PROXY_FACTORY = 0x6FCD258af181B3221073A96dD90D1f7AE7eEc408;
 
     modifier limited {
         if (officeHours) {
@@ -46,30 +37,7 @@ contract SpellAction {
     }
 
     function execute() external limited {
-        address MCD_PAUSE   = CHANGELOG.getAddress("MCD_PAUSE");
-        address FLIPPER_MOM = CHANGELOG.getAddress("FLIPPER_MOM");
-        address OSM_MOM     = CHANGELOG.getAddress("OSM_MOM");
 
-        // Change MCD_ADM address in the changelog (Chief)
-        CHANGELOG.setAddress("MCD_ADM", MCD_ADM);
-
-        // Add VOTE_PROXY_FACTORY to the changelog (previous one was missing)
-        CHANGELOG.setAddress("VOTE_PROXY_FACTORY", VOTE_PROXY_FACTORY);
-
-        // Bump version
-        CHANGELOG.setVersion("1.2.0");
-
-        // Set new Chief in the Pause
-        DSPauseAbstract(MCD_PAUSE).setAuthority(MCD_ADM);
-
-        // Set new Chief in the FlipperMom
-        FlipperMomAbstract(FLIPPER_MOM).setAuthority(MCD_ADM);
-
-        // Set new Chief in the OsmMom
-        OsmMomAbstract(OSM_MOM).setAuthority(MCD_ADM);
-
-        // Set Pause delay to 48 hours
-        DSPauseAbstract(MCD_PAUSE).setDelay(48 * 60 * 60);
     }
 }
 
@@ -96,7 +64,7 @@ contract DssSpell {
     string constant public description =
         "2020-12-02 MakerDAO Executive Spell | Hash: 0x2055ba0fea45996d1639e5a272ffaee7c7769422d771111c4cdede15c4c6af5d";
 
-    function officeHours() public view returns (bool) {
+    function officeHours() external view returns (bool) {
         return SpellAction(action).officeHours();
     }
 
@@ -110,41 +78,40 @@ contract DssSpell {
         expiration = now + 4 days + 2 hours;
     }
 
-    function nextCastTime() public view returns (uint256) {
+    function nextCastTime() external returns (uint256) {
         require(eta != 0, "DSSSpell/spell-not-scheduled");
         uint256 castTime = now > eta ? now : eta;
 
-        if (officeHours()) {
+        if (SpellAction(action).officeHours()) {
             uint256 day    = (castTime / 1 days + 3) % 7;
             uint256 hour   = castTime / 1 hours % 24;
             uint256 minute = castTime / 1 minutes % 60;
             uint256 second = castTime % 60;
 
-            if (day >= 5) castTime += 7 days - day * 86400;
+            if (day >= 5) {
+                castTime += 6 days - day * 86400;               // Go to Sunday 
+                castTime += 24 hours - hour * 3600 + 14 hours;  // Go to 14:00 UTC Monday
+                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
+                return castTime;
+            }
 
             if (hour >= 21) {
-                if (day == 4) castTime += 2 days;
-                castTime += 24 hours - hour * 3600 + 14 hours; // Go to 14:00 UTC next day
-                castTime -= minute * 60 + second;              // 14:00 UTC on the hour
+                if (day == 4) castTime += 2 days;               // If Friday, fast forward to Sunday night
+                castTime += 24 hours - hour * 3600 + 14 hours;  // Go to 14:00 UTC next day
+                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
             } else if (hour < 14) {
-                castTime += 14 hours - hour * 3600;            // Go to 14:00 UTC same day
-                castTime -= minute * 60 + second;              // 14:00 UTC on the hour
+                castTime += 14 hours - hour * 3600;             // Go to 14:00 UTC same day
+                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
             }
         }
         return castTime;
     }
 
-    function schedule() public {
+    function schedule() external {
         require(now <= expiration, "DSSSpell/spell-has-expired");
         require(eta == 0, "DSSSpell/spell-already-scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
-
-        // The old chief will be removed as authority of the SCD contracts.
-        // This authority shouldn't be able to do anything in these contracts after shutdown,
-        // however as a safety measure it's getting removed.
-        DSAuthAbstract(SAI_MOM).setAuthority(address(0));
-        DSAuthAbstract(SAI_TOP).setAuthority(address(0));
     }
 
     function cast() public {
