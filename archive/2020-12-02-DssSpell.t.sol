@@ -4,7 +4,6 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
-import "./test/addresses_mainnet.sol";
 
 import {DssSpell, SpellAction} from "./DssSpell.sol";
 
@@ -44,11 +43,6 @@ contract DssSpellTest is DSTest, DSMath {
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1606928084;
 
-    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
-    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
-
     struct CollateralValues {
         uint256 line;
         uint256 dust;
@@ -82,28 +76,28 @@ contract DssSpellTest is DSTest, DSMath {
     SystemValues afterSpell;
 
     Hevm hevm;
-    Rates     rates = new Rates();
-    Addresses addr  = new Addresses();
+    Rates rates;
 
     // MAINNET ADDRESSES
-    DSPauseAbstract      pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
-    address         pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
-    DSChiefAbstract   oldChief = DSChiefAbstract(    addr.addr("MCD_ADM"));
+    DSPauseAbstract      pause = DSPauseAbstract(    0xbE286431454714F511008713973d3B053A2d38f3);
+    address         pauseProxy =                     0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    DSChiefAbstract   oldChief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
     DSChiefAbstract   newChief = DSChiefAbstract(    0x0a3f6849f78076aefaDf113F5BED87720274dDC0);
-    VatAbstract            vat = VatAbstract(        addr.addr("MCD_VAT"));
-    VowAbstract            vow = VowAbstract(        addr.addr("MCD_VOW"));
-    CatAbstract            cat = CatAbstract(        addr.addr("MCD_CAT"));
-    PotAbstract            pot = PotAbstract(        addr.addr("MCD_POT"));
-    JugAbstract            jug = JugAbstract(        addr.addr("MCD_JUG"));
-    SpotAbstract          spot = SpotAbstract(       addr.addr("MCD_SPOT"));
-    DSTokenAbstract        gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
-    EndAbstract            end = EndAbstract(        addr.addr("MCD_END"));
-    IlkRegistryAbstract    reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    VatAbstract            vat = VatAbstract(        0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    VowAbstract            vow = VowAbstract(        0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    CatAbstract            cat = CatAbstract(        0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea);
+    PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
+    SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
-    OsmMomAbstract      osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
-    FlipperMomAbstract flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
+    DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    IlkRegistryAbstract    reg = IlkRegistryAbstract(0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24);
 
-    ChainlogAbstract  chainlog = ChainlogAbstract(   addr.addr("CHANGELOG"));
+    OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
+    FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
+
+    ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
@@ -174,17 +168,23 @@ contract DssSpellTest is DSTest, DSMath {
         return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
+    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
+    SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
+
+    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
+    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
+
     function castPreviousSpell() internal {
-        SpellLike prevSpell = SpellLike(PREV_SPELL);
         // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != SpellLike(0) && !prevSpell.done()) {
+        if (PREV_SPELL != SpellLike(0) && !PREV_SPELL.done()) {
             hevm.warp(PREV_SPELL_EXECUTION_TIME);
-            prevSpell.cast();
+            PREV_SPELL.cast();
         }
     }
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
+        rates = new Rates();
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 

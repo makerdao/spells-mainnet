@@ -4,7 +4,6 @@ import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
-import "./test/addresses_mainnet.sol";
 
 import {DssSpell, SpellAction} from "./DssSpell.sol";
 
@@ -13,41 +12,23 @@ interface Hevm {
     function store(address,bytes32,bytes32) external;
 }
 
+interface MedianizerV1Abstract {
+    function authority() external view returns (address);
+    function owner() external view returns (address);
+    function peek() external view returns (uint256, bool);
+    function poke() external;
+}
+
 interface SpellLike {
     function done() external view returns (bool);
     function cast() external;
 }
 
-interface VoteProxyFactoryAbstract {
-    function initiateLink(address) external;
-    function approveLink(address) external returns (VoteProxyAbstract);
-}
-
-interface VoteProxyAbstract {
-    function lock(uint256) external;
-    function vote(address[] calldata) external;
-}
-
-contract Voter {
-    function doApproveLink(VoteProxyFactoryAbstract voteProxyFactory, address cold) external returns (VoteProxyAbstract voteProxy) {
-        voteProxy = voteProxyFactory.approveLink(cold);
-    }
-
-    function doVote(VoteProxyAbstract voteProxy, address[] calldata votes) external {
-        voteProxy.vote(votes);
-    }
-}
-
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xB70fB4eE900650DCaE5dD63Fd06E07F0b3a45d13);
+    address constant MAINNET_SPELL = address(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1606928084;
-
-    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
-    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
+    uint256 constant SPELL_CREATED = 1606489212;
 
     struct CollateralValues {
         uint256 line;
@@ -72,7 +53,6 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_bump;
         uint256 vow_hump;
         uint256 cat_box;
-        address pause_authority;
         address osm_mom_authority;
         address flipper_mom_authority;
         uint256 ilk_count;
@@ -82,39 +62,31 @@ contract DssSpellTest is DSTest, DSMath {
     SystemValues afterSpell;
 
     Hevm hevm;
-    Rates     rates = new Rates();
-    Addresses addr  = new Addresses();
+    Rates rates;
 
     // MAINNET ADDRESSES
-    DSPauseAbstract      pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
-    address         pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
-    DSChiefAbstract   oldChief = DSChiefAbstract(    addr.addr("MCD_ADM"));
-    DSChiefAbstract   newChief = DSChiefAbstract(    0x0a3f6849f78076aefaDf113F5BED87720274dDC0);
-    VatAbstract            vat = VatAbstract(        addr.addr("MCD_VAT"));
-    VowAbstract            vow = VowAbstract(        addr.addr("MCD_VOW"));
-    CatAbstract            cat = CatAbstract(        addr.addr("MCD_CAT"));
-    PotAbstract            pot = PotAbstract(        addr.addr("MCD_POT"));
-    JugAbstract            jug = JugAbstract(        addr.addr("MCD_JUG"));
-    SpotAbstract          spot = SpotAbstract(       addr.addr("MCD_SPOT"));
-    DSTokenAbstract        gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
-    EndAbstract            end = EndAbstract(        addr.addr("MCD_END"));
-    IlkRegistryAbstract    reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    DSPauseAbstract      pause = DSPauseAbstract(    0xbE286431454714F511008713973d3B053A2d38f3);
+    address         pauseProxy =                     0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    DSChiefAbstract      chief = DSChiefAbstract(    0x9eF05f7F6deB616fd37aC3c959a2dDD25A54E4F5);
+    VatAbstract            vat = VatAbstract(        0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    VowAbstract            vow = VowAbstract(        0xA950524441892A31ebddF91d3cEEFa04Bf454466);
+    CatAbstract            cat = CatAbstract(        0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea);
+    PotAbstract            pot = PotAbstract(        0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    JugAbstract            jug = JugAbstract(        0x19c0976f590D67707E62397C87829d896Dc0f1F1);
+    SpotAbstract          spot = SpotAbstract(       0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3);
 
-    OsmMomAbstract      osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
-    FlipperMomAbstract flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
+    DSTokenAbstract        gov = DSTokenAbstract(    0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2);
+    EndAbstract            end = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    IlkRegistryAbstract    reg = IlkRegistryAbstract(0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24);
 
-    ChainlogAbstract  chainlog = ChainlogAbstract(   addr.addr("CHANGELOG"));
+    OsmMomAbstract      osmMom = OsmMomAbstract(     0x76416A4d5190d071bfed309861527431304aA14f);
+    FlipperMomAbstract flipMom = FlipperMomAbstract( 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472);
+
+    ChainlogAbstract chainlog  = ChainlogAbstract(   0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
-    // Specific for this spell
-    DSAuthAbstract saiMom      = DSAuthAbstract(     0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C);
-    DSAuthAbstract saiTop      = DSAuthAbstract(     0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3);
-
-    VoteProxyFactoryAbstract
-              voteProxyFactory
-                               = VoteProxyFactoryAbstract(
-                                                     0x6FCD258af181B3221073A96dD90D1f7AE7eEc408);
+    
 
     DssSpell spell;
 
@@ -174,17 +146,23 @@ contract DssSpellTest is DSTest, DSMath {
         return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
+    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
+    SpellLike constant PREV_SPELL = SpellLike(0x8D602692eE4b5f0ec33A22fe6547822377FDCc4c);
+
+    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
+    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
+
     function castPreviousSpell() internal {
-        SpellLike prevSpell = SpellLike(PREV_SPELL);
         // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != SpellLike(0) && !prevSpell.done()) {
+        if (PREV_SPELL != SpellLike(0) && !PREV_SPELL.done()) {
             hevm.warp(PREV_SPELL_EXECUTION_TIME);
-            prevSpell.cast();
+            PREV_SPELL.cast();
         }
     }
 
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
+        rates = new Rates();
 
         spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
 
@@ -194,16 +172,15 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
             vat_Line:              158175 * MILLION / 100,  // In whole Dai units
-            pause_delay:           48 hours,                // In seconds
+            pause_delay:           72 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50000,                   // In whole Dai units
             vow_bump:              10000,                   // In whole Dai units
             vow_hump:              4 * MILLION,             // In whole Dai units
             cat_box:               15 * MILLION,            // In whole Dai units
-            pause_authority:       address(newChief),       // Pause authority
-            osm_mom_authority:     address(newChief),       // OsmMom authority
-            flipper_mom_authority: address(newChief),       // FlipperMom authority
+            osm_mom_authority:     address(0),              // OsmMom authority
+            flipper_mom_authority: address(0),              // FlipperMom authority
             ilk_count:             18                       // Num expected in system
         });
 
@@ -468,24 +445,24 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function vote() private {
-        if (oldChief.hat() != address(spell)) {
+        if (chief.hat() != address(spell)) {
             hevm.store(
                 address(gov),
                 keccak256(abi.encode(address(this), uint256(1))),
                 bytes32(uint256(999999999999 ether))
             );
-            gov.approve(address(oldChief), uint256(-1));
-            oldChief.lock(999999999999 ether);
+            gov.approve(address(chief), uint256(-1));
+            chief.lock(sub(gov.balanceOf(address(this)), 1 ether));
 
             assertTrue(!spell.done());
 
             address[] memory yays = new address[](1);
             yays[0] = address(spell);
 
-            oldChief.vote(yays);
-            oldChief.lift(address(spell));
+            chief.vote(yays);
+            chief.lift(address(spell));
         }
-        assertEq(oldChief.hat(), address(spell));
+        assertEq(chief.hat(), address(spell));
     }
 
     function scheduleWaitAndCast() public {
@@ -589,9 +566,6 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(cat.box(), normalizedBox);
         }
 
-        // check Pause authority
-        assertEq(pause.authority(), values.pause_authority);
-
         // check OsmMom authority
         assertEq(osmMom.authority(), values.osm_mom_authority);
 
@@ -672,20 +646,20 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, values.vat_Line);
     }
 
-    function testFailWrongDay() public {
-        vote();
-        scheduleWaitAndCastFailDay();
-    }
+//    function testFailWrongDay() public {
+//        vote();
+//        scheduleWaitAndCastFailDay();
+//    }
 
-    function testFailTooEarly() public {
-        vote();
-        scheduleWaitAndCastFailEarly();
-    }
+//    function testFailTooEarly() public {
+//        vote();
+//        scheduleWaitAndCastFailEarly();
+//    }
 
-    function testFailTooLate() public {
-        vote();
-        scheduleWaitAndCastFailLate();
-    }
+//    function testFailTooLate() public {
+//        vote();
+//        scheduleWaitAndCastFailLate();
+//    }
 
     function testSpellIsCast() public {
         string memory description = new DssSpell().description();
@@ -707,230 +681,5 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-    }
-
-    function testRootExecuteSpell() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
-    }
-
-    function testRootExecuteSpellViaVoteProxy() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-
-        Voter voter = new Voter();
-        voteProxyFactory.initiateLink(address(voter));
-        VoteProxyAbstract voteProxy = voter.doApproveLink(voteProxyFactory, address(this));
-
-        gov.approve(address(voteProxy), uint256(-1));
-
-        voteProxy.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        voteProxy.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
-    }
-
-    function testFailExecuteSpellNotLaunched() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
-
-    function _runOldChief() internal {
-        TestSpell testSpell = new TestSpell();
-
-        address[] memory slate = new address[](1);
-        slate[0] = address(testSpell);
-        oldChief.vote(slate);
-        oldChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
-
-    function testExecuteSpellOldChief() public {
-        vote();
-        _runOldChief();
-    }
-
-    function testFailExecuteSpellOldChief() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        _runOldChief();
-    }
-
-    function testMoms() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestMomsSpell testMomsSpell = new TestMomsSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(!newChief.isUserRoot(address(testMomsSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        newChief.launch();
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(newChief.isUserRoot(address(testMomsSpell)));
-
-        FlipAbstract flip = FlipAbstract(chainlog.getAddress("MCD_FLIP_ETH_A"));
-        OsmAbstract   osm = OsmAbstract(chainlog.getAddress("PIP_ETH"));
-
-        assertEq(flip.wards(address(cat)), 1);
-        assertEq(osm.stopped(), 0);
-        testMomsSpell.cast();
-        assertEq(flip.wards(address(cat)), 0);
-        assertEq(osm.stopped(), 1);
-    }
-
-    function testSAIcontractsAuthorityChange() public {
-        assertEq(saiMom.authority(), address(oldChief));
-        assertEq(saiTop.authority(), address(oldChief));
-        vote();
-        spell.schedule();
-        assertEq(saiMom.authority(), address(0));
-        assertEq(saiTop.authority(), address(0));
-    }
-}
-
-contract SpellActionTest {
-    function execute() external {
-        // Random action to test authority
-        VatAbstract(ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F).getAddress("MCD_VAT")).rely(address(123));
-    }
-}
-
-contract TestSpell {
-    DSPauseAbstract public pause =
-        DSPauseAbstract(ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F).getAddress("MCD_PAUSE"));
-    address         public action;
-    bytes32         public tag;
-    uint256         public eta;
-    bytes           public sig;
-
-    constructor() public {
-        sig = abi.encodeWithSignature("execute()");
-        action = address(new SpellActionTest());
-        bytes32 _tag;
-        address _action = action;
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
-    }
-
-    function schedule() public {
-        eta = now + DSPauseAbstract(pause).delay();
-        pause.plot(action, tag, sig, eta);
-    }
-}
-
-contract TestMomsSpell {
-    ChainlogAbstract chainlog = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    FlipperMomAbstract public fMom =
-        FlipperMomAbstract(chainlog.getAddress("FLIPPER_MOM"));
-
-    OsmMomAbstract public oMom =
-        OsmMomAbstract(chainlog.getAddress("OSM_MOM"));
-
-    function cast() public {
-        fMom.deny(chainlog.getAddress("MCD_FLIP_ETH_A"));
-        oMom.stop("ETH-A");
     }
 }
