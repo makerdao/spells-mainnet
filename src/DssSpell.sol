@@ -364,7 +364,7 @@ contract DssSpell {
     string constant public description =
         "2020-12-02 MakerDAO Executive Spell | Hash: 0xa2aeed0dab500692caf4fa55c99bc87b57853792de711724668012a21e9bb83a";
 
-    function officeHours() external view returns (bool) {
+    function officeHours() public view returns (bool) {
         return SpellAction(action).officeHours();
     }
 
