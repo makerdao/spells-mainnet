@@ -78,9 +78,9 @@ contract DssSpell {
         expiration = now + 4 days + 2 hours;
     }
 
-    function nextCastTime() external returns (uint256) {
+    function nextCastTime() external returns (uint256 castTime) {
         require(eta != 0, "DSSSpell/spell-not-scheduled");
-        uint256 castTime = now > eta ? now : eta;
+        castTime = now > eta ? now : eta; // Any day at XX:YY
 
         if (SpellAction(action).officeHours()) {
             uint256 day    = (castTime / 1 days + 3) % 7;
@@ -89,22 +89,20 @@ contract DssSpell {
             uint256 second = castTime % 60;
 
             if (day >= 5) {
-                castTime += 6 days - day * 86400;               // Go to Sunday 
-                castTime += 24 hours - hour * 3600 + 14 hours;  // Go to 14:00 UTC Monday
-                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
-                return castTime;
-            }
-
-            if (hour >= 21) {
-                if (day == 4) castTime += 2 days;               // If Friday, fast forward to Sunday night
-                castTime += 24 hours - hour * 3600 + 14 hours;  // Go to 14:00 UTC next day
-                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
-            } else if (hour < 14) {
-                castTime += 14 hours - hour * 3600;             // Go to 14:00 UTC same day
-                castTime -= minute * 60 + second;               // 14:00 UTC on the hour
+                castTime += (6 - day) * 1 days;                 // Go to Sunday XX:YY
+                castTime += (24 - hour + 14) * 1 hours;         // Go to 14:YY UTC Monday
+                castTime -= minute * 1 minutes + second;        // Go to 14:00 UTC
+            } else {
+                if (hour >= 21) {
+                    if (day == 4) castTime += 2 days;           // If Friday, fast forward to Sunday XX:YY
+                    castTime += (24 - hour + 14) * 1 hours;     // Go to 14:YY UTC next day
+                    castTime -= minute * 1 minutes + second;    // Go to 14:00 UTC
+                } else if (hour < 14) {
+                    castTime += (14 - hour) * 1 hours;          // Go to 14:YY UTC same day
+                    castTime -= minute * 1 minutes + second;    // Go to 14:00 UTC
+                }
             }
         }
-        return castTime;
     }
 
     function schedule() external {
