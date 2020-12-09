@@ -16,6 +16,7 @@
 pragma solidity 0.5.12;
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
+
 contract SpellAction {
     // Office hours enabled if true
     bool constant public officeHours = true;
@@ -25,8 +26,7 @@ contract SpellAction {
     // The contracts in this list should correspond to MCD core contracts, verify
     //  against the current release list at:
     //     https://changelog.makerdao.com/releases/mainnet/active/contracts.json
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    ChainlogAbstract constant CHANGELOG = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     modifier limited {
         if (officeHours) {
