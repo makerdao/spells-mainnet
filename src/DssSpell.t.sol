@@ -977,4 +977,37 @@ contract DssSpellTest is DSTest, DSMath {
         cat.bite("RENBTC-A", address(this));
         assertEq(flipRENBTCA.kicks(), 1);
     }
+
+    function testCastCost() public {
+        vote();
+        spell.schedule();
+
+        uint256 castTime = now + pause.delay();
+
+        castPreviousSpell();
+
+        if(spell.officeHours()) {
+            uint256 day = (castTime / 1 days + 3) % 7;
+            if(day >= 5) {
+                castTime += 7 days - day * 86400;
+            }
+
+            uint256 hour = castTime / 1 hours % 24;
+            if (hour >= 21) {
+                castTime += 24 hours - hour * 3600 + 14 hours;
+            } else if (hour < 14) {
+                castTime += 14 hours - hour * 3600;
+            }
+        }
+
+        hevm.warp(castTime);
+        uint startGas = gasleft();
+        spell.cast();
+        uint endGas = gasleft();
+        uint totalGas = startGas - endGas;
+
+        assertTrue(spell.done());
+        // Fail if cast is too expensive
+        assertTrue(totalGas <= 8 * MILLION);
+    }
 }
