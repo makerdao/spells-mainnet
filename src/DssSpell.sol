@@ -61,7 +61,7 @@ contract SpellAction {
     // DC IAM
     address constant MCD_IAM_AUTO_LINE = 0xC7Bdd1F2B16447dcf3dE045C4a039A60EC2f0ba3;
 
-    // DC IAM
+    // YEARN PROXY
     address constant YEARN_PROXY       = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
 
     // decimals & precision
