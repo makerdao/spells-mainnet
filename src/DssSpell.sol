@@ -282,7 +282,7 @@ contract SpellAction {
 
         // Set ilks in MCD_IAM_AUTO_LINE
         DssAutoLineAbstract(MCD_IAM_AUTO_LINE).setIlk(
-            "ETH-B", 50_000_000 * RAD, 5_000_000 * RAD, 12 hours
+            "ETH-B", 50 * MILLION * RAD, 5 * MILLION * RAD, 12 hours
         );
 
         // Add MCD_IAM_AUTO_LINE
