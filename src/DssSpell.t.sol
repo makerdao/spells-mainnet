@@ -18,38 +18,26 @@ interface SpellLike {
     function cast() external;
 }
 
-interface VoteProxyFactoryAbstract {
-    function initiateLink(address) external;
-    function approveLink(address) external returns (VoteProxyAbstract);
-}
-
-interface VoteProxyAbstract {
-    function lock(uint256) external;
-    function vote(address[] calldata) external;
-}
-
-contract Voter {
-    function doApproveLink(VoteProxyFactoryAbstract voteProxyFactory, address cold) external returns (VoteProxyAbstract voteProxy) {
-        voteProxy = voteProxyFactory.approveLink(cold);
-    }
-
-    function doVote(VoteProxyAbstract voteProxy, address[] calldata votes) external {
-        voteProxy.vote(votes);
-    }
-}
-
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 0;
 
-    // Previous spell; supply if there is a need to test prior to its cast() function being called on mainnet.
-    SpellLike constant PREV_SPELL = SpellLike(0x823Ac093BC6C5D1cC48739d574aC0a8D09ffC565);
-    // Time to warp to in order to allow the previous spell to be cast; ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256   constant PREV_SPELL_EXECUTION_TIME = 1612108914;
+    // Previous spell; supply if there is a need to test prior to its cast()
+    // function being called on mainnet.
+    SpellLike constant PREV_SPELL =
+        SpellLike(0xB70fB4eE900650DCaE5dD63Fd06E07F0b3a45d13);
+
+    // Time to warp to in order to allow the previous spell to be cast;
+    // ignored if PREV_SPELL is SpellLike(address(0)).
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1607281234;
 
     struct CollateralValues {
+        bool aL_enabled;
+        uint256 aL_line;
+        uint256 aL_gap;
+        uint256 aL_ttl;
         uint256 line;
         uint256 dust;
         uint256 chop;
@@ -86,35 +74,37 @@ contract DssSpellTest is DSTest, DSMath {
     Addresses addr  = new Addresses();
 
     // MAINNET ADDRESSES
-    DSPauseAbstract      pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
-    address         pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
-    DSChiefAbstract   oldChief = DSChiefAbstract(    addr.addr("MCD_ADM"));
-    DSChiefAbstract   newChief = DSChiefAbstract(    0x0a3f6849f78076aefaDf113F5BED87720274dDC0);
-    VatAbstract            vat = VatAbstract(        addr.addr("MCD_VAT"));
-    VowAbstract            vow = VowAbstract(        addr.addr("MCD_VOW"));
-    CatAbstract            cat = CatAbstract(        addr.addr("MCD_CAT"));
-    PotAbstract            pot = PotAbstract(        addr.addr("MCD_POT"));
-    JugAbstract            jug = JugAbstract(        addr.addr("MCD_JUG"));
-    SpotAbstract          spot = SpotAbstract(       addr.addr("MCD_SPOT"));
-    DSTokenAbstract        gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
-    EndAbstract            end = EndAbstract(        addr.addr("MCD_END"));
-    IlkRegistryAbstract    reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    DSPauseAbstract        pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
+    address           pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
+    DSChiefAbstract        chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
+    VatAbstract              vat = VatAbstract(        addr.addr("MCD_VAT"));
+    VowAbstract              vow = VowAbstract(        addr.addr("MCD_VOW"));
+    CatAbstract              cat = CatAbstract(        addr.addr("MCD_CAT"));
+    PotAbstract              pot = PotAbstract(        addr.addr("MCD_POT"));
+    JugAbstract              jug = JugAbstract(        addr.addr("MCD_JUG"));
+    SpotAbstract            spot = SpotAbstract(       addr.addr("MCD_SPOT"));
+    DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
+    EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
+    IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
 
-    OsmMomAbstract      osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
-    FlipperMomAbstract flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
-
-    ChainlogAbstract  chainlog = ChainlogAbstract(   addr.addr("CHANGELOG"));
-
-    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
+    OsmMomAbstract        osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
+    FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
+    DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
+    // UNI-A specific
+    DSTokenAbstract          uni = DSTokenAbstract(    addr.addr("UNI"));
+    GemJoinAbstract     joinUNIA = GemJoinAbstract(    addr.addr("MCD_JOIN_UNI_A"));
+    FlipAbstract        flipUNIA = FlipAbstract(       addr.addr("MCD_FLIP_UNI_A"));
+    OsmAbstract           pipUNI = OsmAbstract(        addr.addr("PIP_UNI"));
+    MedianAbstract       medUNIA = MedianAbstract(     0x52f761908cC27B4D77AD7A329463cf08baf62153);
 
     // Specific for this spell
-    DSAuthAbstract saiMom      = DSAuthAbstract(     0xF2C5369cFFb8Ea6284452b0326e326DbFdCb867C);
-    DSAuthAbstract saiTop      = DSAuthAbstract(     0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3);
+    DSTokenAbstract       renbtc = DSTokenAbstract(    addr.addr("RENBTC"));
+    GemJoinAbstract  joinRENBTCA = GemJoinAbstract(    addr.addr("MCD_JOIN_RENBTC_A"));
+    FlipAbstract     flipRENBTCA = FlipAbstract(       addr.addr("MCD_FLIP_RENBTC_A"));
+    OsmAbstract        pipRENBTC = OsmAbstract(        addr.addr("PIP_RENBTC"));
+    MedianAbstract     medRENBTC = MedianAbstract(     0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
 
-    VoteProxyFactoryAbstract
-              voteProxyFactory
-                               = VoteProxyFactoryAbstract(
-                                                     0x6FCD258af181B3221073A96dD90D1f7AE7eEc408);
+    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
     DssSpell spell;
 
@@ -163,15 +153,19 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 TOLERANCE = 10 ** 22;
 
     function yearlyYield(uint256 duty) public pure returns (uint256) {
-        return rpow(duty, (365 * 24 * 60 *60), RAY);
+        return rpow(duty, (365 * 24 * 60 * 60), RAY);
     }
 
     function expectedRate(uint256 percentValue) public pure returns (uint256) {
         return (10000 + percentValue) * (10 ** 23);
     }
 
-    function diffCalc(uint256 expectedRate_, uint256 yearlyYield_) public pure returns (uint256) {
-        return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
+    function diffCalc(
+        uint256 expectedRate_,
+        uint256 yearlyYield_
+    ) public pure returns (uint256) {
+        return (expectedRate_ > yearlyYield_) ?
+            expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
     function castPreviousSpell() internal {
@@ -186,14 +180,15 @@ contract DssSpellTest is DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
-        spell = MAINNET_SPELL != address(0) ? DssSpell(MAINNET_SPELL) : new DssSpell();
+        spell = MAINNET_SPELL != address(0) ?
+            DssSpell(MAINNET_SPELL) : new DssSpell();
 
         //
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              158175 * MILLION / 100,  // In whole Dai units
+            vat_Line:              159875 * MILLION / 100,  // In whole Dai units
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -201,16 +196,20 @@ contract DssSpellTest is DSTest, DSMath {
             vow_bump:              10000,                   // In whole Dai units
             vow_hump:              4 * MILLION,             // In whole Dai units
             cat_box:               15 * MILLION,            // In whole Dai units
-            pause_authority:       address(newChief),       // Pause authority
-            osm_mom_authority:     address(newChief),       // OsmMom authority
-            flipper_mom_authority: address(newChief),       // FlipperMom authority
-            ilk_count:             18                       // Num expected in system
+            pause_authority:       address(chief),          // Pause authority
+            osm_mom_authority:     address(chief),          // OsmMom authority
+            flipper_mom_authority: address(chief),          // FlipperMom authority
+            ilk_count:             20                       // Num expected in system
         });
 
         //
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
+            aL_enabled:   false,           // DssAutoLine is enabled?
+            aL_line:      0 * MILLION,     // In whole Dai units
+            aL_gap:       0 * MILLION,     // In whole Dai units
+            aL_ttl:       0,               // In seconds
             line:         590 * MILLION,   // In whole Dai units
             dust:         500,             // In whole Dai units
             pct:          200,             // In basis points
@@ -223,7 +222,11 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1                // 1 if enabled
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
-            line:         10 * MILLION,
+            aL_enabled:   true,
+            aL_line:      50 * MILLION,
+            aL_gap:       5 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,     // Not checked as there is auto line
             dust:         500,
             pct:          400,
             chop:         1300,
@@ -235,6 +238,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         10 * MILLION,
             dust:         500,
             pct:          400,
@@ -247,9 +254,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         485 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -259,6 +270,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0
         });
         afterSpell.collaterals["USDC-B"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         30 * MILLION,
             dust:         500,
             pct:          5000,
@@ -271,6 +286,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         160 * MILLION,
             dust:         500,
             pct:          400,
@@ -283,9 +302,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         135 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -295,6 +318,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         5 * MILLION,
             dust:         500,
             pct:          400,
@@ -307,6 +334,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         5 * MILLION,
             dust:         500,
             pct:          400,
@@ -319,6 +350,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         250 * THOUSAND,
             dust:         500,
             pct:          1200,
@@ -331,6 +366,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         25 * MILLION / 10,
             dust:         500,
             pct:          800,
@@ -343,9 +382,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         100 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          10100,
@@ -355,6 +398,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         7 * MILLION,
             dust:         500,
             pct:          300,
@@ -367,6 +414,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         3 * MILLION,
             dust:         500,
             pct:          300,
@@ -379,6 +430,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         10 * MILLION,
             dust:         500,
             pct:          200,
@@ -391,6 +446,10 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["BAL-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         4 * MILLION,
             dust:         500,
             pct:          500,
@@ -403,9 +462,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
-            line:         20 * MILLION,
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         30 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          1000,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -415,9 +478,13 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1
         });
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         5 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          0,
             chop:         1300,
             dunk:         50000,
             mat:          10100,
@@ -425,6 +492,38 @@ contract DssSpellTest is DSTest, DSMath {
             ttl:          6 hours,
             tau:          6 hours,
             liquidations: 0
+        });
+        afterSpell.collaterals["UNI-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         15 * MILLION,
+            dust:         500,
+            pct:          300,
+            chop:         1300,
+            dunk:         50000,
+            mat:          17500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+        afterSpell.collaterals["RENBTC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         2 * MILLION,
+            dust:         500,
+            pct:          600,
+            chop:         1300,
+            dunk:         50000,
+            mat:          17500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
         });
     }
 
@@ -468,24 +567,39 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function vote() private {
-        if (oldChief.hat() != address(spell)) {
+        if (chief.hat() != address(spell)) {
             hevm.store(
                 address(gov),
                 keccak256(abi.encode(address(this), uint256(1))),
                 bytes32(uint256(999999999999 ether))
             );
-            gov.approve(address(oldChief), uint256(-1));
-            oldChief.lock(999999999999 ether);
+            gov.approve(address(chief), uint256(-1));
+            chief.lock(999999999999 ether);
+
+            address[] memory slate = new address[](1);
+
+            if (chief.live() == 0) {
+                // Launch system
+                slate[0] = address(0);
+                chief.vote(slate);
+                if (chief.hat() != address(0)) {
+                    chief.lift(address(0));
+                }
+                assertEq(chief.live(), 0);
+                assertTrue(!chief.isUserRoot(address(0)));
+                chief.launch();
+                assertEq(chief.live(), 1);
+                assertTrue(chief.isUserRoot(address(0)));
+            }
 
             assertTrue(!spell.done());
 
-            address[] memory yays = new address[](1);
-            yays[0] = address(spell);
+            slate[0] = address(spell);
 
-            oldChief.vote(yays);
-            oldChief.lift(address(spell));
+            chief.vote(slate);
+            chief.lift(address(spell));
         }
-        assertEq(oldChief.hat(), address(spell));
+        assertEq(chief.hat(), address(spell));
     }
 
     function scheduleWaitAndCast() public {
@@ -621,8 +735,18 @@ contract DssSpellTest is DSTest, DSMath {
             // Convert whole Dai units to expected RAD
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
             sumlines += values.collaterals[ilk].line;
-            assertEq(line, normalizedTestLine);
-            assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
+            (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
+            if (!values.collaterals[ilk].aL_enabled) {
+                assertTrue(aL_line == 0);
+                assertEq(line, normalizedTestLine);
+                assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
+            } else {
+                assertTrue(aL_line > 0);
+                assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
+                assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
+                assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
+                assertTrue((aL_line >= RAD && aL_line < BILLION * RAD) || aL_line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
+            }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
             assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
@@ -660,12 +784,12 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
             assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-            assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
+            // assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
             {
             GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-            assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
+            // assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
@@ -707,230 +831,154 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
+
+        // Verify that yearn has been approved on the YFI/USD OSM
+        address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
+        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
     }
 
-    function testRootExecuteSpell() public {
+    function testSpellAutoLineAuth() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
+        assertEq(vat.wards(address(autoLine)), 1);
     }
 
-    function testRootExecuteSpellViaVoteProxy() public {
+    function testSpellIsCast_UNI_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
+        pipUNI.poke();
+        hevm.warp(now + 3601);
+        pipUNI.poke();
+        spot.poke("UNI-A");
 
-        Voter voter = new Voter();
-        voteProxyFactory.initiateLink(address(voter));
-        VoteProxyAbstract voteProxy = voter.doApproveLink(voteProxyFactory, address(this));
+        // Add balance to the test address
+        uint256 ilkAmt = 10 * THOUSAND * WAD;
+        hevm.store(
+            address(uni),
+            keccak256(abi.encode(address(this), uint256(4))),
+            bytes32(ilkAmt)
+        );
+        assertEq(uni.balanceOf(address(this)), ilkAmt);
 
-        gov.approve(address(voteProxy), uint256(-1));
+        // Check median matches pip.src()
+        assertEq(pipUNI.src(), address(medUNIA));
 
-        voteProxy.lock(80_000 ether);
-        address[] memory slate = new address[](1);
+        // Authorization
+        assertEq(joinUNIA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinUNIA)), 1);
+        assertEq(flipUNIA.wards(address(end)), 1);
+        assertEq(flipUNIA.wards(address(flipMom)), 1);
+        assertEq(pipUNI.wards(address(osmMom)), 1);
+        assertEq(pipUNI.bud(address(spot)), 1);
+        assertEq(pipUNI.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipUNI.src()).bud(address(pipUNI)), 1);
 
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
+        // Join to adapter
+        assertEq(vat.gem("UNI-A", address(this)), 0);
+        uni.approve(address(joinUNIA), ilkAmt);
+        joinUNIA.join(address(this), ilkAmt);
+        assertEq(uni.balanceOf(address(this)), 0);
+        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
 
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(!newChief.isUserRoot(address(testSpell)));
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
+        assertEq(vat.gem("UNI-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 500 * RAD);
 
-        // Launch system
-        slate[0] = address(0);
-        voteProxy.vote(slate);
-        newChief.lift(address(0));
-        assertEq(newChief.live(), 0);
-        assertTrue(!newChief.isUserRoot(address(0)));
-        newChief.launch();
-        assertEq(newChief.live(), 1);
-        assertTrue(newChief.isUserRoot(address(0)));
+        // Payback DAI, withdraw collateral
+        vat.frob("UNI-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
+        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
+        assertEq(vat.dai(address(this)), 0);
 
-        // System launched, lifted address gets root access
-        slate[0] = address(testSpell);
-        voteProxy.vote(slate);
-        newChief.lift(address(testSpell));
-        assertTrue(newChief.isUserRoot(address(testSpell)));
-        testSpell.schedule();
+        // Withdraw from adapter
+        joinUNIA.exit(address(this), ilkAmt);
+        assertEq(uni.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("UNI-A", address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        uni.approve(address(joinUNIA), ilkAmt);
+        joinUNIA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("UNI-A");
+        // dart max amount of DAI
+        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("UNI-A");
+        assertEq(flipUNIA.kicks(), 0);
+        cat.bite("UNI-A", address(this));
+        assertEq(flipUNIA.kicks(), 1);
     }
 
-    function testFailExecuteSpellNotLaunched() public {
+    function testSpellIsCast_RENBTC_A_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
+        pipRENBTC.poke();
+        hevm.warp(now + 3601);
+        pipRENBTC.poke();
+        spot.poke("RENBTC-A");
 
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
+        // Add balance to the test address
+        uint256 ilkAmt = 10**8;
+        uint256 ilkAmt18 = ilkAmt * 10**10;
+        hevm.store(
+            address(renbtc),
+            keccak256(abi.encode(address(this), uint256(102))),
+            bytes32(ilkAmt)
+        );
+        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
 
-        // Create spell for testing
-        TestSpell testSpell = new TestSpell();
+        // Check median matches pip.src()
+        assertEq(pipRENBTC.src(), address(medRENBTC));
 
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
+        // Authorization
+        assertEq(joinRENBTCA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinRENBTCA)), 1);
+        assertEq(flipRENBTCA.wards(address(end)), 1);
+        assertEq(flipRENBTCA.wards(address(flipMom)), 1);
+        assertEq(pipRENBTC.wards(address(osmMom)), 1);
+        assertEq(pipRENBTC.bud(address(spot)), 1);
+        assertEq(pipRENBTC.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipRENBTC.src()).bud(address(pipRENBTC)), 1);
 
-    function _runOldChief() internal {
-        TestSpell testSpell = new TestSpell();
+        // Join to adapter
+        assertEq(vat.gem("RENBTC-A", address(this)), 0);
+        renbtc.approve(address(joinRENBTCA), ilkAmt);
+        joinRENBTCA.join(address(this), ilkAmt);
+        assertEq(renbtc.balanceOf(address(this)), 0);
+        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
 
-        address[] memory slate = new address[](1);
-        slate[0] = address(testSpell);
-        oldChief.vote(slate);
-        oldChief.lift(address(testSpell));
-        testSpell.schedule();
-    }
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(500 * WAD));
+        assertEq(vat.gem("RENBTC-A", address(this)), 0);
+        assertEq(vat.dai(address(this)), 500 * RAD);
 
-    function testExecuteSpellOldChief() public {
-        vote();
-        _runOldChief();
-    }
+        // Payback DAI, withdraw collateral
+        vat.frob("RENBTC-A", address(this), address(this), address(this), -int(ilkAmt18), -int(500 * WAD));
+        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
+        assertEq(vat.dai(address(this)), 0);
 
-    function testFailExecuteSpellOldChief() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
+        // Withdraw from adapter
+        joinRENBTCA.exit(address(this), ilkAmt);
+        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("RENBTC-A", address(this)), 0);
 
-        _runOldChief();
-    }
-
-    function testMoms() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        DSTokenAbstract(oldChief.IOU()).approve(address(oldChief), uint256(-1));
-        oldChief.free(999999999999 ether);
-        gov.approve(address(newChief), uint256(-1));
-
-        newChief.lock(80_000 ether);
-        address[] memory slate = new address[](1);
-
-        // Create spell for testing
-        TestMomsSpell testMomsSpell = new TestMomsSpell();
-
-        // System not launched, lifted address doesn't get root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(!newChief.isUserRoot(address(testMomsSpell)));
-
-        // Launch system
-        slate[0] = address(0);
-        newChief.vote(slate);
-        newChief.lift(address(0));
-        newChief.launch();
-
-        // System launched, lifted address gets root access
-        slate[0] = address(testMomsSpell);
-        newChief.vote(slate);
-        newChief.lift(address(testMomsSpell));
-        assertTrue(newChief.isUserRoot(address(testMomsSpell)));
-
-        FlipAbstract flip = FlipAbstract(chainlog.getAddress("MCD_FLIP_ETH_A"));
-        OsmAbstract   osm = OsmAbstract(chainlog.getAddress("PIP_ETH"));
-
-        assertEq(flip.wards(address(cat)), 1);
-        assertEq(osm.stopped(), 0);
-        testMomsSpell.cast();
-        assertEq(flip.wards(address(cat)), 0);
-        assertEq(osm.stopped(), 1);
-    }
-
-    function testSAIcontractsAuthorityChange() public {
-        assertEq(saiMom.authority(), address(oldChief));
-        assertEq(saiTop.authority(), address(oldChief));
-        vote();
-        spell.schedule();
-        assertEq(saiMom.authority(), address(0));
-        assertEq(saiTop.authority(), address(0));
-    }
-}
-
-contract SpellActionTest {
-    function execute() external {
-        // Random action to test authority
-        VatAbstract(ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F).getAddress("MCD_VAT")).rely(address(123));
-    }
-}
-
-contract TestSpell {
-    DSPauseAbstract public pause =
-        DSPauseAbstract(ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F).getAddress("MCD_PAUSE"));
-    address         public action;
-    bytes32         public tag;
-    uint256         public eta;
-    bytes           public sig;
-
-    constructor() public {
-        sig = abi.encodeWithSignature("execute()");
-        action = address(new SpellActionTest());
-        bytes32 _tag;
-        address _action = action;
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
-    }
-
-    function schedule() public {
-        eta = now + DSPauseAbstract(pause).delay();
-        pause.plot(action, tag, sig, eta);
-    }
-}
-
-contract TestMomsSpell {
-    ChainlogAbstract chainlog = ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    FlipperMomAbstract public fMom =
-        FlipperMomAbstract(chainlog.getAddress("FLIPPER_MOM"));
-
-    OsmMomAbstract public oMom =
-        OsmMomAbstract(chainlog.getAddress("OSM_MOM"));
-
-    function cast() public {
-        fMom.deny(chainlog.getAddress("MCD_FLIP_ETH_A"));
-        oMom.stop("ETH-A");
+        // Generate new DAI to force a liquidation
+        renbtc.approve(address(joinRENBTCA), ilkAmt);
+        joinRENBTCA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("RENBTC-A");
+        // dart max amount of DAI
+        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip("RENBTC-A");
+        assertEq(flipRENBTCA.kicks(), 0);
+        cat.bite("RENBTC-A", address(this));
+        assertEq(flipRENBTCA.kicks(), 1);
     }
 }
