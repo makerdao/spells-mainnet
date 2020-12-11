@@ -90,19 +90,20 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract        osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
-    // UNI-A specific
+
+    // Specific for this spell
     DSTokenAbstract          uni = DSTokenAbstract(    addr.addr("UNI"));
     GemJoinAbstract     joinUNIA = GemJoinAbstract(    addr.addr("MCD_JOIN_UNI_A"));
     FlipAbstract        flipUNIA = FlipAbstract(       addr.addr("MCD_FLIP_UNI_A"));
     OsmAbstract           pipUNI = OsmAbstract(        addr.addr("PIP_UNI"));
     MedianAbstract       medUNIA = MedianAbstract(     0x52f761908cC27B4D77AD7A329463cf08baf62153);
 
-    // Specific for this spell
     DSTokenAbstract       renbtc = DSTokenAbstract(    addr.addr("RENBTC"));
     GemJoinAbstract  joinRENBTCA = GemJoinAbstract(    addr.addr("MCD_JOIN_RENBTC_A"));
     FlipAbstract     flipRENBTCA = FlipAbstract(       addr.addr("MCD_FLIP_RENBTC_A"));
     OsmAbstract        pipRENBTC = OsmAbstract(        addr.addr("PIP_RENBTC"));
     MedianAbstract     medRENBTC = MedianAbstract(     0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
+    //
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
@@ -835,13 +836,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Verify that yearn has been approved on the YFI/USD OSM
         address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
         assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
-    }
 
-    function testSpellAutoLineAuth() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
+        // Verify DssAutoLine is authored to file the Vat
         assertEq(vat.wards(address(autoLine)), 1);
     }
 
