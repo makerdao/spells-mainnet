@@ -340,7 +340,7 @@ contract SpellAction {
         JugAbstract(MCD_JUG).file("GUSD-A", "duty", ZERO_PERCENT_RATE);
 
         // Set the global debt ceiling
-        VatAbstract(MCD_VAT).file("Line", 1_598_750_000 * RAD);
+        VatAbstract(MCD_VAT).file("Line", 1_608_750_000 * RAD);
     }
 }
 

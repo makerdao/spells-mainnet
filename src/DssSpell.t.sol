@@ -188,7 +188,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              159875 * MILLION / 100,  // In whole Dai units
+            vat_Line:              160875 * MILLION / 100,  // In whole Dai units
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -734,7 +734,7 @@ contract DssSpellTest is DSTest, DSMath {
             (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
             // Convert whole Dai units to expected RAD
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
-            sumlines += values.collaterals[ilk].line;
+            sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
             if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
@@ -784,16 +784,16 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
             assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-            // assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
+            assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
             {
             GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-            // assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
+            assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        assertEq(sumlines, values.vat_Line);
+        assertEq(sumlines, values.vat_Line * RAD);
     }
 
     function testFailWrongDay() public {
