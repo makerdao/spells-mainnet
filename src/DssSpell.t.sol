@@ -91,18 +91,6 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
-    // Specific for this spell
-    DSTokenAbstract          uni = DSTokenAbstract(    addr.addr("UNI"));
-    GemJoinAbstract     joinUNIA = GemJoinAbstract(    addr.addr("MCD_JOIN_UNI_A"));
-    FlipAbstract        flipUNIA = FlipAbstract(       addr.addr("MCD_FLIP_UNI_A"));
-    OsmAbstract           pipUNI = OsmAbstract(        addr.addr("PIP_UNI"));
-    MedianAbstract       medUNIA = MedianAbstract(     0x52f761908cC27B4D77AD7A329463cf08baf62153);
-
-    DSTokenAbstract       renbtc = DSTokenAbstract(    addr.addr("RENBTC"));
-    GemJoinAbstract  joinRENBTCA = GemJoinAbstract(    addr.addr("MCD_JOIN_RENBTC_A"));
-    FlipAbstract     flipRENBTCA = FlipAbstract(       addr.addr("MCD_FLIP_RENBTC_A"));
-    OsmAbstract        pipRENBTC = OsmAbstract(        addr.addr("PIP_RENBTC"));
-    MedianAbstract     medRENBTC = MedianAbstract(     0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
     //
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
