@@ -88,9 +88,9 @@ contract SpellAction {
 
     modifier limited {
         if (officeHours) {
-            uint day = (now / 1 days + 3) % 7;
+            uint day = (block.timestamp / 1 days + 3) % 7;
             require(day < 5, "Can only be cast on a weekday");
-            uint hour = now / 1 hours % 24;
+            uint hour = block.timestamp / 1 hours % 24;
             require(hour >= 14 && hour < 21, "Outside office hours");
         }
         _;
@@ -159,12 +159,12 @@ contract DssSpell {
         address _action = action = address(new SpellAction());
         assembly { _tag := extcodehash(_action) }
         tag = _tag;
-        expiration = now + 30 days;
+        expiration = block.timestamp + 30 days;
     }
 
     function nextCastTime() external returns (uint256 castTime) {
         require(eta != 0, "DSSSpell/spell-not-scheduled");
-        castTime = now > eta ? now : eta; // Any day at XX:YY
+        castTime = block.timestamp > eta ? block.timestamp : eta; // Any day at XX:YY
 
         if (SpellAction(action).officeHours()) {
             uint256 day    = (castTime / 1 days + 3) % 7;
@@ -190,9 +190,9 @@ contract DssSpell {
     }
 
     function schedule() external {
-        require(now <= expiration, "DSSSpell/spell-has-expired");
+        require(block.timestamp <= expiration, "DSSSpell/spell-has-expired");
         require(eta == 0, "DSSSpell/spell-already-scheduled");
-        eta = now + DSPauseAbstract(pause).delay();
+        eta = block.timestamp + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
     }
 
