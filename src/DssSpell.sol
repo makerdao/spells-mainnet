@@ -45,25 +45,21 @@ contract SpellAction {
     ChainlogAbstract constant CHANGELOG =
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
-    // UNI-A
-    address constant UNI               = 0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984;
-    address constant MCD_JOIN_UNI_A    = 0x3BC3A58b4FC1CbE7e98bB4aB7c99535e8bA9b8F1;
-    address constant MCD_FLIP_UNI_A    = 0xF5b8cD9dB5a0EC031304A7B815010aa7761BD426;
-    address constant PIP_UNI           = 0xf363c7e351C96b910b92b45d34190650df4aE8e7;
-    bytes32 constant ILK_UNI_A         = "UNI-A";
+    // AAVE-A
+    address constant AAVE               = 0x0;
+    address constant MCD_JOIN_AAVE_A    = 0x0;
+    address constant MCD_FLIP_AAVE_A    = 0x0;
+    address constant PIP_AAVE           = 0x0;
+    bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
-    // RENBTC-A
-    address constant RENBTC            = 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D;
-    address constant MCD_JOIN_RENBTC_A = 0xFD5608515A47C37afbA68960c1916b79af9491D0;
-    address constant MCD_FLIP_RENBTC_A = 0x30BC6eBC27372e50606880a36B279240c0bA0758;
-    address constant PIP_RENBTC        = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
-    bytes32 constant ILK_RENBTC_A      = "RENBTC-A";
+    // UNIV2LPWETHDAI-A
+    address constant UNIV2LPWETHDAI            = 0x0;
+    address constant MCD_JOIN_UNIV2LPWETHDAI_A = 0x0;
+    address constant MCD_FLIP_UNIV2LPWETHDAI_A = 0x0;
+    address constant PIP_UNIV2LPWETHDAI        = 0x0;
+    bytes32 constant ILK_UNIV2LPWETHDAI_A      = "UNIV2LPWETHDAI-A";
 
-    // DC IAM
-    address constant MCD_IAM_AUTO_LINE = 0xC7Bdd1F2B16447dcf3dE045C4a039A60EC2f0ba3;
-
-    // YEARN PROXY
-    address constant YEARN_PROXY       = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
+    // MIP21
 
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
