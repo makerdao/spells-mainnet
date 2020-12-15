@@ -162,15 +162,42 @@ contract DssSpell {
         expiration = now + 30 days;
     }
 
+    function nextCastTime() external returns (uint256 castTime) {
+        require(eta != 0, "DSSSpell/spell-not-scheduled");
+        castTime = now > eta ? now : eta; // Any day at XX:YY
+
+        if (SpellAction(action).officeHours()) {
+            uint256 day    = (castTime / 1 days + 3) % 7;
+            uint256 hour   = castTime / 1 hours % 24;
+            uint256 minute = castTime / 1 minutes % 60;
+            uint256 second = castTime % 60;
+
+            if (day >= 5) {
+                castTime += (6 - day) * 1 days;                 // Go to Sunday XX:YY
+                castTime += (24 - hour + 14) * 1 hours;         // Go to 14:YY UTC Monday
+                castTime -= minute * 1 minutes + second;        // Go to 14:00 UTC
+            } else {
+                if (hour >= 21) {
+                    if (day == 4) castTime += 2 days;           // If Friday, fast forward to Sunday XX:YY
+                    castTime += (24 - hour + 14) * 1 hours;     // Go to 14:YY UTC next day
+                    castTime -= minute * 1 minutes + second;    // Go to 14:00 UTC
+                } else if (hour < 14) {
+                    castTime += (14 - hour) * 1 hours;          // Go to 14:YY UTC same day
+                    castTime -= minute * 1 minutes + second;    // Go to 14:00 UTC
+                }
+            }
+        }
+    }
+
     function schedule() external {
-        require(now <= expiration, "This contract has expired");
-        require(eta == 0, "This spell has already been scheduled");
+        require(now <= expiration, "DSSSpell/spell-has-expired");
+        require(eta == 0, "DSSSpell/spell-already-scheduled");
         eta = now + DSPauseAbstract(pause).delay();
         pause.plot(action, tag, sig, eta);
     }
 
     function cast() external {
-        require(!done, "spell-already-cast");
+        require(!done, "DSSSpell/spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
     }
