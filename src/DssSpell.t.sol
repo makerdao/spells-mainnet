@@ -834,12 +834,6 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkCollateralValues(afterSpell);
 
-        // Verify that yearn has been approved on the YFI/USD OSM
-        address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
-
-        // Verify DssAutoLine is authored to file the Vat
-        assertEq(vat.wards(address(autoLine)), 1);
     }
 
     function testSpellIsCast_AAVE_INTEGRATION() public {
