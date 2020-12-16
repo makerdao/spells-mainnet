@@ -53,7 +53,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     struct SystemValues {
         uint256 pot_dsr;
-        uint256 vat_Line;
         uint256 pause_delay;
         uint256 vow_wait;
         uint256 vow_dump;
@@ -93,17 +92,7 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
-    DSTokenAbstract          uni = DSTokenAbstract(    addr.addr("UNI"));
-    GemJoinAbstract     joinUNIA = GemJoinAbstract(    addr.addr("MCD_JOIN_UNI_A"));
-    FlipAbstract        flipUNIA = FlipAbstract(       addr.addr("MCD_FLIP_UNI_A"));
-    OsmAbstract           pipUNI = OsmAbstract(        addr.addr("PIP_UNI"));
-    MedianAbstract       medUNIA = MedianAbstract(     0x52f761908cC27B4D77AD7A329463cf08baf62153);
 
-    DSTokenAbstract       renbtc = DSTokenAbstract(    addr.addr("RENBTC"));
-    GemJoinAbstract  joinRENBTCA = GemJoinAbstract(    addr.addr("MCD_JOIN_RENBTC_A"));
-    FlipAbstract     flipRENBTCA = FlipAbstract(       addr.addr("MCD_FLIP_RENBTC_A"));
-    OsmAbstract        pipRENBTC = OsmAbstract(        addr.addr("PIP_RENBTC"));
-    MedianAbstract     medRENBTC = MedianAbstract(     0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
     //
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
@@ -190,7 +179,6 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell = SystemValues({
             pot_dsr:               0,                       // In basis points
-            vat_Line:              160875 * MILLION / 100,  // In whole Dai units
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
@@ -214,7 +202,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,               // In seconds
             line:         590 * MILLION,   // In whole Dai units
             dust:         500,             // In whole Dai units
-            pct:          200,             // In basis points
+            pct:          250,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
@@ -230,7 +218,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,     // Not checked as there is auto line
             dust:         500,
-            pct:          400,
+            pct:          500,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
@@ -246,7 +234,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         10 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          800,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          15000,
@@ -294,7 +282,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         160 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          450,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          15000,
@@ -326,7 +314,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         5 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -342,7 +330,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         5 * MILLION,
             dust:         500,
-            pct:          400,
+            pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -358,7 +346,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         250 * THOUSAND,
             dust:         500,
-            pct:          1200,
+            pct:          1000,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -406,7 +394,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         7 * MILLION,
             dust:         500,
-            pct:          300,
+            pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -454,7 +442,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         4 * MILLION,
             dust:         500,
-            pct:          500,
+            pct:          200,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -470,7 +458,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         30 * MILLION,
             dust:         500,
-            pct:          1000,
+            pct:          900,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -631,8 +619,6 @@ contract DssSpellTest is DSTest, DSMath {
 
         {
         // Line values in RAD
-        uint256 normalizedLine = values.vat_Line * RAD;
-        assertEq(vat.Line(), normalizedLine);
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < 100 * BILLION * RAD) ||
             vat.Line() == 0
@@ -778,7 +764,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        assertEq(sumlines, values.vat_Line * RAD);
+        assertEq(sumlines, vat.Line() * RAD);
     }
 
     function testFailWrongDay() public {

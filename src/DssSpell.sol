@@ -46,18 +46,18 @@ contract SpellAction {
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     // AAVE-A
-    address constant AAVE               = 0x0;
-    address constant MCD_JOIN_AAVE_A    = 0x0;
-    address constant MCD_FLIP_AAVE_A    = 0x0;
-    address constant PIP_AAVE           = 0x0;
-    bytes32 constant ILK_AAVE_A         = "AAVE-A";
+    //address constant AAVE               = 0x0;
+    //address constant MCD_JOIN_AAVE_A    = 0x0;
+    //address constant MCD_FLIP_AAVE_A    = 0x0;
+    //address constant PIP_AAVE           = 0x0;
+    //bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
     // UNIV2LPWETHDAI-A
-    address constant UNIV2LPWETHDAI            = 0x0;
-    address constant MCD_JOIN_UNIV2LPWETHDAI_A = 0x0;
-    address constant MCD_FLIP_UNIV2LPWETHDAI_A = 0x0;
-    address constant PIP_UNIV2LPWETHDAI        = 0x0;
-    bytes32 constant ILK_UNIV2LPWETHDAI_A      = "UNIV2LPWETHDAI-A";
+    //address constant UNIV2LPWETHDAI            = 0x0;
+    //address constant MCD_JOIN_UNIV2LPWETHDAI_A = 0x0;
+    //address constant MCD_FLIP_UNIV2LPWETHDAI_A = 0x0;
+    //address constant PIP_UNIV2LPWETHDAI        = 0x0;
+    //bytes32 constant ILK_UNIV2LPWETHDAI_A      = "UNIV2LPWETHDAI-A";
 
     // MIP21
 
@@ -77,10 +77,16 @@ contract SpellAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant ZERO_PERCENT_RATE  = 1000000000000000000000000000;
-    uint256 constant THREE_PERCENT_RATE = 1000000000937303470807876289;
-    uint256 constant SIX_PERCENT_RATE   = 1000000001847694957439350562;
-    uint256 constant TEN_PERCENT_RATE   = 1000000003022265980097387650;
+    uint256 constant ZERO_PERCENT_RATE            = 1000000000000000000000000000;
+    uint256 constant TWO_PERCENT_RATE             = 1000000000627937192491029810;
+    uint256 constant TWO_POINT_FIVE_PERCENT_RATE  = 1000000000782997609082909351;
+    uint256 constant THREE_PERCENT_RATE           = 1000000000937303470807876289;
+    uint256 constant FOUR_POINT_FIVE_PERCENT_RATE = 1000000001395766281313196627;
+    uint256 constant FIVE_PERCENT_RATE            = 1000000001547125957863212448;
+    uint256 constant SIX_PERCENT_RATE             = 1000000001847694957439350562;
+    uint256 constant EIGHT_PERCENT_RATE           = 1000000002440418608258400030;
+    uint256 constant NINE_PERCENT_RATE            = 1000000002732676825177582095;
+    uint256 constant TEN_PERCENT_RATE             = 1000000003022265980097387650;
 
     modifier limited {
         if (officeHours) {
@@ -122,6 +128,42 @@ contract SpellAction {
         //
         // Various polling changes
         //
+
+        // Whitelist Gnosis on ETHUSD Oracle (MIP10c9-SP15) - December 14, 2020
+        // https://vote.makerdao.com/polling/QmUqW1pf#poll-detail
+
+        // Rates Proposal - December 14, 2020
+        // https://vote.makerdao.com/polling/QmTTjqGb?network=mainnet#poll-detail
+        // Increase the ETH-A stability fee from 2% to 2.5%.
+        JugAbstract(MCD_JUG).drip("ETH-A");
+        JugAbstract(MCD_JUG).file("ETH-A", "duty", TWO_POINT_FIVE_PERCENT_RATE);
+        // Increase the ETH-B stability fee from 4% to 5%.
+        JugAbstract(MCD_JUG).drip("ETH-B");
+        JugAbstract(MCD_JUG).file("ETH-B", "duty", FIVE_PERCENT_RATE);
+        // Increase the WBTC-A stability fee from 4% to 4.5%.
+        JugAbstract(MCD_JUG).drip("WBTC-A");
+        JugAbstract(MCD_JUG).file("WBTC-A", "duty", FOUR_POINT_FIVE_PERCENT_RATE);
+        // Increase the BAT-A stability fee from 4% to 8%.
+        JugAbstract(MCD_JUG).drip("BAT-A");
+        JugAbstract(MCD_JUG).file("BAT-A", "duty", EIGHT_PERCENT_RATE);
+        // Decrease the KNC-A stability fee from 4% to 2%.
+        JugAbstract(MCD_JUG).drip("KNC-A");
+        JugAbstract(MCD_JUG).file("KNC-A", "duty", TWO_PERCENT_RATE);
+        // Decrease the ZRX-A stability fee from 4% to 2%.
+        JugAbstract(MCD_JUG).drip("ZRX-A");
+        JugAbstract(MCD_JUG).file("ZRX-A", "duty", TWO_PERCENT_RATE);
+        // Decrease the MANA-A stability fee from 12% to 10%.
+        JugAbstract(MCD_JUG).drip("MANA-A");
+        JugAbstract(MCD_JUG).file("MANA-A", "duty", TEN_PERCENT_RATE);
+        // Decrease the COMP-A stability fee from 3% to 2%.
+        JugAbstract(MCD_JUG).drip("COMP-A");
+        JugAbstract(MCD_JUG).file("COMP-A", "duty", TWO_PERCENT_RATE);
+        // Decrease the BAL-A stability fee from 5% to 2%.
+        JugAbstract(MCD_JUG).drip("BAL-A");
+        JugAbstract(MCD_JUG).file("BAL-A", "duty", TWO_PERCENT_RATE);
+        // Decrease the YFI-A stability fee from 10% to 9%.
+        JugAbstract(MCD_JUG).drip("YFI-A");
+        JugAbstract(MCD_JUG).file("YFI-A", "duty", NINE_PERCENT_RATE);
 
     }
 }
