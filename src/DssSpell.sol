@@ -108,7 +108,6 @@ contract SpellAction {
         address FLIPPER_MOM  = CHANGELOG.getAddress("FLIPPER_MOM");
         address OSM_MOM      = CHANGELOG.getAddress("OSM_MOM"); // Only if PIP_TOKEN = Osm
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
-        address PIP_YFI      = CHANGELOG.getAddress("PIP_YFI");
         address PIP_ETH      = CHANGELOG.getAddress("PIP_ETH");
 
         //
@@ -203,7 +202,7 @@ contract DssSpell {
         expiration = block.timestamp + 30 days;
     }
 
-    function nextCastTime() external returns (uint256 castTime) {
+    function nextCastTime() external view returns (uint256 castTime) {
         require(eta != 0, "DSSSpell/spell-not-scheduled");
         castTime = block.timestamp > eta ? block.timestamp : eta; // Any day at XX:YY
 
