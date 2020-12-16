@@ -1048,4 +1048,13 @@ contract DssSpellTest is DSTest, DSMath {
         uint castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
     }
+
+    function testGnosis() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        address GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
+        assertEq(1,    OsmAbstract(addr.addr("PIP_ETH")).bud(GNOSIS));
+    }
 }

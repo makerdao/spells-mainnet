@@ -59,7 +59,8 @@ contract SpellAction {
     //address constant PIP_UNIV2LPWETHDAI        = 0x0;
     //bytes32 constant ILK_UNIV2LPWETHDAI_A      = "UNIV2LPWETHDAI-A";
 
-    // MIP21
+    // Gnosis
+    address constant GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
 
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -108,6 +109,7 @@ contract SpellAction {
         address OSM_MOM      = CHANGELOG.getAddress("OSM_MOM"); // Only if PIP_TOKEN = Osm
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
         address PIP_YFI      = CHANGELOG.getAddress("PIP_YFI");
+        address PIP_ETH      = CHANGELOG.getAddress("PIP_ETH");
 
         //
         // Add AAVE
@@ -131,6 +133,7 @@ contract SpellAction {
 
         // Whitelist Gnosis on ETHUSD Oracle (MIP10c9-SP15) - December 14, 2020
         // https://vote.makerdao.com/polling/QmUqW1pf#poll-detail
+        OsmAbstract(PIP_ETH).kiss(GNOSIS);
 
         // Rates Proposal - December 14, 2020
         // https://vote.makerdao.com/polling/QmTTjqGb?network=mainnet#poll-detail
