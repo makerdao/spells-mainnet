@@ -764,7 +764,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        assertEq(sumlines, vat.Line() * RAD);
+        assertEq(sumlines, vat.Line());
     }
 
     function testFailWrongDay() public {
