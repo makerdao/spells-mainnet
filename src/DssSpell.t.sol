@@ -848,19 +848,12 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 ilkAmt = 1 * THOUSAND * WAD;
         hevm.store(
             address(aave),
-            keccak256(abi.encode(address(this), uint256(?))),
+            keccak256(abi.encode(address(this), uint256(102))),
             bytes32(ilkAmt)
         );
         assertEq(aave.balanceOf(address(this)), ilkAmt);
 
         // FIXME Update to not use faucet
-
-        // Check faucet amount
-        uint256 faucetAmount = faucet.amt(address(aave));
-        uint256 faucetAmountWad = faucetAmount * (10 ** (18 - aave.decimals()));
-        assertTrue(faucetAmount > 0);
-        faucet.gulp(address(aave));
-        assertEq(aave.balanceOf(address(this)), faucetAmount);
 
         // Check median matches pip.src()
         assertEq(pipAAVE.src(), address(medAAVEA));
@@ -877,33 +870,33 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Join to adapter
         assertEq(vat.gem("AAVE-A", address(this)), 0);
-        aave.approve(address(joinAAVEA), faucetAmount);
-        joinAAVEA.join(address(this), faucetAmount);
+        aave.approve(address(joinAAVEA), ilkAmt);
+        joinAAVEA.join(address(this), ilkAmt);
         assertEq(aave.balanceOf(address(this)), 0);
-        assertEq(vat.gem("AAVE-A", address(this)), faucetAmountWad);
+        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("AAVE-A", address(this), address(this), address(this), int(faucetAmountWad), int(100 * WAD));
+        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
         assertEq(vat.gem("AAVE-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("AAVE-A", address(this), address(this), address(this), -int(faucetAmountWad), -int(100 * WAD));
-        assertEq(vat.gem("AAVE-A", address(this)), faucetAmountWad);
+        vat.frob("AAVE-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinAAVEA.exit(address(this), faucetAmount);
-        assertEq(aave.balanceOf(address(this)), faucetAmount);
+        joinAAVEA.exit(address(this), ilkAmt);
+        assertEq(aave.balanceOf(address(this)), ilkAmt);
         assertEq(vat.gem("AAVE-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        aave.approve(address(joinAAVEA), faucetAmount);
-        joinAAVEA.join(address(this), faucetAmount);
+        aave.approve(address(joinAAVEA), ilkAmt);
+        joinAAVEA.join(address(this), ilkAmt);
         (,,uint256 spotV,,) = vat.ilks("AAVE-A");
         // dart max amount of DAI
-        vat.frob("AAVE-A", address(this), address(this), address(this), int(faucetAmountWad), int(mul(faucetAmount, spotV) / RAY));
+        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip("AAVE-A");
         assertEq(flipAAVEA.kicks(), 0);

@@ -46,9 +46,9 @@ contract SpellAction {
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     // AAVE-A
-    address constant AAVE               = 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9;
-    address constant MCD_JOIN_AAVE_A    = 0x24e459f61ceaa7b1ce70dbaea938940a7c5ad46e;
-    address constant MCD_FLIP_AAVE_A    = 0x16e1b844094c885a37509a8f76c533b5fbfed13a;
+    address constant AAVE               = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
+    address constant MCD_JOIN_AAVE_A    = 0x24e459F61cEAa7b1cE70Dbaea938940A7c5aD46e;
+    address constant MCD_FLIP_AAVE_A    = 0x16e1b844094c885a37509a8f76c533B5fbFED13a;
     address constant PIP_AAVE           = 0x8Df8f06DC2dE0434db40dcBb32a82A104218754c;
     bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
