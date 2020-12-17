@@ -113,7 +113,7 @@ contract SpellAction {
         // Set the global debt ceiling
         // + 10 M for AAVE-A
         // +  3 M for UNIV2DAIETH-A
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 10 * MILLION * RAD + 3 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 10 * MILLION * RAD);
 
         //
         // Add AAVE

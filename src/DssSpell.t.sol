@@ -846,14 +846,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Add balance to the test address
         uint256 ilkAmt = 1 * THOUSAND * WAD;
+
         hevm.store(
             address(aave),
-            keccak256(abi.encode(address(this), uint256(102))),
+            keccak256(abi.encode(address(this), uint256(0))),
             bytes32(ilkAmt)
         );
-        assertEq(aave.balanceOf(address(this)), ilkAmt);
 
-        // FIXME Update to not use faucet
+        assertEq(aave.balanceOf(address(this)), ilkAmt);
 
         // Check median matches pip.src()
         assertEq(pipAAVE.src(), address(medAAVEA));
@@ -877,12 +877,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(100 * WAD));
+        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
         assertEq(vat.gem("AAVE-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
+        assertEq(vat.dai(address(this)), 500 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("AAVE-A", address(this), address(this), address(this), -int(ilkAmt), -int(100 * WAD));
+        vat.frob("AAVE-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
         assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
         assertEq(vat.dai(address(this)), 0);
 
