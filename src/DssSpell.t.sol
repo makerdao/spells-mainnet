@@ -537,6 +537,8 @@ contract DssSpellTest is DSTest, DSMath {
             tau:          6 hours,
             liquidations: 1
         });
+
+
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -841,6 +843,17 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(now + 3601);
         pipAAVE.poke();
         spot.poke("AAVE-A");
+
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        hevm.store(
+            address(aave),
+            keccak256(abi.encode(address(this), uint256(?))),
+            bytes32(ilkAmt)
+        );
+        assertEq(aave.balanceOf(address(this)), ilkAmt);
+
+        // FIXME Update to not use faucet
 
         // Check faucet amount
         uint256 faucetAmount = faucet.amt(address(aave));
