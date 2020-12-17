@@ -99,6 +99,14 @@ contract DssSpellTest is DSTest, DSMath {
     OsmAbstract        pipAAVE = OsmAbstract(          addr.addr("PIP_AAVE"));
     MedianAbstract    medAAVEA = MedianAbstract(0xe62872DFEbd323b03D27946f8e2491B454a69811);
 
+    // UNIV2DAIETH-A specific
+    DSTokenAbstract     lp = DSTokenAbstract(addr.addr("UNIV2DAIETH"));
+    GemJoinAbstract lpJoin = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIETH_A"));
+    FlipAbstract    lpFlip = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2DAIETH_A"));
+    LPOsmAbstract    lpPip = LPOsmAbstract(  addr.addr("PIP_UNIV2DAIETH"));
+    MedianAbstract    orb0 = MedianAbstract( lpPip.orb0());
+    MedianAbstract    orb1 = MedianAbstract( lpPip.orb0());
+
     //
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
@@ -537,8 +545,22 @@ contract DssSpellTest is DSTest, DSMath {
             tau:          6 hours,
             liquidations: 1
         });
-
-
+        afterSpell.collaterals["UNIV2DAIETH-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         500,
+            pct:          100,
+            chop:         1300,
+            dunk:         500,
+            mat:          12500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -904,75 +926,72 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flipAAVEA.kicks(), 1);
     }
 
-    function testSpellIsCast_UNIV2_LP_WETH_DAI_INTEGRATION() public {
-        /*
+    function testSpellIsCast_UNIV2DAIETH_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        pipRENBTC.poke();
-        hevm.warp(now + 3601);
-        pipRENBTC.poke();
-        spot.poke("RENBTC-A");
+        bytes32 ilk = "UNIV2DAIETH-A";
 
-        // Add balance to the test address
-        uint256 ilkAmt = 10**8;
-        uint256 ilkAmt18 = ilkAmt * 10**10;
-        hevm.store(
-            address(renbtc),
-            keccak256(abi.encode(address(this), uint256(102))),
-            bytes32(ilkAmt)
-        );
-        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
+        lpPip.poke();
+        hevm.warp(now + 3601);
+        lpPip.poke();
+        spot.poke(ilk);
 
         // Check median matches pip.src()
-        assertEq(pipRENBTC.src(), address(medRENBTC));
+        assertEq(lpPip.src(), address(lp)); // TODO: Check orbs
 
         // Authorization
-        assertEq(joinRENBTCA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinRENBTCA)), 1);
-        assertEq(flipRENBTCA.wards(address(end)), 1);
-        assertEq(flipRENBTCA.wards(address(flipMom)), 1);
-        assertEq(pipRENBTC.wards(address(osmMom)), 1);
-        assertEq(pipRENBTC.bud(address(spot)), 1);
-        assertEq(pipRENBTC.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipRENBTC.src()).bud(address(pipRENBTC)), 1);
+        assertEq(lpJoin.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(lpJoin)), 1);
+        assertEq(lpFlip.wards(address(end)), 1);
+        assertEq(lpFlip.wards(address(flipMom)), 1);
+        assertEq(lpPip.wards(address(osmMom)), 1);
+        assertEq(lpPip.bud(address(spot)), 1);
+        assertEq(lpPip.bud(address(end)), 1);
+        assertEq(MedianAbstract(lpPip.src()).bud(address(lpPip)), 1);
 
         // Join to adapter
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
-        renbtc.approve(address(joinRENBTCA), ilkAmt);
-        joinRENBTCA.join(address(this), ilkAmt);
-        assertEq(renbtc.balanceOf(address(this)), 0);
-        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
+        uint256 amount = 100 ether;
+        hevm.store(
+            address(lp),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(amount)
+        );
+        assertEq(lp.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
+        lp.approve(address(lpJoin), amount);
+        lpJoin.join(address(this), amount);
+        assertEq(lp.balanceOf(address(this)), 0);
+        assertEq(vat.gem(ilk, address(this)), amount);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(500 * WAD));
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 500 * RAD);
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(100 * WAD));
+        assertEq(vat.gem(ilk, address(this)), 0);
+        assertEq(vat.dai(address(this)), 100 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("RENBTC-A", address(this), address(this), address(this), -int(ilkAmt18), -int(500 * WAD));
-        assertEq(vat.gem("RENBTC-A", address(this)), ilkAmt18);
+        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(100 * WAD));
+        assertEq(vat.gem(ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinRENBTCA.exit(address(this), ilkAmt);
-        assertEq(renbtc.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("RENBTC-A", address(this)), 0);
+        lpJoin.exit(address(this), amount);
+        assertEq(lp.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        renbtc.approve(address(joinRENBTCA), ilkAmt);
-        joinRENBTCA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("RENBTC-A");
+        lp.approve(address(lpJoin), amount);
+        lpJoin.join(address(this), amount);
+        (,,uint256 spotV,,) = vat.ilks(ilk);
         // dart max amount of DAI
-        vat.frob("RENBTC-A", address(this), address(this), address(this), int(ilkAmt18), int(mul(ilkAmt18, spotV) / RAY));
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
         hevm.warp(now + 1);
-        jug.drip("RENBTC-A");
-        assertEq(flipRENBTCA.kicks(), 0);
-        cat.bite("RENBTC-A", address(this));
-        assertEq(flipRENBTCA.kicks(), 1);
-        */
+        jug.drip(ilk);
+        assertEq(lpFlip.kicks(), 0);
+        cat.bite(ilk, address(this));
+        assertEq(lpFlip.kicks(), 1);
     }
 
     function testCastCost() public {
