@@ -46,11 +46,11 @@ contract SpellAction {
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     // AAVE-A
-    //address constant AAVE               = 0x0;
-    //address constant MCD_JOIN_AAVE_A    = 0x0;
-    //address constant MCD_FLIP_AAVE_A    = 0x0;
-    //address constant PIP_AAVE           = 0x0;
-    //bytes32 constant ILK_AAVE_A         = "AAVE-A";
+    address constant AAVE               = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
+    address constant MCD_JOIN_AAVE_A    = 0x24e459F61cEAa7b1cE70Dbaea938940A7c5aD46e;
+    address constant MCD_FLIP_AAVE_A    = 0x16e1b844094c885a37509a8f76c533B5fbFED13a;
+    address constant PIP_AAVE           = 0x8Df8f06DC2dE0434db40dcBb32a82A104218754c;
+    bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
     // UNIV2LPWETHDAI-A
     //address constant UNIV2LPWETHDAI            = 0x0;
@@ -110,17 +110,97 @@ contract SpellAction {
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
         address PIP_ETH      = CHANGELOG.getAddress("PIP_ETH");
 
+        // Set the global debt ceiling
+        // + 10 M for AAVE-A
+        // +  3 M for UNIV2DAIETH-A
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() + 10 * MILLION * RAD);
+
         //
         // Add AAVE
         //
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_AAVE_A).vat() == MCD_VAT, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_AAVE_A).ilk() == ILK_AAVE_A, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_AAVE_A).gem() == AAVE, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_AAVE_A).dec() == DSTokenAbstract(AAVE).decimals(), "join-dec-not-match");
+        require(FlipAbstract(MCD_FLIP_AAVE_A).vat() == MCD_VAT, "flip-vat-not-match");
+        require(FlipAbstract(MCD_FLIP_AAVE_A).cat() == MCD_CAT, "flip-cat-not-match");
+        require(FlipAbstract(MCD_FLIP_AAVE_A).ilk() == ILK_AAVE_A, "flip-ilk-not-match");
+
+        // Set the AAVE PIP in the Spotter
+        SpotAbstract(MCD_SPOT).file(ILK_AAVE_A, "pip", PIP_AAVE);
+
+        // Set the AAVE-A Flipper in the Cat
+        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "flip", MCD_FLIP_AAVE_A);
+
+        // Init AAVE-A ilk in Vat & Jug
+        VatAbstract(MCD_VAT).init(ILK_AAVE_A);
+        JugAbstract(MCD_JUG).init(ILK_AAVE_A);
+
+        // Allow AAVE-A Join to modify Vat registry
+        VatAbstract(MCD_VAT).rely(MCD_JOIN_AAVE_A);
+        // Allow the AAVE-A Flipper to reduce the Cat litterbox on deal()
+        CatAbstract(MCD_CAT).rely(MCD_FLIP_AAVE_A);
+        // Allow Cat to kick auctions in AAVE-A Flipper
+        FlipAbstract(MCD_FLIP_AAVE_A).rely(MCD_CAT);
+        // Allow End to yank auctions in AAVE-A Flipper
+        FlipAbstract(MCD_FLIP_AAVE_A).rely(MCD_END);
+        // Allow FlipperMom to access to the AAVE-A Flipper
+        FlipAbstract(MCD_FLIP_AAVE_A).rely(FLIPPER_MOM);
+        // Disallow Cat to kick auctions in AAVE-A Flipper
+        // !!!!!!!! Only for certain collaterals that do not trigger liquidations like USDC-A)
+        //FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_AAVE_A);
+
+        // Allow OsmMom to access to the AAVE Osm
+        // !!!!!!!! Only if PIP_AAVE = Osm and hasn't been already relied due a previous deployed ilk
+        OsmAbstract(PIP_AAVE).rely(OSM_MOM);
+        // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_AAVE = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
+        MedianAbstract(OsmAbstract(PIP_AAVE).src()).kiss(PIP_AAVE);
+        // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_AAVE = Osm or PIP_AAVE = Median and hasn't been already whitelisted due a previous deployed ilk
+        OsmAbstract(PIP_AAVE).kiss(MCD_SPOT);
+        // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
+        // !!!!!!!! Only if PIP_AAVE = Osm or PIP_AAVE = Median and hasn't been already whitelisted due a previous deployed ilk
+        OsmAbstract(PIP_AAVE).kiss(MCD_END);
+        // Set AAVE Osm in the OsmMom for new ilk
+        // !!!!!!!! Only if PIP_AAVE = Osm
+        OsmMomAbstract(OSM_MOM).setOsm(ILK_AAVE_A, PIP_AAVE);
+
+        // Set the AAVE-A debt ceiling
+        VatAbstract(MCD_VAT).file(ILK_AAVE_A, "line", 10 * MILLION * RAD);
+        // Set the AAVE-A dust
+        VatAbstract(MCD_VAT).file(ILK_AAVE_A, "dust", 500 * RAD);
+        // Set the Lot size
+        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "dunk", 50000 * RAD);
+        // Set the AAVE-A liquidation penalty (e.g. 13% => X = 113)
+        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "chop", 113 * WAD / 100);
+        // Set the AAVE-A stability fee (e.g. 1% = 1000000000315522921573372069)
+        JugAbstract(MCD_JUG).file(ILK_AAVE_A, "duty", SIX_PERCENT_RATE);
+        // Set the AAVE-A percentage between bids (e.g. 3% => X = 103)
+        FlipAbstract(MCD_FLIP_AAVE_A).file("beg", 103 * WAD / 100);
+        // Set the AAVE-A time max time between bids
+        FlipAbstract(MCD_FLIP_AAVE_A).file("ttl", 6 hours);
+        // Set the AAVE-A max auction duration to
+        FlipAbstract(MCD_FLIP_AAVE_A).file("tau", 6 hours);
+        // Set the AAVE-A min collateralization ratio (e.g. 150% => X = 150)
+        SpotAbstract(MCD_SPOT).file(ILK_AAVE_A, "mat", 175 * RAY / 100);
+
+        // Update AAVE-A spot value in Vat
+        SpotAbstract(MCD_SPOT).poke(ILK_AAVE_A);
+
+        // Add new ilk to the IlkRegistry
+        IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_AAVE_A);
+
+        // Update the changelog
+        CHANGELOG.setAddress("AAVE", AAVE);
+        CHANGELOG.setAddress("MCD_JOIN_AAVE_A", MCD_JOIN_AAVE_A);
+        CHANGELOG.setAddress("MCD_FLIP_AAVE_A", MCD_FLIP_AAVE_A);
+        CHANGELOG.setAddress("PIP_AAVE", PIP_AAVE);
 
 
         //
         // Add UNIV2_LP_WETH_DAI
-        //
-
-        //
-        // Add MIP21
         //
 
         // Bump version

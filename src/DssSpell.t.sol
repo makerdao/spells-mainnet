@@ -92,6 +92,12 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
+    // AAVE-A specific
+    DSTokenAbstract       aave = DSTokenAbstract(      addr.addr("AAVE"));
+    GemJoinAbstract  joinAAVEA = GemJoinAbstract(      addr.addr("MCD_JOIN_AAVE_A"));
+    FlipAbstract     flipAAVEA = FlipAbstract(         addr.addr("MCD_FLIP_AAVE_A"));
+    OsmAbstract        pipAAVE = OsmAbstract(          addr.addr("PIP_AAVE"));
+    MedianAbstract    medAAVEA = MedianAbstract(0xe62872DFEbd323b03D27946f8e2491B454a69811);
 
     //
 
@@ -189,7 +195,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             20                       // Num expected in system
+            ilk_count:             21                       // Num expected in system
         });
 
         //
@@ -515,6 +521,24 @@ contract DssSpellTest is DSTest, DSMath {
             tau:          6 hours,
             liquidations: 1
         });
+        afterSpell.collaterals["AAVE-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         10 * MILLION,
+            dust:         500,
+            pct:          600,
+            chop:         1300,
+            dunk:         50000,
+            mat:          17500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1
+        });
+
+
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -811,73 +835,73 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast_AAVE_INTEGRATION() public {
-        /*
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        pipUNI.poke();
+        pipAAVE.poke();
         hevm.warp(now + 3601);
-        pipUNI.poke();
-        spot.poke("UNI-A");
+        pipAAVE.poke();
+        spot.poke("AAVE-A");
 
         // Add balance to the test address
-        uint256 ilkAmt = 10 * THOUSAND * WAD;
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+
         hevm.store(
-            address(uni),
-            keccak256(abi.encode(address(this), uint256(4))),
+            address(aave),
+            keccak256(abi.encode(address(this), uint256(0))),
             bytes32(ilkAmt)
         );
-        assertEq(uni.balanceOf(address(this)), ilkAmt);
+
+        assertEq(aave.balanceOf(address(this)), ilkAmt);
 
         // Check median matches pip.src()
-        assertEq(pipUNI.src(), address(medUNIA));
+        assertEq(pipAAVE.src(), address(medAAVEA));
 
         // Authorization
-        assertEq(joinUNIA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinUNIA)), 1);
-        assertEq(flipUNIA.wards(address(end)), 1);
-        assertEq(flipUNIA.wards(address(flipMom)), 1);
-        assertEq(pipUNI.wards(address(osmMom)), 1);
-        assertEq(pipUNI.bud(address(spot)), 1);
-        assertEq(pipUNI.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipUNI.src()).bud(address(pipUNI)), 1);
+        assertEq(joinAAVEA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinAAVEA)), 1);
+        assertEq(flipAAVEA.wards(address(end)), 1);
+        assertEq(flipAAVEA.wards(address(flipMom)), 1);
+        assertEq(pipAAVE.wards(address(osmMom)), 1);
+        assertEq(pipAAVE.bud(address(spot)), 1);
+        assertEq(pipAAVE.bud(address(end)), 1);
+        assertEq(MedianAbstract(pipAAVE.src()).bud(address(pipAAVE)), 1);
 
         // Join to adapter
-        assertEq(vat.gem("UNI-A", address(this)), 0);
-        uni.approve(address(joinUNIA), ilkAmt);
-        joinUNIA.join(address(this), ilkAmt);
-        assertEq(uni.balanceOf(address(this)), 0);
-        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
+        assertEq(vat.gem("AAVE-A", address(this)), 0);
+        aave.approve(address(joinAAVEA), ilkAmt);
+        joinAAVEA.join(address(this), ilkAmt);
+        assertEq(aave.balanceOf(address(this)), 0);
+        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
-        assertEq(vat.gem("UNI-A", address(this)), 0);
+        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
+        assertEq(vat.gem("AAVE-A", address(this)), 0);
         assertEq(vat.dai(address(this)), 500 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob("UNI-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
-        assertEq(vat.gem("UNI-A", address(this)), ilkAmt);
+        vat.frob("AAVE-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
+        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
-        joinUNIA.exit(address(this), ilkAmt);
-        assertEq(uni.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("UNI-A", address(this)), 0);
+        joinAAVEA.exit(address(this), ilkAmt);
+        assertEq(aave.balanceOf(address(this)), ilkAmt);
+        assertEq(vat.gem("AAVE-A", address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        uni.approve(address(joinUNIA), ilkAmt);
-        joinUNIA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("UNI-A");
+        aave.approve(address(joinAAVEA), ilkAmt);
+        joinAAVEA.join(address(this), ilkAmt);
+        (,,uint256 spotV,,) = vat.ilks("AAVE-A");
         // dart max amount of DAI
-        vat.frob("UNI-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
+        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
         hevm.warp(now + 1);
-        jug.drip("UNI-A");
-        assertEq(flipUNIA.kicks(), 0);
-        cat.bite("UNI-A", address(this));
-        assertEq(flipUNIA.kicks(), 1);
-        */
+        jug.drip("AAVE-A");
+        assertEq(flipAAVEA.kicks(), 0);
+        cat.bite("AAVE-A", address(this));
+        assertEq(flipAAVEA.kicks(), 1);
     }
 
     function testSpellIsCast_UNIV2_LP_WETH_DAI_INTEGRATION() public {
