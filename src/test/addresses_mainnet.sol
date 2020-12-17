@@ -117,7 +117,7 @@ contract Addresses {
         addr["MCD_JOIN_RENBTC_A"]   = 0xFD5608515A47C37afbA68960c1916b79af9491D0;
         addr["MCD_FLIP_RENBTC_A"]   = 0x30BC6eBC27372e50606880a36B279240c0bA0758;
         addr["AAVE"]                = 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9;
-        addr["PIP_AAVE"]            = 0;
+        addr["PIP_AAVE"]            = 0x8Df8f06DC2dE0434db40dcBb32a82A104218754c;
         addr["MCD_JOIN_AAVE_A"]     = 0x24e459f61ceaa7b1ce70dbaea938940a7c5ad46e;
         addr["MCD_FLIP_AAVE_A"]     = 0x16e1b844094c885a37509a8f76c533b5fbfed13a;
         addr["MCD_IAM_AUTO_LINE"]   = 0xC7Bdd1F2B16447dcf3dE045C4a039A60EC2f0ba3;

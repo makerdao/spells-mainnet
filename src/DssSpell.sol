@@ -49,7 +49,7 @@ contract SpellAction {
     address constant AAVE               = 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9;
     address constant MCD_JOIN_AAVE_A    = 0x24e459f61ceaa7b1ce70dbaea938940a7c5ad46e;
     address constant MCD_FLIP_AAVE_A    = 0x16e1b844094c885a37509a8f76c533b5fbfed13a;
-    address constant PIP_AAVE           = 0x0;
+    address constant PIP_AAVE           = 0x8Df8f06DC2dE0434db40dcBb32a82A104218754c;
     bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
     // UNIV2LPWETHDAI-A
