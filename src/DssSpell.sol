@@ -54,10 +54,10 @@ contract SpellAction {
     bytes32 constant ILK_AAVE_A         = "AAVE-A";
 
     // UNIV2DAIETH-A
-    address constant UNIV2DAIETH            = 0xa478c2975ab1ea89e8196811f51a7b7ade33eb11;
+    address constant UNIV2DAIETH            = 0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11;
     address constant MCD_JOIN_UNIV2DAIETH_A = 0x6a3bC460d14b8a9274DFE228A4FD03E6b66E2551;
     address constant MCD_FLIP_UNIV2DAIETH_A = 0x57dfd99f45747DD55C1c432Db4aEa07FBd5d2B5c;
-    address constant PIP_UNIV2DAIETH        = 0x0;
+    address constant PIP_UNIV2DAIETH        = address(0);
     bytes32 constant ILK_UNIV2DAIETH_A      = "UNIV2DAIETH-A";
 
     // Gnosis

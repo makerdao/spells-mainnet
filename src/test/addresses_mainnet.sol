@@ -120,8 +120,8 @@ contract Addresses {
         addr["PIP_AAVE"]               = 0x8Df8f06DC2dE0434db40dcBb32a82A104218754c;
         addr["MCD_JOIN_AAVE_A"]        = 0x24e459F61cEAa7b1cE70Dbaea938940A7c5aD46e;
         addr["MCD_FLIP_AAVE_A"]        = 0x16e1b844094c885a37509a8f76c533B5fbFED13a;
-        addr["UNIV2DAIETH"]            = 0xa478c2975ab1ea89e8196811f51a7b7ade33eb11;
-        addr["PIP_UNIV2DAIETH"]        = 0x0;
+        addr["UNIV2DAIETH"]            = 0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11;
+        addr["PIP_UNIV2DAIETH"]        = address(0);
         addr["MCD_JOIN_UNIV2DAIETH_A"] = 0x6a3bC460d14b8a9274DFE228A4FD03E6b66E2551;
         addr["MCD_FLIP_UNIV2DAIETH_A"] = 0x57dfd99f45747DD55C1c432Db4aEa07FBd5d2B5c;
         addr["MCD_IAM_AUTO_LINE"]      = 0xC7Bdd1F2B16447dcf3dE045C4a039A60EC2f0ba3;
