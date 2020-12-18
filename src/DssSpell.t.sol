@@ -943,6 +943,9 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpPip.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
         assertEq(lpPip.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
 
+        assertEq(DSValueAbstract(lpPip.orb0()).read(), bytes32(WAD));
+        assertEq(DSValueAbstract(lpPip.orb0()).owner(), addr.addr("MCD_PAUSE_PROXY"));
+
         // Authorization
         assertEq(lpJoin.wards(pauseProxy), 1);
         assertEq(vat.wards(address(lpJoin)), 1);
