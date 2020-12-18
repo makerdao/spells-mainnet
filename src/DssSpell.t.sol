@@ -887,6 +887,9 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(usdc.balanceOf(address(this)), ilkAmt);
 
+        assertEq(DSValueAbstract(lpPip.orb0()).read(), bytes32(WAD));
+        assertEq(DSValueAbstract(lpPip.orb0()).owner(), addr.addr("MCD_PAUSE_PROXY"));
+
         // Authorization
         assertEq(joinPSMUSDCA.wards(pauseProxy), 1);
         assertEq(joinPSMUSDCA.wards(address(psmPSMUSDCA)), 1);
