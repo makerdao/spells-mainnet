@@ -23,7 +23,7 @@ make all &> /dev/null
 COMPILED_BYTECODE=0x$(jq '.contracts|.["src/DssSpell.sol:DssSpell"]|.["bin-runtime"]' ./out/dapp.sol.json | sed 's/"//g')
 CB=${COMPILED_BYTECODE::${#COMPILED_BYTECODE}-104}  # Trim swarm hash
 DEPLOYED_ADDRESS=$(< src/DssSpell.t.sol grep "address constant MAINNET_SPELL" | sed -e 's#.*address(\(\)#\1#' | sed 's/);.*//')
-if [ "$DEPLOYED_ADDRESS" = "0" ] ; then 
+if [ "$DEPLOYED_ADDRESS" = "0" ] ; then
     echo "Spell not deployed yet"
     exit 0
 fi
