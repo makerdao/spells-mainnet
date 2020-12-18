@@ -174,7 +174,7 @@ contract SpellAction {
         // Set the AAVE-A dust
         VatAbstract(MCD_VAT).file(ILK_AAVE_A, "dust", 500 * RAD);
         // Set the Lot size
-        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "dunk", 50000 * RAD);
+        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "dunk", 50 * THOUSAND * RAD);
         // Set the AAVE-A liquidation penalty (e.g. 13% => X = 113)
         CatAbstract(MCD_CAT).file(ILK_AAVE_A, "chop", 113 * WAD / 100);
         // Set the AAVE-A stability fee (e.g. 1% = 1000000000315522921573372069)
@@ -345,9 +345,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/LongForWisdom/community/2852f31dda9fd4926f5bc66f386dc6cbb560c4dc/governance/votes/Community%20Executive%20vote%20-%20December%2018%2C%202020.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/be0d35d9e457d1f87a4ea06863d3e8db90bff7b9/governance/votes/Executive%20vote%20-%20December%2018%2C%202020.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2020-12-18 MakerDAO Executive Spell | Hash: 0xeea4a577cf72429b1e0f29f38642fb84f8e51014cadc0e4dfb58070e815d017e";
+        "2020-12-18 MakerDAO Executive Spell | Hash: 0x88410d74be25d71344e5c2e2b1855b666e865ac29271778a9e5ff1b8bc931318";
 
     function officeHours() external view returns (bool) {
         return SpellAction(action).officeHours();
