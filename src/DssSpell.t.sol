@@ -21,18 +21,18 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x6b8b3993cFB253968894C8EcB430CaF2455b51Aa);
+    address constant MAINNET_SPELL = address(0x7039C2bDb6fCCdCe630B787E021880F3B9977A72);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1608317037;
+    uint256 constant SPELL_CREATED = 1608325278;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x58401b64CA6b91E346c87B057254F040990c4F98);
+        SpellLike(0x6b8b3993cFB253968894C8EcB430CaF2455b51Aa);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1607281234;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1608317037;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -881,7 +881,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         hevm.store(
             address(usdc),
-            keccak256(abi.encode(address(this), uint256(0))),
+            keccak256(abi.encode(address(this), uint256(9))),
             bytes32(ilkAmt)
         );
 
