@@ -174,7 +174,7 @@ contract SpellAction {
         // Set the AAVE-A dust
         VatAbstract(MCD_VAT).file(ILK_AAVE_A, "dust", 500 * RAD);
         // Set the Lot size
-        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "dunk", 50000 * RAD);
+        CatAbstract(MCD_CAT).file(ILK_AAVE_A, "dunk", 50 * THOUSAND * RAD);
         // Set the AAVE-A liquidation penalty (e.g. 13% => X = 113)
         CatAbstract(MCD_CAT).file(ILK_AAVE_A, "chop", 113 * WAD / 100);
         // Set the AAVE-A stability fee (e.g. 1% = 1000000000315522921573372069)
