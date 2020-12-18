@@ -7,7 +7,7 @@ import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 
-import {DssSpell, SpellAction} from "./DssSpell.sol";
+import {DssSpell, SpellAction, PsmAbstract, LerpAbstract} from "./DssSpell.sol";
 
 interface Hevm {
     function warp(uint256) external;
@@ -83,6 +83,8 @@ contract DssSpellTest is DSTest, DSMath {
     PotAbstract              pot = PotAbstract(        addr.addr("MCD_POT"));
     JugAbstract              jug = JugAbstract(        addr.addr("MCD_JUG"));
     SpotAbstract            spot = SpotAbstract(       addr.addr("MCD_SPOT"));
+    DaiAbstract              dai = DaiAbstract(        addr.addr("MCD_DAI"));
+    DaiJoinAbstract      daiJoin = DaiJoinAbstract(    addr.addr("MCD_DAI_JOIN"));
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
@@ -92,20 +94,13 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
-    // AAVE-A specific
-    DSTokenAbstract       aave = DSTokenAbstract(      addr.addr("AAVE"));
-    GemJoinAbstract  joinAAVEA = GemJoinAbstract(      addr.addr("MCD_JOIN_AAVE_A"));
-    FlipAbstract     flipAAVEA = FlipAbstract(         addr.addr("MCD_FLIP_AAVE_A"));
-    OsmAbstract        pipAAVE = OsmAbstract(          addr.addr("PIP_AAVE"));
-    MedianAbstract    medAAVEA = MedianAbstract(0xe62872DFEbd323b03D27946f8e2491B454a69811);
-
-    // UNIV2DAIETH-A specific
-    DSTokenAbstract     lp = DSTokenAbstract(addr.addr("UNIV2DAIETH"));
-    GemJoinAbstract lpJoin = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIETH_A"));
-    FlipAbstract    lpFlip = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2DAIETH_A"));
-    LPOsmAbstract    lpPip = LPOsmAbstract(  addr.addr("PIP_UNIV2DAIETH"));
-    MedianAbstract    orb0 = MedianAbstract( lpPip.orb0());
-    MedianAbstract    orb1 = MedianAbstract( lpPip.orb0());
+    // PSM-USDC-A specific
+    DSTokenAbstract         usdc = DSTokenAbstract(    addr.addr("USDC"));
+    GemJoinAbstract joinPSMUSDCA = GemJoinAbstract(    addr.addr("MCD_JOIN_PSM_USDC_A"));
+    FlipAbstract    flipPSMUSDCA = FlipAbstract(       addr.addr("MCD_FLIP_PSM_USDC_A"));
+    OsmAbstract          pipUSDC = OsmAbstract(        addr.addr("PIP_USDC"));
+    PsmAbstract      psmPSMUSDCA = PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A);
+    LerpAbstract    lerpPSMUSDCA = LerpAbstract(0x8089E7833B6C39583Cd79c67329c6B5628DC1885);
 
     //
 
@@ -203,7 +198,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             22                       // Num expected in system
+            ilk_count:             23                       // Num expected in system
         });
 
         //
@@ -262,7 +257,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         485 * MILLION,
+            line:         0 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -310,7 +305,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         135 * MILLION,
+            line:         0 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -390,7 +385,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         100 * MILLION,
+            line:         0 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -486,7 +481,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         5 * MILLION,
+            line:         0 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -560,6 +555,22 @@ contract DssSpellTest is DSTest, DSMath {
             ttl:          6 hours,
             tau:          6 hours,
             liquidations: 1
+        });
+        afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         500 * MILLION,
+            dust:         0,
+            pct:          0,
+            chop:         1300,
+            dunk:         50000,
+            mat:          10000,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 0
         });
     }
 
@@ -856,144 +867,90 @@ contract DssSpellTest is DSTest, DSMath {
 
     }
 
-    function testSpellIsCast_AAVE_INTEGRATION() public {
+    function testSpellIsCast_PSM_USDC_A_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        pipAAVE.poke();
-        hevm.warp(now + 3601);
-        pipAAVE.poke();
-        spot.poke("AAVE-A");
+        spot.poke("PSM-USDC-A");
 
         // Add balance to the test address
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        uint256 oneUsdc = 10 ** usdc.decimals();
+        uint256 ilkAmt = 1 * THOUSAND * oneUsdc;
+        uint256 ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
 
         hevm.store(
-            address(aave),
+            address(usdc),
             keccak256(abi.encode(address(this), uint256(0))),
             bytes32(ilkAmt)
         );
 
-        assertEq(aave.balanceOf(address(this)), ilkAmt);
-
-        // Check median matches pip.src()
-        assertEq(pipAAVE.src(), address(medAAVEA));
+        assertEq(usdc.balanceOf(address(this)), ilkAmt);
 
         // Authorization
-        assertEq(joinAAVEA.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(joinAAVEA)), 1);
-        assertEq(flipAAVEA.wards(address(end)), 1);
-        assertEq(flipAAVEA.wards(address(flipMom)), 1);
-        assertEq(pipAAVE.wards(address(osmMom)), 1);
-        assertEq(pipAAVE.bud(address(spot)), 1);
-        assertEq(pipAAVE.bud(address(end)), 1);
-        assertEq(MedianAbstract(pipAAVE.src()).bud(address(pipAAVE)), 1);
+        assertEq(joinPSMUSDCA.wards(pauseProxy), 1);
+        assertEq(joinPSMUSDCA.wards(address(psmPSMUSDCA)), 1);
+        assertEq(psmPSMUSDCA.wards(address(lerpPSMUSDCA)), 1);
+        assertEq(psmPSMUSDCA.wards(pauseProxy), 1);
+        assertEq(lerpPSMUSDCA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinPSMUSDCA)), 1);
+        assertEq(flipPSMUSDCA.wards(address(end)), 1);
+        assertEq(flipPSMUSDCA.wards(address(flipMom)), 1);
 
-        // Join to adapter
-        assertEq(vat.gem("AAVE-A", address(this)), 0);
-        aave.approve(address(joinAAVEA), ilkAmt);
-        joinAAVEA.join(address(this), ilkAmt);
-        assertEq(aave.balanceOf(address(this)), 0);
-        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
+        // Check psm + lerp is set up correctly
+        assertEq(psmPSMUSDCA.tin(), WAD * 1 / 100);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+        assertTrue(lerpPSMUSDCA.started());
+        assertEq(lerpPSMUSDCA.startTime(), now);
+        assertTrue(!lerpPSMUSDCA.done());
 
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(500 * WAD));
-        assertEq(vat.gem("AAVE-A", address(this)), 0);
-        assertEq(vat.dai(address(this)), 500 * RAD);
+        // Convert all USDC to DAI with a 1% fee
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 99 / 100;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
 
-        // Payback DAI, withdraw collateral
-        vat.frob("AAVE-A", address(this), address(this), address(this), -int(ilkAmt), -int(500 * WAD));
-        assertEq(vat.gem("AAVE-A", address(this)), ilkAmt);
-        assertEq(vat.dai(address(this)), 0);
+        // Convert 50 DAI to USDC with a 0.1% fee
+        ilkAmt = 50 * oneUsdc;
+        dai.approve(address(psmPSMUSDCA), uint256(-1));
+        psmPSMUSDCA.buyGem(address(this), ilkAmt);
+        dai.transfer(address(0), dai.balanceOf(address(this)));     // Throw away extra
+        assertEq(usdc.balanceOf(address(this)), ilkAmt);
 
-        // Withdraw from adapter
-        joinAAVEA.exit(address(this), ilkAmt);
-        assertEq(aave.balanceOf(address(this)), ilkAmt);
-        assertEq(vat.gem("AAVE-A", address(this)), 0);
+        // Convert 50 USDC to DAI with a 0.55% fee (halfway through lerp)
+        hevm.warp(now + 3.5 days);
+        lerpPSMUSDCA.tick();
+        assertTrue(!lerpPSMUSDCA.done());
+        assertEq(psmPSMUSDCA.tin(), WAD * 55 / 10000);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 9945 / 10000;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
 
-        // Generate new DAI to force a liquidation
-        aave.approve(address(joinAAVEA), ilkAmt);
-        joinAAVEA.join(address(this), ilkAmt);
-        (,,uint256 spotV,,) = vat.ilks("AAVE-A");
-        // dart max amount of DAI
-        vat.frob("AAVE-A", address(this), address(this), address(this), int(ilkAmt), int(mul(ilkAmt, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip("AAVE-A");
-        assertEq(flipAAVEA.kicks(), 0);
-        cat.bite("AAVE-A", address(this));
-        assertEq(flipAAVEA.kicks(), 1);
-    }
+        // Convert 20 DAI to USDC with a 1% fee
+        ilkAmt = 20 * oneUsdc;
+        psmPSMUSDCA.buyGem(address(this), ilkAmt);
+        dai.transfer(address(0), dai.balanceOf(address(this)));     // Throw away extra
+        assertEq(usdc.balanceOf(address(this)), ilkAmt);
 
-    function testSpellIsCast_UNIV2DAIETH_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        bytes32 ilk = "UNIV2DAIETH-A";
-
-        lpPip.poke();
-        hevm.warp(now + 3601);
-        lpPip.poke();
-        spot.poke(ilk);
-
-        // Check median matches pip.src()
-        assertEq(lpPip.src(), address(lp));
-        assertEq(lpPip.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
-        assertEq(lpPip.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-
-        // Authorization
-        assertEq(lpJoin.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(lpJoin)), 1);
-        assertEq(lpFlip.wards(address(end)), 1);
-        assertEq(lpFlip.wards(address(flipMom)), 1);
-        assertEq(lpPip.wards(address(osmMom)), 1);
-        assertEq(lpPip.bud(address(spot)), 1);
-        assertEq(lpPip.bud(address(end)), 1);
-        assertEq(MedianAbstract(lpPip.orb1()).bud(address(lpPip)), 1);
-
-        // Join to adapter
-        uint256 amount = 1000 ether;
-        hevm.store(
-            address(lp),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(amount)
-        );
-        assertEq(lp.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-        lp.approve(address(lpJoin), amount);
-        lpJoin.join(address(this), amount);
-        assertEq(lp.balanceOf(address(this)), 0);
-        assertEq(vat.gem(ilk, address(this)), amount);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(500 * WAD));
-        assertEq(vat.gem(ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 500 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(500 * WAD));
-        assertEq(vat.gem(ilk, address(this)), amount);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        lpJoin.exit(address(this), amount);
-        assertEq(lp.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        lp.approve(address(lpJoin), amount);
-        lpJoin.join(address(this), amount);
-        (,,uint256 spotV,,) = vat.ilks(ilk);
-        // dart max amount of DAI
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip(ilk);
-        assertEq(lpFlip.kicks(), 0);
-        cat.bite(ilk, address(this));
-        assertEq(lpFlip.kicks(), 1);
+        // Convert 20 USDC to DAI with a 0.1% fee (lerp is done)
+        hevm.warp(now + 4 days);
+        lerpPSMUSDCA.tick();
+        assertTrue(lerpPSMUSDCA.done());
+        assertEq(psmPSMUSDCA.wards(address(lerpPSMUSDCA)), 0);    // Lerp de-auths itself
+        assertEq(psmPSMUSDCA.tin(), WAD * 1 / 1000);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 999 / 1000;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
     }
 
     function testCastCost() public {
@@ -1076,14 +1033,5 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
-    }
-
-    function testGnosis() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        address GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
-        assertEq(1,    OsmAbstract(addr.addr("PIP_ETH")).bud(GNOSIS));
     }
 }
