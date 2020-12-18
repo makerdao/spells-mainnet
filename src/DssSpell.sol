@@ -84,6 +84,8 @@ contract SpellAction {
     address constant LERP               = 0x8089E7833B6C39583Cd79c67329c6B5628DC1885;
     address constant PIP_USDC           = 0x77b68899b99b686F415d074278a9a16b336085A0;
     bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
+
+    // Stablecoin ilks
     bytes32 constant ILK_USDC_A         = "USDC-A";
     bytes32 constant ILK_TUSD_A         = "TUSD-A";
     bytes32 constant ILK_PAXUSD_A       = "PAXUSD-A";
@@ -233,7 +235,6 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0);
         VatAbstract(MCD_VAT).file(ILK_PAXUSD_A, "line", 0);
         VatAbstract(MCD_VAT).file(ILK_GUSD_A, "line", 0);
-
     }
 }
 
