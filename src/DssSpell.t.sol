@@ -954,7 +954,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(MedianAbstract(lpPip.orb1()).bud(address(lpPip)), 1);
 
         // Join to adapter
-        uint256 amount = 100 ether;
+        uint256 amount = 1000 ether;
         hevm.store(
             address(lp),
             keccak256(abi.encode(address(this), uint256(1))),
@@ -969,12 +969,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(100 * WAD));
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(500 * WAD));
         assertEq(vat.gem(ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 100 * RAD);
+        assertEq(vat.dai(address(this)), 500 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(100 * WAD));
+        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(500 * WAD));
         assertEq(vat.gem(ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 
