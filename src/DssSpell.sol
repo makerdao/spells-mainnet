@@ -279,9 +279,6 @@ contract SpellAction {
         // Add new ilk to the IlkRegistry
         IlkRegistryAbstract(ILK_REGISTRY).add(MCD_JOIN_UNIV2DAIETH_A);
 
-        // Set gulp amount in faucet on kovan (only use WAD for decimals = 18) NO FAUCET FOR LP TOKENS
-        // FaucetAbstract(FAUCET).setAmt(UNIV2DAIETH, 2500 * WAD);
-
         // Update the changelog
         CHANGELOG.setAddress("UNIV2DAIETH", UNIV2DAIETH);
         CHANGELOG.setAddress("MCD_JOIN_UNIV2DAIETH_A", MCD_JOIN_UNIV2DAIETH_A);
