@@ -55,9 +55,9 @@ contract SpellAction {
 
     // UNIV2DAIETH-A
     address constant UNIV2DAIETH            = 0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11;
-    address constant MCD_JOIN_UNIV2DAIETH_A = 0x6a3bC460d14b8a9274DFE228A4FD03E6b66E2551;
+    address constant MCD_JOIN_UNIV2DAIETH_A = 0x2502F65D77cA13f183850b5f9272270454094A08;
     address constant MCD_FLIP_UNIV2DAIETH_A = 0x57dfd99f45747DD55C1c432Db4aEa07FBd5d2B5c;
-    address constant PIP_UNIV2DAIETH        = address(0);
+    address constant PIP_UNIV2DAIETH        = 0x87ecBd742cEB40928E6cDE77B2f0b5CFa3342A09;
     bytes32 constant ILK_UNIV2DAIETH_A      = "UNIV2DAIETH-A";
 
     // Gnosis
@@ -257,9 +257,9 @@ contract SpellAction {
         // Set the UNIV2DAIETH-A debt ceiling
         VatAbstract(MCD_VAT).file(ILK_UNIV2DAIETH_A, "line", 3 * MILLION * RAD);
         // Set the UNIV2DAIETH-A dust
-        VatAbstract(MCD_VAT).file(ILK_UNIV2DAIETH_A, "dust", 100 * RAD);
+        VatAbstract(MCD_VAT).file(ILK_UNIV2DAIETH_A, "dust", 500 * RAD);
         // Set the Lot size
-        CatAbstract(MCD_CAT).file(ILK_UNIV2DAIETH_A, "dunk", 500 * RAD);
+        CatAbstract(MCD_CAT).file(ILK_UNIV2DAIETH_A, "dunk", 50 * THOUSAND * RAD);
         // Set the UNIV2DAIETH-A liquidation penalty (e.g. 13% => X = 113)
         CatAbstract(MCD_CAT).file(ILK_UNIV2DAIETH_A, "chop", 113 * WAD / 100);
         // Set the UNIV2DAIETH-A stability fee (e.g. 1% = 1000000000315522921573372069)
@@ -267,9 +267,9 @@ contract SpellAction {
         // Set the UNIV2DAIETH-A percentage between bids (e.g. 3% => X = 103)
         FlipAbstract(MCD_FLIP_UNIV2DAIETH_A).file("beg", 103 * WAD / 100);
         // Set the UNIV2DAIETH-A time max time between bids
-        FlipAbstract(MCD_FLIP_UNIV2DAIETH_A).file("ttl", 1 hours);
+        FlipAbstract(MCD_FLIP_UNIV2DAIETH_A).file("ttl", 6 hours);
         // Set the UNIV2DAIETH-A max auction duration to
-        FlipAbstract(MCD_FLIP_UNIV2DAIETH_A).file("tau", 1 hours);
+        FlipAbstract(MCD_FLIP_UNIV2DAIETH_A).file("tau", 6 hours);
         // Set the UNIV2DAIETH-A min collateralization ratio (e.g. 150% => X = 150)
         SpotAbstract(MCD_SPOT).file(ILK_UNIV2DAIETH_A, "mat", 125 * RAY / 100);
 

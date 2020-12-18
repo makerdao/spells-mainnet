@@ -203,7 +203,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             21                       // Num expected in system
+            ilk_count:             22                       // Num expected in system
         });
 
         //
@@ -551,7 +551,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         3 * MILLION,
-            dust:         500,
+            dust:         50 * THOUSAND,
             pct:          100,
             chop:         1300,
             dunk:         500,
@@ -939,7 +939,9 @@ contract DssSpellTest is DSTest, DSMath {
         spot.poke(ilk);
 
         // Check median matches pip.src()
-        assertEq(lpPip.src(), address(lp)); // TODO: Check orbs
+        assertEq(lpPip.src(), address(lp));
+        assertEq(lpPip.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
+        assertEq(lpPip.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
 
         // Authorization
         assertEq(lpJoin.wards(pauseProxy), 1);
@@ -949,7 +951,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpPip.wards(address(osmMom)), 1);
         assertEq(lpPip.bud(address(spot)), 1);
         assertEq(lpPip.bud(address(end)), 1);
-        assertEq(MedianAbstract(lpPip.src()).bud(address(lpPip)), 1);
+        assertEq(MedianAbstract(lpPip.orb1()).bud(address(lpPip)), 1);
 
         // Join to adapter
         uint256 amount = 100 ether;
