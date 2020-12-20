@@ -23,7 +23,7 @@ contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
     address constant MAINNET_SPELL = address(0x437F5aAF195C97a01f85e672bb8e371484D96C57);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1608473475;
+    uint256 constant SPELL_CREATED = 1608474751;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
@@ -32,7 +32,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1608563377;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1608652800;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -856,7 +856,8 @@ contract DssSpellTest is DSTest, DSMath {
         } else {
             assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
         }
-
+        
+        castPreviousSpell();
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
