@@ -872,7 +872,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
-
+        
         spot.poke("PSM-USDC-A");
 
         // Add balance to the test address
