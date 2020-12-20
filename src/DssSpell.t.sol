@@ -99,7 +99,7 @@ contract DssSpellTest is DSTest, DSMath {
     GemJoinAbstract joinPSMUSDCA = GemJoinAbstract(    addr.addr("MCD_JOIN_PSM_USDC_A"));
     FlipAbstract    flipPSMUSDCA = FlipAbstract(       addr.addr("MCD_FLIP_PSM_USDC_A"));
     OsmAbstract          pipUSDC = OsmAbstract(        addr.addr("PIP_USDC"));
-    PsmAbstract      psmPSMUSDCA = PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A);
+    PsmAbstract      psmPSMUSDCA = PsmAbstract(        addr.addr("MCD_PSM_USDC_A"));
     LerpAbstract    lerpPSMUSDCA = LerpAbstract(0x8089E7833B6C39583Cd79c67329c6B5628DC1885);
 
     //

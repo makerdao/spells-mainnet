@@ -210,6 +210,7 @@ contract SpellAction {
 
         // Initialize the lerp module to start the clock
         LerpAbstract(LERP).init();
+        require(LerpAbstract(LERP).started(), "lerp-not-started");
 
         // Update the changelog
         CHANGELOG.setAddress("MCD_JOIN_PSM_USDC_A", MCD_JOIN_USDC_PSM);

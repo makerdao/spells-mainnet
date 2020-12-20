@@ -58,6 +58,7 @@ contract Addresses {
         addr["MCD_FLIP_USDC_B"]        = 0x77282aD36aADAfC16bCA42c865c674F108c4a616;
         addr["MCD_JOIN_PSM_USDC_A"]    = 0x0A59649758aa4d66E25f08Dd01271e891fe52199;
         addr["MCD_FLIP_PSM_USDC_A"]    = 0x507420100393b1Dc2e8b4C8d0F8A13B56268AC99;
+        addr["MCD_PSM_USDC_A"]         = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
         addr["WBTC"]                   = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
         addr["PIP_WBTC"]               = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
         addr["MCD_JOIN_WBTC_A"]        = 0xBF72Da2Bd84c5170618Fbe5914B0ECA9638d5eb5;
