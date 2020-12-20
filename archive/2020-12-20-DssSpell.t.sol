@@ -21,9 +21,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0x437F5aAF195C97a01f85e672bb8e371484D96C57);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1608474751;
+    uint256 constant SPELL_CREATED = 1608485424;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
@@ -872,7 +872,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
-        
+
         spot.poke("PSM-USDC-A");
 
         // Add balance to the test address
