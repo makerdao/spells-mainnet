@@ -85,12 +85,6 @@ contract SpellAction {
     address constant PIP_USDC           = 0x77b68899b99b686F415d074278a9a16b336085A0;
     bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
 
-    // Stablecoin ilks
-    bytes32 constant ILK_USDC_A         = "USDC-A";
-    bytes32 constant ILK_TUSD_A         = "TUSD-A";
-    bytes32 constant ILK_PAXUSD_A       = "PAXUSD-A";
-    bytes32 constant ILK_GUSD_A         = "GUSD-A";
-
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
     uint256 constant MILLION  = 10 ** 6;
@@ -132,14 +126,10 @@ contract SpellAction {
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
 
         // Set the global debt ceiling
-        // + 500 M for PSM-USDC-A
-        // - 485 M for USDC-A
-        // - 135 M for TUSD-A
-        // - 100 M for PAXUSD-A
-        // -   5 M for GUSD-A
+        // + 3 M for PSM-USDC-A
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            - 225 * MILLION * RAD           // Combined due to stack limit being reached
+            + 3 * MILLION * RAD
         );
 
         //
@@ -192,7 +182,7 @@ contract SpellAction {
         FlipperMomAbstract(FLIPPER_MOM).deny(MCD_FLIP_USDC_PSM);
 
         // Set the PSM-USDC-A debt ceiling
-        VatAbstract(MCD_VAT).file(ILK_PSM_USDC_A, "line", 500 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_PSM_USDC_A, "line", 3 * MILLION * RAD);
         // Set the Lot size
         CatAbstract(MCD_CAT).file(ILK_PSM_USDC_A, "dunk", 50 * THOUSAND * RAD);
         // Set the PSM-USDC-A liquidation penalty (e.g. 13% => X = 113)
@@ -224,17 +214,9 @@ contract SpellAction {
         // Update the changelog
         CHANGELOG.setAddress("MCD_JOIN_PSM_USDC_A", MCD_JOIN_USDC_PSM);
         CHANGELOG.setAddress("MCD_FLIP_PSM_USDC_A", MCD_FLIP_USDC_PSM);
+        CHANGELOG.setAddress("MCD_PSM_USDC_A", MCD_PSM_USDC_PSM);
         // Bump version
         CHANGELOG.setVersion("1.2.3");
-
-        //
-        // Lower Stablecoin (USDC-A/TUSD-A/PAXUSD-A/GUSD-A) Debt Ceilings to 0
-        //
-        
-        VatAbstract(MCD_VAT).file(ILK_USDC_A, "line", 0);
-        VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0);
-        VatAbstract(MCD_VAT).file(ILK_PAXUSD_A, "line", 0);
-        VatAbstract(MCD_VAT).file(ILK_GUSD_A, "line", 0);
     }
 }
 
