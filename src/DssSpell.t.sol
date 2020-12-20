@@ -21,9 +21,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x7039C2bDb6fCCdCe630B787E021880F3B9977A72);
+    address constant MAINNET_SPELL = address(0x437F5aAF195C97a01f85e672bb8e371484D96C57);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1608325278;
+    uint256 constant SPELL_CREATED = 1608473475;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
@@ -32,7 +32,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1608317037;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1608563377;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -257,7 +257,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         485 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -305,7 +305,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         135 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -385,7 +385,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         100 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -481,7 +481,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         5 * MILLION,
             dust:         500,
             pct:          0,
             chop:         1300,
@@ -561,7 +561,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         500 * MILLION,
+            line:         3 * MILLION,
             dust:         0,
             pct:          0,
             chop:         1300,
