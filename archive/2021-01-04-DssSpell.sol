@@ -53,7 +53,6 @@ contract SpellAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant ZERO_PERCENT_RATE            = 1000000000000000000000000000;
 
     modifier limited {
         if (officeHours) {
