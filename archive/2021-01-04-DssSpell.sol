@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2020 Maker Ecosystem Growth Holdings, INC.
+// Copyright (C) 2021 Maker Ecosystem Growth Holdings, INC.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -17,22 +17,8 @@
 pragma solidity 0.6.11;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
-import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
-import "lib/dss-interfaces/src/dss/FlipperMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/JugAbstract.sol";
-import "lib/dss-interfaces/src/dss/CatAbstract.sol";
-import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
-import "lib/dss-interfaces/src/dss/FaucetAbstract.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/LPOsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/OsmMomAbstract.sol";
-import "lib/dss-interfaces/src/dss/MedianAbstract.sol";
-import "lib/dss-interfaces/src/dss/DssAutoLineAbstract.sol";
 
 contract SpellAction {
     // Office hours enabled if true
