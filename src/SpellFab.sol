@@ -26,14 +26,19 @@ import "./DssSpell.sol";
 
 contract SpellFab {
 
-    address public constant  EXEC_FACTORY = 0x29424291Aa396a4828eBE2d558E233f47958ffcb;
+    // Mainnet
+    address public constant  EXEC_FACTORY = 0xf610426dFAb48f7AE5678e97Be0286C1aDCedb11;
+    // Mainnet
     address public constant  EXEC_LIB     = 0xFC32E74e6e33D924bd2fBFC7A27b6F2177032760;
     address public immutable action;
     address public immutable spell;
 
     constructor() public {
-        action = new SpellAction(EXEC_LIB, true);
-        spell  = DssExecFactory(EXEC_FACTORY).newWeeklyExec(SpellAction(action).description(), true);
+        address _action = action = address(new SpellAction(EXEC_LIB, true)); // office hours enabled
+        spell  = DssExecFactory(EXEC_FACTORY).newWeeklyExec(
+            SpellAction(_action).description(),    // action description
+            address(_action)                       // action address
+        );
     }
 
 }

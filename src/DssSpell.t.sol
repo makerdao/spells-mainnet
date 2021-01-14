@@ -854,7 +854,8 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast() public {
-        string memory description = new SpellAction().description();
+        SpellFab _fab = new SpellFab();
+        string memory description = DssExec(_fab.spell()).description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),

@@ -31,7 +31,7 @@ contract SpellAction is DssAction {
 
     }
 
-    function actions() public {
+    function actions() public override {
 
     }
 
