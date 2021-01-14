@@ -6,8 +6,10 @@ import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
+import {DssExec} from "dss-exec-lib/DssExec.sol";
 
-import {DssSpell, SpellAction} from "./DssSpell.sol";
+import {SpellAction} from "./DssSpell.sol";
+import {SpellFab} from "./SpellFab.sol";
 
 interface Hevm {
     function warp(uint256) external;
@@ -21,18 +23,18 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x3ee0C26aE7aa8cCc759e4Ee4f1E6F2C16220e5f6);
+    address constant MAINNET_SPELL = address(0);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1609787927;
+    uint256 constant SPELL_CREATED = 0;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x0);
+        SpellLike(0x3ee0C26aE7aa8cCc759e4Ee4f1E6F2C16220e5f6);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 0;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1609787927;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -99,7 +101,8 @@ contract DssSpellTest is DSTest, DSMath {
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
-    DssSpell spell;
+    DssExec   spell;
+    SpellAction action;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
@@ -173,8 +176,9 @@ contract DssSpellTest is DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
+        SpellFab fab = new SpellFab();
         spell = MAINNET_SPELL != address(0) ?
-            DssSpell(MAINNET_SPELL) : new DssSpell();
+            DssExec(MAINNET_SPELL) : DssExec(fab.spell());
 
         //
         // Test for all system configuration changes
@@ -850,7 +854,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast() public {
-        string memory description = new DssSpell().description();
+        string memory description = new SpellAction().description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
