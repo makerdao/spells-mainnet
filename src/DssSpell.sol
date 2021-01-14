@@ -22,17 +22,68 @@ contract SpellAction is DssAction {
 
     string public constant description = "TODO";
 
+    // Gnosis
+    address constant GNOSIS      = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
+
+    address constant BTCUSD_OSM  = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
+    address constant LINKUSD_OSM = 0x9B0C694C6939b5EA9584e9b61C7815E8d97D9cC7;
+    address constant COMPUSD_OSM = 0xBED0879953E633135a48a157718Aa791AC0108E4;
+    address constant YFIUSD_OSM = 0x5F122465bCf86F45922036970Be6DD7F58820214;
+    address constant ZRXUSD_OSM = 0x7382c066801E7Acb2299aC8562847B9883f5CD3c;
+
+    //    AAVEUSD MED = 0xe62872DFEbd323b03D27946f8e2491B454a69811
+    //Whitelist Addr = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D
+
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    // A table of rates can be found at
+    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
+    //
+    uint256 constant THREE_PT_FIVE_PERCENT_RATE = 1000000001090862085746321732;
+    uint256 constant FOUR_PERCENT_RATE          = 1000000001243680656318820312;
+    uint256 constant FIVE_PERCENT_RATE          = 1000000001547125957863212448;
+    uint256 constant SIX_PERCENT_RATE           = 1000000001847694957439350562;
+    uint256 constant SIX_PT_FIVE_PERCENT_RATE   = 1000000001996917783620820123;
+
+
     /**
         @dev constructor (required)
         @param lib         address of the DssExecLib contract
         @param officeHours true if officehours enabled
     */
-    constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {
-
-    }
+    constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {}
 
     function actions() public override {
 
+        // Adjust FLAP Auction Parameters - January 11, 2021
+        // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
+        // TODO add tests of flap values
+        setMinSurplusAuctionBidIncrease(400);
+        setSurplusAuctionBidDuration(1 hours);
+
+
+        // Rates Proposal - January 11, 2021
+        // https://vote.makerdao.com/polling/QmfBQ4Bh#poll-detail
+        // Increase the ETH-A Stability Fee from 2.5% to 3.5%.
+        setIlkStabilityFee("ETH-A",  THREE_PT_FIVE_PERCENT_RATE);
+        // Increase the ETH-B Stability Fee from 5% to 6.5%.
+        setIlkStabilityFee("ETH-B",  SIX_PT_FIVE_PERCENT_RATE);
+        // Decrease the WBTC-A Stability Fee from 4.5% to 4%.
+        setIlkStabilityFee("WBTC-A", FOUR_PERCENT_RATE);
+        // Decrease the YFI-A Stability Fee from 9% to 6%.
+        setIlkStabilityFee("YFI-A",  SIX_PERCENT_RATE);
+        // Decrease the MANA-A Stability Fee from 10% to 5%.
+        setIlkStabilityFee("MANA-A", FIVE_PERCENT_RATE);
+        // Decrease the AAVE-A Stability Fee from 6% to 4%.
+        setIlkStabilityFee("AAVE-A", FOUR_PERCENT_RATE);
+
+        // Increase the System Surplus Buffer - January 11, 2021
+        // https://vote.makerdao.com/polling/QmcXtm1d#poll-detail
+        setSurplusBuffer(10_000_000);
     }
 
     /* TODO
@@ -61,9 +112,6 @@ contract SpellAction is DssAction {
     Whitelist Addr = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67
     */
 
-    // RATES
-
-    // FLAP Parameters
 
     // Surplus buffer
 
