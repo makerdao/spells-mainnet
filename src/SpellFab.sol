@@ -34,7 +34,7 @@ contract SpellFab {
     address public immutable spell;
 
     constructor() public {
-        address _action = action = address(new SpellAction(EXEC_LIB, true)); // office hours enabled
+        address _action = action = address(new SpellAction(EXEC_LIB, false)); // office hours disabled
         spell  = DssExecFactory(EXEC_FACTORY).newWeeklyExec(
             SpellAction(_action).description(),    // action description
             address(_action)                       // action address
