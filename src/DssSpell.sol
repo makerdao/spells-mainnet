@@ -17,6 +17,7 @@
 pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssAction.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface FlapLike {
     function file(bytes32, uint256) external;
@@ -38,15 +39,10 @@ contract SpellAction is DssAction {
 
     // SET
     address constant SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-    address constant AAVEUSD_MED = 0xe62872DFEbd323b03D27946f8e2491B454a69811;
     address constant SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
-    address constant LRCUSD_MED  = 0xcCe92282d9fe310F4c232b0DA9926d5F24611C7B;
     address constant SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
-    address constant YFIUSD_MED  = 0x89AC26C0aFCB28EC55B6CD2F6b7DAD867Fa24639;
     address constant SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
-    address constant ZRXUSD_MED  = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
     address constant SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
-    address constant UNIUSD_MED  = 0x52f761908cC27B4D77AD7A329463cf08baf62153;
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -78,7 +74,9 @@ contract SpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
         FlapLike(flap()).file("beg", NEW_BEG);
         setSurplusAuctionBidDuration(1 hours);
-
+        // Increase the System Surplus Buffer - January 11, 2021
+        // https://vote.makerdao.com/polling/QmcXtm1d#poll-detail
+        setSurplusBuffer(10_000_000);
 
         // Rates Proposal - January 11, 2021
         // https://vote.makerdao.com/polling/QmfBQ4Bh#poll-detail
@@ -96,28 +94,24 @@ contract SpellAction is DssAction {
         // Decrease the AAVE-A Stability Fee from 6% to 4%.
         setIlkStabilityFee("AAVE-A", FOUR_PERCENT_RATE);
 
-
-        // Increase the System Surplus Buffer - January 11, 2021
-        // https://vote.makerdao.com/polling/QmcXtm1d#poll-detail
-        setSurplusBuffer(10_000_000);
-
+        address PIP_YFI = getChangelogAddress("PIP_YFI");
+        address PIP_ZRX = getChangelogAddress("PIP_ZRX");
 
         // Whitelist Gnosis on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmNwTMcB#poll-detail
         addReaderToOSMWhitelist(getChangelogAddress("PIP_WBTC"), GNOSIS);
         addReaderToOSMWhitelist(getChangelogAddress("PIP_LINK"), GNOSIS);
         addReaderToOSMWhitelist(getChangelogAddress("PIP_COMP"), GNOSIS);
-        addReaderToOSMWhitelist(getChangelogAddress("PIP_YFI"),  GNOSIS);
-        addReaderToOSMWhitelist(getChangelogAddress("PIP_ZRX"),  GNOSIS);
-
+        addReaderToOSMWhitelist(PIP_YFI,                         GNOSIS);
+        addReaderToOSMWhitelist(PIP_ZRX,                         GNOSIS);
 
         // Whitelist Set Protocol on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmTctW6i#poll-detail
-        addReaderToMedianWhitelist(AAVEUSD_MED, SET_AAVE);
-        addReaderToMedianWhitelist(LRCUSD_MED,  SET_LRC);
-        addReaderToMedianWhitelist(YFIUSD_MED,  SET_YFI);
-        addReaderToMedianWhitelist(ZRXUSD_MED,  SET_ZRX);
-        addReaderToMedianWhitelist(UNIUSD_MED,  SET_UNI);
+        addReaderToMedianWhitelist(OsmAbstract(getChangelogAddress("PIP_AAVE")).src(), SET_AAVE);
+        addReaderToMedianWhitelist(OsmAbstract(getChangelogAddress("PIP_LRC")).src(),  SET_LRC);
+        addReaderToMedianWhitelist(OsmAbstract(PIP_YFI).src(),                         SET_YFI);
+        addReaderToMedianWhitelist(OsmAbstract(PIP_ZRX).src(),                         SET_ZRX);
+        addReaderToMedianWhitelist(OsmAbstract(getChangelogAddress("PIP_UNI")).src(),  SET_UNI);
 
         // Limiting Governance Attack Surface for Stablecoins
         // https://forum.makerdao.com/t/limiting-governance-attack-surface-for-stablecoins/6057
