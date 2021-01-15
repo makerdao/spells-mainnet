@@ -182,7 +182,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
 
         SpellFab fab = new SpellFab();
-        spell = MAINNET_SPELL != address(0) ?
+        spell = MAINNET_SPELL != address(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F) ?
             DssExec(MAINNET_SPELL) : DssExec(fab.spell());
 
         //
