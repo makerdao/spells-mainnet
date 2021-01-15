@@ -61,14 +61,14 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 vow_sump;
         uint256 vow_bump;
         uint256 vow_hump;
+        uint256 flap_beg;
+        uint256 flap_ttl;
+        uint256 flap_tau;
         uint256 cat_box;
         address pause_authority;
         address osm_mom_authority;
         address flipper_mom_authority;
         uint256 ilk_count;
-        uint256 flap_beg;
-        uint256 flap_ttl;
-        uint256 flap_tau;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -194,15 +194,15 @@ contract DssSpellTest is DSTest, DSMath {
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50000,                   // In whole Dai units
             vow_bump:              10000,                   // In whole Dai units
-            vow_hump:              10 * MILLION,             // In whole Dai units
+            vow_hump:              10 * MILLION,            // In whole Dai units
+            flap_beg:              104 * WAD / 100,         // in (1 + pct) * WAD
+            flap_ttl:              1 hours,                 // in seconds
+            flap_tau:              72 hours,                // in seconds
             cat_box:               15 * MILLION,            // In whole Dai units
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             23,                      // Num expected in system
-            flap_beg:              104 * WAD / 100,         // in (1 + pct) * WAD
-            flap_ttl:              1 hours,                 // in seconds
-            flap_tau:              72 hours                 // in seconds
+            ilk_count:             23                       // Num expected in system
         });
 
         //
@@ -748,12 +748,16 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(reg.count(), values.ilk_count);
 
         // flap
-        // beg is 4%
+        // check beg value
         assertEq(flap.beg(), values.flap_beg);
-        // ttl is 1 hour
+        assertTrue(flap.beg() >= WAD && flap.beg() < RAY);
+        // Check flap ttl and sanity checks
         assertEq(flap.ttl(), values.flap_ttl);
-        // tau is 72 hours (unchanged)
+        assertTrue(flap.ttl() > 0 && flap.ttl() < 86400); // gt 0 && lt 1 day
+        // Check flap tau and sanity checks
         assertEq(flap.tau(), values.flap_tau);
+        assertTrue(flap.tau() > 0 && flap.tau() < 2678400); // gt 0 && lt 1 month
+        assertTrue(flap.tau() >= flap.ttl());
     }
 
     function checkCollateralValues(SystemValues storage values) internal {
