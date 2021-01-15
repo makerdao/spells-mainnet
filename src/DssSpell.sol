@@ -18,10 +18,7 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-
-interface FlapLike {
-    function file(bytes32, uint256) external;
-}
+import "lib/dss-interfaces/src/dss/FlapAbstract.sol";
 
 contract SpellAction is DssAction {
 
@@ -72,7 +69,7 @@ contract SpellAction is DssAction {
 
         // Adjust FLAP Auction Parameters - January 11, 2021
         // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
-        FlapLike(flap()).file("beg", NEW_BEG);
+        FlapAbstract(flap()).file("beg", NEW_BEG);
         setSurplusAuctionBidDuration(1 hours);
         // Increase the System Surplus Buffer - January 11, 2021
         // https://vote.makerdao.com/polling/QmcXtm1d#poll-detail
