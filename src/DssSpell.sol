@@ -31,7 +31,7 @@ contract SpellAction is DssAction {
         "2021-01-15 MakerDAO Executive Spell | Hash: 0x0";
 
     // New flap.beg() value
-    uint256 constant NEW_BEG = 1.04E18; // 4%
+    uint256 constant NEW_BEG     = 1.04E18; // 4%
 
     // Gnosis
     address constant GNOSIS      = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
