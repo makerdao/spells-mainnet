@@ -26,9 +26,9 @@ contract SpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/TODO -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/b902aac62c589dcc77c74eea6e6de8131c39547a/governance/votes/Executive%20vote%20-%20January%2015%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-01-15 MakerDAO Executive Spell | Hash: 0x0";
+        "2021-01-15 MakerDAO Executive Spell | Hash: 0x2417a1d5c313f1acf1198d99d4356522cbe71e3253af1b7138b3448649c85129";
 
     // New flap.beg() value
     uint256 constant NEW_BEG     = 1.04E18; // 4%
