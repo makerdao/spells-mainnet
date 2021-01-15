@@ -976,4 +976,5 @@ contract DssSpellTest is DSTest, DSMath {
         uint castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
     }
+
 }
