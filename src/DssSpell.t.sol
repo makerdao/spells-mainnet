@@ -981,4 +981,26 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(castTime, spell.eta());
     }
 
+    function test_OSMs() public {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        // Track OSM authorizations here
+
+        address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
+        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
+
+        // Gnosis
+        address GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
+        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(GNOSIS), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(GNOSIS), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_COMP")).bud(GNOSIS), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(GNOSIS), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_ZRX")).bud(GNOSIS), 1);
+    }
+
 }

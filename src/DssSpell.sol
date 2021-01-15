@@ -104,7 +104,6 @@ contract SpellAction is DssAction {
 
         // Whitelist Gnosis on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmNwTMcB#poll-detail
-        // TODO OSM tests
         addReaderToOSMWhitelist(getChangelogAddress("PIP_WBTC"), GNOSIS);
         addReaderToOSMWhitelist(getChangelogAddress("PIP_LINK"), GNOSIS);
         addReaderToOSMWhitelist(getChangelogAddress("PIP_COMP"), GNOSIS);
