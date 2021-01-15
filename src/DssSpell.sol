@@ -36,12 +36,6 @@ contract SpellAction is DssAction {
     // Gnosis
     address constant GNOSIS      = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
 
-    address constant BTCUSD_OSM  = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
-    address constant LINKUSD_OSM = 0x9B0C694C6939b5EA9584e9b61C7815E8d97D9cC7;
-    address constant COMPUSD_OSM = 0xBED0879953E633135a48a157718Aa791AC0108E4;
-    address constant YFIUSD_OSM  = 0x5F122465bCf86F45922036970Be6DD7F58820214;
-    address constant ZRXUSD_OSM  = 0x7382c066801E7Acb2299aC8562847B9883f5CD3c;
-
     // SET
     address constant SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
     address constant AAVEUSD_MED = 0xe62872DFEbd323b03D27946f8e2491B454a69811;
@@ -111,11 +105,11 @@ contract SpellAction is DssAction {
         // Whitelist Gnosis on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmNwTMcB#poll-detail
         // TODO OSM tests
-        addReaderToOSMWhitelist(BTCUSD_OSM,  GNOSIS);
-        addReaderToOSMWhitelist(LINKUSD_OSM, GNOSIS);
-        addReaderToOSMWhitelist(COMPUSD_OSM, GNOSIS);
-        addReaderToOSMWhitelist(YFIUSD_OSM,  GNOSIS);
-        addReaderToOSMWhitelist(ZRXUSD_OSM,  GNOSIS);
+        addReaderToOSMWhitelist(getChangelogAddress("PIP_WBTC"), GNOSIS);
+        addReaderToOSMWhitelist(getChangelogAddress("PIP_LINK"), GNOSIS);
+        addReaderToOSMWhitelist(getChangelogAddress("PIP_COMP"), GNOSIS);
+        addReaderToOSMWhitelist(getChangelogAddress("PIP_YFI"),  GNOSIS);
+        addReaderToOSMWhitelist(getChangelogAddress("PIP_ZRX"),  GNOSIS);
 
 
         // Whitelist Set Protocol on Multiple Oracles - January 11, 2021
