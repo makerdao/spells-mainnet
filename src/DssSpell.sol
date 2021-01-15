@@ -118,5 +118,13 @@ contract SpellAction is DssAction {
         addReaderToMedianWhitelist(YFIUSD_MED,  SET_YFI);
         addReaderToMedianWhitelist(ZRXUSD_MED,  SET_ZRX);
         addReaderToMedianWhitelist(UNIUSD_MED,  SET_UNI);
+
+        // Limiting Governance Attack Surface for Stablecoins
+        // https://forum.makerdao.com/t/limiting-governance-attack-surface-for-stablecoins/6057
+        deauthorize(getChangelogAddress("MCD_FLIP_USDC_A"),   flipperMom());
+        deauthorize(getChangelogAddress("MCD_FLIP_USDC_B"),   flipperMom());
+        deauthorize(getChangelogAddress("MCD_FLIP_TUSD_A"),   flipperMom());
+        deauthorize(getChangelogAddress("MCD_FLIP_PAXUSD_A"), flipperMom());
+        deauthorize(getChangelogAddress("MCD_FLIP_GUSD_A"),   flipperMom());
     }
 }
