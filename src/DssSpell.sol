@@ -71,9 +71,12 @@ contract SpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
         FlapAbstract(flap()).file("beg", NEW_BEG);
         setSurplusAuctionBidDuration(1 hours);
+
+
         // Increase the System Surplus Buffer - January 11, 2021
         // https://vote.makerdao.com/polling/QmcXtm1d#poll-detail
         setSurplusBuffer(10_000_000);
+
 
         // Rates Proposal - January 11, 2021
         // https://vote.makerdao.com/polling/QmfBQ4Bh#poll-detail
@@ -91,6 +94,7 @@ contract SpellAction is DssAction {
         // Decrease the AAVE-A Stability Fee from 6% to 4%.
         setIlkStabilityFee("AAVE-A", FOUR_PERCENT_RATE);
 
+
         address PIP_YFI = getChangelogAddress("PIP_YFI");
         address PIP_ZRX = getChangelogAddress("PIP_ZRX");
 
@@ -102,6 +106,7 @@ contract SpellAction is DssAction {
         addReaderToOSMWhitelist(PIP_YFI,                         GNOSIS);
         addReaderToOSMWhitelist(PIP_ZRX,                         GNOSIS);
 
+
         // Whitelist Set Protocol on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmTctW6i#poll-detail
         addReaderToMedianWhitelist(OsmAbstract(getChangelogAddress("PIP_AAVE")).src(), SET_AAVE);
@@ -109,6 +114,7 @@ contract SpellAction is DssAction {
         addReaderToMedianWhitelist(OsmAbstract(PIP_YFI).src(),                         SET_YFI);
         addReaderToMedianWhitelist(OsmAbstract(PIP_ZRX).src(),                         SET_ZRX);
         addReaderToMedianWhitelist(OsmAbstract(getChangelogAddress("PIP_UNI")).src(),  SET_UNI);
+
 
         // Limiting Governance Attack Surface for Stablecoins
         // https://forum.makerdao.com/t/limiting-governance-attack-surface-for-stablecoins/6057
