@@ -18,6 +18,10 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssAction.sol";
 
+interface FlapLike {
+    function file(bytes32, uint256) external;
+}
+
 contract SpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
@@ -25,6 +29,8 @@ contract SpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/TODO -q -O - 2>/dev/null)"
     string public constant description = "TODO";
 
+    // New flap.beg() value
+    uint256 constant NEW_BEG = 1.04E18; // 4%
 
     // Gnosis
     address constant GNOSIS      = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
@@ -75,13 +81,14 @@ contract SpellAction is DssAction {
 
         // Adjust FLAP Auction Parameters - January 11, 2021
         // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
-        setMinSurplusAuctionBidIncrease(400);
+        FlapLike(flap()).file("beg", NEW_BEG);
         setSurplusAuctionBidDuration(1 hours);
 
 
         // Rates Proposal - January 11, 2021
         // https://vote.makerdao.com/polling/QmfBQ4Bh#poll-detail
         // Increase the ETH-A Stability Fee from 2.5% to 3.5%.
+        /// @dev setIlkStabilityFee will drip() the collateral
         setIlkStabilityFee("ETH-A",  THREE_PT_FIVE_PERCENT_RATE);
         // Increase the ETH-B Stability Fee from 5% to 6.5%.
         setIlkStabilityFee("ETH-B",  SIX_PT_FIVE_PERCENT_RATE);
