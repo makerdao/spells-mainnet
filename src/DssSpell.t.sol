@@ -1003,4 +1003,34 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(OsmAbstract(addr.addr("PIP_ZRX")).bud(GNOSIS), 1);
     }
 
+    function test_Medianizers() public {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        // Track Median authorizations here
+
+        address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
+        address AAVEUSD_MED = 0xe62872DFEbd323b03D27946f8e2491B454a69811;
+        assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
+
+        address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
+        address LRCUSD_MED  = 0xcCe92282d9fe310F4c232b0DA9926d5F24611C7B;
+        assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
+
+        address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
+        address YFIUSD_MED  = 0x89AC26C0aFCB28EC55B6CD2F6b7DAD867Fa24639;
+        assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
+
+        address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
+        address ZRXUSD_MED  = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
+        assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
+
+        address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
+        address UNIUSD_MED  = 0x52f761908cC27B4D77AD7A329463cf08baf62153;
+        assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+    }
 }

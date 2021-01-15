@@ -113,7 +113,6 @@ contract SpellAction is DssAction {
 
         // Whitelist Set Protocol on Multiple Oracles - January 11, 2021
         // https://vote.makerdao.com/polling/QmTctW6i#poll-detail
-        // TODO medianizer tests
         addReaderToMedianWhitelist(AAVEUSD_MED, SET_AAVE);
         addReaderToMedianWhitelist(LRCUSD_MED,  SET_LRC);
         addReaderToMedianWhitelist(YFIUSD_MED,  SET_YFI);
