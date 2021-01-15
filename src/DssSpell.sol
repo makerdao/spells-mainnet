@@ -75,7 +75,6 @@ contract SpellAction is DssAction {
 
         // Adjust FLAP Auction Parameters - January 11, 2021
         // https://vote.makerdao.com/polling/QmT79sT6#poll-detail
-        // TODO add tests of flap values
         setMinSurplusAuctionBidIncrease(400);
         setSurplusAuctionBidDuration(1 hours);
 

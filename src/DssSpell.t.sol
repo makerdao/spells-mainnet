@@ -66,6 +66,9 @@ contract DssSpellTest is DSTest, DSMath {
         address osm_mom_authority;
         address flipper_mom_authority;
         uint256 ilk_count;
+        uint256 flap_beg;
+        uint256 flap_ttl;
+        uint256 flap_tau;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -90,6 +93,7 @@ contract DssSpellTest is DSTest, DSMath {
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    FlapAbstract            flap = FlapAbstract(       addr.addr("MCD_FLAP"));
 
     OsmMomAbstract        osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
@@ -195,7 +199,10 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             23                       // Num expected in system
+            ilk_count:             23,                      // Num expected in system
+            flap_beg:              104 * WAD / 100,         // in (1 + pct) * WAD
+            flap_ttl:              1 hours,                 // in seconds
+            flap_tau:              72 hours                 // in seconds
         });
 
         //
@@ -739,6 +746,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count);
+
+        // flap
+        // beg is 4%
+        assertEq(flap.beg(), values.flap_beg);
+        // ttl is 1 hour
+        assertEq(flap.ttl(), values.flap_ttl);
+        // tau is 72 hours (unchanged)
+        assertEq(flap.tau(), values.flap_tau);
     }
 
     function checkCollateralValues(SystemValues storage values) internal {
