@@ -23,9 +23,9 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
+    address constant MAINNET_SPELL = address(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 0;
+    uint256 constant SPELL_CREATED = 1610735323;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
@@ -182,7 +182,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm = Hevm(address(CHEAT_CODE));
 
         SpellFab fab = new SpellFab();
-        spell = MAINNET_SPELL != address(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F) ?
+        spell = MAINNET_SPELL != address(0) ?
             DssExec(MAINNET_SPELL) : DssExec(fab.spell());
 
         //
