@@ -21,7 +21,7 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x3ee0C26aE7aa8cCc759e4Ee4f1E6F2C16220e5f6);
+    address constant MAINNET_SPELL = address(0x0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1609787927;
 
@@ -202,7 +202,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,     // In whole Dai units
             aL_gap:       0 * MILLION,     // In whole Dai units
             aL_ttl:       0,               // In seconds
-            line:         740 * MILLION,   // In whole Dai units
+            line:         1000 * MILLION,   // In whole Dai units
             dust:         500,             // In whole Dai units
             pct:          250,             // In basis points
             chop:         1300,            // In basis points
@@ -282,7 +282,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         160 * MILLION,
+            line:         210 * MILLION,
             dust:         500,
             pct:          450,
             chop:         1300,

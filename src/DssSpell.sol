@@ -34,8 +34,7 @@ contract SpellAction {
 
     // Ilks
     bytes32 constant ILK_ETH_A          = "ETH-A";
-    bytes32 constant ILK_USDC_A         = "USDC-A";
-    bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
+    bytes32 constant ILK_WBTC_A         = "WBTC-A";
 
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -68,22 +67,19 @@ contract SpellAction {
         address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
 
         // Set the global debt ceiling
-        // + 150 M for ETH-A
-        // + 70 M for USDC-A
-        // + 27 M for PSM-USDC-A
+        // + 260 M for ETH-A
+        // + 50 M for WBTC-A
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 150 * MILLION * RAD
-            + 70 * MILLION * RAD
-            + 27 * MILLION * RAD
+            + 260 * MILLION * RAD
+            + 50 * MILLION * RAD
         );
 
         //
         // Update the Debt Ceilings
         //
-        VatAbstract(MCD_VAT).file(ILK_ETH_A, "line", 740 * MILLION * RAD);
-        VatAbstract(MCD_VAT).file(ILK_USDC_A, "line", 555 * MILLION * RAD);
-        VatAbstract(MCD_VAT).file(ILK_PSM_USDC_A, "line", 30 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_ETH_A, "line", 1000 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_WBTC_A, "line", 210 * MILLION * RAD);
     }
 }
 
