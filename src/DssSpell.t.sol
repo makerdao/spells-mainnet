@@ -760,7 +760,7 @@ contract DssSpellTest is DSTest, DSMath {
             if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
                 assertEq(line, normalizedTestLine);
-                assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
+                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
             } else {
                 assertTrue(aL_line > 0);
                 assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
