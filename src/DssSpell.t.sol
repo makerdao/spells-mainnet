@@ -28,11 +28,11 @@ contract DssSpellTest is DSTest, DSMath {
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x0);
+        SpellLike(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 0;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1611185294;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -186,7 +186,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50000,                   // In whole Dai units
             vow_bump:              10000,                   // In whole Dai units
-            vow_hump:              4 * MILLION,             // In whole Dai units
+            vow_hump:              10 * MILLION,             // In whole Dai units
             cat_box:               15 * MILLION,            // In whole Dai units
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
@@ -204,7 +204,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,               // In seconds
             line:         1000 * MILLION,  // In whole Dai units
             dust:         500,             // In whole Dai units
-            pct:          250,             // In basis points
+            pct:          350,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
@@ -220,7 +220,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,     // Not checked as there is auto line
             dust:         500,
-            pct:          500,
+            pct:          650,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
@@ -284,7 +284,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         210 * MILLION,
             dust:         500,
-            pct:          450,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          15000,
@@ -348,7 +348,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         250 * THOUSAND,
             dust:         500,
-            pct:          1000,
+            pct:          500,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -460,7 +460,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         30 * MILLION,
             dust:         500,
-            pct:          900,
+            pct:          600,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -524,7 +524,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         10 * MILLION,
             dust:         500,
-            pct:          600,
+            pct:          400,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
