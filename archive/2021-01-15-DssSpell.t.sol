@@ -6,8 +6,10 @@ import "ds-test/test.sol";
 import "lib/dss-interfaces/src/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
+import {DssExec} from "dss-exec-lib/DssExec.sol";
 
-import {DssSpell} from "./DssSpell.sol";
+import {SpellAction} from "./DssSpell.sol";
+import {SpellFab} from "./SpellFab.sol";
 
 interface Hevm {
     function warp(uint256) external;
@@ -21,18 +23,18 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xc1d8187CEb7C0ec33a99c928FebB4384BbcAEC50);
+    address constant MAINNET_SPELL = address(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F);
     // this needs to be updated
-    uint256 constant SPELL_CREATED = 1611013860;
+    uint256 constant SPELL_CREATED = 1610735323;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F);
+        SpellLike(0x3ee0C26aE7aa8cCc759e4Ee4f1E6F2C16220e5f6);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1611185294;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1609787927;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -104,7 +106,8 @@ contract DssSpellTest is DSTest, DSMath {
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
-    DssSpell   spell;
+    DssExec   spell;
+    SpellAction action;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
     bytes20 constant CHEAT_CODE =
@@ -178,8 +181,9 @@ contract DssSpellTest is DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
+        SpellFab fab = new SpellFab();
         spell = MAINNET_SPELL != address(0) ?
-            DssSpell(MAINNET_SPELL) : new DssSpell();
+            DssExec(MAINNET_SPELL) : DssExec(fab.spell());
 
         //
         // Test for all system configuration changes
@@ -210,7 +214,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,     // In whole Dai units
             aL_gap:       0 * MILLION,     // In whole Dai units
             aL_ttl:       0,               // In seconds
-            line:         1000 * MILLION,  // In whole Dai units
+            line:         740 * MILLION,   // In whole Dai units
             dust:         500,             // In whole Dai units
             pct:          350,             // In basis points
             chop:         1300,            // In basis points
@@ -295,7 +299,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         210 * MILLION,
+            line:         160 * MILLION,
             dust:         500,
             pct:          400,
             chop:         1300,
@@ -803,13 +807,13 @@ contract DssSpellTest is DSTest, DSMath {
             if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
                 assertEq(line, normalizedTestLine);
-                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue((line >= RAD && line < BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
             } else {
                 assertTrue(aL_line > 0);
                 assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
                 assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
                 assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
-                assertTrue((aL_line >= RAD && aL_line < 10 * BILLION * RAD) || aL_line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue((aL_line >= RAD && aL_line < BILLION * RAD) || aL_line == 0);  // eq 0 or gt eq 1 RAD and lt 1B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
@@ -895,7 +899,8 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast() public {
-        string memory description = new DssSpell().description();
+        SpellFab _fab = new SpellFab();
+        string memory description = DssExec(_fab.spell()).description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
