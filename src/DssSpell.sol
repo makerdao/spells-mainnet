@@ -18,7 +18,17 @@ pragma solidity 0.6.11;
 
 import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
+import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
+import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+
+interface LerpFabLike {
+    function newIlkLerp(address target_, bytes32 ilk_, bytes32 what_, uint256 start_, uint256 end_, uint256 duration_) external returns (address);
+}
+
+interface LerpLike {
+    function init() external;
+}
 
 contract SpellAction {
     // Office hours enabled if true
@@ -33,8 +43,18 @@ contract SpellAction {
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     // Ilks
-    bytes32 constant ILK_ETH_A          = "ETH-A";
-    bytes32 constant ILK_WBTC_A         = "WBTC-A";
+    bytes32 constant ILK_LINK_A         = "LINK-A";
+    bytes32 constant ILK_MANA_A         = "MANA-A";
+    bytes32 constant ILK_BAT_A          = "BAT-A";
+    bytes32 constant ILK_TUSD_A         = "TUSD-A";
+    bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
+
+    // Lerp Module
+    address constant LERP_FAB = 0x9B98aF142993877BEF8FC5cA514fD8A18E8f8Ed6;
+
+    // Oracle whitelist
+    address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
+    address constant INSTA_DAPP    = 0x3b50336E3E1E618FE74DF351966ebaD2B12cD24a;
 
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -65,21 +85,87 @@ contract SpellAction {
 
     function execute() external limited {
         address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
+        address MCD_VOW      = CHANGELOG.getAddress("MCD_VOW");
+        address MCD_JOIN_DAI = CHANGELOG.getAddress("MCD_JOIN_DAI");
+
+        // Adjust Debt Ceiling Parameters - January 18, 2021
+        // https://vote.makerdao.com/polling/QmQtn7UY#poll-detail - LINK-A
+        // https://vote.makerdao.com/polling/QmSCLfXN#poll-detail - MANA-A
+        // https://vote.makerdao.com/polling/QmW4ei2M#poll-detail - BAT-A
+        // https://vote.makerdao.com/polling/QmXTGwq4#poll-detail - TUSD-A
+        // https://vote.makerdao.com/polling/QmfTU85J#poll-detail - PSM-USDC-A [ December 14, 2020 ]
 
         // Set the global debt ceiling
-        // + 260 M for ETH-A
-        // + 50 M for WBTC-A
+        // + 10 M for LINK-A
+        // + 750 K for WBTC-A [ Note: Units ]
+        // - 8 M for WBTC-A
+        // - 135 M for TUSD-A
+        // + 470 M for PSM-USDC-A [ Lerp End Amount ]
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 260 * MILLION * RAD
-            + 50 * MILLION * RAD
+            + 10 * MILLION * RAD
+            + 750 * THOUSAND * RAD
+            - 8 * MILLION * RAD
+            - 135 * MILLION * RAD
+            + 470 * MILLION * RAD
         );
 
-        //
         // Update the Debt Ceilings
+        VatAbstract(MCD_VAT).file(ILK_LINK_A, "line", 20 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_MANA_A, "line", 1 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_BAT_A, "line", 2 * MILLION * RAD);
+        VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0 * MILLION * RAD);
+        // Note: PSM-USDC-A is set to 80 M in the Lerp.init()
+
+        // Setup the Lerp module
+        address lerp = LerpFabLike(LERP_FAB).newIlkLerp(MCD_VAT, ILK_PSM_USDC_A, "line", 80 * MILLION * RAD, 500 * MILLION * RAD, 12 weeks);
+        VatAbstract(MCD_VAT).rely(lerp);
+        LerpLike(lerp).init();
+
+        // Set dust to 2000 DAI - January 18, 2021
+        // https://vote.makerdao.com/polling/QmWPAu5z#poll-detail
+        bytes32[] memory ilks = IlkRegistryAbstract(ILK_REGISTRY).list();
+        for (uint256 i = 0; i < ilks.length; i++) {
+            (,,,, uint256 dust) = vat.ilks(ilks[i]);
+            if (dust != 0) {
+                VatAbstract(MCD_VAT).file(ilks[i], "dust", 2000 * RAD);
+            }
+        }
+
+        // Vault Compensation Working Group Payment - January 18, 2021
+        // https://vote.makerdao.com/polling/QmQcXFeC#poll-detail
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), 12700 * RAD);
+        VatAbstract(MCD_VAT).hope(MCD_JOIN_DAI);
+        
+        // @makerman: 6,300 Dai for 126 hours to [0x9ac6a6b24bcd789fa59a175c0514f33255e1e6d0]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x9ac6a6b24bcd789fa59a175c0514f33255e1e6d0, 6300 * WAD);
+        // @monet-supply: 3,800 Dai for 76 hours to [0x8d07D225a769b7Af3A923481E1FdF49180e6A265]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x8d07D225a769b7Af3A923481E1FdF49180e6A265, 3800 * WAD);
+        // @Joshua_Pritikin: 2,000 Dai for 40 hours to [0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58, 2000 * WAD);
+        // @befitsandpiper: 400 Dai for 8 hours to [0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a, 400 * WAD);
+        // @Vault2288: 200 Dai for 4 hours to [0x92e5a14b08e5232682eb38269a1ce661f04ec93d]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x92e5a14b08e5232682eb38269a1ce661f04ec93d, 200 * WAD);
+
+        VatAbstract(MCD_VAT).nope(MCD_JOIN_DAI);
+
+        // Whitelist Instadapp on ETHUSD Oracle - January 18, 2021
+        // https://vote.makerdao.com/polling/QmNSb2cu#poll-detail
+        OsmAbstract(ETHUSD_OSM).kiss(INSTA_DAPP);
+
         //
-        VatAbstract(MCD_VAT).file(ILK_ETH_A, "line", 1000 * MILLION * RAD);
-        VatAbstract(MCD_VAT).file(ILK_WBTC_A, "line", 210 * MILLION * RAD);
+        // TODO: Onboard WBTC-ETH UNI LP
+        //
+
+        //
+        // TODO: Onboard USDC-ETH UNI LP
+        //
+
+        // Update the changelog
+        CHANGELOG.setAddress("LERP_FAB", LERP_FAB);
+        // Bump version
+        CHANGELOG.setVersion("1.2.4");
     }
 }
 
@@ -99,7 +185,7 @@ contract DssSpell {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/7545776ce23113335369331dff39d71d9e767a19/governance/votes/Executive%20vote%20-%20January%2018%2C%202021.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2021-01-18 MakerDAO Executive Spell | Hash: 0x71eb4d0a0f678bc2d706033c2ad238e637fb7665521040a31a193ad27d89183c";
+        "2021-01-22 MakerDAO Executive Spell | Hash: 0x71eb4d0a0f678bc2d706033c2ad238e637fb7665521040a31a193ad27d89183c";
 
     function officeHours() external view returns (bool) {
         return SpellAction(action).officeHours();
