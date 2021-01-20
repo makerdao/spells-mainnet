@@ -20,6 +20,7 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 interface LerpFabLike {
@@ -87,6 +88,7 @@ contract SpellAction {
         address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
         address MCD_VOW      = CHANGELOG.getAddress("MCD_VOW");
         address MCD_JOIN_DAI = CHANGELOG.getAddress("MCD_JOIN_DAI");
+        address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
 
         // Adjust Debt Ceiling Parameters - January 18, 2021
         // https://vote.makerdao.com/polling/QmQtn7UY#poll-detail - LINK-A
@@ -101,6 +103,8 @@ contract SpellAction {
         // - 8 M for WBTC-A
         // - 135 M for TUSD-A
         // + 470 M for PSM-USDC-A [ Lerp End Amount ]
+        // TODO: WBTC-ETH UNI LP
+        // TODO: USDC-ETH UNI LP
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
             + 10 * MILLION * RAD
@@ -126,7 +130,7 @@ contract SpellAction {
         // https://vote.makerdao.com/polling/QmWPAu5z#poll-detail
         bytes32[] memory ilks = IlkRegistryAbstract(ILK_REGISTRY).list();
         for (uint256 i = 0; i < ilks.length; i++) {
-            (,,,, uint256 dust) = vat.ilks(ilks[i]);
+            (,,,, uint256 dust) = VatAbstract(MCD_VAT).ilks(ilks[i]);
             if (dust != 0) {
                 VatAbstract(MCD_VAT).file(ilks[i], "dust", 2000 * RAD);
             }
@@ -137,16 +141,16 @@ contract SpellAction {
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), 12700 * RAD);
         VatAbstract(MCD_VAT).hope(MCD_JOIN_DAI);
         
-        // @makerman: 6,300 Dai for 126 hours to [0x9ac6a6b24bcd789fa59a175c0514f33255e1e6d0]
-        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x9ac6a6b24bcd789fa59a175c0514f33255e1e6d0, 6300 * WAD);
+        // @makerman: 6,300 Dai for 126 hours to [0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0, 6300 * WAD);
         // @monet-supply: 3,800 Dai for 76 hours to [0x8d07D225a769b7Af3A923481E1FdF49180e6A265]
         DaiJoinAbstract(MCD_JOIN_DAI).exit(0x8d07D225a769b7Af3A923481E1FdF49180e6A265, 3800 * WAD);
         // @Joshua_Pritikin: 2,000 Dai for 40 hours to [0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58]
         DaiJoinAbstract(MCD_JOIN_DAI).exit(0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58, 2000 * WAD);
         // @befitsandpiper: 400 Dai for 8 hours to [0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a]
         DaiJoinAbstract(MCD_JOIN_DAI).exit(0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a, 400 * WAD);
-        // @Vault2288: 200 Dai for 4 hours to [0x92e5a14b08e5232682eb38269a1ce661f04ec93d]
-        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x92e5a14b08e5232682eb38269a1ce661f04ec93d, 200 * WAD);
+        // @Vault2288: 200 Dai for 4 hours to [0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D]
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D, 200 * WAD);
 
         VatAbstract(MCD_VAT).nope(MCD_JOIN_DAI);
 

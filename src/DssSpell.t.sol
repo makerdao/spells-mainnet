@@ -21,14 +21,14 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0xc1d8187CEb7C0ec33a99c928FebB4384BbcAEC50);
+    address constant MAINNET_SPELL = address(0x0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1611013860;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x421B7C446F8545D98D9adCB10CdeB4a588210f8F);
+        SpellLike(0x0);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
@@ -211,7 +211,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,     // In whole Dai units
             aL_ttl:       0,               // In seconds
             line:         1000 * MILLION,  // In whole Dai units
-            dust:         500,             // In whole Dai units
+            dust:         2000,             // In whole Dai units
             pct:          350,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
@@ -228,7 +228,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
             line:         0 * MILLION,     // Not checked as there is auto line
-            dust:         500,
+            dust:         2000,
             pct:          650,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -244,8 +244,8 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         10 * MILLION,
-            dust:         500,
+            line:         2 * MILLION,
+            dust:         2000,
             pct:          800,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -262,7 +262,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         555 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -279,7 +279,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         30 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          5000,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -296,7 +296,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         210 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -312,8 +312,8 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         135 * MILLION,
-            dust:         500,
+            line:         0 * MILLION,
+            dust:         2000,
             pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -330,7 +330,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         5 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -347,7 +347,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         5 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -363,8 +363,8 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         250 * THOUSAND,
-            dust:         500,
+            line:         1 * MILLION,
+            dust:         2000,
             pct:          500,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -381,7 +381,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         25 * MILLION / 10,
-            dust:         500,
+            dust:         2000,
             pct:          800,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -398,7 +398,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         100 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          0,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -415,7 +415,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         7 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -432,7 +432,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         3 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -448,8 +448,8 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         10 * MILLION,
-            dust:         500,
+            line:         20 * MILLION,
+            dust:         2000,
             pct:          200,
             chop:         1300,
             dunk:         50 * THOUSAND,
@@ -466,7 +466,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         4 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          200,
             chop:         1300,
             dunk:         50000,
@@ -483,7 +483,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         30 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          600,
             chop:         1300,
             dunk:         50000,
@@ -500,7 +500,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         5 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          0,
             chop:         1300,
             dunk:         50000,
@@ -517,7 +517,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         15 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          300,
             chop:         1300,
             dunk:         50000,
@@ -534,7 +534,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         2 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          600,
             chop:         1300,
             dunk:         50000,
@@ -551,7 +551,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         10 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          400,
             chop:         1300,
             dunk:         50000,
@@ -568,7 +568,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
             line:         3 * MILLION,
-            dust:         500,
+            dust:         2000,
             pct:          100,
             chop:         1300,
             dunk:         50000,
@@ -584,7 +584,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         30 * MILLION,
+            line:         80 * MILLION,
             dust:         0,
             pct:          0,
             chop:         1300,
