@@ -50,7 +50,7 @@ contract SpellAction {
     bytes32 constant ILK_TUSD_A         = "TUSD-A";
     bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
 
-    // Lerp Module
+    // Lerp Module - https://github.com/BellwoodStudios/dss-lerp
     address constant LERP_FAB = 0x0;        // TODO - needs to be reployed with updates
 
     // Oracle whitelist
