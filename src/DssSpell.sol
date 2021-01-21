@@ -36,7 +36,7 @@ interface LerpFabLike {
 }
 
 interface LerpLike {
-    function tick() external;
+    function init() external;
 }
 
 contract SpellAction {
@@ -73,7 +73,7 @@ contract SpellAction {
     bytes32 constant ILK_UNIV2USDCETH_A      = "UNIV2USDCETH-A";
 
     // Lerp Module - https://github.com/BellwoodStudios/dss-lerp
-    address constant LERP_FAB = 0x0;        // TODO - needs to be reployed with updates
+    address constant LERP_FAB = 0x9B98aF142993877BEF8FC5cA514fD8A18E8f8Ed6;
 
     // Oracle whitelist
     address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
@@ -145,12 +145,12 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ILK_MANA_A, "line", 1 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_BAT_A, "line", 2 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0 * MILLION * RAD);
-        // Note: PSM-USDC-A is set to 80 M in the Lerp.tick()
+        // Note: PSM-USDC-A is set to 80 M in the Lerp.init()
 
         // Setup the Lerp module
         address lerp = LerpFabLike(LERP_FAB).newIlkLerp(MCD_VAT, ILK_PSM_USDC_A, "line", 80 * MILLION * RAD, 500 * MILLION * RAD, 12 weeks);
         VatAbstract(MCD_VAT).rely(lerp);
-        LerpLike(lerp).tick();
+        LerpLike(lerp).init();
 
         // Set dust to 2000 DAI - January 18, 2021
         // https://vote.makerdao.com/polling/QmWPAu5z#poll-detail
