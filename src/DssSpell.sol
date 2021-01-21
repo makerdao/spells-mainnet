@@ -28,7 +28,7 @@ interface LerpFabLike {
 }
 
 interface LerpLike {
-    function init() external;
+    function tick() external;
 }
 
 contract SpellAction {
@@ -119,12 +119,12 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ILK_MANA_A, "line", 1 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_BAT_A, "line", 2 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0 * MILLION * RAD);
-        // Note: PSM-USDC-A is set to 80 M in the Lerp.init()
+        // Note: PSM-USDC-A is set to 80 M in the Lerp.tick()
 
         // Setup the Lerp module
         address lerp = LerpFabLike(LERP_FAB).newIlkLerp(MCD_VAT, ILK_PSM_USDC_A, "line", 80 * MILLION * RAD, 500 * MILLION * RAD, 12 weeks);
         VatAbstract(MCD_VAT).rely(lerp);
-        LerpLike(lerp).init();
+        LerpLike(lerp).tick();
 
         // Set dust to 2000 DAI - January 18, 2021
         // https://vote.makerdao.com/polling/QmWPAu5z#poll-detail
