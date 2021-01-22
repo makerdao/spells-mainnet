@@ -909,7 +909,9 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        assertEq(sumlines, vat.Line());
+        // NOTE: Remove the + 420 M when the lerp is complete
+        // Sum lines is not going to equal vat.Line() for the next 12 weeks
+        assertEq(sumlines + 420 * MILLION * RAD, vat.Line());
     }
 
     // function testFailWrongDay() public {
@@ -1253,5 +1255,29 @@ contract DssSpellTest is DSTest, DSMath {
     //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
     // }
 
+    function testOsmWhitelist() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        // Verify that B Protocol has been whitelisted on the ETHUSD Medianizer and OSM
+        assertEq(OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(0x3b50336E3E1E618FE74DF351966ebaD2B12cD24a), 1);
+    }
+
+    function testPayouts() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        // Verify Vault Compensation Working Group Payment have been sent out properly
+        assertTrue(dai.balanceOf(0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0) >= 6300 ether);
+        assertTrue(dai.balanceOf(0x8d07D225a769b7Af3A923481E1FdF49180e6A265) >= 3800 ether);
+        assertTrue(dai.balanceOf(0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58) >= 2000 ether);
+        assertTrue(dai.balanceOf(0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a) >= 400 ether);
+        assertTrue(dai.balanceOf(0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D) >= 200 ether);
+
+        // Confirm access to pause proxy vat dai is revoked to dai join
+        assertEq(vat.can(pauseProxy, address(daiJoin)), 0);
+    }
 
 }
