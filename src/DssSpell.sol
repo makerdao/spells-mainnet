@@ -136,11 +136,11 @@ contract SpellAction {
         // - 8 M for BAT-A
         // - 135 M for TUSD-A
         // + 470 M for PSM-USDC-A [ Lerp End Amount ]
-        // +3 M for WBTC-ETH UNI LP
-        // +3 M for USDC-ETH UNI LP
+        // + 3 M for WBTC-ETH UNI LP
+        // + 3 M for USDC-ETH UNI LP
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 343750 * THOUSAND * RAD
+            + 343_750_000 * RAD
         );
 
         // Update the Debt Ceilings
