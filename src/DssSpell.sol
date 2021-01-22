@@ -78,7 +78,7 @@ contract SpellAction {
 
     // Oracle whitelist
     address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
-    address constant INSTA_DAPP    = 0x3b50336E3E1E618FE74DF351966ebaD2B12cD24a;
+    address constant INSTA_DAPP    = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
 
     // rates
     uint256 constant ONE_PERCENT_RATE = 1000000000315522921573372069;
