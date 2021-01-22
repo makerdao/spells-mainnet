@@ -132,8 +132,8 @@ contract SpellAction {
 
         // Set the global debt ceiling
         // + 10 M for LINK-A
-        // + 750 K for WBTC-A [ Note: Units ]
-        // - 8 M for WBTC-A
+        // + 750 K for MANA-A [ Note: Units ]
+        // - 8 M for BAT-A
         // - 135 M for TUSD-A
         // + 470 M for PSM-USDC-A [ Lerp End Amount ]
         // TODO: WBTC-ETH UNI LP
