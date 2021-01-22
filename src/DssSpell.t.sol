@@ -1263,7 +1263,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Verify that B Protocol has been whitelisted on the ETHUSD Medianizer and OSM
-        assertEq(OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(0x3b50336E3E1E618FE74DF351966ebaD2B12cD24a), 1);
+        assertEq(OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(0xDF3CDd10e646e4155723a3bC5b1191741DD90333), 1);
     }
 
     function testPayouts() public {
