@@ -23,6 +23,7 @@ import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/CatAbstract.sol";
 import "lib/dss-interfaces/src/dss/JugAbstract.sol";
 import "lib/dss-interfaces/src/dss/SpotAbstract.sol";
 import "lib/dss-interfaces/src/dss/FlipAbstract.sol";
@@ -60,15 +61,15 @@ contract SpellAction {
 
     // UNIV2WBTCETH-A
     address constant UNIV2WBTCETH            = 0xBb2b8038a1640196FbE3e38816F3e67Cba72D940;
-    address constant MCD_JOIN_UNIV2WBTCETH_A = ;
-    address constant MCD_FLIP_UNIV2WBTCETH_A = ;
-    address constant PIP_UNIV2WBTCETH        = 0x771338D5B31754b25D2eb03Cea676877562Dec26; // 
+    address constant MCD_JOIN_UNIV2WBTCETH_A = 0xDc26C9b7a8fe4F5dF648E314eC3E6Dc3694e6Dd2;
+    address constant MCD_FLIP_UNIV2WBTCETH_A = 0xbc95e8904d879F371Ac6B749727a0EAfDCd2ACB6;
+    address constant PIP_UNIV2WBTCETH        = 0x771338D5B31754b25D2eb03Cea676877562Dec26; 
     bytes32 constant ILK_UNIV2WBTCETH_A      = "UNIV2WBTCETH-A";
 
     // UNIV2USDCETH-A
     address constant UNIV2USDCETH            = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
-    address constant MCD_JOIN_UNIV2USDCETH_A = ;
-    address constant MCD_FLIP_UNIV2USDCETH_A = ;
+    address constant MCD_JOIN_UNIV2USDCETH_A = 0x03Ae53B33FeeAc1222C3f372f32D37Ba95f0F099;
+    address constant MCD_FLIP_UNIV2USDCETH_A = 0x48d2C08b93E57701C8ae8974Fc4ADd725222B0BB;
     address constant PIP_UNIV2USDCETH        = 0xECB03Fec701B93DC06d19B4639AA8b5a838472BE;
     bytes32 constant ILK_UNIV2USDCETH_A      = "UNIV2USDCETH-A";
 
@@ -112,7 +113,13 @@ contract SpellAction {
 
     function execute() external limited {
         address MCD_VAT      = CHANGELOG.getAddress("MCD_VAT");
+        address MCD_CAT      = CHANGELOG.getAddress("MCD_CAT");
+        address MCD_SPOT     = CHANGELOG.getAddress("MCD_SPOT");
+        address MCD_JUG      = CHANGELOG.getAddress("MCD_JUG");
+        address MCD_END      = CHANGELOG.getAddress("MCD_END");
         address MCD_VOW      = CHANGELOG.getAddress("MCD_VOW");
+        address FLIPPER_MOM  = CHANGELOG.getAddress("FLIPPER_MOM");
+        address OSM_MOM      = CHANGELOG.getAddress("OSM_MOM");
         address MCD_JOIN_DAI = CHANGELOG.getAddress("MCD_JOIN_DAI");
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
 
@@ -131,13 +138,17 @@ contract SpellAction {
         // + 470 M for PSM-USDC-A [ Lerp End Amount ]
         // TODO: WBTC-ETH UNI LP
         // TODO: USDC-ETH UNI LP
+        // VatAbstract(MCD_VAT).file("Line",
+        //     VatAbstract(MCD_VAT).Line()
+        //     + 10 * MILLION * RAD
+        //     + 750 * THOUSAND * RAD
+        //     - 8 * MILLION * RAD
+        //     - 135 * MILLION * RAD
+        //     + 470 * MILLION * RAD
+        // );
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 10 * MILLION * RAD
-            + 750 * THOUSAND * RAD
-            - 8 * MILLION * RAD
-            - 135 * MILLION * RAD
-            + 470 * MILLION * RAD
+            + 337750 * THOUSAND * RAD
         );
 
         // Update the Debt Ceilings
@@ -145,6 +156,8 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ILK_MANA_A, "line", 1 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_BAT_A, "line", 2 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0 * MILLION * RAD);
+        // VatAbstract(MCD_VAT).file(ILK_UNIV2WBTCETH_A, "line", 0 * MILLION * RAD);
+        // VatAbstract(MCD_VAT).file(ILK_UNIV2USDCETH_A, "line", 0 * MILLION * RAD);
         // Note: PSM-USDC-A is set to 80 M in the Lerp.init()
 
         // Setup the Lerp module
@@ -224,12 +237,16 @@ contract SpellAction {
         // Allow OsmMom to access to the UNIV2WBTCETH Osm
         // !!!!!!!! Only if PIP_UNIV2WBTCETH = Osm and hasn't been already relied due a previous deployed ilk
         LPOsmAbstract(PIP_UNIV2WBTCETH).rely(OSM_MOM);
+
         // Whitelist Osm to read the Median data (only necessary if it is the first time the token is being added to an ilk)
         // !!!!!!!! Only if PIP_UNIV2WBTCETH = Osm, its src is a Median and hasn't been already whitelisted due a previous deployed ilk
+        MedianAbstract(LPOsmAbstract(PIP_UNIV2WBTCETH).orb0()).kiss(PIP_UNIV2WBTCETH);
         MedianAbstract(LPOsmAbstract(PIP_UNIV2WBTCETH).orb1()).kiss(PIP_UNIV2WBTCETH);
+
         // Whitelist Spotter to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
         // !!!!!!!! Only if PIP_UNIV2WBTCETH = Osm or PIP_UNIV2WBTCETH = Median and hasn't been already whitelisted due a previous deployed ilk
         LPOsmAbstract(PIP_UNIV2WBTCETH).kiss(MCD_SPOT);
+
         // Whitelist End to read the Osm data (only necessary if it is the first time the token is being added to an ilk)
         // !!!!!!!! Only if PIP_UNIV2WBTCETH = Osm or PIP_UNIV2WBTCETH = Median and hasn't been already whitelisted due a previous deployed ilk
         LPOsmAbstract(PIP_UNIV2WBTCETH).kiss(MCD_END);
