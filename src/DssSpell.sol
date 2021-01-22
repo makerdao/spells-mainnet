@@ -77,12 +77,11 @@ contract SpellAction {
     address constant LERP_FAB = 0x9B98aF142993877BEF8FC5cA514fD8A18E8f8Ed6;
 
     // Oracle whitelist
-    address constant ETHUSD_OSM    = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
-    address constant INSTA_DAPP    = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
+    address constant INSTA_DAPP = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
 
     // rates
     uint256 constant ONE_PERCENT_RATE = 1000000000315522921573372069;
-	uint256 constant TWO_PERCENT_RATE = 1000000000627937192491029810;
+    uint256 constant TWO_PERCENT_RATE = 1000000000627937192491029810;
 
     // decimals & precision
     uint256 constant THOUSAND = 10 ** 3;
@@ -122,6 +121,7 @@ contract SpellAction {
         address OSM_MOM      = CHANGELOG.getAddress("OSM_MOM");
         address MCD_JOIN_DAI = CHANGELOG.getAddress("MCD_JOIN_DAI");
         address ILK_REGISTRY = CHANGELOG.getAddress("ILK_REGISTRY");
+        address ETHUSD_OSM   = CHANGELOG.getAddress("PIP_ETH");
 
         // Adjust Debt Ceiling Parameters - January 18, 2021
         // https://vote.makerdao.com/polling/QmQtn7UY#poll-detail - LINK-A

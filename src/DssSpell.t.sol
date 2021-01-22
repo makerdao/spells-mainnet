@@ -1252,21 +1252,33 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        // Verify that B Protocol has been whitelisted on the ETHUSD Medianizer and OSM
+        // Verify that Instadapp has been whitelisted on the ETHUSD OSM
         assertEq(OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(0xDF3CDd10e646e4155723a3bC5b1191741DD90333), 1);
     }
 
     function testPayouts() public {
+        address addr1 = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+        address addr2 = 0x8d07D225a769b7Af3A923481E1FdF49180e6A265;
+        address addr3 = 0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58;
+        address addr4 = 0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a;
+        address addr5 = 0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D;
+
+        uint256 bal1 = dai.balanceOf(addr1);
+        uint256 bal2 = dai.balanceOf(addr2);
+        uint256 bal3 = dai.balanceOf(addr3);
+        uint256 bal4 = dai.balanceOf(addr4);
+        uint256 bal5 = dai.balanceOf(addr5);
+
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
         // Verify Vault Compensation Working Group Payment have been sent out properly
-        assertTrue(dai.balanceOf(0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0) >= 6300 ether);
-        assertTrue(dai.balanceOf(0x8d07D225a769b7Af3A923481E1FdF49180e6A265) >= 3800 ether);
-        assertTrue(dai.balanceOf(0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58) >= 2000 ether);
-        assertTrue(dai.balanceOf(0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a) >= 400 ether);
-        assertTrue(dai.balanceOf(0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D) >= 200 ether);
+        assertEq(dai.balanceOf(addr1) - bal1, 6300 ether);
+        assertEq(dai.balanceOf(addr2) - bal2, 3800 ether);
+        assertEq(dai.balanceOf(addr3) - bal3, 2000 ether);
+        assertEq(dai.balanceOf(addr4) - bal4, 400 ether);
+        assertEq(dai.balanceOf(addr5) - bal5, 200 ether);
 
         // Confirm access to pause proxy vat dai is revoked to dai join
         assertEq(vat.can(pauseProxy, address(daiJoin)), 0);
