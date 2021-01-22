@@ -1214,6 +1214,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(OsmAbstract(addr.addr("PIP_COMP")).bud(GNOSIS), 1);
         assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(GNOSIS), 1);
         assertEq(OsmAbstract(addr.addr("PIP_ZRX")).bud(GNOSIS), 1);
+
+        // Instadapp
+        address INSTADAPP = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
+        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(INSTADAPP), 1);
     }
 
     function test_Medianizers() public {
@@ -1245,15 +1249,6 @@ contract DssSpellTest is DSTest, DSMath {
         address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
         address UNIUSD_MED  = 0x52f761908cC27B4D77AD7A329463cf08baf62153;
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
-    }
-
-    function testOsmWhitelist() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        // Verify that Instadapp has been whitelisted on the ETHUSD OSM
-        assertEq(OsmAbstract(0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763).bud(0xDF3CDd10e646e4155723a3bC5b1191741DD90333), 1);
     }
 
     function testPayouts() public {

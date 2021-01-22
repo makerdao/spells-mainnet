@@ -73,7 +73,7 @@ contract SpellAction {
     address constant PIP_UNIV2USDCETH        = 0xECB03Fec701B93DC06d19B4639AA8b5a838472BE;
     bytes32 constant ILK_UNIV2USDCETH_A      = "UNIV2USDCETH-A";
 
-    // Lerp Module - https://github.com/BellwoodStudios/dss-lerp
+    // Lerp Module - https://github.com/BellwoodStudios/dss-lerp/tree/v0.1.0
     address constant LERP_FAB = 0x9B98aF142993877BEF8FC5cA514fD8A18E8f8Ed6;
 
     // Oracle whitelist
