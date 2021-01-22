@@ -859,7 +859,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
                 assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
                 assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
-                assertTrue((aL_line >= RAD && aL_line < 10 * BILLION * RAD) || aL_line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue((aL_line >= RAD && aL_line < 10 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 10B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
@@ -914,61 +914,60 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines + 420 * MILLION * RAD, vat.Line());
     }
 
-    // function testFailWrongDay() public {
-    //     if (spell.officeHours()) {
-    //         vote();
-    //         scheduleWaitAndCastFailDay();
-    //     } else {
-    //         revert("Office Hours Disabled");
-    //     }
-    // }
+    function testFailWrongDay() public {
+        if (spell.officeHours()) {
+            vote();
+            scheduleWaitAndCastFailDay();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
 
-    // function testFailTooEarly() public {
-    //     if (spell.officeHours()) {
-    //         vote();
-    //         scheduleWaitAndCastFailEarly();
-    //     } else {
-    //         revert("Office Hours Disabled");
-    //     }
-    // }
+    function testFailTooEarly() public {
+        if (spell.officeHours()) {
+            vote();
+            scheduleWaitAndCastFailEarly();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
 
-    // function testFailTooLate() public {
-    //     if (spell.officeHours()) {
-    //         vote();
-    //         scheduleWaitAndCastFailLate();
-    //     } else {
-    //         revert("Office Hours Disabled");
-    //     }
-    // }
+    function testFailTooLate() public {
+        if (spell.officeHours()) {
+            vote();
+            scheduleWaitAndCastFailLate();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
 
-    // function testOnTime() public {
-    //     vote();
-    //     scheduleWaitAndCast();
-    // }
+    function testOnTime() public {
+        vote();
+        scheduleWaitAndCast();
+    }
 
-    // function testSpellIsCast() public {
-    //     string memory description = new DssSpell().description();
-    //     assertTrue(bytes(description).length > 0);
-    //     // DS-Test can't handle strings directly, so cast to a bytes32.
-    //     assertEq(stringToBytes32(spell.description()),
-    //             stringToBytes32(description));
+    function testSpellIsCast() public {
+        string memory description = new DssSpell().description();
+        assertTrue(bytes(description).length > 0);
+        // DS-Test can't handle strings directly, so cast to a bytes32.
+        assertEq(stringToBytes32(spell.description()),
+                stringToBytes32(description));
 
-    //     if(address(spell) != address(MAINNET_SPELL)) {
-    //         assertEq(spell.expiration(), (now + 30 days));
-    //     } else {
-    //         assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
-    //     }
+        if(address(spell) != address(MAINNET_SPELL)) {
+            assertEq(spell.expiration(), (now + 30 days));
+        } else {
+            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+        }
 
-    //     castPreviousSpell();
-    //     vote();
-    //     scheduleWaitAndCast();
-    //     assertTrue(spell.done());
+        castPreviousSpell();
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
 
-    //     checkSystemValues(afterSpell);
+        checkSystemValues(afterSpell);
 
-    //     checkCollateralValues(afterSpell);
-
-    // }
+        checkCollateralValues(afterSpell);
+    }
 
     // TODO: double-check
 	function testSpellIsCast_UNIV2WBTCETH_INTEGRATION() public {
@@ -987,10 +986,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpPipWbtc.src(), address(lpWbtc));
         assertEq(lpPipWbtc.orb0(), address(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f));
         assertEq(lpPipWbtc.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-
-        // TODO
-        assertEq(DSValueAbstract(lpPipWbtc.orb0()).read(), bytes32(WAD));
-        assertEq(DSValueAbstract(lpPipWbtc.orb0()).owner(), addr.addr("MCD_PAUSE_PROXY"));
 
         // Authorization
         assertEq(lpJoinWbtc.wards(pauseProxy), 1);
@@ -1120,22 +1115,22 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpFlipUsdc.kicks(), 1);
     }
 
-    // function testCastCost() public {
-    //     vote();
-    //     spell.schedule();
+    function testCastCost() public {
+        vote();
+        spell.schedule();
 
-    //     castPreviousSpell();
+        castPreviousSpell();
 
-    //     hevm.warp(spell.nextCastTime());
-    //     uint startGas = gasleft();
-    //     spell.cast();
-    //     uint endGas = gasleft();
-    //     uint totalGas = startGas - endGas;
+        hevm.warp(spell.nextCastTime());
+        uint startGas = gasleft();
+        spell.cast();
+        uint endGas = gasleft();
+        uint totalGas = startGas - endGas;
 
-    //     assertTrue(spell.done());
-    //     // Fail if cast is too expensive
-    //     assertTrue(totalGas <= 8 * MILLION);
-    // }
+        assertTrue(spell.done());
+        // Fail if cast is too expensive
+        assertTrue(totalGas <= 8 * MILLION);
+    }
 
     // function test_nextCastTime() public {
     //     hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
@@ -1190,19 +1185,19 @@ contract DssSpellTest is DSTest, DSMath {
     //     }
     // }
 
-    // function testFail_notScheduled() public {
-    //     spell.nextCastTime();
-    // }
+    function testFail_notScheduled() public {
+        spell.nextCastTime();
+    }
 
-    // function test_use_eta() public {
-    //     hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+    function test_use_eta() public {
+        hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
 
-    //     vote();
-    //     spell.schedule();
+        vote();
+        spell.schedule();
 
-    //     uint castTime = spell.nextCastTime();
-    //     assertEq(castTime, spell.eta());
-    // }
+        uint castTime = spell.nextCastTime();
+        assertEq(castTime, spell.eta());
+    }
 
     // function test_OSMs() public {
     //     vote();

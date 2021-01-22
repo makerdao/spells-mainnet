@@ -149,7 +149,7 @@ contract SpellAction {
         // TODO: fix this, this includes 6M for the two uni lp tokens
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 937750 * THOUSAND * RAD
+            + 337750 * THOUSAND * RAD
             + 6 * MILLION * RAD
         );
 
