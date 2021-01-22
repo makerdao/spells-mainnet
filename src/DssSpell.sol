@@ -148,7 +148,8 @@ contract SpellAction {
         // );
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 337750 * THOUSAND * RAD
+            + 937750 * THOUSAND * RAD
+            + 6 * MILLION * RAD
         );
 
         // Update the Debt Ceilings
@@ -156,8 +157,6 @@ contract SpellAction {
         VatAbstract(MCD_VAT).file(ILK_MANA_A, "line", 1 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_BAT_A, "line", 2 * MILLION * RAD);
         VatAbstract(MCD_VAT).file(ILK_TUSD_A, "line", 0 * MILLION * RAD);
-        // VatAbstract(MCD_VAT).file(ILK_UNIV2WBTCETH_A, "line", 0 * MILLION * RAD);
-        // VatAbstract(MCD_VAT).file(ILK_UNIV2USDCETH_A, "line", 0 * MILLION * RAD);
         // Note: PSM-USDC-A is set to 80 M in the Lerp.init()
 
         // Setup the Lerp module
