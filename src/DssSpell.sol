@@ -136,21 +136,11 @@ contract SpellAction {
         // - 8 M for BAT-A
         // - 135 M for TUSD-A
         // + 470 M for PSM-USDC-A [ Lerp End Amount ]
-        // TODO: WBTC-ETH UNI LP
-        // TODO: USDC-ETH UNI LP
-        // VatAbstract(MCD_VAT).file("Line",
-        //     VatAbstract(MCD_VAT).Line()
-        //     + 10 * MILLION * RAD
-        //     + 750 * THOUSAND * RAD
-        //     - 8 * MILLION * RAD
-        //     - 135 * MILLION * RAD
-        //     + 470 * MILLION * RAD
-        // );
-        // TODO: fix this, this includes 6M for the two uni lp tokens
+        // +3 M for WBTC-ETH UNI LP
+        // +3 M for USDC-ETH UNI LP
         VatAbstract(MCD_VAT).file("Line",
             VatAbstract(MCD_VAT).Line()
-            + 337750 * THOUSAND * RAD
-            + 6 * MILLION * RAD
+            + 343750 * THOUSAND * RAD
         );
 
         // Update the Debt Ceilings
@@ -198,7 +188,7 @@ contract SpellAction {
         OsmAbstract(ETHUSD_OSM).kiss(INSTA_DAPP);
 
         //
-        // TODO: Onboard WBTC-ETH UNI LP
+        // Onboard WBTC-ETH UNI LP
         //
 
 		// Sanity checks
@@ -286,7 +276,7 @@ contract SpellAction {
         CHANGELOG.setAddress("PIP_UNIV2WBTCETH", PIP_UNIV2WBTCETH);
 
         //
-        // TODO: Onboard USDC-ETH UNI LP
+        // Onboard USDC-ETH UNI LP
         //
 
         // Sanity checks

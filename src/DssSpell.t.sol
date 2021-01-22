@@ -213,7 +213,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             23                       // Num expected in system
+            ilk_count:             25                       // Num expected in system
         });
 
         //
@@ -610,7 +610,6 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0,
             flipper_mom:  1
         });
-        // TODO: double-check
         afterSpell.collaterals["UNIV2WBTCETH-A"] = CollateralValues({
             aL_enabled:   false,
             aL_line:      0 * MILLION,
@@ -628,7 +627,6 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1,
             flipper_mom:  1
         });
-        // TODO: double-check
         afterSpell.collaterals["UNIV2USDCETH-A"] = CollateralValues({
             aL_enabled:   false,
             aL_line:      0 * MILLION,
@@ -969,7 +967,6 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    // TODO: double-check
 	function testSpellIsCast_UNIV2WBTCETH_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
@@ -1039,8 +1036,6 @@ contract DssSpellTest is DSTest, DSMath {
         cat.bite(ilk, address(this));
         assertEq(lpFlipWbtc.kicks(), 1);
     }
-
-    // TODO: double-check
 
 	function testSpellIsCast_UNIV2USDCETH_INTEGRATION() public {
         vote();
