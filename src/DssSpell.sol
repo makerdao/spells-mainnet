@@ -88,9 +88,9 @@ contract DssSpell {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/817271a5ee9237a1b058b744eae6453417082cb9/governance/votes/Executive%20vote%20-%20January%2025%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3e18ba4514db068a96ea277e006028831dbd5ed7/governance/votes/Executive%20vote%20-%20January%2025%2C%202021.md -q -O - 2>/dev/null)"
     string constant public description =
-        "2021-01-25 MakerDAO Executive Spell | Hash: 0xc4dfa0f33b8d5f3de863ef7c2f3737f051bc6478e1e92da281f503593709e01e";
+        "2021-01-25 MakerDAO Executive Spell | Hash: 0x6d023ee5874db51d0cdb0491d5ae3095c89a578133c44769c836efcb06f02eb0";
 
     // MIP29: Peg Stability Module
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/4fc8d21ce2122c637f3302c63d2892b572cb5c94/MIP29/mip29.md -q -O - 2>/dev/null)"
