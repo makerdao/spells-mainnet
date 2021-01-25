@@ -21,18 +21,18 @@ interface SpellLike {
 
 contract DssSpellTest is DSTest, DSMath {
     // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0x02b288B361539462c0Ab80FdC7eAE53E120268C7);
+    address constant MAINNET_SPELL = address(0x0);
     // this needs to be updated
     uint256 constant SPELL_CREATED = 1611344807;
 
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x0);
+        SpellLike(0x02b288B361539462c0Ab80FdC7eAE53E120268C7);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1611185294;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 1611751300;
 
     struct CollateralValues {
         bool aL_enabled;
@@ -907,9 +907,9 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        // NOTE: Remove the + 420 M when the lerp is complete
+        // NOTE: Remove the range check when the lerp is complete
         // Sum lines is not going to equal vat.Line() for the next 12 weeks
-        assertEq(sumlines + 420 * MILLION * RAD, vat.Line());
+        assertTrue(vat.Line() <= sumlines + 500 * MILLION * RAD && sumlines <= vat.Line());
     }
 
     function testFailWrongDay() public {
@@ -952,9 +952,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(MAINNET_SPELL)) {
-            assertEq(spell.expiration(), (now + 30 days));
+            assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 30 days));
+            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
         }
 
         castPreviousSpell();
@@ -965,149 +965,6 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-    }
-
-	function testSpellIsCast_UNIV2WBTCETH_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        bytes32 ilk = "UNIV2WBTCETH-A";
-
-        lpPipWbtc.poke();
-        hevm.warp(now + 3601);
-        lpPipWbtc.poke();
-        spot.poke(ilk);
-
-        // Check median matches pip.src()
-        assertEq(lpPipWbtc.src(), address(lpWbtc));
-        assertEq(lpPipWbtc.orb0(), address(0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f));
-        assertEq(lpPipWbtc.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-
-        // Authorization
-        assertEq(lpJoinWbtc.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(lpJoinWbtc)), 1);
-        assertEq(lpFlipWbtc.wards(address(end)), 1);
-        assertEq(lpFlipWbtc.wards(address(flipMom)), 1);
-        assertEq(lpPipWbtc.wards(address(osmMom)), 1);
-        assertEq(lpPipWbtc.bud(address(spot)), 1);
-        assertEq(lpPipWbtc.bud(address(end)), 1);
-        assertEq(MedianAbstract(lpPipWbtc.orb1()).bud(address(lpPipWbtc)), 1);
-
-        // Join to adapter
-        uint256 amount = 20 * 10 ** 13;
-        hevm.store(
-            address(lpWbtc),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(amount)
-        );
-        assertEq(lpWbtc.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-        lpWbtc.approve(address(lpJoinWbtc), amount);
-        lpJoinWbtc.join(address(this), amount);
-        assertEq(lpWbtc.balanceOf(address(this)), 0);
-        assertEq(vat.gem(ilk, address(this)), amount);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(2000 * WAD));
-        assertEq(vat.gem(ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 2000 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(2000 * WAD));
-        assertEq(vat.gem(ilk, address(this)), amount);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        lpJoinWbtc.exit(address(this), amount);
-        assertEq(lpWbtc.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        lpWbtc.approve(address(lpJoinWbtc), amount);
-        lpJoinWbtc.join(address(this), amount);
-        (,,uint256 spotV,,) = vat.ilks(ilk);
-        // dart max amount of DAI
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip(ilk);
-        assertEq(lpFlipWbtc.kicks(), 0);
-        cat.bite(ilk, address(this));
-        assertEq(lpFlipWbtc.kicks(), 1);
-    }
-
-	function testSpellIsCast_UNIV2USDCETH_INTEGRATION() public {
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        bytes32 ilk = "UNIV2USDCETH-A";
-
-        lpPipUsdc.poke();
-        hevm.warp(now + 3601);
-        lpPipUsdc.poke();
-        spot.poke(ilk);
-
-        // Check median matches pip.src()
-        assertEq(lpPipUsdc.src(), address(lpUsdc));
-        assertEq(lpPipUsdc.orb0(), address(0x77b68899b99b686F415d074278a9a16b336085A0));
-        assertEq(lpPipUsdc.orb1(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-
-        assertEq(DSValueAbstract(lpPipUsdc.orb0()).read(), bytes32(WAD));
-        assertEq(DSValueAbstract(lpPipUsdc.orb0()).owner(), addr.addr("MCD_PAUSE_PROXY"));
-
-        // Authorization
-        assertEq(lpJoinUsdc.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(lpJoinUsdc)), 1);
-        assertEq(lpFlipUsdc.wards(address(end)), 1);
-        assertEq(lpFlipUsdc.wards(address(flipMom)), 1);
-        assertEq(lpPipUsdc.wards(address(osmMom)), 1);
-        assertEq(lpPipUsdc.bud(address(spot)), 1);
-        assertEq(lpPipUsdc.bud(address(end)), 1);
-        assertEq(MedianAbstract(lpPipUsdc.orb1()).bud(address(lpPipUsdc)), 1);
-
-        // Join to adapter
-        uint256 amount = 20 * 10 ** 13;
-        hevm.store(
-            address(lpUsdc),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(amount)
-        );
-        assertEq(lpUsdc.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-        lpUsdc.approve(address(lpJoinUsdc), amount);
-        lpJoinUsdc.join(address(this), amount);
-        assertEq(lpUsdc.balanceOf(address(this)), 0);
-        assertEq(vat.gem(ilk, address(this)), amount);
-
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(2000 * WAD));
-        assertEq(vat.gem(ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 2000 * RAD);
-
-        // Payback DAI, withdraw collateral
-        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(2000 * WAD));
-        assertEq(vat.gem(ilk, address(this)), amount);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        lpJoinUsdc.exit(address(this), amount);
-        assertEq(lpUsdc.balanceOf(address(this)), amount);
-        assertEq(vat.gem(ilk, address(this)), 0);
-
-        // Generate new DAI to force a liquidation
-        lpUsdc.approve(address(lpJoinUsdc), amount);
-        lpJoinUsdc.join(address(this), amount);
-        (,,uint256 spotV,,) = vat.ilks(ilk);
-        // dart max amount of DAI
-        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
-        hevm.warp(now + 1);
-        jug.drip(ilk);
-        assertEq(lpFlipUsdc.kicks(), 0);
-        cat.bite(ilk, address(this));
-        assertEq(lpFlipUsdc.kicks(), 1);
     }
 
     function testCastCost() public {
@@ -1249,34 +1106,6 @@ contract DssSpellTest is DSTest, DSMath {
         address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
         address UNIUSD_MED  = 0x52f761908cC27B4D77AD7A329463cf08baf62153;
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
-    }
-
-    function testPayouts() public {
-        address addr1 = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
-        address addr2 = 0x8d07D225a769b7Af3A923481E1FdF49180e6A265;
-        address addr3 = 0x2235A5D7bCC37855CB91dFf66334F4DFD9C39b58;
-        address addr4 = 0x851fB899dA7F80c211d9B8e5f231FB3BC9eca41a;
-        address addr5 = 0x92e5a14b08E5232682Eb38269A1cE661F04Ec93D;
-
-        uint256 bal1 = dai.balanceOf(addr1);
-        uint256 bal2 = dai.balanceOf(addr2);
-        uint256 bal3 = dai.balanceOf(addr3);
-        uint256 bal4 = dai.balanceOf(addr4);
-        uint256 bal5 = dai.balanceOf(addr5);
-
-        vote();
-        scheduleWaitAndCast();
-        assertTrue(spell.done());
-
-        // Verify Vault Compensation Working Group Payment have been sent out properly
-        assertEq(dai.balanceOf(addr1) - bal1, 6300 ether);
-        assertEq(dai.balanceOf(addr2) - bal2, 3800 ether);
-        assertEq(dai.balanceOf(addr3) - bal3, 2000 ether);
-        assertEq(dai.balanceOf(addr4) - bal4, 400 ether);
-        assertEq(dai.balanceOf(addr5) - bal5, 200 ether);
-
-        // Confirm access to pause proxy vat dai is revoked to dai join
-        assertEq(vat.can(pauseProxy, address(daiJoin)), 0);
     }
 
 }
