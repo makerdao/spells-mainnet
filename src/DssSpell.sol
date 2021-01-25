@@ -20,14 +20,6 @@ import "lib/dss-interfaces/src/dapp/DSPauseAbstract.sol";
 import "lib/dss-interfaces/src/dss/ChainlogAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
-interface LerpFabLike {
-    function newIlkLerp(address target_, bytes32 ilk_, bytes32 what_, uint256 start_, uint256 end_, uint256 duration_) external returns (address);
-}
-
-interface LerpLike {
-    function init() external;
-}
-
 contract SpellAction {
     // Office hours enabled if true
     bool constant public officeHours = false;
