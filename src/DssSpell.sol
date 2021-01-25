@@ -105,8 +105,8 @@ contract DssSpell {
     string constant public MIP7c3SP6 = "0x20f8c70ec4f91fa36acb3708aaf018f9bcd42529802fefbe3633d5f80a3085d8";
 
     // MIP28c7-SP2: Onboarding @JuanJuan to the Operational Support Domain
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/4942ee3a65f4205303146388d5af48f69f5e6898/MIP28/MIP28c7-Subproposals/MIP28c7-SP2.md -q -O - 2>/dev/null)"
-    string constant public MIP28c7SP2 = "0xb2d42ad131edacd08310a05dc008447451a4aef57bd3bec87ee0a06d055174ee";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c0f090df4d1ca28daefbb030725e7f8c115ea516/MIP28/MIP28c7-Subproposals/MIP28c7-SP2.md -q -O - 2>/dev/null)"
+    string constant public MIP28c7SP2 = "0x37d7005b0bf865b171bec39a7e1648f7cea3171124d615fb59e77ac455586850";
 
     function officeHours() external view returns (bool) {
         return SpellAction(action).officeHours();
