@@ -27,6 +27,7 @@ contract DssSpellTest is DSTest, DSMath {
         address previous_spell;
         uint256 previous_spell_execution_time;
         bool    office_hours_enabled;
+        uint256 expiration_threshold;
     }
 
     struct CollateralValues {
@@ -175,12 +176,15 @@ contract DssSpellTest is DSTest, DSMath {
         //
         // Test for spell-specific parameters
         //
+        uint256 monthly_expiration = 4 days;
+        uint256 weekly_expiration = 30 days;
         spellValues = SpellValues({
-            mainnet_spell:                  address(0),   // populate with mainnet spell if deployed
-            mainnet_spell_created:          0,            // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),   // supply if there is a need to test prior to its cast() function being called on mainnet.
-            previous_spell_execution_time:  0,            // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           true          // true if officehours is expected to be enabled in the spell
+            mainnet_spell:                  address(0),        // populate with mainnet spell if deployed
+            mainnet_spell_created:          0,                 // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on mainnet.
+            previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.mainnet_spell != address(0) ?
             DssSpell(spellValues.mainnet_spell) : new DssSpell();
@@ -588,7 +592,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         80 * MILLION,
+            line:         500 * MILLION,
             dust:         0,
             pct:          0,
             chop:         1300,
@@ -838,7 +842,12 @@ contract DssSpellTest is DSTest, DSMath {
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
             sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
-            if (!values.collaterals[ilk].aL_enabled) {
+            if (ilk == "PSM-USDC-A") {
+                // Block can be removed when PSM hits max line
+                assertTrue(aL_line == 0);
+                assertTrue(line <= normalizedTestLine); // Amount should be lteq test line
+                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+            } else if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
                 assertEq(line, normalizedTestLine);
                 assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
@@ -945,9 +954,9 @@ contract DssSpellTest is DSTest, DSMath {
                 stringToBytes32(description));
 
         if(address(spell) != address(spellValues.mainnet_spell)) {
-            assertEq(spell.expiration(), (now + 4 days + 2 hours));
+            assertEq(spell.expiration(), (now + spellValues.expiration_threshold));
         } else {
-            assertEq(spell.expiration(), (spellValues.mainnet_spell_created + 4 days + 2 hours));
+            assertEq(spell.expiration(), (spellValues.mainnet_spell_created + spellValues.expiration_threshold));
         }
 
         castPreviousSpell();
