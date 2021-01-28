@@ -45,13 +45,16 @@ contract DssSpellAction is DssAction {
     */
     constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {}
 
-    function actions() public override {
+    uint256 constant MILLION = 10**6;
 
+    function actions() public override {
+        //                           ilk            line           gap       ttl
+        setIlkAutoLineParameters("ETH-A", 1500 * MILLION, 30 * MILLION, 12 hours);
     }
 }
 
 contract DssSpell is DssExec {
     address public constant LIB = 0xFC32E74e6e33D924bd2fBFC7A27b6F2177032760;
-    DssSpellAction public spell = new DssSpellAction(LIB, true);
+    DssSpellAction public spell = new DssSpellAction(LIB, false);
     constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
 }

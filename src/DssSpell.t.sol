@@ -184,7 +184,7 @@ contract DssSpellTest is DSTest, DSMath {
             mainnet_spell_created:          0,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on mainnet.
             previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.mainnet_spell != address(0) ?
@@ -215,10 +215,10 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all collateral based changes here
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
-            aL_enabled:   false,           // DssAutoLine is enabled?
-            aL_line:      0 * MILLION,     // In whole Dai units
-            aL_gap:       0 * MILLION,     // In whole Dai units
-            aL_ttl:       0,               // In seconds
+            aL_enabled:   true,            // DssAutoLine is enabled?
+            aL_line:      1500 * MILLION,  // In whole Dai units
+            aL_gap:       30 * MILLION,    // In whole Dai units
+            aL_ttl:       12 hours,        // In seconds
             line:         1000 * MILLION,  // In whole Dai units
             dust:         2000,            // In whole Dai units
             pct:          350,             // In basis points
