@@ -20,19 +20,14 @@ interface SpellLike {
 }
 
 contract DssSpellTest is DSTest, DSMath {
-    // populate with mainnet spell if needed
-    address constant MAINNET_SPELL = address(0);
-    // this needs to be updated
-    uint256 constant SPELL_CREATED = 0;
 
-    // Previous spell; supply if there is a need to test prior to its cast()
-    // function being called on mainnet.
-    SpellLike constant PREV_SPELL =
-        SpellLike(0);
-
-    // Time to warp to in order to allow the previous spell to be cast;
-    // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 0;
+    struct SpellValues {
+        address mainnet_spell;
+        uint256 mainnet_spell_created;
+        address previous_spell;
+        uint256 previous_spell_execution_time;
+        bool    office_hours_enabled;
+    }
 
     struct CollateralValues {
         bool aL_enabled;
@@ -72,6 +67,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     SystemValues afterSpell;
+    SpellValues  spellValues;
 
     Hevm hevm;
     Rates     rates = new Rates();
@@ -99,22 +95,6 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
-
-    // UNIV2WBTCETH-A specific
-    DSTokenAbstract     lpWbtc = DSTokenAbstract(addr.addr("UNIV2WBTCETH"));
-    GemJoinAbstract lpJoinWbtc = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCETH_A"));
-    FlipAbstract    lpFlipWbtc = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2WBTCETH_A"));
-    LPOsmAbstract    lpPipWbtc = LPOsmAbstract(  addr.addr("PIP_UNIV2WBTCETH"));
-    MedianAbstract    orb0Wbtc = MedianAbstract( lpPipWbtc.orb0());
-    MedianAbstract    orb1Wbtc = MedianAbstract( lpPipWbtc.orb1());
-
-    // UNIV2USDCETH-A specific
-    DSTokenAbstract     lpUsdc = DSTokenAbstract(addr.addr("UNIV2USDCETH"));
-    GemJoinAbstract lpJoinUsdc = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A"));
-    FlipAbstract    lpFlipUsdc = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2USDCETH_A"));
-    LPOsmAbstract    lpPipUsdc = LPOsmAbstract(  addr.addr("PIP_UNIV2USDCETH"));
-    MedianAbstract    orb0Usdc = MedianAbstract( lpPipUsdc.orb0());
-    MedianAbstract    orb1Usdc = MedianAbstract( lpPipUsdc.orb1());
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
@@ -181,10 +161,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function castPreviousSpell() internal {
-        SpellLike prevSpell = SpellLike(PREV_SPELL);
+        SpellLike prevSpell = SpellLike(spellValues.previous_spell);
         // warp and cast previous spell so values are up-to-date to test against
         if (prevSpell != SpellLike(0) && !prevSpell.done()) {
-            hevm.warp(PREV_SPELL_EXECUTION_TIME);
+            hevm.warp(spellValues.previous_spell_execution_time);
             prevSpell.cast();
         }
     }
@@ -192,8 +172,18 @@ contract DssSpellTest is DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
-        spell = MAINNET_SPELL != address(0) ?
-            DssSpell(MAINNET_SPELL) : new DssSpell();
+        //
+        // Test for spell-specific parameters
+        //
+        spellValues = SpellValues({
+            mainnet_spell:                  address(0),   // populate with mainnet spell if deployed
+            mainnet_spell_created:          0,            // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0),   // supply if there is a need to test prior to its cast() function being called on mainnet.
+            previous_spell_execution_time:  0,            // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            office_hours_enabled:           true          // true if officehours is expected to be enabled in the spell
+        });
+        spell = spellValues.mainnet_spell != address(0) ?
+            DssSpell(spellValues.mainnet_spell) : new DssSpell();
 
         //
         // Test for all system configuration changes
@@ -913,6 +903,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testFailWrongDay() public {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
             vote();
             scheduleWaitAndCastFailDay();
@@ -922,6 +913,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testFailTooEarly() public {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
             vote();
             scheduleWaitAndCastFailEarly();
@@ -931,6 +923,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testFailTooLate() public {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
             vote();
             scheduleWaitAndCastFailLate();
@@ -951,10 +944,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(stringToBytes32(spell.description()),
                 stringToBytes32(description));
 
-        if(address(spell) != address(MAINNET_SPELL)) {
+        if(address(spell) != address(spellValues.mainnet_spell)) {
             assertEq(spell.expiration(), (now + 4 days + 2 hours));
         } else {
-            assertEq(spell.expiration(), (SPELL_CREATED + 4 days + 2 hours));
+            assertEq(spell.expiration(), (spellValues.mainnet_spell_created + 4 days + 2 hours));
         }
 
         castPreviousSpell();
@@ -994,8 +987,8 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
 
         // Day tests
-        hevm.warp(monday_1400_UTC);                                // Monday,   14:00 UTC
-        assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+        hevm.warp(monday_1400_UTC);                                    // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);               // Monday,   14:00 UTC
 
         if (spell.officeHours()) {
             hevm.warp(monday_1400_UTC - 1 days);                       // Sunday,   14:00 UTC
@@ -1088,23 +1081,23 @@ contract DssSpellTest is DSTest, DSMath {
         // Track Median authorizations here
 
         address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-        address AAVEUSD_MED = 0xe62872DFEbd323b03D27946f8e2491B454a69811;
+        address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
         assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
 
         address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
-        address LRCUSD_MED  = 0xcCe92282d9fe310F4c232b0DA9926d5F24611C7B;
+        address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
         assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
 
         address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
-        address YFIUSD_MED  = 0x89AC26C0aFCB28EC55B6CD2F6b7DAD867Fa24639;
+        address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
         assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
 
         address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
-        address ZRXUSD_MED  = 0x956ecD6a9A9A0d84e8eB4e6BaaC09329E202E55e;
+        address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
         assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
 
         address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
-        address UNIUSD_MED  = 0x52f761908cC27B4D77AD7A329463cf08baf62153;
+        address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
     }
 
