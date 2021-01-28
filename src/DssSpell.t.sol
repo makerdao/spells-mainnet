@@ -113,6 +113,9 @@ contract DssSpellTest is DSTest, DSMath {
     // uint256 constant RAY        = 10 ** 27; // provided by ds-math
     uint256 constant RAD        = 10 ** 45;
 
+    uint256 constant monthly_expiration = 4 days;
+    uint256 constant weekly_expiration = 30 days;
+
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
@@ -176,8 +179,6 @@ contract DssSpellTest is DSTest, DSMath {
         //
         // Test for spell-specific parameters
         //
-        uint256 monthly_expiration = 4 days;
-        uint256 weekly_expiration = 30 days;
         spellValues = SpellValues({
             mainnet_spell:                  address(0),        // populate with mainnet spell if deployed
             mainnet_spell_created:          0,                 // use get-created-timestamp.sh if deployed
