@@ -28,11 +28,11 @@ contract DssSpellTest is DSTest, DSMath {
     // Previous spell; supply if there is a need to test prior to its cast()
     // function being called on mainnet.
     SpellLike constant PREV_SPELL =
-        SpellLike(0x047178B77A3996f9688BcE68A53009d2576c8F19);
+        SpellLike(0);
 
     // Time to warp to in order to allow the previous spell to be cast;
     // ignored if PREV_SPELL is SpellLike(address(0)).
-    uint256 constant PREV_SPELL_EXECUTION_TIME = 1611599005;
+    uint256 constant PREV_SPELL_EXECUTION_TIME = 0;
 
     struct CollateralValues {
         bool aL_enabled;
