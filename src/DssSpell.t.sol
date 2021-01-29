@@ -219,7 +219,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      1500 * MILLION,  // In whole Dai units
             aL_gap:       30 * MILLION,    // In whole Dai units
             aL_ttl:       12 hours,        // In seconds
-            line:         1000 * MILLION,  // In whole Dai units
+            line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
             dust:         2000,            // In whole Dai units
             pct:          350,             // In basis points
             chop:         1300,            // In basis points
