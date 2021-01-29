@@ -13,11 +13,10 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-
-pragma solidity 0.6.11;
 
 contract DssSpellAction is DssAction {
 
