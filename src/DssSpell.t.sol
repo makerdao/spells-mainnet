@@ -22,8 +22,8 @@ interface SpellLike {
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
-        address mainnet_spell;
-        uint256 mainnet_spell_created;
+        address deployed_spell;
+        uint256 deployed_spell_created;
         address previous_spell;
         uint256 previous_spell_execution_time;
         bool    office_hours_enabled;
@@ -180,15 +180,15 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            mainnet_spell:                  address(0),        // populate with mainnet spell if deployed
-            mainnet_spell_created:          0,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on mainnet.
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,                 // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
             office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
-        spell = spellValues.mainnet_spell != address(0) ?
-            DssSpell(spellValues.mainnet_spell) : new DssSpell();
+        spell = spellValues.deployed_spell != address(0) ?
+            DssSpell(spellValues.deployed_spell) : new DssSpell();
 
         //
         // Test for all system configuration changes
@@ -954,10 +954,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(stringToBytes32(spell.description()),
                 stringToBytes32(description));
 
-        if(address(spell) != address(spellValues.mainnet_spell)) {
+        if(address(spell) != address(spellValues.deployed_spell)) {
             assertEq(spell.expiration(), (now + spellValues.expiration_threshold));
         } else {
-            assertEq(spell.expiration(), (spellValues.mainnet_spell_created + spellValues.expiration_threshold));
+            assertEq(spell.expiration(), (spellValues.deployed_spell_created + spellValues.expiration_threshold));
         }
 
         castPreviousSpell();
