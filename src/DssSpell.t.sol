@@ -19,6 +19,15 @@ interface SpellLike {
     function cast() external;
 }
 
+interface ChainLogLike {
+    function list() external returns (bytes32[] memory);
+    function getAddress(bytes32 _key) external returns (address addr);
+}
+
+interface AuthLike {
+    function wards(address addr) external returns (uint auth);
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -1109,6 +1118,53 @@ contract DssSpellTest is DSTest, DSMath {
         address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
         address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+    }
+
+    event Log(string message, address deployer, bytes32 contractName);
+
+    function hasWards(address addr) internal returns (bool) {
+        (bool ok, bytes memory data) = addr
+            .call(abi.encodeWithSignature("wards(address)", 0x0));
+        return ok && data.length == 32;
+    }
+
+    address[] evilAddresses = [
+        0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
+        0xDa0FaB05039809e63C5D068c897c3e602fA97457,
+        0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
+        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf
+    ];
+
+    function hasBadAuth(address addr, bytes32 contractName) internal {
+        for (uint i = 0; i < evilAddresses.length; i ++) {
+            if (AuthLike(addr).wards(evilAddresses[i]) > 0) {
+                emit Log("Bad auth", evilAddresses[i], contractName);
+                fail();
+            }
+        }
+    }
+
+    function test_wards() public {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+        ChainLogLike chainLog = ChainLogLike(addr.addr("CHANGELOG"));
+        bytes32[] memory contractNames = chainLog.list();
+        for(uint i = 0; i < contractNames.length; i++) {
+            try chainLog.getAddress(contractNames[i]) returns (address addr) {
+                if (hasWards(addr)) {
+                    hasBadAuth(addr, contractNames[i]);
+                }
+            } catch Error(string memory reason) {
+                if (keccak256(bytes(reason))
+                    != keccak256(bytes("dss-chain-log/invalid-key"))) {
+                    revert(reason);
+                }
+            }
+        }
     }
 
 }
