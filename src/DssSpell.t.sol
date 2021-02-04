@@ -128,6 +128,7 @@ contract DssSpellTest is DSTest, DSMath {
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
+    event Log(string message, address deployer, bytes32 contractName);
 
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
@@ -1120,7 +1121,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
     }
 
-    event Log(string message, address deployer, bytes32 contractName);
 
     function hasWards(address addr) internal returns (bool) {
         (bool ok, bytes memory data) = addr
