@@ -123,7 +123,7 @@ contract DssSpellTest is DSTest, DSMath {
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
-    event Log(string message, address deployer, bytes32 contractName);
+    event Log(string message, address deployer, string contractName);
 
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
@@ -1123,6 +1123,12 @@ contract DssSpellTest is DSTest, DSMath {
         return ok && data.length == 32;
     }
 
+    function hasSource(address addr) internal returns (bool) {
+        (bool ok, bytes memory data) = addr
+            .call(abi.encodeWithSignature("src()"));
+        return ok && data.length == 32;
+    }
+
     address[] deployerAddresses = [
         0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
         0xDa0FaB05039809e63C5D068c897c3e602fA97457,
@@ -1131,13 +1137,21 @@ contract DssSpellTest is DSTest, DSMath {
         0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c
     ];
 
-    function hasBadAuth(address addr, bytes32 contractName) internal {
+    function hasBadAuth(address addr, string memory contractName) internal {
         for (uint i = 0; i < deployerAddresses.length; i ++) {
             if (AuthLike(addr).wards(deployerAddresses[i]) > 0) {
                 emit Log("Bad auth", deployerAddresses[i], contractName);
                 fail();
             }
         }
+    }
+
+    function checkSource(address addr, bytes32 contractName) internal {
+        address source = OsmAbstract(addr).src();
+        string memory sourceName = string(
+            abi.encodePacked("source of ", contractName)
+        );
+        hasBadAuth(source, sourceName);
     }
 
     function test_wards() public {
@@ -1152,7 +1166,13 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint i = 0; i < contractNames.length; i++) {
             try chainLog.getAddress(contractNames[i]) returns (address addr) {
                 if (hasWards(addr)) {
-                    hasBadAuth(addr, contractNames[i]);
+                    string memory contractName = string(
+                        abi.encodePacked(contractNames[i])
+                    );
+                    hasBadAuth(addr, contractName);
+                }
+                if (hasSource(addr)) {
+                    checkSource(addr, contractNames[i]);
                 }
             } catch Error(string memory reason) {
                 if (keccak256(bytes(reason))
