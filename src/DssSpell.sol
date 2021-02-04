@@ -22,9 +22,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e2929f286f2c486c0485637967284630643ddc8d/governance/votes/Executive%20vote%20-%20January%2029%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://<TBD> -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-01-29 MakerDAO Executive Spell | Hash: 0xbb7974fc8e89c016a6c42f5ced4b1f42e45671e5f4f4009535658affb6a98343";
+        "2021-02-05 MakerDAO Executive Spell | Hash: 0x";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -47,13 +47,15 @@ contract DssSpellAction is DssAction {
     uint256 constant MILLION = 10**6;
 
     function actions() public override {
-        //                           ilk            line           gap       ttl
-        setIlkAutoLineParameters("ETH-A", 1500 * MILLION, 30 * MILLION, 12 hours);
+
+
+
+
     }
 }
 
 contract DssSpell is DssExec {
-    address public constant LIB = 0xFC32E74e6e33D924bd2fBFC7A27b6F2177032760;
+    address public constant LIB = 0x5b2867E4537DC4e10B2876E91bF693a6E6A768B3; // v0.0.3
     DssSpellAction public spell = new DssSpellAction(LIB, false);
     constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
 }
