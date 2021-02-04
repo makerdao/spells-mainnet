@@ -1128,17 +1128,18 @@ contract DssSpellTest is DSTest, DSMath {
         return ok && data.length == 32;
     }
 
-    address[] evilAddresses = [
+    address[] deployerAddresses = [
         0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
         0xDa0FaB05039809e63C5D068c897c3e602fA97457,
         0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
-        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf
+        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
+        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c
     ];
 
     function hasBadAuth(address addr, bytes32 contractName) internal {
-        for (uint i = 0; i < evilAddresses.length; i ++) {
-            if (AuthLike(addr).wards(evilAddresses[i]) > 0) {
-                emit Log("Bad auth", evilAddresses[i], contractName);
+        for (uint i = 0; i < deployerAddresses.length; i ++) {
+            if (AuthLike(addr).wards(deployerAddresses[i]) > 0) {
+                emit Log("Bad auth", deployerAddresses[i], contractName);
                 fail();
             }
         }
