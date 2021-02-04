@@ -19,11 +19,6 @@ interface SpellLike {
     function cast() external;
 }
 
-interface ChainLogLike {
-    function list() external returns (bytes32[] memory);
-    function getAddress(bytes32 _key) external returns (address addr);
-}
-
 interface AuthLike {
     function wards(address addr) external returns (uint auth);
 }
@@ -1152,7 +1147,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
-        ChainLogLike chainLog = ChainLogLike(addr.addr("CHANGELOG"));
+        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
         for(uint i = 0; i < contractNames.length; i++) {
             try chainLog.getAddress(contractNames[i]) returns (address addr) {
