@@ -1338,10 +1338,7 @@ contract DssSpellTest is DSTest, DSMath {
                 abi.encodeWithSignature("wards(address)", deployerAddresses[i])
             );
             if (!ok || data.length != 32) return;
-            uint ward;
-            assembly {
-                ward := mload(add(data, 32))
-            }
+            uint ward = abi.decode(data, (uint256));
             if (ward > 0) {
                 emit Log("Bad auth", deployerAddresses[i], contractName);
                 fail();
@@ -1353,10 +1350,7 @@ contract DssSpellTest is DSTest, DSMath {
         (bool ok, bytes memory data) =
             addr.call(abi.encodeWithSignature("src()"));
         if (!ok || data.length != 32) return;
-        address source;
-        assembly {
-            source := mload(add(data, 32))
-        }
+        address source = abi.decode(data, (address));
         string memory sourceName = string(
             abi.encodePacked("source of ", contractName)
         );
