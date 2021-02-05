@@ -1367,7 +1367,6 @@ contract DssSpellTest is DSTest, DSMath {
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
         for(uint i = 0; i < contractNames.length; i++) {
-            if (contractNames[i] == "FAUCET") continue;
             address addr = chainLog.getAddress(contractNames[i]);
             string memory contractName = string(
                 abi.encodePacked(contractNames[i])
