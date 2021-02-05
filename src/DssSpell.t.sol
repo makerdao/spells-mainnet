@@ -19,10 +19,6 @@ interface SpellLike {
     function cast() external;
 }
 
-interface AuthLike {
-    function wards(address addr) external returns (uint auth);
-}
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -1116,19 +1112,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
     }
 
-
-    function hasWards(address addr) internal returns (bool) {
-        (bool ok, bytes memory data) = addr
-            .call(abi.encodeWithSignature("wards(address)", 0x0));
-        return ok && data.length == 32;
-    }
-
-    function hasSource(address addr) internal returns (bool) {
-        (bool ok, bytes memory data) = addr
-            .call(abi.encodeWithSignature("src()"));
-        return ok && data.length == 32;
-    }
-
     address[] deployerAddresses = [
         0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
         0xDa0FaB05039809e63C5D068c897c3e602fA97457,
@@ -1137,24 +1120,38 @@ contract DssSpellTest is DSTest, DSMath {
         0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c
     ];
 
-    function hasBadAuth(address addr, string memory contractName) internal {
+    function checkWards(address addr, string memory contractName) internal {
         for (uint i = 0; i < deployerAddresses.length; i ++) {
-            if (AuthLike(addr).wards(deployerAddresses[i]) > 0) {
+            (bool ok, bytes memory data) = addr.call(
+                abi.encodeWithSignature("wards(address)", deployerAddresses[i])
+            );
+            if (!ok || data.length != 32) return;
+            uint ward;
+            assembly {
+                ward := mload(add(data, 32))
+            }
+            if (ward > 0) {
                 emit Log("Bad auth", deployerAddresses[i], contractName);
                 fail();
             }
         }
     }
 
-    function checkSource(address addr, bytes32 contractName) internal {
-        address source = OsmAbstract(addr).src();
+    function checkSource(address addr, string memory contractName) internal {
+        (bool ok, bytes memory data) =
+            addr.call(abi.encodeWithSignature("src()"));
+        if (!ok || data.length != 32) return;
+        address source;
+        assembly {
+            source := mload(add(data, 32))
+        }
         string memory sourceName = string(
             abi.encodePacked("source of ", contractName)
         );
-        hasBadAuth(source, sourceName);
+        checkWards(source, sourceName);
     }
 
-    function test_wards() public {
+    function checkAuth(bool onlySource) internal {
         vote();
         spell.schedule();
         castPreviousSpell();
@@ -1165,15 +1162,11 @@ contract DssSpellTest is DSTest, DSMath {
         bytes32[] memory contractNames = chainLog.list();
         for(uint i = 0; i < contractNames.length; i++) {
             try chainLog.getAddress(contractNames[i]) returns (address addr) {
-                if (hasWards(addr)) {
-                    string memory contractName = string(
-                        abi.encodePacked(contractNames[i])
-                    );
-                    hasBadAuth(addr, contractName);
-                }
-                if (hasSource(addr)) {
-                    checkSource(addr, contractNames[i]);
-                }
+                string memory contractName = string(
+                    abi.encodePacked(contractNames[i])
+                );
+                if (onlySource) checkSource(addr, contractName);
+                else checkWards(addr, contractName);
             } catch Error(string memory reason) {
                 if (keccak256(bytes(reason))
                     != keccak256(bytes("dss-chain-log/invalid-key"))) {
@@ -1181,6 +1174,14 @@ contract DssSpellTest is DSTest, DSMath {
                 }
             }
         }
+    }
+
+    function test_auth() public {
+        checkAuth(false);
+    }
+
+    function test_auth_in_sources() public {
+        checkAuth(true);
     }
 
 }
