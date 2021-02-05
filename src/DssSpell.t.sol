@@ -1034,7 +1034,7 @@ contract DssSpellTest is DSTest, DSMath {
 	function testSpellIsCast_UNIV2ETHUSDT_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
-     
+
         assertTrue(spell.done());
 
         bytes32 ilk = "UNIV2ETHUSDT-A";
@@ -1300,5 +1300,27 @@ contract DssSpellTest is DSTest, DSMath {
     //     address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
     //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
     // }
+
+    function testFaucetIsGone() public {
+        ChainlogAbstract _log = ChainlogAbstract(addr.addr("CHANGELOG"));
+        uint256 ct = _log.count();
+
+        (bytes32 key, address val) = _log.get(6);
+        assertTrue(key == "FAUCET");
+        assertTrue(val == address(0));
+
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        // Adding 8 new addresses and removing one this week.
+        assertEq(_log.count(), ct + 7);
+        (key, val) = _log.get(6);
+        assertTrue(key != "FAUCET");
+        assertTrue(val != address(0));
+    }
 
 }
