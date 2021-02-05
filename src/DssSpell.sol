@@ -17,16 +17,18 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
+    function getAddress(bytes32) external view returns (address);
 }
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://<TBD> -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/2d433f95cc980092aeba21dd7ed431809160f021/governance/votes/Executive%20vote%20-%20February%205%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
         "2021-02-05 MakerDAO Executive Spell | Hash: 0xcd8106c161924820ee7f4061218e474b4f3eda29564957cf02e9b88bb96534e1";
 
@@ -48,16 +50,32 @@ contract DssSpellAction is DssAction {
     */
     constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {}
 
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+
     uint256 constant MILLION = 10**6;
+
+    uint256 constant THREE_PCT = 1000000000937303470807876289;
+    uint256 constant FOUR_PCT  = 1000000001243680656318820312;
+
+    address constant UNIV2DAIUSDC_GEM   = 0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5;
+    address constant UNIV2DAIUSDC_JOIN  = 0xA81598667AC561986b70ae11bBE2dd5348ed4327;
+    address constant UNIV2DAIUSDC_FLIP  = 0x4a613f79a250D522DdB53904D87b8f442EA94496;
+    address constant UNIV2DAIUSDC_PIP   = 0x25CD858a00146961611b18441353603191f110A0;
+
+    address constant UNIV2ETHUSDT_GEM   = 0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852;
+    address constant UNIV2ETHUSDT_JOIN  = 0x4aAD139a88D2dd5e7410b408593208523a3a891d;
+    address constant UNIV2ETHUSDT_FLIP  = 0x118d5051e70F9EaF3B4a6a11F765185A2Ca0802E;
+    address constant UNIV2ETHUSDT_PIP   = 0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B;
 
     function actions() public override {
         // add UNI-V2-DAI-USDC-A collateral type
         CollateralOpts memory UNIV2DAIUSDC_A = CollateralOpts({
             ilk: "UNIV2DAIUSDC-A",
-            gem: 0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5,
-            join: 0xA81598667AC561986b70ae11bBE2dd5348ed4327,
-            flip: 0x4a613f79a250D522DdB53904D87b8f442EA94496,
-            pip: 0x25CD858a00146961611b18441353603191f110A0,
+            gem: UNIV2DAIUSDC_GEM,
+            join: UNIV2DAIUSDC_JOIN,
+            flip: UNIV2DAIUSDC_FLIP,
+            pip: UNIV2DAIUSDC_PIP,
             isLiquidatable: false,
             isOSM: true,
             whitelistOSM: false,
@@ -65,7 +83,7 @@ contract DssSpellAction is DssAction {
             minVaultAmount: 2000,
             maxLiquidationAmount: 50000,
             liquidationPenalty: 1300,
-            ilkStabilityFee: 1000000000937303470807876289, // 3%
+            ilkStabilityFee: THREE_PCT, // 3%
             bidIncrease: 300, // 3%
             bidDuration: 6 hours,
             auctionDuration: 6 hours,
@@ -74,22 +92,22 @@ contract DssSpellAction is DssAction {
         addNewCollateral(UNIV2DAIUSDC_A);
 
         addReaderToMedianWhitelist(
-            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85, // median ETH/USDC
-            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
+            OsmAbstract(CHANGELOG.getAddress("PIP_ETH")).src(),
+            UNIV2DAIUSDC_PIP
         );
 
         addReaderToMedianWhitelist(
-            0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A, // median USDT/USD
-            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
+            OsmAbstract(CHANGELOG.getAddress("PIP_USDT")).src(),
+            UNIV2ETHUSDT_PIP 
         );
 
         // add UNI-V2-ETH-USDT-A collateral type
         CollateralOpts memory UNIV2ETHUSDT_A = CollateralOpts({
             ilk: "UNIV2ETHUSDT-A",
-            gem: 0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852,
-            join: 0x4aAD139a88D2dd5e7410b408593208523a3a891d,
-            flip: 0x118d5051e70F9EaF3B4a6a11F765185A2Ca0802E,
-            pip: 0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B,
+            gem: UNIV2ETHUSDT_GEM,
+            join: UNIV2ETHUSDT_JOIN,
+            flip: UNIV2ETHUSDT_FLIP,
+            pip: UNIV2ETHUSDT_PIP,
             isLiquidatable: true,
             isOSM: true,
             whitelistOSM: false,
@@ -97,7 +115,7 @@ contract DssSpellAction is DssAction {
             minVaultAmount: 2000,
             maxLiquidationAmount: 50000,
             liquidationPenalty: 1300,
-            ilkStabilityFee: 1000000001243680656318820312, // 4%
+            ilkStabilityFee: FOUR_PCT, // 4%
             bidIncrease: 300, // 3%
             bidDuration: 6 hours,
             auctionDuration: 6 hours,
@@ -110,21 +128,24 @@ contract DssSpellAction is DssAction {
         ChainlogAbstract(LOG).removeAddress("FAUCET");
 
         // add UNIV2DAIUSDC to Changelog
-        setChangelogAddress("UNIV2DAIUSDC",             0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5);
-        setChangelogAddress("MCD_JOIN_UNIV2DAIUSDC_A",  0xA81598667AC561986b70ae11bBE2dd5348ed4327);
-        setChangelogAddress("MCD_FLIP_UNIV2DAIUSDC_A",  0x4a613f79a250D522DdB53904D87b8f442EA94496);
-        setChangelogAddress("PIP_UNIV2DAIUSDC",         0x25CD858a00146961611b18441353603191f110A0);
+        setChangelogAddress("UNIV2DAIUSDC",             UNIV2DAIUSDC_GEM);
+        setChangelogAddress("MCD_JOIN_UNIV2DAIUSDC_A",  UNIV2DAIUSDC_JOIN);
+        setChangelogAddress("MCD_FLIP_UNIV2DAIUSDC_A",  UNIV2DAIUSDC_FLIP);
+        setChangelogAddress("PIP_UNIV2DAIUSDC",         UNIV2DAIUSDC_PIP);
 
         // add UNIV2ETHUSDT to Changelog
-        setChangelogAddress("UNIV2ETHUSDT",             0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852);
-        setChangelogAddress("MCD_JOIN_UNIV2ETHUSDT_A",  0x4aAD139a88D2dd5e7410b408593208523a3a891d);
-        setChangelogAddress("MCD_FLIP_UNIV2ETHUSDT_A",  0x118d5051e70F9EaF3B4a6a11F765185A2Ca0802E);
-        setChangelogAddress("PIP_UNIV2ETHUSDT",         0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B);
+        setChangelogAddress("UNIV2ETHUSDT",             UNIV2ETHUSDT_GEM);
+        setChangelogAddress("MCD_JOIN_UNIV2ETHUSDT_A",  UNIV2ETHUSDT_JOIN);
+        setChangelogAddress("MCD_FLIP_UNIV2ETHUSDT_A",  UNIV2ETHUSDT_FLIP);
+        setChangelogAddress("PIP_UNIV2ETHUSDT",         UNIV2ETHUSDT_PIP);
+
+        // bump Changelog version
+        setChangelogVersion("1.2.5");
     }
 }
 
 contract DssSpell is DssExec {
     address public constant LIB = 0x5b2867E4537DC4e10B2876E91bF693a6E6A768B3; // v0.0.3
-    DssSpellAction public spell = new DssSpellAction(LIB, false);
+    DssSpellAction public spell = new DssSpellAction(LIB, true);
     constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
 }
