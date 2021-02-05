@@ -55,9 +55,6 @@ contract DssSpellAction is DssAction {
     */
     constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {}
 
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
     uint256 constant MILLION = 10**6;
 
     address constant UNIV2DAIUSDC_GEM   = 0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5;
