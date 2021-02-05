@@ -54,7 +54,7 @@ contract DssSpellAction is DssAction {
             join: 0xA81598667AC561986b70ae11bBE2dd5348ed4327,
             flip: 0x4a613f79a250D522DdB53904D87b8f442EA94496,
             pip: 0x25CD858a00146961611b18441353603191f110A0,
-            isLiquidatable: true,
+            isLiquidatable: false,
             isOSM: true,
             whitelistOSM: false,
             ilkDebtCeiling: 3 * MILLION, // initially 3 million
