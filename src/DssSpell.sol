@@ -47,10 +47,56 @@ contract DssSpellAction is DssAction {
     uint256 constant MILLION = 10**6;
 
     function actions() public override {
+        // add UNI-V2-DAI-USDC-A collateral type
+        CollateralOpts memory UNIV2DAIUSDC_A = CollateralOpts({
+            ilk: "UNIV2DAIUSDC-A",
+            gem: 0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5,
+            join: 0xA81598667AC561986b70ae11bBE2dd5348ed4327,
+            flip: 0x4a613f79a250D522DdB53904D87b8f442EA94496,
+            pip: 0x25CD858a00146961611b18441353603191f110A0,
+            isLiquidatable: true,
+            isOSM: true,
+            whitelistOSM: false,
+            ilkDebtCeiling: 3 * MILLION, // initially 3 million
+            minVaultAmount: 2000,
+            maxLiquidationAmount: 50000,
+            liquidationPenalty: 1300,
+            ilkStabilityFee: 1000000000937303470807876289, // 3%
+            bidIncrease: 300, // 3%
+            bidDuration: 6 hours,
+            auctionDuration: 6 hours,
+            liquidationRatio: 11000 // 110%
+        });
+        addNewCollateral(UNIV2DAIUSDC_A);
 
+        authorize(
+            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85, // median ETH/USD
+            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
+        );
 
+        // add UNI-V2-ETH-USDT-A collateral type
+        CollateralOpts memory UNIV2ETHUSDT_A = CollateralOpts({
+            ilk: "UNIV2ETHUSDT-A",
+            gem: 0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852,
+            join: 0x4aAD139a88D2dd5e7410b408593208523a3a891d,
+            flip: 0x118d5051e70F9EaF3B4a6a11F765185A2Ca0802E,
+            pip: 0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B,
+            isLiquidatable: true,
+            isOSM: true,
+            whitelistOSM: false,
+            ilkDebtCeiling: 3 * MILLION, // initially 3 million
+            minVaultAmount: 2000,
+            maxLiquidationAmount: 50000,
+            liquidationPenalty: 1300,
+            ilkStabilityFee: 1000000001243680656318820312, // 4% 
+            bidIncrease: 300, // 3%
+            bidDuration: 6 hours,
+            auctionDuration: 6 hours,
+            liquidationRatio: 14000 // 140%
+        });
+        addNewCollateral(UNIV2ETHUSDT_A);
 
-
+        // risk params
     }
 }
 
