@@ -11,5 +11,5 @@ export DAPP_TEST_NUMBER=$(seth block latest number)
 if [[ -z "$1" ]]; then
   LANG=C.UTF-8 hevm dapp-test --rpc="$ETH_RPC_URL" --json-file=out/dapp.sol.json --dapp-root=. --verbose 1
 else
-  LANG=C.UTF-8 hevm dapp-test --rpc="$ETH_RPC_URL" --json-file=out/dapp.sol.json --dapp-root=. --match "$1" --verbose 1
+  LANG=C.UTF-8 hevm dapp-test --rpc="$ETH_RPC_URL" --json-file=out/dapp.sol.json --dapp-root=. --match "$1" --verbose 3
 fi

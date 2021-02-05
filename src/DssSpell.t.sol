@@ -133,6 +133,7 @@ contract DssSpellTest is DSTest, DSMath {
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
+    event Log(string message, address deployer, string contractName);
 
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
@@ -1321,6 +1322,66 @@ contract DssSpellTest is DSTest, DSMath {
         (key, val) = _log.get(6);
         assertTrue(key != "FAUCET");
         assertTrue(val != address(0));
+    }
+
+    address[] deployerAddresses = [
+        0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
+        0xDa0FaB05039809e63C5D068c897c3e602fA97457,
+        0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
+        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
+        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c
+    ];
+
+    function checkWards(address addr, string memory contractName) internal {
+        for (uint i = 0; i < deployerAddresses.length; i ++) {
+            (bool ok, bytes memory data) = addr.call(
+                abi.encodeWithSignature("wards(address)", deployerAddresses[i])
+            );
+            if (!ok || data.length != 32) return;
+            uint ward = abi.decode(data, (uint256));
+            if (ward > 0) {
+                emit Log("Bad auth", deployerAddresses[i], contractName);
+                fail();
+            }
+        }
+    }
+
+    function checkSource(address addr, string memory contractName) internal {
+        (bool ok, bytes memory data) =
+            addr.call(abi.encodeWithSignature("src()"));
+        if (!ok || data.length != 32) return;
+        address source = abi.decode(data, (address));
+        string memory sourceName = string(
+            abi.encodePacked("source of ", contractName)
+        );
+        checkWards(source, sourceName);
+    }
+
+    function checkAuth(bool onlySource) internal {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+        bytes32[] memory contractNames = chainLog.list();
+        for(uint i = 0; i < contractNames.length; i++) {
+            address addr = chainLog.getAddress(contractNames[i]);
+            string memory contractName = string(
+                abi.encodePacked(contractNames[i])
+            );
+            if (onlySource) checkSource(addr, contractName);
+            else checkWards(addr, contractName);
+        }
+    }
+
+    function test_auth() public {
+        checkAuth(false);
+    }
+
+    function test_auth_in_sources() public {
+        checkAuth(true);
     }
 
 }
