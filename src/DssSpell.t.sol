@@ -824,7 +824,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
         {
         // bump values in RAD
-        uint normalizedBump = values.vow_bump * RAD;
+        uint256 normalizedBump = values.vow_bump * RAD;
         assertEq(vow.bump(), normalizedBump);
         assertTrue(
             (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
@@ -1188,10 +1188,10 @@ contract DssSpellTest is DSTest, DSMath {
         castPreviousSpell();
 
         hevm.warp(spell.nextCastTime());
-        uint startGas = gasleft();
+        uint256 startGas = gasleft();
         spell.cast();
-        uint endGas = gasleft();
-        uint totalGas = startGas - endGas;
+        uint256 endGas = gasleft();
+        uint256 totalGas = startGas - endGas;
 
         assertTrue(spell.done());
         // Fail if cast is too expensive
@@ -1236,7 +1236,7 @@ contract DssSpellTest is DSTest, DSMath {
             // Time tests
             uint256 castTime;
 
-            for(uint i = 0; i < 5; i++) {
+            for(uint256 i = 0; i < 5; i++) {
                 castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
                 hevm.warp(castTime - 1 seconds); // 13:59:59 UTC
                 assertEq(spell.nextCastTime(), castTime);
@@ -1261,7 +1261,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote();
         spell.schedule();
 
-        uint castTime = spell.nextCastTime();
+        uint256 castTime = spell.nextCastTime();
         assertEq(castTime, spell.eta());
     }
 
@@ -1353,12 +1353,12 @@ contract DssSpellTest is DSTest, DSMath {
     ];
 
     function checkWards(address addr, string memory contractName) internal {
-        for (uint i = 0; i < deployerAddresses.length; i ++) {
+        for (uint256 i = 0; i < deployerAddresses.length; i ++) {
             (bool ok, bytes memory data) = addr.call(
                 abi.encodeWithSignature("wards(address)", deployerAddresses[i])
             );
             if (!ok || data.length != 32) return;
-            uint ward = abi.decode(data, (uint256));
+            uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
                 emit Log("Bad auth", deployerAddresses[i], contractName);
                 fail();
@@ -1386,7 +1386,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
-        for(uint i = 0; i < contractNames.length; i++) {
+        for(uint256 i = 0; i < contractNames.length; i++) {
             address addr = chainLog.getAddress(contractNames[i]);
             string memory contractName = string(
                 abi.encodePacked(contractNames[i])
