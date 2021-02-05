@@ -199,7 +199,7 @@ contract DssSpellTest is DSTest, DSMath {
             deployed_spell_created:         1612553472,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.deployed_spell != address(0) ?
@@ -1101,6 +1101,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpFlipEthUsdt.kicks(), 0);
         cat.bite(ilk, address(this));
         assertEq(lpFlipEthUsdt.kicks(), 1);
+    }
+
+    function testOfficeHoursMatches() public {
+        assertTrue(spell.officeHours() == spellValues.office_hours_enabled);
     }
 
     function testFailWrongDay() public {
