@@ -1026,8 +1026,9 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(now + 1);
         jug.drip(ilk);
         assertEq(lpFlipDaiUsdc.kicks(), 0);
-        cat.bite(ilk, address(this));
-        assertEq(lpFlipDaiUsdc.kicks(), 1);
+        // liquidations disabled
+        // cat.bite(ilk, address(this));
+        // assertEq(lpFlipDaiUsdc.kicks(), 1);
     }
 
 	function testSpellIsCast_UNIV2ETHUSDT_INTEGRATION() public {
