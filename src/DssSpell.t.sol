@@ -95,7 +95,21 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
-    // Specific for this spell
+    // UNIV2DAIUSDC-A specific
+    DSTokenAbstract     lpDaiUsdc = DSTokenAbstract(addr.addr("UNIV2DAIUSDC"));
+    GemJoinAbstract lpJoinDaiUsdc = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDC_A"));
+    FlipAbstract    lpFlipDaiUsdc = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2DAIUSDC_A"));
+    LPOsmAbstract    lpPipDaiUsdc = LPOsmAbstract(  addr.addr("PIP_UNIV2DAIUSDC"));
+    MedianAbstract    orb0DaiUsdc = MedianAbstract( lpPipDaiUsdc.orb0());
+    MedianAbstract    orb1DaiUsdc = MedianAbstract( lpPipDaiUsdc.orb1());
+
+    // UNIV2ETHUSDT-A specific
+    DSTokenAbstract     lpEthUsdt = DSTokenAbstract(addr.addr("UNIV2ETHUSDT"));
+    GemJoinAbstract lpJoinEthUsdt = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2ETHUSDT_A"));
+    FlipAbstract    lpFlipEthUsdt = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2ETHUSDT_A"));
+    LPOsmAbstract    lpPipEthUsdt = LPOsmAbstract(  addr.addr("PIP_UNIV2ETHUSDT"));
+    MedianAbstract    orb0EthUsdt = MedianAbstract( lpPipEthUsdt.orb0());
+    MedianAbstract    orb1EthUsdt = MedianAbstract( lpPipEthUsdt.orb1());
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
@@ -209,7 +223,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             25                       // Num expected in system
+            ilk_count:             27                       // Num expected in system
         });
 
         //
@@ -640,6 +654,40 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1,
             flipper_mom:  1
         });
+        afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          300,
+            chop:         1300,
+            dunk:         50000,
+            mat:          11000,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 0,
+            flipper_mom:  1
+        });
+        afterSpell.collaterals["UNIV2ETHUSDT-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          14000,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -913,6 +961,148 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(vat.Line() <= sumlines + 500 * MILLION * RAD && sumlines <= vat.Line());
     }
 
+	function testSpellIsCast_UNIV2DAIUSDC_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        bytes32 ilk = "UNIV2DAIUSDC-A";
+
+        lpPipDaiUsdc.poke();
+        hevm.warp(now + 3601);
+        lpPipDaiUsdc.poke();
+        spot.poke(ilk);
+
+        // Check median matches pip.src()
+        assertEq(lpPipDaiUsdc.src(), address(lpDaiUsdc));
+        assertEq(lpPipDaiUsdc.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
+        assertEq(lpPipDaiUsdc.orb1(), address(0x77b68899b99b686F415d074278a9a16b336085A0));
+
+        // Authorization
+        assertEq(lpJoinDaiUsdc.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(lpJoinDaiUsdc)), 1);
+        assertEq(lpFlipDaiUsdc.wards(address(end)), 1);
+        assertEq(lpFlipDaiUsdc.wards(address(flipMom)), 1);
+        assertEq(lpPipDaiUsdc.wards(address(osmMom)), 1);
+        assertEq(lpPipDaiUsdc.bud(address(spot)), 1);
+        assertEq(lpPipDaiUsdc.bud(address(end)), 1);
+        // assertEq(MedianAbstract(lpPipDaiUsdc.orb1()).bud(address(lpPipDaiUsdc)), 1);
+
+        // Join to adapter
+        uint256 amount = 10000 * 10 ** 13;
+        hevm.store(
+            address(lpDaiUsdc),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(amount)
+        );
+        assertEq(lpDaiUsdc.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
+        lpDaiUsdc.approve(address(lpJoinDaiUsdc), amount);
+        lpJoinDaiUsdc.join(address(this), amount);
+        assertEq(lpDaiUsdc.balanceOf(address(this)), 0);
+        assertEq(vat.gem(ilk, address(this)), amount);
+
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(2000 * WAD));
+        assertEq(vat.gem(ilk, address(this)), 0);
+        assertEq(vat.dai(address(this)), 2000 * RAD);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(2000 * WAD));
+        assertEq(vat.gem(ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        lpJoinDaiUsdc.exit(address(this), amount);
+        assertEq(lpDaiUsdc.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        lpDaiUsdc.approve(address(lpJoinDaiUsdc), amount);
+        lpJoinDaiUsdc.join(address(this), amount);
+        (,,uint256 spotV,,) = vat.ilks(ilk);
+        // dart max amount of DAI
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip(ilk);
+        assertEq(lpFlipDaiUsdc.kicks(), 0);
+        // liquidations disabled
+        // cat.bite(ilk, address(this));
+        // assertEq(lpFlipDaiUsdc.kicks(), 1);
+    }
+
+	function testSpellIsCast_UNIV2ETHUSDT_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+
+        assertTrue(spell.done());
+
+        bytes32 ilk = "UNIV2ETHUSDT-A";
+
+        lpPipEthUsdt.poke();
+        hevm.warp(now + 3601);
+        lpPipEthUsdt.poke();
+        spot.poke(ilk);
+
+        // Check median matches pip.src()
+        assertEq(lpPipEthUsdt.src(), address(lpEthUsdt));
+        assertEq(lpPipEthUsdt.orb0(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
+        assertEq(lpPipEthUsdt.orb1(), address(0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A));
+
+        // Authorization
+        assertEq(lpJoinEthUsdt.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(lpJoinEthUsdt)), 1);
+        assertEq(lpFlipEthUsdt.wards(address(end)), 1);
+        assertEq(lpFlipEthUsdt.wards(address(flipMom)), 1);
+        assertEq(lpPipEthUsdt.wards(address(osmMom)), 1);
+        assertEq(lpPipEthUsdt.bud(address(spot)), 1);
+        assertEq(lpPipEthUsdt.bud(address(end)), 1);
+        assertEq(MedianAbstract(lpPipEthUsdt.orb1()).bud(address(lpPipEthUsdt)), 1);
+
+        // Join to adapter
+        uint256 amount = 20 * 10 ** 13;
+        hevm.store(
+            address(lpEthUsdt),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(amount)
+        );
+        assertEq(lpEthUsdt.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
+        lpEthUsdt.approve(address(lpJoinEthUsdt), amount);
+        lpJoinEthUsdt.join(address(this), amount);
+        assertEq(lpEthUsdt.balanceOf(address(this)), 0);
+        assertEq(vat.gem(ilk, address(this)), amount);
+
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(2000 * WAD));
+        assertEq(vat.gem(ilk, address(this)), 0);
+        assertEq(vat.dai(address(this)), 2000 * RAD);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(ilk, address(this), address(this), address(this), -int(amount), -int(2000 * WAD));
+        assertEq(vat.gem(ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        lpJoinEthUsdt.exit(address(this), amount);
+        assertEq(lpEthUsdt.balanceOf(address(this)), amount);
+        assertEq(vat.gem(ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        lpEthUsdt.approve(address(lpJoinEthUsdt), amount);
+        lpJoinEthUsdt.join(address(this), amount);
+        (,,uint256 spotV,,) = vat.ilks(ilk);
+        // dart max amount of DAI
+        vat.frob(ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip(ilk);
+        assertEq(lpFlipEthUsdt.kicks(), 0);
+        cat.bite(ilk, address(this));
+        assertEq(lpFlipEthUsdt.kicks(), 1);
+    }
+
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
@@ -1081,7 +1271,45 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(INSTADAPP), 1);
     }
 
-    function test_Medianizers() public {
+    // function test_Medianizers() public {
+    //     vote();
+    //     spell.schedule();
+    //     castPreviousSpell();
+    //     hevm.warp(spell.nextCastTime());
+    //     spell.cast();
+    //     assertTrue(spell.done());
+
+    //     // Track Median authorizations here
+
+    //     address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
+    //     address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
+    //     assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
+
+    //     address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
+    //     address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
+    //     assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
+
+    //     address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
+    //     address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
+    //     assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
+
+    //     address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
+    //     address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
+    //     assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
+
+    //     address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
+    //     address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
+    //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+    // }
+
+    function testFaucetIsGone() public {
+        ChainlogAbstract _log = ChainlogAbstract(addr.addr("CHANGELOG"));
+        uint256 ct = _log.count();
+
+        (bytes32 key, address val) = _log.get(6);
+        assertTrue(key == "FAUCET");
+        assertTrue(val == address(0));
+
         vote();
         spell.schedule();
         castPreviousSpell();
@@ -1089,27 +1317,11 @@ contract DssSpellTest is DSTest, DSMath {
         spell.cast();
         assertTrue(spell.done());
 
-        // Track Median authorizations here
-
-        address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-        address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
-        assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
-
-        address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
-        address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
-        assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
-
-        address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
-        address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
-        assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
-
-        address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
-        address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
-        assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
-
-        address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
-        address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
-        assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+        // Adding 8 new addresses and removing one this week.
+        assertEq(_log.count(), ct + 7);
+        (key, val) = _log.get(6);
+        assertTrue(key != "FAUCET");
+        assertTrue(val != address(0));
     }
 
     address[] deployerAddresses = [
