@@ -1161,18 +1161,13 @@ contract DssSpellTest is DSTest, DSMath {
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
         for(uint i = 0; i < contractNames.length; i++) {
-            try chainLog.getAddress(contractNames[i]) returns (address addr) {
-                string memory contractName = string(
-                    abi.encodePacked(contractNames[i])
-                );
-                if (onlySource) checkSource(addr, contractName);
-                else checkWards(addr, contractName);
-            } catch Error(string memory reason) {
-                if (keccak256(bytes(reason))
-                    != keccak256(bytes("dss-chain-log/invalid-key"))) {
-                    revert(reason);
-                }
-            }
+            if (contractNames[i] == "FAUCET") continue;
+            address addr = chainLog.getAddress(contractNames[i]);
+            string memory contractName = string(
+                abi.encodePacked(contractNames[i])
+            );
+            if (onlySource) checkSource(addr, contractName);
+            else checkWards(addr, contractName);
         }
     }
 
