@@ -21,7 +21,11 @@ import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
-    function getAddress(bytes32) external view returns (address);
+}
+
+interface LPOracle {
+    function orb0() external view returns (address);
+    function orb1() external view returns (address);
 }
 
 contract DssSpellAction is DssAction {
@@ -93,11 +97,11 @@ contract DssSpellAction is DssAction {
 
         // LP oracle needs to be whitelisted on medianizers
         addReaderToMedianWhitelist(
-            OsmAbstract(CHANGELOG.getAddress("PIP_ETH")).src(),
+            LPOracle(UNIV2ETHUSDT_PIP).orb0(),
             UNIV2ETHUSDT_PIP
         );
         addReaderToMedianWhitelist(
-            OsmAbstract(CHANGELOG.getAddress("PIP_USDT")).src(),
+            LPOracle(UNIV2ETHUSDT_PIP).orb1(),
             UNIV2ETHUSDT_PIP
         );
 
