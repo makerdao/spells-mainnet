@@ -74,7 +74,7 @@ contract DssSpellAction is DssAction {
             0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
         );
 
-        addReaderToMedianWhilelist(
+        addReaderToMedianWhitelist(
             0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A, // median USDT/USD
             0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
         );
