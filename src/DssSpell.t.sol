@@ -222,7 +222,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             25                       // Num expected in system
+            ilk_count:             27                       // Num expected in system
         });
 
         //
