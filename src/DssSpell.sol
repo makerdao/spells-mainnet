@@ -93,12 +93,12 @@ contract DssSpellAction is DssAction {
 
         addReaderToMedianWhitelist(
             OsmAbstract(CHANGELOG.getAddress("PIP_ETH")).src(),
-            UNIV2DAIUSDC_PIP
+            UNIV2ETHUSDT_PIP
         );
 
         addReaderToMedianWhitelist(
             OsmAbstract(CHANGELOG.getAddress("PIP_USDT")).src(),
-            UNIV2ETHUSDT_PIP 
+            UNIV2ETHUSDT_PIP
         );
 
         // add UNI-V2-ETH-USDT-A collateral type
