@@ -28,7 +28,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://<TBD> -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-02-05 MakerDAO Executive Spell | Hash: 0x";
+        "2021-02-05 MakerDAO Executive Spell | Hash: 0xcd8106c161924820ee7f4061218e474b4f3eda29564957cf02e9b88bb96534e1";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -105,10 +105,21 @@ contract DssSpellAction is DssAction {
         });
         addNewCollateral(UNIV2ETHUSDT_A);
 
-
         // Faucet is currently set to zero address in Changelog.
         //   We're cleaning it up this week and removing it from the list.
         ChainlogAbstract(LOG).removeAddress("FAUCET");
+
+        // add UNIV2DAIUSDC to Changelog
+        setChangelogAddress("UNIV2DAIUSDC",             0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5);
+        setChangelogAddress("MCD_JOIN_UNIV2DAIUSDC_A",  0xA81598667AC561986b70ae11bBE2dd5348ed4327);
+        setChangelogAddress("MCD_FLIP_UNIV2DAIUSDC_A",  0x4a613f79a250D522DdB53904D87b8f442EA94496);
+        setChangelogAddress("PIP_UNIV2DAIUSDC",         0x25CD858a00146961611b18441353603191f110A0);
+
+        // add UNIV2ETHUSDT to Changelog
+        setChangelogAddress("UNIV2ETHUSDT",             0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852);
+        setChangelogAddress("MCD_JOIN_UNIV2ETHUSDT_A",  0x4aAD139a88D2dd5e7410b408593208523a3a891d);
+        setChangelogAddress("MCD_FLIP_UNIV2ETHUSDT_A",  0x118d5051e70F9EaF3B4a6a11F765185A2Ca0802E);
+        setChangelogAddress("PIP_UNIV2ETHUSDT",         0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B);
     }
 }
 
