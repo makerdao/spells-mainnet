@@ -17,7 +17,6 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
