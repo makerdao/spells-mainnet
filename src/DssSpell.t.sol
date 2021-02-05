@@ -1271,36 +1271,36 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(INSTADAPP), 1);
     }
 
-    // function test_Medianizers() public {
-    //     vote();
-    //     spell.schedule();
-    //     castPreviousSpell();
-    //     hevm.warp(spell.nextCastTime());
-    //     spell.cast();
-    //     assertTrue(spell.done());
+    function test_Medianizers() public {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
 
-    //     // Track Median authorizations here
+        // Track Median authorizations here
 
-    //     address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-    //     address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
-    //     assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
+        address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
+        address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
+        assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
 
-    //     address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
-    //     address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
-    //     assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
+        address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
+        address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
+        assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
 
-    //     address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
-    //     address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
-    //     assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
+        address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
+        address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
+        assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
 
-    //     address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
-    //     address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
-    //     assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
+        address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
+        address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
+        assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
 
-    //     address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
-    //     address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
-    //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
-    // }
+        address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
+        address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
+        assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+    }
 
     function testFaucetIsGone() public {
         ChainlogAbstract _log = ChainlogAbstract(addr.addr("CHANGELOG"));

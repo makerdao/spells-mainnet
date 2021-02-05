@@ -21,7 +21,11 @@ import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
-    function getAddress(bytes32) external view returns (address);
+}
+
+interface LPOracle {
+    function orb0() external view returns (address);
+    function orb1() external view returns (address);
 }
 
 contract DssSpellAction is DssAction {
@@ -42,6 +46,8 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant THREE_PCT = 1000000000937303470807876289;
+    uint256 constant FOUR_PCT  = 1000000001243680656318820312;
 
     /**
         @dev constructor (required)
@@ -54,9 +60,6 @@ contract DssSpellAction is DssAction {
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
 
     uint256 constant MILLION = 10**6;
-
-    uint256 constant THREE_PCT = 1000000000937303470807876289;
-    uint256 constant FOUR_PCT  = 1000000001243680656318820312;
 
     address constant UNIV2DAIUSDC_GEM   = 0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5;
     address constant UNIV2DAIUSDC_JOIN  = 0xA81598667AC561986b70ae11bBE2dd5348ed4327;
@@ -91,14 +94,15 @@ contract DssSpellAction is DssAction {
         });
         addNewCollateral(UNIV2DAIUSDC_A);
 
-        addReaderToMedianWhitelist(
-            OsmAbstract(CHANGELOG.getAddress("PIP_ETH")).src(),
-            UNIV2DAIUSDC_PIP
-        );
 
+        // LP oracle needs to be whitelisted on medianizers
         addReaderToMedianWhitelist(
-            OsmAbstract(CHANGELOG.getAddress("PIP_USDT")).src(),
-            UNIV2ETHUSDT_PIP 
+            LPOracle(UNIV2ETHUSDT_PIP).orb0(),
+            UNIV2ETHUSDT_PIP
+        );
+        addReaderToMedianWhitelist(
+            LPOracle(UNIV2ETHUSDT_PIP).orb1(),
+            UNIV2ETHUSDT_PIP
         );
 
         // add UNI-V2-ETH-USDT-A collateral type
