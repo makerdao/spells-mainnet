@@ -667,7 +667,7 @@ contract DssSpellTest is DSTest, DSMath {
             beg:          300,
             ttl:          6 hours,
             tau:          6 hours,
-            liquidations: 1,
+            liquidations: 0,
             flipper_mom:  1
         });
         afterSpell.collaterals["UNIV2ETHUSDT-A"] = CollateralValues({
