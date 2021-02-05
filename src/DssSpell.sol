@@ -69,14 +69,14 @@ contract DssSpellAction is DssAction {
         });
         addNewCollateral(UNIV2DAIUSDC_A);
 
-        authorize(
-            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B,  // pip
-            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85 // median ETH/USDC
+        addReaderToMedianWhitelist(
+            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85, // median ETH/USDC
+            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
         );
 
-        authorize(
-            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B,  // pip
-            0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A // median USDT/USD
+        addReaderToMedianWhilelist(
+            0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A, // median USDT/USD
+            0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B  // pip
         );
 
         // add UNI-V2-ETH-USDT-A collateral type
