@@ -18,6 +18,10 @@ pragma solidity 0.6.11;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface ChainlogAbstract {
+    function removeAddress(bytes32) external;
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
@@ -93,7 +97,7 @@ contract DssSpellAction is DssAction {
             minVaultAmount: 2000,
             maxLiquidationAmount: 50000,
             liquidationPenalty: 1300,
-            ilkStabilityFee: 1000000001243680656318820312, // 4% 
+            ilkStabilityFee: 1000000001243680656318820312, // 4%
             bidIncrease: 300, // 3%
             bidDuration: 6 hours,
             auctionDuration: 6 hours,
@@ -101,7 +105,10 @@ contract DssSpellAction is DssAction {
         });
         addNewCollateral(UNIV2ETHUSDT_A);
 
-        // risk params
+
+        // Faucet is currently set to zero address in Changelog.
+        //   We're cleaning it up this week and removing it from the list.
+        ChainlogAbstract(LOG).removeAddress("FAUCET");
     }
 }
 
