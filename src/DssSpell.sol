@@ -50,10 +50,9 @@ contract DssSpellAction is DssAction {
 
     /**
         @dev constructor (required)
-        @param lib         address of the DssExecLib contract
         @param officeHours true if officehours enabled
     */
-    constructor(address lib, bool officeHours) public DssAction(lib, officeHours) {}
+    constructor(bool officeHours) public DssAction(officeHours) {}
 
     uint256 constant MILLION = 10**6;
 
@@ -145,7 +144,6 @@ contract DssSpellAction is DssAction {
 }
 
 contract DssSpell is DssExec {
-    address public constant LIB = 0x5b2867E4537DC4e10B2876E91bF693a6E6A768B3; // v0.0.3
-    DssSpellAction public spell = new DssSpellAction(LIB, true);
+    DssSpellAction public spell = new DssSpellAction(true);
     constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
 }
