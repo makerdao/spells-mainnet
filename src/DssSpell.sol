@@ -17,6 +17,8 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -49,6 +51,7 @@ contract DssSpellAction is DssAction {
     uint256 constant TWO_PT_FIVE_PCT    = 1000000000782997609082909351;
     uint256 constant THREE_PCT          = 1000000000937303470807876289;
     uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
+    uint256 constant FOUR_PCT           = 1000000001243680656318820312;
     uint256 constant FOUR_PT_FIVE_PCT   = 1000000001395766281313196627;
     uint256 constant FIVE_PT_FIVE_PCT   = 1000000001697766583380253701;
     uint256 constant SIX_PCT            = 1000000001847694957439350562;
@@ -81,13 +84,13 @@ contract DssSpellAction is DssAction {
     bytes32 constant UNIV2LINKETH_ILK   = "UNIV2LINKETH-A";
     address constant UNIV2LINKETH_GEM   = 0xa2107FA5B38d9bbd2C461D6EDf11B11A50F6b974;
     address constant UNIV2LINKETH_JOIN  = 0xDae88bDe1FB38cF39B6A02b595930A3449e593A6;
-    address constant UNIV2LINKETH_FLIP  = 0xb79f818e3c73fca387845f892356224ca75eac4b;
+    address constant UNIV2LINKETH_FLIP  = 0xb79f818E3c73FCA387845f892356224CA75eac4b;
     address constant UNIV2LINKETH_PIP   = 0x628009F5F5029544AE84636Ef676D3Cc5755238b;
 
     bytes32 constant UNIV2UNIETH_ILK    = "UNIV2UNIETH-A";
     address constant UNIV2UNIETH_GEM    = 0xd3d2E2692501A5c9Ca623199D38826e513033a17;
-    address constant UNIV2UNIETH_JOIN   = 0xf11a98339fe1cde648e8d1463310ce3ccc3d7cc1;
-    address constant UNIV2UNIETH_FLIP   = 0xe5ed7da0483e291485011d5372f3bf46235eb277;
+    address constant UNIV2UNIETH_JOIN   = 0xf11a98339FE1CdE648e8D1463310CE3ccC3d7cC1;
+    address constant UNIV2UNIETH_FLIP   = 0xe5ED7da0483e291485011D5372F3BF46235EB277;
     address constant UNIV2UNIETH_PIP    = 0x8Ce9E9442F2791FC63CD6394cC12F2dE4fbc1D71;
 
     function actions() public override {
@@ -101,12 +104,12 @@ contract DssSpellAction is DssAction {
 
         // add UNI-V2-LINK-ETH-A collateral type
         addReaderToMedianWhitelist(
-            LPOracle(UNIV2LINKETH_A).orb0(),
-            UNIV2LINKETH_A
+            LPOracle(UNIV2LINKETH_PIP).orb0(),
+            UNIV2LINKETH_PIP
         );
         addReaderToMedianWhitelist(
-            LPOracle(UNIV2LINKETH_A).orb1(),
-            UNIV2LINKETH_A
+            LPOracle(UNIV2LINKETH_PIP).orb1(),
+            UNIV2LINKETH_PIP
         );
         CollateralOpts memory UNIV2LINKETH_A = CollateralOpts({
             ilk: UNIV2LINKETH_ILK,
