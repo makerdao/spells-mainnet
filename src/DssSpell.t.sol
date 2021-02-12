@@ -95,19 +95,19 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
-    // UNIV2DAIUSDC-A specific
-    DSTokenAbstract     lpDaiUsdc = DSTokenAbstract(addr.addr("UNIV2DAIUSDC"));
-    GemJoinAbstract lpJoinDaiUsdc = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDC_A"));
-    FlipAbstract    lpFlipDaiUsdc = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2DAIUSDC_A"));
-    LPOsmAbstract    lpPipDaiUsdc = LPOsmAbstract(  addr.addr("PIP_UNIV2DAIUSDC"));
+    // UNIV2LINKETH-A specific
+    DSTokenAbstract     lpDaiUsdc = DSTokenAbstract(addr.addr("UNIV2LINKETH"));
+    GemJoinAbstract lpJoinDaiUsdc = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2LINKETH_A"));
+    FlipAbstract    lpFlipDaiUsdc = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2LINKETH_A"));
+    LPOsmAbstract    lpPipDaiUsdc = LPOsmAbstract(  addr.addr("PIP_UNIV2LINKETH"));
     MedianAbstract    orb0DaiUsdc = MedianAbstract( lpPipDaiUsdc.orb0());
     MedianAbstract    orb1DaiUsdc = MedianAbstract( lpPipDaiUsdc.orb1());
 
-    // UNIV2ETHUSDT-A specific
-    DSTokenAbstract     lpEthUsdt = DSTokenAbstract(addr.addr("UNIV2ETHUSDT"));
-    GemJoinAbstract lpJoinEthUsdt = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2ETHUSDT_A"));
-    FlipAbstract    lpFlipEthUsdt = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2ETHUSDT_A"));
-    LPOsmAbstract    lpPipEthUsdt = LPOsmAbstract(  addr.addr("PIP_UNIV2ETHUSDT"));
+    // UNIV2UNIETH-A specific
+    DSTokenAbstract     lpEthUsdt = DSTokenAbstract(addr.addr("UNIV2UNIETH"));
+    GemJoinAbstract lpJoinEthUsdt = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2UNIETH_A"));
+    FlipAbstract    lpFlipEthUsdt = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2UNIETH_A"));
+    LPOsmAbstract    lpPipEthUsdt = LPOsmAbstract(  addr.addr("PIP_UNIV2UNIETH"));
     MedianAbstract    orb0EthUsdt = MedianAbstract( lpPipEthUsdt.orb0());
     MedianAbstract    orb1EthUsdt = MedianAbstract( lpPipEthUsdt.orb1());
 
@@ -223,7 +223,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             27                       // Num expected in system
+            ilk_count:             29                       // Num expected in system
         });
 
         //
@@ -270,7 +270,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         2 * MILLION,
             dust:         2000,
-            pct:          800,
+            pct:          600,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          15000,
@@ -316,12 +316,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         210 * MILLION,
+            aL_line:      350 * MILLION,
+            aL_gap:       15 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
-            pct:          400,
+            pct:          450,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          15000,
@@ -435,12 +435,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         7 * MILLION,
+            aL_line:      10 * MILLION,
+            aL_gap:       2 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
-            pct:          200,
+            pct:          300,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -469,12 +469,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         20 * MILLION,
+            aL_line:      140 * MILLION,
+            aL_gap:       7 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
-            pct:          200,
+            pct:          350,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -491,7 +491,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         4 * MILLION,
             dust:         2000,
-            pct:          200,
+            pct:          350,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -503,12 +503,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         30 * MILLION,
+            aL_line:      45 * MILLION,
+            aL_gap:       5 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
-            pct:          600,
+            pct:          550,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -537,10 +537,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["UNI-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         15 * MILLION,
+            aL_line:      50 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          300,
             chop:         1300,
@@ -571,10 +571,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["AAVE-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         10 * MILLION,
+            aL_line:      25 * MILLION,
+            aL_gap:       2 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          400,
             chop:         1300,
@@ -593,7 +593,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          100,
+            pct:          200,
             chop:         1300,
             dunk:         50000,
             mat:          12500,
@@ -627,7 +627,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          200,
+            pct:          250,
             chop:         1300,
             dunk:         50000,
             mat:          15000,
@@ -644,7 +644,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          100,
+            pct:          250,
             chop:         1300,
             dunk:         50000,
             mat:          12500,
@@ -682,6 +682,40 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          14000,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
+        afterSpell.collaterals["UNIV2LINKETH-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          6500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
+        afterSpell.collaterals["UNIV2UNIETH-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          6500,
             beg:          300,
             ttl:          6 hours,
             tau:          6 hours,
@@ -964,12 +998,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(vat.Line() <= sumlines + 500 * MILLION * RAD && sumlines <= vat.Line());
     }
 
-	function testSpellIsCast_UNIV2DAIUSDC_INTEGRATION() public {
+	function testSpellIsCast_UNIV2LINKETH_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
         assertTrue(spell.done());
 
-        bytes32 ilk = "UNIV2DAIUSDC-A";
+        bytes32 ilk = "UNIV2LINKETH-A";
 
         lpPipDaiUsdc.poke();
         hevm.warp(now + 3601);
@@ -1035,13 +1069,13 @@ contract DssSpellTest is DSTest, DSMath {
         // assertEq(lpFlipDaiUsdc.kicks(), 1);
     }
 
-	function testSpellIsCast_UNIV2ETHUSDT_INTEGRATION() public {
+	function testSpellIsCast_UNIV2UNIETH_INTEGRATION() public {
         vote();
         scheduleWaitAndCast();
 
         assertTrue(spell.done());
 
-        bytes32 ilk = "UNIV2ETHUSDT-A";
+        bytes32 ilk = "UNIV2UNIETH-A";
 
         lpPipEthUsdt.poke();
         hevm.warp(now + 3601);
