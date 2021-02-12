@@ -4,4 +4,5 @@ clean   :; dapp clean
            # Usage example: make test match=SpellIsCast
 test    :; ./test-dssspell.sh $(match)
 deploy  :; make && dapp create DssSpell
+estimate:; ./estimate-deploy-gas.sh
 flatten :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
