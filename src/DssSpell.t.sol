@@ -1012,8 +1012,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Check median matches pip.src()
         assertEq(lpPipLinkEth.src(), address(lpLinkEth));
-        //assertEq(lpPipLinkEth.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
-        //assertEq(lpPipLinkEth.orb1(), address(0x77b68899b99b686F415d074278a9a16b336085A0));
+        assertEq(lpPipLinkEth.orb0(), OsmAbstract(address(addr.addr("PIP_LINK"))).src());
+        assertEq(lpPipLinkEth.orb1(), OsmAbstract(address(addr.addr("PIP_ETH"))).src());
 
         // Authorization
         assertEq(lpJoinLinkEth.wards(pauseProxy), 1);
@@ -1064,9 +1064,8 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(now + 1);
         jug.drip(ilk);
         assertEq(lpFlipLinkEth.kicks(), 0);
-        // liquidations disabled
-        // cat.bite(ilk, address(this));
-        // assertEq(lpFlipLinkEth.kicks(), 1);
+        cat.bite(ilk, address(this));
+        assertEq(lpFlipLinkEth.kicks(), 1);
     }
 
 	function testSpellIsCast_UNIV2UNIETH_INTEGRATION() public {
@@ -1084,8 +1083,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Check median matches pip.src()
         assertEq(lpPipUniEth.src(), address(lpUniEth));
-        //assertEq(lpPipUniEth.orb0(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-        //assertEq(lpPipUniEth.orb1(), address(0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A));
+        assertEq(lpPipLinkEth.orb0(), OsmAbstract(address(addr.addr("PIP_UNI"))).src());
+        assertEq(lpPipLinkEth.orb1(), OsmAbstract(address(addr.addr("PIP_ETH"))).src());
 
         // Authorization
         assertEq(lpJoinUniEth.wards(pauseProxy), 1);
