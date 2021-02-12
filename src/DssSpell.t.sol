@@ -1179,7 +1179,7 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast();
     }
 
-    function getExtcodesize(address target) public returns (uint256 exsize) {
+    function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
             exsize := extcodesize(target)
         }
@@ -1284,7 +1284,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    function testFail_notScheduled() public {
+    function testFail_notScheduled() public view {
         spell.nextCastTime();
     }
 
@@ -1364,9 +1364,9 @@ contract DssSpellTest is DSTest, DSMath {
         0xd200790f62c8da69973e61d4936cfE4f356ccD07
     ];
 
-    function checkWards(address addr, string memory contractName) internal {
+    function checkWards(address _addr, string memory contractName) internal {
         for (uint256 i = 0; i < deployerAddresses.length; i ++) {
-            (bool ok, bytes memory data) = addr.call(
+            (bool ok, bytes memory data) = _addr.call(
                 abi.encodeWithSignature("wards(address)", deployerAddresses[i])
             );
             if (!ok || data.length != 32) return;
@@ -1378,9 +1378,9 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    function checkSource(address addr, string memory contractName) internal {
+    function checkSource(address _addr, string memory contractName) internal {
         (bool ok, bytes memory data) =
-            addr.call(abi.encodeWithSignature("src()"));
+            _addr.call(abi.encodeWithSignature("src()"));
         if (!ok || data.length != 32) return;
         address source = abi.decode(data, (address));
         string memory sourceName = string(
@@ -1399,12 +1399,12 @@ contract DssSpellTest is DSTest, DSMath {
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
         for(uint256 i = 0; i < contractNames.length; i++) {
-            address addr = chainLog.getAddress(contractNames[i]);
+            address _addr = chainLog.getAddress(contractNames[i]);
             string memory contractName = string(
                 abi.encodePacked(contractNames[i])
             );
-            if (onlySource) checkSource(addr, contractName);
-            else checkWards(addr, contractName);
+            if (onlySource) checkSource(_addr, contractName);
+            else checkWards(_addr, contractName);
         }
     }
 
