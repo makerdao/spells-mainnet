@@ -197,8 +197,8 @@ contract DssSpellTest is DSTest, DSMath {
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1612553472,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            previous_spell:                 address(0x296E9C87967427c2539838535175e616eCe761d4),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell_execution_time:  1613496480,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -236,7 +236,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,        // In seconds
             line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
             dust:         2000,            // In whole Dai units
-            pct:          350,             // In basis points
+            pct:          450,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
@@ -253,7 +253,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,     // Not checked as there is auto line
             dust:         2000,
-            pct:          650,
+            pct:          750,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
@@ -315,7 +315,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  0
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      350 * MILLION,
             aL_gap:       15 * MILLION,
             aL_ttl:       12 hours,
@@ -434,7 +434,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  0
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      10 * MILLION,
             aL_gap:       2 * MILLION,
             aL_ttl:       12 hours,
@@ -468,7 +468,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      140 * MILLION,
             aL_gap:       7 * MILLION,
             aL_ttl:       12 hours,
@@ -502,7 +502,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      45 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
@@ -536,7 +536,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  0
         });
         afterSpell.collaterals["UNI-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      50 * MILLION,
             aL_gap:       3 * MILLION,
             aL_ttl:       12 hours,
@@ -570,7 +570,7 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["AAVE-A"] = CollateralValues({
-            aL_enabled:   false,
+            aL_enabled:   true,
             aL_line:      25 * MILLION,
             aL_gap:       2 * MILLION,
             aL_ttl:       12 hours,
@@ -627,7 +627,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          250,
+            pct:          350,
             chop:         1300,
             dunk:         50000,
             mat:          15000,
@@ -1012,8 +1012,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Check median matches pip.src()
         assertEq(lpPipLinkEth.src(), address(lpLinkEth));
-        assertEq(lpPipLinkEth.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
-        assertEq(lpPipLinkEth.orb1(), address(0x77b68899b99b686F415d074278a9a16b336085A0));
+        //assertEq(lpPipLinkEth.orb0(), address(0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e));
+        //assertEq(lpPipLinkEth.orb1(), address(0x77b68899b99b686F415d074278a9a16b336085A0));
 
         // Authorization
         assertEq(lpJoinLinkEth.wards(pauseProxy), 1);
@@ -1026,7 +1026,7 @@ contract DssSpellTest is DSTest, DSMath {
         // assertEq(MedianAbstract(lpPipLinkEth.orb1()).bud(address(lpPipLinkEth)), 1);
 
         // Join to adapter
-        uint256 amount = 10000 * 10 ** 13;
+        uint256 amount = 100 * 10 ** 18;
         hevm.store(
             address(lpLinkEth),
             keccak256(abi.encode(address(this), uint256(1))),
@@ -1084,8 +1084,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Check median matches pip.src()
         assertEq(lpPipUniEth.src(), address(lpUniEth));
-        assertEq(lpPipUniEth.orb0(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
-        assertEq(lpPipUniEth.orb1(), address(0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A));
+        //assertEq(lpPipUniEth.orb0(), address(0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85));
+        //assertEq(lpPipUniEth.orb1(), address(0x56D4bBF358D7790579b55eA6Af3f605BcA2c0C3A));
 
         // Authorization
         assertEq(lpJoinUniEth.wards(pauseProxy), 1);
@@ -1098,7 +1098,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(MedianAbstract(lpPipUniEth.orb1()).bud(address(lpPipUniEth)), 1);
 
         // Join to adapter
-        uint256 amount = 20 * 10 ** 13;
+        uint256 amount = 100 * 10 ** 18;
         hevm.store(
             address(lpUniEth),
             keccak256(abi.encode(address(this), uint256(1))),
