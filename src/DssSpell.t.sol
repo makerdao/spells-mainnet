@@ -1360,7 +1360,8 @@ contract DssSpellTest is DSTest, DSMath {
         0xDa0FaB05039809e63C5D068c897c3e602fA97457,
         0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
         0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
-        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c
+        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
+        0xd200790f62c8da69973e61d4936cfE4f356ccD07
     ];
 
     function checkWards(address addr, string memory contractName) internal {
@@ -1413,6 +1414,20 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    function test_interim_budget() public {
+        address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+        uint256 prevSin = vat.sin(address(vow));
+        uint256 prevDai = dai.balanceOf(multisig);
+
+        vote();
+        scheduleWaitAndCast();
+
+        assertTrue(spell.done());
+
+        assertEq(vat.sin(address(vow)) - prevSin, 100_001 * RAD);
+        assertEq(dai.balanceOf(multisig) - prevDai, 100_000 * WAD);
     }
 
 }

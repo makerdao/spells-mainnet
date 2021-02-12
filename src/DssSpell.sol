@@ -19,6 +19,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
+import "lib/dss-interfaces/src/dss/DaiAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -27,6 +28,10 @@ interface ChainlogAbstract {
 interface LPOracle {
     function orb0() external view returns (address);
     function orb1() external view returns (address);
+}
+
+interface GnosisAllowanceModule {
+    function executeAllowanceTransfer(address safe, address token, address to, uint96 amount, address paymentToken, uint96 payment, address delegate, bytes memory signature) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -92,6 +97,10 @@ contract DssSpellAction is DssAction {
     address constant UNIV2UNIETH_JOIN   = 0xf11a98339FE1CdE648e8D1463310CE3ccC3d7cC1;
     address constant UNIV2UNIETH_FLIP   = 0xe5ED7da0483e291485011D5372F3BF46235EB277;
     address constant UNIV2UNIETH_PIP    = 0x8Ce9E9442F2791FC63CD6394cC12F2dE4fbc1D71;
+
+    // Interim Budget Addresses
+    address constant DAO_MULTISIG       = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    address constant ALLOWANCE_MODULE   = 0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134;
 
     function actions() public override {
         // DC-IAM
@@ -176,10 +185,25 @@ contract DssSpellAction is DssAction {
         setIlkStabilityFee(YFI_ILK, FIVE_PT_FIVE_PCT, true);
 
         // Interim DAO Budget (Note: we are leaving daiJoin hoped from the Pause Proxy for future payments)
-        address MCD_JOIN_DAI = getChangelogAddress("MCD_JOIN_DAI");
-        VatAbstract(vat()).suck(vow(), address(this), 100_000 * RAD);
+        // Sending 100,001 DAI and testing the return feature of the multisig for governance to retrieve the funds if necessary
+        address MCD_JOIN_DAI    = getChangelogAddress("MCD_JOIN_DAI");
+        address MCD_DAI         = getChangelogAddress("MCD_DAI");
+        address MCD_PAUSE_PROXY = getChangelogAddress("MCD_PAUSE_PROXY");
+        VatAbstract(vat()).suck(vow(), address(this), 100_001 * RAD);
         VatAbstract(vat()).hope(MCD_JOIN_DAI);
-        DaiJoinAbstract(MCD_JOIN_DAI).exit(0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff, 100_000 * WAD);
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(DAO_MULTISIG, 100_001 * WAD);
+        GnosisAllowanceModule(ALLOWANCE_MODULE).executeAllowanceTransfer(
+            DAO_MULTISIG,
+            MCD_DAI,
+            MCD_PAUSE_PROXY,
+            uint96(1 * WAD),
+            address(0),
+            uint96(0),
+            address(this),
+            ""
+        );
+        DaiAbstract(MCD_DAI).approve(MCD_JOIN_DAI, 1 * WAD);
+        DaiJoinAbstract(MCD_JOIN_DAI).join(vow(), 1 * WAD);
 
         // add UNIV2LINKETH to Changelog
         setChangelogAddress("UNIV2LINKETH",             UNIV2LINKETH_GEM);
