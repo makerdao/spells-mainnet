@@ -1419,11 +1419,15 @@ contract DssSpellTest is DSTest, DSMath {
         address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
         uint256 prevSin = vat.sin(address(vow));
         uint256 prevDai = dai.balanceOf(multisig);
+        
+        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
 
         vote();
         scheduleWaitAndCast();
 
         assertTrue(spell.done());
+        
+        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
 
         assertEq(vat.sin(address(vow)) - prevSin, 100_001 * RAD);
         assertEq(dai.balanceOf(multisig) - prevDai, 100_000 * WAD);
