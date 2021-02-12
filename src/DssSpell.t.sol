@@ -216,7 +216,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_sump:              50000,                   // In whole Dai units
             vow_bump:              10000,                   // In whole Dai units
             vow_hump:              10 * MILLION,            // In whole Dai units
-            flap_beg:              104 * WAD / 100,         // in (1 + pct) * WAD
+            flap_beg:              400,                     // in basis points
             flap_ttl:              1 hours,                 // in seconds
             flap_tau:              72 hours,                // in seconds
             cat_box:               15 * MILLION,            // In whole Dai units
@@ -898,7 +898,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // flap
         // check beg value
-        assertEq(flap.beg(), values.flap_beg);
+        uint256 normalizedTestBeg = (values.flap_beg + 10000)  * 10**14;
+        assertEq(flap.beg(), normalizedTestBeg);
         assertTrue(flap.beg() >= WAD && flap.beg() < 3 * WAD);
         // Check flap ttl and sanity checks
         assertEq(flap.ttl(), values.flap_ttl);
@@ -1419,14 +1420,14 @@ contract DssSpellTest is DSTest, DSMath {
         address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
         uint256 prevSin = vat.sin(address(vow));
         uint256 prevDai = dai.balanceOf(multisig);
-        
+
         assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
 
         vote();
         scheduleWaitAndCast();
 
         assertTrue(spell.done());
-        
+
         assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
 
         assertEq(vat.sin(address(vow)) - prevSin, 100_001 * RAD);
