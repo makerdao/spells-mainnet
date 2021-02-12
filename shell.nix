@@ -1,7 +1,7 @@
 { url
   , dappPkgs ? (
-    import (fetchTarball "https://github.com/makerdao/makerpkgs/tarball/master") {}
-  ).dappPkgsVersions.hevm-0_43_1
+    import (fetchTarball "https://github.com/makerdao/makerpkgs/tarball/temp-fix-json") {}
+  ).dappPkgsVersions.temp-fix-json
 }: with dappPkgs;
 
 mkShell {
