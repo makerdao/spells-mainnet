@@ -1083,8 +1083,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Check median matches pip.src()
         assertEq(lpPipUniEth.src(), address(lpUniEth));
-        assertEq(lpPipLinkEth.orb0(), OsmAbstract(address(addr.addr("PIP_UNI"))).src());
-        assertEq(lpPipLinkEth.orb1(), OsmAbstract(address(addr.addr("PIP_ETH"))).src());
+        assertEq(lpPipUniEth.orb0(), OsmAbstract(address(addr.addr("PIP_UNI"))).src());
+        assertEq(lpPipUniEth.orb1(), OsmAbstract(address(addr.addr("PIP_ETH"))).src());
 
         // Authorization
         assertEq(lpJoinUniEth.wards(pauseProxy), 1);
