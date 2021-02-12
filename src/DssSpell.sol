@@ -142,7 +142,7 @@ contract DssSpellAction is DssAction {
             UNIV2UNIETH_PIP
         );
         CollateralOpts memory UNIV2UNIETH_A = CollateralOpts({
-            ilk: "UNIV2UNIETH-A",
+            ilk: UNIV2UNIETH_ILK,
             gem: UNIV2UNIETH_GEM,
             join: UNIV2UNIETH_JOIN,
             flip: UNIV2UNIETH_FLIP,
@@ -176,7 +176,7 @@ contract DssSpellAction is DssAction {
         setIlkStabilityFee(YFI_ILK, FIVE_PT_FIVE_PCT, true);
 
         // Interim DAO Budget (Note: we are leaving daiJoin hoped from the Pause Proxy for future payments)
-        address MCD_JOIN_DAI = getChangelogAddress("MCD_VAT");
+        address MCD_JOIN_DAI = getChangelogAddress("MCD_JOIN_DAI");
         VatAbstract(vat()).suck(vow(), address(this), 100_000 * RAD);
         VatAbstract(vat()).hope(MCD_JOIN_DAI);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff, 100_000 * WAD);
