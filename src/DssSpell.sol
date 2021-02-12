@@ -184,14 +184,15 @@ contract DssSpellAction is DssAction {
         setIlkStabilityFee(BAT_ILK, SIX_PCT, true);
         setIlkStabilityFee(YFI_ILK, FIVE_PT_FIVE_PCT, true);
 
-        // Interim DAO Budget (Note: we are leaving daiJoin hoped from the Pause Proxy for future payments)
-        // Sending 100,001 DAI and testing the return feature of the multisig for governance to retrieve the funds if necessary
+        // Interim DAO Budget (Note: we are leaving daiJoin hope'd from the Pause Proxy for future payments)
+        // Sending 100,001 DAI to the DAO multi-sig (1 extra to test retrieval)
         address MCD_JOIN_DAI    = getChangelogAddress("MCD_JOIN_DAI");
         address MCD_DAI         = getChangelogAddress("MCD_DAI");
         address MCD_PAUSE_PROXY = getChangelogAddress("MCD_PAUSE_PROXY");
         VatAbstract(vat()).suck(vow(), address(this), 100_001 * RAD);
         VatAbstract(vat()).hope(MCD_JOIN_DAI);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(DAO_MULTISIG, 100_001 * WAD);
+        // Testing the ability for governance to retrieve funds from the multi-sig
         GnosisAllowanceModule(ALLOWANCE_MODULE).executeAllowanceTransfer(
             DAO_MULTISIG,
             MCD_DAI,
