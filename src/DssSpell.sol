@@ -17,9 +17,7 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/DaiAbstract.sol";
+import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -102,6 +100,26 @@ contract DssSpellAction is DssAction {
         address flipperMom = flipperMom();
         deauthorize(flip(PSM_USDC_A_ILK), flipperMom);
         deauthorize(flip(UNIV2DAIUSDC_A_ILK), flipperMom);
+
+        // Changelog updates
+        setChangelogAddress("MED_ETH", OsmAbstract(getChangelogAddress("PIP_ETH")).src());
+        setChangelogAddress("MED_BAT", OsmAbstract(getChangelogAddress("PIP_BAT")).src());
+        setChangelogAddress("MED_WBTC", OsmAbstract(getChangelogAddress("PIP_WBTC")).src());
+        setChangelogAddress("MED_ZRX", OsmAbstract(getChangelogAddress("PIP_ZRX")).src());
+        setChangelogAddress("MED_KNC", OsmAbstract(getChangelogAddress("PIP_KNC")).src());
+        setChangelogAddress("MED_MANA", OsmAbstract(getChangelogAddress("PIP_MANA")).src());
+        setChangelogAddress("MED_USDT", OsmAbstract(getChangelogAddress("PIP_USDT")).src());
+        setChangelogAddress("MED_COMP", OsmAbstract(getChangelogAddress("PIP_COMP")).src());
+        setChangelogAddress("MED_LRC", OsmAbstract(getChangelogAddress("PIP_LRC")).src());
+        setChangelogAddress("MED_LINK", OsmAbstract(getChangelogAddress("PIP_LINK")).src());
+        setChangelogAddress("MED_BAL", OsmAbstract(getChangelogAddress("PIP_BAL")).src());
+        setChangelogAddress("MED_YFI", OsmAbstract(getChangelogAddress("PIP_YFI")).src());
+        setChangelogAddress("MED_UNI", OsmAbstract(getChangelogAddress("PIP_UNI")).src());
+        setChangelogAddress("MED_RENBTC", OsmAbstract(getChangelogAddress("PIP_RENBTC")).src());
+        setChangelogAddress("MED_AAVE", OsmAbstract(getChangelogAddress("PIP_AAVE")).src());
+
+        // bump Changelog version
+        setChangelogVersion("1.2.7");
     }
 }
 

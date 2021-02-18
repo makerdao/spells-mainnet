@@ -1016,8 +1016,6 @@ contract DssSpellTest is DSTest, DSMath {
         DSTokenAbstract token = DSTokenAbstract(join.gem());
         FlipAbstract flip = FlipAbstract(_flip);
         LPOsmAbstract pip = LPOsmAbstract(_pip);
-        DSTokenAbstract utoken1 = DSTokenAbstract(LPTokenLike(join.gem()).token0());
-        DSTokenAbstract utoken2 = DSTokenAbstract(LPTokenLike(join.gem()).token1());
 
         pip.poke();
         hevm.warp(now + 3601);
@@ -1065,8 +1063,8 @@ contract DssSpellTest is DSTest, DSMath {
             price2 = MedianAbstract(_medianizer2).read();
         }
         // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
-        price1 /= 10 ** (18 - utoken1.decimals());
-        price2 /= 10 ** (18 - utoken2.decimals());
+        price1 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token0()).decimals());
+        price2 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token1()).decimals());
         uint256 amount = sqrt(price1 * price2) * dust * 2;
         hevm.store(
             address(token),
