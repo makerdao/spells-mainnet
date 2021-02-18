@@ -1048,7 +1048,7 @@ contract DssSpellTest is DSTest, DSMath {
             // Medianizer
             price1 = uint256(hevm.load(
                 address(_medianizer1),
-                1
+                bytes32(uint256(1))
             )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
         } else {
             // DSValue
@@ -1058,7 +1058,7 @@ contract DssSpellTest is DSTest, DSMath {
             // Medianizer
             price2 = uint256(hevm.load(
                 address(_medianizer2),
-                1
+                bytes32(uint256(1))
             )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
         } else {
             // DSValue
@@ -1093,11 +1093,11 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Withdraw from adapter
         join.exit(address(this), amount);
-        assertEq(lpLinkEth.balanceOf(address(this)), amount);
+        assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
 
         // Generate new DAI to force a liquidation
-        lpLinkEth.approve(address(join), amount);
+        token.approve(address(join), amount);
         join.join(address(this), amount);
         // dart max amount of DAI
         vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
