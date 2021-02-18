@@ -211,13 +211,13 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
-            pot_dsr:               0,                       // In basis points
+            pot_dsr:               1,                       // In basis points
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50000,                   // In whole Dai units
             vow_bump:              10000,                   // In whole Dai units
-            vow_hump:              10 * MILLION,            // In whole Dai units
+            vow_hump:              30 * MILLION,            // In whole Dai units
             flap_beg:              400,                     // in basis points
             flap_ttl:              1 hours,                 // in seconds
             flap_tau:              72 hours,                // in seconds
@@ -233,7 +233,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
-            aL_line:      1500 * MILLION,  // In whole Dai units
+            aL_line:      2500 * MILLION,  // In whole Dai units
             aL_gap:       30 * MILLION,    // In whole Dai units
             aL_ttl:       12 hours,        // In seconds
             line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
@@ -266,11 +266,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         2 * MILLION,
+            aL_enabled:   true,
+            aL_line:      3 * MILLION,
+            aL_gap:       1 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          600,
             chop:         1300,
@@ -351,11 +351,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  0
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         5 * MILLION,
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       1 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          200,
             chop:         1300,
@@ -368,11 +368,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         5 * MILLION,
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       1 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          200,
             chop:         1300,
@@ -385,11 +385,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         1 * MILLION,
+            aL_enabled:   true,
+            aL_line:      2 * MILLION,
+            aL_gap:       500_000,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          500,
             chop:         1300,
@@ -453,11 +453,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         3 * MILLION,
+            aL_enabled:   true,
+            aL_line:      10 * MILLION,
+            aL_gap:       2 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          300,
             chop:         1300,
@@ -487,11 +487,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["BAL-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         4 * MILLION,
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       1 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          350,
             chop:         1300,
@@ -555,11 +555,11 @@ contract DssSpellTest is DSTest, DSMath {
             flipper_mom:  1
         });
         afterSpell.collaterals["RENBTC-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
-            aL_ttl:       0,
-            line:         2 * MILLION,
+            aL_enabled:   true,
+            aL_line:      2 * MILLION,
+            aL_gap:       500_000,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          600,
             chop:         1300,

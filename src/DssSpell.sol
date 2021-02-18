@@ -52,11 +52,7 @@ contract DssSpellAction is DssAction {
     //
     uint256 constant ONE_HUNDREDTH_PCT = 1000000000003170820659990704;
 
-    /**
-        @dev constructor (required)
-        @param officeHours true if officehours enabled
-    */
-    constructor(bool officeHours) public DssAction(officeHours) {}
+    constructor() public DssAction() {}
 
     uint256 constant WAD        = 10**18;
     uint256 constant RAD        = 10**45;
@@ -75,55 +71,55 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // Increase ETH-A Maximum Debt Ceiling
-        setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
 
         // Set Debt Ceiling Instant Access Module Parameters For Multiple Vault Types
-        setIlkAutoLineParameters(LRC_A_ILK, 10 * MILLION, 2 * MILLION, 12 hours);
-        setIlkAutoLineParameters(BAT_A_ILK, 3 * MILLION, 1 * MILLION, 12 hours);
-        setIlkAutoLineParameters(BAL_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        setIlkAutoLineParameters(MANA_A_ILK, 2 * MILLION, 500_000, 12 hours);
-        setIlkAutoLineParameters(ZRX_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        setIlkAutoLineParameters(KNC_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        setIlkAutoLineParameters(RENBTC_A_ILK, 2 * MILLION, 500_000, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(LRC_A_ILK, 10 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(BAT_A_ILK, 3 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(BAL_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(MANA_A_ILK, 2 * MILLION, 500_000, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(ZRX_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(KNC_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters(RENBTC_A_ILK, 2 * MILLION, 500_000, 12 hours);
 
         // Increase System Surplus Buffer
-        setSurplusBuffer(30 * MILLION);
+        DssExecLib.setSurplusBuffer(30 * MILLION);
 
         // TODO: Onboard UNIV2WBTCDAI-A
 
         // TODO: Onboard UNIV2AAVEETH-A
 
         // Dai Savings Rate Adjustment
-        setDSR(ONE_HUNDREDTH_PCT);
+        DssExecLib.setDSR(ONE_HUNDREDTH_PCT);
 
         // Remove Permissions for Liquidations Circuit Breaker
-        address flipperMom = flipperMom();
-        deauthorize(flip(PSM_USDC_A_ILK), flipperMom);
-        deauthorize(flip(UNIV2DAIUSDC_A_ILK), flipperMom);
+        address flipperMom = DssExecLib.flipperMom();
+        DssExecLib.deauthorize(DssExecLib.flip(PSM_USDC_A_ILK), flipperMom);
+        DssExecLib.deauthorize(DssExecLib.flip(UNIV2DAIUSDC_A_ILK), flipperMom);
 
         // Changelog updates
-        setChangelogAddress("MED_ETH", OsmAbstract(getChangelogAddress("PIP_ETH")).src());
-        setChangelogAddress("MED_BAT", OsmAbstract(getChangelogAddress("PIP_BAT")).src());
-        setChangelogAddress("MED_WBTC", OsmAbstract(getChangelogAddress("PIP_WBTC")).src());
-        setChangelogAddress("MED_ZRX", OsmAbstract(getChangelogAddress("PIP_ZRX")).src());
-        setChangelogAddress("MED_KNC", OsmAbstract(getChangelogAddress("PIP_KNC")).src());
-        setChangelogAddress("MED_MANA", OsmAbstract(getChangelogAddress("PIP_MANA")).src());
-        setChangelogAddress("MED_USDT", OsmAbstract(getChangelogAddress("PIP_USDT")).src());
-        setChangelogAddress("MED_COMP", OsmAbstract(getChangelogAddress("PIP_COMP")).src());
-        setChangelogAddress("MED_LRC", OsmAbstract(getChangelogAddress("PIP_LRC")).src());
-        setChangelogAddress("MED_LINK", OsmAbstract(getChangelogAddress("PIP_LINK")).src());
-        setChangelogAddress("MED_BAL", OsmAbstract(getChangelogAddress("PIP_BAL")).src());
-        setChangelogAddress("MED_YFI", OsmAbstract(getChangelogAddress("PIP_YFI")).src());
-        setChangelogAddress("MED_UNI", OsmAbstract(getChangelogAddress("PIP_UNI")).src());
-        setChangelogAddress("MED_RENBTC", OsmAbstract(getChangelogAddress("PIP_RENBTC")).src());
-        setChangelogAddress("MED_AAVE", OsmAbstract(getChangelogAddress("PIP_AAVE")).src());
+        DssExecLib.setChangelogAddress("MED_ETH", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ETH")).src());
+        DssExecLib.setChangelogAddress("MED_BAT", OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAT")).src());
+        DssExecLib.setChangelogAddress("MED_WBTC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_WBTC")).src());
+        DssExecLib.setChangelogAddress("MED_ZRX", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ZRX")).src());
+        DssExecLib.setChangelogAddress("MED_KNC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_KNC")).src());
+        DssExecLib.setChangelogAddress("MED_MANA", OsmAbstract(DssExecLib.getChangelogAddress("PIP_MANA")).src());
+        DssExecLib.setChangelogAddress("MED_USDT", OsmAbstract(DssExecLib.getChangelogAddress("PIP_USDT")).src());
+        DssExecLib.setChangelogAddress("MED_COMP", OsmAbstract(DssExecLib.getChangelogAddress("PIP_COMP")).src());
+        DssExecLib.setChangelogAddress("MED_LRC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_LRC")).src());
+        DssExecLib.setChangelogAddress("MED_LINK", OsmAbstract(DssExecLib.getChangelogAddress("PIP_LINK")).src());
+        DssExecLib.setChangelogAddress("MED_BAL", OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAL")).src());
+        DssExecLib.setChangelogAddress("MED_YFI", OsmAbstract(DssExecLib.getChangelogAddress("PIP_YFI")).src());
+        DssExecLib.setChangelogAddress("MED_UNI", OsmAbstract(DssExecLib.getChangelogAddress("PIP_UNI")).src());
+        DssExecLib.setChangelogAddress("MED_RENBTC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_RENBTC")).src());
+        DssExecLib.setChangelogAddress("MED_AAVE", OsmAbstract(DssExecLib.getChangelogAddress("PIP_AAVE")).src());
 
         // bump Changelog version
-        setChangelogVersion("1.2.7");
+        DssExecLib.setChangelogVersion("1.2.7");
     }
 }
 
 contract DssSpell is DssExec {
-    DssSpellAction public spell = new DssSpellAction(true);
+    DssSpellAction public spell = new DssSpellAction();
     constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
 }
