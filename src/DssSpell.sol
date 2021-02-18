@@ -19,6 +19,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
 import "lib/dss-interfaces/src/dss/PotAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -70,6 +71,10 @@ contract DssSpellAction is DssAction {
     bytes32 constant PSM_USDC_A_ILK     = "PSM-USDC-A";
     bytes32 constant UNIV2DAIUSDC_A_ILK = "UNIV2DAIUSDC-A";
 
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x);
+    }
+
     function actions() public override {
         // Increase ETH-A Maximum Debt Ceiling
         DssExecLib.setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
@@ -99,7 +104,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(DssExecLib.flip(PSM_USDC_A_ILK), flipperMom);
         DssExecLib.deauthorize(DssExecLib.flip(UNIV2DAIUSDC_A_ILK), flipperMom);
 
-        // Changelog updates
+        // Fix for Line != sum lines rounding error issue (0.602857457497899800874246318932698818152722680 DAI)
+        VatAbstract vat = VatAbstract(DssExecLib.vat());
+        vat.file("Line", add(vat.Line(), 602857457497899800874246318932698818152722680));
+
+        // Add medianizers to the chain log
         DssExecLib.setChangelogAddress("MED_ETH", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ETH")).src());
         DssExecLib.setChangelogAddress("MED_BAT", OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAT")).src());
         DssExecLib.setChangelogAddress("MED_WBTC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_WBTC")).src());
