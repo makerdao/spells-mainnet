@@ -12,11 +12,17 @@ import {DssSpell} from "./DssSpell.sol";
 interface Hevm {
     function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
+    function load(address,bytes32) external view returns (bytes32);
 }
 
 interface SpellLike {
     function done() external view returns (bool);
     function cast() external;
+}
+
+interface LPTokenLike {
+    function token0() external view returns (address);
+    function token1() external view returns (address);
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -95,22 +101,6 @@ contract DssSpellTest is DSTest, DSMath {
     FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
-    // UNIV2LINKETH-A specific
-    DSTokenAbstract     lpLinkEth = DSTokenAbstract(addr.addr("UNIV2LINKETH"));
-    GemJoinAbstract lpJoinLinkEth = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2LINKETH_A"));
-    FlipAbstract    lpFlipLinkEth = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2LINKETH_A"));
-    LPOsmAbstract    lpPipLinkEth = LPOsmAbstract(  addr.addr("PIP_UNIV2LINKETH"));
-    MedianAbstract    orb0LinkEth = MedianAbstract( lpPipLinkEth.orb0());
-    MedianAbstract    orb1LinkEth = MedianAbstract( lpPipLinkEth.orb1());
-
-    // UNIV2UNIETH-A specific
-    DSTokenAbstract     lpUniEth = DSTokenAbstract(addr.addr("UNIV2UNIETH"));
-    GemJoinAbstract lpJoinUniEth = GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2UNIETH_A"));
-    FlipAbstract    lpFlipUniEth = FlipAbstract(   addr.addr("MCD_FLIP_UNIV2UNIETH_A"));
-    LPOsmAbstract    lpPipUniEth = LPOsmAbstract(  addr.addr("PIP_UNIV2UNIETH"));
-    MedianAbstract    orb0UniEth = MedianAbstract( lpPipUniEth.orb0());
-    MedianAbstract    orb1UniEth = MedianAbstract( lpPipUniEth.orb1());
-
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
     DssSpell   spell;
@@ -158,6 +148,18 @@ contract DssSpellTest is DSTest, DSMath {
           }
         }
       }
+    }
+    function sqrt(uint y) internal pure returns (uint z) {
+        if (y > 3) {
+            z = y;
+            uint x = y / 2 + 1;
+            while (x < z) {
+                z = x;
+                x = (y / x + x) / 2;
+            }
+        } else if (y != 0) {
+            z = 1;
+        }
     }
 
     // 10^-5 (tenth of a basis point) as a RAY
@@ -997,6 +999,115 @@ contract DssSpellTest is DSTest, DSMath {
         // NOTE: Remove the range check when the lerp is complete
         // Sum lines is not going to equal vat.Line() for the next 12 weeks
         assertTrue(vat.Line() <= sumlines + 500 * MILLION * RAD && sumlines <= vat.Line());
+    }
+
+	function checkUNIV2LPIntegration(
+        bytes32 _ilk,
+        address _join,
+        address _flip,
+        address _pip,
+        address _medianizer1,
+        bool _isMedian1,
+        address _medianizer2,
+        bool _isMedian2,
+        bool _checkLiquidations
+    ) public {
+        GemJoinAbstract join = GemJoinAbstract(_join);
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+        FlipAbstract flip = FlipAbstract(_flip);
+        LPOsmAbstract pip = LPOsmAbstract(_pip);
+        DSTokenAbstract utoken1 = DSTokenAbstract(LPTokenLike(join.gem()).token0());
+        DSTokenAbstract utoken2 = DSTokenAbstract(LPTokenLike(join.gem()).token1());
+
+        pip.poke();
+        hevm.warp(now + 3601);
+        pip.poke();
+        spot.poke(_ilk);
+
+        // Check medianizer sources
+        assertEq(pip.src(), address(token));
+        assertEq(pip.orb0(), _medianizer1);
+        assertEq(pip.orb1(), _medianizer2);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(flip.wards(address(end)), 1);
+        assertEq(flip.wards(address(flipMom)), 1);
+        assertEq(pip.wards(address(osmMom)), 1);
+        assertEq(pip.bud(address(spot)), 1);
+        assertEq(pip.bud(address(end)), 1);
+        if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
+        if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
+
+        // Join to adapter
+        uint256 price1;
+        uint256 price2;
+        (,, uint256 spotV,, uint256 dust) = vat.ilks(_ilk);
+        if (_isMedian1) {
+            // Medianizer
+            price1 = uint256(hevm.load(
+                address(_medianizer1),
+                1
+            )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+        } else {
+            // DSValue
+            price1 = MedianAbstract(_medianizer1).read();
+        }
+        if (_isMedian1) {
+            // Medianizer
+            price2 = uint256(hevm.load(
+                address(_medianizer2),
+                1
+            )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+        } else {
+            // DSValue
+            price2 = MedianAbstract(_medianizer2).read();
+        }
+        // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
+        price1 /= 10 ** (18 - utoken1.decimals());
+        price2 /= 10 ** (18 - utoken2.decimals());
+        uint256 amount = sqrt(price1 * price2) * dust * 2;
+        hevm.store(
+            address(token),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(amount)
+        );
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(vat.gem(_ilk, address(this)), amount);
+
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertEq(vat.dai(address(this)), 2000 * RAD);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        join.exit(address(this), amount);
+        assertEq(lpLinkEth.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        lpLinkEth.approve(address(join), amount);
+        join.join(address(this), amount);
+        // dart max amount of DAI
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
+        hevm.warp(now + 1);
+        jug.drip(_ilk);
+        assertEq(flip.kicks(), 0);
+        if (_checkLiquidations) {
+            cat.bite(_ilk, address(this));
+            assertEq(flip.kicks(), 1);
+        }
     }
 
     function testOfficeHoursMatches() public {
