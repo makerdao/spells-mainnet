@@ -937,6 +937,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(aL_line == 0);
                 assertTrue(line <= normalizedTestLine); // Amount should be lteq test line
                 assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+                sumlines += normalizedTestLine - line;  // Treat it as if it's at the final value for global Line comparison
             } else if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
                 assertEq(line, normalizedTestLine);
@@ -996,9 +997,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
-        // NOTE: Remove the range check when the lerp is complete
-        // Sum lines is not going to equal vat.Line() for the next 12 weeks
-        assertTrue(vat.Line() <= sumlines + 500 * MILLION * RAD && sumlines <= vat.Line());
+        assertEq(sumlines, vat.Line());
     }
 
 	function checkUNIV2LPIntegration(
