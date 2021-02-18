@@ -18,6 +18,7 @@ pragma solidity 0.6.11;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
+import "lib/dss-interfaces/src/dss/PotAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -67,7 +68,7 @@ contract DssSpellAction is DssAction {
     bytes32 constant KNC_A_ILK          = "KNC-A";
     bytes32 constant RENBTC_A_ILK       = "RENBTC-A";
     bytes32 constant PSM_USDC_A_ILK     = "PSM-USDC-A";
-    bytes32 constant UNIV2DAIUSDC_A_ILK = "PSM-USDC-A";
+    bytes32 constant UNIV2DAIUSDC_A_ILK = "UNIV2DAIUSDC-A";
 
     function actions() public override {
         // Increase ETH-A Maximum Debt Ceiling
@@ -90,6 +91,7 @@ contract DssSpellAction is DssAction {
         // TODO: Onboard UNIV2AAVEETH-A
 
         // Dai Savings Rate Adjustment
+        PotAbstract(DssExecLib.pot()).drip();
         DssExecLib.setDSR(ONE_HUNDREDTH_PCT);
 
         // Remove Permissions for Liquidations Circuit Breaker
