@@ -1003,19 +1003,16 @@ contract DssSpellTest is DSTest, DSMath {
 
 	function checkUNIV2LPIntegration(
         bytes32 _ilk,
-        address _join,
-        address _flip,
-        address _pip,
+        GemJoinAbstract join,
+        FlipAbstract flip,
+        LPOsmAbstract pip,
         address _medianizer1,
-        bool _isMedian1,
         address _medianizer2,
+        bool _isMedian1,
         bool _isMedian2,
         bool _checkLiquidations
     ) public {
-        GemJoinAbstract join = GemJoinAbstract(_join);
         DSTokenAbstract token = DSTokenAbstract(join.gem());
-        FlipAbstract flip = FlipAbstract(_flip);
-        LPOsmAbstract pip = LPOsmAbstract(_pip);
 
         pip.poke();
         hevm.warp(now + 3601);
@@ -1038,39 +1035,44 @@ contract DssSpellTest is DSTest, DSMath {
         if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
         if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
 
-        // Join to adapter
-        uint256 price1;
-        uint256 price2;
-        (,, uint256 spotV,, uint256 dust) = vat.ilks(_ilk);
-        if (_isMedian1) {
-            // Medianizer
-            price1 = uint256(hevm.load(
-                address(_medianizer1),
-                bytes32(uint256(1))
-            )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-        } else {
-            // DSValue
-            price1 = MedianAbstract(_medianizer1).read();
+        uint256 amount;
+        // Stack too deep
+        {
+            // Join to adapter
+            uint256 price1;
+            uint256 price2;
+            (,,,, uint256 dust) = vat.ilks(_ilk);
+            if (_isMedian1) {
+                // Medianizer
+                price1 = uint256(hevm.load(
+                    address(_medianizer1),
+                    bytes32(uint256(1))
+                )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+            } else {
+                // DSValue
+                price1 = MedianAbstract(_medianizer1).read();
+            }
+            if (_isMedian1) {
+                // Medianizer
+                price2 = uint256(hevm.load(
+                    address(_medianizer2),
+                    bytes32(uint256(1))
+                )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+            } else {
+                // DSValue
+                price2 = MedianAbstract(_medianizer2).read();
+            }
+            // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
+            price1 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token0()).decimals());
+            price2 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token1()).decimals());
+            amount = sqrt(price1 * price2) * dust * 2;
+            hevm.store(
+                address(token),
+                keccak256(abi.encode(address(this), uint256(1))),
+                bytes32(amount)
+            );
         }
-        if (_isMedian1) {
-            // Medianizer
-            price2 = uint256(hevm.load(
-                address(_medianizer2),
-                bytes32(uint256(1))
-            )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-        } else {
-            // DSValue
-            price2 = MedianAbstract(_medianizer2).read();
-        }
-        // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
-        price1 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token0()).decimals());
-        price2 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token1()).decimals());
-        uint256 amount = sqrt(price1 * price2) * dust * 2;
-        hevm.store(
-            address(token),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(amount)
-        );
+
         assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
         token.approve(address(join), amount);
@@ -1078,16 +1080,21 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(token.balanceOf(address(this)), 0);
         assertEq(vat.gem(_ilk, address(this)), amount);
 
-        // Deposit collateral, generate DAI
-        assertEq(vat.dai(address(this)), 0);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
-        assertEq(vat.gem(_ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 2000 * RAD);
+        // Stack too deep
+        {
+            (,,,, uint256 dust) = vat.ilks(_ilk);
 
-        // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
-        assertEq(vat.gem(_ilk, address(this)), amount);
-        assertEq(vat.dai(address(this)), 0);
+            // Deposit collateral, generate DAI
+            assertEq(vat.dai(address(this)), 0);
+            vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
+            assertEq(vat.gem(_ilk, address(this)), 0);
+            assertEq(vat.dai(address(this)), 2000 * RAD);
+
+            // Payback DAI, withdraw collateral
+            vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
+            assertEq(vat.gem(_ilk, address(this)), amount);
+            assertEq(vat.dai(address(this)), 0);
+        }
 
         // Withdraw from adapter
         join.exit(address(this), amount);
@@ -1098,6 +1105,7 @@ contract DssSpellTest is DSTest, DSMath {
         token.approve(address(join), amount);
         join.join(address(this), amount);
         // dart max amount of DAI
+        (,,uint256 spotV,,) = vat.ilks(_ilk);
         vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
         hevm.warp(now + 1);
         jug.drip(_ilk);
