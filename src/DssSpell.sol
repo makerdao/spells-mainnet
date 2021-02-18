@@ -40,7 +40,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/9b7eba966a6f43e95935276313cac2490ec44e71/governance/votes/Executive%20vote%20-%20February%2012%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "TODO";
+        "2021-02-19 MakerDAO Executive Spell | Hash: TODO";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -52,6 +52,7 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant ONE_HUNDREDTH_PCT = 1000000000003170820659990704;
 
     /**
         @dev constructor (required)
@@ -63,7 +64,44 @@ contract DssSpellAction is DssAction {
     uint256 constant RAD        = 10**45;
     uint256 constant MILLION    = 10**6;
 
+    bytes32 constant ETH_A_ILK          = "ETH-A";
+    bytes32 constant LRC_A_ILK          = "LRC-A";
+    bytes32 constant BAT_A_ILK          = "BAT-A";
+    bytes32 constant BAL_A_ILK          = "BAL-A";
+    bytes32 constant MANA_A_ILK         = "MANA-A";
+    bytes32 constant ZRX_A_ILK          = "ZRX-A";
+    bytes32 constant KNC_A_ILK          = "KNC-A";
+    bytes32 constant RENBTC_A_ILK       = "RENBTC-A";
+    bytes32 constant PSM_USDC_A_ILK     = "PSM-USDC-A";
+    bytes32 constant UNIV2DAIUSDC_A_ILK = "PSM-USDC-A";
+
     function actions() public override {
+        // Increase ETH-A Maximum Debt Ceiling
+        setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
+
+        // Set Debt Ceiling Instant Access Module Parameters For Multiple Vault Types
+        setIlkAutoLineParameters(LRC_A_ILK, 10 * MILLION, 2 * MILLION, 12 hours);
+        setIlkAutoLineParameters(BAT_A_ILK, 3 * MILLION, 1 * MILLION, 12 hours);
+        setIlkAutoLineParameters(BAL_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        setIlkAutoLineParameters(MANA_A_ILK, 2 * MILLION, 500_000, 12 hours);
+        setIlkAutoLineParameters(ZRX_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        setIlkAutoLineParameters(KNC_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
+        setIlkAutoLineParameters(RENBTC_A_ILK, 2 * MILLION, 500_000, 12 hours);
+
+        // Increase System Surplus Buffer
+        setSurplusBuffer(30 * MILLION);
+
+        // TODO: Onboard UNIV2WBTCDAI-A
+
+        // TODO: Onboard UNIV2AAVEETH-A
+
+        // Dai Savings Rate Adjustment
+        setDSR(ONE_HUNDREDTH_PCT);
+
+        // Remove Permissions for Liquidations Circuit Breaker
+        address flipperMom = flipperMom();
+        deauthorize(flip(PSM_USDC_A_ILK), flipperMom);
+        deauthorize(flip(UNIV2DAIUSDC_A_ILK), flipperMom);
     }
 }
 
