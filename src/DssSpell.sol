@@ -60,24 +60,11 @@ contract DssSpellAction is DssAction {
     uint256 constant RAD        = 10**45;
     uint256 constant MILLION    = 10**6;
 
-    bytes32 constant ETH_A_ILK          = "ETH-A";
-    bytes32 constant LRC_A_ILK          = "LRC-A";
-    bytes32 constant BAT_A_ILK          = "BAT-A";
-    bytes32 constant BAL_A_ILK          = "BAL-A";
-    bytes32 constant MANA_A_ILK         = "MANA-A";
-    bytes32 constant ZRX_A_ILK          = "ZRX-A";
-    bytes32 constant KNC_A_ILK          = "KNC-A";
-    bytes32 constant RENBTC_A_ILK       = "RENBTC-A";
-    bytes32 constant PSM_USDC_A_ILK     = "PSM-USDC-A";
-    bytes32 constant UNIV2DAIUSDC_A_ILK = "UNIV2DAIUSDC-A";
-
-    bytes32 constant UNIV2WBTCDAI_ILK   = "UNIV2WBTCDAI-A";
     address constant UNIV2WBTCDAI_GEM   = 0x231B7589426Ffe1b75405526fC32aC09D44364c4;
     address constant UNIV2WBTCDAI_JOIN  = 0xD40798267795Cbf3aeEA8E9F8DCbdBA9b5281fcC;
     address constant UNIV2WBTCDAI_FLIP  = 0x172200d12D09C2698Dd918d347155fE6692f5662;
     address constant UNIV2WBTCDAI_PIP   = 0x5FB5a346347ACf4FCD3AAb28f5eE518785FB0AD0;
 
-    bytes32 constant UNIV2AAVEETH_ILK   = "UNIV2AAVEETH-A";
     address constant UNIV2AAVEETH_GEM   = 0xDFC14d2Af169B0D36C4EFF567Ada9b2E0CAE044f;
     address constant UNIV2AAVEETH_JOIN  = 0x42AFd448Df7d96291551f1eFE1A590101afB1DfF;
     address constant UNIV2AAVEETH_FLIP  = 0x20D298ca96bf8c2000203B911908DbDc1a8Bac58;
@@ -85,16 +72,16 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // Increase ETH-A Maximum Debt Ceiling
-        DssExecLib.setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling("ETH-A", 2_500 * MILLION);
 
         // Set Debt Ceiling Instant Access Module Parameters For Multiple Vault Types
-        DssExecLib.setIlkAutoLineParameters(LRC_A_ILK, 10 * MILLION, 2 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(BAT_A_ILK, 3 * MILLION, 1 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(BAL_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(MANA_A_ILK, 2 * MILLION, 500_000, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(ZRX_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(KNC_A_ILK, 5 * MILLION, 1 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters(RENBTC_A_ILK, 2 * MILLION, 500_000, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("LRC-A", 10 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("BAT-A", 3 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("BAL-A", 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("MANA-A", 2 * MILLION, 500_000, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("ZRX-A", 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("KNC-A", 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("RENBTC-A", 2 * MILLION, 500_000, 12 hours);
 
         // Increase System Surplus Buffer
         DssExecLib.setSurplusBuffer(30 * MILLION);
@@ -105,7 +92,7 @@ contract DssSpellAction is DssAction {
             UNIV2WBTCDAI_PIP
         );
         CollateralOpts memory UNIV2WBTCDAI_A = CollateralOpts({
-            ilk: UNIV2WBTCDAI_ILK,
+            ilk: "UNIV2WBTCDAI-A",
             gem: UNIV2WBTCDAI_GEM,
             join: UNIV2WBTCDAI_JOIN,
             flip: UNIV2WBTCDAI_FLIP,
@@ -139,7 +126,7 @@ contract DssSpellAction is DssAction {
             UNIV2AAVEETH_PIP
         );
         CollateralOpts memory UNIV2AAVEETH_A = CollateralOpts({
-            ilk: UNIV2AAVEETH_ILK,
+            ilk: "UNIV2AAVEETH-A",
             gem: UNIV2AAVEETH_GEM,
             join: UNIV2AAVEETH_JOIN,
             flip: UNIV2AAVEETH_FLIP,
@@ -169,8 +156,8 @@ contract DssSpellAction is DssAction {
 
         // Remove Permissions for Liquidations Circuit Breaker
         address flipperMom = DssExecLib.flipperMom();
-        DssExecLib.deauthorize(DssExecLib.flip(PSM_USDC_A_ILK), flipperMom);
-        DssExecLib.deauthorize(DssExecLib.flip(UNIV2DAIUSDC_A_ILK), flipperMom);
+        DssExecLib.deauthorize(DssExecLib.flip("PSM-USDC-A"), flipperMom);
+        DssExecLib.deauthorize(DssExecLib.flip("UNIV2DAIUSDC-A"), flipperMom);
 
         // Fix for Line != sum lines rounding error issue (0.602857457497899800874246318932698818152722680 DAI)
         VatAbstract vat = VatAbstract(DssExecLib.vat());
@@ -199,6 +186,6 @@ contract DssSpellAction is DssAction {
 }
 
 contract DssSpell is DssExec {
-    DssSpellAction public spell = new DssSpellAction();
-    constructor() DssExec(spell.description(), block.timestamp + 30 days, address(spell)) public {}
+    DssSpellAction internal action_ = new DssSpellAction();
+    constructor() DssExec(action_.description(), block.timestamp + 30 days, address(action_)) public {}
 }
