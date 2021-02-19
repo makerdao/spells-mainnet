@@ -1165,7 +1165,7 @@ contract DssSpellTest is DSTest, DSMath {
             GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCDAI_A")),
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCDAI_A")),
             LPOsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
-            addr.addr("MED_WBTC"),
+            OsmAbstract(addr.addr("PIP_WBTC")).src(),
             0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e, // DAI DSValue
             true,
             false,
@@ -1176,8 +1176,8 @@ contract DssSpellTest is DSTest, DSMath {
             GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2AAVEETH_A")),
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2AAVEETH_A")),
             LPOsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
-            addr.addr("MED_AAVE"),
-            addr.addr("MED_ETH"),
+            OsmAbstract(addr.addr("PIP_AAVE")).src(),
+            OsmAbstract(addr.addr("PIP_ETH")).src(),
             true,
             true,
             true

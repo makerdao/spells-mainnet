@@ -163,23 +163,6 @@ contract DssSpellAction is DssAction {
         VatAbstract vat = VatAbstract(DssExecLib.vat());
         vat.file("Line", vat.Line() + 602857457497899800874246318932698818152722680);
 
-        // Add medianizers to the chain log
-        DssExecLib.setChangelogAddress("MED_ETH", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ETH")).src());
-        DssExecLib.setChangelogAddress("MED_BAT", OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAT")).src());
-        DssExecLib.setChangelogAddress("MED_WBTC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_WBTC")).src());
-        DssExecLib.setChangelogAddress("MED_ZRX", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ZRX")).src());
-        DssExecLib.setChangelogAddress("MED_KNC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_KNC")).src());
-        DssExecLib.setChangelogAddress("MED_MANA", OsmAbstract(DssExecLib.getChangelogAddress("PIP_MANA")).src());
-        DssExecLib.setChangelogAddress("MED_USDT", OsmAbstract(DssExecLib.getChangelogAddress("PIP_USDT")).src());
-        DssExecLib.setChangelogAddress("MED_COMP", OsmAbstract(DssExecLib.getChangelogAddress("PIP_COMP")).src());
-        DssExecLib.setChangelogAddress("MED_LRC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_LRC")).src());
-        DssExecLib.setChangelogAddress("MED_LINK", OsmAbstract(DssExecLib.getChangelogAddress("PIP_LINK")).src());
-        DssExecLib.setChangelogAddress("MED_BAL", OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAL")).src());
-        DssExecLib.setChangelogAddress("MED_YFI", OsmAbstract(DssExecLib.getChangelogAddress("PIP_YFI")).src());
-        DssExecLib.setChangelogAddress("MED_UNI", OsmAbstract(DssExecLib.getChangelogAddress("PIP_UNI")).src());
-        DssExecLib.setChangelogAddress("MED_RENBTC", OsmAbstract(DssExecLib.getChangelogAddress("PIP_RENBTC")).src());
-        DssExecLib.setChangelogAddress("MED_AAVE", OsmAbstract(DssExecLib.getChangelogAddress("PIP_AAVE")).src());
-
         // bump Changelog version
         DssExecLib.setChangelogVersion("1.2.7");
     }
