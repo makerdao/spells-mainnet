@@ -102,6 +102,7 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
+    address    makerDeployer07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
 
     DssSpell   spell;
 
@@ -1023,11 +1024,13 @@ contract DssSpellTest is DSTest, DSMath {
 
             assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
             assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
+            assertEq(flip.wards(address(makerDeployer07)), 0); // Check deployer denied
             assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
             {
             GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
             assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
+            assertEq(join.wards(address(makerDeployer07)), 0); // Check deployer denied
             assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
             }
         }
