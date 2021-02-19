@@ -56,8 +56,6 @@ contract DssSpellAction is DssAction {
     uint256 constant THREE_PCT          = 1000000000937303470807876289;
     uint256 constant FOUR_PCT           = 1000000001243680656318820312;
 
-    constructor() public DssAction() {}
-
     uint256 constant WAD        = 10**18;
     uint256 constant RAD        = 10**45;
     uint256 constant MILLION    = 10**6;
