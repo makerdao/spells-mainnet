@@ -225,7 +225,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             29                       // Num expected in system
+            ilk_count:             31                       // Num expected in system
         });
 
         //
@@ -724,6 +724,40 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1,
             flipper_mom:  1
         });
+        afterSpell.collaterals["UNIV2WBTCDAI-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          300,
+            chop:         1300,
+            dunk:         50000,
+            mat:          12500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
+        afterSpell.collaterals["UNIV2AAVEETH-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          16500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1035,12 +1069,14 @@ contract DssSpellTest is DSTest, DSMath {
         if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
 
         uint256 amount;
+        uint256 dust;
         // Stack too deep
         {
             // Join to adapter
             uint256 price1;
             uint256 price2;
-            (,,,, uint256 dust) = vat.ilks(_ilk);
+            (,,,, dust) = vat.ilks(_ilk);
+            dust /= RAD;
             if (_isMedian1) {
                 // Medianizer
                 price1 = uint256(hevm.load(
@@ -1051,7 +1087,7 @@ contract DssSpellTest is DSTest, DSMath {
                 // DSValue
                 price1 = MedianAbstract(_medianizer1).read();
             }
-            if (_isMedian1) {
+            if (_isMedian2) {
                 // Medianizer
                 price2 = uint256(hevm.load(
                     address(_medianizer2),
@@ -1062,9 +1098,11 @@ contract DssSpellTest is DSTest, DSMath {
                 price2 = MedianAbstract(_medianizer2).read();
             }
             // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
+            uint256 nprice1 = price1;
+            uint256 nprice2 = price2;
             price1 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token0()).decimals());
             price2 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token1()).decimals());
-            amount = sqrt(price1 * price2) * dust * 2;
+            amount = sqrt(price1 * price2) * dust * WAD / (nprice1 + nprice2);
             hevm.store(
                 address(token),
                 keccak256(abi.encode(address(this), uint256(1))),
@@ -1079,21 +1117,16 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(token.balanceOf(address(this)), 0);
         assertEq(vat.gem(_ilk, address(this)), amount);
 
-        // Stack too deep
-        {
-            (,,,, uint256 dust) = vat.ilks(_ilk);
+        // Deposit collateral, generate DAI
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertEq(vat.dai(address(this)), 2000 * RAD);
 
-            // Deposit collateral, generate DAI
-            assertEq(vat.dai(address(this)), 0);
-            vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
-            assertEq(vat.gem(_ilk, address(this)), 0);
-            assertEq(vat.dai(address(this)), 2000 * RAD);
-
-            // Payback DAI, withdraw collateral
-            vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
-            assertEq(vat.gem(_ilk, address(this)), amount);
-            assertEq(vat.dai(address(this)), 0);
-        }
+        // Payback DAI, withdraw collateral
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
         join.exit(address(this), amount);
@@ -1113,6 +1146,42 @@ contract DssSpellTest is DSTest, DSMath {
             cat.bite(_ilk, address(this));
             assertEq(flip.kicks(), 1);
         }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function testCollateralIntegrations() public {
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        // Insert new collateral tests here
+        checkUNIV2LPIntegration(
+            "UNIV2WBTCDAI-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCDAI_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCDAI_A")),
+            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
+            addr.addr("MED_WBTC"),
+            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e, // DAI DSValue
+            true,
+            false,
+            true
+        );
+        checkUNIV2LPIntegration(
+            "UNIV2AAVEETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2AAVEETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2AAVEETH_A")),
+            LPOsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
+            addr.addr("MED_AAVE"),
+            addr.addr("MED_ETH"),
+            true,
+            true,
+            true
+        );
     }
 
     function testOfficeHoursMatches() public {
