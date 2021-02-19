@@ -83,10 +83,6 @@ contract DssSpellAction is DssAction {
     address constant UNIV2AAVEETH_FLIP  = 0x20D298ca96bf8c2000203B911908DbDc1a8Bac58;
     address constant UNIV2AAVEETH_PIP   = 0x8D34DC2c33A6386E96cA562D8478Eaf82305b81a;
 
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x);
-    }
-
     function actions() public override {
         // Increase ETH-A Maximum Debt Ceiling
         DssExecLib.setIlkAutoLineDebtCeiling(ETH_A_ILK, 2_500 * MILLION);
@@ -178,7 +174,7 @@ contract DssSpellAction is DssAction {
 
         // Fix for Line != sum lines rounding error issue (0.602857457497899800874246318932698818152722680 DAI)
         VatAbstract vat = VatAbstract(DssExecLib.vat());
-        vat.file("Line", add(vat.Line(), 602857457497899800874246318932698818152722680));
+        vat.file("Line", vat.Line() + 602857457497899800874246318932698818152722680);
 
         // Add medianizers to the chain log
         DssExecLib.setChangelogAddress("MED_ETH", OsmAbstract(DssExecLib.getChangelogAddress("PIP_ETH")).src());
@@ -204,5 +200,5 @@ contract DssSpellAction is DssAction {
 
 contract DssSpell is DssExec {
     DssSpellAction public spell = new DssSpellAction();
-    constructor() DssExec(spell.description(), now + 30 days, address(spell)) public {}
+    constructor() DssExec(spell.description(), block.timestamp + 30 days, address(spell)) public {}
 }
