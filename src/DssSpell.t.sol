@@ -226,7 +226,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             31                       // Num expected in system
+            ilk_count:             32                       // Num expected in system
         });
 
         //
@@ -239,7 +239,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,        // In seconds
             line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
             dust:         2000,            // In whole Dai units
-            pct:          450,             // In basis points
+            pct:          550,             // In basis points
             chop:         1300,            // In basis points
             dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
@@ -256,7 +256,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,     // Not checked as there is auto line
             dust:         2000,
-            pct:          750,
+            pct:          900,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
@@ -759,6 +759,23 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1,
             flipper_mom:  1
         });
+        afterSpell.collaterals["UNIV2DAIUSDT-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         2000,
+            pct:          400,
+            chop:         1300,
+            dunk:         50000,
+            mat:          12500,
+            beg:          300,
+            ttl:          6 hours,
+            tau:          6 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1164,24 +1181,13 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Insert new collateral tests here
         checkUNIV2LPIntegration(
-            "UNIV2WBTCDAI-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCDAI_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCDAI_A")),
-            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
-            OsmAbstract(addr.addr("PIP_WBTC")).src(),
+            "UNIV2DAIUSDT-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDT_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDT_A")),
+            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
             0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e, // DAI DSValue
-            true,
+            OsmAbstract(addr.addr("PIP_USDT")).src(),
             false,
-            true
-        );
-        checkUNIV2LPIntegration(
-            "UNIV2AAVEETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2AAVEETH_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNIV2AAVEETH_A")),
-            LPOsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
-            OsmAbstract(addr.addr("PIP_AAVE")).src(),
-            OsmAbstract(addr.addr("PIP_ETH")).src(),
-            true,
             true,
             true
         );
