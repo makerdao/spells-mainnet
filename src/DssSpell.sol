@@ -101,7 +101,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("PIP_UNIV2DAIUSDT",         UNIV2DAIUSDT_PIP);
 
         // Lower PSM-USDC-A Toll Out
-        DssExecLib.setContract(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tout", 4 * WAD / 1000);
+        DssExecLib.setContract(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tout", 4 * WAD / 10000);
 
         // bump Changelog version
         DssExecLib.setChangelogVersion("1.2.8");
