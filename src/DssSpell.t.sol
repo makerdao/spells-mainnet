@@ -25,6 +25,10 @@ interface LPTokenLike {
     function token1() external view returns (address);
 }
 
+interface PSMLike {
+    function tout() external view returns (uint256);
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -1467,6 +1471,20 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    function test_psm_tout() public {
+        // 0.1%
+        assertEq(PSMLike(addr.addr("MCD_PSM_USDC_A")).tout(), 10 * WAD / 10000);
+
+        vote();
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+
+        // 0.04%
+        assertEq(PSMLike(addr.addr("MCD_PSM_USDC_A")).tout(), 4 * WAD / 10000);
     }
 
 }

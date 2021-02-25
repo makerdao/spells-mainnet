@@ -17,9 +17,6 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/OsmAbstract.sol";
-import "lib/dss-interfaces/src/dss/PotAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 interface ChainlogAbstract {
     function removeAddress(bytes32) external;
@@ -30,8 +27,8 @@ interface LPOracle {
     function orb1() external view returns (address);
 }
 
-interface GnosisAllowanceModule {
-    function executeAllowanceTransfer(address safe, address token, address to, uint96 amount, address paymentToken, uint96 payment, address delegate, bytes memory signature) external;
+interface Fileable {
+    function file(bytes32,uint256) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -60,15 +57,15 @@ contract DssSpellAction is DssAction {
     uint256 constant RAD        = 10**45;
     uint256 constant MILLION    = 10**6;
 
-    address constant UNIV2DAIUSDT_GEM   = 0xb20bd5d04be54f870d5c0d3ca85d82b34b836405;
+    address constant UNIV2DAIUSDT_GEM   = 0xB20bd5D04BE54f870D5C0d3cA85d82b34B836405;
     address constant UNIV2DAIUSDT_JOIN  = 0xAf034D882169328CAf43b823a4083dABC7EEE0F4;
-    address constant UNIV2DAIUSDT_FLIP  = 0xd32f8b8adbe331ec0cfada9cfdbc537619622cfe;
-    address constant UNIV2DAIUSDT_PIP   = 0x0;
+    address constant UNIV2DAIUSDT_FLIP  = 0xD32f8B8aDbE331eC0CfADa9cfDbc537619622cFe;
+    address constant UNIV2DAIUSDT_PIP   = address(0x0);
 
     function actions() public override {
         // Rates Proposal - February 22, 2021
-        DssExecLib.setIlkStabilityFee("ETH-A", FIVE_PT_FIVE_PCT);
-        DssExecLib.setIlkStabilityFee("ETH-B", NINE_PCT);
+        DssExecLib.setIlkStabilityFee("ETH-A", FIVE_PT_FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("ETH-B", NINE_PCT, true);
 
         // Onboard UNIV2DAIUSDT-A
         DssExecLib.addReaderToMedianWhitelist(
@@ -101,7 +98,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("PIP_UNIV2DAIUSDT",         UNIV2DAIUSDT_PIP);
 
         // Lower PSM-USDC-A Toll Out
-        DssExecLib.setContract(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tout", 4 * WAD / 10000);
+        Fileable(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A")).file("tout", 4 * WAD / 10000);
 
         // bump Changelog version
         DssExecLib.setChangelogVersion("1.2.8");
