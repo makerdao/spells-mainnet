@@ -4,10 +4,8 @@ language: nix
 nix: 2.3.6
 before_install:
   - nix-env -iA nixpkgs.cachix
-  - nix-env -f https://github.com/dapphub/dapptools/archive/master.tar.gz -iA solc-static-versions.solc_0_6_11
   - echo "trusted-users = root travis" | sudo tee -a /etc/nix/nix.conf && sudo pkill nix-daemon
   - cachix use maker
   - cachix use dapp
 script:
-  - nix-shell --pure --argstr url ${ETH_RPC_URL} --run './test-dssspell.sh'
-
+  - nix-shell --pure --argstr url ${ETH_RPC_URL} --run 'dapp test -v --rpc'
