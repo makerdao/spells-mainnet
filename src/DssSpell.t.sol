@@ -154,17 +154,8 @@ contract DssSpellTest is DSTest, DSMath {
         }
       }
     }
-    function sqrt(uint y) internal pure returns (uint z) {
-        if (y > 3) {
-            z = y;
-            uint x = y / 2 + 1;
-            while (x < z) {
-                z = x;
-                x = (y / x + x) / 2;
-            }
-        } else if (y != 0) {
-            z = 1;
-        }
+    function divup(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = add(x, sub(y, 1)) / y;
     }
 
     // 10^-5 (tenth of a basis point) as a RAY
@@ -1094,11 +1085,10 @@ contract DssSpellTest is DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 price = uint256(hevm.load(
+        uint256 amount = 2 * dust * WAD / (uint256(hevm.load(
             address(pip),
             bytes32(uint256(6))
-        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-        uint256 amount = 2 * dust * WAD / price;
+        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);   // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         hevm.store(
             address(token),
             keccak256(abi.encode(address(this), uint256(1))),
@@ -1112,14 +1102,19 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(token.balanceOf(address(this)), 0);
         assertEq(vat.gem(_ilk, address(this)), amount);
 
+        // Tick the fees forward so that art != dai in wad units
+        hevm.warp(now + 1);
+        jug.drip(_ilk);
+
         // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust));
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
         assertEq(vat.gem(_ilk, address(this)), 0);
-        assertEq(vat.dai(address(this)), 2000 * RAD);
+        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust));
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
         assertEq(vat.gem(_ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 
@@ -1133,7 +1128,7 @@ contract DssSpellTest is DSTest, DSMath {
         join.join(address(this), amount);
         // dart max amount of DAI
         (,,uint256 spotV,,) = vat.ilks(_ilk);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / RAY));
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / rate));
         hevm.warp(now + 1);
         jug.drip(_ilk);
         assertEq(flip.kicks(), 0);
