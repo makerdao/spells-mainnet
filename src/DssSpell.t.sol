@@ -1094,7 +1094,10 @@ contract DssSpellTest is DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        (uint128 price,) = pip.cur();
+        uint256 price = uint256(hevm.load(
+            address(pip),
+            bytes32(uint256(6))
+        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
         uint256 amount = 2 * dust * WAD / price;
         hevm.store(
             address(token),
