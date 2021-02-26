@@ -202,7 +202,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x389a34ff795Fa0b63F325486560FC6666A0d81A7),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0x0),        // populate with deployed spell if deployed
             deployed_spell_created:         1613755614,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0x0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             previous_spell_execution_time:  1613496480,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
@@ -1092,47 +1092,15 @@ contract DssSpellTest is DSTest, DSMath {
         if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
         if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
 
-        uint256 amount;
-        uint256 dust;
-        // Stack too deep
-        {
-            // Join to adapter
-            uint256 price1;
-            uint256 price2;
-            (,,,, dust) = vat.ilks(_ilk);
-            dust /= RAD;
-            if (_isMedian1) {
-                // Medianizer
-                price1 = uint256(hevm.load(
-                    address(_medianizer1),
-                    bytes32(uint256(1))
-                )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-            } else {
-                // DSValue
-                price1 = MedianAbstract(_medianizer1).read();
-            }
-            if (_isMedian2) {
-                // Medianizer
-                price2 = uint256(hevm.load(
-                    address(_medianizer2),
-                    bytes32(uint256(1))
-                )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-            } else {
-                // DSValue
-                price2 = MedianAbstract(_medianizer2).read();
-            }
-            // Amount needs to be the geometric mean of two prices * dust * 2 (for padding)
-            uint256 nprice1 = price1;
-            uint256 nprice2 = price2;
-            price1 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token0()).decimals());
-            price2 /= 10 ** (18 - DSTokenAbstract(LPTokenLike(join.gem()).token1()).decimals());
-            amount = sqrt(price1 * price2) * dust * WAD / (nprice1 + nprice2);
-            hevm.store(
-                address(token),
-                keccak256(abi.encode(address(this), uint256(1))),
-                bytes32(amount)
-            );
-        }
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        dust /= RAY;
+        (uint128 price,) = pip.cur();
+        uint256 amount = 2 * dust * WAD / price;
+        hevm.store(
+            address(token),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(amount)
+        );
 
         assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
@@ -1143,12 +1111,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         assertEq(vat.dai(address(this)), 0);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust * WAD));
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(dust));
         assertEq(vat.gem(_ilk, address(this)), 0);
         assertEq(vat.dai(address(this)), 2000 * RAD);
 
         // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust * WAD));
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(dust));
         assertEq(vat.gem(_ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 

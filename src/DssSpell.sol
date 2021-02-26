@@ -35,9 +35,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/00fc3831345790536ad792b29da2c3cb9d6cbad3/governance/votes/Executive%20vote%20-%20February%2019%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/46cbe46a16b7836d6b219201e3a07d40b01a7db4/governance/votes/Community%20Executive%20vote%20-%20February%2026%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-02-26 MakerDAO Executive Spell | Hash: TODO";
+        "2021-02-26 MakerDAO Executive Spell | Hash: 0x4c91fafa587264790d3ad6498caf9c0070a810237c46bb7f3b2556e043ba7b23";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -60,7 +60,7 @@ contract DssSpellAction is DssAction {
     address constant UNIV2DAIUSDT_GEM   = 0xB20bd5D04BE54f870D5C0d3cA85d82b34B836405;
     address constant UNIV2DAIUSDT_JOIN  = 0xAf034D882169328CAf43b823a4083dABC7EEE0F4;
     address constant UNIV2DAIUSDT_FLIP  = 0xD32f8B8aDbE331eC0CfADa9cfDbc537619622cFe;
-    address constant UNIV2DAIUSDT_PIP   = address(0x0);
+    address constant UNIV2DAIUSDT_PIP   = 0x69562A7812830E6854Ffc50b992c2AA861D5C2d3;
 
     function actions() public override {
         // Rates Proposal - February 22, 2021
