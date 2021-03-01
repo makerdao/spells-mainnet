@@ -27,9 +27,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/46cbe46a16b7836d6b219201e3a07d40b01a7db4/governance/votes/Community%20Executive%20vote%20-%20February%2026%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/44f3b05bc9da83a9b59163ac7645e78b82397246/governance/votes/Community%20Executive%20vote%20-%20March%201%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-03-01 MakerDAO Executive Spell | Hash: TODO";
+        "2021-03-01 MakerDAO Executive Spell | Hash: 0x883a580e50389497383818938dc2e1be5d28e8e6cde890bca89ed7d3ef4ba7ac";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -69,7 +69,7 @@ contract DssSpellAction is DssAction {
         // Global debt ceiling for PSM was previously set to the end lerp value of 500M
         // Increase it by another 500M to match the 1B target debt ceiling
         // Also subtract out the USDC-A line
-        vat.file("Line", vat.Line() + 500 * MILLION * RAD - line);
+        vat.file("Line", vat.Line() + (500 * MILLION * RAD) - line);
     }
 }
 
