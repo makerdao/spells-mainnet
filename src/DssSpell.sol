@@ -23,15 +23,6 @@ interface ChainlogAbstract {
     function removeAddress(bytes32) external;
 }
 
-interface LPOracle {
-    function orb0() external view returns (address);
-    function orb1() external view returns (address);
-}
-
-interface Fileable {
-    function file(bytes32,uint256) external;
-}
-
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
