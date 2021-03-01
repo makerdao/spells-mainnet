@@ -25,10 +25,6 @@ interface LPTokenLike {
     function token1() external view returns (address);
 }
 
-interface PSMLike {
-    function tout() external view returns (uint256);
-}
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -193,11 +189,11 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x969b3701A17391f2906d8c5E5D816aBcD9D0f199),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0x0),        // populate with deployed spell if deployed
             deployed_spell_created:         1614362710,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  1613496480,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            previous_spell:                 address(0x969b3701A17391f2906d8c5E5D816aBcD9D0f199),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell_execution_time:  1614790361,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.deployed_spell != address(0) ?
@@ -283,7 +279,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         555 * MILLION,
+            line:         0 * MILLION,
             dust:         2000,
             pct:          0,
             chop:         1300,
@@ -606,7 +602,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         500 * MILLION,
+            line:         1000 * MILLION,
             dust:         0,
             pct:          0,
             chop:         1300,
@@ -979,13 +975,7 @@ contract DssSpellTest is DSTest, DSMath {
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
             sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
-            if (ilk == "PSM-USDC-A") {
-                // Block can be removed when PSM hits max line
-                assertTrue(aL_line == 0);
-                assertTrue(line <= normalizedTestLine); // Amount should be lteq test line
-                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
-                sumlines += normalizedTestLine - line;  // Treat it as if it's at the final value for global Line comparison
-            } else if (!values.collaterals[ilk].aL_enabled) {
+            if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0);
                 assertEq(line, normalizedTestLine);
                 assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
@@ -1440,9 +1430,9 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function test_psm_tout() public {
-        // 0.1%
-        assertEq(PSMLike(addr.addr("MCD_PSM_USDC_A")).tout(), 10 * WAD / 10000);
+    function test_psm_deauth() public {
+        address LERP = 0x7b3799b30f268BA55f926d7F714a3001aF89d359;
+        assertEq(VatAbstract(addr.addr("MCD_VAT")).wards(LERP), 1);
 
         vote();
         spell.schedule();
@@ -1450,8 +1440,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(spell.nextCastTime());
         spell.cast();
 
-        // 0.04%
-        assertEq(PSMLike(addr.addr("MCD_PSM_USDC_A")).tout(), 4 * WAD / 10000);
+        assertEq(VatAbstract(addr.addr("MCD_VAT")).wards(LERP), 0);
     }
 
 }
