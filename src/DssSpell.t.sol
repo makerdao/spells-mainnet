@@ -397,7 +397,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             32                       // Num expected in system
+            ilk_count:             33                       // Num expected in system
         });
 
         //
@@ -1136,7 +1136,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flipMom.authority(), values.flipper_mom_authority);
 
         // check number of ilks
-        assertEq(reg.count(), values.ilk_count);
+        assertEq(reg.count(), values.ilk_count + 1); // Extra collateral RWA001-A
 
         // flap
         // check beg value
@@ -1155,7 +1155,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
         bytes32[] memory ilks = reg.list();
-        ilks.push("RWA001-A");
+        ilks[ilks.length] = "RWA001-A";
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
