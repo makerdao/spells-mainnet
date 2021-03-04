@@ -189,11 +189,11 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x088D6b3f68Bc4F93F90006A1356A21145EDD96E2),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0x0),        // populate with deployed spell if deployed
             deployed_spell_created:         1614627205,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x969b3701A17391f2906d8c5E5D816aBcD9D0f199),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0x0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             previous_spell_execution_time:  1614790361,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.deployed_spell != address(0) ?
@@ -1039,6 +1039,22 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(sumlines, vat.Line());
     }
 
+    function getUNIV2LPPrice(address pip) internal returns (uint256) {
+        // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
+        uint256 price = uint256(hevm.load(
+            pip,
+            bytes32(uint256(6))
+        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+
+        // Price is bounded in the spot by around 10^23
+        // Give a 10^9 buffer for price appreciation over time
+        // Note: This currently can't be hit due to the uint112, but we want to backstop
+        //       once the PIP uint size is increased
+        assertTrue(price <= (10 ** 14) * WAD);
+
+        return price;
+    }
+
 	function checkUNIV2LPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
@@ -1075,10 +1091,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 2 * dust * WAD / (uint256(hevm.load(
-            address(pip),
-            bytes32(uint256(6))
-        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);   // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
+        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
         hevm.store(
             address(token),
             keccak256(abi.encode(address(this), uint256(1))),
@@ -1140,17 +1153,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkUNIV2LPIntegration(
-            "UNIV2DAIUSDT-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDT_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDT_A")),
-            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
-            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e, // DAI DSValue
-            OsmAbstract(addr.addr("PIP_USDT")).src(),
-            false,
-            true,
-            true
-        );
     }
 
     function testOfficeHoursMatches() public {
@@ -1428,19 +1430,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
-    }
-
-    function test_psm_deauth() public {
-        address LERP = 0x7b3799b30f268BA55f926d7F714a3001aF89d359;
-        assertEq(VatAbstract(addr.addr("MCD_VAT")).wards(LERP), 1);
-
-        vote();
-        spell.schedule();
-        castPreviousSpell();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-
-        assertEq(VatAbstract(addr.addr("MCD_VAT")).wards(LERP), 0);
     }
 
 }
