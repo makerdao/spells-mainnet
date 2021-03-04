@@ -1561,6 +1561,13 @@ contract DssSpellTest is DSTest, DSMath {
         rwaconduitout.kiss(address(this));
         rwaconduitout.pick(address(this));
 
+        // 1 Conti MKR for being able to push in and out
+        hevm.store(
+            address(gov),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+
         rwaconduitout.push();
 
         assertEq(dai.balanceOf(address(rwaconduitout)), 0);
