@@ -60,7 +60,7 @@ contract DssSpellAction is DssAction {
     address constant RWA001_GEM                = 0x10b2aA5D77Aa6484886d8e244f0686aB319a270d;
     address constant MCD_JOIN_RWA001_A         = 0x476b81c12Dc71EDfad1F64B9E07CaA60F4b156E2;
     address constant RWA001_A_URN              = 0xa3342059BcDcFA57a13b12a35eD4BBE59B873005;
-    address constant RWA001_A_INPUT_CONDUIT    = 0x8000458b54a0050c0b256aCBAf6Aa192adf5b952;
+    address constant RWA001_A_INPUT_CONDUIT    = 0x486C85e2bb9801d14f6A8fdb78F5108a0fd932f2;
     address constant RWA001_A_OUTPUT_CONDUIT   = 0xb3eFb912e1cbC0B26FC17388Dd433Cecd2206C3d;
     address constant MIP21_LIQUIDATION_ORACLE  = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
 
@@ -93,7 +93,7 @@ contract DssSpellAction is DssAction {
         // doc: "doc"
         // tau: 5 minutes
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
-            ilk, RWA001_A_INITIAL_PRICE, DOC, 300
+            ilk, RWA001_A_INITIAL_PRICE, DOC, 7890000
         );
         (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
 
