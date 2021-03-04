@@ -1246,6 +1246,22 @@ contract DssSpellTest is DSTest, DSMath {
         }
         assertEq(sumlines, vat.Line());
     }
+    
+    function getUNIV2LPPrice(address pip) internal returns (uint256) {
+        // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
+        uint256 price = uint256(hevm.load(
+            pip,
+            bytes32(uint256(6))
+        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+
+        // Price is bounded in the spot by around 10^23
+        // Give a 10^9 buffer for price appreciation over time
+        // Note: This currently can't be hit due to the uint112, but we want to backstop
+        //       once the PIP uint size is increased
+        assertTrue(price <= (10 ** 14) * WAD);
+
+        return price;
+    }
 
 	function checkUNIV2LPIntegration(
         bytes32 _ilk,
@@ -1283,10 +1299,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 2 * dust * WAD / (uint256(hevm.load(
-            address(pip),
-            bytes32(uint256(6))
-        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);   // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
+        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
         hevm.store(
             address(token),
             keccak256(abi.encode(address(this), uint256(1))),
