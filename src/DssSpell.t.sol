@@ -947,6 +947,23 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 1,
             flipper_mom:  1
         });
+        afterSpell.collaterals["RWA001-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         1 * THOUSAND,
+            dust:         0,
+            pct:          300,
+            chop:         1000,
+            dunk:         50000,
+            mat:          10000,
+            beg:          0,
+            ttl:          0,
+            tau:          0,
+            liquidations: 0,
+            flipper_mom:  0
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1138,6 +1155,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
         bytes32[] memory ilks = reg.list();
+        ilks.push("RWA001-A");
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
@@ -1191,29 +1209,31 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
             }
             {
-            (address flipper,,) = cat.ilks(ilk);
-            FlipAbstract flip = FlipAbstract(flipper);
-            // Convert BP to system expected value
-            uint256 normalizedTestBeg = (values.collaterals[ilk].beg + 10000)  * 10**14;
-            assertEq(uint256(flip.beg()), normalizedTestBeg);
-            assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
-            assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
-            assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
-            assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
-            assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
+            if (ilk != "RWA001-A") {
+                (address flipper,,) = cat.ilks(ilk);
+                FlipAbstract flip = FlipAbstract(flipper);
+                // Convert BP to system expected value
+                uint256 normalizedTestBeg = (values.collaterals[ilk].beg + 10000)  * 10**14;
+                assertEq(uint256(flip.beg()), normalizedTestBeg);
+                assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
+                assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
+                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
+                assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
+                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
 
-            assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom);
+                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom);
 
-            assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-            assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
-            assertEq(flip.wards(address(makerDeployer07)), 0); // Check deployer denied
-            assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
-            }
-            {
-            GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-            assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
-            assertEq(join.wards(address(makerDeployer07)), 0); // Check deployer denied
-            assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
+                assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
+                assertEq(flip.wards(address(makerDeployer07)), 0); // Check deployer denied
+                assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                }
+                {
+                GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
+                assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
+                assertEq(join.wards(address(makerDeployer07)), 0); // Check deployer denied
+                assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                }
             }
         }
         assertEq(sumlines, vat.Line());
