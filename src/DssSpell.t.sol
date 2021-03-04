@@ -955,8 +955,8 @@ contract DssSpellTest is DSTest, DSMath {
             line:         1 * THOUSAND,
             dust:         0,
             pct:          300,
-            chop:         1000,
-            dunk:         50000,
+            chop:         0,
+            dunk:         0,
             mat:          10000,
             beg:          0,
             ttl:          0,
@@ -1154,8 +1154,12 @@ contract DssSpellTest is DSTest, DSMath {
 
     function checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
-        bytes32[] memory ilks = reg.list();
-        ilks[ilks.length] = "RWA001-A";
+        bytes32[] memory _ilks = reg.list();
+        bytes32[] memory ilks = new bytes32[](_ilks.length + 1);
+        for (uint256 i; i < _ilks.length; i++) {
+            ilks[i] = _ilks[i];
+        }
+        ilks[ilks.length -1] = "RWA001-A";
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
@@ -1188,19 +1192,9 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(dust, normalizedTestDust);
             assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
             }
-            {
-            (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
-            // Convert BP to system expected value
-            uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-            assertEq(chop, normalizedTestChop);
-            // make sure chop is less than 100%
-            assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
-            // Convert whole Dai units to expected RAD
-            uint256 normalizedTestDunk = values.collaterals[ilk].dunk * RAD;
-            assertEq(dunk, normalizedTestDunk);
-            // put back in after LIQ-1.2
-            assertTrue(dunk >= RAD && dunk < MILLION * RAD);
-            }
+
+
+
             {
             (,uint256 mat) = spot.ilks(ilk);
             // Convert BP to system expected value
@@ -1208,8 +1202,22 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(mat, normalizedTestMat);
             assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
             }
-            {
+
             if (ilk != "RWA001-A") {
+                {
+                (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
+                // Convert BP to system expected value
+                uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
+                assertEq(chop, normalizedTestChop);
+                // make sure chop is less than 100%
+                assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
+
+                // Convert whole Dai units to expected RAD
+                uint256 normalizedTestDunk = values.collaterals[ilk].dunk * RAD;
+                assertEq(dunk, normalizedTestDunk);
+                // put back in after LIQ-1.2
+                assertTrue(dunk >= RAD && dunk < MILLION * RAD);
+
                 (address flipper,,) = cat.ilks(ilk);
                 FlipAbstract flip = FlipAbstract(flipper);
                 // Convert BP to system expected value
@@ -1337,7 +1345,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    function testSpellIsCast() public {
+    function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0);
         // DS-Test can't handle strings directly, so cast to a bytes32.
