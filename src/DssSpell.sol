@@ -17,19 +17,29 @@ pragma solidity 0.6.11;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
+import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
 
-interface ChainlogAbstract {
-    function removeAddress(bytes32) external;
+interface Initializable {
+    function init(bytes32) external;
+}
+
+interface Hopeable {
+    function hope(address) external;
+}
+
+interface RwaLiquidationLike {
+    function ilks(bytes32) external returns (bytes32,address,uint48,uint48);
+    function init(bytes32, uint256, string calldata, uint48) external;
 }
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/44f3b05bc9da83a9b59163ac7645e78b82397246/governance/votes/Community%20Executive%20vote%20-%20March%201%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Community%20Executive%20vote%20-%20March%205%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-03-01 MakerDAO Executive Spell | Hash: 0x883a580e50389497383818938dc2e1be5d28e8e6cde890bca89ed7d3ef4ba7ac";
+        "2021-03-05 MakerDAO Executive Spell | Hash: ";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -41,35 +51,104 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant THREE_PCT_RATE  = 1000000000937303470807876289;
 
     uint256 constant WAD        = 10**18;
     uint256 constant RAD        = 10**45;
-    uint256 constant MILLION    = 10**6;
 
-    address constant LERP = 0x7b3799b30f268BA55f926d7F714a3001aF89d359;
+    address constant RWA001_OPERATOR           = 0x7709f0840097170E5cB1F8c890AcB8601d73b35f;
+    address constant RWA001_GEM                = 0x10b2aA5D77Aa6484886d8e244f0686aB319a270d;
+    address constant MCD_JOIN_RWA001_A         = 0x476b81c12Dc71EDfad1F64B9E07CaA60F4b156E2;
+    address constant RWA001_A_URN              = 0xa3342059BcDcFA57a13b12a35eD4BBE59B873005;
+    address constant RWA001_A_INPUT_CONDUIT    = 0x8000458b54a0050c0b256aCBAf6Aa192adf5b952;
+    address constant RWA001_A_OUTPUT_CONDUIT   = 0xb3eFb912e1cbC0B26FC17388Dd433Cecd2206C3d;
+    address constant MIP21_LIQUIDATION_ORACLE  = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
 
-    // Turn off office hours
-    function officeHours() public override returns (bool) {
-        return false;
-    }
+    uint256 constant RWA001_A_INITIAL_PRICE = 1060 * WAD;
+
+
+    // MIP13c3-SP4 Declaration of Intent & Commercial Points -
+    //   Off-Chain Asset Backed Lender to onboard Real World Assets
+    //   as Collateral for a DAI loan
+    //
+    // https://ipfs.io/ipfs/QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk
+    string constant DOC = "QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk";
 
     function actions() public override {
-        VatAbstract vat = VatAbstract(DssExecLib.vat());
 
-        // De-authorize the lerp contract from adjusting the PSM-USDC-A DC
-        DssExecLib.deauthorize(address(vat), LERP);
+        // RWA001-A collateral deploy
 
-        // Increase PSM-USDC-A to 1 Billion from its current value.
-        DssExecLib.setIlkDebtCeiling("PSM-USDC-A", 1000 * MILLION);
+        // Set ilk bytes32 variable
+        bytes32 ilk = "RWA001-A";
 
-        // Decrease the USDC-A Debt Ceiling to zero from its current value.
-        (,,,uint256 line,) = vat.ilks("USDC-A");
-        DssExecLib.setIlkDebtCeiling("USDC-A", 0);
+        address vat = DssExecLib.vat();
 
-        // Global debt ceiling for PSM was previously set to the end lerp value of 500M
-        // Increase it by another 500M to match the 1B target debt ceiling
-        // Also subtract out the USDC-A line
-        vat.file("Line", vat.Line() + (500 * MILLION * RAD) - line);
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_RWA001_A).vat() == vat, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA001_A).ilk() == ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA001_A).gem() == RWA001_GEM, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA001_A).dec() == DSTokenAbstract(RWA001_GEM).decimals(), "join-dec-not-match");
+
+        // init the RwaLiquidationOracle
+        // doc: "doc"
+        // tau: 5 minutes
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
+            ilk, RWA001_A_INITIAL_PRICE, DOC, 300
+        );
+        (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
+
+        // Set price feed for RWA001
+        DssExecLib.setContract(DssExecLib.spotter(), ilk, "pip", pip);
+
+        // Init RWA-001 in Vat
+        Initializable(vat).init(ilk);
+        // Init RWA-001 in Jug
+        Initializable(DssExecLib.jug()).init(ilk);
+
+        // Allow RWA-001 Join to modify Vat registry
+        DssExecLib.authorize(vat, MCD_JOIN_RWA001_A);
+
+        // Allow RwaLiquidationOracle to modify Vat registry
+        DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
+
+        // Increase the global debt ceiling by the ilk ceiling
+        DssExecLib.increaseGlobalDebtCeiling(1_000);
+        // Set the ilk debt ceiling
+        DssExecLib.setIlkDebtCeiling(ilk, 1_000);
+
+        // No dust
+        // DssExecLib.setIlkMinVaultAmount(ilk, 0);
+
+        // 3% stability fee
+        DssExecLib.setIlkStabilityFee(ilk, THREE_PCT_RATE, true);
+
+        // collateralization ratio 100%
+        DssExecLib.setIlkLiquidationRatio(ilk, 10_000);
+
+        // poke the spotter to pull in a price
+        DssExecLib.updateCollateralPrice(ilk);
+
+        // give the urn permissions on the join adapter
+        DssExecLib.authorize(MCD_JOIN_RWA001_A, RWA001_A_URN);
+
+        // set up the urn
+        Hopeable(RWA001_A_URN).hope(RWA001_OPERATOR);
+
+        // set up output conduit
+        Hopeable(RWA001_A_OUTPUT_CONDUIT).hope(RWA001_OPERATOR);
+        // could potentially kiss some BD addresses if they are available
+
+        // add RWA-001 contract to the changelog
+        DssExecLib.setChangelogAddress("RWA001", RWA001_GEM);
+        DssExecLib.setChangelogAddress("PIP_RWA001", pip);
+        DssExecLib.setChangelogAddress("MCD_JOIN_RWA001_A", MCD_JOIN_RWA001_A);
+        DssExecLib.setChangelogAddress("MIP21_LIQUIDATION_ORACLE", MIP21_LIQUIDATION_ORACLE);
+        DssExecLib.setChangelogAddress("RWA001_A_URN", RWA001_A_URN);
+        DssExecLib.setChangelogAddress("RWA001_A_INPUT_CONDUIT", RWA001_A_INPUT_CONDUIT);
+        DssExecLib.setChangelogAddress("RWA001_A_OUTPUT_CONDUIT", RWA001_A_OUTPUT_CONDUIT);
+
+        // bump changelog version
+        DssExecLib.setChangelogVersion("1.2.9");
     }
 }
 
