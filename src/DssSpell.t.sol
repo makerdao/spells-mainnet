@@ -1136,7 +1136,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flipMom.authority(), values.flipper_mom_authority);
 
         // check number of ilks
-        assertEq(reg.count(), values.ilk_count + 1); // Extra collateral RWA001-A
+        assertEq(reg.count() + 1, values.ilk_count); // Extra collateral RWA001-A
 
         // flap
         // check beg value
