@@ -1017,21 +1017,7 @@ contract DssSpellTest is DSTest, DSMath {
 
             address[] memory slate = new address[](1);
 
-            if (chief.live() == 0) {
-                // Launch system
-                slate[0] = address(0);
-                chief.vote(slate);
-                if (chief.hat() != address(0)) {
-                    chief.lift(address(0));
-                }
-                assertEq(chief.live(), 0);
-                assertTrue(!chief.isUserRoot(address(0)));
-                chief.launch();
-                assertEq(chief.live(), 1);
-                assertTrue(chief.isUserRoot(address(0)));
-            }
-
-            assertTrue(!spell.done());
+            assertTrue(!DssSpell(spell_).done());
 
             slate[0] = spell_;
 
@@ -1193,8 +1179,6 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue((dust >= RAD && dust < 10 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
             }
 
-
-
             {
             (,uint256 mat) = spot.ilks(ilk);
             // Convert BP to system expected value
@@ -1246,7 +1230,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
         assertEq(sumlines, vat.Line());
     }
-    
+
     function getUNIV2LPPrice(address pip) internal returns (uint256) {
         // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(hevm.load(
