@@ -840,8 +840,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          11000,
             beg:          500,
-            ttl:          4 hours,
-            tau:          4 hours,
+            ttl:          6 hours,
+            tau:          6 hours,
             liquidations: 0,
             flipper_mom:  0
         });

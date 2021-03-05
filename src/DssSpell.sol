@@ -109,8 +109,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAuctionDuration("UNIV2WBTCETH-A", 4 hours);
         DssExecLib.setIlkBidDuration("UNIV2USDCETH-A", 4 hours);
         DssExecLib.setIlkAuctionDuration("UNIV2USDCETH-A", 4 hours);
-        DssExecLib.setIlkBidDuration("UNIV2DAIUSDC-A", 4 hours);
-        DssExecLib.setIlkAuctionDuration("UNIV2DAIUSDC-A", 4 hours);
         DssExecLib.setIlkBidDuration("UNIV2ETHUSDT-A", 4 hours);
         DssExecLib.setIlkAuctionDuration("UNIV2ETHUSDT-A", 4 hours);
         DssExecLib.setIlkBidDuration("UNIV2LINKETH-A", 4 hours);
