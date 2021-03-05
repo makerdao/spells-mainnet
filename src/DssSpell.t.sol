@@ -1424,7 +1424,7 @@ contract DssSpellTest is DSTest, DSMath {
         (, , , uint48 tocPost) = oracle.ilks("RWA001-A");
         assertTrue(tocPost > 0);
         assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 7890001);
+        hevm.warp(block.timestamp + 30 days + 1);
         assertTrue(!oracle.good("RWA001-A"));
     }
 
@@ -1442,7 +1442,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         tellSpell.cast();
         assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 7890001);
+        hevm.warp(block.timestamp + 30 days + 1);
         assertTrue(!oracle.good("RWA001-A"));
 
         CureSpell cureSpell = new CureSpell();
@@ -1486,7 +1486,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         tellSpell.cast();
         assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 7890001);
+        hevm.warp(block.timestamp + 30 days + 1);
         assertTrue(!oracle.good("RWA001-A"));
 
         CullSpell cullSpell = new CullSpell();

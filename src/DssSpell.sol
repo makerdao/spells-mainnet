@@ -65,16 +65,6 @@ contract DssSpellAction is DssAction {
     address constant RWA001_A_OUTPUT_CONDUIT   = 0xb3eFb912e1cbC0B26FC17388Dd433Cecd2206C3d;
     address constant MIP21_LIQUIDATION_ORACLE  = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
 
-    uint256 constant RWA001_A_INITIAL_PRICE = 1060 * WAD;
-
-
-    // MIP13c3-SP4 Declaration of Intent & Commercial Points -
-    //   Off-Chain Asset Backed Lender to onboard Real World Assets
-    //   as Collateral for a DAI loan
-    //
-    // https://ipfs.io/ipfs/QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk
-    string constant DOC = "QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk";
-
     function actions() public override {
 
         // Increase ETH-A target available debt (gap) from 30M to 80M
@@ -162,10 +152,14 @@ contract DssSpellAction is DssAction {
         require(GemJoinAbstract(MCD_JOIN_RWA001_A).dec() == DSTokenAbstract(RWA001_GEM).decimals(), "join-dec-not-match");
 
         // init the RwaLiquidationOracle
-        // doc: "doc"
-        // tau: 5 minutes
+        // Oracle initial price: 1060
+        // doc: "https://ipfs.io/ipfs/QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk"
+        //   MIP13c3-SP4 Declaration of Intent & Commercial Points -
+        //   Off-Chain Asset Backed Lender to onboard Real World Assets
+        //   as Collateral for a DAI loan
+        // tau: 30 days
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
-            ilk, RWA001_A_INITIAL_PRICE, DOC, 7890000
+            ilk, 1060 * WAD, "QmdmAUTU3sd9VkdfTZNQM6krc9jsKgF2pz7W1qvvfJo1xk", 30 days
         );
         (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
 
