@@ -839,7 +839,7 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          11000,
-            beg:          500,
+            beg:          300,
             ttl:          6 hours,
             tau:          6 hours,
             liquidations: 0,
