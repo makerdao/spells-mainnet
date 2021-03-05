@@ -1128,7 +1128,7 @@ contract DssSpellTest is DSTest, DSMath {
         // check beg value
         uint256 normalizedTestBeg = (values.flap_beg + 10000)  * 10**14;
         assertEq(flap.beg(), normalizedTestBeg);
-        assertTrue(flap.beg() >= WAD && flap.beg() < 3 * WAD);
+        assertTrue(flap.beg() >= WAD && flap.beg() <= 110 * WAD / 100); // gte 0% and lte 10%
         // Check flap ttl and sanity checks
         assertEq(flap.ttl(), values.flap_ttl);
         assertTrue(flap.ttl() > 0 && flap.ttl() < 86400); // gt 0 && lt 1 day
@@ -1207,7 +1207,7 @@ contract DssSpellTest is DSTest, DSMath {
                 // Convert BP to system expected value
                 uint256 normalizedTestBeg = (values.collaterals[ilk].beg + 10000)  * 10**14;
                 assertEq(uint256(flip.beg()), normalizedTestBeg);
-                assertTrue(flip.beg() >= WAD && flip.beg() < 105 * WAD / 100);  // gt eq 0% and lt 5%
+                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100); // gte 0% and lte 10%
                 assertEq(uint256(flip.ttl()), values.collaterals[ilk].ttl);
                 assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
                 assertEq(uint256(flip.tau()), values.collaterals[ilk].tau);
