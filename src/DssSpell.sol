@@ -134,7 +134,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinAuctionBidIncrease("ETH-B", 500);
         DssExecLib.setIlkMinAuctionBidIncrease("UNIV2USDCETH-A", 500);
         DssExecLib.setIlkMinAuctionBidIncrease("UNIV2WBTCETH-A", 500);
-        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2DAIUSDC-A", 500);
         DssExecLib.setIlkMinAuctionBidIncrease("UNIV2DAIETH-A", 500);
         DssExecLib.setIlkMinAuctionBidIncrease("UNIV2UNIETH-A", 500);
         DssExecLib.setIlkMinAuctionBidIncrease("UNIV2ETHUSDT-A", 500);
@@ -189,7 +188,7 @@ contract DssSpellAction is DssAction {
         // DssExecLib.setIlkMinVaultAmount(ilk, 0);
 
         // 3% stability fee
-        DssExecLib.setIlkStabilityFee(ilk, THREE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee(ilk, THREE_PCT_RATE, false);
 
         // collateralization ratio 100%
         DssExecLib.setIlkLiquidationRatio(ilk, 10_000);
