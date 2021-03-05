@@ -76,9 +76,80 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
-        // RWA001-A collateral deploy
+        // Increase ETH-A target available debt (gap) from 30M to 80M
+        DssExecLib.setIlkAutoLineParameters("ETH-A", 2_500 * MILLION, 80 * MILLION, 12 hours);
 
-        // Set ilk bytes32 variable
+        // Decrease the bid duration (ttl) and max auction duration (tau) from 6 to 4 hours to all the ilks with liquidation on
+        DssExecLib.setIlkBidDuration("ETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("ETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("ETH-B", 4 hours);
+        DssExecLib.setIlkAuctionDuration("ETH-B", 4 hours);
+        DssExecLib.setIlkBidDuration("BAT-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("BAT-A", 4 hours);
+        DssExecLib.setIlkBidDuration("WBTC-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("WBTC-A", 4 hours);
+        DssExecLib.setIlkBidDuration("KNC-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("KNC-A", 4 hours);
+        DssExecLib.setIlkBidDuration("ZRX-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("ZRX-A", 4 hours);
+        DssExecLib.setIlkBidDuration("MANA-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("MANA-A", 4 hours);
+        DssExecLib.setIlkBidDuration("USDT-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("USDT-A", 4 hours);
+        DssExecLib.setIlkBidDuration("COMP-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("COMP-A", 4 hours);
+        DssExecLib.setIlkBidDuration("LRC-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("LRC-A", 4 hours);
+        DssExecLib.setIlkBidDuration("LINK-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("LINK-A", 4 hours);
+        DssExecLib.setIlkBidDuration("BAL-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("BAL-A", 4 hours);
+        DssExecLib.setIlkBidDuration("YFI-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("YFI-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNI-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNI-A", 4 hours);
+        DssExecLib.setIlkBidDuration("RENBTC-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("RENBTC-A", 4 hours);
+        DssExecLib.setIlkBidDuration("AAVE-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("AAVE-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2DAIETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2DAIETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2WBTCETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2WBTCETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2USDCETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2USDCETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2DAIUSDC-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2DAIUSDC-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2ETHUSDT-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2ETHUSDT-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2LINKETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2LINKETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2UNIETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2UNIETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2WBTCDAI-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2WBTCDAI-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2AAVEETH-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2AAVEETH-A", 4 hours);
+        DssExecLib.setIlkBidDuration("UNIV2DAIUSDT-A", 4 hours);
+        DssExecLib.setIlkAuctionDuration("UNIV2DAIUSDT-A", 4 hours);
+
+        // Increase the box parameter from 15M to 20M
+        DssExecLib.setMaxTotalDAILiquidationAmount(20 * MILLION);
+
+        // Increase the minimum bid increment (beg) from 3% to 5% for the following collaterals
+        DssExecLib.setIlkMinAuctionBidIncrease("ETH-B", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2USDCETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2WBTCETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2DAIUSDC-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2DAIETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2UNIETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2ETHUSDT-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2LINKETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2WBTCDAI-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2AAVEETH-A", 500);
+        DssExecLib.setIlkMinAuctionBidIncrease("UNIV2DAIUSDT-A", 500);
+
+        // RWA001-A collateral deploy
         bytes32 ilk = "RWA001-A";
 
         address vat = DssExecLib.vat();

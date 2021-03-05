@@ -393,7 +393,7 @@ contract DssSpellTest is DSTest, DSMath {
             flap_beg:              400,                     // in basis points
             flap_ttl:              1 hours,                 // in seconds
             flap_tau:              72 hours,                // in seconds
-            cat_box:               15 * MILLION,            // In whole Dai units
+            cat_box:               20 * MILLION,            // In whole Dai units
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
@@ -406,7 +406,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
             aL_line:      2500 * MILLION,  // In whole Dai units
-            aL_gap:       30 * MILLION,    // In whole Dai units
+            aL_gap:       80 * MILLION,    // In whole Dai units
             aL_ttl:       12 hours,        // In seconds
             line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
             dust:         2000,            // In whole Dai units
@@ -415,8 +415,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,   // In whole Dai units
             mat:          15000,           // In basis points
             beg:          300,             // In basis points
-            ttl:          6 hours,         // In seconds
-            tau:          6 hours,         // In seconds
+            ttl:          4 hours,         // In seconds
+            tau:          4 hours,         // In seconds
             liquidations: 1,               // 1 if enabled
             flipper_mom:  1                // 1 if circuit breaker enabled
         });
@@ -431,9 +431,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          13000,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -449,8 +449,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -500,8 +500,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -534,8 +534,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -551,8 +551,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -568,8 +568,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -585,8 +585,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          15000,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -619,8 +619,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -636,8 +636,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -653,8 +653,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -670,8 +670,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -687,8 +687,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -721,8 +721,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -738,8 +738,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -755,8 +755,8 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50000,
             mat:          17500,
             beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -771,9 +771,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          12500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -805,9 +805,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          15000,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -822,9 +822,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          12500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -839,9 +839,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          11000,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 0,
             flipper_mom:  0
         });
@@ -856,9 +856,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          14000,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -873,9 +873,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          16500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -890,9 +890,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          16500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -907,9 +907,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          12500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -924,9 +924,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          16500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
@@ -941,9 +941,9 @@ contract DssSpellTest is DSTest, DSMath {
             chop:         1300,
             dunk:         50000,
             mat:          12500,
-            beg:          300,
-            ttl:          6 hours,
-            tau:          6 hours,
+            beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
             liquidations: 1,
             flipper_mom:  1
         });
