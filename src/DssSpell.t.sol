@@ -1369,6 +1369,8 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
+
+        assertEq(rwaconduitout.bud(0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf), 1);
     }
 
     function testChainlogValues() public {

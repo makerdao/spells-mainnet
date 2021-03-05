@@ -28,6 +28,10 @@ interface Hopeable {
     function hope(address) external;
 }
 
+interface Kissable {
+    function kiss(address) external;
+}
+
 interface RwaLiquidationLike {
     function ilks(bytes32) external returns (bytes32,address,uint48,uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
@@ -64,6 +68,7 @@ contract DssSpellAction is DssAction {
     address constant RWA001_A_INPUT_CONDUIT    = 0x486C85e2bb9801d14f6A8fdb78F5108a0fd932f2;
     address constant RWA001_A_OUTPUT_CONDUIT   = 0xb3eFb912e1cbC0B26FC17388Dd433Cecd2206C3d;
     address constant MIP21_LIQUIDATION_ORACLE  = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
+    address constant SC_DOMAIN_DEPLOYER_07     = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
 
     function actions() public override {
 
@@ -200,7 +205,11 @@ contract DssSpellAction is DssAction {
 
         // set up output conduit
         Hopeable(RWA001_A_OUTPUT_CONDUIT).hope(RWA001_OPERATOR);
-        // could potentially kiss some BD addresses if they are available
+
+        // Authorize the SC Domain team deployer address on the output conduit during introductory phase.
+        //  This allows the SC team to assist in the testing of a complete circuit.
+        //  Once a broker dealer arrangement is established the deployer address should be `deny`ed on the conduit.
+        Kissable(RWA001_A_OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
 
         // add RWA-001 contract to the changelog
         DssExecLib.setChangelogAddress("RWA001", RWA001_GEM);
