@@ -53,6 +53,7 @@ contract DssSpellAction is DssAction {
     //
     uint256 constant THREE_PCT_RATE  = 1000000000937303470807876289;
 
+    uint256 constant MILLION    = 10**6;
     uint256 constant WAD        = 10**18;
     uint256 constant RAD        = 10**45;
 
