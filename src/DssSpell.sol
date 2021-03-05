@@ -183,7 +183,7 @@ contract DssSpellAction is DssAction {
         // DssExecLib.setIlkMinVaultAmount(ilk, 0);
 
         // 3% stability fee
-        DssExecLib.setIlkStabilityFee(ilk, THREE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee(ilk, THREE_PCT_RATE, false);
 
         // collateralization ratio 100%
         DssExecLib.setIlkLiquidationRatio(ilk, 10_000);
