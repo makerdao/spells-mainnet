@@ -25,176 +25,9 @@ interface LPTokenLike {
     function token1() external view returns (address);
 }
 
-// Specific for this spell
-interface RwaInputConduitLike {
-    function push() external;
+interface DSValueLike {
+    function read() external view returns (bytes32);
 }
-
-interface RwaOutputConduitLike {
-    function wards(address) external returns (uint);
-    function can(address) external returns (uint);
-    function rely(address) external;
-    function deny(address) external;
-    function hope(address) external;
-    function nope(address) external;
-    function bud(address) external returns (uint);
-    function kiss(address) external;
-    function diss(address) external;
-    function pick(address) external;
-    function push() external;
-}
-
-interface RwaUrnLike {
-    function can(address) external returns (uint);
-    function rely(address) external;
-    function deny(address) external;
-    function hope(address) external;
-    function nope(address) external;
-    function file(bytes32, address) external;
-    function lock(uint256) external;
-    function free(uint256) external;
-    function draw(uint256) external;
-    function wipe(uint256) external;
-}
-
-interface RwaLiquidationLike {
-    function wards(address) external returns (uint256);
-    function rely(address) external;
-    function deny(address) external;
-    function ilks(bytes32) external returns (bytes32, address, uint48, uint48);
-    function init(bytes32, uint256, string calldata, uint48) external;
-    function bump(bytes32, uint256) external;
-    function tell(bytes32) external;
-    function cure(bytes32) external;
-    function cull(bytes32, address) external;
-    function good(bytes32) external view returns (bool);
-}
-
-contract EndSpellAction {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    function execute() public {
-        EndAbstract(CHANGELOG.getAddress("MCD_END")).cage();
-    }
-}
-
-contract TestSpell {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-    DSPauseAbstract public pause =
-        DSPauseAbstract(CHANGELOG.getAddress("MCD_PAUSE"));
-    address         public action;
-    bytes32         public tag;
-    uint256         public eta;
-    bytes           public sig;
-    uint256         public expiration;
-    bool            public done;
-
-    constructor() public {
-        sig = abi.encodeWithSignature("execute()");
-    }
-
-    function setTag() internal {
-        bytes32 _tag;
-        address _action = action;
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
-    }
-
-    function schedule() public {
-        require(eta == 0, "This spell has already been scheduled");
-        eta = block.timestamp + DSPauseAbstract(pause).delay();
-        pause.plot(action, tag, sig, eta);
-    }
-
-    function cast() public {
-        require(!done, "spell-already-cast");
-        done = true;
-        pause.exec(action, tag, sig, eta);
-    }
-}
-
-contract EndSpell is TestSpell {
-    constructor() public {
-        action = address(new EndSpellAction());
-        setTag();
-    }
-}
-
-contract CullSpellAction {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    function execute() public {
-        RwaLiquidationLike(
-            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
-        ).cull("RWA001-A", CHANGELOG.getAddress("RWA001_A_URN"));
-    }
-}
-
-contract CullSpell is TestSpell {
-    constructor() public {
-        action = address(new CullSpellAction());
-        setTag();
-    }
-}
-
-contract CureSpellAction {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    function execute() public {
-        RwaLiquidationLike(
-            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
-        ).cure("RWA001-A");
-    }
-}
-
-contract CureSpell is TestSpell {
-    constructor() public {
-        action = address(new CureSpellAction());
-        setTag();
-    }
-}
-
-contract TellSpellAction {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    function execute() public {
-        VatAbstract(CHANGELOG.getAddress("MCD_VAT")).file("RWA001-A", "line", 0);
-        RwaLiquidationLike(
-            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
-        ).tell("RWA001-A");
-    }
-}
-
-contract TellSpell is TestSpell {
-    constructor() public {
-        action = address(new TellSpellAction());
-        setTag();
-    }
-}
-
-contract BumpSpellAction {
-    ChainlogAbstract constant CHANGELOG =
-        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-
-    function execute() public {
-        RwaLiquidationLike(
-            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
-        ).bump("RWA001-A", 1070 * 10 ** 18);
-    }
-}
-
-contract BumpSpell is TestSpell {
-    constructor() public {
-        action = address(new BumpSpellAction());
-        setTag();
-    }
-}
-//
 
 contract DssSpellTest is DSTest, DSMath {
 
@@ -273,12 +106,6 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
-    DSTokenAbstract             rwagem = DSTokenAbstract(     addr.addr("RWA001"));
-    GemJoinAbstract            rwajoin = GemJoinAbstract(     addr.addr("MCD_JOIN_RWA001_A"));
-    RwaLiquidationLike          oracle = RwaLiquidationLike(  addr.addr("MIP21_LIQUIDATION_ORACLE"));
-    RwaUrnLike                  rwaurn = RwaUrnLike(          addr.addr("RWA001_A_URN"));
-    RwaInputConduitLike   rwaconduitin = RwaInputConduitLike( addr.addr("RWA001_A_INPUT_CONDUIT"));
-    RwaOutputConduitLike rwaconduitout = RwaOutputConduitLike(addr.addr("RWA001_A_OUTPUT_CONDUIT"));
     //
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
@@ -369,7 +196,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x8332fBf5494aAC0F1dE51f4f16110f6A82719330),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1614963412,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             previous_spell_execution_time:  1614790361,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
@@ -397,7 +224,7 @@ contract DssSpellTest is DSTest, DSMath {
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
-            ilk_count:             33                       // Num expected in system
+            ilk_count:             34                       // Num expected in system
         });
 
         //
@@ -432,6 +259,23 @@ contract DssSpellTest is DSTest, DSMath {
             dunk:         50 * THOUSAND,
             mat:          13000,
             beg:          500,
+            ttl:          4 hours,
+            tau:          4 hours,
+            liquidations: 1,
+            flipper_mom:  1
+        });
+        afterSpell.collaterals["ETH-C"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      2000 * MILLION,
+            aL_gap:       100 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0 * MILLION,     // Not checked as there is auto line
+            dust:         2000,
+            pct:          350,
+            chop:         1300,
+            dunk:         50 * THOUSAND,
+            mat:          17500,
+            beg:          300,
             ttl:          4 hours,
             tau:          4 hours,
             liquidations: 1,
@@ -563,7 +407,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,
             dust:         2000,
-            pct:          500,
+            pct:          400,
             chop:         1300,
             dunk:         50 * THOUSAND,
             mat:          17500,
@@ -733,7 +577,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       12 hours,
             line:         0 * MILLION,
             dust:         2000,
-            pct:          600,
+            pct:          500,
             chop:         1300,
             dunk:         50000,
             mat:          17500,
@@ -767,7 +611,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          200,
+            pct:          300,
             chop:         1300,
             dunk:         50000,
             mat:          12500,
@@ -801,7 +645,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          350,
+            pct:          450,
             chop:         1300,
             dunk:         50000,
             mat:          15000,
@@ -818,7 +662,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          250,
+            pct:          350,
             chop:         1300,
             dunk:         50000,
             mat:          12500,
@@ -852,7 +696,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          400,
+            pct:          500,
             chop:         1300,
             dunk:         50000,
             mat:          14000,
@@ -869,7 +713,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          400,
+            pct:          500,
             chop:         1300,
             dunk:         50000,
             mat:          16500,
@@ -886,7 +730,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          400,
+            pct:          500,
             chop:         1300,
             dunk:         50000,
             mat:          16500,
@@ -903,7 +747,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          300,
+            pct:          200,
             chop:         1300,
             dunk:         50000,
             mat:          12500,
@@ -920,7 +764,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         3 * MILLION,
             dust:         2000,
-            pct:          400,
+            pct:          500,
             chop:         1300,
             dunk:         50000,
             mat:          16500,
@@ -1230,6 +1074,22 @@ contract DssSpellTest is DSTest, DSMath {
         }
         assertEq(sumlines, vat.Line());
     }
+    
+    function getOSMPrice(address pip) internal returns (uint256) {
+        // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
+        uint256 price = uint256(hevm.load(
+            pip,
+            bytes32(uint256(3))
+        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+
+        // Price is bounded in the spot by around 10^23
+        // Give a 10^9 buffer for price appreciation over time
+        // Note: This currently can't be hit due to the uint112, but we want to backstop
+        //       once the PIP uint size is increased
+        assertTrue(price <= (10 ** 14) * WAD);
+
+        return price;
+    }
 
     function getUNIV2LPPrice(address pip) internal returns (uint256) {
         // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
@@ -1245,6 +1105,116 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(price <= (10 ** 14) * WAD);
 
         return price;
+    }
+    
+    function giveTokens(DSTokenAbstract token, uint256 amount) internal {
+        // Edge case - balance is already set for some reason
+        if (token.balanceOf(address(this)) == amount) return;
+
+        for (int i = 0; i < 40; i++) {
+            // Scan the storage for the balance storage slot
+            bytes32 prevValue = hevm.load(
+                address(token),
+                keccak256(abi.encode(address(this), uint256(i)))
+            );
+            hevm.store(
+                address(token),
+                keccak256(abi.encode(address(this), uint256(i))),
+                bytes32(amount)
+            );
+            if (token.balanceOf(address(this)) == amount) {
+                // Found it
+                return;
+            } else {
+                // Keep going after restoring the original value
+                hevm.store(
+                    address(token),
+                    keccak256(abi.encode(address(this), uint256(i))),
+                    prevValue
+                );
+            }
+        }
+
+        // We have failed if we reach here
+        assertTrue(false);
+    }
+
+	function checkIlkIntegration(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        FlipAbstract flip,
+        address pip,
+        bool _isOSM,
+        bool _checkLiquidations
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        if (_isOSM) OsmAbstract(pip).poke();
+        hevm.warp(now + 3601);
+        if (_isOSM) OsmAbstract(pip).poke();
+        spot.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(flip.wards(address(end)), 1);
+        assertEq(flip.wards(address(flipMom)), 1);
+        if (_isOSM) {
+            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1);
+            assertEq(OsmAbstract(pip).bud(address(spot)), 1);
+            assertEq(OsmAbstract(pip).bud(address(end)), 1);
+            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1);
+        }
+
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        dust /= RAY;
+        uint256 amount = 2 * dust * WAD / (_isOSM ? getOSMPrice(pip) : uint256(DSValueLike(pip).read()));
+        giveTokens(token, amount);
+
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(vat.gem(_ilk, address(this)), amount);
+
+        // Tick the fees forward so that art != dai in wad units
+        hevm.warp(now + 1);
+        jug.drip(_ilk);
+
+        // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        join.exit(address(this), amount);
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        // dart max amount of DAI
+        (,,uint256 spotV,,) = vat.ilks(_ilk);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spotV) / rate));
+        hevm.warp(now + 1);
+        jug.drip(_ilk);
+        assertEq(flip.kicks(), 0);
+        if (_checkLiquidations) {
+            cat.bite(_ilk, address(this));
+            assertEq(flip.kicks(), 1);
+        }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
 	function checkUNIV2LPIntegration(
@@ -1284,11 +1254,7 @@ contract DssSpellTest is DSTest, DSMath {
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
         uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
-        hevm.store(
-            address(token),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(amount)
-        );
+        giveTokens(token, amount);
 
         assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
@@ -1369,8 +1335,6 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-
-        assertEq(rwaconduitout.bud(0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf), 1);
     }
 
     function testChainlogValues() public {
@@ -1380,253 +1344,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainLog.getAddress("RWA001"), addr.addr("RWA001"));
-        assertEq(chainLog.getAddress("MCD_JOIN_RWA001_A"), addr.addr("MCD_JOIN_RWA001_A"));
-        assertEq(chainLog.getAddress("RWA001_A_URN"), addr.addr("RWA001_A_URN"));
-        assertEq(chainLog.getAddress("RWA001_A_INPUT_CONDUIT"), addr.addr("RWA001_A_INPUT_CONDUIT"));
-        assertEq(chainLog.getAddress("RWA001_A_OUTPUT_CONDUIT"), addr.addr("RWA001_A_OUTPUT_CONDUIT"));
-        assertEq(chainLog.getAddress("MIP21_LIQUIDATION_ORACLE"), addr.addr("MIP21_LIQUIDATION_ORACLE"));
-    }
-
-    function testSpellIsCast_RWA001_INTEGRATION_BUMP() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        BumpSpell bumpSpell = new BumpSpell();
-        vote(address(bumpSpell));
-
-        bumpSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        (, address pip, ,) = oracle.ilks("RWA001-A");
-
-        assertEq(DSValueAbstract(pip).read(), bytes32(1060 * WAD));
-        bumpSpell.cast();
-        assertEq(DSValueAbstract(pip).read(), bytes32(1070 * WAD));
-    }
-
-    function testSpellIsCast_RWA001_INTEGRATION_TELL() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        TellSpell tellSpell = new TellSpell();
-        vote(address(tellSpell));
-
-        tellSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        (, , , uint48 tocPre) = oracle.ilks("RWA001-A");
-        assertTrue(tocPre == 0);
-        assertTrue(oracle.good("RWA001-A"));
-        tellSpell.cast();
-        (, , , uint48 tocPost) = oracle.ilks("RWA001-A");
-        assertTrue(tocPost > 0);
-        assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 30 days + 1);
-        assertTrue(!oracle.good("RWA001-A"));
-    }
-
-    function testSpellIsCast_RWA001_INTEGRATION_TELL_CURE_GOOD() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        TellSpell tellSpell = new TellSpell();
-        vote(address(tellSpell));
-
-        tellSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        tellSpell.cast();
-        assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 30 days + 1);
-        assertTrue(!oracle.good("RWA001-A"));
-
-        CureSpell cureSpell = new CureSpell();
-        vote(address(cureSpell));
-
-        cureSpell.schedule();
-        castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cureSpell.cast();
-        assertTrue(oracle.good("RWA001-A"));
-        (,,, uint48 toc) = oracle.ilks("RWA001-A");
-        assertEq(uint256(toc), 0);
-    }
-
-    function testFailSpellIsCast_RWA001_INTEGRATION_CURE() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        CureSpell cureSpell = new CureSpell();
-        vote(address(cureSpell));
-
-        cureSpell.schedule();
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cureSpell.cast();
-    }
-
-    function testSpellIsCast_RWA001_INTEGRATION_TELL_CULL() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        assertTrue(oracle.good("RWA001-A"));
-
-        TellSpell tellSpell = new TellSpell();
-        vote(address(tellSpell));
-
-        tellSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        tellSpell.cast();
-        assertTrue(oracle.good("RWA001-A"));
-        hevm.warp(block.timestamp + 30 days + 1);
-        assertTrue(!oracle.good("RWA001-A"));
-
-        CullSpell cullSpell = new CullSpell();
-        vote(address(cullSpell));
-
-        cullSpell.schedule();
-        castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cullSpell.cast();
-        assertTrue(!oracle.good("RWA001-A"));
-        (, address pip,,) = oracle.ilks("RWA001-A");
-        assertEq(DSValueAbstract(pip).read(), bytes32(0));
-    }
-
-    function testSpellIsCast_RWA001_OPERATOR_LOCK_DRAW_CONDUITS_WIPE_FREE() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        hevm.warp(now + 10 days); // Let rate be > 1
-
-        hevm.store(
-            address(rwagem),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(uint256(2 ether))
-        );
-        hevm.store(
-            address(rwagem),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1 ether))
-        );
-        // setting address(this) as operator
-        hevm.store(
-            address(rwaurn),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-        assertEq(rwagem.totalSupply(), 1 * WAD);
-        assertEq(rwagem.balanceOf(address(this)), 1 * WAD);
-        assertEq(rwaurn.can(address(this)), 1);
-
-        rwagem.approve(address(rwaurn), 1 * WAD);
-        rwaurn.lock(1 * WAD);
-        assertEq(dai.balanceOf(address(rwaconduitout)), 0);
-        rwaurn.draw(1 * WAD);
-
-        (, uint256 rate,,,) = vat.ilks("RWA001-A");
-
-        uint256 dustInVat = vat.dai(address(rwaurn));
-
-        (uint256 ink, uint256 art) = vat.urns("RWA001-A", address(rwaurn));
-        assertEq(ink, 1 * WAD);
-        assertEq(art, (1 * RAD + dustInVat) / rate);
-        assertEq(dai.balanceOf(address(rwaconduitout)), 1 * WAD);
-
-        // wards
-        hevm.store(
-            address(rwaconduitout),
-            keccak256(abi.encode(address(this), uint256(0))),
-            bytes32(uint256(1))
-        );
-
-        // can
-        hevm.store(
-            address(rwaconduitout),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-
-        assertEq(dai.balanceOf(address(rwaconduitout)), 1 * WAD);
-
-        rwaconduitout.kiss(address(this));
-        rwaconduitout.pick(address(this));
-
-        // 1 Conti MKR for being able to push in and out
-        hevm.store(
-            address(gov),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-
-        rwaconduitout.push();
-
-        assertEq(dai.balanceOf(address(rwaconduitout)), 0);
-        assertEq(dai.balanceOf(address(this)), 1 * WAD);
-
-        hevm.warp(now + 10 days);
-
-        (ink, art) = vat.urns("RWA001-A", address(rwaurn));
-        assertEq(ink, 1 * WAD);
-        assertEq(art, (1 * RAD + dustInVat) / rate);
-        (ink,) = vat.urns("RWA001-A", address(this));
-        assertEq(ink, 0);
-
-        jug.drip("RWA001-A");
-
-        (, rate,,,) = vat.ilks("RWA001-A");
-
-        uint256 daiToPay = (art * rate - dustInVat) / RAY + 1; // extra wei rounding
-
-        hevm.store(
-            address(dai),
-            keccak256(abi.encode(address(this), uint256(2))),
-            bytes32(uint256(daiToPay))
-        ); // Forcing extra DAI balance to pay accumulated fee
-
-        assertEq(dai.balanceOf(address(rwaconduitin)), 0);
-        dai.transfer(address(rwaconduitin), daiToPay);
-        assertEq(dai.balanceOf(address(rwaconduitin)), daiToPay);
-        rwaconduitin.push();
-
-        assertEq(dai.balanceOf(address(rwaurn)), daiToPay);
-        assertEq(dai.balanceOf(address(rwaconduitin)), 0);
-
-        rwaurn.wipe(daiToPay);
-        rwaurn.free(1 * WAD);
-        (ink, art) = vat.urns("RWA001-A", address(rwaurn));
-        assertEq(ink, 0);
-        assertEq(art, 0);
-        (ink,) = vat.urns("RWA001-A", address(this));
-        assertEq(ink, 0);
-    }
-
-    function testSpellIsCast_RWA001_END() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        EndSpell endSpell = new EndSpell();
-        vote(address(endSpell));
-
-        endSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        endSpell.cast();
-
-        // TODO: finish
+        assertEq(chainLog.getAddress("MCD_JOIN_ETH_C"), addr.addr("MCD_JOIN_ETH_C"));
+        assertEq(chainLog.getAddress("MCD_FLIP_ETH_C"), addr.addr("MCD_FLIP_ETH_C"));
     }
 
     function testCollateralIntegrations() public {
@@ -1638,14 +1357,11 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkUNIV2LPIntegration(
-            "UNIV2DAIUSDT-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDT_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDT_A")),
-            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
-            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e, // DAI DSValue
-            OsmAbstract(addr.addr("PIP_USDT")).src(),
-            false,
+        checkIlkIntegration(
+            "ETH-C",
+            GemJoinAbstract(addr.addr("MCD_JOIN_ETH_C")),
+            FlipAbstract(addr.addr("MCD_FLIP_ETH_C")),
+            addr.addr("PIP_ETH"),
             true,
             true
         );
