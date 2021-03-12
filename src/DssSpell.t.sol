@@ -25,10 +25,6 @@ interface LPTokenLike {
     function token1() external view returns (address);
 }
 
-interface DSValueLike {
-    function read() external view returns (bytes32);
-}
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -1080,7 +1076,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 price = uint256(hevm.load(
             pip,
             bytes32(uint256(3))
-        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+        )) & uint128(-1);   // Price is in the second half of the 32-byte storage slot
 
         // Price is bounded in the spot by around 10^23
         // Give a 10^9 buffer for price appreciation over time
@@ -1096,7 +1092,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 price = uint256(hevm.load(
             pip,
             bytes32(uint256(6))
-        )) & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+        )) & uint128(-1);   // Price is in the second half of the 32-byte storage slot
 
         // Price is bounded in the spot by around 10^23
         // Give a 10^9 buffer for price appreciation over time
@@ -1111,7 +1107,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 100; i++) {
             // Scan the storage for the balance storage slot
             bytes32 prevValue = hevm.load(
                 address(token),
@@ -1168,7 +1164,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 2 * dust * WAD / (_isOSM ? getOSMPrice(pip) : uint256(DSValueLike(pip).read()));
+        uint256 amount = 2 * dust * WAD / (_isOSM ? getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
         giveTokens(token, amount);
 
         assertEq(token.balanceOf(address(this)), amount);

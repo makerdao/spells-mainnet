@@ -18,30 +18,13 @@ pragma solidity 0.6.11;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface Initializable {
-    function init(bytes32) external;
-}
-
-interface Hopeable {
-    function hope(address) external;
-}
-
-interface Kissable {
-    function kiss(address) external;
-}
-
-interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (bytes32,address,uint48,uint48);
-    function init(bytes32, uint256, string calldata, uint48) external;
-}
-
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5925c52da6f8d485447228ca5acd435997522de6/governance/votes/Executive%20vote%20-%20March%205%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a083a4efccd26e23b7d5493f019fa5999997c1e5/governance/votes/Executive%20vote%20-%20March%2012%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-03-12 MakerDAO Executive Spell | Hash: TODO";
+        "2021-03-12 MakerDAO Executive Spell | Hash: 0x100830e8d607164a38aeff906e85ed79c7007fd92bac416ff7f2fc36935eff8e";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
