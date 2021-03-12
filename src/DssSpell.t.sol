@@ -1183,7 +1183,8 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vat.dai(address(this)), 0);
         vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
         assertEq(vat.gem(_ilk, address(this)), 0);
-        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
+        assertTrue(vat.dai(address(this)) >= dust * RAY);
+        assertTrue(vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
         vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
