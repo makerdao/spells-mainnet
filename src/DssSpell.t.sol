@@ -1012,7 +1012,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
                 assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
                 assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
-                assertTrue((aL_line >= RAD && aL_line < 10 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 10B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
