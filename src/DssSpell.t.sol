@@ -1341,8 +1341,6 @@ contract DssSpellTest is DSTest, DSMath {
 
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainLog.getAddress("MCD_JOIN_ETH_C"), addr.addr("MCD_JOIN_ETH_C"));
-        assertEq(chainLog.getAddress("MCD_FLIP_ETH_C"), addr.addr("MCD_FLIP_ETH_C"));
     }
 
     function testCollateralIntegrations() public {
