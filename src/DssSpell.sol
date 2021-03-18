@@ -18,80 +18,47 @@ pragma solidity 0.6.11;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+// https://github.com/makerdao/ilk-registry/blob/master/src/IlkRegistry.sol
+interface IlkRegistryLike {
+    function list() external view returns (bytes32[] memory);
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a083a4efccd26e23b7d5493f019fa5999997c1e5/governance/votes/Executive%20vote%20-%20March%2012%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-03-12 MakerDAO Executive Spell | Hash: 0x100830e8d607164a38aeff906e85ed79c7007fd92bac416ff7f2fc36935eff8e";
+        "2021-03-19 MakerDAO Executive Spell | Hash: TODO";
 
-
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    //
-    uint256 constant TWO_PCT            = 1000000000627937192491029810;
-    uint256 constant THREE_PCT          = 1000000000937303470807876289;
-    uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
-    uint256 constant FOUR_PCT           = 1000000001243680656318820312;
-    uint256 constant FOUR_PT_FIVE_PCT   = 1000000001395766281313196627;
-    uint256 constant FIVE_PCT           = 1000000001547125957863212448;
-
-    uint256 constant MILLION    = 10**6;
-    uint256 constant WAD        = 10**18;
-    uint256 constant RAD        = 10**45;
-
-    // ETH-C
-    address constant MCD_JOIN_ETH_C = 0xF04a5cC80B1E94C69B48f5ee68a08CD2F09A7c3E;
-    address constant MCD_FLIP_ETH_C = 0x7A67901A68243241EBf66beEB0e7b5395582BF17;
+    uint256 constant MILLION = 10**6;
 
     function actions() public override {
-        // Rates Proposal
-        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", THREE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", THREE_PT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", FOUR_PT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2ETHUSDT-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2LINKETH-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2AAVEETH-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("MANA-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2WBTCDAI-A", TWO_PCT, true);
-        DssExecLib.setIlkStabilityFee("RENBTC-A", FIVE_PCT, true);
 
-        // Onboarding ETH-C
-        CollateralOpts memory ETH_C = CollateralOpts({
-            ilk: "ETH-C",
-            gem: DssExecLib.getChangelogAddress("ETH"),
-            join: MCD_JOIN_ETH_C,
-            flip: MCD_FLIP_ETH_C,
-            pip: DssExecLib.getChangelogAddress("PIP_ETH"),
-            isLiquidatable: true,
-            isOSM: true,
-            whitelistOSM: false,
-            ilkDebtCeiling: 100 * MILLION,
-            minVaultAmount: 2000,
-            maxLiquidationAmount: 50000,
-            liquidationPenalty: 1300,
-            ilkStabilityFee: THREE_PT_FIVE_PCT,
-            bidIncrease: 300,
-            bidDuration: 4 hours,
-            auctionDuration: 4 hours,
-            liquidationRatio: 17500
-        });
-        addNewCollateral(ETH_C);
-        DssExecLib.setIlkAutoLineParameters("ETH-C", 2000 * MILLION, 100 * MILLION, 12 hours);
+        address ILK_REGISTRY = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+        IlkRegistryLike registry = IlkRegistryLike(ILK_REGISTRY);
+        bytes32[] memory ilks = registry.list();
 
-        DssExecLib.setChangelogAddress("MCD_JOIN_ETH_C", MCD_JOIN_ETH_C);
-        DssExecLib.setChangelogAddress("MCD_FLIP_ETH_C", MCD_FLIP_ETH_C);
+        // Increase Dust Parameter for most Ilks
+        //
+        // Loop over all ilks
 
-        // bump changelog version
-        DssExecLib.setChangelogVersion("1.2.10");
+        for (uint i = 0; i < ilks.length; i++) {
+            // skip the rest of the loop for the following ilks:
+            //
+            if (ilks[i] == "ETH-B" ||
+                ilks[i] == "PSM-USDC-A"
+            ) { continue; }
+
+            // Increase Dust Paramater
+            //
+            DssExecLib.setIlkMinVaultAmount(ilks[i], 5000);
+        }
+
+
+        // Increase Debt Ceiling
+        DssExecLib.setIlkAutoLineDebtCeiling("ETH-A", 15000 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling("WBTC-A", 750 * MILLION);
     }
 }
 
