@@ -228,7 +228,7 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
-            aL_line:      15000 * MILLION,  // In whole Dai units
+            aL_line:      15 * BILLION,  // In whole Dai units
             aL_gap:       80 * MILLION,    // In whole Dai units
             aL_ttl:       12 hours,        // In seconds
             line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
@@ -1012,7 +1012,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
                 assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
                 assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
-                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 20B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
@@ -1352,14 +1352,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
-            "ETH-C",
-            GemJoinAbstract(addr.addr("MCD_JOIN_ETH_C")),
-            FlipAbstract(addr.addr("MCD_FLIP_ETH_C")),
-            addr.addr("PIP_ETH"),
-            true,
-            true
-        );
     }
 
     function testOfficeHoursMatches() public {

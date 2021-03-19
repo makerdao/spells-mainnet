@@ -43,6 +43,7 @@ contract DssSpellAction is DssAction {
     //
 
     uint256 constant MILLION = 10**6;
+    uint256 constant BILLION = 10**9;
 
     // Disable Office Hours
     function officeHours() public override returns (bool) {
@@ -51,9 +52,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
-        address ILK_REGISTRY = DssExecLib.getChangelogAddress("ILK_REGISTRY");
-        IlkRegistryLike registry = IlkRegistryLike(ILK_REGISTRY);
-        bytes32[] memory ilks = registry.list();
+        bytes32[] memory ilks = IlkRegistryLike(DssExecLib.reg()).list();
 
         // Increase Dust Parameter for most Ilks
         //
@@ -62,6 +61,8 @@ contract DssSpellAction is DssAction {
         for (uint256 i = 0; i < ilks.length; i++) {
             // skip the rest of the loop for the following ilks:
             //
+            // RWA001-A ilk is not included in the ilk registry
+
             if (ilks[i] == "ETH-B" ||
                 ilks[i] == "PSM-USDC-A"
             ) { continue; }
@@ -73,7 +74,7 @@ contract DssSpellAction is DssAction {
 
 
         // Increase Debt Ceiling
-        DssExecLib.setIlkAutoLineDebtCeiling("ETH-A", 15000 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling("ETH-A", 15 * BILLION);
         DssExecLib.setIlkAutoLineDebtCeiling("WBTC-A", 750 * MILLION);
     }
 }
