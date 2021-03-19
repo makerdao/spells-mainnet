@@ -43,7 +43,7 @@ contract DssSpellAction is DssAction {
         //
         // Loop over all ilks
 
-        for (uint i = 0; i < ilks.length; i++) {
+        for (uint256 i = 0; i < ilks.length; i++) {
             // skip the rest of the loop for the following ilks:
             //
             if (ilks[i] == "ETH-B" ||
