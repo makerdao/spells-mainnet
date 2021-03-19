@@ -33,6 +33,11 @@ contract DssSpellAction is DssAction {
 
     uint256 constant MILLION = 10**6;
 
+    // Disable Office Hours 
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     function actions() public override {
 
         address ILK_REGISTRY = DssExecLib.getChangelogAddress("ILK_REGISTRY");
