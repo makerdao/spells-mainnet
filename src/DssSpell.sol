@@ -120,5 +120,5 @@ contract DssSpellAction is DssAction {
 
 contract DssSpell is DssExec {
     DssSpellAction internal action_ = new DssSpellAction();
-    constructor() DssExec(action_.description(), block.timestamp + 4 days + 2 hours, address(action_)) public {}
+    constructor() DssExec(action_.description(), block.timestamp + 4 days, address(action_)) public {}
 }
