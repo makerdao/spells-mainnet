@@ -18,11 +18,6 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-// https://github.com/makerdao/ilk-registry/blob/master/src/IlkRegistry.sol
-interface IlkRegistryLike {
-    function list() external view returns (bytes32[] memory);
-}
-
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
