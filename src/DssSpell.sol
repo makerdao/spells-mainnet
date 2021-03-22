@@ -31,6 +31,22 @@ contract DssSpellAction is DssAction {
     string public constant description =
         "2021-03-22 MakerDAO Executive Spell | Hash: 0x6340de8661da4482d004b9dc9c0eb7dfd725cad4ea0441f5df33405e8bc878bc";
 
+    // MIP38: DAO Primitives State
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5c981b8b24c966d110f133c792d27e7728cc77ab/MIP38/mip38.md -q -O - 2>/dev/null)"
+    string constant public MIP38 = "0x45ba0a20e7c72334b3c735b33a4726a23a75d92b36f111dc4d09f2ecdf420fea";
+
+    // MIP39: Core Unit Framework
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5c981b8b24c966d110f133c792d27e7728cc77ab/MIP39/mip39.md -q -O - 2>/dev/null)"
+    string constant public MIP39 = "0xbdf82a7fe0dbe8e93738792d43bfab0327fa2db500718b178f48257f219ff89a";
+
+    // MIP40: Budget Framework
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5c981b8b24c966d110f133c792d27e7728cc77ab/MIP40/mip40.md -q -O - 2>/dev/null)"
+    string constant public MIP40 = "0xf873b83231f506fed45fa55c2cf073fd8b9bf36cbe4e9d29c2611ccf2dd3bddb";
+
+    // MIP41: Facilitator Framework
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5c981b8b24c966d110f133c792d27e7728cc77ab/MIP41/mip41.md -q -O - 2>/dev/null)"
+    string constant public MIP41 = "0x2f5cba5b9ca5b15d0c2a896224105763bd0346d2722cbc03a88d7ed01a666b95";
+
     // MIP4c2-SP12: MIP16 Amendments
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/5c981b8b24c966d110f133c792d27e7728cc77ab/MIP4/MIP4c2-Subproposals/MIP4c2-SP12.md -q -O - 2>/dev/null)"
     string constant public MIP4c2SP12 = "0x0a9c87c613deeea92efc3bc4cc00f036af415a6017883aaa1c1e3dc206c843dd";
