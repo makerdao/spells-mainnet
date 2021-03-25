@@ -27,9 +27,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e0a37c7b58a98566ba637793a804179b4666b4c7/governance/votes/Executive%20vote%20-%20March%2019%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e0a37c7b58a98566ba637793a804179b4666b4c7/governance/votes/Executive%20vote%20-%20March%2026%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-03-19 MakerDAO Executive Spell | Hash: 0xa7979ce287cd7df9ecbf25251f2b41a52c27a47567721d7c5ddfc6f85885d4d7";
+        "2021-03-26 MakerDAO Executive Spell | Hash: ";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -42,8 +42,8 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
 
-    uint256 constant MILLION = 10**6;
-    uint256 constant BILLION = 10**9;
+    uint256 constant THOUSAND = 10**3;
+    uint256 constant MILLION  = 10**6;
 
     // Disable Office Hours
     function officeHours() public override returns (bool) {
@@ -51,31 +51,13 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
+        DssExecLib.setSurplusAuctionAmount(30 * THOUSAND);
 
-        bytes32[] memory ilks = IlkRegistryLike(DssExecLib.reg()).list();
+        DssExecLib.setIlkMinVaultAmount("ETH-B", 15 * THOUSAND);
 
-        // Increase Dust Parameter for most Ilks
-        //
-        // Loop over all ilks
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            // skip the rest of the loop for the following ilks:
-            //
-            // RWA001-A ilk is not included in the ilk registry
-
-            if (ilks[i] == "ETH-B" ||
-                ilks[i] == "PSM-USDC-A"
-            ) { continue; }
-
-            // Increase Dust Paramater
-            //
-            DssExecLib.setIlkMinVaultAmount(ilks[i], 5000);
-        }
-
-
-        // Increase Debt Ceiling
-        DssExecLib.setIlkAutoLineDebtCeiling("ETH-A", 15 * BILLION);
-        DssExecLib.setIlkAutoLineDebtCeiling("WBTC-A", 750 * MILLION);
+        DssExecLib.setIlkAutoLineParameters("UNIV2DAIETH-A", 30 * MILLION, 5 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2USDCETH-A", 50 * MILLION, 5 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 50 * MILLION, 5 * MILLION, 12 hours);
     }
 }
 
