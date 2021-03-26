@@ -1016,7 +1016,7 @@ contract DssSpellTest is DSTest, DSMath {
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust);
-            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 10k
+            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 20k
             }
 
             {
