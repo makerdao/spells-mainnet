@@ -18,16 +18,11 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-// https://github.com/makerdao/ilk-registry/blob/master/src/IlkRegistry.sol
-interface IlkRegistryLike {
-    function list() external view returns (bytes32[] memory);
-}
-
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e0a37c7b58a98566ba637793a804179b4666b4c7/governance/votes/Executive%20vote%20-%20March%2026%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Executive%20vote%20-%20March%2026%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
         "2021-03-26 MakerDAO Executive Spell | Hash: ";
 
@@ -51,10 +46,13 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
+        // Set bump parameter from 10,000 to 30,000
         DssExecLib.setSurplusAuctionAmount(30 * THOUSAND);
 
+        // Set ETH-B dust parameter from 2,000 to 15,000
         DssExecLib.setIlkMinVaultAmount("ETH-B", 15 * THOUSAND);
 
+        // Set DC-IAM module for UNIV2DAIETH-A, UNIV2USDCETH-A and UNIV2DAIUSDC-A
         DssExecLib.setIlkAutoLineParameters("UNIV2DAIETH-A", 30 * MILLION, 5 * MILLION, 12 hours);
         DssExecLib.setIlkAutoLineParameters("UNIV2USDCETH-A", 50 * MILLION, 5 * MILLION, 12 hours);
         DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 50 * MILLION, 5 * MILLION, 12 hours);
