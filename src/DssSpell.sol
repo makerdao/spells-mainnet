@@ -44,7 +44,7 @@ contract DssSpellAction is DssAction {
         // Set DC-IAM module for UNIV2DAIETH-A, UNIV2USDCETH-A and UNIV2DAIUSDC-A
         DssExecLib.setIlkAutoLineParameters("UNIV2DAIETH-A", 30 * MILLION, 5 * MILLION, 12 hours);
         DssExecLib.setIlkAutoLineParameters("UNIV2USDCETH-A", 50 * MILLION, 5 * MILLION, 12 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 50 * MILLION, 5 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 50 * MILLION, 10 * MILLION, 12 hours);
     }
 }
 

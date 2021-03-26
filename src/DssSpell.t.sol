@@ -671,7 +671,7 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      50 * MILLION,
-            aL_gap:       5 * MILLION,
+            aL_gap:       10 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         5 * THOUSAND,
