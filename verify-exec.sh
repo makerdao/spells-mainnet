@@ -35,6 +35,13 @@ path=${1?contractname}
 name=${path#*:}
 address=${2?contractaddress}
 
+# combined-json has a sourceList field
+if [[ $(jq .sourceList "$DAPP_JSON") == null ]]; then
+    contract=$(<"$DAPP_JSON" jq -r ".contracts[\"${path/:*/}\"][\"$name\"]")
+else
+    contract=$(<"$DAPP_JSON" jq -r ".contracts[\"$path\"]")
+fi
+
 meta=$(jshon <<<"$contract" -e metadata -u)
 version=$(jshon <<<"$meta" -e compiler -e version -u)
 optimized=$(jshon <<<"$meta" -e settings -e optimizer -e enabled -u)
