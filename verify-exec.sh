@@ -33,6 +33,7 @@ esac
 
 path=${1?contractname}
 name=${path#*:}
+contractName=$(basename "$path")
 address=${2?contractaddress}
 
 # combined-json has a sourceList field
@@ -91,7 +92,7 @@ inputJSON=$(dapp mk-standard-json)
 
 params=(
   "module=contract" "action=verifysourcecode"
-  "contractname=$name" "contractaddress=$address"
+  "contractname=$contractName" "contractaddress=$address"
   "sourcecode=$inputJSON" "codeformat=solidity-standard-json-input"
   "optimizationUsed=$optimized" "runs=$runs"
   "apikey=$ETHERSCAN_API_KEY"
