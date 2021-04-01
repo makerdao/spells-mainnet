@@ -193,11 +193,11 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x0CF9B10FE87dC44B0307b954074faAC7e756d6Fa),        // populate with deployed spell if deployed
-            deployed_spell_created:         1616771470,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  0,                 // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,                 // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0x0CF9B10FE87dC44B0307b954074faAC7e756d6Fa),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell_execution_time:  1617642000,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.deployed_spell != address(0) ?
@@ -382,7 +382,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      5 * MILLION,
+            aL_line:      10 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
             line:         0 * MILLION,
@@ -450,7 +450,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
+            aL_line:      30 * MILLION,
             aL_gap:       2 * MILLION,
             aL_ttl:       12 hours,
             line:         0 * MILLION,
@@ -518,7 +518,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      45 * MILLION,
+            aL_line:      75 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
             line:         0 * MILLION,
@@ -623,7 +623,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         1000 * MILLION,
+            line:         2 * BILLION,
             dust:         0,
             pct:          0,
             chop:         1300,
