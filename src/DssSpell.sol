@@ -23,9 +23,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/f5ecd64f82c035d8c115115ca1e562177f4cdb44/governance/votes/Executive%20vote%20-%20March%2026%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20April%202%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-04-02 MakerDAO Executive Spell | Hash: TODO";
+        "2021-04-02 MakerDAO Executive Spell | Hash: 0xdb1339f86f456759bc4ec97f49b7b10abb86d97bbb9f56577731efd715d978c9";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -41,6 +41,10 @@ contract DssSpellAction is DssAction {
     uint256 constant MILLION = 10**6;
     uint256 constant BILLION = 10**9;
 
+    // Core Units Budget Addresses
+    address constant INTERIM_MULTISIG = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    address constant RISK = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+
     // Disable Office Hours
     function officeHours() public override returns (bool) {
         return false;
@@ -50,7 +54,7 @@ contract DssSpellAction is DssAction {
         // Increase the COMP-A Maximum Debt Ceiling from 10M to 30M
         DssExecLib.setIlkAutoLineDebtCeiling("COMP-A", 30 * MILLION);
 
-        // Increase the ZRX-A Maximum Debt Ceiling from 5M t0 10M
+        // Increase the ZRX-A Maximum Debt Ceiling from 5M to 10M
         DssExecLib.setIlkAutoLineDebtCeiling("ZRX-A", 10 * MILLION);
 
         // Increase the YFI-A Maximum Debt Ceiling from 45M to 75M
@@ -61,14 +65,14 @@ contract DssSpellAction is DssAction {
 
         // Provide Core Unit Budgets
 
-        // Risk
-        DssExecLib.sendPaymentFromSurplusBuffer(address(0xd98ef20520048a35EdA9A202137847A62120d2d9), 100_500);
-
-        // Real World Finance (Interim Multi-Sig)
-        DssExecLib.sendPaymentFromSurplusBuffer(address(0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff), 40 * THOUSAND);
+        // Real-World Finance (Interim Multi-Sig)
+        DssExecLib.sendPaymentFromSurplusBuffer(INTERIM_MULTISIG, 40 * THOUSAND);
 
         // Governance (Interim Multi-Sig)
-        DssExecLib.sendPaymentFromSurplusBuffer(address(0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff), 80 * THOUSAND);
+        DssExecLib.sendPaymentFromSurplusBuffer(INTERIM_MULTISIG, 80 * THOUSAND);
+
+        // Risk
+        DssExecLib.sendPaymentFromSurplusBuffer(RISK, 100_500);
     }
 }
 
