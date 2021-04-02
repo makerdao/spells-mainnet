@@ -105,9 +105,6 @@ contract DssSpellTest is DSTest, DSMath {
     // Specific for this spell
     //
 
-    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
-    address    makerDeployer07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
-
     DssSpell   spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -156,6 +153,14 @@ contract DssSpellTest is DSTest, DSMath {
     }
     function divup(uint256 x, uint256 y) internal pure returns (uint256 z) {
         z = add(x, sub(y, 1)) / y;
+    }
+
+    function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
+        bytes memory bytesArray = new bytes(32);
+        for (uint256 i; i < 32; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
     }
 
     // 10^-5 (tenth of a basis point) as a RAY
@@ -1057,14 +1062,12 @@ contract DssSpellTest is DSTest, DSMath {
                 assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom);
 
                 assertEq(flip.wards(address(cat)), values.collaterals[ilk].liquidations);  // liquidations == 1 => on
-                assertEq(flip.wards(address(makerDeployer06)), 0); // Check deployer denied
-                assertEq(flip.wards(address(makerDeployer07)), 0); // Check deployer denied
+                checkWards(address(flip), bytes32ToStr(ilk));
                 assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
                 }
                 {
                 GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-                assertEq(join.wards(address(makerDeployer06)), 0); // Check deployer denied
-                assertEq(join.wards(address(makerDeployer07)), 0); // Check deployer denied
+                checkWards(address(join), bytes32ToStr(ilk));
                 assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
                 }
             }
