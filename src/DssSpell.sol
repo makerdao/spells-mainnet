@@ -65,11 +65,8 @@ contract DssSpellAction is DssAction {
 
         // Provide Core Unit Budgets
 
-        // Real-World Finance (Interim Multi-Sig)
-        DssExecLib.sendPaymentFromSurplusBuffer(INTERIM_MULTISIG, 40 * THOUSAND);
-
-        // Governance (Interim Multi-Sig)
-        DssExecLib.sendPaymentFromSurplusBuffer(INTERIM_MULTISIG, 80 * THOUSAND);
+        // Real-World Finance + Governance (Interim Multi-Sig)
+        DssExecLib.sendPaymentFromSurplusBuffer(INTERIM_MULTISIG, (40 + 80) * THOUSAND);
 
         // Risk
         DssExecLib.sendPaymentFromSurplusBuffer(RISK, 100_500);
