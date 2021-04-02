@@ -1596,4 +1596,28 @@ contract DssSpellTest is DSTest, DSMath {
     function test_auth_in_sources() public {
         checkAuth(true);
     }
+
+    function test_core_unit_budgets() public {
+        address risk = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+        address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+
+        uint256 prevSin = vat.sin(address(vow));
+        uint256 prevDai = dai.balanceOf(multisig);
+        uint256 prevRisk = dai.balanceOf(risk);
+
+        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
+
+        vote(address(spell));
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
+
+        assertEq(vat.sin(address(vow)) - prevSin, 220_500 * RAD);
+        assertEq(dai.balanceOf(multisig) - prevDai, 120_000 * WAD);
+        assertEq(dai.balanceOf(risk) - prevRisk, 100_500 * WAD);
+    }
 }
