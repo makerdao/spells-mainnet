@@ -92,7 +92,7 @@ contract DssSpellTest is DSTest, DSMath {
     JugAbstract              jug = JugAbstract(        addr.addr("MCD_JUG"));
     SpotAbstract            spot = SpotAbstract(       addr.addr("MCD_SPOT"));
     DaiAbstract              dai = DaiAbstract(        addr.addr("MCD_DAI"));
-    DaiJoinAbstract      daiJoin = DaiJoinAbstract(    addr.addr("MCD_DAI_JOIN"));
+    DaiJoinAbstract      daiJoin = DaiJoinAbstract(    addr.addr("MCD_JOIN_DAI"));
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
@@ -1605,7 +1605,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 prevDai = dai.balanceOf(multisig);
         uint256 prevRisk = dai.balanceOf(risk);
 
-        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         vote(address(spell));
         spell.schedule();
@@ -1614,7 +1614,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell.cast();
         assertTrue(spell.done());
 
-        assertEq(dai.allowance(address(pauseProxy), address(daiJoin)), 0);
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         assertEq(vat.sin(address(vow)) - prevSin, 220_500 * RAD);
         assertEq(dai.balanceOf(multisig) - prevDai, 120_000 * WAD);
