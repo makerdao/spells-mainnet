@@ -45,8 +45,11 @@ fi
 
 meta=$(jshon <<<"$contract" -e metadata -u)
 version=$(jshon <<<"$meta" -e compiler -e version -u)
-optimized=$(jshon <<<"$meta" -e settings -e optimizer -e enabled -u)
-runs=$(jshon <<<"$meta" -e settings -e optimizer -e runs -u)
+sources=$(jshon <<<"$meta" -e sources)
+language=$(jshon <<<"$meta" -e language)
+remappings=$(jshon <<<"$meta" -e settings -e remappings)
+optimizer=$(jshon <<<"$meta" -e settings -e optimizer)
+evmVersion=$(jshon <<<"meta" -e settings -e evmVersion)
 
 abi=$(jq '.["abi"]' -r <<< "$contract")
 type=$(seth --abi-constructor <<< "$abi")
@@ -79,22 +82,25 @@ if [[ $version_list != *"$version"* ]]; then
   fi
 fi
 
-
-if [[ "$optimized" = "true" ]]; then
-  optimized=1
-else
-  optimized=0
-fi
-
 # Standard Input JSON
 
-inputJSON=$(dapp mk-standard-json)
+inputJSON=$(cat <<-EOF
+{
+  "language": "$language",
+  "sources": "$sources",
+  "settings": {
+    "remappings": "$remappings",
+    "optimizer": "$optimizer",
+    "evmVersion": "$evmVersion"
+  }
+}
+EOF
+)
 
 params=(
   "module=contract" "action=verifysourcecode"
   "contractname=$contractName" "contractaddress=$address"
   "sourcecode=$inputJSON" "codeformat=solidity-standard-json-input"
-  "optimizationUsed=$optimized" "runs=$runs"
   "apikey=$ETHERSCAN_API_KEY"
 )
 
