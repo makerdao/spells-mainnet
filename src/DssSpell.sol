@@ -18,6 +18,8 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
+import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
 
 interface Initializable {
     function init(bytes32) external;
@@ -72,14 +74,14 @@ contract DssSpellAction is DssAction {
         bytes32 ilk   = "RWA002-A";
         uint256 CEIL  = 5 * MILLION * WAD;
         uint256 PRICE = 5_634_804 * WAD;
-        uint256 TAU   = 0;
         uint256 MAT   = 10_500;
+        uint48 TAU    = 0;
 
         // https://ipfs.io/ipfs/QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E
-        string DOC = "QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E";
+        string memory DOC = "QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E";
 
         address MIP21_LIQUIDATION_ORACLE =
-            ChainlogAbstract(CHANGELOG).getAddress("MIP21_LIQUIDATION_ORACLE");
+            DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
         address vat = DssExecLib.vat();
 
