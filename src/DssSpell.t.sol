@@ -284,19 +284,19 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Specific for this spell
     //
-    bytes32 constant ilk               = "RWA001-A";
-    DSTokenAbstract             rwagem = DSTokenAbstract(     addr.addr("RWA001"));
-    GemJoinAbstract            rwajoin = GemJoinAbstract(     addr.addr("MCD_JOIN_RWA001_A"));
+    bytes32 constant ilk               = "RWA002-A";
+    DSTokenAbstract             rwagem = DSTokenAbstract(     addr.addr("RWA002"));
+    GemJoinAbstract            rwajoin = GemJoinAbstract(     addr.addr("MCD_JOIN_RWA002_A"));
     RwaLiquidationLike          oracle = RwaLiquidationLike(  addr.addr("MIP21_LIQUIDATION_ORACLE"));
-    RwaUrnLike                  rwaurn = RwaUrnLike(          addr.addr("RWA001_A_URN"));
-    RwaInputConduitLike   rwaconduitin = RwaInputConduitLike( addr.addr("RWA001_A_INPUT_CONDUIT"));
-    RwaOutputConduitLike rwaconduitout = RwaOutputConduitLike(addr.addr("RWA001_A_OUTPUT_CONDUIT"));
+    RwaUrnLike                  rwaurn = RwaUrnLike(          addr.addr("RWA002_A_URN"));
+    RwaInputConduitLike   rwaconduitin = RwaInputConduitLike( addr.addr("RWA002_A_INPUT_CONDUIT"));
+    RwaOutputConduitLike rwaconduitout = RwaOutputConduitLike(addr.addr("RWA002_A_OUTPUT_CONDUIT"));
 
     address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
 
     // Tinlake (same as INPUT/OUTPUT conduit)
     TinlakeManagerLike mgr = TinlakeManagerLike(
-        addr.addr("RWA001_A_OUTPUT_CONDUIT")
+        addr.addr("RWA002_A_OUTPUT_CONDUIT")
     );
     address mgr_ = address(mgr);
 
