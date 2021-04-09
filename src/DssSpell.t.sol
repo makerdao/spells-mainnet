@@ -198,11 +198,11 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xeb44d1Fa2DE0d6E4CcEA80dA982804ca3197005b),        // populate with deployed spell if deployed
-            deployed_spell_created:         1617378230,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x0CF9B10FE87dC44B0307b954074faAC7e756d6Fa),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  1617642000,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
-            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         1618236000,        // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0xeb44d1Fa2DE0d6E4CcEA80dA982804ca3197005b),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell_execution_time:  1617378230,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spell = spellValues.deployed_spell != address(0) ?
@@ -1600,27 +1600,27 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function test_core_unit_budgets() public {
-        address risk = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-        address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    // function test_core_unit_budgets() public {
+    //     address risk = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    //     address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
 
-        uint256 prevSin = vat.sin(address(vow));
-        uint256 prevDai = dai.balanceOf(multisig);
-        uint256 prevRisk = dai.balanceOf(risk);
+    //     uint256 prevSin = vat.sin(address(vow));
+    //     uint256 prevDai = dai.balanceOf(multisig);
+    //     uint256 prevRisk = dai.balanceOf(risk);
 
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+    //     assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
-        vote(address(spell));
-        spell.schedule();
-        castPreviousSpell();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
+    //     vote(address(spell));
+    //     spell.schedule();
+    //     castPreviousSpell();
+    //     hevm.warp(spell.nextCastTime());
+    //     spell.cast();
+    //     assertTrue(spell.done());
 
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+    //     assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
-        assertEq(vat.sin(address(vow)) - prevSin, 220_500 * RAD);
-        assertEq(dai.balanceOf(multisig) - prevDai, 120_000 * WAD);
-        assertEq(dai.balanceOf(risk) - prevRisk, 100_500 * WAD);
-    }
+    //     assertEq(vat.sin(address(vow)) - prevSin, 220_500 * RAD);
+    //     assertEq(dai.balanceOf(multisig) - prevDai, 120_000 * WAD);
+    //     assertEq(dai.balanceOf(risk) - prevRisk, 100_500 * WAD);
+    // }
 }

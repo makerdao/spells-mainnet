@@ -55,7 +55,7 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant THREE_PT_FIVE_PCT  = 1000000002090862085746321732;
+    uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
 
     // Math
     uint256 constant MILLION = 10**6;
@@ -72,7 +72,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         bytes32 ilk   = "RWA002-A";
-        uint256 CEIL  = 5 * MILLION * WAD;
+        uint256 CEIL  = 5 * MILLION;
         uint256 PRICE = 5_634_804 * WAD;
         uint256 MAT   = 10_500;
         uint48 TAU    = 0;
