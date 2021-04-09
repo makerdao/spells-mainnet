@@ -1882,11 +1882,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         (, , uint48 tau, uint48 tocPre) = oracle.ilks(ilk);
         assertTrue(tocPre == 0);
-        if (tau == 0) {
-            assertTrue(!oracle.good(ilk));
-        } else {
-            assertTrue(oracle.good(ilk));
-        }
+        assertTrue(oracle.good(ilk));
         tellSpell.cast();
         (, , , uint48 tocPost) = oracle.ilks(ilk);
         assertTrue(tocPost > 0);
