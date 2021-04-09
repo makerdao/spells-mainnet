@@ -195,7 +195,7 @@ contract BumpSpellAction {
     function execute() public {
         RwaLiquidationLike(
             CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
-        ).bump(ilk, 5466480 * WAD);
+        ).bump(ilk, 5_634_805 * WAD);
     }
 }
 
@@ -1863,7 +1863,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         (, address pip, ,) = oracle.ilks("RWA002-A");
 
-        assertEq(DSValueAbstract(pip).read(), bytes32(5_366_480 * WAD));
+        assertEq(DSValueAbstract(pip).read(), bytes32(5_634_804 * WAD));
         bumpSpell.cast();
         assertEq(DSValueAbstract(pip).read(), bytes32(5_466_480 * WAD));
     }
