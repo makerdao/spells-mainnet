@@ -1393,7 +1393,9 @@ contract DssSpellTest is DSTest, DSMath {
             addr.addr("RWA002_A_OUTPUT_CONDUIT")
         );
 
-        (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
+        (,address pip,,) = RwaLiquidationLike(
+            addr.addr("MIP21_LIQUIDATION_ORACLE")
+        ).ilks("RWA002-A");
         assertTrue(chainLog.getAddress("PIP_RWA002") == pip);
 
         assertEq(chainLog.version(), "1.2.11");
