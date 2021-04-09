@@ -1880,10 +1880,10 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
-        (, , uiunt48 tau, uint48 tocPre) = oracle.ilks(ilk);
+        (, , uint48 tau, uint48 tocPre) = oracle.ilks(ilk);
         assertTrue(tocPre == 0);
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
@@ -1891,7 +1891,7 @@ contract DssSpellTest is DSTest, DSMath {
         (, , , uint48 tocPost) = oracle.ilks(ilk);
         assertTrue(tocPost > 0);
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
@@ -1912,8 +1912,9 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
         tellSpell.cast();
+        (, , uint48 tau,) = oracle.ilks(ilk);
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
@@ -1928,7 +1929,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         cureSpell.cast();
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
@@ -1954,8 +1955,9 @@ contract DssSpellTest is DSTest, DSMath {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+        (, , uint48 tau,) = oracle.ilks(ilk);
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
@@ -1969,7 +1971,7 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         tellSpell.cast();
         if (tau == 0) {
-            assertFalse(oracle.good(ilk));
+            assertTrue(!oracle.good(ilk));
         } else {
             assertTrue(oracle.good(ilk));
         }
