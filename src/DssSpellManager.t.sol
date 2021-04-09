@@ -27,6 +27,8 @@ interface AssessorLike {
 }
 
 contract DssSpellManager is DssSpellTest {
+    address self;
+
     DSTokenAbstract  public drop;
     TinlakeManagerLike dropMgr;
 
@@ -39,6 +41,8 @@ contract DssSpellManager is DssSpellTest {
     address constant assessor_ = 0xdA0bA5Dd06C8BaeC53Fa8ae25Ad4f19088D6375b;
 
     function managerInit() public {
+        self = address(this);
+
         hevm.store(
             mgr_, keccak256(abi.encode(address(this), uint(0))), bytes32(uint(1))
         );
