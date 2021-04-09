@@ -128,7 +128,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice(ilk);
 
         // give the urn permissions on the join adapter
-        DssExecLib.authorize(MCD_JOIN_RWA002_A, RWA002_A_URN);
+        // DssExecLib.authorize(MCD_JOIN_RWA002_A, RWA002_A_URN);
 
         // set up the urn
         Hopeable(RWA002_A_URN).hope(RWA002_OPERATOR);

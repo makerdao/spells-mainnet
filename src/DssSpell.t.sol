@@ -1373,10 +1373,6 @@ contract DssSpellTest is DSTest, DSMath {
             addr.addr("RWA002")
         );
         assertEq(
-            chainLog.getAddress("PIP_RWA002"),
-            addr.addr("PIP_RWA002")
-        );
-        assertEq(
             chainLog.getAddress("MCD_JOIN_RWA002_A"),
             addr.addr("MCD_JOIN_RWA002_A")
         );
