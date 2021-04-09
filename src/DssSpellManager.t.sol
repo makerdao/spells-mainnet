@@ -94,8 +94,6 @@ contract DssSpellManager is DssSpellTest {
     }
 
     function testWipeAndExit() public {
-        managerInit();
-
         testJoinAndDraw();
         dropMgr.wipe(10 ether);
         dropMgr.exit(10 ether);
