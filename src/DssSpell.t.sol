@@ -26,9 +26,184 @@ interface LPTokenLike {
     function token1() external view returns (address);
 }
 
+interface RwaUrnLike {
+    function can(address) external returns (uint);
+    function rely(address) external;
+    function deny(address) external;
+    function hope(address) external;
+    function nope(address) external;
+    function file(bytes32, address) external;
+    function lock(uint256) external;
+    function free(uint256) external;
+    function draw(uint256) external;
+    function wipe(uint256) external;
+}
+
+interface RwaInputConduitLike {
+    function push() external;
+}
+
+interface RwaOutputConduitLike {
+    function wards(address) external returns (uint);
+    function can(address) external returns (uint);
+    function rely(address) external;
+    function deny(address) external;
+    function hope(address) external;
+    function nope(address) external;
+    function bud(address) external returns (uint);
+    function kiss(address) external;
+    function diss(address) external;
+    function pick(address) external;
+    function push() external;
+}
+
 interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory,address,uint48,uint48);
+    function wards(address) external returns (uint256);
+    function rely(address) external;
+    function deny(address) external;
+    function ilks(bytes32) external returns (bytes32, address, uint48, uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
+    function bump(bytes32, uint256) external;
+    function tell(bytes32) external;
+    function cure(bytes32) external;
+    function cull(bytes32, address) external;
+    function good(bytes32) external view returns (bool);
+}
+
+interface TinlakeManagerLike {
+    function wards(address) external returns(uint);
+    function file(bytes32 what, address data) external;
+}
+
+contract EndSpellAction {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+
+    function execute() public {
+        EndAbstract(CHANGELOG.getAddress("MCD_END")).cage();
+    }
+}
+
+contract TestSpell {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    DSPauseAbstract public pause =
+        DSPauseAbstract(CHANGELOG.getAddress("MCD_PAUSE"));
+
+    address         public action;
+    bytes32         public tag;
+    uint256         public eta;
+    bytes           public sig;
+    uint256         public expiration;
+    bool            public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+    }
+
+    function setTag() internal {
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "This spell has already been scheduled");
+        eta = block.timestamp + DSPauseAbstract(pause).delay();
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
+}
+
+contract EndSpell is TestSpell {
+    constructor() public {
+        action = address(new EndSpellAction());
+        setTag();
+    }
+}
+
+contract CullSpellAction {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    bytes32 constant ilk = "RWA002-A";
+
+    function execute() public {
+        RwaLiquidationLike(
+            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
+        ).cull(ilk, CHANGELOG.getAddress("RWA002_A_URN"));
+    }
+}
+
+contract CullSpell is TestSpell {
+    constructor() public {
+        action = address(new CullSpellAction());
+        setTag();
+    }
+}
+
+contract CureSpellAction {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    bytes32 constant ilk = "RWA002-A";
+
+    function execute() public {
+        RwaLiquidationLike(
+            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
+        ).cure(ilk);
+    }
+}
+
+contract CureSpell is TestSpell {
+    constructor() public {
+        action = address(new CureSpellAction());
+        setTag();
+    }
+}
+
+contract TellSpellAction {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    bytes32 constant ilk = "RWA002-A";
+
+    function execute() public {
+        VatAbstract(CHANGELOG.getAddress("MCD_VAT")).file(ilk, "line", 0);
+        RwaLiquidationLike(
+            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
+        ).tell(ilk);
+    }
+}
+
+contract TellSpell is TestSpell {
+    constructor() public {
+        action = address(new TellSpellAction());
+        setTag();
+    }
+}
+
+contract BumpSpellAction {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    bytes32 constant ilk = "RWA002-A";
+    uint256 constant WAD = 10 ** 18;
+
+    function execute() public {
+        RwaLiquidationLike(
+            CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE")
+        ).bump(ilk, 5466480 * WAD);
+    }
+}
+
+contract BumpSpell is TestSpell {
+    constructor() public {
+        action = address(new BumpSpellAction());
+        setTag();
+    }
 }
 
 contract DssSpellTest is DSTest, DSMath {
@@ -109,7 +284,27 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Specific for this spell
     //
+    bytes32 constant ilk               = "RWA001-A";
+    DSTokenAbstract             rwagem = DSTokenAbstract(     addr.addr("RWA001"));
+    GemJoinAbstract            rwajoin = GemJoinAbstract(     addr.addr("MCD_JOIN_RWA001_A"));
+    RwaLiquidationLike          oracle = RwaLiquidationLike(  addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    RwaUrnLike                  rwaurn = RwaUrnLike(          addr.addr("RWA001_A_URN"));
+    RwaInputConduitLike   rwaconduitin = RwaInputConduitLike( addr.addr("RWA001_A_INPUT_CONDUIT"));
+    RwaOutputConduitLike rwaconduitout = RwaOutputConduitLike(addr.addr("RWA001_A_OUTPUT_CONDUIT"));
 
+    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
+
+    // Tinlake (same as INPUT/OUTPUT conduit)
+    TinlakeManagerLike mgr = TinlakeManagerLike(
+        addr.addr("RWA001_A_OUTPUT_CONDUIT")
+    );
+    address mgr_ = address(mgr);
+
+    BumpSpell bumpSpell;
+    TellSpell tellSpell;
+    CureSpell cureSpell;
+    CullSpell cullSpell;
+    EndSpell   endSpell;
     DssSpell   spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -1388,10 +1583,14 @@ contract DssSpellTest is DSTest, DSMath {
             chainLog.getAddress("RWA002_A_OUTPUT_CONDUIT"),
             addr.addr("RWA002_A_OUTPUT_CONDUIT")
         );
+        assertEq(
+            chainLog.getAddress("MIP21_LIQUIDATION_ORACLE"),
+            addr.addr("MIP21_LIQUIDATION_ORACLE")
+        );
 
         (,address pip,,) = RwaLiquidationLike(
             addr.addr("MIP21_LIQUIDATION_ORACLE")
-        ).ilks("RWA002-A");
+        ).ilks(ilk);
         assertTrue(chainLog.getAddress("PIP_RWA002") == pip);
 
         assertEq(chainLog.version(), "1.2.11");
@@ -1650,27 +1849,134 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    // function test_core_unit_budgets() public {
-    //     address risk = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    //     address multisig = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    function testSpellIsCast_RWA002_INTEGRATION_BUMP() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     uint256 prevSin = vat.sin(address(vow));
-    //     uint256 prevDai = dai.balanceOf(multisig);
-    //     uint256 prevRisk = dai.balanceOf(risk);
+        bumpSpell = new BumpSpell();
+        vote(address(bumpSpell));
 
-    //     assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+        bumpSpell.schedule();
 
-    //     vote(address(spell));
-    //     spell.schedule();
-    //     castPreviousSpell();
-    //     hevm.warp(spell.nextCastTime());
-    //     spell.cast();
-    //     assertTrue(spell.done());
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        (, address pip, ,) = oracle.ilks("RWA002-A");
 
-    //     assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+        assertEq(DSValueAbstract(pip).read(), bytes32(5_366_480 * WAD));
+        bumpSpell.cast();
+        assertEq(DSValueAbstract(pip).read(), bytes32(5_466_480 * WAD));
+    }
 
-    //     assertEq(vat.sin(address(vow)) - prevSin, 220_500 * RAD);
-    //     assertEq(dai.balanceOf(multisig) - prevDai, 120_000 * WAD);
-    //     assertEq(dai.balanceOf(risk) - prevRisk, 100_500 * WAD);
-    // }
+    function testSpellIsCast_RWA002_INTEGRATION_TELL() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        tellSpell = new TellSpell();
+        vote(address(tellSpell));
+
+        tellSpell.schedule();
+
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        (, , , uint48 tocPre) = oracle.ilks("RWA002-A");
+        assertTrue(tocPre == 0);
+        assertTrue(oracle.good("RWA002-A"));
+        tellSpell.cast();
+        (, , , uint48 tocPost) = oracle.ilks("RWA002-A");
+        assertTrue(tocPost > 0);
+        assertTrue(oracle.good("RWA002-A"));
+        hevm.warp(block.timestamp + 600);
+        assertTrue(!oracle.good("RWA002-A"));
+    }
+
+    function testSpellIsCast_RWA002_INTEGRATION_TELL_CURE_GOOD() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        tellSpell = new TellSpell();
+        vote(address(tellSpell));
+
+        tellSpell.schedule();
+
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        tellSpell.cast();
+        assertTrue(oracle.good(ilk));
+        hevm.warp(block.timestamp + 600);
+        assertTrue(!oracle.good(ilk));
+
+        cureSpell = new CureSpell();
+        vote(address(cureSpell));
+
+        cureSpell.schedule();
+        castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        cureSpell.cast();
+        assertTrue(oracle.good(ilk));
+        (,,, uint48 toc) = oracle.ilks(ilk);
+        assertEq(uint256(toc), 0);
+    }
+
+    function testFailSpellIsCast_RWA002_INTEGRATION_CURE() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        cureSpell = new CureSpell();
+        vote(address(cureSpell));
+
+        cureSpell.schedule();
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        cureSpell.cast();
+    }
+
+    function testSpellIsCast_RWA002_INTEGRATION_TELL_CULL() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        assertTrue(oracle.good("RWA002-A"));
+
+        tellSpell = new TellSpell();
+        vote(address(tellSpell));
+
+        tellSpell.schedule();
+
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        tellSpell.cast();
+        assertTrue(oracle.good("RWA002-A"));
+        hevm.warp(block.timestamp + 600);
+        assertTrue(!oracle.good("RWA002-A"));
+
+        cullSpell = new CullSpell();
+        vote(address(cullSpell));
+
+        cullSpell.schedule();
+        castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        cullSpell.cast();
+        assertTrue(!oracle.good("RWA002-A"));
+        (, address pip,,) = oracle.ilks("RWA002-A");
+        assertEq(DSValueAbstract(pip).read(), bytes32(0));
+    }
+
+    function testSpellIsCast_RWA002_END() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        endSpell = new EndSpell();
+        vote(address(endSpell));
+
+        endSpell.schedule();
+
+        uint256 castTime = block.timestamp + pause.delay();
+        hevm.warp(castTime);
+        endSpell.cast();
+    }
+
 }
