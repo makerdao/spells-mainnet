@@ -1865,7 +1865,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(DSValueAbstract(pip).read(), bytes32(5_634_804 * WAD));
         bumpSpell.cast();
-        assertEq(DSValueAbstract(pip).read(), bytes32(5_466_480 * WAD));
+        assertEq(DSValueAbstract(pip).read(), bytes32(5_634_805 * WAD));
     }
 
     function testSpellIsCast_RWA002_INTEGRATION_TELL() public {
