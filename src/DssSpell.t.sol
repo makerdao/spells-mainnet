@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "ds-math/math.sol";
 import "ds-test/test.sol";
-import "lib/dss-interfaces/src/Interfaces.sol";
+import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 
@@ -61,7 +61,7 @@ interface RwaLiquidationLike {
     function wards(address) external returns (uint256);
     function rely(address) external;
     function deny(address) external;
-    function ilks(bytes32) external returns (bytes32, address, uint48, uint48);
+    function ilks(bytes32) external returns (string memory, address, uint48, uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
     function bump(bytes32, uint256) external;
     function tell(bytes32) external;
@@ -71,6 +71,13 @@ interface RwaLiquidationLike {
 }
 
 interface TinlakeManagerLike {
+    function gem() external returns(address);
+    function owner() external returns(address);
+    function lock(uint256) external;
+    function join(uint256) external;
+    function draw(uint256) external;
+    function wipe(uint256) external;
+    function exit(uint256) external;
     function wards(address) external returns(uint);
     function file(bytes32 what, address data) external;
 }
@@ -1068,7 +1075,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell.cast();
     }
 
-    function vote(address spell_) private {
+    function vote(address spell_) internal {
         if (chief.hat() != spell_) {
             hevm.store(
                 address(gov),
