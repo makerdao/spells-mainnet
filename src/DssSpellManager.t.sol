@@ -65,9 +65,6 @@ contract DssSpellManager is DssSpellTest {
         memberlist.updateMember(address(this), uint(-1));
         memberlist.updateMember(address(dropMgr), uint(-1));
 
-        // ste this contract as ward on the mgr
-        hevm.store(address(dropMgr), keccak256(abi.encode(address(this), uint(0))), bytes32(uint(1)));
-
         assertEq(dropMgr.owner(), address(this));
         // give this address 1500 dai and 1000 drop
 
