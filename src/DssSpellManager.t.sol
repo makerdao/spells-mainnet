@@ -39,7 +39,18 @@ contract DssSpellManager is DssSpellTest {
     address constant assessor_ = 0xdA0bA5Dd06C8BaeC53Fa8ae25Ad4f19088D6375b;
 
     function managerInit() public {
+        hevm.store(
+            mgr_, keccak256(abi.encode(address(this), uint(0))), bytes32(uint(1))
+        );
+        assertEq(mgr.wards(self), 1);
+
+        // setup manager dependencies
+        mgr.file("urn", address(rwaurn));
+        mgr.file("liq", address(oracle));
+        mgr.file("owner", self);
+
         super.setUp();
+
         dropMgr = TinlakeManagerLike(address(mgr));
         drop = DSTokenAbstract(address(dropMgr.gem()));
 
