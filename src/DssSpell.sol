@@ -34,7 +34,7 @@ interface Kissable {
 }
 
 interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (bytes32,address,uint48,uint48);
+    function ilks(bytes32) external returns (string memory,address,uint48,uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
 }
 
