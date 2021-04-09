@@ -810,6 +810,23 @@ contract DssSpellTest is DSTest, DSMath {
             liquidations: 0,
             flipper_mom:  0
         });
+        afterSpell.collaterals["RWA002-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0 * MILLION,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
+            line:         5 * MILLION,
+            dust:         0,
+            pct:          350,
+            chop:         0,
+            dunk:         0,
+            mat:          10500,
+            beg:          0,
+            ttl:          0,
+            tau:          0,
+            liquidations: 0,
+            flipper_mom:  0
+        });
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -968,7 +985,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(flipMom.authority(), values.flipper_mom_authority);
 
         // check number of ilks
-        assertEq(reg.count() + 1, values.ilk_count); // Extra collateral RWA001-A
+        assertEq(reg.count() + 2, values.ilk_count); // Extra collaterals RWA
 
         // flap
         // check beg value
@@ -987,11 +1004,12 @@ contract DssSpellTest is DSTest, DSMath {
     function checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
         bytes32[] memory _ilks = reg.list();
-        bytes32[] memory ilks = new bytes32[](_ilks.length + 1);
+        bytes32[] memory ilks = new bytes32[](_ilks.length + 2);
         for (uint256 i; i < _ilks.length; i++) {
             ilks[i] = _ilks[i];
         }
-        ilks[ilks.length -1] = "RWA001-A";
+        ilks[ilks.length -2] = "RWA001-A";
+        ilks[ilks.length -1] = "RWA002-A";
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
@@ -1033,7 +1051,7 @@ contract DssSpellTest is DSTest, DSMath {
             assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
             }
 
-            if (ilk != "RWA001-A") {
+            if (ilk != "RWA001-A" && ilk != "RWA002-A") {
                 {
                 (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
                 // Convert BP to system expected value
