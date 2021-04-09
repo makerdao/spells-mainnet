@@ -50,12 +50,13 @@ contract DssSpellManager is DssSpellTest {
         memberlist.updateMember(address(this), uint(-1));
         memberlist.updateMember(address(dropMgr), uint(-1));
 
-        // set this contract as owner of dropMgr // override slot 1
-        // check what's inside slot 1 with: bytes32 slot = hevm.load(address(dropMgr), bytes32(uint(1)));
-        hevm.store(address(dropMgr), bytes32(uint(1)), bytes32(0x0000000000000000000101013bE95e4159a131E56A84657c4ad4D43eC7Cd865d));
+        // set this contract as owner of dropMgr // override slot 13
+        // check what's inside slot 1 with: bytes32 slot = hevm.load(address(dropMgr), bytes32(uint(13)));
+        hevm.store(address(dropMgr), bytes32(uint(13)), bytes32(uint256(address(this))));
         // ste this contract as ward on the mgr
         hevm.store(address(dropMgr), keccak256(abi.encode(address(this), uint(0))), bytes32(uint(1)));
 
+        assertTrue(dropMgr.owner() != address(0));
         assertEq(dropMgr.owner(), address(this));
         // give this address 1500 dai and 1000 drop
 
