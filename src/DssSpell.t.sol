@@ -1861,7 +1861,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
-        (, address pip, ,) = oracle.ilks("RWA002-A");
+        (, address pip, ,) = oracle.ilks(ilk);
 
         assertEq(DSValueAbstract(pip).read(), bytes32(5_634_804 * WAD));
         bumpSpell.cast();
@@ -1880,89 +1880,89 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
-        (, , , uint48 tocPre) = oracle.ilks("RWA002-A");
+        (, , , uint48 tocPre) = oracle.ilks(ilk);
         assertTrue(tocPre == 0);
-        assertTrue(oracle.good("RWA002-A"));
+        assertTrue(oracle.good(ilk));
         tellSpell.cast();
-        (, , , uint48 tocPost) = oracle.ilks("RWA002-A");
+        (, , , uint48 tocPost) = oracle.ilks(ilk);
         assertTrue(tocPost > 0);
-        assertTrue(oracle.good("RWA002-A"));
-        hevm.warp(block.timestamp + 600);
-        assertTrue(!oracle.good("RWA002-A"));
-    }
-
-    function testSpellIsCast_RWA002_INTEGRATION_TELL_CURE_GOOD() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        tellSpell = new TellSpell();
-        vote(address(tellSpell));
-
-        tellSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        tellSpell.cast();
         assertTrue(oracle.good(ilk));
         hevm.warp(block.timestamp + 600);
         assertTrue(!oracle.good(ilk));
-
-        cureSpell = new CureSpell();
-        vote(address(cureSpell));
-
-        cureSpell.schedule();
-        castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cureSpell.cast();
-        assertTrue(oracle.good(ilk));
-        (,,, uint48 toc) = oracle.ilks(ilk);
-        assertEq(uint256(toc), 0);
     }
 
-    function testFailSpellIsCast_RWA002_INTEGRATION_CURE() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        cureSpell = new CureSpell();
-        vote(address(cureSpell));
-
-        cureSpell.schedule();
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cureSpell.cast();
-    }
-
-    function testSpellIsCast_RWA002_INTEGRATION_TELL_CULL() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        assertTrue(oracle.good("RWA002-A"));
-
-        tellSpell = new TellSpell();
-        vote(address(tellSpell));
-
-        tellSpell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        tellSpell.cast();
-        assertTrue(oracle.good("RWA002-A"));
-        hevm.warp(block.timestamp + 600);
-        assertTrue(!oracle.good("RWA002-A"));
-
-        cullSpell = new CullSpell();
-        vote(address(cullSpell));
-
-        cullSpell.schedule();
-        castTime = block.timestamp + pause.delay();
-        hevm.warp(castTime);
-        cullSpell.cast();
-        assertTrue(!oracle.good("RWA002-A"));
-        (, address pip,,) = oracle.ilks("RWA002-A");
-        assertEq(DSValueAbstract(pip).read(), bytes32(0));
-    }
+//    function testSpellIsCast_RWA002_INTEGRATION_TELL_CURE_GOOD() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//
+//        tellSpell = new TellSpell();
+//        vote(address(tellSpell));
+//
+//        tellSpell.schedule();
+//
+//        uint256 castTime = block.timestamp + pause.delay();
+//        hevm.warp(castTime);
+//        tellSpell.cast();
+//        assertTrue(oracle.good(ilk));
+//        hevm.warp(block.timestamp + 600);
+//        assertTrue(!oracle.good(ilk));
+//
+//        cureSpell = new CureSpell();
+//        vote(address(cureSpell));
+//
+//        cureSpell.schedule();
+//        castTime = block.timestamp + pause.delay();
+//        hevm.warp(castTime);
+//        cureSpell.cast();
+//        assertTrue(oracle.good(ilk));
+//        (,,, uint48 toc) = oracle.ilks(ilk);
+//        assertEq(uint256(toc), 0);
+//    }
+//
+//    function testFailSpellIsCast_RWA002_INTEGRATION_CURE() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//
+//        cureSpell = new CureSpell();
+//        vote(address(cureSpell));
+//
+//        cureSpell.schedule();
+//        uint256 castTime = block.timestamp + pause.delay();
+//        hevm.warp(castTime);
+//        cureSpell.cast();
+//    }
+//
+//    function testSpellIsCast_RWA002_INTEGRATION_TELL_CULL() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//        assertTrue(oracle.good(ilk));
+//
+//        tellSpell = new TellSpell();
+//        vote(address(tellSpell));
+//
+//        tellSpell.schedule();
+//
+//        uint256 castTime = block.timestamp + pause.delay();
+//        hevm.warp(castTime);
+//        tellSpell.cast();
+//        assertTrue(oracle.good(ilk));
+//        hevm.warp(block.timestamp + 600);
+//        assertTrue(!oracle.good(ilk));
+//
+//        cullSpell = new CullSpell();
+//        vote(address(cullSpell));
+//
+//        cullSpell.schedule();
+//        castTime = block.timestamp + pause.delay();
+//        hevm.warp(castTime);
+//        cullSpell.cast();
+//        assertTrue(!oracle.good(ilk));
+//        (, address pip,,) = oracle.ilks(ilk);
+//        assertEq(DSValueAbstract(pip).read(), bytes32(0));
+//    }
 
     function testSpellIsCast_RWA002_END() public {
         vote(address(spell));
