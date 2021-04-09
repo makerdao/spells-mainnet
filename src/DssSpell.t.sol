@@ -1924,11 +1924,7 @@ contract DssSpellTest is DSTest, DSMath {
         castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
         cureSpell.cast();
-        if (tau == 0) {
-            assertTrue(!oracle.good(ilk));
-        } else {
-            assertTrue(oracle.good(ilk));
-        }
+        assertTrue(oracle.good(ilk));
         (,,, uint48 toc) = oracle.ilks(ilk);
         assertEq(uint256(toc), 0);
     }
@@ -1952,11 +1948,7 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
         (, , uint48 tau,) = oracle.ilks(ilk);
-        if (tau == 0) {
-            assertTrue(!oracle.good(ilk));
-        } else {
-            assertTrue(oracle.good(ilk));
-        }
+        assertTrue(oracle.good(ilk));
 
         tellSpell = new TellSpell();
         vote(address(tellSpell));
