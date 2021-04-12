@@ -1888,11 +1888,11 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
         (, , uint48 tau, uint48 tocPre) = oracle.ilks(ilk);
-        assertTrue(tocPre == 0);
+        assertEq(uint256(tocPre), 0);
         assertTrue(oracle.good(ilk));
         tellSpell.cast();
         (, , , uint48 tocPost) = oracle.ilks(ilk);
-        assertTrue(tocPost > 0);
+        assertEq(uint256(tocPost), block.timestamp);
         if (tau == 0) {
             assertTrue(!oracle.good(ilk));
         } else {
