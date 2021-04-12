@@ -1998,6 +1998,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 castTime = block.timestamp + pause.delay();
         hevm.warp(castTime);
         endSpell.cast();
-    }
 
+        assertEq(end.live(), 0);
+    }
 }
