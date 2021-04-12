@@ -35,7 +35,6 @@ contract DssSpellManager is DssSpellTest {
     // Tinlake
     Root constant root = Root(0x53b2d22d07E069a3b132BfeaaD275b10273d381E);
     MemberList constant memberlist = MemberList(0x5B5CFD6E45F1407ABCb4BFD9947aBea1EA6649dA);
-    EpochCoordinatorLike constant coordinator = EpochCoordinatorLike(0xFE860d06fF2a3A485922A6a029DFc1CD8A335288);
     address constant seniorOperator_ = 0x230f2E19D6c2Dc0c441c2150D4dD9d67B563A60C;
     address constant seniorTranche_ = 0xfB30B47c47E2fAB74ca5b0c1561C2909b280c4E5;
     address constant assessor_ = 0xdA0bA5Dd06C8BaeC53Fa8ae25Ad4f19088D6375b;
