@@ -5,7 +5,7 @@ set -e
 
 export DAPP_BUILD_OPTIMIZE=1
 export DAPP_BUILD_OPTIMIZE_RUNS=1
-export DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x9a6c490bA30507E732D61235eFF94c26AEa234EF'
+export DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xc061EDFC9C38912E0ad4F3922aA84ee11FB03347'
 export DAPP_LINK_TEST_LIBRARIES=0
 
 if [[ -z "$1" ]]; then
