@@ -16,35 +16,21 @@
 
 pragma solidity 0.6.12;
 
+import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
-import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
-
-interface Initializable {
-    function init(bytes32) external;
-}
-
-interface Hopeable {
-    function hope(address) external;
-}
-
-interface Kissable {
-    function kiss(address) external;
-}
-
-interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory,address,uint48,uint48);
-    function init(bytes32, uint256, string calldata, uint48) external;
-}
+import "dss-interfaces/dss/IlkRegistryAbstract.sol";
+import "dss-interfaces/dss/ClipAbstract.sol";
+import "dss-interfaces/dss/ClipperMomAbstract.sol";
+import "dss-interfaces/dss/EndAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/2a7a8c915695b7298fe725ee3dc6c613fa9d9bbe/governance/votes/Executive%20vote%20-%20April%2012%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Executive%20vote%20-%20April%2016%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-04-12 MakerDAO Executive Spell | Hash: 0x431aeda689004abd7c9532c77893667ef6207d7b72a0044ee01b60418ba94830";
+        "2021-04-16 MakerDAO Executive Spell | Hash: ";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -57,105 +43,183 @@ contract DssSpellAction is DssAction {
     //
     uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
 
-    // Math
-    uint256 constant MILLION = 10**6;
-    uint256 constant WAD     = 10**18;
-    uint256 constant RAD     = 10**45;
-
     // Addresses
-    address constant RWA002_OPERATOR         = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-    address constant RWA002_GEM              = 0xAAA760c2027817169D7C8DB0DC61A2fb4c19AC23;
-    address constant MCD_JOIN_RWA002_A       = 0xe72C7e90bc26c11d45dBeE736F0acf57fC5B7152;
-    address constant RWA002_A_URN            = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
-    address constant RWA002_A_INPUT_CONDUIT  = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-    address constant RWA002_A_OUTPUT_CONDUIT = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
+    address constant MCD_DOG              = address(0);
+    address constant MCD_END              = address(0);
+    address constant MCD_ESM              = address(0);
+    address constant ILK_REGISTRY         = address(0);
+    address constant CLIPPER_MOM          = address(0);
+    address constant MCD_CLIP_LINK_A      = address(0);
+    address constant MCD_CLIP_CALC_LINK_A = address(0);
+
+    uint256 constant THOUSAND   = 10**3;
+    uint256 constant MILLION    = 10**6;
+    uint256 constant WAD        = 10**18;
+    uint256 constant RAY        = 10**27;
+    uint256 constant RAD        = 10**45;
 
     function actions() public override {
-        bytes32 ilk   = "RWA002-A";
-        uint256 CEIL  = 5 * MILLION;
-        uint256 PRICE = 5_634_804 * WAD;
-        uint256 MAT   = 10_500;
-        uint48 TAU    = 0;
+        address MCD_VAT          = DssExecLib.vat();
+        address MCD_CAT          = DssExecLib.cat();
+        address MCD_VOW          = DssExecLib.vow();
+        address MCD_POT          = DssExecLib.pot();
+        address MCD_SPOT         = DssExecLib.spotter();
+        address MCD_END_OLD      = DssExecLib.end();
+        address MCD_FLIP_LINK_A  = DssExecLib.flip("LINK-A");
+        address ILK_REGISTRY_OLD = DssExecLib.reg();
+        address PIP_LINK         = DssExecLib.getChangelogAddress("PIP_LINK");
 
-        // https://ipfs.io/ipfs/QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E
-        string memory DOC = "QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E";
+        // ------------------  END  ------------------
 
-        address MIP21_LIQUIDATION_ORACLE =
-            DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+        // Set contracts in END
+        DssExecLib.setContract(MCD_END,  "vat", MCD_VAT);
+        DssExecLib.setContract(MCD_END,  "cat", MCD_CAT);
+        DssExecLib.setContract(MCD_END,  "dog", MCD_DOG);
+        DssExecLib.setContract(MCD_END,  "vow", MCD_VOW);
+        DssExecLib.setContract(MCD_END,  "pot", MCD_POT);
+        DssExecLib.setContract(MCD_END, "spot", MCD_SPOT);
 
-        address vat = DssExecLib.vat();
+        // Authorize the new END in contracts
+        DssExecLib.authorize(MCD_VAT, MCD_END);
+        DssExecLib.authorize(MCD_CAT, MCD_END);
+        DssExecLib.authorize(MCD_DOG, MCD_END);
+        DssExecLib.authorize(MCD_VOW, MCD_END);
+        DssExecLib.authorize(MCD_POT, MCD_END);
+        DssExecLib.authorize(MCD_SPOT, MCD_END);
 
-        // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_RWA002_A).vat() == vat, "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA002_A).ilk() == ilk, "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA002_A).gem() == RWA002_GEM, "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA002_A).dec() == DSTokenAbstract(RWA002_GEM).decimals(), "join-dec-not-match");
+        // Set wait time in END
+        Fileable(MCD_END).file("wait", EndAbstract(MCD_END_OLD).wait());
 
-        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
-            ilk, PRICE, DOC, TAU
-        );
-        (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
+        // Deauthorize the old END in contracts
+        DssExecLib.deauthorize(MCD_VAT, MCD_END_OLD);
+        DssExecLib.deauthorize(MCD_CAT, MCD_END_OLD);
+        DssExecLib.deauthorize(MCD_VOW, MCD_END_OLD);
+        DssExecLib.deauthorize(MCD_POT, MCD_END_OLD);
+        DssExecLib.deauthorize(MCD_SPOT, MCD_END_OLD);
 
-        // Set price feed for RWA002
-        DssExecLib.setContract(DssExecLib.spotter(), ilk, "pip", pip);
+        // Deauthorize the old END from all the FLIPS
+        // Authorize the new END in all the FLIPS
+        bytes32[] memory ilks = IlkRegistryAbstract(ILK_REGISTRY_OLD).list();
+        address[] memory flips = new address[](ilks.length);
+        for (uint256 i = 0; i < ilks.length; i++) {
+            bytes32 ilk = ilks[i];
 
-        // Init RWA-002 in Vat
-        Initializable(vat).init(ilk);
-        // Init RWA-002 in Jug
-        Initializable(DssExecLib.jug()).init(ilk);
+            address flip = DssExecLib.flip(ilk);
+            flips[i] = flip;
+            DssExecLib.deauthorize(flip, MCD_END_OLD);
+            DssExecLib.authorize(flip, MCD_END);
 
-        // Allow RWA-002 Join to modify Vat registry
-        DssExecLib.authorize(vat, MCD_JOIN_RWA002_A);
+            try DssExecLib.removeReaderFromOSMWhitelist(IlkRegistryAbstract(ILK_REGISTRY_OLD).pip(ilk), MCD_END_OLD) {} catch {}
+            try DssExecLib.addReaderToOSMWhitelist(IlkRegistryAbstract(ILK_REGISTRY_OLD).pip(ilk), MCD_END) {} catch {}
+        }
 
-        // Allow RwaLiquidationOracle to modify Vat registry
-        // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
+        // ------------------  ESM  ------------------
 
-        // Increase the global debt ceiling by the ilk ceiling
-        DssExecLib.increaseGlobalDebtCeiling(CEIL);
-        // Set the ilk debt ceiling
-        DssExecLib.setIlkDebtCeiling(ilk, CEIL);
+        // Authorize new ESM to execute in new END
+        DssExecLib.authorize(MCD_END, MCD_ESM);
 
-        // No dust
-        // DssExecLib.setIlkMinVaultAmount(ilk, 0);
+        // Authorize new ESM to execute in VAT
+        DssExecLib.authorize(MCD_VAT, MCD_ESM);
 
-        // stability fee
-        DssExecLib.setIlkStabilityFee(ilk, THREE_PT_FIVE_PCT, false);
+        // Make every flipper relies the MCD_ESM
+        for (uint256 i = 0; i < flips.length; i++) {
+            DssExecLib.authorize(flips[i], MCD_ESM);
+        }
 
-        // collateralization ratio
-        DssExecLib.setIlkLiquidationRatio(ilk, MAT);
+        // ------------------  DOG  ------------------
 
-        // poke the spotter to pull in a price
-        DssExecLib.updateCollateralPrice(ilk);
+        // Set VOW in the DOG
+        DssExecLib.setContract(MCD_DOG, "vow", MCD_VOW);
 
-        // give the urn permissions on the join adapter
-        // DssExecLib.authorize(MCD_JOIN_RWA002_A, RWA002_A_URN);
+        // Authorize DOG can access to VAT
+        DssExecLib.authorize(MCD_VAT, MCD_DOG);
 
-        // set up the urn
-        Hopeable(RWA002_A_URN).hope(RWA002_OPERATOR);
+        // Authorize DOG can access to VOW
+        DssExecLib.authorize(MCD_VOW, MCD_DOG);
 
-        // set up output conduit
-        // Hopeable(RWA002_A_OUTPUT_CONDUIT).hope(RWA002_OPERATOR);
+        Fileable(MCD_DOG).file("Hole", 100 * MILLION * RAD);
 
-        // Authorize the SC Domain team deployer address on the output conduit
-        // during introductory phase. This allows the SC team to assist in the
-        // testing of a complete circuit. Once a broker dealer arrangement is
-        // established the deployer address should be `deny`ed on the conduit.
-        // Kissable(RWA002_A_OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
 
-        // add RWA-002 contract to the changelog
-        DssExecLib.setChangelogAddress("RWA002", RWA002_GEM);
-        DssExecLib.setChangelogAddress("PIP_RWA002", pip);
-        DssExecLib.setChangelogAddress("MCD_JOIN_RWA002_A", MCD_JOIN_RWA002_A);
-        DssExecLib.setChangelogAddress("RWA002_A_URN", RWA002_A_URN);
-        DssExecLib.setChangelogAddress(
-            "RWA002_A_INPUT_CONDUIT", RWA002_A_INPUT_CONDUIT
-        );
-        DssExecLib.setChangelogAddress(
-            "RWA002_A_OUTPUT_CONDUIT", RWA002_A_OUTPUT_CONDUIT
-        );
+        // --------------  CLIPPER_MOM  --------------
 
-        // bump changelog version
-        DssExecLib.setChangelogVersion("1.2.11");
+        ClipperMomAbstract(CLIPPER_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
+
+        // ----------------  LINK-A  -----------------
+
+        // Set CLIP for LINK-A in the DOG
+        DssExecLib.setContract(MCD_DOG, "LINK-A", "clip", MCD_CLIP_LINK_A);
+
+        // Set VOW in the LINK-A CLIP
+        DssExecLib.setContract(MCD_CLIP_LINK_A, "vow", MCD_VOW);
+
+        // Set CALC in the LINK-A CLIP
+        DssExecLib.setContract(MCD_CLIP_LINK_A, "calc", MCD_CLIP_CALC_LINK_A);
+
+        // Authorize CLIP can access to VAT
+        DssExecLib.authorize(MCD_VAT, MCD_CLIP_LINK_A);
+
+        // Authorize CLIP can access to DOG
+        DssExecLib.authorize(MCD_DOG, MCD_CLIP_LINK_A);
+
+        // Authorize DOG can kick auctions on CLIP
+        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_DOG);
+
+        // Authorize the new END to access the LINK CLIP
+        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_END);
+
+        // Authorize CLIPPERMOM can set the stopped flag in CLIP
+        DssExecLib.authorize(MCD_CLIP_LINK_A, CLIPPER_MOM);
+
+        // Authorize new ESM to execute in LINK-A Clipper
+        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_ESM);
+
+        // Whitelist CLIP in the LINK osm
+        DssExecLib.addReaderToOSMWhitelist(PIP_LINK, MCD_CLIP_LINK_A);
+
+        // Whitelist CLIPPER_MOM in the LINK osm
+        DssExecLib.addReaderToOSMWhitelist(PIP_LINK, CLIPPER_MOM);
+
+        // No more auctions kicked via the CAT:
+        DssExecLib.deauthorize(MCD_FLIP_LINK_A, MCD_CAT);
+
+        // No more circuit breaker for the FLIP in LINK-A:
+        DssExecLib.deauthorize(MCD_FLIP_LINK_A, DssExecLib.flipperMom());
+
+        Fileable(MCD_DOG).file("LINK-A", "hole", 6 * MILLION * RAD);
+        Fileable(MCD_DOG).file("LINK-A", "chop", 113 * WAD / 100);
+        Fileable(MCD_CLIP_LINK_A).file("buf", 130 * RAY / 100);
+        Fileable(MCD_CLIP_LINK_A).file("tail", 140 minutes);
+        Fileable(MCD_CLIP_LINK_A).file("cusp", 40 * RAY / 100);
+        Fileable(MCD_CLIP_LINK_A).file("chip", 1 * WAD / 1000);
+        Fileable(MCD_CLIP_LINK_A).file("tip", 0);
+        Fileable(MCD_CLIP_CALC_LINK_A).file("cut", 99 * RAY / 100); // 1% cut
+        Fileable(MCD_CLIP_CALC_LINK_A).file("step", 90 seconds);
+
+        //  Tolerance currently set to 50%.
+        //   n.b. 600000000000000000000000000 == 40% acceptable drop
+        ClipperMomAbstract(CLIPPER_MOM).setPriceTolerance(MCD_CLIP_LINK_A, 50 * RAY / 100);
+
+        ClipAbstract(MCD_CLIP_LINK_A).upchost();
+
+        // Replace flip to clip in the ilk registry
+        DssExecLib.setContract(ILK_REGISTRY, "LINK-A", "xlip", MCD_CLIP_LINK_A);
+        Fileable(ILK_REGISTRY).file("LINK-A", "class", 1);
+
+
+        // ------------------  CHAINLOG  -----------------
+
+        address log = DssExecLib.getChangelogAddress("CHANGELOG");
+
+        DssExecLib.setChangelogAddress("MCD_DOG", MCD_DOG);
+        DssExecLib.setChangelogAddress("MCD_END", MCD_END);
+        DssExecLib.setChangelogAddress("MCD_ESM", MCD_ESM);
+        DssExecLib.setChangelogAddress("CLIPPER_MOM", CLIPPER_MOM);
+        DssExecLib.setChangelogAddress("MCD_CLIP_LINK_A", MCD_CLIP_LINK_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_LINK_A", MCD_CLIP_CALC_LINK_A);
+        DssExecLib.setChangelogAddress("ILK_REGISTRY", ILK_REGISTRY);
+        ChainlogLike(log).removeAddress("MCD_FLIP_LINK_A");
+
+        DssExecLib.setChangelogVersion("1.3.0");
     }
 }
 
