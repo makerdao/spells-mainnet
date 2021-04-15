@@ -23,6 +23,7 @@ import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
 import "dss-interfaces/dss/EndAbstract.sol";
+import "dss-interfaces/dss/ESMAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
@@ -44,13 +45,13 @@ contract DssSpellAction is DssAction {
     uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
 
     // Addresses
-    address constant MCD_DOG              = address(0);
-    address constant MCD_END              = address(0);
-    address constant MCD_ESM              = address(0);
+    address constant MCD_DOG              = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
+    address constant MCD_END              = 0xFB4713C20CCD81c53BC55e12923d37a4f0DB3E93;
+    address constant MCD_ESM              = 0x0f8B44Df587Abe2533cE7D75cB004C127Fe1a267;
     address constant ILK_REGISTRY         = address(0);
-    address constant CLIPPER_MOM          = address(0);
-    address constant MCD_CLIP_LINK_A      = address(0);
-    address constant MCD_CLIP_CALC_LINK_A = address(0);
+    address constant CLIPPER_MOM          = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
+    address constant MCD_CLIP_LINK_A      = 0x832Dd5f17B30078a5E46Fdb8130A68cBc4a74dC0;
+    address constant MCD_CLIP_CALC_LINK_A = 0x7B1696677107E48B152e9Bf400293e98B7D86Eb1;
 
     uint256 constant THOUSAND   = 10**3;
     uint256 constant MILLION    = 10**6;
@@ -115,6 +116,8 @@ contract DssSpellAction is DssAction {
 
         // ------------------  ESM  ------------------
 
+        require(ESMAbstract(MCD_ESM).end() == MCD_END, "DssSpell/error-esm-end");
+
         // Authorize new ESM to execute in new END
         DssExecLib.authorize(MCD_END, MCD_ESM);
 
@@ -142,9 +145,16 @@ contract DssSpellAction is DssAction {
 
         // --------------  CLIPPER_MOM  --------------
 
+        require(ClipperMomAbstract(CLIPPER_MOM).spotter() == MCD_SPOT, "DssSpell/error-clipper-mom-spotter");
+
         ClipperMomAbstract(CLIPPER_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
 
         // ----------------  LINK-A  -----------------
+
+        require(ClipAbstract(MCD_CLIP_LINK_A).vat() == MCD_VAT, "DssSpell/error-clip-vat");
+        require(ClipAbstract(MCD_CLIP_LINK_A).dog() == MCD_DOG, "DssSpell/error-clip-dog");
+        require(ClipAbstract(MCD_CLIP_LINK_A).spotter() == MCD_SPOT, "DssSpell/error-clip-spot");
+        require(ClipAbstract(MCD_CLIP_LINK_A).ilk() == "LINK-A", "DssSpell/error-clip-ilk");
 
         // Set CLIP for LINK-A in the DOG
         DssExecLib.setContract(MCD_DOG, "LINK-A", "clip", MCD_CLIP_LINK_A);
