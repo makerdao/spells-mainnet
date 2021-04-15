@@ -19,6 +19,7 @@ interface Hevm {
 interface SpellLike {
     function done() external view returns (bool);
     function cast() external;
+    function nextCastTime() external returns (uint256);
 }
 
 interface LPTokenLike {
@@ -205,6 +206,8 @@ contract DssSpellTest is DSTest, DSMath {
         // warp and cast previous spell so values are up-to-date to test against
         if (prevSpell != SpellLike(0) && !prevSpell.done()) {
             hevm.warp(spellValues.previous_spell_execution_time);
+            // jump to nextCastTime to be a little more forgiving on the spell execution time
+            hevm.warp(prevSpell.nextCastTime());
             prevSpell.cast();
         }
     }
@@ -219,7 +222,7 @@ contract DssSpellTest is DSTest, DSMath {
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1618246761,        // use get-created-timestamp.sh if deployed
             previous_spell:                 0x637F98654cC147C263ae740455d350D0339b19F5,        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  1618246761 + 7 days,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            previous_spell_execution_time:  1618537995 + 7 days,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
