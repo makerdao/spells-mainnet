@@ -2277,6 +2277,13 @@ contract DssSpellTest is DSTest, DSMath {
 
         vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
 
+        // Removing the surplus to allow continuing the execution.
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
+
         end.thaw();
 
         end.flow("ETH-A");
