@@ -2407,7 +2407,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertTrue(esm.revokesGovernanceAccess());
 
-        uint256 amt = 50 * THOUSAND * WAD;
+        uint256 amt = 75 * THOUSAND * WAD;
         assertEq(esm.min(), amt);
         giveTokens(gov, amt);
         gov.approve(address(esm), amt);
