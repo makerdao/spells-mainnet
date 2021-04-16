@@ -2190,9 +2190,9 @@ contract DssSpellTest is DSTest, DSMath {
         GemJoinAbstract joinETHA = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_A"));
         FlipAbstract flipETHA = FlipAbstract(addr.addr("MCD_FLIP_ETH_A"));
 
-        DSTokenAbstract BAT = DSTokenAbstract(addr.addr("BAT"));
-        GemJoinAbstract joinBATA = GemJoinAbstract(addr.addr("MCD_JOIN_BAT_A"));
-        FlipAbstract flipBATA = FlipAbstract(addr.addr("MCD_FLIP_BAT_A"));
+        DSTokenAbstract BAL = DSTokenAbstract(addr.addr("BAL"));
+        GemJoinAbstract joinBALA = GemJoinAbstract(addr.addr("MCD_JOIN_BAL_A"));
+        FlipAbstract flipBALA = FlipAbstract(addr.addr("MCD_FLIP_BAL_A"));
 
         DSTokenAbstract LINK = DSTokenAbstract(addr.addr("LINK"));
         GemJoinAbstract joinLINKA = GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A"));
@@ -2201,38 +2201,38 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 ilkAmt = 1 * THOUSAND * WAD;
 
         giveTokens(ETH, ilkAmt);
-        giveTokens(BAT, ilkAmt);
+        giveTokens(BAL, ilkAmt);
         giveTokens(LINK, ilkAmt);
 
         ETH.approve(address(joinETHA), ilkAmt);
         joinETHA.join(address(this), ilkAmt);
-        BAT.approve(address(joinBATA), ilkAmt);
-        joinBATA.join(address(this), ilkAmt);
+        BAL.approve(address(joinBALA), ilkAmt);
+        joinBALA.join(address(this), ilkAmt);
         LINK.approve(address(joinLINKA), ilkAmt);
         joinLINKA.join(address(this), ilkAmt);
 
         (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-A");
         vat.frob("ETH-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
-        (, rate, spot,,) = vat.ilks("BAT-A");
-        vat.frob("BAT-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
+        (, rate, spot,,) = vat.ilks("BAL-A");
+        vat.frob("BAL-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
         (, rate, spot,,) = vat.ilks("LINK-A");
         vat.frob("LINK-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
 
         hevm.warp(block.timestamp + 1);
         jug.drip("ETH-A");
-        jug.drip("BAT-A");
+        jug.drip("BAL-A");
         jug.drip("LINK-A");
 
         uint256 auctionIdETHA = flipETHA.kicks() + 1;
-        uint256 auctionIdBATA = flipBATA.kicks() + 1;
+        uint256 auctionIdBALA = flipBALA.kicks() + 1;
         uint256 auctionIdLINKA = clipLINKA.kicks() + 1;
 
         cat.bite("ETH-A", address(this));
-        cat.bite("BAT-A", address(this));
+        cat.bite("BAL-A", address(this));
         dog.bark("LINK-A", address(this), address(this));
 
         assertEq(flipETHA.kicks(), auctionIdETHA);
-        assertEq(flipBATA.kicks(), auctionIdBATA);
+        assertEq(flipBALA.kicks(), auctionIdBALA);
         assertEq(clipLINKA.kicks(), auctionIdLINKA);
 
         hevm.store(
@@ -2244,33 +2244,33 @@ contract DssSpellTest is DSTest, DSMath {
 
         end.cage();
         end.cage("ETH-A");
-        end.cage("BAT-A");
+        end.cage("BAL-A");
         end.cage("LINK-A");
 
         (,, address usr,,,,,) = flipETHA.bids(auctionIdETHA);
         assertTrue(usr != address(0));
-        (,, usr,,,,,) = flipBATA.bids(auctionIdBATA);
+        (,, usr,,,,,) = flipBALA.bids(auctionIdBALA);
         assertTrue(usr != address(0));
         (,,, usr,,) = clipLINKA.sales(auctionIdLINKA);
         assertTrue(usr != address(0));
 
         end.skip("ETH-A", auctionIdETHA);
-        end.skip("BAT-A", auctionIdBATA);
+        end.skip("BAL-A", auctionIdBALA);
         end.snip("LINK-A", auctionIdLINKA);
 
         (,, usr,,,,,) = flipETHA.bids(auctionIdETHA);
         assertTrue(usr == address(0));
-        (,, usr,,,,,) = flipBATA.bids(auctionIdBATA);
+        (,, usr,,,,,) = flipBALA.bids(auctionIdBALA);
         assertTrue(usr == address(0));
         (,,, usr,,) = clipLINKA.sales(auctionIdLINKA);
         assertTrue(usr == address(0));
 
         end.skim("ETH-A", address(this));
-        end.skim("BAT-A", address(this));
+        end.skim("BAL-A", address(this));
         end.skim("LINK-A", address(this));
 
         end.free("ETH-A");
-        end.free("BAT-A");
+        end.free("BAL-A");
         end.free("LINK-A");
 
         hevm.warp(block.timestamp + end.wait());
@@ -2280,7 +2280,7 @@ contract DssSpellTest is DSTest, DSMath {
         end.thaw();
 
         end.flow("ETH-A");
-        end.flow("BAT-A");
+        end.flow("BAL-A");
         end.flow("LINK-A");
 
         vat.hope(address(end));
@@ -2291,7 +2291,7 @@ contract DssSpellTest is DSTest, DSMath {
         end.pack(daiToRedeem);
 
         end.cash("ETH-A", daiToRedeem);
-        end.cash("BAT-A", daiToRedeem);
+        end.cash("BAL-A", daiToRedeem);
         end.cash("LINK-A", daiToRedeem);
     }
 
