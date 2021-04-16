@@ -180,7 +180,7 @@ contract Addresses {
         addr["RWA001_A_INPUT_CONDUIT"]   = 0x486C85e2bb9801d14f6A8fdb78F5108a0fd932f2;
         addr["RWA001_A_OUTPUT_CONDUIT"]  = 0xb3eFb912e1cbC0B26FC17388Dd433Cecd2206C3d;
         addr["RWA002"]                   = 0xAAA760c2027817169D7C8DB0DC61A2fb4c19AC23;
-        addr["PIP_RWA002"]               = address(0);
+        addr["PIP_RWA002"]               = 0xd2473237E20Bd52F8E7cE0FD79403A6a82fbAEC8;
         addr["MCD_JOIN_RWA002_A"]        = 0xe72C7e90bc26c11d45dBeE736F0acf57fC5B7152;
         addr["RWA002_A_URN"]             = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]   = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
