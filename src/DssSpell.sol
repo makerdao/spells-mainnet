@@ -33,17 +33,6 @@ contract DssSpellAction is DssAction {
     string public constant description =
         "2021-04-16 MakerDAO Executive Spell | Hash: ";
 
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    //
-    uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
-
     // Addresses
     address constant MCD_DOG              = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
     address constant MCD_END              = 0xFB4713C20CCD81c53BC55e12923d37a4f0DB3E93;
