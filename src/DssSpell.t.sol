@@ -684,7 +684,7 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          350,
             mat:          17500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
             cat_dunk:     0,
