@@ -1525,7 +1525,7 @@ contract DssSpellTest is DSTest, DSMath {
                 // Convert BP to system expected value
                 uint256 normalizedTestBuf = (values.collaterals[ilk].clip_buf + 10000)  * 10**23;
                 assertEq(uint256(clip.buf()), normalizedTestBuf);
-                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY); // gte 0% and lte 100%
+                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY); // gte 100% and lte 200%
                 assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail);
                 assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours); // gt eq 20 minutes and lt 10 hours
                 uint256 normalizedTestCusp = (values.collaterals[ilk].clip_cusp)  * 10**23;
@@ -1534,7 +1534,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(rmul(clip.buf(), clip.cusp()) <= RAY);
                 uint256 normalizedTestChip = (values.collaterals[ilk].clip_chip)  * 10**14;
                 assertEq(uint256(clip.chip()), normalizedTestChip);
-                assertTrue(clip.chip() < 1 * WAD / 100); // lt 13% (typical liquidation penalty)
+                assertTrue(clip.chip() < 1 * WAD / 100); // lt 1%
                 uint256 normalizedTestTip = values.collaterals[ilk].clip_tip * RAD;
                 assertEq(uint256(clip.tip()), normalizedTestTip);
                 assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 100 * RAD);

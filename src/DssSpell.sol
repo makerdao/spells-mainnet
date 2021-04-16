@@ -106,7 +106,7 @@ contract DssSpellAction is DssAction {
 
         // ------------------  ESM  ------------------
 
-        require(ESMAbstract(MCD_ESM).min() == 75_000 * WAD, "DssSpell/error-esm-end");
+        require(ESMAbstract(MCD_ESM).min() == 75_000 * WAD, "DssSpell/error-esm-min");
         require(ESMAbstract(MCD_ESM).end() == MCD_END, "DssSpell/error-esm-end");
         require(ESMAbstract(MCD_ESM).gem() == DssExecLib.getChangelogAddress("MCD_GOV"), "DssSpell/error-esm-gov");
         require(ESMAbstract(MCD_ESM).proxy() == address(this), "DssSpell/error-esm-proxy");
