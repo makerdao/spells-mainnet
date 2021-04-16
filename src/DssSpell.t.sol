@@ -2425,6 +2425,18 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(clipLINKA.wards(address(pauseProxy)), 0);
     }
 
+    function testFailFireESM() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 amt = 74 * THOUSAND * WAD;
+        giveTokens(gov, amt);
+        gov.approve(address(esm), amt);
+        esm.join(amt);
+        esm.fire();
+    }
+
     function testClipperMomSetBreaker() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
