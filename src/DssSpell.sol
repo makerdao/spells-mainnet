@@ -20,6 +20,7 @@ import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
+import "dss-interfaces/dss/DogAbstract.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
 import "dss-interfaces/dss/EndAbstract.sol";
@@ -105,6 +106,7 @@ contract DssSpellAction is DssAction {
 
         // ------------------  ESM  ------------------
 
+        require(ESMAbstract(MCD_ESM).min() == 75_000 * WAD, "DssSpell/error-esm-end");
         require(ESMAbstract(MCD_ESM).end() == MCD_END, "DssSpell/error-esm-end");
         require(ESMAbstract(MCD_ESM).gem() == DssExecLib.getChangelogAddress("MCD_GOV"), "DssSpell/error-esm-gov");
         require(ESMAbstract(MCD_ESM).proxy() == address(this), "DssSpell/error-esm-proxy");
@@ -121,6 +123,8 @@ contract DssSpellAction is DssAction {
         }
 
         // ------------------  DOG  ------------------
+
+        require(DogAbstract(MCD_DOG).vat() == MCD_VAT, "DssSpell/error-dog-vat");
 
         // Set VOW in the DOG
         DssExecLib.setContract(MCD_DOG, "vow", MCD_VOW);
