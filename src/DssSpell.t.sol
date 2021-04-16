@@ -120,8 +120,8 @@ contract DssSpellTest is DSTest, DSMath {
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
     // Specific for this spell
-    EndAbstract          end_old = EndAbstract(        address(0));
-    ESMAbstract          esm_old = ESMAbstract(        address(0));
+    EndAbstract          end_old = EndAbstract(        0xaB14d3CE3F733CACB76eC2AbE7d2fcb00c99F3d5);
+    ESMAbstract          esm_old = ESMAbstract(        0x0581A0AbE32AAe9B5f0f68deFab77C6759100085);
     //
 
     DssSpell   spell;

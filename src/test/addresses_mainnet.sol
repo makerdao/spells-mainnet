@@ -102,6 +102,7 @@ contract Addresses {
         addr["LINK"]                   = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
         addr["PIP_LINK"]               = 0x9B0C694C6939b5EA9584e9b61C7815E8d97D9cC7;
         addr["MCD_JOIN_LINK_A"]        = 0xdFccAf8fDbD2F4805C174f856a317765B49E4a50;
+        addr["MCD_FLIP_LINK_A"]        = 0xB907EEdD63a30A3381E6D898e5815Ee8c9fd2c85;
         addr["MCD_CLIP_LINK_A"]        = 0x832Dd5f17B30078a5E46Fdb8130A68cBc4a74dC0;
         addr["MCD_CLIP_CALC_LINK_A"]   = 0x7B1696677107E48B152e9Bf400293e98B7D86Eb1;
         addr["BAL"]                    = 0xba100000625a3754423978a60c9317c58a424e3D;
