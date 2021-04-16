@@ -36,7 +36,7 @@ contract Addresses {
         addr["CDP_MANAGER"]            = 0x5ef30b9986345249bc32d8928B7ee64DE9435E39;
         addr["DSR_MANAGER"]            = 0x373238337Bfe1146fb49989fc222523f83081dDb;
         addr["GET_CDPS"]               = 0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573;
-        addr["ILK_REGISTRY"]           = 0xa1cB9e29f1727d8a0a6E3e0c1334A2323312A2d5;
+        addr["ILK_REGISTRY"]           = 0x5a464C28D19848f44199D003BeF5ecc87d090F87;
         addr["OSM_MOM"]                = 0x76416A4d5190d071bfed309861527431304aA14f;
         addr["FLIPPER_MOM"]            = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]            = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
