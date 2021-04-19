@@ -2270,6 +2270,9 @@ contract DssSpellTest is DSTest, DSMath {
         end.skim("LINK-A", address(this));
 
         // Skim some other vaults (big ones)
+        end.skim("ETH-A", 0x539d799A5DC7BCDdA53084A8943e6998C8e4b61F);
+        end.skim("ETH-A", 0xB5d6F76eC1b981f030A05d8Eb1E6Be305D55d8BA);
+        end.skim("ETH-A", 0x46b164fF756120cf38EF0C314427Fe7A7086A82b);
         end.skim("LINK-A", 0xa91b2eB4827A86B2B6a26258a263cA8A58014e18);
 
         end.free("ETH-A");
@@ -2281,11 +2284,12 @@ contract DssSpellTest is DSTest, DSMath {
         vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
 
         // Removing the surplus to allow continuing the execution.
-        hevm.store(
-            address(vat),
-            keccak256(abi.encode(address(vow), uint256(5))),
-            bytes32(uint256(0))
-        );
+        // (not needed if enough vaults skimmed)
+        // hevm.store(
+        //     address(vat),
+        //     keccak256(abi.encode(address(vow), uint256(5))),
+        //     bytes32(uint256(0))
+        // );
 
         end.thaw();
 
