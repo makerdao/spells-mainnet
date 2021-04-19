@@ -36,8 +36,8 @@ contract DssSpellAction is DssAction {
 
     // Addresses
     address constant MCD_DOG              = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
-    address constant MCD_END              = 0xFB4713C20CCD81c53BC55e12923d37a4f0DB3E93;
-    address constant MCD_ESM              = 0x41BAfF224E19D33Af3972CDC3452cDb66138937E;
+    address constant MCD_END              = 0xBB856d1742fD182a90239D7AE85706C2FE4e5922;
+    address constant MCD_ESM              = 0x29CfBd381043D00a98fD9904a431015Fef07af2f;
     address constant ILK_REGISTRY         = 0x5a464C28D19848f44199D003BeF5ecc87d090F87;
     address constant CLIPPER_MOM          = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
     address constant MCD_CLIP_LINK_A      = 0x832Dd5f17B30078a5E46Fdb8130A68cBc4a74dC0;

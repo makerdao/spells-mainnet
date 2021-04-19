@@ -28,8 +28,8 @@ contract Addresses {
         addr["MCD_DAI"]                = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
         addr["MCD_SPOT"]               = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
         addr["MCD_POT"]                = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-        addr["MCD_END"]                = 0xFB4713C20CCD81c53BC55e12923d37a4f0DB3E93;
-        addr["MCD_ESM"]                = 0x41BAfF224E19D33Af3972CDC3452cDb66138937E;
+        addr["MCD_END"]                = 0xBB856d1742fD182a90239D7AE85706C2FE4e5922;
+        addr["MCD_ESM"]                = 0x29CfBd381043D00a98fD9904a431015Fef07af2f;
         addr["PROXY_ACTIONS"]          = 0x82ecD135Dce65Fbc6DbdD0e4237E0AF93FFD5038;
         addr["PROXY_ACTIONS_END"]      = 0x7AfF9FC9faD225e3c88cDA06BC56d8Aca774bC57;
         addr["PROXY_ACTIONS_DSR"]      = 0x07ee93aEEa0a36FfF2A9B95dd22Bd6049EE54f26;
