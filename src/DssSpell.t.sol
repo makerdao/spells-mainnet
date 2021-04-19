@@ -2269,6 +2269,9 @@ contract DssSpellTest is DSTest, DSMath {
         end.skim("BAL-A", address(this));
         end.skim("LINK-A", address(this));
 
+        // Skim some other vaults (big ones)
+        end.skim("LINK-A", 0xa91b2eB4827A86B2B6a26258a263cA8A58014e18);
+
         end.free("ETH-A");
         end.free("BAL-A");
         end.free("LINK-A");
