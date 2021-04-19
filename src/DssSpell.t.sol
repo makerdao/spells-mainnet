@@ -2273,33 +2273,33 @@ contract DssSpellTest is DSTest, DSMath {
         end.free("BAL-A");
         end.free("LINK-A");
 
-    //     hevm.warp(block.timestamp + end.wait());
+        hevm.warp(block.timestamp + end.wait());
 
-    //     vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
+        vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
 
-    //     // Removing the surplus to allow continuing the execution.
-    //     hevm.store(
-    //         address(vat),
-    //         keccak256(abi.encode(address(vow), uint256(5))),
-    //         bytes32(uint256(0))
-    //     );
+        // Removing the surplus to allow continuing the execution.
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
 
-    //     end.thaw();
+        end.thaw();
 
-    //     end.flow("ETH-A");
-    //     end.flow("BAL-A");
-    //     end.flow("LINK-A");
+        end.flow("ETH-A");
+        end.flow("BAL-A");
+        end.flow("LINK-A");
 
-    //     vat.hope(address(end));
+        vat.hope(address(end));
 
-    //     uint256 daiToRedeem = vat.dai(address(this)) / RAY;
-    //     assertTrue(daiToRedeem > 0);
+        uint256 daiToRedeem = vat.dai(address(this)) / RAY;
+        assertTrue(daiToRedeem > 0);
 
-    //     end.pack(daiToRedeem);
+        end.pack(daiToRedeem);
 
-    //     end.cash("ETH-A", daiToRedeem);
-    //     end.cash("BAL-A", daiToRedeem);
-    //     end.cash("LINK-A", daiToRedeem);
+        end.cash("ETH-A", daiToRedeem);
+        end.cash("BAL-A", daiToRedeem);
+        end.cash("LINK-A", daiToRedeem);
     }
 
     function testSpellIsCast_new_ClipperMom() public {
