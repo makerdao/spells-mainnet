@@ -113,6 +113,8 @@ contract Addresses {
         addr["PIP_YFI"]                = 0x5F122465bCf86F45922036970Be6DD7F58820214;
         addr["MCD_JOIN_YFI_A"]         = 0x3ff33d9162aD47660083D7DC4bC02Fb231c81677;
         addr["MCD_FLIP_YFI_A"]         = 0xEe4C9C36257afB8098059a4763A374a4ECFE28A7;
+        addr["MCD_CLIP_YFI_A"]         = 0x9daCc11dcD0aa13386D295eAeeBBd38130897E6f;
+        addr["MCD_CLIP_CALC_YFI_A"]    = 0x1f206d7916Fd3B1b5B0Ce53d5Cab11FCebc124DA;
         addr["GUSD"]                   = 0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd;
         addr["PIP_GUSD"]               = 0xf45Ae69CcA1b9B043dAE2C83A5B65Bc605BEc5F5;
         addr["MCD_JOIN_GUSD_A"]        = 0xe29A14bcDeA40d83675aa43B72dF07f649738C8b;
@@ -185,5 +187,6 @@ contract Addresses {
         addr["RWA002_A_URN"]             = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]   = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
         addr["RWA002_A_OUTPUT_CONDUIT"]  = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
+        addr["LERP_FAB"]                 = 0x00B416da876fe42dd02813da435Cc030F0d72434;
     }
 }

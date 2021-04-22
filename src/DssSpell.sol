@@ -20,211 +20,202 @@ import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
+import "dss-interfaces/dss/VowAbstract.sol";
 import "dss-interfaces/dss/DogAbstract.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
 import "dss-interfaces/dss/EndAbstract.sol";
 import "dss-interfaces/dss/ESMAbstract.sol";
 
+interface LerpFabLike {
+    function newLerp(bytes32, address, bytes32, uint256, uint256, uint256, uint256) external returns (address);
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6f9bc23e6862ef798bf61349fb06e529703171bd/governance/votes/Executive%20vote%20-%20April%2019%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Executive%20vote%20-%20April%2023%2C%202021.md -q -O - 2>/dev/null)"
     string public constant description =
-        "2021-04-19 MakerDAO Executive Spell | Hash: 0xc92979935a4ecb8f1d8e76c77aaac43ea3aa46a21545dbeb47a104e77323ae6f";
+        "2021-04-23 MakerDAO Executive Spell | Hash: ";
 
-    // Addresses
-    address constant MCD_DOG              = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
-    address constant MCD_END              = 0xBB856d1742fD182a90239D7AE85706C2FE4e5922;
-    address constant MCD_ESM              = 0x29CfBd381043D00a98fD9904a431015Fef07af2f;
-    address constant ILK_REGISTRY         = 0x5a464C28D19848f44199D003BeF5ecc87d090F87;
-    address constant CLIPPER_MOM          = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
-    address constant MCD_CLIP_LINK_A      = 0x832Dd5f17B30078a5E46Fdb8130A68cBc4a74dC0;
-    address constant MCD_CLIP_CALC_LINK_A = 0x7B1696677107E48B152e9Bf400293e98B7D86Eb1;
+    // New addresses
+    address constant MCD_CLIP_YFI_A      = 0x9daCc11dcD0aa13386D295eAeeBBd38130897E6f;
+    address constant MCD_CLIP_CALC_YFI_A = 0x1f206d7916Fd3B1b5B0Ce53d5Cab11FCebc124DA;
+    address constant LERP_FAB            = 0x00B416da876fe42dd02813da435Cc030F0d72434;
 
-    uint256 constant THOUSAND   = 10**3;
+    // Units used
     uint256 constant MILLION    = 10**6;
     uint256 constant WAD        = 10**18;
     uint256 constant RAY        = 10**27;
     uint256 constant RAD        = 10**45;
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    // A table of rates can be found at
+    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
+    //
+    uint256 constant ZERO_PCT           = 1000000000000000000000000000;
+    uint256 constant ONE_PCT            = 1000000000315522921573372069;
+    uint256 constant TWO_PCT            = 1000000000627937192491029810;
+    uint256 constant THREE_PCT          = 1000000000937303470807876289;
+    uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
+    uint256 constant FOUR_PCT           = 1000000001243680656318820312;
+    uint256 constant FOUR_PT_FIVE_PCT   = 1000000001395766281313196627;
+    uint256 constant FIVE_PCT           = 1000000001547125957863212448;
+    uint256 constant TEN_PCT            = 1000000003022265980097387650;
+
     function actions() public override {
-        address MCD_VAT          = DssExecLib.vat();
-        address MCD_CAT          = DssExecLib.cat();
-        address MCD_VOW          = DssExecLib.vow();
-        address MCD_POT          = DssExecLib.pot();
-        address MCD_SPOT         = DssExecLib.spotter();
-        address MCD_END_OLD      = DssExecLib.end();
-        address MCD_FLIP_LINK_A  = DssExecLib.flip("LINK-A");
-        address ILK_REGISTRY_OLD = DssExecLib.reg();
-        address PIP_LINK         = DssExecLib.getChangelogAddress("PIP_LINK");
+        // ------------- Get all the needed address from Chainlog -------------
 
-        // ------------------  END  ------------------
+        address MCD_VAT        = DssExecLib.vat();
+        address MCD_CAT        = DssExecLib.cat();
+        address MCD_DOG        = DssExecLib.getChangelogAddress("MCD_DOG");
+        address MCD_VOW        = DssExecLib.vow();
+        address MCD_SPOT       = DssExecLib.spotter();
+        address MCD_END        = DssExecLib.end();
+        address MCD_ESM        = DssExecLib.getChangelogAddress("MCD_ESM");
+        address CLIPPER_MOM    = DssExecLib.getChangelogAddress("CLIPPER_MOM");
+        address ILK_REGISTRY   = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+        address PIP_YFI        = DssExecLib.getChangelogAddress("PIP_YFI");
+        address MCD_FLIP_YFI_A = DssExecLib.getChangelogAddress("MCD_FLIP_YFI_A");
+        address CHANGELOG      = DssExecLib.getChangelogAddress("CHANGELOG");
 
-        // Set contracts in END
-        DssExecLib.setContract(MCD_END,  "vat", MCD_VAT);
-        DssExecLib.setContract(MCD_END,  "cat", MCD_CAT);
-        DssExecLib.setContract(MCD_END,  "dog", MCD_DOG);
-        DssExecLib.setContract(MCD_END,  "vow", MCD_VOW);
-        DssExecLib.setContract(MCD_END,  "pot", MCD_POT);
-        DssExecLib.setContract(MCD_END, "spot", MCD_SPOT);
+        // ------------- Increase the System Surplus Buffer And Add Burn Percentage -------------
 
-        // Authorize the new END in contracts
-        DssExecLib.authorize(MCD_VAT, MCD_END);
-        DssExecLib.authorize(MCD_CAT, MCD_END);
-        DssExecLib.authorize(MCD_DOG, MCD_END);
-        DssExecLib.authorize(MCD_VOW, MCD_END);
-        DssExecLib.authorize(MCD_POT, MCD_END);
-        DssExecLib.authorize(MCD_SPOT, MCD_END);
+        // TODO: Review values
+        address lerp = LerpFabLike(LERP_FAB).newLerp("20210423_VOW_HUMP1", MCD_VOW, "hump", 1619841600, 30 * MILLION, 60 * MILLION, 105 days);
+        VowAbstract(MCD_VOW).rely(lerp);
+        DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
 
-        // Set wait time in END
-        Fileable(MCD_END).file("wait", EndAbstract(MCD_END_OLD).wait());
+        // ------------- Add YFI-A to Liquidations 2.0 Framework -------------
 
-        // Deauthorize the old END in contracts
-        DssExecLib.deauthorize(MCD_VAT, MCD_END_OLD);
-        DssExecLib.deauthorize(MCD_CAT, MCD_END_OLD);
-        DssExecLib.deauthorize(MCD_VOW, MCD_END_OLD);
-        DssExecLib.deauthorize(MCD_POT, MCD_END_OLD);
-        DssExecLib.deauthorize(MCD_SPOT, MCD_END_OLD);
+        // Check constructor values of Clipper
+        require(ClipAbstract(MCD_CLIP_YFI_A).vat() == MCD_VAT, "DssSpell/clip-wrong-vat");
+        require(ClipAbstract(MCD_CLIP_YFI_A).spotter() == MCD_SPOT, "DssSpell/clip-wrong-spotter");
+        require(ClipAbstract(MCD_CLIP_YFI_A).dog() == MCD_DOG, "DssSpell/clip-wrong-dog");
+        require(ClipAbstract(MCD_CLIP_YFI_A).ilk() == "YFI-A", "DssSpell/clip-wrong-ilk");
 
-        // Deauthorize the old END from all the FLIPS
-        // Authorize the new END in all the FLIPS
-        bytes32[] memory ilks = IlkRegistryAbstract(ILK_REGISTRY_OLD).list();
-        address[] memory flips = new address[](ilks.length);
-        for (uint256 i = 0; i < ilks.length; i++) {
-            bytes32 ilk = ilks[i];
+        // Set CLIP for YFI-A in the DOG
+        DssExecLib.setContract(MCD_DOG, "YFI-A", "clip", MCD_CLIP_YFI_A);
 
-            address flip = DssExecLib.flip(ilk);
-            flips[i] = flip;
-            DssExecLib.deauthorize(flip, MCD_END_OLD);
-            DssExecLib.authorize(flip, MCD_END);
+        // Set VOW in the YFI-A CLIP
+        DssExecLib.setContract(MCD_CLIP_YFI_A, "vow", MCD_VOW);
 
-            try DssExecLib.removeReaderFromOSMWhitelist(IlkRegistryAbstract(ILK_REGISTRY_OLD).pip(ilk), MCD_END_OLD) {} catch {}
-            try DssExecLib.addReaderToOSMWhitelist(IlkRegistryAbstract(ILK_REGISTRY_OLD).pip(ilk), MCD_END) {} catch {}
-        }
-
-        // ------------------  ESM  ------------------
-
-        require(ESMAbstract(MCD_ESM).min() == 75_000 * WAD, "DssSpell/error-esm-min");
-        require(ESMAbstract(MCD_ESM).end() == MCD_END, "DssSpell/error-esm-end");
-        require(ESMAbstract(MCD_ESM).gem() == DssExecLib.getChangelogAddress("MCD_GOV"), "DssSpell/error-esm-gov");
-        require(ESMAbstract(MCD_ESM).proxy() == address(this), "DssSpell/error-esm-proxy");
-
-        // Authorize new ESM to execute in new END
-        DssExecLib.authorize(MCD_END, MCD_ESM);
-
-        // Authorize new ESM to execute in VAT
-        DssExecLib.authorize(MCD_VAT, MCD_ESM);
-
-        // Make every flipper relies the MCD_ESM
-        for (uint256 i = 0; i < flips.length; i++) {
-            DssExecLib.authorize(flips[i], MCD_ESM);
-        }
-
-        // ------------------  DOG  ------------------
-
-        require(DogAbstract(MCD_DOG).vat() == MCD_VAT, "DssSpell/error-dog-vat");
-
-        // Set VOW in the DOG
-        DssExecLib.setContract(MCD_DOG, "vow", MCD_VOW);
-
-        // Authorize DOG can access to VAT
-        DssExecLib.authorize(MCD_VAT, MCD_DOG);
-
-        // Authorize DOG can access to VOW
-        DssExecLib.authorize(MCD_VOW, MCD_DOG);
-
-        Fileable(MCD_DOG).file("Hole", 100 * MILLION * RAD);
-
-
-        // --------------  CLIPPER_MOM  --------------
-
-        require(ClipperMomAbstract(CLIPPER_MOM).spotter() == MCD_SPOT, "DssSpell/error-clipper-mom-spotter");
-
-        ClipperMomAbstract(CLIPPER_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
-
-        // ----------------  LINK-A  -----------------
-
-        require(ClipAbstract(MCD_CLIP_LINK_A).vat() == MCD_VAT, "DssSpell/error-clip-vat");
-        require(ClipAbstract(MCD_CLIP_LINK_A).dog() == MCD_DOG, "DssSpell/error-clip-dog");
-        require(ClipAbstract(MCD_CLIP_LINK_A).spotter() == MCD_SPOT, "DssSpell/error-clip-spot");
-        require(ClipAbstract(MCD_CLIP_LINK_A).ilk() == "LINK-A", "DssSpell/error-clip-ilk");
-
-        // Set CLIP for LINK-A in the DOG
-        DssExecLib.setContract(MCD_DOG, "LINK-A", "clip", MCD_CLIP_LINK_A);
-
-        // Set VOW in the LINK-A CLIP
-        DssExecLib.setContract(MCD_CLIP_LINK_A, "vow", MCD_VOW);
-
-        // Set CALC in the LINK-A CLIP
-        DssExecLib.setContract(MCD_CLIP_LINK_A, "calc", MCD_CLIP_CALC_LINK_A);
+        // Set CALC in the YFI-A CLIP
+        DssExecLib.setContract(MCD_CLIP_YFI_A, "calc", MCD_CLIP_CALC_YFI_A);
 
         // Authorize CLIP can access to VAT
-        DssExecLib.authorize(MCD_VAT, MCD_CLIP_LINK_A);
+        DssExecLib.authorize(MCD_VAT, MCD_CLIP_YFI_A);
 
         // Authorize CLIP can access to DOG
-        DssExecLib.authorize(MCD_DOG, MCD_CLIP_LINK_A);
+        DssExecLib.authorize(MCD_DOG, MCD_CLIP_YFI_A);
 
         // Authorize DOG can kick auctions on CLIP
-        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_DOG);
+        DssExecLib.authorize(MCD_CLIP_YFI_A, MCD_DOG);
 
-        // Authorize the new END to access the LINK CLIP
-        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_END);
+        // Authorize the new END to access the YFI CLIP
+        DssExecLib.authorize(MCD_CLIP_YFI_A, MCD_END);
 
         // Authorize CLIPPERMOM can set the stopped flag in CLIP
-        DssExecLib.authorize(MCD_CLIP_LINK_A, CLIPPER_MOM);
+        DssExecLib.authorize(MCD_CLIP_YFI_A, CLIPPER_MOM);
 
-        // Authorize new ESM to execute in LINK-A Clipper
-        DssExecLib.authorize(MCD_CLIP_LINK_A, MCD_ESM);
+        // Authorize new ESM to execute in YFI-A Clipper
+        DssExecLib.authorize(MCD_CLIP_YFI_A, MCD_ESM);
 
-        // Whitelist CLIP in the LINK osm
-        DssExecLib.addReaderToOSMWhitelist(PIP_LINK, MCD_CLIP_LINK_A);
+        // Whitelist CLIP in the YFI osm
+        DssExecLib.addReaderToOSMWhitelist(PIP_YFI, MCD_CLIP_YFI_A);
 
-        // Whitelist CLIPPER_MOM in the LINK osm
-        DssExecLib.addReaderToOSMWhitelist(PIP_LINK, CLIPPER_MOM);
+        // Whitelist CLIPPER_MOM in the YFI osm
+        DssExecLib.addReaderToOSMWhitelist(PIP_YFI, CLIPPER_MOM);
 
         // No more auctions kicked via the CAT:
-        DssExecLib.deauthorize(MCD_FLIP_LINK_A, MCD_CAT);
+        DssExecLib.deauthorize(MCD_FLIP_YFI_A, MCD_CAT);
 
-        // No more circuit breaker for the FLIP in LINK-A:
-        DssExecLib.deauthorize(MCD_FLIP_LINK_A, DssExecLib.flipperMom());
+        // No more circuit breaker for the FLIP in YFI-A:
+        DssExecLib.deauthorize(MCD_FLIP_YFI_A, DssExecLib.flipperMom());
 
-        Fileable(MCD_DOG).file("LINK-A", "hole", 6 * MILLION * RAD);
-        Fileable(MCD_DOG).file("LINK-A", "chop", 113 * WAD / 100);
-        Fileable(MCD_CLIP_LINK_A).file("buf", 130 * RAY / 100);
-        Fileable(MCD_CLIP_LINK_A).file("tail", 140 minutes);
-        Fileable(MCD_CLIP_LINK_A).file("cusp", 40 * RAY / 100);
-        Fileable(MCD_CLIP_LINK_A).file("chip", 1 * WAD / 1000);
-        Fileable(MCD_CLIP_LINK_A).file("tip", 0);
-        Fileable(MCD_CLIP_CALC_LINK_A).file("cut", 99 * RAY / 100); // 1% cut
-        Fileable(MCD_CLIP_CALC_LINK_A).file("step", 90 seconds);
+        Fileable(MCD_DOG).file("YFI-A", "hole", 5 * MILLION * RAD);
+        Fileable(MCD_DOG).file("YFI-A", "chop", 113 * WAD / 100);
+        Fileable(MCD_CLIP_YFI_A).file("buf", 130 * RAY / 100);
+        Fileable(MCD_CLIP_YFI_A).file("tail", 140 minutes);
+        Fileable(MCD_CLIP_YFI_A).file("cusp", 40 * RAY / 100);
+        Fileable(MCD_CLIP_YFI_A).file("chip", 1 * WAD / 1000);
+        Fileable(MCD_CLIP_YFI_A).file("tip", 0);
+        Fileable(MCD_CLIP_CALC_YFI_A).file("cut", 99 * RAY / 100); // 1% cut
+        Fileable(MCD_CLIP_CALC_YFI_A).file("step", 90 seconds);
 
         //  Tolerance currently set to 50%.
         //   n.b. 600000000000000000000000000 == 40% acceptable drop
-        ClipperMomAbstract(CLIPPER_MOM).setPriceTolerance(MCD_CLIP_LINK_A, 50 * RAY / 100);
+        ClipperMomAbstract(CLIPPER_MOM).setPriceTolerance(MCD_CLIP_YFI_A, 50 * RAY / 100);
 
-        ClipAbstract(MCD_CLIP_LINK_A).upchost();
+        ClipAbstract(MCD_CLIP_YFI_A).upchost();
 
         // Replace flip to clip in the ilk registry
-        DssExecLib.setContract(ILK_REGISTRY, "LINK-A", "xlip", MCD_CLIP_LINK_A);
-        Fileable(ILK_REGISTRY).file("LINK-A", "class", 1);
+        DssExecLib.setContract(ILK_REGISTRY, "YFI-A", "xlip", MCD_CLIP_YFI_A);
+        Fileable(ILK_REGISTRY).file("YFI-A", "class", 1);
 
+        DssExecLib.setChangelogAddress("MCD_CLIP_YFI_A", MCD_CLIP_YFI_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_YFI_A", MCD_CLIP_CALC_YFI_A);
+        ChainlogLike(CHANGELOG).removeAddress("MCD_FLIP_YFI_A");
 
-        // ------------------  CHAINLOG  -----------------
+        // ------------- Stability fees -------------
+        DssExecLib.setIlkStabilityFee("LINK-A", FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("ETH-A", TEN_PCT, true);
+        DssExecLib.setIlkStabilityFee("ZRX-A", FOUR_PCT, true);
+        DssExecLib.setIlkStabilityFee("LRC-A", FOUR_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", THREE_PT_FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", FOUR_PT_FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("AAVE-A", THREE_PCT, true);
+        DssExecLib.setIlkStabilityFee("BAT-A", FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("MANA-A", THREE_PCT, true);
+        DssExecLib.setIlkStabilityFee("BAL-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2DAIUSDC-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2LINKETH-A", FOUR_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2WBTCDAI-A", ZERO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2AAVEETH-A", FOUR_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2DAIUSDT-A", THREE_PCT, true);
 
-        address log = DssExecLib.getChangelogAddress("CHANGELOG");
+        // ------------- Regular debt ceilings -------------
 
-        DssExecLib.setChangelogAddress("MCD_DOG", MCD_DOG);
-        DssExecLib.setChangelogAddress("MCD_END", MCD_END);
-        DssExecLib.setChangelogAddress("MCD_ESM", MCD_ESM);
-        DssExecLib.setChangelogAddress("CLIPPER_MOM", CLIPPER_MOM);
-        DssExecLib.setChangelogAddress("MCD_CLIP_LINK_A", MCD_CLIP_LINK_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_LINK_A", MCD_CLIP_CALC_LINK_A);
-        DssExecLib.setChangelogAddress("ILK_REGISTRY", ILK_REGISTRY);
-        ChainlogLike(log).removeAddress("MCD_FLIP_LINK_A");
+        DssExecLib.decreaseIlkDebtCeiling("USDT-A", 25 * MILLION / 10, true);
 
-        DssExecLib.setChangelogVersion("1.3.0");
+        // ------------- Auto line max ceiling changes -------------
+
+        DssExecLib.setIlkAutoLineDebtCeiling("YFI-A", 90 * MILLION);
+        // DssExecLib.setIlkAutoLineDebtCeiling("AAVE-A", 50 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling("BAT-A", 7 * MILLION);
+        // DssExecLib.setIlkAutoLineDebtCeiling("RENBTC-A", 10 * MILLION);
+        // DssExecLib.setIlkAutoLineDebtCeiling("MANA-A", 5 * MILLION);
+        // DssExecLib.setIlkAutoLineDebtCeiling("BAL-A", 30 * MILLION);
+        DssExecLib.setIlkAutoLineDebtCeiling("UNIV2DAIETH-A", 50 * MILLION);
+        // DssExecLib.setIlkAutoLineDebtCeiling("LRC-A", 5 * MILLION);
+
+        // ------------- Auto line gap changes -------------
+
+        DssExecLib.setIlkAutoLineParameters("AAVE-A", 50 * MILLION, 5 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("RENBTC-A", 10 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("MANA-A", 5 * MILLION, 1 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("BAL-A", 30 * MILLION, 3 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("LRC-A", 5 * MILLION, 1 * MILLION, 12 hours);
+
+        // ------------- Auto line new ilks -------------
+
+        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCETH-A", 20 * MILLION, 3 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2UNIETH-A", 20 * MILLION, 3 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2LINKETH-A", 20 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2AAVEETH-A", 20 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2ETHUSDT-A", 10 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDT-A", 10 * MILLION, 2 * MILLION, 12 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCDAI-A", 20 * MILLION, 3 * MILLION, 12 hours);
+
+        // ------------- Chainlog version -------------
+
+        DssExecLib.setChangelogVersion("1.4.0");
     }
 }
 
