@@ -2276,16 +2276,13 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         assertEq(factory.count(), 1);
-        LerpLike lerp = LerpLike(factory.lerps("20210421_VOW_HUMP1"));
+        LerpLike lerp = LerpLike(factory.lerps("20210423_VOW_HUMP1"));
 
         assertEq(vow.hump(), 30 * MILLION * RAD);
 
         // Should do nothing as we are before the start date
         lerp.tick();
         assertEq(vow.hump(), 30 * MILLION * RAD);
-
-        // Warp to the start time Thu Apr 22 2021 16:00:00 GMT+0000
-        hevm.warp(1619107200);
 
         // Should do nothing as we are exactly at the start date
         lerp.tick();

@@ -88,7 +88,7 @@ contract DssSpellAction is DssAction {
         // ------------- Increase the System Surplus Buffer And Add Burn Percentage -------------
 
         // TODO: Review values
-        address lerp = LerpFabLike(LERP_FAB).newLerp("20210423_VOW_HUMP1", MCD_VOW, "hump", 1619841600, 30 * MILLION, 60 * MILLION, 105 days);
+        address lerp = LerpFabLike(LERP_FAB).newLerp("20210423_VOW_HUMP1", MCD_VOW, "hump", 1619841600, 30 * MILLION * RAD, 60 * MILLION * RAD, 105 days);
         VowAbstract(MCD_VOW).rely(lerp);
         DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
 
