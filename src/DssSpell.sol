@@ -165,7 +165,7 @@ contract DssSpellAction is DssAction {
 
         // ------------- Stability fees -------------
         DssExecLib.setIlkStabilityFee("LINK-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("ETH-A", TEN_PCT, true);
+        DssExecLib.setIlkStabilityFee("ETH-B", TEN_PCT, true);
         DssExecLib.setIlkStabilityFee("ZRX-A", FOUR_PCT, true);
         DssExecLib.setIlkStabilityFee("LRC-A", FOUR_PCT, true);
         DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", THREE_PT_FIVE_PCT, true);
