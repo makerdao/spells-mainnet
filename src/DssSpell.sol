@@ -70,7 +70,7 @@ contract DssSpellAction is DssAction {
     uint256 constant TEN_PCT            = 1000000003022265980097387650;
 
     function actions() public override {
-        // ------------- Get all the needed address from Chainlog -------------
+        // ------------- Get all the needed addresses from Chainlog -------------
 
         address MCD_VAT        = DssExecLib.vat();
         address MCD_CAT        = DssExecLib.cat();

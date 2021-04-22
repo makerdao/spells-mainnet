@@ -2268,7 +2268,7 @@ contract DssSpellTest is DSTest, DSMath {
     function testLerp() public {
         LerpFabLike factory = LerpFabLike(addr.addr("LERP_FAB"));
 
-        assertEq(vow.hump(), 500 * RAD);
+        assertEq(vow.hump(), 30 * MILLION * RAD);
         assertEq(factory.count(), 0);
 
         vote(address(spell));
@@ -2278,31 +2278,31 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(factory.count(), 1);
         LerpLike lerp = LerpLike(factory.lerps("20210421_VOW_HUMP1"));
 
-        assertEq(vow.hump(), 500 * RAD);
+        assertEq(vow.hump(), 30 * MILLION * RAD);
 
         // Should do nothing as we are before the start date
         lerp.tick();
-        assertEq(vow.hump(), 500 * RAD);
+        assertEq(vow.hump(), 30 * MILLION * RAD);
 
         // Warp to the start time Thu Apr 22 2021 16:00:00 GMT+0000
         hevm.warp(1619107200);
 
         // Should do nothing as we are exactly at the start date
         lerp.tick();
-        assertEq(vow.hump(), 500 * RAD);
+        assertEq(vow.hump(), 30 * MILLION * RAD);
 
-        hevm.warp(now + 1 days);
+        hevm.warp(1619841600 + 1 days);
 
         // Should advance to an intermediary value
         factory.tall();
-        assertTrue(vow.hump() > 500 * RAD);
-        assertTrue(vow.hump() < 1000 * RAD);
+        assertTrue(vow.hump() > 30 * MILLION * RAD);
+        assertTrue(vow.hump() < 60 * MILLION * RAD);
 
-        hevm.warp(now + 20 days);
+        hevm.warp(1619841600 + 105 days);
 
         // Should be done
         factory.tall();
         assertEq(factory.count(), 0);
-        assertEq(vow.hump(), 1000 * RAD);
+        assertEq(vow.hump(), 60 * MILLION * RAD);
     }
 }
