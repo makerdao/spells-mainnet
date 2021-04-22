@@ -228,7 +228,7 @@ contract DssSpellTest is DSTest, DSMath {
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1618861850,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0xDb0D1af4531F59E4E7EfA4ec0AcADec7518D42B6),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            previous_spell_execution_time:  1618861850 + 10 days,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
+            previous_spell_execution_time:  1619372356,        // Time to warp to in order to allow the previous spell to be cast ignored if PREV_SPELL is SpellLike(address(0)).
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -1241,6 +1241,8 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    0,
             calc_cut:     0
         });
+
+        castPreviousSpell();
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1839,7 +1841,6 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(getExtcodesize(depl_spell), getExtcodesize(code_spell));
         }
 
-        castPreviousSpell();
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -1868,7 +1869,6 @@ contract DssSpellTest is DSTest, DSMath {
     // function testCollateralIntegrations() public {
     //     vote(address(spell));
     //     spell.schedule();
-    //     castPreviousSpell();
     //     hevm.warp(spell.nextCastTime());
     //     spell.cast();
     //     assertTrue(spell.done());
@@ -1918,8 +1918,6 @@ contract DssSpellTest is DSTest, DSMath {
     function testCastCost() public {
         vote(address(spell));
         spell.schedule();
-
-        castPreviousSpell();
 
         hevm.warp(spell.nextCastTime());
         uint256 startGas = gasleft();
@@ -2002,7 +2000,6 @@ contract DssSpellTest is DSTest, DSMath {
     // function test_OSMs() public {
     //     vote(address(spell));
     //     spell.schedule();
-    //     castPreviousSpell();
     //     hevm.warp(spell.nextCastTime());
     //     spell.cast();
     //     assertTrue(spell.done());
@@ -2028,7 +2025,6 @@ contract DssSpellTest is DSTest, DSMath {
     // function test_Medianizers() public {
     //     vote(address(spell));
     //     spell.schedule();
-    //     castPreviousSpell();
     //     hevm.warp(spell.nextCastTime());
     //     spell.cast();
     //     assertTrue(spell.done());
@@ -2094,7 +2090,6 @@ contract DssSpellTest is DSTest, DSMath {
     function checkAuth(bool onlySource) internal {
         vote(address(spell));
         spell.schedule();
-        castPreviousSpell();
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
