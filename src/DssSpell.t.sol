@@ -2218,7 +2218,14 @@ contract DssSpellTest is DSTest, DSMath {
         GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A"));
         ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
 
-        uint256 ilkAmt = 1 * THOUSAND * WAD;
+        // Force max debt ceiling for YFI-A
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+
+        uint256 ilkAmt = 2 * WAD;
 
         giveTokens(YFI, ilkAmt);
 
