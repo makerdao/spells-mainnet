@@ -2157,7 +2157,7 @@ contract DssSpellTest is DSTest, DSMath {
         );
 
         // Add balance to the test address
-        uint256 ilkAmt = 2 * 10 ** 18;
+        uint256 ilkAmt = 2 * WAD;
 
         giveTokens(YFI, ilkAmt);
         assertEq(YFI.balanceOf(address(this)), ilkAmt);
