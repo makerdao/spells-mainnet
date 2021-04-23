@@ -2252,6 +2252,8 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(end.wards(address(this)), 1);
 
         end.cage();
+        end.cage("ETH-A");
+        end.cage("LINK-A");
         end.cage("YFI-A");
 
         (,,, address usr,,) = clipYFIA.sales(auctionIdYFIA);
