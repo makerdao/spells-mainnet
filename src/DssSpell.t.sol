@@ -2287,14 +2287,14 @@ contract DssSpellTest is DSTest, DSMath {
         lerp.tick();
         assertEq(vow.hump(), 30 * MILLION * RAD);
 
-        hevm.warp(1619841600 + 1 days);
+        hevm.warp(1619773200 + 1 days);
 
         // Should advance to an intermediary value
         factory.tall();
         assertTrue(vow.hump() > 30 * MILLION * RAD);
         assertTrue(vow.hump() < 60 * MILLION * RAD);
 
-        hevm.warp(1619841600 + 105 days);
+        hevm.warp(1619773200 + 99 days);
 
         // Should be done
         factory.tall();

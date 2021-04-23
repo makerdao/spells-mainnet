@@ -79,6 +79,7 @@ contract DssSpellAction is DssAction {
         address MCD_SPOT       = DssExecLib.spotter();
         address MCD_END        = DssExecLib.end();
         address MCD_ESM        = DssExecLib.getChangelogAddress("MCD_ESM");
+        address FLIPPER_MOM    = DssExecLib.flipperMom();
         address CLIPPER_MOM    = DssExecLib.getChangelogAddress("CLIPPER_MOM");
         address ILK_REGISTRY   = DssExecLib.getChangelogAddress("ILK_REGISTRY");
         address PIP_YFI        = DssExecLib.getChangelogAddress("PIP_YFI");
@@ -87,8 +88,7 @@ contract DssSpellAction is DssAction {
 
         // ------------- Increase the System Surplus Buffer And Add Burn Percentage -------------
 
-        // TODO: Review values
-        address lerp = LerpFabLike(LERP_FAB).newLerp("20210423_VOW_HUMP1", MCD_VOW, "hump", 1619841600, 30 * MILLION * RAD, 60 * MILLION * RAD, 105 days);
+        address lerp = LerpFabLike(LERP_FAB).newLerp("20210423_VOW_HUMP1", MCD_VOW, "hump", 1619773200, 30 * MILLION * RAD, 60 * MILLION * RAD, 99 days);
         VowAbstract(MCD_VOW).rely(lerp);
         DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
 
@@ -137,7 +137,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(MCD_FLIP_YFI_A, MCD_CAT);
 
         // No more circuit breaker for the FLIP in YFI-A:
-        DssExecLib.deauthorize(MCD_FLIP_YFI_A, DssExecLib.flipperMom());
+        DssExecLib.deauthorize(MCD_FLIP_YFI_A, FLIPPER_MOM);
 
         Fileable(MCD_DOG).file("YFI-A", "hole", 5 * MILLION * RAD);
         Fileable(MCD_DOG).file("YFI-A", "chop", 113 * WAD / 100);
