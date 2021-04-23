@@ -2112,7 +2112,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function testSpellIsCast_YFI_A_CLIP() public {
+    function testSpellIsCast_YFI_A_Clip() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -2209,6 +2209,87 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vat.gem("YFI-A", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
     }
 
+    function testSpellIsCast_YFI_A_End() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DSTokenAbstract YFI = DSTokenAbstract(addr.addr("YFI"));
+        GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A"));
+        ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
+
+        uint256 ilkAmt = 1 * THOUSAND * WAD;
+
+        giveTokens(YFI, ilkAmt);
+
+        YFI.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
+
+        (,uint256 rate, uint256 spot,,) = vat.ilks("YFI-A");
+        vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
+
+        hevm.warp(block.timestamp + 1);
+        jug.drip("YFI-A");
+
+        uint256 auctionIdYFIA = clipYFIA.kicks() + 1;
+
+        dog.bark("YFI-A", address(this), address(this));
+
+        assertEq(clipYFIA.kicks(), auctionIdYFIA);
+
+        hevm.store(
+            address(end),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1))
+        );
+        assertEq(end.wards(address(this)), 1);
+
+        end.cage();
+        end.cage("YFI-A");
+
+        (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
+        assertTrue(usr != address(0));
+
+        end.snip("YFI-A", auctionIdYFIA);
+        (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
+        assertTrue(usr == address(0));
+
+        end.skim("YFI-A", address(this));
+
+        // Skim some other vaults (big ones)
+        end.skim("ETH-A", 0x539d799A5DC7BCDdA53084A8943e6998C8e4b61F);
+        end.skim("ETH-A", 0xB5d6F76eC1b981f030A05d8Eb1E6Be305D55d8BA);
+        end.skim("ETH-A", 0x46b164fF756120cf38EF0C314427Fe7A7086A82b);
+        end.skim("LINK-A", 0xa91b2eB4827A86B2B6a26258a263cA8A58014e18);
+
+        end.free("YFI-A");
+
+        hevm.warp(block.timestamp + end.wait());
+
+        vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
+
+        // Removing the surplus to allow continuing the execution.
+        // (not needed if enough vaults skimmed)
+        // hevm.store(
+        //     address(vat),
+        //     keccak256(abi.encode(address(vow), uint256(5))),
+        //     bytes32(uint256(0))
+        // );
+
+        end.thaw();
+
+        end.flow("YFI-A");
+
+        vat.hope(address(end));
+
+        uint256 daiToRedeem = vat.dai(address(this)) / RAY;
+        assertTrue(daiToRedeem > 0);
+
+        end.pack(daiToRedeem);
+
+        end.cash("YFI-A", daiToRedeem);
+    }
+
     function testClipperMomSetBreaker() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -2282,6 +2363,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Should do nothing as we are before the start date
         lerp.tick();
         assertEq(vow.hump(), 30 * MILLION * RAD);
+
+        hevm.warp(1619773200);
 
         // Should do nothing as we are exactly at the start date
         lerp.tick();
