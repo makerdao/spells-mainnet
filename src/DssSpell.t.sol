@@ -2247,7 +2247,7 @@ contract DssSpellTest is DSTest, DSMath {
         end.cage();
         end.cage("YFI-A");
 
-        (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
+        (,,, address usr,,) = clipYFIA.sales(auctionIdYFIA);
         assertTrue(usr != address(0));
 
         end.snip("YFI-A", auctionIdYFIA);
