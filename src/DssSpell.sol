@@ -16,7 +16,6 @@
 
 pragma solidity 0.6.12;
 
-import "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import { VatAbstract, DaiJoinAbstract } from "dss-interfaces/Interfaces.sol";
@@ -163,14 +162,14 @@ contract DssSpellAction is DssAction {
         address MCD_JOIN_DAI   = DssExecLib.daiJoin();
 
 
-    // Payments to the Protocol Engineering Core Unit
+        // Payments to the Protocol Engineering Core Unit
 
-    // Payment of monthly expenses for May 2021
-        VatAbstract(MCD_VAT).move(MCD_VOW, address(this), PE_MONTHLY_EXPENSES * RAD);
+        // Payment of monthly expenses for May 2021
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), PE_MONTHLY_EXPENSES * RAD);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(PE_MULTISIG, PE_MONTHLY_EXPENSES * WAD);
 
-    // Payment of continuous operation lump-sum
-        VatAbstract(MCD_VAT).move(MCD_VOW, address(this), PE_CO_LUMP_SUM * RAD);
+        // Payment of continuous operation lump-sum
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), PE_CO_LUMP_SUM * RAD);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(PE_CO_MULTISIG, PE_CO_LUMP_SUM * WAD);
     }
 }
