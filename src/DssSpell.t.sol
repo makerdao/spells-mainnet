@@ -2111,6 +2111,7 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
         hevm.warp(spell.nextCastTime());
         spell.cast();
+        assertTrue(spell.done());
         assertEq(dai.balanceOf(PE_MULTISIG), PE_MONTHLY_EXPENSES * WAD);
     }
 
@@ -2120,6 +2121,18 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
         hevm.warp(spell.nextCastTime());
         spell.cast();
+        assertTrue(spell.done());
         assertEq(dai.balanceOf(PE_CO_MULTISIG), PE_CO_LUMP_SUM * WAD);
+    }
+
+    function testSinIncrease() public {
+        uint256 prevSin = vat.sin(address(vow));
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+        uint256 nextSin = vat.sin(address(vow));
+        assertEq(nextSin, prevSin + PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD);
     }
 }
