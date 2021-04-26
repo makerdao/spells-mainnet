@@ -30,9 +30,9 @@ contract DssSpellAction is DssAction {
 
     // Units used
     // uint256 constant MILLION    = 10**6;
-    uint256 constant WAD        = 10**18;
+    // uint256 constant WAD        = 10**18;
     // uint256 constant RAY        = 10**27;
-    uint256 constant RAD        = 10**45;
+    // uint256 constant RAD        = 10**45;
 
 
     // Protocol Engineering constants
@@ -154,12 +154,6 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
-        // ------------- Get all the needed addresses from Chainlog -------------
-
-        address MCD_VAT        = DssExecLib.vat();
-        address MCD_VOW        = DssExecLib.vow();
-        address MCD_JOIN_DAI   = DssExecLib.daiJoin();
-
 
         // Payments to the Protocol Engineering Core Unit
 
