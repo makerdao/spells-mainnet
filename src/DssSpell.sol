@@ -28,13 +28,6 @@ contract DssSpellAction is DssAction {
         "2021-04-26 MakerDAO Executive Spell | Hash: "; // TODO
 
 
-    // Units used
-    // uint256 constant MILLION    = 10**6;
-    // uint256 constant WAD        = 10**18;
-    // uint256 constant RAY        = 10**27;
-    // uint256 constant RAD        = 10**45;
-
-
     // Protocol Engineering constants
 
     // Protocol Engineering Multisig
@@ -45,25 +38,6 @@ contract DssSpellAction is DssAction {
     uint256 constant PE_MONTHLY_EXPENSES = 510_000;
     // Continuous Operation lump-sum
     uint256 constant PE_CO_LUMP_SUM      = 1_300_000;
-
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    //
-    // uint256 constant ZERO_PCT           = 1000000000000000000000000000;
-    // uint256 constant ONE_PCT            = 1000000000315522921573372069;
-    // uint256 constant TWO_PCT            = 1000000000627937192491029810;
-    // uint256 constant THREE_PCT          = 1000000000937303470807876289;
-    // uint256 constant THREE_PT_FIVE_PCT  = 1000000001090862085746321732;
-    // uint256 constant FOUR_PCT           = 1000000001243680656318820312;
-    // uint256 constant FOUR_PT_FIVE_PCT   = 1000000001395766281313196627;
-    // uint256 constant FIVE_PCT           = 1000000001547125957863212448;
-    // uint256 constant TEN_PCT            = 1000000003022265980097387650;
 
 
     // Amendment Proposals
