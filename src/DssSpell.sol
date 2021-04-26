@@ -165,8 +165,7 @@ contract DssSpellAction is DssAction {
         // Payments to the Protocol Engineering Core Unit
 
         // Payment of monthly expenses for May 2021
-        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), PE_MONTHLY_EXPENSES * RAD);
-        DaiJoinAbstract(MCD_JOIN_DAI).exit(PE_MULTISIG, PE_MONTHLY_EXPENSES * WAD);
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG, PE_MONTHLY_EXPENSES);
 
         // Payment of continuous operation lump-sum
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), PE_CO_LUMP_SUM * RAD);
