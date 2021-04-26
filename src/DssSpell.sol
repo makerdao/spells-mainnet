@@ -168,8 +168,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG, PE_MONTHLY_EXPENSES);
 
         // Payment of continuous operation lump-sum
-        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), PE_CO_LUMP_SUM * RAD);
-        DaiJoinAbstract(MCD_JOIN_DAI).exit(PE_CO_MULTISIG, PE_CO_LUMP_SUM * WAD);
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_CO_MULTISIG, PE_CO_LUMP_SUM);
     }
 }
 
