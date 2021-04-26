@@ -2105,34 +2105,27 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function testExpensesPayment() public {
-        assertEq(dai.balanceOf(PE_MULTISIG), 0);
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-        assertEq(dai.balanceOf(PE_MULTISIG), PE_MONTHLY_EXPENSES * WAD);
-    }
-
-    function testCoPayment() public {
-        assertEq(dai.balanceOf(PE_CO_MULTISIG), 0);
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-        assertEq(dai.balanceOf(PE_CO_MULTISIG), PE_CO_LUMP_SUM * WAD);
-    }
-
-    function testSinIncrease() public {
+    function test_pe_core_unit_budgets() public {
         uint256 prevSin = vat.sin(address(vow));
+        uint256 prevDaiPe = dai.balanceOf(PE_MULTISIG);
+        uint256 prevDaiCo = dai.balanceOf(PE_CO_MULTISIG);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
         vote(address(spell));
         spell.schedule();
+        castPreviousSpell();
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
-        uint256 nextSin = vat.sin(address(vow));
-        assertEq(nextSin, prevSin + PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD
+        );
+        assertEq(dai.balanceOf(PE_MULTISIG) - prevDaiPe, PE_MONTHLY_EXPENSES * WAD);
+        assertEq(dai.balanceOf(PE_CO_MULTISIG) - prevDaiCo, PE_CO_LUMP_SUM * WAD);
     }
 }
