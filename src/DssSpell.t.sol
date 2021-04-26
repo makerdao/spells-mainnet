@@ -2105,6 +2105,288 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
+    /* function testSpellIsCast_YFI_A_Clip() public { */
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     DSTokenAbstract YFI = DSTokenAbstract(addr.addr("YFI")); */
+    /*     GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")); */
+    /*     FlipAbstract flipYFIA = FlipAbstract(addr.addr("MCD_FLIP_YFI_A")); */
+    /*     ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A")); */
+    /*     OsmAbstract pipYFI    = OsmAbstract(addr.addr("PIP_YFI")); */
+
+    /*     // Contracts set */
+    /*     assertEq(dog.vat(), address(vat)); */
+    /*     assertEq(dog.vow(), address(vow)); */
+    /*     (address clip,,,) = dog.ilks("YFI-A"); */
+    /*     assertEq(clip, address(clipYFIA)); */
+    /*     assertEq(clipYFIA.ilk(), "YFI-A"); */
+    /*     assertEq(clipYFIA.vat(), address(vat)); */
+    /*     assertEq(clipYFIA.vow(), address(vow)); */
+    /*     assertEq(clipYFIA.dog(), address(dog)); */
+    /*     assertEq(clipYFIA.spotter(), address(spotter)); */
+    /*     assertEq(clipYFIA.calc(), addr.addr("MCD_CLIP_CALC_YFI_A")); */
+
+    /*     // Authorization */
+    /*     assertEq(flipYFIA.wards(address(cat))    , 0); */
+    /*     assertEq(flipYFIA.wards(address(flipMom)), 0); */
+
+    /*     assertEq(vat.wards(address(clipYFIA))    , 1); */
+    /*     assertEq(dog.wards(address(clipYFIA))    , 1); */
+    /*     assertEq(clipYFIA.wards(address(dog))    , 1); */
+    /*     assertEq(clipYFIA.wards(address(end))    , 1); */
+    /*     assertEq(clipYFIA.wards(address(clipMom)), 1); */
+    /*     assertEq(clipYFIA.wards(address(esm)), 1); */
+
+    /*     assertEq(pipYFI.bud(address(clipYFIA)), 1); */
+    /*     assertEq(pipYFI.bud(address(clipMom)), 1); */
+
+    /*     // Force max debt ceiling for YFI-A */
+    /*     hevm.store( */
+    /*         address(vat), */
+    /*         bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3), */
+    /*         bytes32(uint256(-1)) */
+    /*     ); */
+
+    /*     // Add balance to the test address */
+    /*     uint256 ilkAmt = 2 * WAD; */
+
+    /*     giveTokens(YFI, ilkAmt); */
+    /*     assertEq(YFI.balanceOf(address(this)), ilkAmt); */
+
+    /*     // Join to adapter */
+    /*     assertEq(vat.gem("YFI-A", address(this)), 0); */
+    /*     YFI.approve(address(joinYFIA), ilkAmt); */
+    /*     joinYFIA.join(address(this), ilkAmt); */
+    /*     assertEq(YFI.balanceOf(address(this)), 0); */
+    /*     assertEq(vat.gem("YFI-A", address(this)), ilkAmt); */
+
+    /*     // Generate new DAI to force a liquidation */
+    /*     (,uint256 rate, uint256 spot,,) = vat.ilks("YFI-A"); */
+    /*     // dart max amount of DAI */
+    /*     int256 art = int256(mul(ilkAmt, spot) / rate); */
+    /*     vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), art); */
+    /*     hevm.warp(block.timestamp + 1); */
+    /*     jug.drip("YFI-A"); */
+    /*     assertEq(clipYFIA.kicks(), 0); */
+    /*     dog.bark("YFI-A", address(this), address(this)); */
+    /*     assertEq(clipYFIA.kicks(), 1); */
+
+    /*     (,rate,,,) = vat.ilks("YFI-A"); */
+    /*     uint256 debt = mul(mul(rate, uint256(art)), dog.chop("YFI-A")) / WAD; */
+    /*     hevm.store( */
+    /*         address(vat), */
+    /*         keccak256(abi.encode(address(this), uint256(5))), */
+    /*         bytes32(debt) */
+    /*     ); */
+    /*     assertEq(vat.dai(address(this)), debt); */
+    /*     assertEq(vat.gem("YFI-A", address(this)), 0); */
+
+    /*     hevm.warp(block.timestamp + 20 minutes); */
+    /*     (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipYFIA.sales(1); */
+
+    /*     assertEq(usr, address(this)); */
+    /*     assertEq(tab, debt); */
+    /*     assertEq(lot, ilkAmt); */
+    /*     assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price */
+
+    /*     vat.hope(address(clipYFIA)); */
+    /*     clipYFIA.take(1, lot, top, address(this), bytes("")); */
+
+    /*     (, tab, lot, usr,,) = clipYFIA.sales(1); */
+    /*     assertEq(usr, address(0)); */
+    /*     assertEq(tab, 0); */
+    /*     assertEq(lot, 0); */
+    /*     assertEq(vat.dai(address(this)), 0); */
+    /*     assertEq(vat.gem("YFI-A", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault */
+    /* } */
+
+    /* function testSpellIsCast_YFI_A_End() public { */
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     DSTokenAbstract YFI = DSTokenAbstract(addr.addr("YFI")); */
+    /*     GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")); */
+    /*     ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A")); */
+
+    /*     // Force max debt ceiling for YFI-A */
+    /*     hevm.store( */
+    /*         address(vat), */
+    /*         bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3), */
+    /*         bytes32(uint256(-1)) */
+    /*     ); */
+
+    /*     uint256 ilkAmt = 2 * WAD; */
+
+    /*     giveTokens(YFI, ilkAmt); */
+
+    /*     YFI.approve(address(joinYFIA), ilkAmt); */
+    /*     joinYFIA.join(address(this), ilkAmt); */
+
+    /*     (,uint256 rate, uint256 spot,,) = vat.ilks("YFI-A"); */
+    /*     vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate)); */
+
+    /*     hevm.warp(block.timestamp + 1); */
+    /*     jug.drip("YFI-A"); */
+
+    /*     uint256 auctionIdYFIA = clipYFIA.kicks() + 1; */
+
+    /*     dog.bark("YFI-A", address(this), address(this)); */
+
+    /*     assertEq(clipYFIA.kicks(), auctionIdYFIA); */
+
+    /*     hevm.store( */
+    /*         address(end), */
+    /*         keccak256(abi.encode(address(this), uint256(0))), */
+    /*         bytes32(uint256(1)) */
+    /*     ); */
+    /*     assertEq(end.wards(address(this)), 1); */
+
+    /*     end.cage(); */
+    /*     end.cage("ETH-A"); */
+    /*     end.cage("LINK-A"); */
+    /*     end.cage("YFI-A"); */
+
+    /*     (,,, address usr,,) = clipYFIA.sales(auctionIdYFIA); */
+    /*     assertTrue(usr != address(0)); */
+
+    /*     end.snip("YFI-A", auctionIdYFIA); */
+    /*     (,,, usr,,) = clipYFIA.sales(auctionIdYFIA); */
+    /*     assertTrue(usr == address(0)); */
+
+    /*     end.skim("YFI-A", address(this)); */
+
+    /*     // Skim some other vaults (big ones) */
+    /*     end.skim("ETH-A", 0x539d799A5DC7BCDdA53084A8943e6998C8e4b61F); */
+    /*     end.skim("ETH-A", 0xB5d6F76eC1b981f030A05d8Eb1E6Be305D55d8BA); */
+    /*     end.skim("ETH-A", 0x46b164fF756120cf38EF0C314427Fe7A7086A82b); */
+    /*     end.skim("LINK-A", 0xa91b2eB4827A86B2B6a26258a263cA8A58014e18); */
+
+    /*     end.free("YFI-A"); */
+
+    /*     hevm.warp(block.timestamp + end.wait()); */
+
+    /*     vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash()))); */
+
+    /*     // Removing the surplus to allow continuing the execution. */
+    /*     // (not needed if enough vaults skimmed) */
+    /*     // hevm.store( */
+    /*     //     address(vat), */
+    /*     //     keccak256(abi.encode(address(vow), uint256(5))), */
+    /*     //     bytes32(uint256(0)) */
+    /*     // ); */
+
+    /*     end.thaw(); */
+
+    /*     end.flow("YFI-A"); */
+
+    /*     vat.hope(address(end)); */
+
+    /*     uint256 daiToRedeem = vat.dai(address(this)) / RAY; */
+    /*     assertTrue(daiToRedeem > 0); */
+
+    /*     end.pack(daiToRedeem); */
+
+    /*     end.cash("YFI-A", daiToRedeem); */
+    /* } */
+
+    /* function testClipperMomSetBreaker() public { */
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     // clipperMom is an authority-based contract, so here we set the Chieftain's hat */
+    /*     //  to the current contract to simulate governance authority. */
+    /*     hevm.store( */
+    /*         address(chief), */
+    /*         bytes32(uint256(12)), */
+    /*         bytes32(uint256(address(this))) */
+    /*     ); */
+
+    /*     ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A")); */
+    /*     assertEq(clipYFIA.stopped(), 0); */
+    /*     clipMom.setBreaker(address(clipYFIA), 1, 0); */
+    /*     assertEq(clipYFIA.stopped(), 1); */
+    /*     clipMom.setBreaker(address(clipYFIA), 2, 0); */
+    /*     assertEq(clipYFIA.stopped(), 2); */
+    /*     clipMom.setBreaker(address(clipYFIA), 3, 0); */
+    /*     assertEq(clipYFIA.stopped(), 3); */
+    /*     clipMom.setBreaker(address(clipYFIA), 0, 0); */
+    /*     assertEq(clipYFIA.stopped(), 0); */
+    /* } */
+
+    /* function testFailClipperMomTripBreaker() public { */
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     // Assuming we're within bounds at time of testing, this shouldn't work. */
+    /*     ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A")); */
+    /*     clipMom.tripBreaker(address(clipYFIA)); */
+    /* } */
+
+    /* function testClipperMomTripBreaker() public { */
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     // Hacking nxt price to 0x123 (and making it valid) */
+    /*     bytes32 hackedValue = 0x0000000000000000000000000000000100000000000000000000000000000123; */
+
+    /*     ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A")); */
+
+    /*     hevm.store(address(addr.addr("PIP_YFI")), bytes32(uint256(4)), hackedValue); */
+
+    /*     assertEq(clipMom.tolerance(address(clipYFIA)), (RAY / 2)); // (RAY / 2) for 50% */
+
+    /*     // Price is hacked, anyone can trip the breaker */
+    /*     clipMom.tripBreaker(address(clipYFIA)); */
+
+    /*     assertEq(clipYFIA.stopped(), 2); */
+    /* } */
+
+    /* function testLerp() public { */
+    /*     LerpFabLike factory = LerpFabLike(addr.addr("LERP_FAB")); */
+
+    /*     assertEq(vow.hump(), 30 * MILLION * RAD); */
+    /*     assertEq(factory.count(), 0); */
+
+    /*     vote(address(spell)); */
+    /*     scheduleWaitAndCast(address(spell)); */
+    /*     assertTrue(spell.done()); */
+
+    /*     assertEq(factory.count(), 1); */
+    /*     LerpLike lerp = LerpLike(factory.lerps("20210423_VOW_HUMP1")); */
+
+    /*     assertEq(vow.hump(), 30 * MILLION * RAD); */
+
+    /*     // Should do nothing as we are before the start date */
+    /*     lerp.tick(); */
+    /*     assertEq(vow.hump(), 30 * MILLION * RAD); */
+
+    /*     hevm.warp(1619773200); */
+
+    /*     // Should do nothing as we are exactly at the start date */
+    /*     lerp.tick(); */
+    /*     assertEq(vow.hump(), 30 * MILLION * RAD); */
+
+    /*     hevm.warp(1619773200 + 1 days); */
+
+    /*     // Should advance to an intermediary value */
+    /*     factory.tall(); */
+    /*     assertTrue(vow.hump() > 30 * MILLION * RAD); */
+    /*     assertTrue(vow.hump() < 60 * MILLION * RAD); */
+
+    /*     hevm.warp(1619773200 + 99 days); */
+
+    /*     // Should be done */
+    /*     factory.tall(); */
+    /*     assertEq(factory.count(), 0); */
+    /*     assertEq(vow.hump(), 60 * MILLION * RAD); */
+    /* } */
+
     function test_pe_core_unit_budgets() public {
         uint256 prevSin = vat.sin(address(vow));
         uint256 prevDaiPe = dai.balanceOf(PE_MULTISIG);
