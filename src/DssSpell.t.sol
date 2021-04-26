@@ -2105,6 +2105,30 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
+    function test_pe_core_unit_budgets() public {
+        uint256 prevSin = vat.sin(address(vow));
+        uint256 prevDaiPe = dai.balanceOf(PE_MULTISIG);
+        uint256 prevDaiCo = dai.balanceOf(PE_CO_MULTISIG);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD
+        );
+        assertEq(dai.balanceOf(PE_MULTISIG) - prevDaiPe, PE_MONTHLY_EXPENSES * WAD);
+        assertEq(dai.balanceOf(PE_CO_MULTISIG) - prevDaiCo, PE_CO_LUMP_SUM * WAD);
+    }
+
 //  function testSpellIsCast_YFI_A_Clip() public {
 //      vote(address(spell));
 //      scheduleWaitAndCast(address(spell));
@@ -2385,29 +2409,5 @@ contract DssSpellTest is DSTest, DSMath {
 //      factory.tall();
 //      assertEq(factory.count(), 0);
 //      assertEq(vow.hump(), 60 * MILLION * RAD);
-//
 
-    function test_pe_core_unit_budgets() public {
-        uint256 prevSin = vat.sin(address(vow));
-        uint256 prevDaiPe = dai.balanceOf(PE_MULTISIG);
-        uint256 prevDaiCo = dai.balanceOf(PE_CO_MULTISIG);
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        vote(address(spell));
-        spell.schedule();
-        castPreviousSpell();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD
-        );
-        assertEq(dai.balanceOf(PE_MULTISIG) - prevDaiPe, PE_MONTHLY_EXPENSES * WAD);
-        assertEq(dai.balanceOf(PE_CO_MULTISIG) - prevDaiCo, PE_CO_LUMP_SUM * WAD);
-    }
 }
