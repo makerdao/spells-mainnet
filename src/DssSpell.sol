@@ -18,7 +18,6 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { VatAbstract, DaiJoinAbstract } from "dss-interfaces/Interfaces.sol";
 
 contract DssSpellAction is DssAction {
 
