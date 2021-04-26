@@ -105,8 +105,12 @@ contract DssSpellTest is DSTest, DSMath {
     // Specific for this spell
     //
 
-    address    makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
-    address    makerDeployer07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
+    address     makerDeployer06 = 0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711;
+    address     makerDeployer07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
+    address         PE_MULTISIG = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    address      PE_CO_MULTISIG = 0x83e36aAA1c7b99E2D3d07789F7b70FCe46f0d45E;
+    uint256 PE_MONTHLY_EXPENSES = 510_000;
+    uint256      PE_CO_LUMP_SUM = 1_300_000;
 
     DssSpell   spell;
 
@@ -1595,5 +1599,23 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    function testExpensesPayment() public {
+        assertEq(dai.balanceOf(PE_MULTISIG), 0);
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertEq(dai.balanceOf(PE_MULTISIG), PE_MONTHLY_EXPENSES * WAD);
+    }
+
+    function testCoPayment() public {
+        assertEq(dai.balanceOf(PE_CO_MULTISIG), 0);
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertEq(dai.balanceOf(PE_CO_MULTISIG), PE_CO_LUMP_SUM * WAD);
     }
 }
