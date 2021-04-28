@@ -1526,7 +1526,7 @@ contract DssSpellTest is DSTest, DSMath {
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTesthole = values.collaterals[ilk].dog_hole * RAD;
                 assertEq(hole, normalizedTesthole);
-                assertTrue(hole >= RAD && hole < 20 * MILLION * RAD);
+                assertTrue(hole >= RAD && hole < 50 * MILLION * RAD);
                 }
                 (address clipper,,,) = dog.ilks(ilk);
                 ClipAbstract clip = ClipAbstract(clipper);
