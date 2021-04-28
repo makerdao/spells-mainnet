@@ -121,10 +121,10 @@ contract DssSpellTest is DSTest, DSMath {
 
     // Specific for this spell
 
-    address         PE_MULTISIG = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    address      PE_CO_MULTISIG = 0x83e36aAA1c7b99E2D3d07789F7b70FCe46f0d45E;
-    uint256 PE_MONTHLY_EXPENSES = 510_000;
-    uint256      PE_CO_LUMP_SUM = 1_300_000;
+    address constant ETHBTC               = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
+
+    address constant DEFI_SAVER           = 0xd72BA9402E9f3Ff01959D6c841DDD13615FFff42;
+    address constant LISKO                = 0x238A3F4C923B75F3eF8cA3473A503073f0530801;
 
     DssSpell   spell;
 
@@ -2805,5 +2805,75 @@ contract DssSpellTest is DSTest, DSMath {
         end.cash("ETH-B", daiToRedeem);
         end.cash("ETH-C", daiToRedeem);
         end.cash("WBTC-A", daiToRedeem);
+    }
+
+    function test_feed_changes() public {
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ETH")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ETH")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAT")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAT")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WBTC")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WBTC")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ZRX")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ZRX")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_KNC")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_KNC")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_MANA")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_MANA")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_USDT")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_USDT")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_COMP")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_COMP")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LRC")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LRC")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LINK")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LINK")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAL")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAL")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_YFI")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_YFI")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_UNI")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_UNI")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_AAVE")).src()).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_AAVE")).src()).orcl(LISKO), 1);
+        assertEq(MedianAbstract(ETHBTC).orcl(DEFI_SAVER), 0);
+        assertEq(MedianAbstract(ETHBTC).orcl(LISKO), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ETH")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ETH")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAT")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAT")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WBTC")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WBTC")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ZRX")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_ZRX")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_KNC")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_KNC")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_MANA")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_MANA")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_USDT")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_USDT")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_COMP")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_COMP")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LRC")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LRC")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LINK")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_LINK")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAL")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_BAL")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_YFI")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_YFI")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_UNI")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_UNI")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_AAVE")).src()).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_AAVE")).src()).orcl(LISKO), 0);
+        assertEq(MedianAbstract(ETHBTC).orcl(DEFI_SAVER), 1);
+        assertEq(MedianAbstract(ETHBTC).orcl(LISKO), 0);
     }
 }

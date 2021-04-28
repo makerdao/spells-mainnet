@@ -22,6 +22,7 @@ import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
 import "dss-interfaces/dss/VowAbstract.sol";
+import "dss-interfaces/dss/OsmAbstract.sol";
 
 struct Collateral {
     bytes32 ilk;
@@ -76,6 +77,11 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_ETH_C  = 0x1c4fC274D12b2e1BBDF97795193D3148fCDa6108;
     address constant MCD_CLIP_WBTC_A      = 0x0227b54AdbFAEec5f1eD1dFa11f54dcff9076e2C;
     address constant MCD_CLIP_CALC_WBTC_A = 0x5f4CEa97ca1030C6Bd38429c8a0De7Cd4981C70A;
+
+    address constant ETHBTC               = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
+
+    address constant DEFI_SAVER           = 0xd72BA9402E9f3Ff01959D6c841DDD13615FFff42;
+    address constant LISKO                = 0x238A3F4C923B75F3eF8cA3473A503073f0530801;
 
     function flipperToClipper(Collateral memory col) internal {
         // Check constructor values of Clipper
@@ -275,6 +281,60 @@ contract DssSpellAction is DssAction {
             calcKey: "MCD_CLIP_CALC_WBTC_A",
             flipKey: "MCD_FLIP_WBTC_A"
         }));
+
+        // ---------- Whitelist DeFi Saver as light feed and remove "lisko" as dark feed ----------
+
+        address[] memory addAddrs = new address[](1);
+        addAddrs[0] = DEFI_SAVER;
+        address[] memory remAddrs = new address[](1);
+        remAddrs[0] = LISKO;
+        address median;
+
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_ETH")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAT")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_WBTC")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_ZRX")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_KNC")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_MANA")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_USDT")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_COMP")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_LRC")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_LINK")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_BAL")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_YFI")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_UNI")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = OsmAbstract(DssExecLib.getChangelogAddress("PIP_AAVE")).src();
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
+        median = ETHBTC;
+        DssExecLib.addWritersToMedianWhitelist(median, addAddrs);
+        DssExecLib.removeWritersFromMedianWhitelist(median, remAddrs);
 
 
         DssExecLib.setChangelogVersion("1.5.0");
