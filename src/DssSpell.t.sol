@@ -226,7 +226,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x5F637105ae24b73A6393E45Ef871998933Eb2eB8),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1619474683,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0x961eEE551d0Fe5FF8B88db5441875564ac967f09),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
@@ -271,24 +271,24 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,    // In whole Dai units
             pct:          550,             // In basis points
             mat:          15000,           // In basis points
-            liqType:      "flip",          // "" or "flip" or "clip"
+            liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
             chop:         1300,            // In basis points
-            cat_dunk:     50 * THOUSAND,   // In whole Dai units
-            flip_beg:     300,             // In basis points
-            flip_ttl:     4 hours,         // In seconds
-            flip_tau:     4 hours,         // In seconds
-            flipper_mom:  1,               // 1 if circuit breaker enabled
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,               // In whole Dai units
+            flip_beg:     0,               // In basis points
+            flip_ttl:     0,               // In seconds
+            flip_tau:     0,               // In seconds
+            flipper_mom:  0,               // 1 if circuit breaker enabled
+            dog_hole:     22 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    90,
+            calc_cut:     9900
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
             aL_enabled:   true,
@@ -299,24 +299,24 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         15 * THOUSAND,
             pct:          1000,
             mat:          13000,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50 * THOUSAND,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     8 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    90,
+            calc_cut:     9900
         });
         afterSpell.collaterals["ETH-C"] = CollateralValues({
             aL_enabled:   true,
@@ -327,24 +327,24 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          350,
             mat:          17500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50 * THOUSAND,
-            flip_beg:     300,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    90,
+            calc_cut:     9900
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
             aL_enabled:   true,
@@ -439,24 +439,24 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          450,
             mat:          15000,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50 * THOUSAND,
-            flip_beg:     300,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     15 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    90,
+            calc_cut:     9900
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
             aL_enabled:   false,
@@ -700,7 +700,7 @@ contract DssSpellTest is DSTest, DSMath {
             flip_tau:     0,
             flipper_mom:  0,
             dog_hole:     6 * MILLION,
-            clip_buf:     3000,
+            clip_buf:     13000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -756,7 +756,7 @@ contract DssSpellTest is DSTest, DSMath {
             flip_tau:     0,
             flipper_mom:  0,
             dog_hole:     5 * MILLION,
-            clip_buf:     3000,
+            clip_buf:     13000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -1532,7 +1532,7 @@ contract DssSpellTest is DSTest, DSMath {
                 ClipAbstract clip = ClipAbstract(clipper);
                 {
                 // Convert BP to system expected value
-                uint256 normalizedTestBuf = (values.collaterals[ilk].clip_buf + 10000)  * 10**23;
+                uint256 normalizedTestBuf = values.collaterals[ilk].clip_buf  * 10**23;
                 assertEq(uint256(clip.buf()), normalizedTestBuf);
                 assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY); // gte 100% and lte 200%
                 assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail);
@@ -1563,9 +1563,15 @@ contract DssSpellTest is DSTest, DSMath {
                     assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_tau);
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("step()"));
                     assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_step);
+                    if (exists) {
+                       assertTrue(abi.decode(value, (uint256)) > 0);
+                    }
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("cut()"));
                     uint256 normalizedTestCut = values.collaterals[ilk].calc_cut * 10**23;
                     assertEq(exists ? abi.decode(value, (uint256)) : 0, normalizedTestCut);
+                    if (exists) {
+                       assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY);
+                    }
                 }
             }
             if (reg.class(ilk) < 3) {
@@ -1849,13 +1855,36 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testChainlogValues() public {
+    function testNewChainlogValues() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
+        assertEq(chainLog.getAddress("MCD_CLIP_ETH_A"), addr.addr("MCD_CLIP_ETH_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_ETH_A"), addr.addr("MCD_CLIP_CALC_ETH_A"));
+        try chainLog.getAddress("MCD_FLIP_ETH_A") returns (address) {
+            assertTrue(false);
+        } catch {}
+
+        assertEq(chainLog.getAddress("MCD_CLIP_ETH_B"), addr.addr("MCD_CLIP_ETH_B"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_ETH_B"), addr.addr("MCD_CLIP_CALC_ETH_B"));
+        try chainLog.getAddress("MCD_FLIP_ETH_B") returns (address) {
+            assertTrue(false);
+        } catch {}
+
+        assertEq(chainLog.getAddress("MCD_CLIP_ETH_C"), addr.addr("MCD_CLIP_ETH_C"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_ETH_C"), addr.addr("MCD_CLIP_CALC_ETH_C"));
+        try chainLog.getAddress("MCD_FLIP_ETH_C") returns (address) {
+            assertTrue(false);
+        } catch {}
+
+        assertEq(chainLog.getAddress("MCD_CLIP_WBTC_A"), addr.addr("MCD_CLIP_WBTC_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WBTC_A"), addr.addr("MCD_CLIP_CALC_WBTC_A"));
+        try chainLog.getAddress("MCD_FLIP_WBTC_A") returns (address) {
+            assertTrue(false);
+        } catch {}
     }
 
     // function testCollateralIntegrations() public {
@@ -2105,309 +2134,676 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function test_pe_core_unit_budgets() public {
-        uint256 prevSin = vat.sin(address(vow));
-        uint256 prevDaiPe = dai.balanceOf(PE_MULTISIG);
-        uint256 prevDaiCo = dai.balanceOf(PE_CO_MULTISIG);
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
+    function testSpellIsCast_ETH_A_clip() public {
         vote(address(spell));
-        spell.schedule();
-        castPreviousSpell();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+        DSTokenAbstract ETH = DSTokenAbstract(addr.addr("ETH"));
+        GemJoinAbstract joinETHA = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_A"));
+        FlipAbstract flipETHA = FlipAbstract(addr.addr("MCD_FLIP_ETH_A"));
+        ClipAbstract clipETHA = ClipAbstract(addr.addr("MCD_CLIP_ETH_A"));
+        OsmAbstract pipETH    = OsmAbstract(addr.addr("PIP_ETH"));
 
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            PE_MONTHLY_EXPENSES * RAD + PE_CO_LUMP_SUM * RAD
+        // Contracts set
+        assertEq(dog.vat(), address(vat));
+        assertEq(dog.vow(), address(vow));
+        (address clip,,,) = dog.ilks("ETH-A");
+        assertEq(clip, address(clipETHA));
+        assertEq(clipETHA.ilk(), "ETH-A");
+        assertEq(clipETHA.vat(), address(vat));
+        assertEq(clipETHA.vow(), address(vow));
+        assertEq(clipETHA.dog(), address(dog));
+        assertEq(clipETHA.spotter(), address(spotter));
+        assertEq(clipETHA.calc(), addr.addr("MCD_CLIP_CALC_ETH_A"));
+
+        // Authorization
+        assertEq(flipETHA.wards(address(cat))    , 0);
+        assertEq(flipETHA.wards(address(flipMom)), 0);
+
+        assertEq(vat.wards(address(clipETHA))    , 1);
+        assertEq(dog.wards(address(clipETHA))    , 1);
+        assertEq(clipETHA.wards(address(dog))    , 1);
+        assertEq(clipETHA.wards(address(end))    , 1);
+        assertEq(clipETHA.wards(address(clipMom)), 1);
+        assertEq(clipETHA.wards(address(esm)), 1);
+
+        assertEq(pipETH.bud(address(clipETHA)), 1);
+        assertEq(pipETH.bud(address(clipMom)), 1);
+
+        // Force max debt ceiling for ETH-A
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-A"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
         );
-        assertEq(dai.balanceOf(PE_MULTISIG) - prevDaiPe, PE_MONTHLY_EXPENSES * WAD);
-        assertEq(dai.balanceOf(PE_CO_MULTISIG) - prevDaiCo, PE_CO_LUMP_SUM * WAD);
+
+        // Add balance to the test address
+        uint256 ilkAmt = 20 * WAD;
+
+        giveTokens(ETH, ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), ilkAmt);
+
+        // Join to adapter
+        assertEq(vat.gem("ETH-A", address(this)), 0);
+        ETH.approve(address(joinETHA), ilkAmt);
+        joinETHA.join(address(this), ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), 0);
+        assertEq(vat.gem("ETH-A", address(this)), ilkAmt);
+
+        // Generate new DAI to force a liquidation
+        (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-A");
+        // dart max amount of DAI
+        int256 art = int256(mul(ilkAmt, spot) / rate);
+        vat.frob("ETH-A", address(this), address(this), address(this), int256(ilkAmt), art);
+        hevm.warp(block.timestamp + 1);
+        jug.drip("ETH-A");
+        assertEq(clipETHA.kicks(), 0);
+        dog.bark("ETH-A", address(this), address(this));
+        assertEq(clipETHA.kicks(), 1);
+
+        (,rate,,,) = vat.ilks("ETH-A");
+        uint256 debt = mul(mul(rate, uint256(art)), dog.chop("ETH-A")) / WAD;
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(debt)
+        );
+        assertEq(vat.dai(address(this)), debt);
+        assertEq(vat.gem("ETH-A", address(this)), 0);
+
+        hevm.warp(block.timestamp + 20 minutes);
+        (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipETHA.sales(1);
+
+        assertEq(usr, address(this));
+        assertEq(tab, debt);
+        assertEq(lot, ilkAmt);
+        assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
+
+        vat.hope(address(clipETHA));
+        clipETHA.take(1, lot, top, address(this), bytes(""));
+
+        (, tab, lot, usr,,) = clipETHA.sales(1);
+        assertEq(usr, address(0));
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+        assertEq(vat.dai(address(this)), 0);
+        assertEq(vat.gem("ETH-A", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
     }
 
-//  function testSpellIsCast_YFI_A_Clip() public {
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      DSTokenAbstract YFI = DSTokenAbstract(addr.addr("YFI"));
-//      GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A"));
-//      FlipAbstract flipYFIA = FlipAbstract(addr.addr("MCD_FLIP_YFI_A"));
-//      ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
-//      OsmAbstract pipYFI    = OsmAbstract(addr.addr("PIP_YFI"));
-//
-//      // Contracts set
-//      assertEq(dog.vat(), address(vat));
-//      assertEq(dog.vow(), address(vow));
-//      (address clip,,,) = dog.ilks("YFI-A");
-//      assertEq(clip, address(clipYFIA));
-//      assertEq(clipYFIA.ilk(), "YFI-A");
-//      assertEq(clipYFIA.vat(), address(vat));
-//      assertEq(clipYFIA.vow(), address(vow));
-//      assertEq(clipYFIA.dog(), address(dog));
-//      assertEq(clipYFIA.spotter(), address(spotter));
-//      assertEq(clipYFIA.calc(), addr.addr("MCD_CLIP_CALC_YFI_A"));
-//
-//      // Authorization
-//      assertEq(flipYFIA.wards(address(cat))    , 0);
-//      assertEq(flipYFIA.wards(address(flipMom)), 0);
-//
-//      assertEq(vat.wards(address(clipYFIA))    , 1);
-//      assertEq(dog.wards(address(clipYFIA))    , 1);
-//      assertEq(clipYFIA.wards(address(dog))    , 1);
-//      assertEq(clipYFIA.wards(address(end))    , 1);
-//      assertEq(clipYFIA.wards(address(clipMom)), 1);
-//      assertEq(clipYFIA.wards(address(esm)), 1);
-//
-//      assertEq(pipYFI.bud(address(clipYFIA)), 1);
-//      assertEq(pipYFI.bud(address(clipMom)), 1);
-//
-//      // Force max debt ceiling for YFI-A
-//      hevm.store(
-//          address(vat),
-//          bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3),
-//          bytes32(uint256(-1))
-//      );
-//
-//      // Add balance to the test address
-//      uint256 ilkAmt = 2 * WAD;
-//
-//      giveTokens(YFI, ilkAmt);
-//      assertEq(YFI.balanceOf(address(this)), ilkAmt);
-//
-//      // Join to adapter
-//      assertEq(vat.gem("YFI-A", address(this)), 0);
-//      YFI.approve(address(joinYFIA), ilkAmt);
-//      joinYFIA.join(address(this), ilkAmt);
-//      assertEq(YFI.balanceOf(address(this)), 0);
-//      assertEq(vat.gem("YFI-A", address(this)), ilkAmt);
-//
-//      // Generate new DAI to force a liquidation
-//      (,uint256 rate, uint256 spot,,) = vat.ilks("YFI-A");
-//      // dart max amount of DAI
-//      int256 art = int256(mul(ilkAmt, spot) / rate);
-//      vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), art);
-//      hevm.warp(block.timestamp + 1);
-//      jug.drip("YFI-A");
-//      assertEq(clipYFIA.kicks(), 0);
-//      dog.bark("YFI-A", address(this), address(this));
-//      assertEq(clipYFIA.kicks(), 1);
-//
-//      (,rate,,,) = vat.ilks("YFI-A");
-//      uint256 debt = mul(mul(rate, uint256(art)), dog.chop("YFI-A")) / WAD;
-//      hevm.store(
-//          address(vat),
-//          keccak256(abi.encode(address(this), uint256(5))),
-//          bytes32(debt)
-//      );
-//      assertEq(vat.dai(address(this)), debt);
-//      assertEq(vat.gem("YFI-A", address(this)), 0);
-//
-//      hevm.warp(block.timestamp + 20 minutes);
-//      (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipYFIA.sales(1);
-//
-//      assertEq(usr, address(this));
-//      assertEq(tab, debt);
-//      assertEq(lot, ilkAmt);
-//      assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
-//
-//      vat.hope(address(clipYFIA));
-//      clipYFIA.take(1, lot, top, address(this), bytes(""));
-//
-//      (, tab, lot, usr,,) = clipYFIA.sales(1);
-//      assertEq(usr, address(0));
-//      assertEq(tab, 0);
-//      assertEq(lot, 0);
-//      assertEq(vat.dai(address(this)), 0);
-//      assertEq(vat.gem("YFI-A", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
-//
-//
-//  function testSpellIsCast_YFI_A_End() public {
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      DSTokenAbstract YFI = DSTokenAbstract(addr.addr("YFI"));
-//      GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A"));
-//      ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
-//
-//      // Force max debt ceiling for YFI-A
-//      hevm.store(
-//          address(vat),
-//          bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3),
-//          bytes32(uint256(-1))
-//      );
-//
-//      uint256 ilkAmt = 2 * WAD;
-//
-//      giveTokens(YFI, ilkAmt);
-//
-//      YFI.approve(address(joinYFIA), ilkAmt);
-//      joinYFIA.join(address(this), ilkAmt);
-//
-//      (,uint256 rate, uint256 spot,,) = vat.ilks("YFI-A");
-//      vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
-//
-//      hevm.warp(block.timestamp + 1);
-//      jug.drip("YFI-A");
-//
-//      uint256 auctionIdYFIA = clipYFIA.kicks() + 1;
-//
-//      dog.bark("YFI-A", address(this), address(this));
-//
-//      assertEq(clipYFIA.kicks(), auctionIdYFIA);
-//
-//      hevm.store(
-//          address(end),
-//          keccak256(abi.encode(address(this), uint256(0))),
-//          bytes32(uint256(1))
-//      );
-//      assertEq(end.wards(address(this)), 1);
-//
-//      end.cage();
-//      end.cage("ETH-A");
-//      end.cage("LINK-A");
-//      end.cage("YFI-A");
-//
-//      (,,, address usr,,) = clipYFIA.sales(auctionIdYFIA);
-//      assertTrue(usr != address(0));
-//
-//      end.snip("YFI-A", auctionIdYFIA);
-//      (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
-//      assertTrue(usr == address(0));
-//
-//      end.skim("YFI-A", address(this));
-//
-//      // Skim some other vaults (big ones)
-//      end.skim("ETH-A", 0x539d799A5DC7BCDdA53084A8943e6998C8e4b61F);
-//      end.skim("ETH-A", 0xB5d6F76eC1b981f030A05d8Eb1E6Be305D55d8BA);
-//      end.skim("ETH-A", 0x46b164fF756120cf38EF0C314427Fe7A7086A82b);
-//      end.skim("LINK-A", 0xa91b2eB4827A86B2B6a26258a263cA8A58014e18);
-//
-//      end.free("YFI-A");
-//
-//      hevm.warp(block.timestamp + end.wait());
-//
-//      vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
-//
-//      // Removing the surplus to allow continuing the execution.
-//      // (not needed if enough vaults skimmed)
-//      // hevm.store(
-//      //     address(vat),
-//      //     keccak256(abi.encode(address(vow), uint256(5))),
-//      //     bytes32(uint256(0))
-//      // );
-//
-//      end.thaw();
-//
-//      end.flow("YFI-A");
-//
-//      vat.hope(address(end));
-//
-//      uint256 daiToRedeem = vat.dai(address(this)) / RAY;
-//      assertTrue(daiToRedeem > 0);
-//
-//      end.pack(daiToRedeem);
-//
-//      end.cash("YFI-A", daiToRedeem);
-//
-//
-//  function testClipperMomSetBreaker() public {
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      // clipperMom is an authority-based contract, so here we set the Chieftain's hat
-//      //  to the current contract to simulate governance authority.
-//      hevm.store(
-//          address(chief),
-//          bytes32(uint256(12)),
-//          bytes32(uint256(address(this)))
-//      );
-//
-//      ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
-//      assertEq(clipYFIA.stopped(), 0);
-//      clipMom.setBreaker(address(clipYFIA), 1, 0);
-//      assertEq(clipYFIA.stopped(), 1);
-//      clipMom.setBreaker(address(clipYFIA), 2, 0);
-//      assertEq(clipYFIA.stopped(), 2);
-//      clipMom.setBreaker(address(clipYFIA), 3, 0);
-//      assertEq(clipYFIA.stopped(), 3);
-//      clipMom.setBreaker(address(clipYFIA), 0, 0);
-//      assertEq(clipYFIA.stopped(), 0);
-//
-//
-//  function testFailClipperMomTripBreaker() public {
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      // Assuming we're within bounds at time of testing, this shouldn't work.
-//      ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
-//      clipMom.tripBreaker(address(clipYFIA));
-//
-//
-//  function testClipperMomTripBreaker() public {
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      // Hacking nxt price to 0x123 (and making it valid)
-//      bytes32 hackedValue = 0x0000000000000000000000000000000100000000000000000000000000000123;
-//
-//      ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
-//
-//      hevm.store(address(addr.addr("PIP_YFI")), bytes32(uint256(4)), hackedValue);
-//
-//      assertEq(clipMom.tolerance(address(clipYFIA)), (RAY / 2)); // (RAY / 2) for 50%
-//
-//      // Price is hacked, anyone can trip the breaker
-//      clipMom.tripBreaker(address(clipYFIA));
-//
-//      assertEq(clipYFIA.stopped(), 2);
-//
-//
-//  function testLerp() public {
-//      LerpFabLike factory = LerpFabLike(addr.addr("LERP_FAB"));
-//
-//      assertEq(vow.hump(), 30 * MILLION * RAD);
-//      assertEq(factory.count(), 0);
-//
-//      vote(address(spell));
-//      scheduleWaitAndCast(address(spell));
-//      assertTrue(spell.done());
-//
-//      assertEq(factory.count(), 1);
-//      LerpLike lerp = LerpLike(factory.lerps("20210423_VOW_HUMP1"));
-//
-//      assertEq(vow.hump(), 30 * MILLION * RAD);
-//
-//      // Should do nothing as we are before the start date
-//      lerp.tick();
-//      assertEq(vow.hump(), 30 * MILLION * RAD);
-//
-//      hevm.warp(1619773200);
-//
-//      // Should do nothing as we are exactly at the start date
-//      lerp.tick();
-//      assertEq(vow.hump(), 30 * MILLION * RAD);
-//
-//      hevm.warp(1619773200 + 1 days);
-//
-//      // Should advance to an intermediary value
-//      factory.tall();
-//      assertTrue(vow.hump() > 30 * MILLION * RAD);
-//      assertTrue(vow.hump() < 60 * MILLION * RAD);
-//
-//      hevm.warp(1619773200 + 99 days);
-//
-//      // Should be done
-//      factory.tall();
-//      assertEq(factory.count(), 0);
-//      assertEq(vow.hump(), 60 * MILLION * RAD);
+    function testSpellIsCast_ETH_B_clip() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
+        DSTokenAbstract ETH = DSTokenAbstract(addr.addr("ETH"));
+        GemJoinAbstract joinETHB = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_B"));
+        FlipAbstract flipETHB = FlipAbstract(addr.addr("MCD_FLIP_ETH_B"));
+        ClipAbstract clipETHB = ClipAbstract(addr.addr("MCD_CLIP_ETH_B"));
+        OsmAbstract pipETH    = OsmAbstract(addr.addr("PIP_ETH"));
+
+        // Contracts set
+        assertEq(dog.vat(), address(vat));
+        assertEq(dog.vow(), address(vow));
+        (address clip,,,) = dog.ilks("ETH-B");
+        assertEq(clip, address(clipETHB));
+        assertEq(clipETHB.ilk(), "ETH-B");
+        assertEq(clipETHB.vat(), address(vat));
+        assertEq(clipETHB.vow(), address(vow));
+        assertEq(clipETHB.dog(), address(dog));
+        assertEq(clipETHB.spotter(), address(spotter));
+        assertEq(clipETHB.calc(), addr.addr("MCD_CLIP_CALC_ETH_B"));
+
+        // Authorization
+        assertEq(flipETHB.wards(address(cat))    , 0);
+        assertEq(flipETHB.wards(address(flipMom)), 0);
+
+        assertEq(vat.wards(address(clipETHB))    , 1);
+        assertEq(dog.wards(address(clipETHB))    , 1);
+        assertEq(clipETHB.wards(address(dog))    , 1);
+        assertEq(clipETHB.wards(address(end))    , 1);
+        assertEq(clipETHB.wards(address(clipMom)), 1);
+        assertEq(clipETHB.wards(address(esm)), 1);
+
+        assertEq(pipETH.bud(address(clipETHB)), 1);
+        assertEq(pipETH.bud(address(clipMom)), 1);
+
+        // Force max debt ceiling for ETH-B
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-B"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+
+        // Add balance to the test address
+        uint256 ilkAmt = 20 * WAD;
+
+        giveTokens(ETH, ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), ilkAmt);
+
+        // Join to adapter
+        assertEq(vat.gem("ETH-B", address(this)), 0);
+        ETH.approve(address(joinETHB), ilkAmt);
+        joinETHB.join(address(this), ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), 0);
+        assertEq(vat.gem("ETH-B", address(this)), ilkAmt);
+
+        // Generate new DAI to force a liquidation
+        (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-B");
+        // dart max amount of DAI
+        int256 art = int256(mul(ilkAmt, spot) / rate);
+        vat.frob("ETH-B", address(this), address(this), address(this), int256(ilkAmt), art);
+        hevm.warp(block.timestamp + 1);
+        jug.drip("ETH-B");
+        assertEq(clipETHB.kicks(), 0);
+        dog.bark("ETH-B", address(this), address(this));
+        assertEq(clipETHB.kicks(), 1);
+
+        (,rate,,,) = vat.ilks("ETH-B");
+        uint256 debt = mul(mul(rate, uint256(art)), dog.chop("ETH-B")) / WAD;
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(debt)
+        );
+        assertEq(vat.dai(address(this)), debt);
+        assertEq(vat.gem("ETH-B", address(this)), 0);
+
+        hevm.warp(block.timestamp + 20 minutes);
+        (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipETHB.sales(1);
+
+        assertEq(usr, address(this));
+        assertEq(tab, debt);
+        assertEq(lot, ilkAmt);
+        assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
+
+        vat.hope(address(clipETHB));
+        clipETHB.take(1, lot, top, address(this), bytes(""));
+
+        (, tab, lot, usr,,) = clipETHB.sales(1);
+        assertEq(usr, address(0));
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+        assertEq(vat.dai(address(this)), 0);
+        assertEq(vat.gem("ETH-B", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
+    }
+
+    function testSpellIsCast_ETH_C_clip() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DSTokenAbstract ETH = DSTokenAbstract(addr.addr("ETH"));
+        GemJoinAbstract joinETHC = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_C"));
+        FlipAbstract flipETHC = FlipAbstract(addr.addr("MCD_FLIP_ETH_C"));
+        ClipAbstract clipETHC = ClipAbstract(addr.addr("MCD_CLIP_ETH_C"));
+        OsmAbstract pipETH    = OsmAbstract(addr.addr("PIP_ETH"));
+
+        // Contracts set
+        assertEq(dog.vat(), address(vat));
+        assertEq(dog.vow(), address(vow));
+        (address clip,,,) = dog.ilks("ETH-C");
+        assertEq(clip, address(clipETHC));
+        assertEq(clipETHC.ilk(), "ETH-C");
+        assertEq(clipETHC.vat(), address(vat));
+        assertEq(clipETHC.vow(), address(vow));
+        assertEq(clipETHC.dog(), address(dog));
+        assertEq(clipETHC.spotter(), address(spotter));
+        assertEq(clipETHC.calc(), addr.addr("MCD_CLIP_CALC_ETH_C"));
+
+        // Authorization
+        assertEq(flipETHC.wards(address(cat))    , 0);
+        assertEq(flipETHC.wards(address(flipMom)), 0);
+
+        assertEq(vat.wards(address(clipETHC))    , 1);
+        assertEq(dog.wards(address(clipETHC))    , 1);
+        assertEq(clipETHC.wards(address(dog))    , 1);
+        assertEq(clipETHC.wards(address(end))    , 1);
+        assertEq(clipETHC.wards(address(clipMom)), 1);
+        assertEq(clipETHC.wards(address(esm)), 1);
+
+        assertEq(pipETH.bud(address(clipETHC)), 1);
+        assertEq(pipETH.bud(address(clipMom)), 1);
+
+        // Force max debt ceiling for ETH-C
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-C"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+
+        // Add balance to the test address
+        uint256 ilkAmt = 20 * WAD;
+
+        giveTokens(ETH, ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), ilkAmt);
+
+        // Join to adapter
+        assertEq(vat.gem("ETH-C", address(this)), 0);
+        ETH.approve(address(joinETHC), ilkAmt);
+        joinETHC.join(address(this), ilkAmt);
+        assertEq(ETH.balanceOf(address(this)), 0);
+        assertEq(vat.gem("ETH-C", address(this)), ilkAmt);
+
+        // Generate new DAI to force a liquidation
+        (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-C");
+        // dart max amount of DAI
+        int256 art = int256(mul(ilkAmt, spot) / rate);
+        vat.frob("ETH-C", address(this), address(this), address(this), int256(ilkAmt), art);
+        hevm.warp(block.timestamp + 1);
+        jug.drip("ETH-C");
+        assertEq(clipETHC.kicks(), 0);
+        dog.bark("ETH-C", address(this), address(this));
+        assertEq(clipETHC.kicks(), 1);
+
+        (,rate,,,) = vat.ilks("ETH-C");
+        uint256 debt = mul(mul(rate, uint256(art)), dog.chop("ETH-C")) / WAD;
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(debt)
+        );
+        assertEq(vat.dai(address(this)), debt);
+        assertEq(vat.gem("ETH-C", address(this)), 0);
+
+        hevm.warp(block.timestamp + 20 minutes);
+        (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipETHC.sales(1);
+
+        assertEq(usr, address(this));
+        assertEq(tab, debt);
+        assertEq(lot, ilkAmt);
+        assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
+
+        vat.hope(address(clipETHC));
+        clipETHC.take(1, lot, top, address(this), bytes(""));
+
+        (, tab, lot, usr,,) = clipETHC.sales(1);
+        assertEq(usr, address(0));
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+        assertEq(vat.dai(address(this)), 0);
+        assertEq(vat.gem("ETH-C", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
+    }
+
+    function testSpellIsCast_WBTC_A_clip() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DSTokenAbstract WBTC = DSTokenAbstract(addr.addr("WBTC"));
+        GemJoinAbstract joinWBTCA = GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_A"));
+        FlipAbstract flipWBTCA = FlipAbstract(addr.addr("MCD_FLIP_WBTC_A"));
+        ClipAbstract clipWBTCA = ClipAbstract(addr.addr("MCD_CLIP_WBTC_A"));
+        OsmAbstract pipWBTC    = OsmAbstract(addr.addr("PIP_WBTC"));
+
+        // Contracts set
+        assertEq(dog.vat(), address(vat));
+        assertEq(dog.vow(), address(vow));
+        (address clip,,,) = dog.ilks("WBTC-A");
+        assertEq(clip, address(clipWBTCA));
+        assertEq(clipWBTCA.ilk(), "WBTC-A");
+        assertEq(clipWBTCA.vat(), address(vat));
+        assertEq(clipWBTCA.vow(), address(vow));
+        assertEq(clipWBTCA.dog(), address(dog));
+        assertEq(clipWBTCA.spotter(), address(spotter));
+        assertEq(clipWBTCA.calc(), addr.addr("MCD_CLIP_CALC_WBTC_A"));
+
+        // Authorization
+        assertEq(flipWBTCA.wards(address(cat))    , 0);
+        assertEq(flipWBTCA.wards(address(flipMom)), 0);
+
+        assertEq(vat.wards(address(clipWBTCA))    , 1);
+        assertEq(dog.wards(address(clipWBTCA))    , 1);
+        assertEq(clipWBTCA.wards(address(dog))    , 1);
+        assertEq(clipWBTCA.wards(address(end))    , 1);
+        assertEq(clipWBTCA.wards(address(clipMom)), 1);
+        assertEq(clipWBTCA.wards(address(esm)), 1);
+
+        assertEq(pipWBTC.bud(address(clipWBTCA)), 1);
+        assertEq(pipWBTC.bud(address(clipMom)), 1);
+
+        // Force max debt ceiling for WBTC-A
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("WBTC-A"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+
+        // Add balance to the test address
+        uint256 ilkAmt = 1 * WAD;
+
+        giveTokens(WBTC, ilkAmt / 10 ** (18 - 8));
+        assertEq(WBTC.balanceOf(address(this)), ilkAmt / 10 ** (18 - 8));
+
+        // Join to adapter
+        assertEq(vat.gem("WBTC-A", address(this)), 0);
+        WBTC.approve(address(joinWBTCA), ilkAmt / 10 ** (18 - 8));
+        joinWBTCA.join(address(this), ilkAmt / 10 ** (18 - 8));
+        assertEq(WBTC.balanceOf(address(this)), 0);
+        assertEq(vat.gem("WBTC-A", address(this)), ilkAmt);
+
+        // Generate new DAI to force a liquidation
+        (,uint256 rate, uint256 spot,,) = vat.ilks("WBTC-A");
+        // dart max amount of DAI
+        int256 art = int256(mul(ilkAmt, spot) / rate);
+        vat.frob("WBTC-A", address(this), address(this), address(this), int256(ilkAmt), art);
+        hevm.warp(block.timestamp + 1);
+        jug.drip("WBTC-A");
+        assertEq(clipWBTCA.kicks(), 0);
+        dog.bark("WBTC-A", address(this), address(this));
+        assertEq(clipWBTCA.kicks(), 1);
+
+        (,rate,,,) = vat.ilks("WBTC-A");
+        uint256 debt = mul(mul(rate, uint256(art)), dog.chop("WBTC-A")) / WAD;
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(debt)
+        );
+        assertEq(vat.dai(address(this)), debt);
+        assertEq(vat.gem("WBTC-A", address(this)), 0);
+
+        hevm.warp(block.timestamp + 20 minutes);
+        (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipWBTCA.sales(1);
+
+        assertEq(usr, address(this));
+        assertEq(tab, debt);
+        assertEq(lot, ilkAmt);
+        assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
+
+        vat.hope(address(clipWBTCA));
+        clipWBTCA.take(1, lot, top, address(this), bytes(""));
+
+        (, tab, lot, usr,,) = clipWBTCA.sales(1);
+        assertEq(usr, address(0));
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+        assertEq(vat.dai(address(this)), 0);
+        assertEq(vat.gem("WBTC-A", address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
+    }
+
+    function testClipperMomSetBreaker() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // clipperMom is an authority-based contract, so here we set the Chieftain's hat
+        //  to the current contract to simulate governance authority.
+        hevm.store(
+            address(chief),
+            bytes32(uint256(12)),
+            bytes32(uint256(address(this)))
+        );
+
+        ClipAbstract clipETHA = ClipAbstract(addr.addr("MCD_CLIP_ETH_A"));
+        assertEq(clipETHA.stopped(), 0);
+        clipMom.setBreaker(address(clipETHA), 1, 0);
+        assertEq(clipETHA.stopped(), 1);
+        clipMom.setBreaker(address(clipETHA), 2, 0);
+        assertEq(clipETHA.stopped(), 2);
+        clipMom.setBreaker(address(clipETHA), 3, 0);
+        assertEq(clipETHA.stopped(), 3);
+        clipMom.setBreaker(address(clipETHA), 0, 0);
+        assertEq(clipETHA.stopped(), 0);
+
+        ClipAbstract clipETHB = ClipAbstract(addr.addr("MCD_CLIP_ETH_B"));
+        assertEq(clipETHB.stopped(), 0);
+        clipMom.setBreaker(address(clipETHB), 1, 0);
+        assertEq(clipETHB.stopped(), 1);
+        clipMom.setBreaker(address(clipETHB), 2, 0);
+        assertEq(clipETHB.stopped(), 2);
+        clipMom.setBreaker(address(clipETHB), 3, 0);
+        assertEq(clipETHB.stopped(), 3);
+        clipMom.setBreaker(address(clipETHB), 0, 0);
+        assertEq(clipETHB.stopped(), 0);
+
+        ClipAbstract clipETHC = ClipAbstract(addr.addr("MCD_CLIP_ETH_C"));
+        assertEq(clipETHC.stopped(), 0);
+        clipMom.setBreaker(address(clipETHC), 1, 0);
+        assertEq(clipETHC.stopped(), 1);
+        clipMom.setBreaker(address(clipETHC), 2, 0);
+        assertEq(clipETHC.stopped(), 2);
+        clipMom.setBreaker(address(clipETHC), 3, 0);
+        assertEq(clipETHC.stopped(), 3);
+        clipMom.setBreaker(address(clipETHC), 0, 0);
+        assertEq(clipETHC.stopped(), 0);
+
+        ClipAbstract clipWBTCA = ClipAbstract(addr.addr("MCD_CLIP_WBTC_A"));
+        assertEq(clipWBTCA.stopped(), 0);
+        clipMom.setBreaker(address(clipWBTCA), 1, 0);
+        assertEq(clipWBTCA.stopped(), 1);
+        clipMom.setBreaker(address(clipWBTCA), 2, 0);
+        assertEq(clipWBTCA.stopped(), 2);
+        clipMom.setBreaker(address(clipWBTCA), 3, 0);
+        assertEq(clipWBTCA.stopped(), 3);
+        clipMom.setBreaker(address(clipWBTCA), 0, 0);
+        assertEq(clipWBTCA.stopped(), 0);
+    }
+
+    function testClipperMomTripBreaker() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Hacking nxt price to 0x123 (and making it valid)
+        bytes32 hackedValue = 0x0000000000000000000000000000000100000000000000000000000000000123;
+
+        ClipAbstract clipETHA = ClipAbstract(addr.addr("MCD_CLIP_ETH_A"));
+        ClipAbstract clipETHB = ClipAbstract(addr.addr("MCD_CLIP_ETH_B"));
+        ClipAbstract clipETHC = ClipAbstract(addr.addr("MCD_CLIP_ETH_C"));
+        hevm.store(address(addr.addr("PIP_ETH")), bytes32(uint256(4)), hackedValue);
+        assertEq(clipMom.tolerance(address(clipETHA)), (RAY / 2)); // (RAY / 2) for 50%
+        assertEq(clipMom.tolerance(address(clipETHB)), (RAY / 2)); // (RAY / 2) for 50%
+        assertEq(clipMom.tolerance(address(clipETHC)), (RAY / 2)); // (RAY / 2) for 50%
+        // Price is hacked, anyone can trip the breaker
+        clipMom.tripBreaker(address(clipETHA));
+        assertEq(clipETHA.stopped(), 2);
+        clipMom.tripBreaker(address(clipETHB));
+        assertEq(clipETHB.stopped(), 2);
+        clipMom.tripBreaker(address(clipETHC));
+        assertEq(clipETHC.stopped(), 2);
+
+        ClipAbstract clipWBTCA = ClipAbstract(addr.addr("MCD_CLIP_WBTC_A"));
+        hevm.store(address(addr.addr("PIP_WBTC")), bytes32(uint256(4)), hackedValue);
+        assertEq(clipMom.tolerance(address(clipWBTCA)), (RAY / 2)); // (RAY / 2) for 50%
+        // Price is hacked, anyone can trip the breaker
+        clipMom.tripBreaker(address(clipWBTCA));
+        assertEq(clipWBTCA.stopped(), 2);
+    }
+
+    function testSpellIsCast_End() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DSTokenAbstract ETH = DSTokenAbstract(addr.addr("ETH"));
+        GemJoinAbstract joinETHA = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_A"));
+        ClipAbstract clipETHA = ClipAbstract(addr.addr("MCD_CLIP_ETH_A"));
+        GemJoinAbstract joinETHB = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_B"));
+        ClipAbstract clipETHB = ClipAbstract(addr.addr("MCD_CLIP_ETH_B"));
+        GemJoinAbstract joinETHC = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_C"));
+        ClipAbstract clipETHC = ClipAbstract(addr.addr("MCD_CLIP_ETH_C"));
+
+        DSTokenAbstract WBTC = DSTokenAbstract(addr.addr("WBTC"));
+        GemJoinAbstract joinWBTCA = GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_A"));
+        ClipAbstract clipWBTCA = ClipAbstract(addr.addr("MCD_CLIP_WBTC_A"));
+
+        // Force max debt ceiling for collaterals
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-A"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-B"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-C"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("WBTC-A"), uint256(2)))) + 3),
+            bytes32(uint256(-1))
+        );
+
+        {
+            uint256 ETHIlkAmt = 20 * WAD;
+            uint256 WBTCIlkAmt = 1 * WAD;
+
+            giveTokens(ETH, ETHIlkAmt * 3);
+            giveTokens(WBTC, WBTCIlkAmt / 10 ** (18 - 8));
+
+            ETH.approve(address(joinETHA), ETHIlkAmt);
+            joinETHA.join(address(this), ETHIlkAmt);
+            ETH.approve(address(joinETHB), ETHIlkAmt);
+            joinETHB.join(address(this), ETHIlkAmt);
+            ETH.approve(address(joinETHC), ETHIlkAmt);
+            joinETHC.join(address(this), ETHIlkAmt);
+
+            WBTC.approve(address(joinWBTCA), WBTCIlkAmt / 10 ** (18 - 8));
+            joinWBTCA.join(address(this), WBTCIlkAmt / 10 ** (18 - 8));
+
+            (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-A");
+            vat.frob("ETH-A", address(this), address(this), address(this), int256(ETHIlkAmt), int256(mul(ETHIlkAmt, spot) / rate));
+
+            (, rate, spot,,) = vat.ilks("ETH-B");
+            vat.frob("ETH-B", address(this), address(this), address(this), int256(ETHIlkAmt), int256(mul(ETHIlkAmt, spot) / rate));
+
+            (, rate, spot,,) = vat.ilks("ETH-C");
+            vat.frob("ETH-C", address(this), address(this), address(this), int256(ETHIlkAmt), int256(mul(ETHIlkAmt, spot) / rate));
+
+            (, rate, spot,,) = vat.ilks("WBTC-A");
+            vat.frob("WBTC-A", address(this), address(this), address(this), int256(WBTCIlkAmt), int256(mul(WBTCIlkAmt, spot) / rate));
+        }
+
+        hevm.warp(block.timestamp + 1);
+        jug.drip("ETH-A");
+        jug.drip("ETH-B");
+        jug.drip("ETH-C");
+        jug.drip("WBTC-A");
+
+        uint256 auctionIdETHA = clipETHA.kicks() + 1;
+        uint256 auctionIdETHB = clipETHB.kicks() + 1;
+        uint256 auctionIdETHC = clipETHC.kicks() + 1;
+        uint256 auctionIdWBTCA = clipWBTCA.kicks() + 1;
+
+        dog.bark("ETH-A", address(this), address(this));
+        dog.bark("ETH-B", address(this), address(this));
+        dog.bark("ETH-C", address(this), address(this));
+        dog.bark("WBTC-A", address(this), address(this));
+
+        assertEq(clipETHA.kicks(), auctionIdETHA);
+        assertEq(clipETHB.kicks(), auctionIdETHB);
+        assertEq(clipETHC.kicks(), auctionIdETHC);
+        assertEq(clipWBTCA.kicks(), auctionIdWBTCA);
+
+        hevm.store(
+            address(end),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1))
+        );
+        assertEq(end.wards(address(this)), 1);
+
+        end.cage();
+        end.cage("ETH-A");
+        end.cage("ETH-B");
+        end.cage("ETH-C");
+        end.cage("WBTC-A");
+
+        (,,, address usr,,) = clipETHA.sales(auctionIdETHA);
+        assertTrue(usr != address(0));
+
+        (,,, usr,,) = clipETHB.sales(auctionIdETHB);
+        assertTrue(usr != address(0));
+
+        (,,, usr,,) = clipETHC.sales(auctionIdETHC);
+        assertTrue(usr != address(0));
+
+        (,,, usr,,) = clipWBTCA.sales(auctionIdWBTCA);
+        assertTrue(usr != address(0));
+
+        end.snip("ETH-A", auctionIdETHA);
+        (,,, usr,,) = clipETHA.sales(auctionIdETHA);
+        assertTrue(usr == address(0));
+
+        end.snip("ETH-B", auctionIdETHB);
+        (,,, usr,,) = clipETHB.sales(auctionIdETHB);
+        assertTrue(usr == address(0));
+
+        end.snip("ETH-C", auctionIdETHC);
+        (,,, usr,,) = clipETHC.sales(auctionIdETHC);
+        assertTrue(usr == address(0));
+
+        end.snip("WBTC-A", auctionIdWBTCA);
+        (,,, usr,,) = clipWBTCA.sales(auctionIdWBTCA);
+        assertTrue(usr == address(0));
+
+        end.skim("ETH-A", address(this));
+        end.skim("ETH-B", address(this));
+        end.skim("ETH-C", address(this));
+        end.skim("WBTC-A", address(this));
+
+        end.free("ETH-A");
+        end.free("ETH-B");
+        end.free("ETH-C");
+        end.free("WBTC-A");
+
+        hevm.warp(block.timestamp + end.wait());
+
+        vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
+
+        // Removing the surplus to allow continuing the execution.
+        // (not needed if enough vaults skimmed)
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
+
+        end.thaw();
+
+        end.flow("ETH-A");
+        end.flow("ETH-B");
+        end.flow("ETH-C");
+        end.flow("WBTC-A");
+
+        vat.hope(address(end));
+
+        uint256 daiToRedeem = vat.dai(address(this)) / RAY;
+        assertTrue(daiToRedeem > 0);
+
+        end.pack(daiToRedeem);
+
+        // Force a lot of collateral available to pay in end.cash
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("ETH-A"), uint256(4))))),
+            bytes32(uint256(1 * MILLION * WAD))
+        );
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("ETH-B"), uint256(4))))),
+            bytes32(uint256(1 * MILLION * WAD))
+        );
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("ETH-C"), uint256(4))))),
+            bytes32(uint256(1 * MILLION * WAD))
+        );
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("WBTC-A"), uint256(4))))),
+            bytes32(uint256(1 * MILLION * WAD))
+        );
+
+
+        end.cash("ETH-A", daiToRedeem);
+        end.cash("ETH-B", daiToRedeem);
+        end.cash("ETH-C", daiToRedeem);
+        end.cash("WBTC-A", daiToRedeem);
+    }
 }
