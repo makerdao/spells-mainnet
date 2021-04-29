@@ -23,11 +23,6 @@ interface SpellLike {
     function nextCastTime() external returns (uint256);
 }
 
-interface LPTokenLike {
-    function token0() external view returns (address);
-    function token1() external view returns (address);
-}
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
