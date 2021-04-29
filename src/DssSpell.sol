@@ -21,7 +21,6 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
-import "dss-interfaces/dss/VowAbstract.sol";
 import "dss-interfaces/dss/OsmAbstract.sol";
 
 struct Collateral {
