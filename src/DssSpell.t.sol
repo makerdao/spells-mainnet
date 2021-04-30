@@ -227,7 +227,7 @@ contract DssSpellTest is DSTest, DSMath {
         spellValues = SpellValues({
             deployed_spell:                 address(0x3Baab03C225eB9033FC6B73C16D310D56Afa922F),        // populate with deployed spell if deployed
             deployed_spell_created:         1619790968,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x961eEE551d0Fe5FF8B88db5441875564ac967f09),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
