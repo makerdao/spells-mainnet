@@ -2272,14 +2272,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         {
         DSTokenAbstract token = DSTokenAbstract(join.gem());
-        uint256 divider =  10 ** (18 - join.dec());
-        giveTokens(token, ilkAmt / divider);
-        assertEq(token.balanceOf(address(this)), ilkAmt / divider);
+        uint256 tknAmt =  ilkAmt / 10 ** (18 - join.dec());
+        giveTokens(token, tknAmt);
+        assertEq(token.balanceOf(address(this)), tknAmt);
 
         // Join to adapter
         assertEq(vat.gem(ilk, address(this)), 0);
-        token.approve(address(join), ilkAmt / divider);
-        join.join(address(this), ilkAmt / divider);
+        token.approve(address(join), tknAmt);
+        join.join(address(this), tknAmt);
         assertEq(token.balanceOf(address(this)), 0);
         assertEq(vat.gem(ilk, address(this)), ilkAmt);
         }
@@ -2433,7 +2433,7 @@ contract DssSpellTest is DSTest, DSMath {
             ClipAbstract(addr.addr("MCD_CLIP_BAT_A")),
             addr.addr("MCD_CLIP_CALC_BAT_A"),
             OsmAbstract(addr.addr("PIP_BAT")),
-            2000 * WAD
+            50_000 * WAD
         );
     }
 
