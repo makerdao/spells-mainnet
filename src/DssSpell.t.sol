@@ -1622,7 +1622,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             // Scan the storage for the balance storage slot
             bytes32 prevValue = hevm.load(
                 address(token),
