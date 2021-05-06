@@ -119,13 +119,6 @@ contract DssSpellTest is DSTest, DSMath {
     ClipperMomAbstract   clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
-    // Specific for this spell
-
-    address constant ETHBTC               = 0x81A679f98b63B3dDf2F17CB5619f4d6775b3c5ED;
-
-    address constant DEFI_SAVER           = 0xd72BA9402E9f3Ff01959D6c841DDD13615FFff42;
-    address constant LISKO                = 0x238A3F4C923B75F3eF8cA3473A503073f0530801;
-
     DssSpell   spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -1958,21 +1951,6 @@ contract DssSpellTest is DSTest, DSMath {
         try chainLog.getAddress("MCD_FLIP_AAVE_A") returns (address) {
             assertTrue(false);
         } catch {}
-
-        // This is only for kovan as we are checking keys that were wrong before only in this environment
-        assertEq(chainLog.getAddress("MCD_JOIN_PSM_USDC_A"), addr.addr("MCD_JOIN_PSM_USDC_A"));
-        try chainLog.getAddress("MCD_JOIN_USDC_PSM") returns (address) {
-            assertTrue(false);
-        } catch {}
-        assertEq(chainLog.getAddress("MCD_PSM_USDC_A"), addr.addr("MCD_PSM_USDC_A"));
-        try chainLog.getAddress("MCD_PSM_USDC_PSM") returns (address) {
-            assertTrue(false);
-        } catch {}
-        assertEq(chainLog.getAddress("MCD_FLIP_PSM_USDC_A"), addr.addr("MCD_FLIP_PSM_USDC_A"));
-        try chainLog.getAddress("MCD_FLIP_USDC_PSM") returns (address) {
-            assertTrue(false);
-        } catch {}
-        //
     }
 
     // function testCollateralIntegrations() public {
