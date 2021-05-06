@@ -86,6 +86,18 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_AAVE_A            = 0x8723b74F598DE2ea49747de5896f9034CC09349e;
     address constant MCD_CLIP_CALC_AAVE_A       = 0x76024a8EfFCFE270e089964a562Ece6ea5f3a14C;
 
+    address constant GOV_MULSTISIG  = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    address constant RISK_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    address constant RWF_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant GRO_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
+    address constant CP_MULSTISIG   = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237;
+
+    uint256 constant GOV_MONTHLY_EXPENSE  = 80_000;
+    uint256 constant RISK_MONTHLY_EXPENSE = 100_500;
+    uint256 constant RWF_MONTHLY_EXPENSE  = 40_000;
+    uint256 constant GRO_MONTHLY_EXPENSE  = 126_117;
+    uint256 constant CP_MONTHLY_EXPENSE   = 44_375;
+
     function flipperToClipper(Collateral memory col) internal {
         // Check constructor values of Clipper
         require(ClipAbstract(col.clipper).vat() == col.vat, "DssSpell/clip-wrong-vat");
@@ -151,6 +163,9 @@ contract DssSpellAction is DssAction {
         address FLIPPER_MOM     = DssExecLib.getChangelogAddress("FLIPPER_MOM");
         address CLIPPER_MOM     = DssExecLib.getChangelogAddress("CLIPPER_MOM");
         address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+
+        // -------------------- UNIV2DAIUSDC-A Adjust liq ratio --------------------
+        DssExecLib.setIlkLiquidationRatio("UNIV2DAIUSDC-A", 10500);
 
         // --------------------------------- BAT-A ---------------------------------
         flipperToClipper(Collateral({
@@ -472,7 +487,21 @@ contract DssSpellAction is DssAction {
             flipKey: "MCD_FLIP_AAVE_A"
         }));
 
+        // ------------------------- Update Chainlog -------------------------
+
         DssExecLib.setChangelogVersion("1.6.0");
+
+        // ----------------------- Core Units Payments -----------------------
+        // GovAlpha
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULSTISIG, GOV_MONTHLY_EXPENSE);
+        // Risk
+        DssExecLib.sendPaymentFromSurplusBuffer(RISK_MULSTISIG, RISK_MONTHLY_EXPENSE);
+        // Real World Finance
+        DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULSTISIG, RWF_MONTHLY_EXPENSE);
+        // Growth
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULSTISIG, GRO_MONTHLY_EXPENSE);
+        // Content Production
+        DssExecLib.sendPaymentFromSurplusBuffer(CP_MULSTISIG, CP_MONTHLY_EXPENSE);
     }
 }
 

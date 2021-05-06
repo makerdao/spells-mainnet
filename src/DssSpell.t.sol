@@ -999,7 +999,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         5 * THOUSAND,
             pct:          100,
-            mat:          11000,
+            mat:          10500,
             liqType:      "flip",
             liqOn:        false,
             chop:         1300,
@@ -2543,5 +2543,41 @@ contract DssSpellTest is DSTest, DSMath {
             OsmAbstract(addr.addr("PIP_AAVE")),
             100 * WAD
         );
+    }
+
+    address constant GOV_MULSTISIG  = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
+    address constant RISK_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    address constant RWF_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant GRO_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
+    address constant CP_MULSTISIG   = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237;
+
+    uint256 constant GOV_MONTHLY_EXPENSE  = 80_000;
+    uint256 constant RISK_MONTHLY_EXPENSE = 100_500;
+    uint256 constant RWF_MONTHLY_EXPENSE  = 40_000;
+    uint256 constant GRO_MONTHLY_EXPENSE  = 126_117;
+    uint256 constant CP_MONTHLY_EXPENSE   = 44_375;
+
+    function test_core_units_budgets() public {
+        uint256 prevSin = vat.sin(address(vow));
+
+        uint256 prevDaiGov = dai.balanceOf(GOV_MULSTISIG);
+        uint256 prevDaiRisk = dai.balanceOf(RISK_MULSTISIG);
+        uint256 prevDaiRWF = dai.balanceOf(RWF_MULSTISIG);
+        uint256 prevDaiGro = dai.balanceOf(GRO_MULSTISIG);
+        uint256 prevDaiCP = dai.balanceOf(CP_MULSTISIG);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            GOV_MONTHLY_EXPENSE * RAD + RISK_MONTHLY_EXPENSE * RAD + RWF_MONTHLY_EXPENSE * RAD + GRO_MONTHLY_EXPENSE * RAD + CP_MONTHLY_EXPENSE * RAD
+        );
+        assertEq(dai.balanceOf(GOV_MULSTISIG) - prevDaiGov, GOV_MONTHLY_EXPENSE * WAD);
+        assertEq(dai.balanceOf(RISK_MULSTISIG) - prevDaiRisk, RISK_MONTHLY_EXPENSE * WAD);
+        assertEq(dai.balanceOf(RWF_MULSTISIG) - prevDaiRWF, RWF_MONTHLY_EXPENSE * WAD);
+        assertEq(dai.balanceOf(GRO_MULSTISIG) - prevDaiGro, GRO_MONTHLY_EXPENSE * WAD);
+        assertEq(dai.balanceOf(CP_MULSTISIG) - prevDaiCP, CP_MONTHLY_EXPENSE * WAD);
     }
 }
