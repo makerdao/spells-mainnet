@@ -2,7 +2,7 @@
 
 # Contribution Checklist
 
-- [ ] PR title ends with `(SC-<TICKET_NUMBER>)`
+- [ ] PR title starts with `(PE-<TICKET_NUMBER>)`
 - [ ] Link to clubhouse ticket
 - [ ] Code approved
 - [ ] Tests approved
