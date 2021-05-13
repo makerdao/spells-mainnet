@@ -401,7 +401,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         30 * MILLION,
+            line:         0 * MILLION,
             dust:         5 * THOUSAND,
             pct:          5000,
             mat:          12000,
@@ -482,7 +482,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      5 * MILLION,
+            aL_line:      0 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
             line:         0 * MILLION,
@@ -597,7 +597,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         100 * MILLION,
+            line:         0 * MILLION,
             dust:         5 * THOUSAND,
             pct:          0,
             mat:          10100,
@@ -2200,6 +2200,150 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
+    function check_UNIV2_replacement(bytes32 ilk, LPOsmAbstract lpPip, LPOsmAbstract oldLpPip) internal {
+        try MedianAbstract(oldLpPip.orb0()).bud(address(oldLpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 1); // Only if a Median
+        } catch {}
+        try MedianAbstract(oldLpPip.orb1()).bud(address(oldLpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 1); // Only if a Median
+        } catch {}
+
+        hevm.warp(block.timestamp + 3601);
+        oldLpPip.poke();
+        hevm.warp(block.timestamp + 3601);
+        oldLpPip.poke();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        lpPip.poke();
+        hevm.warp(block.timestamp + 3601);
+        lpPip.poke();
+        spotter.poke(ilk);
+
+        // Check median matches pip.src()
+        assertEq(lpPip.src(),  oldLpPip.src());
+        assertEq(lpPip.orb0(), oldLpPip.orb0());
+        assertEq(lpPip.orb1(), oldLpPip.orb1());
+
+        // Authorization
+        assertEq(lpPip.wards(address(osmMom)), 1);
+        assertEq(lpPip.bud(address(spotter)), 1);
+        assertEq(lpPip.bud(address(end)), 1);
+        try MedianAbstract(lpPip.orb0()).bud(address(lpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 1); // Only if a Median
+        } catch {}
+        try MedianAbstract(lpPip.orb1()).bud(address(lpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 1); // Only if a Median
+        } catch {}
+        try MedianAbstract(oldLpPip.orb0()).bud(address(oldLpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 0); // Only if a Median
+        } catch {}
+        try MedianAbstract(oldLpPip.orb1()).bud(address(oldLpPip)) returns (uint256 kissed) {
+            assertEq(kissed, 0); // Only if a Median
+        } catch {}
+
+        // Give reading access to test
+        hevm.store(
+            address(lpPip),
+            keccak256(abi.encode(address(this), uint256(2))),
+            bytes32(uint256(1))
+        );
+        hevm.store(
+            address(oldLpPip),
+            keccak256(abi.encode(address(this), uint256(2))),
+            bytes32(uint256(1))
+        );
+
+        (bytes32 price1, bool ok1) = lpPip.peek();
+        (bytes32 price2, bool ok2) = oldLpPip.peek();
+        // As the new LP oracles manage a different rounding we just check that they aprox the same
+        assertTrue(uint256(price1) < add(uint256(price2), 5) && uint256(price1) > sub(uint256(price2), 5));
+        assertTrue(ok1);
+        assertTrue(ok2);
+    }
+
+    function testSpellIsCast_UNIV2DAIETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2DAIETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2DAIETH")),
+            LPOsmAbstract(0x87ecBd742cEB40928E6cDE77B2f0b5CFa3342A09)
+        );
+    }
+
+    function testSpellIsCast_UNIV2WBTCETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2WBTCETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCETH")),
+            LPOsmAbstract(0x771338D5B31754b25D2eb03Cea676877562Dec26)
+        );
+    }
+
+    function testSpellIsCast_UNIV2USDCETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2USDCETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
+            LPOsmAbstract(0xECB03Fec701B93DC06d19B4639AA8b5a838472BE)
+        );
+    }
+
+    function testSpellIsCast_UNIV2DAIUSDC_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2DAIUSDC-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDC")),
+            LPOsmAbstract(0x25CD858a00146961611b18441353603191f110A0)
+        );
+    }
+
+    function testSpellIsCast_UNIV2ETHUSDT_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2ETHUSDT-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2ETHUSDT")),
+            LPOsmAbstract(0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B)
+        );
+    }
+
+    function testSpellIsCast_UNIV2LINKETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2LINKETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2LINKETH")),
+            LPOsmAbstract(0x628009F5F5029544AE84636Ef676D3Cc5755238b)
+        );
+    }
+
+    function testSpellIsCast_UNIV2UNIETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2UNIETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2UNIETH")),
+            LPOsmAbstract(0x8Ce9E9442F2791FC63CD6394cC12F2dE4fbc1D71)
+        );
+    }
+
+    function testSpellIsCast_UNIV2WBTCDAI_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2WBTCDAI-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
+            LPOsmAbstract(0x5FB5a346347ACf4FCD3AAb28f5eE518785FB0AD0)
+        );
+    }
+
+    function testSpellIsCast_UNIV2AAVEETH_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2AAVEETH-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
+            LPOsmAbstract(0x8D34DC2c33A6386E96cA562D8478Eaf82305b81a)
+        );
+    }
+
+    function testSpellIsCast_UNIV2DAIUSDT_PIP_replacement() public {
+        check_UNIV2_replacement(
+            "UNIV2DAIUSDT-A",
+            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
+            LPOsmAbstract(0x69562A7812830E6854Ffc50b992c2AA861D5C2d3)
+        );
+    }
+
     function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip, uint256 ilkAmt) internal {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -2403,159 +2547,15 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    function testSpellIsCast_BAT_A_clip() public {
-        checkIlkClipper(
-            "BAT-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_BAT_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_BAT_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_BAT_A")),
-            addr.addr("MCD_CLIP_CALC_BAT_A"),
-            OsmAbstract(addr.addr("PIP_BAT")),
-            50_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_ZRX_A_clip() public {
-        checkIlkClipper(
-            "ZRX-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_ZRX_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_ZRX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_ZRX_A")),
-            addr.addr("MCD_CLIP_CALC_ZRX_A"),
-            OsmAbstract(addr.addr("PIP_ZRX")),
-            20_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_KNC_A_clip() public {
-        checkIlkClipper(
-            "KNC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_KNC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_KNC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_KNC_A")),
-            addr.addr("MCD_CLIP_CALC_KNC_A"),
-            OsmAbstract(addr.addr("PIP_KNC")),
-            10_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_MANA_A_clip() public {
-        checkIlkClipper(
-            "MANA-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_MANA_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_MANA_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_MANA_A")),
-            addr.addr("MCD_CLIP_CALC_MANA_A"),
-            OsmAbstract(addr.addr("PIP_MANA")),
-            20_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_COMP_A_clip() public {
-        checkIlkClipper(
-            "COMP-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_COMP_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_COMP_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_COMP_A")),
-            addr.addr("MCD_CLIP_CALC_COMP_A"),
-            OsmAbstract(addr.addr("PIP_COMP")),
-            40 * WAD
-        );
-    }
-
-    function testSpellIsCast_LRC_A_clip() public {
-        checkIlkClipper(
-            "LRC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_LRC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_LRC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_LRC_A")),
-            addr.addr("MCD_CLIP_CALC_LRC_A"),
-            OsmAbstract(addr.addr("PIP_LRC")),
-            40_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_BAL_A_clip() public {
-        checkIlkClipper(
-            "BAL-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_BAL_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_BAL_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_BAL_A")),
-            addr.addr("MCD_CLIP_CALC_BAL_A"),
-            OsmAbstract(addr.addr("PIP_BAL")),
-            500 * WAD
-        );
-    }
-
-    function testSpellIsCast_UNI_A_clip() public {
-        checkIlkClipper(
-            "UNI-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNI_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNI_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_UNI_A")),
-            addr.addr("MCD_CLIP_CALC_UNI_A"),
-            OsmAbstract(addr.addr("PIP_UNI")),
-            1_000 * WAD
-        );
-    }
-
-    function testSpellIsCast_RENBTC_A_clip() public {
-        checkIlkClipper(
-            "RENBTC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RENBTC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_RENBTC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
-            addr.addr("MCD_CLIP_CALC_RENBTC_A"),
-            OsmAbstract(addr.addr("PIP_RENBTC")),
-            1 * WAD
-        );
-    }
-
-    function testSpellIsCast_AAVE_A_clip() public {
-        checkIlkClipper(
-            "AAVE-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_AAVE_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_AAVE_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_AAVE_A")),
-            addr.addr("MCD_CLIP_CALC_AAVE_A"),
-            OsmAbstract(addr.addr("PIP_AAVE")),
-            100 * WAD
-        );
-    }
-
-    address constant GOV_MULSTISIG  = 0x73f09254a81e1F835Ee442d1b3262c1f1d7A13ff;
-    address constant RISK_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    address constant RWF_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    address constant GRO_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
-    address constant CP_MULSTISIG   = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237;
-
-    uint256 constant GOV_MONTHLY_EXPENSE  = 80_000;
-    uint256 constant RISK_MONTHLY_EXPENSE = 100_500;
-    uint256 constant RWF_MONTHLY_EXPENSE  = 40_000;
-    uint256 constant GRO_MONTHLY_EXPENSE  = 126_117;
-    uint256 constant CP_MONTHLY_EXPENSE   = 44_375;
-
-    function test_core_units_budgets() public {
-        uint256 prevSin = vat.sin(address(vow));
-
-        uint256 prevDaiGov = dai.balanceOf(GOV_MULSTISIG);
-        uint256 prevDaiRisk = dai.balanceOf(RISK_MULSTISIG);
-        uint256 prevDaiRWF = dai.balanceOf(RWF_MULSTISIG);
-        uint256 prevDaiGro = dai.balanceOf(GRO_MULSTISIG);
-        uint256 prevDaiCP = dai.balanceOf(CP_MULSTISIG);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            GOV_MONTHLY_EXPENSE * RAD + RISK_MONTHLY_EXPENSE * RAD + RWF_MONTHLY_EXPENSE * RAD + GRO_MONTHLY_EXPENSE * RAD + CP_MONTHLY_EXPENSE * RAD
-        );
-        assertEq(dai.balanceOf(GOV_MULSTISIG) - prevDaiGov, GOV_MONTHLY_EXPENSE * WAD);
-        assertEq(dai.balanceOf(RISK_MULSTISIG) - prevDaiRisk, RISK_MONTHLY_EXPENSE * WAD);
-        assertEq(dai.balanceOf(RWF_MULSTISIG) - prevDaiRWF, RWF_MONTHLY_EXPENSE * WAD);
-        assertEq(dai.balanceOf(GRO_MULSTISIG) - prevDaiGro, GRO_MONTHLY_EXPENSE * WAD);
-        assertEq(dai.balanceOf(CP_MULSTISIG) - prevDaiCP, CP_MONTHLY_EXPENSE * WAD);
-    }
+    // function testSpellIsCast_BAT_A_clip() public {
+    //     checkIlkClipper(
+    //         "BAT-A",
+    //         GemJoinAbstract(addr.addr("MCD_JOIN_BAT_A")),
+    //         FlipAbstract(addr.addr("MCD_FLIP_BAT_A")),
+    //         ClipAbstract(addr.addr("MCD_CLIP_BAT_A")),
+    //         addr.addr("MCD_CLIP_CALC_BAT_A"),
+    //         OsmAbstract(addr.addr("PIP_BAT")),
+    //         50_000 * WAD
+    //     );
+    // }
 }
