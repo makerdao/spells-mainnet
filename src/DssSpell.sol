@@ -29,16 +29,16 @@ contract DssSpellAction is DssAction {
     string public constant description =
         "2021-05-14 MakerDAO Executive Spell | Hash: 0xd33a03015df3af9e045e54f62f3a78a5843514b01a0f282698afda166fdde202";
 
-    address constant PIP_UNIV2DAIETH  = address(0);
+    address constant PIP_UNIV2DAIETH  = 0xFc8137E1a45BAF0030563EC4F0F851bd36a85b7D;
     address constant PIP_UNIV2WBTCETH = address(0);
-    address constant PIP_UNIV2USDCETH = address(0);
-    address constant PIP_UNIV2DAIUSDC = address(0);
-    address constant PIP_UNIV2ETHUSDT = address(0);
-    address constant PIP_UNIV2LINKETH = address(0);
-    address constant PIP_UNIV2UNIETH  = address(0);
-    address constant PIP_UNIV2WBTCDAI = address(0);
-    address constant PIP_UNIV2AAVEETH = address(0);
-    address constant PIP_UNIV2DAIUSDT = address(0);
+    address constant PIP_UNIV2USDCETH = 0xf751f24DD9cfAd885984D1bA68860F558D21E52A;
+    address constant PIP_UNIV2DAIUSDC = 0x25D03C2C928ADE19ff9f4FFECc07d991d0df054B;
+    address constant PIP_UNIV2ETHUSDT = 0x5f6dD5B421B8d92c59dC6D907C9271b1DBFE3016;
+    address constant PIP_UNIV2LINKETH = 0xd7d31e62AE5bfC3bfaa24Eda33e8c32D31a1746F;
+    address constant PIP_UNIV2UNIETH  = 0x8462A88f50122782Cc96108F476deDB12248f931;
+    address constant PIP_UNIV2WBTCDAI = 0x5bB72127a196392cf4aC00Cf57aB278394d24e55;
+    address constant PIP_UNIV2AAVEETH = 0x32d8416e8538Ac36272c44b0cd962cD7E0198489;
+    address constant PIP_UNIV2DAIUSDT = 0x9A1CD705dc7ac64B50777BcEcA3529E58B1292F1;
 
     uint256 constant ONE_PCT   = 1000000000315522921573372069;
     uint256 constant THREE_PCT = 1000000000937303470807876289;
