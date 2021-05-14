@@ -16,41 +16,10 @@
 
 pragma solidity 0.6.12;
 
-import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/DssAutoLineAbstract.sol";
-
-struct Collateral {
-    bytes32 ilk;
-    address vat;
-    address vow;
-    address spotter;
-    address cat;
-    address dog;
-    address end;
-    address esm;
-    address flipperMom;
-    address clipperMom;
-    address ilkRegistry;
-    address pip;
-    address clipper;
-    address flipper;
-    address calc;
-    uint256 hole;
-    uint256 chop;
-    uint256 buf;
-    uint256 tail;
-    uint256 cusp;
-    uint256 chip;
-    uint256 tip;
-    uint256 cut;
-    uint256 step;
-    uint256 tolerance;
-    bytes32 clipKey;
-    bytes32 calcKey;
-    bytes32 flipKey;
-}
+import "dss-interfaces/dss/LPOsmAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
@@ -77,6 +46,39 @@ contract DssSpellAction is DssAction {
 
     uint256 constant MILLION = 10 ** 6;
 
+    function replaceOracle(
+        bytes32 ilk,
+        bytes32 pipKey,
+        address newOracle,
+        address spotter,
+        address end,
+        address mom,
+        bool orb0Med,
+        bool orb1Med
+    ) internal {
+        address oldOracle = DssExecLib.getChangelogAddress(pipKey);
+        address orb0 = LPOsmAbstract(newOracle).orb0();
+        address orb1 = LPOsmAbstract(newOracle).orb1();
+        require(LPOsmAbstract(newOracle).wat() == LPOsmAbstract(oldOracle).wat(), "DssSpell/not-matching-wat");
+        require(LPOsmAbstract(newOracle).src() == LPOsmAbstract(oldOracle).src(), "DssSpell/not-matching-src");
+        require(orb0 == LPOsmAbstract(oldOracle).orb0(), "DssSpell/not-matching-orb0");
+        require(orb1 == LPOsmAbstract(oldOracle).orb1(), "DssSpell/not-matching-orb1");
+        DssExecLib.setContract(spotter, ilk, "pip", newOracle);
+        DssExecLib.authorize(newOracle, mom);
+        DssExecLib.addReaderToOSMWhitelist(newOracle, spotter);
+        DssExecLib.addReaderToOSMWhitelist(newOracle, end);
+        if (orb0Med) {
+            DssExecLib.addReaderToMedianWhitelist(orb0, newOracle);
+            DssExecLib.removeReaderFromMedianWhitelist(orb0, oldOracle);
+        }
+        if (orb1Med) {
+            DssExecLib.addReaderToMedianWhitelist(orb1, newOracle);
+            DssExecLib.removeReaderFromMedianWhitelist(orb1, oldOracle);
+        }
+        DssExecLib.allowOSMFreeze(newOracle, ilk);
+        DssExecLib.setChangelogAddress(pipKey, newOracle);
+    }
+
     function actions() public override {
         address MCD_SPOT = DssExecLib.spotter();
         address MCD_END  = DssExecLib.end();
@@ -96,112 +98,124 @@ contract DssSpellAction is DssAction {
         DssExecLib.decreaseGlobalDebtCeiling(130 * MILLION);
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2DAIETH-A", "pip", PIP_UNIV2DAIETH);
-        DssExecLib.authorize(PIP_UNIV2DAIETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2DAIETH).orb1(), PIP_UNIV2DAIETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2DAIETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2DAIETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2DAIETH, "UNIV2DAIETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2DAIETH", PIP_UNIV2DAIETH);
+        replaceOracle(
+            "UNIV2DAIETH-A",
+            "PIP_UNIV2DAIETH",
+            PIP_UNIV2DAIETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            false,
+            true
+        );
 
         // --------------------------------- UNIV2WBTCETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2WBTCETH-A", "pip", PIP_UNIV2WBTCETH);
-        DssExecLib.authorize(PIP_UNIV2WBTCETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCETH).orb0(), PIP_UNIV2WBTCETH);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCETH).orb1(), PIP_UNIV2WBTCETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCETH).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2WBTCETH"));
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2WBTCETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2WBTCETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2WBTCETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2WBTCETH, "UNIV2WBTCETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2WBTCETH", PIP_UNIV2WBTCETH);
+        replaceOracle(
+            "UNIV2WBTCETH-A",
+            "PIP_UNIV2WBTCETH",
+            PIP_UNIV2WBTCETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            true
+        );
 
         // --------------------------------- UNIV2USDCETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2USDCETH-A", "pip", PIP_UNIV2USDCETH);
-        DssExecLib.authorize(PIP_UNIV2USDCETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2USDCETH).orb1(), PIP_UNIV2USDCETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2USDCETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2USDCETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2USDCETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2USDCETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2USDCETH, "UNIV2USDCETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2USDCETH", PIP_UNIV2USDCETH);
+        replaceOracle(
+            "UNIV2USDCETH-A",
+            "PIP_UNIV2USDCETH",
+            PIP_UNIV2USDCETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            false,
+            true
+        );
 
         // --------------------------------- UNIV2DAIUSDC-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2DAIUSDC-A", "pip", PIP_UNIV2DAIUSDC);
-        DssExecLib.authorize(PIP_UNIV2DAIUSDC, OSM_MOM);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIUSDC, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIUSDC, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2DAIUSDC, "UNIV2DAIUSDC-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2DAIUSDC", PIP_UNIV2DAIUSDC);
+        replaceOracle(
+            "UNIV2DAIUSDC-A",
+            "PIP_UNIV2DAIUSDC",
+            PIP_UNIV2DAIUSDC,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            false,
+            false
+        );
 
         // --------------------------------- UNIV2ETHUSDT-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2ETHUSDT-A", "pip", PIP_UNIV2ETHUSDT);
-        DssExecLib.authorize(PIP_UNIV2ETHUSDT, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2ETHUSDT).orb0(), PIP_UNIV2ETHUSDT);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2ETHUSDT).orb1(), PIP_UNIV2ETHUSDT);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2ETHUSDT).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2ETHUSDT"));
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2ETHUSDT).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2ETHUSDT"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2ETHUSDT, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2ETHUSDT, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2ETHUSDT, "UNIV2ETHUSDT-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2ETHUSDT", PIP_UNIV2ETHUSDT);
+        replaceOracle(
+            "UNIV2ETHUSDT-A",
+            "PIP_UNIV2ETHUSDT",
+            PIP_UNIV2ETHUSDT,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            true
+        );
 
         // --------------------------------- UNIV2LINKETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2LINKETH-A", "pip", PIP_UNIV2LINKETH);
-        DssExecLib.authorize(PIP_UNIV2LINKETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2LINKETH).orb0(), PIP_UNIV2LINKETH);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2LINKETH).orb1(), PIP_UNIV2LINKETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2LINKETH).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2LINKETH"));
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2LINKETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2LINKETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2LINKETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2LINKETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2LINKETH, "UNIV2LINKETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2LINKETH", PIP_UNIV2LINKETH);
+        replaceOracle(
+            "UNIV2LINKETH-A",
+            "PIP_UNIV2LINKETH",
+            PIP_UNIV2LINKETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            true
+        );
 
         // --------------------------------- UNIV2UNIETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2UNIETH-A", "pip", PIP_UNIV2UNIETH);
-        DssExecLib.authorize(PIP_UNIV2UNIETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2UNIETH).orb0(), PIP_UNIV2UNIETH);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2UNIETH).orb1(), PIP_UNIV2UNIETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2UNIETH).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2UNIETH"));
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2UNIETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2UNIETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2UNIETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2UNIETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2UNIETH, "UNIV2UNIETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2UNIETH", PIP_UNIV2UNIETH);
+        replaceOracle(
+            "UNIV2UNIETH-A",
+            "PIP_UNIV2UNIETH",
+            PIP_UNIV2UNIETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            true
+        );
 
         // --------------------------------- UNIV2WBTCDAI-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2WBTCDAI-A", "pip", PIP_UNIV2WBTCDAI);
-        DssExecLib.authorize(PIP_UNIV2WBTCDAI, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCDAI).orb0(), PIP_UNIV2WBTCDAI);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2WBTCDAI).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2WBTCDAI"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2WBTCDAI, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2WBTCDAI, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2WBTCDAI, "UNIV2WBTCDAI-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2WBTCDAI", PIP_UNIV2WBTCDAI);
+        replaceOracle(
+            "UNIV2WBTCDAI-A",
+            "PIP_UNIV2WBTCDAI",
+            PIP_UNIV2WBTCDAI,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            false
+        );
 
         // --------------------------------- UNIV2AAVEETH-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2AAVEETH-A", "pip", PIP_UNIV2AAVEETH);
-        DssExecLib.authorize(PIP_UNIV2AAVEETH, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2AAVEETH).orb0(), PIP_UNIV2AAVEETH);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2AAVEETH).orb1(), PIP_UNIV2AAVEETH);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2AAVEETH).orb0(), DssExecLib.getChangelogAddress("PIP_UNIV2AAVEETH"));
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2AAVEETH).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2AAVEETH"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2AAVEETH, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2AAVEETH, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2AAVEETH, "UNIV2AAVEETH-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2AAVEETH", PIP_UNIV2AAVEETH);
+        replaceOracle(
+            "UNIV2AAVEETH-A",
+            "PIP_UNIV2AAVEETH",
+            PIP_UNIV2AAVEETH,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            true,
+            true
+        );
 
         // --------------------------------- UNIV2DAIUSDT-A ---------------------------------
-        DssExecLib.setContract(MCD_SPOT, "UNIV2DAIUSDT-A", "pip", PIP_UNIV2DAIUSDT);
-        DssExecLib.authorize(PIP_UNIV2DAIUSDT, OSM_MOM);
-        DssExecLib.addReaderToMedianWhitelist(LPOsmAbstract(PIP_UNIV2DAIUSDT).orb1(), PIP_UNIV2DAIUSDT);
-        DssExecLib.removeReaderFromMedianWhitelist(LPOsmAbstract(PIP_UNIV2DAIUSDT).orb1(), DssExecLib.getChangelogAddress("PIP_UNIV2DAIUSDT"));
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIUSDT, MCD_SPOT);
-        DssExecLib.addReaderToOSMWhitelist(PIP_UNIV2DAIUSDT, MCD_END);
-        DssExecLib.allowOSMFreeze(PIP_UNIV2DAIUSDT, "UNIV2DAIUSDT-A");
-        DssExecLib.setChangelogAddress("PIP_UNIV2DAIUSDT", PIP_UNIV2DAIUSDT);
+        replaceOracle(
+            "UNIV2DAIUSDT-A",
+            "PIP_UNIV2DAIUSDT",
+            PIP_UNIV2DAIUSDT,
+            MCD_SPOT,
+            MCD_END,
+            OSM_MOM,
+            false,
+            true
+        );
 
         // ---------------------------- Update Chainlog version ----------------------------
         DssExecLib.setChangelogVersion("1.7.0");

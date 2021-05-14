@@ -2222,7 +2222,7 @@ contract DssSpellTest is DSTest, DSMath {
         lpPip.poke();
         spotter.poke(ilk);
 
-        // Check median matches pip.src()
+        assertEq(lpPip.wat(),  oldLpPip.wat());
         assertEq(lpPip.src(),  oldLpPip.src());
         assertEq(lpPip.orb0(), oldLpPip.orb0());
         assertEq(lpPip.orb1(), oldLpPip.orb1());
