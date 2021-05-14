@@ -18,6 +18,7 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/VatAbstract.sol";
 import "dss-interfaces/dss/DssAutoLineAbstract.sol";
 import "dss-interfaces/dss/LPOsmAbstract.sol";
 
@@ -80,6 +81,7 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
+        address MCD_VAT  = DssExecLib.vat();
         address MCD_SPOT = DssExecLib.spotter();
         address MCD_END  = DssExecLib.end();
         address OSM_MOM  = DssExecLib.osmMom();
@@ -92,10 +94,14 @@ contract DssSpellAction is DssAction {
 
         // ------------------------------ Debt ceiling updates -----------------------------
         DssExecLib.setIlkAutoLineDebtCeiling("KNC-A", 0);
-        DssAutoLineAbstract(DssExecLib.autoLine()).exec("KNC-A"); // Sets line to 0 and decreases global one
+        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
+        DssExecLib.setIlkDebtCeiling("KNC-A", 0); // -kncLine
         DssExecLib.setIlkDebtCeiling("PAXUSD-A", 0); // -100M
         DssExecLib.setIlkDebtCeiling("USDC-B", 0); // -30M
         DssExecLib.decreaseGlobalDebtCeiling(130 * MILLION);
+        uint256 Line = VatAbstract(MCD_VAT).Line();
+        require(Line > 130 * MILLION + kncLine, "DssSpell/underflow");
+        VatAbstract(MCD_VAT).file("Line", Line - (130 * MILLION + kncLine));
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
         replaceOracle(
