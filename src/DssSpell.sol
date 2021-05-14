@@ -100,7 +100,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("USDC-B", 0); // -30M
         uint256 Line = VatAbstract(MCD_VAT).Line();
         require(Line > 130 * MILLION + kncLine, "DssSpell/underflow");
-        VatAbstract(MCD_VAT).file("Line", Line - (130 * MILLION + kncLine));
+        VatAbstract(MCD_VAT).file("Line", Line - (130 * MILLION * RAD + kncLine));
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
         replaceOracle(
