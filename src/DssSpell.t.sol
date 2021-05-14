@@ -2208,9 +2208,9 @@ contract DssSpellTest is DSTest, DSMath {
             assertEq(kissed, 1); // Only if a Median
         } catch {}
 
-        hevm.warp(block.timestamp + 3601);
+        hevm.warp(block.timestamp + 1 hours);
         oldLpPip.poke();
-        hevm.warp(block.timestamp + 3601);
+        hevm.warp(block.timestamp + 1 hours);
         oldLpPip.poke();
 
         vote(address(spell));
@@ -2218,7 +2218,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         lpPip.poke();
-        hevm.warp(block.timestamp + 3601);
+        hevm.warp(block.timestamp + 1 hours);
         lpPip.poke();
         spotter.poke(ilk);
 
@@ -2226,6 +2226,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(lpPip.src(),  oldLpPip.src());
         assertEq(lpPip.orb0(), oldLpPip.orb0());
         assertEq(lpPip.orb1(), oldLpPip.orb1());
+
+        assertEq(osmMom.osms(ilk), address(lpPip));
+        (address spotterPip,) = spotter.ilks(ilk);
+        assertEq(spotterPip, address(lpPip));
 
         // Authorization
         assertEq(lpPip.wards(address(osmMom)), 1);
