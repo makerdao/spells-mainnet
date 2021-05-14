@@ -30,7 +30,7 @@ contract DssSpellAction is DssAction {
         "2021-05-14 MakerDAO Executive Spell | Hash: 0xd33a03015df3af9e045e54f62f3a78a5843514b01a0f282698afda166fdde202";
 
     address constant PIP_UNIV2DAIETH  = 0xFc8137E1a45BAF0030563EC4F0F851bd36a85b7D;
-    address constant PIP_UNIV2WBTCETH = address(0);
+    address constant PIP_UNIV2WBTCETH = 0x8400D2EDb8B97f780356Ef602b1BdBc082c2aD07;
     address constant PIP_UNIV2USDCETH = 0xf751f24DD9cfAd885984D1bA68860F558D21E52A;
     address constant PIP_UNIV2DAIUSDC = 0x25D03C2C928ADE19ff9f4FFECc07d991d0df054B;
     address constant PIP_UNIV2ETHUSDT = 0x5f6dD5B421B8d92c59dC6D907C9271b1DBFE3016;
