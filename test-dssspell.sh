@@ -3,8 +3,8 @@ set -e
 
 [[ "$ETH_RPC_URL" && "$(seth chain)" == "ethlive"  ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1;  }
 
-# export DAPP_BUILD_OPTIMIZE=1
-# export DAPP_BUILD_OPTIMIZE_RUNS=1
+export DAPP_BUILD_OPTIMIZE=1
+export DAPP_BUILD_OPTIMIZE_RUNS=1
 export DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xc061EDFC9C38912E0ad4F3922aA84ee11FB03347'
 export DAPP_LINK_TEST_LIBRARIES=0
 
