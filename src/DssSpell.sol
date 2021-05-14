@@ -46,7 +46,7 @@ contract DssSpellAction is DssAction {
     uint256 constant FIVE_PCT  = 1000000001547125957863212448;
 
     uint256 constant MILLION = 10 ** 6;
-    uint256 constant RAD     = 10 ** 47;
+    uint256 constant RAD     = 10 ** 45;
 
     function replaceOracle(
         bytes32 ilk,
@@ -101,11 +101,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("ETH-C", THREE_PCT, true);
 
         // ------------------------------ Debt ceiling updates -----------------------------
+        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
         DssExecLib.removeIlkFromAutoLine("KNC-A");
         DssExecLib.setIlkDebtCeiling("KNC-A", 0); // -kncLine
         DssExecLib.setIlkDebtCeiling("PAXUSD-A", 0); // -100M
         DssExecLib.setIlkDebtCeiling("USDC-B", 0); // -30M
-        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
         uint256 Line = VatAbstract(MCD_VAT).Line();
         VatAbstract(MCD_VAT).file("Line", sub(Line, add(130 * MILLION * RAD, kncLine)));
 
