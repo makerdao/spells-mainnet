@@ -2263,7 +2263,7 @@ contract DssSpellTest is DSTest, DSMath {
         (bytes32 price1, bool ok1) = lpPip.peek();
         (bytes32 price2, bool ok2) = oldLpPip.peek();
         // As the new LP oracles manage a different rounding we just check that they aprox the same
-        assertTrue(uint256(price1) < add(uint256(price2), 5) && uint256(price1) > sub(uint256(price2), 5));
+        assertTrue(uint256(price1) <= add(uint256(price2), uint256(price2) / 1000) && uint256(price1) >= sub(uint256(price2), uint256(price2) / 1000));
         assertTrue(ok1);
         assertTrue(ok2);
     }
