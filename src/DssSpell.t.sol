@@ -481,10 +481,10 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     0
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
-            aL_enabled:   true,
+            aL_enabled:   false,
             aL_line:      0 * MILLION,
-            aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_gap:       0 * MILLION,
+            aL_ttl:       0,
             line:         0 * MILLION,
             dust:         5 * THOUSAND,
             pct:          500,
