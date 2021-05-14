@@ -46,6 +46,7 @@ contract DssSpellAction is DssAction {
     uint256 constant FIVE_PCT  = 1000000001547125957863212448;
 
     uint256 constant MILLION = 10 ** 6;
+    uint256 constant RAD     = 10 ** 47;
 
     function replaceOracle(
         bytes32 ilk,
