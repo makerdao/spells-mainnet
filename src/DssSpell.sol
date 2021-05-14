@@ -81,6 +81,13 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress(pipKey, newOracle);
     }
 
+    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x);
+    }
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x);
+    }
+
     function actions() public override {
         address MCD_VAT  = DssExecLib.vat();
         address MCD_SPOT = DssExecLib.spotter();
@@ -94,14 +101,13 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("ETH-C", THREE_PCT, true);
 
         // ------------------------------ Debt ceiling updates -----------------------------
-        DssExecLib.setIlkAutoLineDebtCeiling("KNC-A", 0);
-        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
+        DssExecLib.removeIlkFromAutoLine("KNC-A");
         DssExecLib.setIlkDebtCeiling("KNC-A", 0); // -kncLine
         DssExecLib.setIlkDebtCeiling("PAXUSD-A", 0); // -100M
         DssExecLib.setIlkDebtCeiling("USDC-B", 0); // -30M
+        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
         uint256 Line = VatAbstract(MCD_VAT).Line();
-        require(Line > 130 * MILLION + kncLine, "DssSpell/underflow");
-        VatAbstract(MCD_VAT).file("Line", Line - (130 * MILLION * RAD + kncLine));
+        VatAbstract(MCD_VAT).file("Line", sub(Line, add(130 * MILLION * RAD, kncLine)));
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
         replaceOracle(
