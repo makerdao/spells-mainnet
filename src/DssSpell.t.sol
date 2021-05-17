@@ -61,6 +61,7 @@ contract DssSpellTest is DSTest, DSMath {
         uint256 clip_chip;
         uint256 clip_tip;
         uint256 clipper_mom;
+        uint256 cm_tolerance;
         uint256 calc_tau;
         uint256 calc_step;
         uint256 calc_cut;
@@ -219,9 +220,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x8EFE2c82bD31B67fa262c0D364773629f6EA828A),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1621032504,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0xc5Ed356eadd9863eF78F74155fa4bEE1fc4ad879),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0x8EFE2c82bD31B67fa262c0D364773629f6EA828A),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -280,6 +281,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -308,6 +310,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -336,6 +339,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -364,6 +368,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -392,6 +397,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -420,6 +426,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -448,6 +455,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -476,6 +484,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -504,6 +513,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -532,6 +542,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -560,6 +571,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -588,6 +600,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -616,6 +629,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -644,6 +658,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -672,6 +687,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -700,6 +716,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -728,6 +745,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -756,6 +774,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -784,6 +803,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -812,6 +832,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -840,6 +861,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -868,6 +890,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    10,
             clip_tip:     0,
             clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900
@@ -881,24 +904,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          350,
             mat:          12500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     11500,
+            clip_tail:    215 minutes,
+            clip_cusp:    6000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 7000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    125,
+            calc_cut:     9950
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   false,
@@ -924,6 +948,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -937,24 +962,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          450,
             mat:          15000,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    200 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    130,
+            calc_cut:     9900
         });
         afterSpell.collaterals["UNIV2USDCETH-A"] = CollateralValues({
             aL_enabled:   true,
@@ -965,24 +991,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          450,
             mat:          12500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     11500,
+            clip_tail:    215 minutes,
+            clip_cusp:    6000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 7000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    125,
+            calc_cut:     9950
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1008,6 +1035,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -1021,24 +1049,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          14000,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     11500,
+            clip_tail:    215 minutes,
+            clip_cusp:    6000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 7000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    125,
+            calc_cut:     9950
         });
         afterSpell.collaterals["UNIV2LINKETH-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1049,24 +1078,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          400,
             mat:          16500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    200 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    130,
+            calc_cut:     9900
         });
         afterSpell.collaterals["UNIV2UNIETH-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1077,24 +1107,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          16500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    200 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    130,
+            calc_cut:     9900
         });
         afterSpell.collaterals["UNIV2WBTCDAI-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1105,24 +1136,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          0,
             mat:          12500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     11500,
+            clip_tail:    215 minutes,
+            clip_cusp:    6000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 7000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    125,
+            calc_cut:     9950
         });
         afterSpell.collaterals["UNIV2AAVEETH-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1133,24 +1165,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          400,
             mat:          16500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    200 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    130,
+            calc_cut:     9900
         });
         afterSpell.collaterals["UNIV2DAIUSDT-A"] = CollateralValues({
             aL_enabled:   true,
@@ -1161,24 +1194,25 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          12500,
-            liqType:      "flip",
+            liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            cat_dunk:     50000,
-            flip_beg:     500,
-            flip_ttl:     4 hours,
-            flip_tau:     4 hours,
-            flipper_mom:  1,
-            dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     5 * MILLION,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
             clip_tip:     0,
-            clipper_mom:  0,
+            clipper_mom:  1,
+            cm_tolerance: 9500,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0
+            calc_step:    120,
+            calc_cut:     9990
         });
         afterSpell.collaterals["RWA001-A"] = CollateralValues({
             aL_enabled:   false,
@@ -1204,6 +1238,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -1232,6 +1267,7 @@ contract DssSpellTest is DSTest, DSMath {
             clip_chip:    0,
             clip_tip:     0,
             clipper_mom:  0,
+            cm_tolerance: 0,
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0
@@ -1544,6 +1580,8 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 100 * RAD);
 
                 assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom);
+
+                assertEq(clipMom.tolerance(address(clip)), values.collaterals[ilk].cm_tolerance * RAY / 10000);
 
                 if (values.collaterals[ilk].liqOn) {
                     assertEq(clip.stopped(), 0);
@@ -2200,154 +2238,6 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function check_UNIV2_replacement(bytes32 ilk, LPOsmAbstract lpPip, LPOsmAbstract oldLpPip) internal {
-        try MedianAbstract(oldLpPip.orb0()).bud(address(oldLpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 1); // Only if a Median
-        } catch {}
-        try MedianAbstract(oldLpPip.orb1()).bud(address(oldLpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 1); // Only if a Median
-        } catch {}
-
-        hevm.warp(block.timestamp + 1 hours);
-        oldLpPip.poke();
-        hevm.warp(block.timestamp + 1 hours);
-        oldLpPip.poke();
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        lpPip.poke();
-        hevm.warp(block.timestamp + 1 hours);
-        lpPip.poke();
-        spotter.poke(ilk);
-
-        assertEq(lpPip.wat(),  oldLpPip.wat());
-        assertEq(lpPip.src(),  oldLpPip.src());
-        assertEq(lpPip.orb0(), oldLpPip.orb0());
-        assertEq(lpPip.orb1(), oldLpPip.orb1());
-
-        assertEq(osmMom.osms(ilk), address(lpPip));
-        (address spotterPip,) = spotter.ilks(ilk);
-        assertEq(spotterPip, address(lpPip));
-
-        // Authorization
-        assertEq(lpPip.wards(address(osmMom)), 1);
-        assertEq(lpPip.bud(address(spotter)), 1);
-        assertEq(lpPip.bud(address(end)), 1);
-        try MedianAbstract(lpPip.orb0()).bud(address(lpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 1); // Only if a Median
-        } catch {}
-        try MedianAbstract(lpPip.orb1()).bud(address(lpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 1); // Only if a Median
-        } catch {}
-        try MedianAbstract(oldLpPip.orb0()).bud(address(oldLpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 0); // Only if a Median
-        } catch {}
-        try MedianAbstract(oldLpPip.orb1()).bud(address(oldLpPip)) returns (uint256 kissed) {
-            assertEq(kissed, 0); // Only if a Median
-        } catch {}
-
-        // Give reading access to test
-        hevm.store(
-            address(lpPip),
-            keccak256(abi.encode(address(this), uint256(2))),
-            bytes32(uint256(1))
-        );
-        hevm.store(
-            address(oldLpPip),
-            keccak256(abi.encode(address(this), uint256(2))),
-            bytes32(uint256(1))
-        );
-
-        (bytes32 price1, bool ok1) = lpPip.peek();
-        (bytes32 price2, bool ok2) = oldLpPip.peek();
-        // As the new LP oracles manage a different rounding we just check that they aprox the same
-        assertTrue(uint256(price1) <= add(uint256(price2), uint256(price2) / 1000) && uint256(price1) >= sub(uint256(price2), uint256(price2) / 1000));
-        assertTrue(ok1);
-        assertTrue(ok2);
-    }
-
-    function testSpellIsCast_UNIV2DAIETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2DAIETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2DAIETH")),
-            LPOsmAbstract(0x87ecBd742cEB40928E6cDE77B2f0b5CFa3342A09)
-        );
-    }
-
-    function testSpellIsCast_UNIV2WBTCETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2WBTCETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCETH")),
-            LPOsmAbstract(0x771338D5B31754b25D2eb03Cea676877562Dec26)
-        );
-    }
-
-    function testSpellIsCast_UNIV2USDCETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2USDCETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
-            LPOsmAbstract(0xECB03Fec701B93DC06d19B4639AA8b5a838472BE)
-        );
-    }
-
-    function testSpellIsCast_UNIV2DAIUSDC_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2DAIUSDC-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDC")),
-            LPOsmAbstract(0x25CD858a00146961611b18441353603191f110A0)
-        );
-    }
-
-    function testSpellIsCast_UNIV2ETHUSDT_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2ETHUSDT-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2ETHUSDT")),
-            LPOsmAbstract(0x9b015AA3e4787dd0df8B43bF2FE6d90fa543E13B)
-        );
-    }
-
-    function testSpellIsCast_UNIV2LINKETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2LINKETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2LINKETH")),
-            LPOsmAbstract(0x628009F5F5029544AE84636Ef676D3Cc5755238b)
-        );
-    }
-
-    function testSpellIsCast_UNIV2UNIETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2UNIETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2UNIETH")),
-            LPOsmAbstract(0x8Ce9E9442F2791FC63CD6394cC12F2dE4fbc1D71)
-        );
-    }
-
-    function testSpellIsCast_UNIV2WBTCDAI_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2WBTCDAI-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
-            LPOsmAbstract(0x5FB5a346347ACf4FCD3AAb28f5eE518785FB0AD0)
-        );
-    }
-
-    function testSpellIsCast_UNIV2AAVEETH_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2AAVEETH-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
-            LPOsmAbstract(0x8D34DC2c33A6386E96cA562D8478Eaf82305b81a)
-        );
-    }
-
-    function testSpellIsCast_UNIV2DAIUSDT_PIP_replacement() public {
-        check_UNIV2_replacement(
-            "UNIV2DAIUSDT-A",
-            LPOsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
-            LPOsmAbstract(0x69562A7812830E6854Ffc50b992c2AA861D5C2d3)
-        );
-    }
-
     function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip, uint256 ilkAmt) internal {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -2485,7 +2375,6 @@ contract DssSpellTest is DSTest, DSMath {
         bytes32 hackedValue = 0x0000000000000000000000000000000100000000000000000000000000000123;
 
         hevm.store(address(pip), bytes32(uint256(4)), hackedValue);
-        assertEq(clipMom.tolerance(address(clipper)), (RAY / 2)); // (RAY / 2) for 50%
         // Price is hacked, anyone can trip the breaker
         clipMom.tripBreaker(address(clipper));
         assertEq(clipper.stopped(), 2);
@@ -2551,15 +2440,111 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-    // function testSpellIsCast_BAT_A_clip() public {
-    //     checkIlkClipper(
-    //         "BAT-A",
-    //         GemJoinAbstract(addr.addr("MCD_JOIN_BAT_A")),
-    //         FlipAbstract(addr.addr("MCD_FLIP_BAT_A")),
-    //         ClipAbstract(addr.addr("MCD_CLIP_BAT_A")),
-    //         addr.addr("MCD_CLIP_CALC_BAT_A"),
-    //         OsmAbstract(addr.addr("PIP_BAT")),
-    //         50_000 * WAD
-    //     );
-    // }
+    function testSpellIsCast_UNIV2DAIETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2DAIETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2DAIETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2DAIETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2DAIETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2USDCETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2USDCETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2USDCETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2ETHUSDT_A_clip() public {
+        checkIlkClipper(
+            "UNIV2ETHUSDT-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2ETHUSDT_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2ETHUSDT_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2ETHUSDT_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2ETHUSDT_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2ETHUSDT")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2WBTCDAI_A_clip() public {
+        checkIlkClipper(
+            "UNIV2WBTCDAI-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCDAI_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCDAI_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2WBTCDAI_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2WBTCDAI_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2WBTCETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2WBTCETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2WBTCETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2WBTCETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2WBTCETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2LINKETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2LINKETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2LINKETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2LINKETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2LINKETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2LINKETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2LINKETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2UNIETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2UNIETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2UNIETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2UNIETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2UNIETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2UNIETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2UNIETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2AAVEETH_A_clip() public {
+        checkIlkClipper(
+            "UNIV2AAVEETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2AAVEETH_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2AAVEETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2AAVEETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2AAVEETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
+            50_000 * WAD
+        );
+    }
+
+    function testSpellIsCast_UNIV2DAIUSDT_A_clip() public {
+        checkIlkClipper(
+            "UNIV2DAIUSDT-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDT_A")),
+            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDT_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2DAIUSDT_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDT_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
+            50_000 * WAD
+        );
+    }
 }

@@ -16,221 +16,434 @@
 
 pragma solidity 0.6.12;
 
+import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VatAbstract.sol";
-import "dss-interfaces/dss/DssAutoLineAbstract.sol";
-import "dss-interfaces/dss/LPOsmAbstract.sol";
+import "dss-interfaces/dss/ClipAbstract.sol";
+import "dss-interfaces/dss/ClipperMomAbstract.sol";
+
+struct Collateral {
+    bytes32 ilk;
+    address vat;
+    address vow;
+    address spotter;
+    address cat;
+    address dog;
+    address end;
+    address esm;
+    address flipperMom;
+    address clipperMom;
+    address ilkRegistry;
+    address pip;
+    address clipper;
+    address flipper;
+    address calc;
+    uint256 hole;
+    uint256 chop;
+    uint256 buf;
+    uint256 tail;
+    uint256 cusp;
+    uint256 chip;
+    uint256 tip;
+    uint256 cut;
+    uint256 step;
+    uint256 tolerance;
+    bytes32 clipKey;
+    bytes32 calcKey;
+    bytes32 flipKey;
+}
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/098eabb0973a264de343457ad42e29084577c338/governance/votes/Executive%20vote%20-%20May%2014%2C%202021.md -q -O - 2> /dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Executive%20vote%20-%20May%2021%2C%202021.md -q -O - 2> /dev/null)"
     string public constant description =
-        "2021-05-14 MakerDAO Executive Spell | Hash: 0xd33a03015df3af9e045e54f62f3a78a5843514b01a0f282698afda166fdde202";
+        "2021-05-21 MakerDAO Executive Spell | Hash: ";
 
-    address constant PIP_UNIV2DAIETH  = 0xFc8137E1a45BAF0030563EC4F0F851bd36a85b7D;
-    address constant PIP_UNIV2WBTCETH = 0x8400D2EDb8B97f780356Ef602b1BdBc082c2aD07;
-    address constant PIP_UNIV2USDCETH = 0xf751f24DD9cfAd885984D1bA68860F558D21E52A;
-    address constant PIP_UNIV2DAIUSDC = 0x25D03C2C928ADE19ff9f4FFECc07d991d0df054B;
-    address constant PIP_UNIV2ETHUSDT = 0x5f6dD5B421B8d92c59dC6D907C9271b1DBFE3016;
-    address constant PIP_UNIV2LINKETH = 0xd7d31e62AE5bfC3bfaa24Eda33e8c32D31a1746F;
-    address constant PIP_UNIV2UNIETH  = 0x8462A88f50122782Cc96108F476deDB12248f931;
-    address constant PIP_UNIV2WBTCDAI = 0x5bB72127a196392cf4aC00Cf57aB278394d24e55;
-    address constant PIP_UNIV2AAVEETH = 0x32d8416e8538Ac36272c44b0cd962cD7E0198489;
-    address constant PIP_UNIV2DAIUSDT = 0x9A1CD705dc7ac64B50777BcEcA3529E58B1292F1;
+    uint256 constant WAD = 10**18;
+    uint256 constant RAY = 10**27;
+    uint256 constant RAD = 10**45;
 
-    uint256 constant ONE_PCT   = 1000000000315522921573372069;
-    uint256 constant THREE_PCT = 1000000000937303470807876289;
-    uint256 constant FIVE_PCT  = 1000000001547125957863212448;
+    address constant MCD_CLIP_UNIV2DAIETH_A       = 0x9F6981bA5c77211A34B76c6385c0f6FA10414035;
+    address constant MCD_CLIP_CALC_UNIV2DAIETH_A  = 0xf738C272D648Cc4565EaFb43c0C5B35BbA3bf29d;
+    address constant MCD_CLIP_UNIV2USDCETH_A      = 0x93AE03815BAF1F19d7F18D9116E4b637cc32A131;
+    address constant MCD_CLIP_CALC_UNIV2USDCETH_A = 0x022ff40643e8b94C43f0a1E54f51EF6D070AcbC4;
+    address constant MCD_CLIP_UNIV2ETHUSDT_A      = 0x2aC4C9b49051275AcB4C43Ec973082388D015D48;
+    address constant MCD_CLIP_CALC_UNIV2ETHUSDT_A = 0xA475582E3D6Ec35091EaE81da3b423C1B27fa029;
+    address constant MCD_CLIP_UNIV2WBTCDAI_A      = 0x4fC53a57262B87ABDa61d6d0DB2bE7E9BE68F6b8;
+    address constant MCD_CLIP_CALC_UNIV2WBTCDAI_A = 0x863AEa7D2c4BF2B5Aa191B057240b6Dc29F532eB;
+    address constant MCD_CLIP_UNIV2WBTCETH_A      = 0xb15afaB996904170f87a64Fe42db0b64a6F75d24;
+    address constant MCD_CLIP_CALC_UNIV2WBTCETH_A = 0xC94ee71e909DbE08d63aA9e6EFbc9976751601B4;
+    address constant MCD_CLIP_UNIV2LINKETH_A      = 0x6aa0520354d1b84e1C6ABFE64a708939529b619e;
+    address constant MCD_CLIP_CALC_UNIV2LINKETH_A = 0x8aCeC2d937a4A4cAF42565aFbbb05ac242134F14;
+    address constant MCD_CLIP_UNIV2UNIETH_A       = 0xb0ece6F5542A4577E2f1Be491A937Ccbbec8479e;
+    address constant MCD_CLIP_CALC_UNIV2UNIETH_A  = 0xad609Ed16157014EF955C94553E40e94A09049f0;
+    address constant MCD_CLIP_UNIV2AAVEETH_A      = 0x854b252BA15eaFA4d1609D3B98e00cc10084Ec55;
+    address constant MCD_CLIP_CALC_UNIV2AAVEETH_A = 0x5396e541E1F648EC03faf338389045F1D7691960;
+    address constant MCD_CLIP_UNIV2DAIUSDT_A      = 0xe4B82Be84391b9e7c56a1fC821f47569B364dd4a;
+    address constant MCD_CLIP_CALC_UNIV2DAIUSDT_A = 0x4E88cE740F6bEa31C2b14134F6C5eB2a63104fcF;
 
-    uint256 constant MILLION = 10 ** 6;
-    uint256 constant RAD     = 10 ** 45;
-
-    function replaceOracle(
-        bytes32 ilk,
-        bytes32 pipKey,
-        address newOracle,
-        address spotter,
-        address end,
-        address mom,
-        bool orb0Med,
-        bool orb1Med
-    ) internal {
-        address oldOracle = DssExecLib.getChangelogAddress(pipKey);
-        address orb0 = LPOsmAbstract(newOracle).orb0();
-        address orb1 = LPOsmAbstract(newOracle).orb1();
-        require(LPOsmAbstract(newOracle).wat() == LPOsmAbstract(oldOracle).wat(), "DssSpell/not-matching-wat");
-        require(LPOsmAbstract(newOracle).src() == LPOsmAbstract(oldOracle).src(), "DssSpell/not-matching-src");
-        require(orb0 == LPOsmAbstract(oldOracle).orb0(), "DssSpell/not-matching-orb0");
-        require(orb1 == LPOsmAbstract(oldOracle).orb1(), "DssSpell/not-matching-orb1");
-        DssExecLib.setContract(spotter, ilk, "pip", newOracle);
-        DssExecLib.authorize(newOracle, mom);
-        DssExecLib.addReaderToOSMWhitelist(newOracle, spotter);
-        DssExecLib.addReaderToOSMWhitelist(newOracle, end);
-        if (orb0Med) {
-            DssExecLib.addReaderToMedianWhitelist(orb0, newOracle);
-            DssExecLib.removeReaderFromMedianWhitelist(orb0, oldOracle);
-        }
-        if (orb1Med) {
-            DssExecLib.addReaderToMedianWhitelist(orb1, newOracle);
-            DssExecLib.removeReaderFromMedianWhitelist(orb1, oldOracle);
-        }
-        DssExecLib.allowOSMFreeze(newOracle, ilk);
-        DssExecLib.setChangelogAddress(pipKey, newOracle);
-    }
-
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x + y) >= x);
-    }
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x - y) <= x);
+    function flipperToClipper(Collateral memory col) internal {
+        // Check constructor values of Clipper
+        require(ClipAbstract(col.clipper).vat() == col.vat, "DssSpell/clip-wrong-vat");
+        require(ClipAbstract(col.clipper).spotter() == col.spotter, "DssSpell/clip-wrong-spotter");
+        require(ClipAbstract(col.clipper).dog() == col.dog, "DssSpell/clip-wrong-dog");
+        require(ClipAbstract(col.clipper).ilk() == col.ilk, "DssSpell/clip-wrong-ilk");
+        // Set CLIP for the ilk in the DOG
+        DssExecLib.setContract(col.dog, col.ilk, "clip", col.clipper);
+        // Set VOW in the CLIP
+        DssExecLib.setContract(col.clipper, "vow", col.vow);
+        // Set CALC in the CLIP
+        DssExecLib.setContract(col.clipper, "calc", col.calc);
+        // Authorize CLIP can access to VAT
+        DssExecLib.authorize(col.vat, col.clipper);
+        // Authorize CLIP can access to DOG
+        DssExecLib.authorize(col.dog, col.clipper);
+        // Authorize DOG can kick auctions on CLIP
+        DssExecLib.authorize(col.clipper, col.dog);
+        // Authorize the END to access the CLIP
+        DssExecLib.authorize(col.clipper, col.end);
+        // Authorize CLIPPERMOM can set the stopped flag in CLIP
+        DssExecLib.authorize(col.clipper, col.clipperMom);
+        // Authorize ESM to execute in Clipper
+        DssExecLib.authorize(col.clipper, col.esm);
+        // Whitelist CLIP in the osm
+        DssExecLib.addReaderToOSMWhitelist(col.pip, col.clipper);
+        // Whitelist clipperMom in the osm
+        DssExecLib.addReaderToOSMWhitelist(col.pip, col.clipperMom);
+        // No more auctions kicked via the CAT:
+        DssExecLib.deauthorize(col.flipper, col.cat);
+        // No more circuit breaker for the FLIP:
+        DssExecLib.deauthorize(col.flipper, col.flipperMom);
+        // Set values
+        Fileable(col.dog).file(col.ilk, "hole", col.hole);
+        Fileable(col.dog).file(col.ilk, "chop", col.chop);
+        Fileable(col.clipper).file("buf", col.buf);
+        Fileable(col.clipper).file("tail", col.tail);
+        Fileable(col.clipper).file("cusp", col.cusp);
+        Fileable(col.clipper).file("chip", col.chip);
+        Fileable(col.clipper).file("tip", col.tip);
+        Fileable(col.calc).file("cut", col.cut);
+        Fileable(col.calc).file("step", col.step);
+        ClipperMomAbstract(col.clipperMom).setPriceTolerance(col.clipper, col.tolerance);
+        // Update chost
+        ClipAbstract(col.clipper).upchost();
+        // Replace flip to clip in the ilk registry
+        DssExecLib.setContract(col.ilkRegistry, col.ilk, "xlip", col.clipper);
+        Fileable(col.ilkRegistry).file(col.ilk, "class", 1);
+        // Update Chainlog
+        DssExecLib.setChangelogAddress(col.clipKey, col.clipper);
+        DssExecLib.setChangelogAddress(col.calcKey, col.calc);
+        ChainlogLike(DssExecLib.LOG).removeAddress(col.flipKey);
     }
 
     function actions() public override {
-        address MCD_VAT  = DssExecLib.vat();
-        address MCD_SPOT = DssExecLib.spotter();
-        address MCD_END  = DssExecLib.end();
-        address OSM_MOM  = DssExecLib.osmMom();
+        address MCD_VAT         = DssExecLib.vat();
+        address MCD_CAT         = DssExecLib.cat();
+        address MCD_DOG         = DssExecLib.getChangelogAddress("MCD_DOG");
+        address MCD_VOW         = DssExecLib.vow();
+        address MCD_SPOT        = DssExecLib.spotter();
+        address MCD_END         = DssExecLib.end();
+        address MCD_ESM         = DssExecLib.getChangelogAddress("MCD_ESM");
+        address FLIPPER_MOM     = DssExecLib.getChangelogAddress("FLIPPER_MOM");
+        address CLIPPER_MOM     = DssExecLib.getChangelogAddress("CLIPPER_MOM");
+        address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
 
-        // ----------------------------- Stability Fee updates ----------------------------
-        DssExecLib.setIlkStabilityFee("KNC-A", FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("TUSD-A", ONE_PCT, true);
-        DssExecLib.setIlkStabilityFee("PAXUSD-A", ONE_PCT, true);
-        DssExecLib.setIlkStabilityFee("ETH-C", THREE_PCT, true);
-
-        // ------------------------------ Debt ceiling updates -----------------------------
-        (,,,uint256 kncLine,) = VatAbstract(MCD_VAT).ilks("KNC-A");
-        DssExecLib.removeIlkFromAutoLine("KNC-A");
-        DssExecLib.setIlkDebtCeiling("KNC-A", 0); // -kncLine
-        DssExecLib.setIlkDebtCeiling("PAXUSD-A", 0); // -100M
-        DssExecLib.setIlkDebtCeiling("USDC-B", 0); // -30M
-        uint256 Line = VatAbstract(MCD_VAT).Line();
-        VatAbstract(MCD_VAT).file("Line", sub(Line, add(130 * MILLION * RAD, kncLine)));
+        // -------------------- UNIV2DAIUSDC-A Adjust liq ratio --------------------
+        DssExecLib.setIlkLiquidationRatio("UNIV2DAIUSDC-A", 10500);
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2DAIETH-A",
-            "PIP_UNIV2DAIETH",
-            PIP_UNIV2DAIETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            false,
-            true
-        );
-
-        // --------------------------------- UNIV2WBTCETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2WBTCETH-A",
-            "PIP_UNIV2WBTCETH",
-            PIP_UNIV2WBTCETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            true
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2DAIETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2DAIETH"),
+            clipper: MCD_CLIP_UNIV2DAIETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2DAIETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2DAIETH_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 115 * RAY / 100,
+            tail: 215 minutes,
+            cusp: 60 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 995 * RAY / 1000,
+            step: 125 seconds,
+            tolerance: 70 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2DAIETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2DAIETH_A",
+            flipKey: "MCD_FLIP_UNIV2DAIETH_A"
+        }));
 
         // --------------------------------- UNIV2USDCETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2USDCETH-A",
-            "PIP_UNIV2USDCETH",
-            PIP_UNIV2USDCETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            false,
-            true
-        );
-
-        // --------------------------------- UNIV2DAIUSDC-A ---------------------------------
-        replaceOracle(
-            "UNIV2DAIUSDC-A",
-            "PIP_UNIV2DAIUSDC",
-            PIP_UNIV2DAIUSDC,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            false,
-            false
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2USDCETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2USDCETH"),
+            clipper: MCD_CLIP_UNIV2USDCETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2USDCETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2USDCETH_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 115 * RAY / 100,
+            tail: 215 minutes,
+            cusp: 60 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 995 * RAY / 1000,
+            step: 125 seconds,
+            tolerance: 70 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2USDCETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2USDCETH_A",
+            flipKey: "MCD_FLIP_UNIV2USDCETH_A"
+        }));
 
         // --------------------------------- UNIV2ETHUSDT-A ---------------------------------
-        replaceOracle(
-            "UNIV2ETHUSDT-A",
-            "PIP_UNIV2ETHUSDT",
-            PIP_UNIV2ETHUSDT,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            true
-        );
-
-        // --------------------------------- UNIV2LINKETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2LINKETH-A",
-            "PIP_UNIV2LINKETH",
-            PIP_UNIV2LINKETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            true
-        );
-
-        // --------------------------------- UNIV2UNIETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2UNIETH-A",
-            "PIP_UNIV2UNIETH",
-            PIP_UNIV2UNIETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            true
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2ETHUSDT-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2ETHUSDT"),
+            clipper: MCD_CLIP_UNIV2ETHUSDT_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2ETHUSDT_A"),
+            calc: MCD_CLIP_CALC_UNIV2ETHUSDT_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 115 * RAY / 100,
+            tail: 215 minutes,
+            cusp: 60 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 995 * RAY / 1000,
+            step: 125 seconds,
+            tolerance: 70 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2ETHUSDT_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2ETHUSDT_A",
+            flipKey: "MCD_FLIP_UNIV2ETHUSDT_A"
+        }));
 
         // --------------------------------- UNIV2WBTCDAI-A ---------------------------------
-        replaceOracle(
-            "UNIV2WBTCDAI-A",
-            "PIP_UNIV2WBTCDAI",
-            PIP_UNIV2WBTCDAI,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            false
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2WBTCDAI-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2WBTCDAI"),
+            clipper: MCD_CLIP_UNIV2WBTCDAI_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2WBTCDAI_A"),
+            calc: MCD_CLIP_CALC_UNIV2WBTCDAI_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 115 * RAY / 100,
+            tail: 215 minutes,
+            cusp: 60 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 995 * RAY / 1000,
+            step: 125 seconds,
+            tolerance: 70 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2WBTCDAI_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2WBTCDAI_A",
+            flipKey: "MCD_FLIP_UNIV2WBTCDAI_A"
+        }));
+
+        // --------------------------------- UNIV2WBTCETH-A ---------------------------------
+        flipperToClipper(Collateral({
+            ilk: "UNIV2WBTCETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2WBTCETH"),
+            clipper: MCD_CLIP_UNIV2WBTCETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2WBTCETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2WBTCETH_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 130 * RAY / 100,
+            tail: 200 minutes,
+            cusp: 40 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 99 * RAY / 100,
+            step: 130 seconds,
+            tolerance: 50 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2WBTCETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2WBTCETH_A",
+            flipKey: "MCD_FLIP_UNIV2WBTCETH_A"
+        }));
+
+        // --------------------------------- UNIV2LINKETH-A ---------------------------------
+        flipperToClipper(Collateral({
+            ilk: "UNIV2LINKETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2LINKETH"),
+            clipper: MCD_CLIP_UNIV2LINKETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2LINKETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2LINKETH_A,
+            hole: 3_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 130 * RAY / 100,
+            tail: 200 minutes,
+            cusp: 40 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 99 * RAY / 100,
+            step: 130 seconds,
+            tolerance: 50 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2LINKETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2LINKETH_A",
+            flipKey: "MCD_FLIP_UNIV2LINKETH_A"
+        }));
+
+        // --------------------------------- UNIV2UNIETH-A ---------------------------------
+        flipperToClipper(Collateral({
+            ilk: "UNIV2UNIETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2UNIETH"),
+            clipper: MCD_CLIP_UNIV2UNIETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2UNIETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2UNIETH_A,
+            hole: 3_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 130 * RAY / 100,
+            tail: 200 minutes,
+            cusp: 40 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 99 * RAY / 100,
+            step: 130 seconds,
+            tolerance: 50 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2UNIETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2UNIETH_A",
+            flipKey: "MCD_FLIP_UNIV2UNIETH_A"
+        }));
 
         // --------------------------------- UNIV2AAVEETH-A ---------------------------------
-        replaceOracle(
-            "UNIV2AAVEETH-A",
-            "PIP_UNIV2AAVEETH",
-            PIP_UNIV2AAVEETH,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            true,
-            true
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2AAVEETH-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2AAVEETH"),
+            clipper: MCD_CLIP_UNIV2AAVEETH_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2AAVEETH_A"),
+            calc: MCD_CLIP_CALC_UNIV2AAVEETH_A,
+            hole: 3_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 130 * RAY / 100,
+            tail: 200 minutes,
+            cusp: 40 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 99 * RAY / 100,
+            step: 130 seconds,
+            tolerance: 50 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2AAVEETH_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2AAVEETH_A",
+            flipKey: "MCD_FLIP_UNIV2AAVEETH_A"
+        }));
 
         // --------------------------------- UNIV2DAIUSDT-A ---------------------------------
-        replaceOracle(
-            "UNIV2DAIUSDT-A",
-            "PIP_UNIV2DAIUSDT",
-            PIP_UNIV2DAIUSDT,
-            MCD_SPOT,
-            MCD_END,
-            OSM_MOM,
-            false,
-            true
-        );
+        flipperToClipper(Collateral({
+            ilk: "UNIV2DAIUSDT-A",
+            vat: MCD_VAT,
+            vow: MCD_VOW,
+            spotter: MCD_SPOT,
+            cat: MCD_CAT,
+            dog: MCD_DOG,
+            end: MCD_END,
+            esm: MCD_ESM,
+            flipperMom: FLIPPER_MOM,
+            clipperMom: CLIPPER_MOM,
+            ilkRegistry: ILK_REGISTRY,
+            pip: DssExecLib.getChangelogAddress("PIP_UNIV2DAIUSDT"),
+            clipper: MCD_CLIP_UNIV2DAIUSDT_A,
+            flipper: DssExecLib.getChangelogAddress("MCD_FLIP_UNIV2DAIUSDT_A"),
+            calc: MCD_CLIP_CALC_UNIV2DAIUSDT_A,
+            hole: 5_000_000 * RAD,
+            chop: 113 * WAD / 100,
+            buf: 105 * RAY / 100,
+            tail: 220 minutes,
+            cusp: 90 * RAY / 100,
+            chip: 1 * WAD / 1000,
+            tip: 0,
+            cut: 999 * RAY / 1000,
+            step: 120 seconds,
+            tolerance: 95 * RAY / 100,
+            clipKey: "MCD_CLIP_UNIV2DAIUSDT_A",
+            calcKey: "MCD_CLIP_CALC_UNIV2DAIUSDT_A",
+            flipKey: "MCD_FLIP_UNIV2DAIUSDT_A"
+        }));
 
-        // ---------------------------- Update Chainlog version ----------------------------
-        DssExecLib.setChangelogVersion("1.7.0");
+        // ------------------------- Update Chainlog -------------------------
+
+        DssExecLib.setChangelogVersion("1.8.0");
     }
 }
 
