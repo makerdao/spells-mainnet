@@ -2237,6 +2237,13 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // New LP oracles do not have a price yet
+        pip.poke();
+        hevm.warp(block.timestamp + 1 hours);
+        pip.poke();
+        spotter.poke(ilk);
+        //
+
         // Contracts set
         assertEq(dog.vat(), address(vat));
         assertEq(dog.vow(), address(vow));
