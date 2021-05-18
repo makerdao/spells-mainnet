@@ -2478,6 +2478,12 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testSpellIsCast_UNIV2WBTCDAI_A_clip() public {
+        jug.drip("UNIV2WBTCDAI-A");
+        hevm.store(
+            address(jug),
+            keccak256(abi.encode(bytes32("UNIV2WBTCDAI-A"), uint256(1))),
+            bytes32(uint256(1000000001243680656318820312))
+        );
         checkIlkClipper(
             "UNIV2WBTCDAI-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2WBTCDAI_A")),
