@@ -2238,7 +2238,7 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip, uint256 ilkAmt) internal {
+    function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip) internal {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -2285,6 +2285,19 @@ contract DssSpellTest is DSTest, DSMath {
         );
 
         // ----------------------- Check Clipper works and bids can be made -----------------------
+        uint256 ilkAmt;
+
+        {
+        // Generate new DAI to force a liquidation
+        uint256 rate;
+        int256 art;
+        {
+        uint256 spot;
+        uint256 dust;
+        (,rate, spot,, dust) = vat.ilks(ilk);
+        art = int256(dust * 2 / rate);
+        ilkAmt = dust * 2 / spot + 1;
+        }
 
         {
         DSTokenAbstract token = DSTokenAbstract(join.gem());
@@ -2298,16 +2311,6 @@ contract DssSpellTest is DSTest, DSMath {
         join.join(address(this), tknAmt);
         assertEq(token.balanceOf(address(this)), 0);
         assertEq(vat.gem(ilk, address(this)), ilkAmt);
-        }
-
-        {
-        // Generate new DAI to force a liquidation
-        uint256 rate;
-        int256 art;
-        {
-        uint256 spot;
-        (,rate, spot,,) = vat.ilks(ilk);
-        art = int256(mul(ilkAmt, spot) / rate);
         }
 
         // dart max amount of DAI
@@ -2447,8 +2450,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2DAIETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2DAIETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2DAIETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2DAIETH"))
         );
     }
 
@@ -2459,8 +2461,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2USDCETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2USDCETH"))
         );
     }
 
@@ -2471,8 +2472,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2ETHUSDT_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2ETHUSDT_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2ETHUSDT_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2ETHUSDT")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2ETHUSDT"))
         );
     }
 
@@ -2483,8 +2483,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCDAI_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2WBTCDAI_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2WBTCDAI_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2WBTCDAI")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2WBTCDAI"))
         );
     }
 
@@ -2495,8 +2494,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2WBTCETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2WBTCETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2WBTCETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2WBTCETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2WBTCETH"))
         );
     }
 
@@ -2507,8 +2505,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2LINKETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2LINKETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2LINKETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2LINKETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2LINKETH"))
         );
     }
 
@@ -2519,8 +2516,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2UNIETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2UNIETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2UNIETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2UNIETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2UNIETH"))
         );
     }
 
@@ -2531,8 +2527,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2AAVEETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2AAVEETH_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2AAVEETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2AAVEETH")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2AAVEETH"))
         );
     }
 
@@ -2543,8 +2538,7 @@ contract DssSpellTest is DSTest, DSMath {
             FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDT_A")),
             ClipAbstract(addr.addr("MCD_CLIP_UNIV2DAIUSDT_A")),
             addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDT_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2DAIUSDT")),
-            50_000 * WAD
+            OsmAbstract(addr.addr("PIP_UNIV2DAIUSDT"))
         );
     }
 }
