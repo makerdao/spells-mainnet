@@ -16,9 +16,10 @@
 
 pragma solidity 0.6.12;
 
-import {Fileable, ChainlogLike} from "dss-exec-lib/DssExecLib.sol";
+import {Fileable} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/ChainlogAbstract.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
 
@@ -135,10 +136,15 @@ contract DssSpellAction is DssAction {
         // Update Chainlog
         DssExecLib.setChangelogAddress(col.clipKey, col.clipper);
         DssExecLib.setChangelogAddress(col.calcKey, col.calc);
-        ChainlogLike(DssExecLib.LOG).removeAddress(col.flipKey);
+        ChainlogAbstract(DssExecLib.LOG).removeAddress(col.flipKey);
     }
 
     function actions() public override {
+        require(
+            keccak256(abi.encode(ChainlogAbstract(DssExecLib.LOG).version())) ==
+            keccak256(abi.encode("1.7.0"))
+        , "DssSpell/missing-prev-spell");
+
         address MCD_VAT         = DssExecLib.vat();
         address MCD_CAT         = DssExecLib.cat();
         address MCD_DOG         = DssExecLib.getChangelogAddress("MCD_DOG");
