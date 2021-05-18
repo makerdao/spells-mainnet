@@ -156,9 +156,6 @@ contract DssSpellAction is DssAction {
         address CLIPPER_MOM     = DssExecLib.getChangelogAddress("CLIPPER_MOM");
         address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
 
-        // -------------------- UNIV2DAIUSDC-A Adjust liq ratio --------------------
-        DssExecLib.setIlkLiquidationRatio("UNIV2DAIUSDC-A", 10500);
-
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
         flipperToClipper(Collateral({
             ilk: "UNIV2DAIETH-A",
