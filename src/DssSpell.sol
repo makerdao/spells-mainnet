@@ -54,7 +54,7 @@ contract DssSpellAction is DssAction {
 
     // MIP41c4: Facilitator Onboarding (Subproposal Process) Template
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c23fd23b340ecf66a16f0e1ecfe7b55a5232864d/MIP41/MIP41c4-Subproposals/MIP41c4-SP10.md -q -O - 2> /dev/null)"
-    string constant public MIP41c4 = "0xe37c37e3ffc8a2c638500f05f179b1d07d00e5aa35ae37ac88a1e10d43e77728";
+    string constant public MIP41c4SP10 = "0xe37c37e3ffc8a2c638500f05f179b1d07d00e5aa35ae37ac88a1e10d43e77728";
 
     // Disable Office Hours
     function officeHours() public override returns (bool) {
