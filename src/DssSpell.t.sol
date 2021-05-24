@@ -2254,7 +2254,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(
             vat.sin(address(vow)) - prevSin,
-            prevDaiSESA * RAD
+            SES_AUDITORS_AMOUNT * RAD
         );
         assertEq(dai.balanceOf(SES_AUDITORS_MULTISIG) - prevDaiSESA, SES_AUDITORS_AMOUNT * WAD);
     }
