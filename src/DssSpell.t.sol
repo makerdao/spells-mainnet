@@ -1922,68 +1922,68 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testNewChainlogValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    // function testNewChainlogValues() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
 
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+    //     ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2DAIETH_A"), addr.addr("MCD_CLIP_UNIV2DAIETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2DAIETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2DAIETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2DAIETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2DAIETH_A"), addr.addr("MCD_CLIP_UNIV2DAIETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2DAIETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2DAIETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2DAIETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2USDCETH_A"), addr.addr("MCD_CLIP_UNIV2USDCETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2USDCETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2USDCETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2USDCETH_A"), addr.addr("MCD_CLIP_UNIV2USDCETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2USDCETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2USDCETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2ETHUSDT_A"), addr.addr("MCD_CLIP_UNIV2ETHUSDT_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2ETHUSDT_A"), addr.addr("MCD_CLIP_CALC_UNIV2ETHUSDT_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2ETHUSDT_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2ETHUSDT_A"), addr.addr("MCD_CLIP_UNIV2ETHUSDT_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2ETHUSDT_A"), addr.addr("MCD_CLIP_CALC_UNIV2ETHUSDT_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2ETHUSDT_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2WBTCDAI_A"), addr.addr("MCD_CLIP_UNIV2WBTCDAI_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2WBTCDAI_A"), addr.addr("MCD_CLIP_CALC_UNIV2WBTCDAI_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2WBTCDAI_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2WBTCDAI_A"), addr.addr("MCD_CLIP_UNIV2WBTCDAI_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2WBTCDAI_A"), addr.addr("MCD_CLIP_CALC_UNIV2WBTCDAI_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2WBTCDAI_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2WBTCETH_A"), addr.addr("MCD_CLIP_UNIV2WBTCETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2WBTCETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2WBTCETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2WBTCETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2WBTCETH_A"), addr.addr("MCD_CLIP_UNIV2WBTCETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2WBTCETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2WBTCETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2WBTCETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2LINKETH_A"), addr.addr("MCD_CLIP_UNIV2LINKETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2LINKETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2LINKETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2LINKETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2LINKETH_A"), addr.addr("MCD_CLIP_UNIV2LINKETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2LINKETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2LINKETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2LINKETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2UNIETH_A"), addr.addr("MCD_CLIP_UNIV2UNIETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2UNIETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2UNIETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2UNIETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2UNIETH_A"), addr.addr("MCD_CLIP_UNIV2UNIETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2UNIETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2UNIETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2UNIETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2AAVEETH_A"), addr.addr("MCD_CLIP_UNIV2AAVEETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2AAVEETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2AAVEETH_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2AAVEETH_A") returns (address) {
-            assertTrue(false);
-        } catch {}
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2AAVEETH_A"), addr.addr("MCD_CLIP_UNIV2AAVEETH_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2AAVEETH_A"), addr.addr("MCD_CLIP_CALC_UNIV2AAVEETH_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2AAVEETH_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
 
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2DAIUSDT_A"), addr.addr("MCD_CLIP_UNIV2DAIUSDT_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2DAIUSDT_A"), addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDT_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2DAIUSDT_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-    }
+    //     assertEq(chainLog.getAddress("MCD_CLIP_UNIV2DAIUSDT_A"), addr.addr("MCD_CLIP_UNIV2DAIUSDT_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2DAIUSDT_A"), addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDT_A"));
+    //     try chainLog.getAddress("MCD_FLIP_UNIV2DAIUSDT_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
+    // }
 
     // function testCollateralIntegrations() public {
     //     vote(address(spell));
