@@ -52,7 +52,7 @@ contract DssSpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c23fd23b340ecf66a16f0e1ecfe7b55a5232864d/MIP40/MIP40c3-Subproposals/MIP40c3-SP10.md -q -O - 2> /dev/null)"
     string constant public MIP40c3SP10 = "0xa3afb63a4710cb30ad67082cdbb8156a11b315cadb251bfe6af7732c08303aa6";
 
-    // MIP41c4: Facilitator Onboarding (Subproposal Process) Template
+    // MIP41c4-SP10: Facilitator Onboarding (Subproposal Process) Template
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/mips/c23fd23b340ecf66a16f0e1ecfe7b55a5232864d/MIP41/MIP41c4-Subproposals/MIP41c4-SP10.md -q -O - 2> /dev/null)"
     string constant public MIP41c4SP10 = "0xe37c37e3ffc8a2c638500f05f179b1d07d00e5aa35ae37ac88a1e10d43e77728";
 
