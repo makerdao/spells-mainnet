@@ -2237,7 +2237,7 @@ contract DssSpellTest is DSTest, DSMath {
     // Monthly expenses
     uint256 constant SES_AUDITORS_AMOUNT = 1_153_480;
 
-    function test_pe_core_unit_budgets() public {
+    function test_core_unit_budgets() public {
         uint256 prevSin = vat.sin(address(vow));
         uint256 prevDaiSESA = dai.balanceOf(SES_AUDITORS_MULTISIG);
 
