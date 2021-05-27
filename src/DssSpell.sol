@@ -21,6 +21,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
+import "dss-interfaces/dss/OsmAbstract.sol";
 
 struct Collateral {
     bytes32 ilk;
@@ -83,6 +84,9 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_UNIV2AAVEETH_A = 0x5396e541E1F648EC03faf338389045F1D7691960;
     address constant MCD_CLIP_UNIV2DAIUSDT_A      = 0xe4B82Be84391b9e7c56a1fC821f47569B364dd4a;
     address constant MCD_CLIP_CALC_UNIV2DAIUSDT_A = 0x4E88cE740F6bEa31C2b14134F6C5eB2a63104fcF;
+
+    address constant BPROTOCOL_WBTC_MED_READER    = 0x2325aa20DEAa9770a978f1dc7C073589ffC79DC3;
+    address constant BPROTOCOL_WBTC_OSM_READER    = 0x4530AEb397b234f0208c8A7c238C7c7545DaEc15;
 
     function flipperToClipper(Collateral memory col) internal {
         // Check constructor values of Clipper
@@ -170,6 +174,11 @@ contract DssSpellAction is DssAction {
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_UNI_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_RENBTC_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_AAVE_A")).file("tip", 300 * RAD);
+
+        // ------------------------------- Feed whitelisting -------------------------------
+        address PIP_WBTC = DssExecLib.getChangelogAddress("PIP_WBTC");
+        DssExecLib.addReaderToMedianWhitelist(OsmAbstract(PIP_WBTC).src(), BPROTOCOL_WBTC_MED_READER);
+        DssExecLib.addReaderToOSMWhitelist(PIP_WBTC, BPROTOCOL_WBTC_OSM_READER);
 
         // --------------------------------- UNIV2DAIETH-A ---------------------------------
         flipperToClipper(Collateral({

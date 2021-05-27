@@ -2232,6 +2232,25 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
+    function testSpellIsCast_feeds_whitelisting() public {
+        address BPROTOCOL_WBTC_MED_READER = 0x2325aa20DEAa9770a978f1dc7C073589ffC79DC3;
+        address BPROTOCOL_WBTC_OSM_READER = 0x4530AEb397b234f0208c8A7c238C7c7545DaEc15;
+        address PIP_WBTC = addr.addr("PIP_WBTC");
+        address WBTC_MED = OsmAbstract(PIP_WBTC).src();
+
+        assertEq(MedianAbstract(WBTC_MED).bud(BPROTOCOL_WBTC_MED_READER), 0);
+        assertEq(MedianAbstract(PIP_WBTC).bud(BPROTOCOL_WBTC_OSM_READER), 0);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(MedianAbstract(WBTC_MED).bud(BPROTOCOL_WBTC_MED_READER), 1);
+        assertEq(MedianAbstract(PIP_WBTC).bud(BPROTOCOL_WBTC_OSM_READER), 1);
+    }
+
     function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip) internal {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
