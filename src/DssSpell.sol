@@ -159,6 +159,7 @@ contract DssSpellAction is DssAction {
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_ETH_C")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_BAT_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_WBTC_A")).file("tip", 300 * RAD);
+        Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_KNC_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_ZRX_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_MANA_A")).file("tip", 300 * RAD);
         Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_COMP_A")).file("tip", 300 * RAD);
