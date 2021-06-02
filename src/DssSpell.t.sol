@@ -1504,7 +1504,7 @@ contract DssSpellTest is DSTest, DSMath {
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust, string(abi.encodePacked("TestError/vat-dust-", ilk)));
-            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0, string(abi.encodePacked("TestError/vat-dust-range-", ilk))); // eq 0 or gt eq 1 and lt 10k
+            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0, string(abi.encodePacked("TestError/vat-dust-range-", ilk))); // eq 0 or gt eq 1 and lt 20k
             }
 
             {
@@ -1570,7 +1570,7 @@ contract DssSpellTest is DSTest, DSMath {
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTesthole = values.collaterals[ilk].dog_hole * RAD;
                 assertEq(hole, normalizedTesthole, string(abi.encodePacked("TestError/dog-hole-", ilk)));
-                assertTrue(hole == 0 || hole >= RAD && hole <= 30 * MILLION * RAD, string(abi.encodePacked("TestError/dog-hole-range-", ilk)));
+                assertTrue(hole == 0 || hole >= RAD && hole <= 50 * MILLION * RAD, string(abi.encodePacked("TestError/dog-hole-range-", ilk)));
                 }
                 (address clipper,,,) = dog.ilks(ilk);
                 ClipAbstract clip = ClipAbstract(clipper);
