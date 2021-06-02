@@ -1364,7 +1364,8 @@ contract DssSpellTest is DSTest, DSMath {
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
         assertTrue(
-            pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027
+            pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027,
+            "TestError/pot-dsr-range"
         );
         assertTrue(diffCalc(expectedRate(values.pot_dsr), yearlyYield(expectedDSRRate)) <= TOLERANCE);
 
@@ -1372,96 +1373,99 @@ contract DssSpellTest is DSTest, DSMath {
         // Line values in RAD
         assertTrue(
             (vat.Line() >= RAD && vat.Line() < 100 * BILLION * RAD) ||
-            vat.Line() == 0
+            vat.Line() == 0,
+            "TestError/vat-Line-range"
         );
         }
 
         // Pause delay
-        assertEq(pause.delay(), values.pause_delay);
+        assertEq(pause.delay(), values.pause_delay, "TestError/pause-delay");
 
         // wait
-        assertEq(vow.wait(), values.vow_wait);
+        assertEq(vow.wait(), values.vow_wait, "TestError/vow-wait");
         {
         // dump values in WAD
         uint256 normalizedDump = values.vow_dump * WAD;
-        assertEq(vow.dump(), normalizedDump);
+        assertEq(vow.dump(), normalizedDump, "TestError/vow-dump");
         assertTrue(
             (vow.dump() >= WAD && vow.dump() < 2 * THOUSAND * WAD) ||
-            vow.dump() == 0
+            vow.dump() == 0,
+            "TestError/vow-dump-range"
         );
         }
         {
         // sump values in RAD
         uint256 normalizedSump = values.vow_sump * RAD;
-        assertEq(vow.sump(), normalizedSump);
+        assertEq(vow.sump(), normalizedSump, "TestError/vow-sump");
         assertTrue(
             (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
-            vow.sump() == 0
+            vow.sump() == 0,
+            "TestError/vow-sump-range"
         );
         }
         {
         // bump values in RAD
         uint256 normalizedBump = values.vow_bump * RAD;
-        assertEq(vow.bump(), normalizedBump);
+        assertEq(vow.bump(), normalizedBump, "TestError/vow-bump");
         assertTrue(
             (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
-            vow.bump() == 0
+            vow.bump() == 0,
+            "TestError/vow-bump-range"
         );
         }
         {
         // hump values in RAD
         uint256 normalizedHumpMin = values.vow_hump_min * RAD;
         uint256 normalizedHumpMax = values.vow_hump_max * RAD;
-        assertTrue(vow.hump() >= normalizedHumpMin && vow.hump() <= normalizedHumpMax);
+        assertTrue(vow.hump() >= normalizedHumpMin && vow.hump() <= normalizedHumpMax, "TestError/vow-hump-min-max");
         assertTrue(
             (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
-            vow.hump() == 0
+            vow.hump() == 0,
+            "TestError/vow-hump-range"
         );
         }
 
-        // box values in RAD
+        // box value in RAD
         {
             uint256 normalizedBox = values.cat_box * RAD;
-            assertEq(cat.box(), normalizedBox);
-            assertTrue(cat.box() >= MILLION * RAD);
-            assertTrue(cat.box() < 50 * MILLION * RAD);
+            assertEq(cat.box(), normalizedBox, "TestError/cat-box");
+            assertTrue(cat.box() >= MILLION * RAD && cat.box() <= 50 * MILLION * RAD, "TestError/cat-box-range");
         }
 
         // Hole value in RAD
         {
-            uint normalizedHole = values.dog_Hole * RAD;
-            assertEq(dog.Hole(), normalizedHole);
-            assertTrue(dog.Hole() >= MILLION * RAD);
-            assertTrue(dog.Hole() < 200 * MILLION * RAD);
+            uint256 normalizedHole = values.dog_Hole * RAD;
+            assertEq(dog.Hole(), normalizedHole, "TestError/dog-Hole");
+            assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 50 * MILLION * RAD, "TestError/dog-Hole-range");
         }
 
         // check Pause authority
-        assertEq(pause.authority(), values.pause_authority);
+        assertEq(pause.authority(), values.pause_authority, "TestError/pause-authority");
 
         // check OsmMom authority
-        assertEq(osmMom.authority(), values.osm_mom_authority);
+        assertEq(osmMom.authority(), values.osm_mom_authority, "TestError/osmMom-authority");
 
         // check FlipperMom authority
-        assertEq(flipMom.authority(), values.flipper_mom_authority);
+        assertEq(flipMom.authority(), values.flipper_mom_authority, "TestError/flipperMom-authority");
 
         // check ClipperMom authority
-        assertEq(clipMom.authority(), values.clipper_mom_authority);
+        assertEq(clipMom.authority(), values.clipper_mom_authority, "TestError/clipperMom-authority");
 
         // check number of ilks
-        assertEq(reg.count(), values.ilk_count);
+        assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
 
         // flap
         // check beg value
         uint256 normalizedTestBeg = (values.flap_beg + 10000)  * 10**14;
-        assertEq(flap.beg(), normalizedTestBeg);
-        assertTrue(flap.beg() >= WAD && flap.beg() <= 110 * WAD / 100); // gte 0% and lte 10%
+        assertEq(flap.beg(), normalizedTestBeg, "TestError/flap-beg");
+        assertTrue(flap.beg() >= WAD && flap.beg() <= 110 * WAD / 100, "TestError/flap-beg-range"); // gte 0% and lte 10%
         // Check flap ttl and sanity checks
-        assertEq(flap.ttl(), values.flap_ttl);
-        assertTrue(flap.ttl() > 0 && flap.ttl() < 86400); // gt 0 && lt 1 day
+        assertEq(flap.ttl(), values.flap_ttl, "TestError/flap-ttl");
+        assertTrue(flap.ttl() > 0 && flap.ttl() < 86400, "TestError/flap-ttl-range"); // gt 0 && lt 1 day
         // Check flap tau and sanity checks
-        assertEq(flap.tau(), values.flap_tau);
-        assertTrue(flap.tau() > 0 && flap.tau() < 2678400); // gt 0 && lt 1 month
-        assertTrue(flap.tau() >= flap.ttl());
+        assertEq(flap.tau(), values.flap_tau, "TestError/flap-tau");
+        assertTrue(flap.tau() > 0 && flap.tau() < 2678400, "TestError/flap-tau-range"); // gt 0 && lt 1 month
+        assertTrue(flap.tau() >= flap.ttl(), "TestError/flap-tau-ttl");
     }
 
     function checkCollateralValues(SystemValues storage values) internal {
@@ -1471,13 +1475,16 @@ contract DssSpellTest is DSTest, DSMath {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
 
-            assertEq(duty, rates.rates(values.collaterals[ilk].pct));
+            assertEq(duty, rates.rates(values.collaterals[ilk].pct), string(abi.encodePacked("TestError/jug-duty-", ilk)));
             // make sure duty is less than 1000% APR
             // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
             // 1000000073014496989316680335
-            assertTrue(duty >= RAY && duty < 1000000073014496989316680335);  // gt 0 and lt 1000%
-            assertTrue(diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE);
-            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND);   // check value lt 1000%
+            assertTrue(duty >= RAY && duty < 1000000073014496989316680335, string(abi.encodePacked("TestError/jug-duty-range-", ilk)));  // gt 0 and lt 1000%
+            assertTrue(
+                diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE,
+                string(abi.encodePacked("TestError/rates-", ilk))
+            );
+            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, string(abi.encodePacked("TestError/pct-max-", ilk)));   // check value lt 1000%
             {
             (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
             // Convert whole Dai units to expected RAD
@@ -1485,142 +1492,143 @@ contract DssSpellTest is DSTest, DSMath {
             sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
             if (!values.collaterals[ilk].aL_enabled) {
-                assertTrue(aL_line == 0);
-                assertEq(line, normalizedTestLine);
-                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0);  // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue(aL_line == 0, string(abi.encodePacked("TestError/al-Line-not-zero-", ilk)));
+                assertEq(line, normalizedTestLine, string(abi.encodePacked("TestError/vat-line-", ilk)));
+                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0, string(abi.encodePacked("TestError/vat-line-range-", ilk)));  // eq 0 or gt eq 1 RAD and lt 10B
             } else {
-                assertTrue(aL_line > 0);
-                assertEq(aL_line, values.collaterals[ilk].aL_line * RAD);
-                assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD);
-                assertEq(aL_ttl, values.collaterals[ilk].aL_ttl);
-                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0); // eq 0 or gt eq 1 RAD and lt 20B
+                assertTrue(aL_line > 0, string(abi.encodePacked("TestError/al-Line-is-zero-", ilk)));
+                assertEq(aL_line, values.collaterals[ilk].aL_line * RAD, string(abi.encodePacked("TestError/al-line-", ilk)));
+                assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD, string(abi.encodePacked("TestError/al-gap-", ilk)));
+                assertEq(aL_ttl, values.collaterals[ilk].aL_ttl, string(abi.encodePacked("TestError/al-ttl-", ilk)));
+                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0, string(abi.encodePacked("TestError/al-line-range-", ilk))); // eq 0 or gt eq 1 RAD and lt 10B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
-            assertEq(dust, normalizedTestDust);
-            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0); // eq 0 or gt eq 1 and lt 20k
+            assertEq(dust, normalizedTestDust, string(abi.encodePacked("TestError/vat-dust-", ilk)));
+            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0, string(abi.encodePacked("TestError/vat-dust-range-", ilk))); // eq 0 or gt eq 1 and lt 10k
             }
 
             {
             (,uint256 mat) = spotter.ilks(ilk);
             // Convert BP to system expected value
             uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
-            assertEq(mat, normalizedTestMat);
-            assertTrue(mat >= RAY && mat < 10 * RAY);    // cr eq 100% and lt 1000%
+            assertEq(mat, normalizedTestMat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
+            assertTrue(mat >= RAY && mat < 10 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));    // cr eq 100% and lt 1000%
             }
 
             if (values.collaterals[ilk].liqType == "flip") {
                 {
-                assertEq(reg.class(ilk), 2);
+                assertEq(reg.class(ilk), 2, string(abi.encodePacked("TestError/reg-class-", ilk)));
                 (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("cat()"));
-                assertTrue(ok);
-                assertEq(abi.decode(val, (address)), address(cat));
+                assertTrue(ok, string(abi.encodePacked("TestError/reg-xlip-cat-", ilk)));
+                assertEq(abi.decode(val, (address)), address(cat), string(abi.encodePacked("TestError/reg-xlip-cat-", ilk)));
                 }
                 {
                 (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
                 // Convert BP to system expected value
                 uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                assertEq(chop, normalizedTestChop);
+                assertEq(chop, normalizedTestChop, string(abi.encodePacked("TestError/cat-chop-", ilk)));
                 // make sure chop is less than 100%
-                assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
+                assertTrue(chop >= WAD && chop < 2 * WAD, string(abi.encodePacked("TestError/cat-chop-range-", ilk)));   // penalty gt eq 0% and lt 100%
 
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTestDunk = values.collaterals[ilk].cat_dunk * RAD;
-                assertEq(dunk, normalizedTestDunk);
-                assertTrue(dunk >= RAD && dunk < MILLION * RAD);
+                assertEq(dunk, normalizedTestDunk, string(abi.encodePacked("TestError/cat-dunk-", ilk)));
+                assertTrue(dunk >= RAD && dunk < MILLION * RAD, string(abi.encodePacked("TestError/cat-dunk-range-", ilk)));
 
                 (address flipper,,) = cat.ilks(ilk);
                 FlipAbstract flip = FlipAbstract(flipper);
                 // Convert BP to system expected value
                 uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
-                assertEq(uint256(flip.beg()), normalizedTestBeg);
-                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100); // gte 0% and lte 10%
-                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl);
-                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours);         // gt eq 10 minutes and lt 10 hours
-                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau);
-                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days);          // gt eq 10 minutes and lt eq 3 days
+                assertEq(uint256(flip.beg()), normalizedTestBeg, string(abi.encodePacked("TestError/flip-beg-", ilk)));
+                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, string(abi.encodePacked("TestError/flip-beg-range-", ilk))); // gte 0% and lte 10%
+                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, string(abi.encodePacked("TestError/flip-ttl-", ilk)));
+                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, string(abi.encodePacked("TestError/flip-ttl-range-", ilk)));         // gt eq 10 minutes and lt 10 hours
+                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, string(abi.encodePacked("TestError/flip-tau-", ilk)));
+                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, string(abi.encodePacked("TestError/flip-tau-range-", ilk)));          // gt eq 10 minutes and lt eq 3 days
 
-                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom);
+                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, string(abi.encodePacked("TestError/flip-flipperMom-auth-", ilk)));
 
-                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0);
-                assertEq(flip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, string(abi.encodePacked("TestError/flip-liqOn-", ilk)));
+                assertEq(flip.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/flip-pause-proxy-auth-", ilk))); // Check pause_proxy ward
                 }
             }
             if (values.collaterals[ilk].liqType == "clip") {
                 {
-                assertEq(reg.class(ilk), 1);
+                assertEq(reg.class(ilk), 1, string(abi.encodePacked("TestError/reg-class-", ilk)));
                 (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("dog()"));
-                assertTrue(ok);
-                assertEq(abi.decode(val, (address)), address(dog));
+                assertTrue(ok, string(abi.encodePacked("TestError/reg-xlip-dog-", ilk)));
+                assertEq(abi.decode(val, (address)), address(dog), string(abi.encodePacked("TestError/reg-xlip-dog-", ilk)));
                 }
                 {
                 (, uint256 chop, uint256 hole,) = dog.ilks(ilk);
                 // Convert BP to system expected value
                 uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                assertEq(chop, normalizedTestChop);
+                assertEq(chop, normalizedTestChop, string(abi.encodePacked("TestError/dog-chop-", ilk)));
                 // make sure chop is less than 100%
-                assertTrue(chop >= WAD && chop < 2 * WAD);   // penalty gt eq 0% and lt 100%
+                assertTrue(chop >= WAD && chop < 2 * WAD, string(abi.encodePacked("TestError/dog-chop-range-", ilk)));   // penalty gt eq 0% and lt 100%
 
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTesthole = values.collaterals[ilk].dog_hole * RAD;
-                assertEq(hole, normalizedTesthole);
-                assertTrue(hole == 0 || hole >= RAD && hole <= 30 * MILLION * RAD);
+                assertEq(hole, normalizedTesthole, string(abi.encodePacked("TestError/dog-hole-", ilk)));
+                assertTrue(hole == 0 || hole >= RAD && hole <= 30 * MILLION * RAD, string(abi.encodePacked("TestError/dog-hole-range-", ilk)));
                 }
                 (address clipper,,,) = dog.ilks(ilk);
                 ClipAbstract clip = ClipAbstract(clipper);
                 {
                 // Convert BP to system expected value
-                uint256 normalizedTestBuf = values.collaterals[ilk].clip_buf  * 10**23;
-                assertEq(uint256(clip.buf()), normalizedTestBuf);
-                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY); // gte 100% and lte 200%
-                assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail);
-                assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours); // gt eq 20 minutes and lt 10 hours
+                uint256 normalizedTestBuf = values.collaterals[ilk].clip_buf * 10**23;
+                assertEq(uint256(clip.buf()), normalizedTestBuf, string(abi.encodePacked("TestError/clip-buf-", ilk)));
+                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY, string(abi.encodePacked("TestError/clip-buf-range-", ilk))); // gte 0% and lte 100%
+                assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail, string(abi.encodePacked("TestError/clip-tail-", ilk)));
+                assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours, string(abi.encodePacked("TestError/clip-tail-range-", ilk))); // gt eq 20 minutes and lt 10 hours
                 uint256 normalizedTestCusp = (values.collaterals[ilk].clip_cusp)  * 10**23;
-                assertEq(uint256(clip.cusp()), normalizedTestCusp);
-                assertTrue(clip.cusp() >= RAY / 10 && clip.cusp() < RAY); // gte 10% and lt 100%
-                assertTrue(rmul(clip.buf(), clip.cusp()) <= RAY);
+                assertEq(uint256(clip.cusp()), normalizedTestCusp, string(abi.encodePacked("TestError/clip-cusp-", ilk)));
+                assertTrue(clip.cusp() >= RAY / 10 && clip.cusp() < RAY, string(abi.encodePacked("TestError/clip-cusp-range-", ilk))); // gte 10% and lt 100%
+                assertTrue(rmul(clip.buf(), clip.cusp()) <= RAY, string(abi.encodePacked("TestError/clip-buf-cusp-limit-", ilk)));
                 uint256 normalizedTestChip = (values.collaterals[ilk].clip_chip)  * 10**14;
-                assertEq(uint256(clip.chip()), normalizedTestChip);
-                assertTrue(clip.chip() < 1 * WAD / 100); // lt 1%
+                assertEq(uint256(clip.chip()), normalizedTestChip, string(abi.encodePacked("TestError/clip-chip-", ilk)));
+                assertTrue(clip.chip() < 1 * WAD / 100, string(abi.encodePacked("TestError/clip-chip-range-", ilk))); // lt 1%
                 uint256 normalizedTestTip = values.collaterals[ilk].clip_tip * RAD;
-                assertEq(uint256(clip.tip()), normalizedTestTip);
-                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 500 * RAD);
+                assertEq(uint256(clip.tip()), normalizedTestTip, string(abi.encodePacked("TestError/clip-tip-", ilk)));
+                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 300 * RAD, string(abi.encodePacked("TestError/clip-tip-range-", ilk)));
 
-                assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom);
+                assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom, string(abi.encodePacked("TestError/clip-clipperMom-auth-", ilk)));
 
-                assertEq(clipMom.tolerance(address(clip)), values.collaterals[ilk].cm_tolerance * RAY / 10000);
+                assertEq(clipMom.tolerance(address(clip)), values.collaterals[ilk].cm_tolerance * RAY / 10000, string(abi.encodePacked("TestError/clipperMom-tolerance-", ilk)));
 
                 if (values.collaterals[ilk].liqOn) {
-                    assertEq(clip.stopped(), 0);
+                    assertEq(clip.stopped(), 0, string(abi.encodePacked("TestError/clip-liqOn-", ilk)));
                 } else {
-                    assertTrue(clip.stopped() > 0);
+                    assertTrue(clip.stopped() > 0, string(abi.encodePacked("TestError/clip-liqOn-", ilk)));
                 }
 
-                assertEq(clip.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                assertEq(clip.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/clip-pause-proxy-auth-", ilk))); // Check pause_proxy ward
                 }
                 {
                     (bool exists, bytes memory value) = clip.calc().call(abi.encodeWithSignature("tau()"));
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_tau);
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_tau, string(abi.encodePacked("TestError/calc-tau-", ilk)));
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("step()"));
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_step);
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_step, string(abi.encodePacked("TestError/calc-step-", ilk)));
                     if (exists) {
-                       assertTrue(abi.decode(value, (uint256)) > 0);
+                       assertTrue(abi.decode(value, (uint256)) > 0, string(abi.encodePacked("TestError/calc-step-is-zero-", ilk)));
                     }
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("cut()"));
                     uint256 normalizedTestCut = values.collaterals[ilk].calc_cut * 10**23;
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, normalizedTestCut);
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, normalizedTestCut, string(abi.encodePacked("TestError/calc-cut-", ilk)));
                     if (exists) {
-                       assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY);
+                       assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY, string(abi.encodePacked("TestError/calc-cut-range-", ilk)));
                     }
                 }
             }
             if (reg.class(ilk) < 3) {
                 {
                 GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-                assertEq(join.wards(address(pauseProxy)), 1); // Check pause_proxy ward
+                assertEq(join.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/join-pause-proxy-auth-", ilk))); // Check pause_proxy ward
                 }
             }
         }
-        assertEq(sumlines, vat.Line());
+        //       actual    expected
+        assertEq(sumlines, vat.Line(), "TestError/vat-Line");
     }
 
     function getOSMPrice(address pip) internal returns (uint256) {
@@ -1904,24 +1912,28 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
-        assertTrue(bytes(description).length > 0);
+        assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
         // DS-Test can't handle strings directly, so cast to a bytes32.
         assertEq(stringToBytes32(spell.description()),
-                stringToBytes32(description));
+                stringToBytes32(description), "TestError/spell-description");
 
-        assertEq(spell.expiration(), (spellValues.deployed_spell_created + spellValues.expiration_threshold));
+        if(address(spell) != address(spellValues.deployed_spell)) {
+            assertEq(spell.expiration(), block.timestamp + spellValues.expiration_threshold, "TestError/spell-expiration");
+        } else {
+            assertEq(spell.expiration(), spellValues.deployed_spell_created + spellValues.expiration_threshold, "TestError/spell-expiration");
 
-        if(address(spell) == address(spellValues.deployed_spell)) {
             // If the spell is deployed compare the on-chain bytecode size with the generated bytecode size.
             //   extcodehash doesn't match, potentially because it's address-specific, avenue for further research.
             address depl_spell = spellValues.deployed_spell;
             address code_spell = address(new DssSpell());
-            assertEq(getExtcodesize(depl_spell), getExtcodesize(code_spell));
+            assertEq(getExtcodesize(depl_spell), getExtcodesize(code_spell), "TestError/spell-codesize");
         }
+
+        assertTrue(spell.officeHours() == spellValues.office_hours_enabled, "TestError/spell-office-hours");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
         checkSystemValues(afterSpell);
 
@@ -1993,10 +2005,6 @@ contract DssSpellTest is DSTest, DSMath {
 
     //     // Insert new collateral tests here
     // }
-
-    function testOfficeHoursMatches() public {
-        assertTrue(spell.officeHours() == spellValues.office_hours_enabled);
-    }
 
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
