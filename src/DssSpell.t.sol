@@ -229,7 +229,7 @@ contract DssSpellTest is DSTest, DSMath {
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1622215614,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0x8EFE2c82bD31B67fa262c0D364773629f6EA828A),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -1436,7 +1436,7 @@ contract DssSpellTest is DSTest, DSMath {
         {
             uint256 normalizedHole = values.dog_Hole * RAD;
             assertEq(dog.Hole(), normalizedHole, "TestError/dog-Hole");
-            assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 50 * MILLION * RAD, "TestError/dog-Hole-range");
+            assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
         }
 
         // check Pause authority
