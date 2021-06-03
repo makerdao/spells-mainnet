@@ -2309,7 +2309,18 @@ contract DssSpellTest is DSTest, DSMath {
             DSTokenAbstract token = DSTokenAbstract(join.gem());
             uint256 tknAmt =  ilkAmt / 10 ** (18 - join.dec()) + 1;
             ilkAmt = tknAmt * 10 ** (18 - join.dec());
-            giveTokens(token, tknAmt);
+            if (ilk == "GUSD-A") {
+                // GUSD uses another contract for storing the balances
+                // which doens't have the balanceOf interface, then giveTokens
+                // can't be used as it is (even passing the store contract addr)
+                hevm.store(
+                    address(0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0),
+                    keccak256(abi.encode(address(this), uint256(6))),
+                    bytes32(uint256(1000))
+                );
+            } else {
+                giveTokens(token, tknAmt);
+            }
             assertEq(token.balanceOf(address(this)), tknAmt);
 
             // Join to adapter
