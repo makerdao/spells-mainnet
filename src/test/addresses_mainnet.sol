@@ -75,7 +75,7 @@ contract Addresses {
         addr["MCD_JOIN_PSM_USDC_A"]             = 0x0A59649758aa4d66E25f08Dd01271e891fe52199;
         addr["MCD_FLIP_PSM_USDC_A"]             = 0x507420100393b1Dc2e8b4C8d0F8A13B56268AC99;
         addr["MCD_CLIP_PSM_USDC_A"]             = 0x66609b4799fd7cE12BA799AD01094aBD13d5014D;
-        addr["MCD_CLIP_CALC_PSM_USDC_A"]        = 0xbEF2ab2aA5CC780A03bccf22AD3320c8CF35af6A;
+        addr["MCD_CLIP_CALC_PSM_USDC_A"]        = 0xbeE028b5Fa9eb0aDAC5eeF7E5B13383172b91A4E;
         addr["MCD_PSM_USDC_A"]                  = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
         addr["WBTC"]                            = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
         addr["PIP_WBTC"]                        = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
@@ -198,7 +198,7 @@ contract Addresses {
         addr["MCD_JOIN_UNIV2DAIUSDC_A"]         = 0xA81598667AC561986b70ae11bBE2dd5348ed4327;
         addr["MCD_FLIP_UNIV2DAIUSDC_A"]         = 0x4a613f79a250D522DdB53904D87b8f442EA94496;
         addr["MCD_CLIP_UNIV2DAIUSDC_A"]         = 0x9B3310708af333f6F379FA42a5d09CBAA10ab309;
-        addr["MCD_CLIP_CALC_UNIV2DAIUSDC_A"]    = 0xbeE028b5Fa9eb0aDAC5eeF7E5B13383172b91A4E;
+        addr["MCD_CLIP_CALC_UNIV2DAIUSDC_A"]    = 0xbEF2ab2aA5CC780A03bccf22AD3320c8CF35af6A;
         addr["PIP_UNIV2DAIUSDC"]                = 0x25D03C2C928ADE19ff9f4FFECc07d991d0df054B;
         addr["UNIV2ETHUSDT"]                    = 0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852;
         addr["MCD_JOIN_UNIV2ETHUSDT_A"]         = 0x4aAD139a88D2dd5e7410b408593208523a3a891d;
