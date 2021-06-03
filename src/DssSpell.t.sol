@@ -2316,7 +2316,7 @@ contract DssSpellTest is DSTest, DSMath {
                 hevm.store(
                     address(0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0),
                     keccak256(abi.encode(address(this), uint256(6))),
-                    bytes32(uint256(1000))
+                    bytes32(uint256(tknAmt))
                 );
             } else {
                 giveTokens(token, tknAmt);
