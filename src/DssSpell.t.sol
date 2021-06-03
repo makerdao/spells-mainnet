@@ -1667,7 +1667,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
-        for (int i = 0; i < 200; i++) {
+        for (uint256 i = 0; i < 200; i++) {
             // Scan the storage for the balance storage slot
             bytes32 prevValue = hevm.load(
                 address(token),
@@ -1692,7 +1692,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
 
         // We have failed if we reach here
-        assertTrue(false);
+        assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
     function giveAuth(address _base, address target) internal {
