@@ -21,7 +21,6 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/ClipAbstract.sol";
 import "dss-interfaces/dss/ClipperMomAbstract.sol";
-import "dss-interfaces/dss/OsmAbstract.sol";
 
 struct Collateral {
     bytes32 ilk;
@@ -129,6 +128,10 @@ contract DssSpellAction is DssAction {
         // Authorize ESM to execute in Clipper
         DssExecLib.authorize(col.clipper, col.esm);
         if (col.pip != address(0)) {
+            // We are passing address(0) to those ilks that use a DSValue
+            // instead of an Osm or LPOracle. Meaning there is nothing to
+            // whilelist on them, the call would revert otherwise.
+
             // Whitelist CLIP in the osm
             DssExecLib.addReaderToOSMWhitelist(col.pip, col.clipper);
             // Whitelist clipperMom in the osm
@@ -200,7 +203,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_USDC_A,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_USDC_A"),
             calc: MCD_CLIP_CALC_USDC_A,
@@ -232,7 +235,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_USDC_B,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_USDC_B"),
             calc: MCD_CLIP_CALC_USDC_B,
@@ -264,7 +267,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_TUSD_A,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_TUSD_A"),
             calc: MCD_CLIP_CALC_TUSD_A,
@@ -328,7 +331,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_PAXUSD_A,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_PAXUSD_A"),
             calc: MCD_CLIP_CALC_PAXUSD_A,
@@ -360,7 +363,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_GUSD_A,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_GUSD_A"),
             calc: MCD_CLIP_CALC_GUSD_A,
@@ -392,7 +395,7 @@ contract DssSpellAction is DssAction {
             flipperMom: FLIPPER_MOM,
             clipperMom: CLIPPER_MOM,
             ilkRegistry: ILK_REGISTRY,
-            pip: address(0),
+            pip: address(0), // DsValue (nothing to whitelist)
             clipper: MCD_CLIP_PSM_USDC_A,
             flipper: DssExecLib.getChangelogAddress("MCD_FLIP_PSM_USDC_A"),
             calc: MCD_CLIP_CALC_PSM_USDC_A,
