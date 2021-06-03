@@ -88,6 +88,20 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_UNIV2DAIUSDC_A      = 0x9B3310708af333f6F379FA42a5d09CBAA10ab309;
     address constant MCD_CLIP_CALC_UNIV2DAIUSDC_A = 0xbeE028b5Fa9eb0aDAC5eeF7E5B13383172b91A4E;
 
+    address constant RWF_001_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    uint256 constant RWF_001_EXPENSE    = 40_000;
+    address constant RISK_001_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    uint256 constant RISK_001_EXPENSE   = 100_500;
+    address constant GOV_001_MULSTISIG  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    uint256 constant GOV_001_EXPENSE    = 80_000;
+    address constant PE_001_MULSTISIG   = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    uint256 constant PE_001_EXPENSE     = 510_000;
+    address constant GRO_001_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
+    uint256 constant GRO_001_EXPENSE    = 126_117;
+    address constant MKT_001_MULSTISIG  = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+    uint256 constant MKT_001_EXPENSE    = 44_375;
+    address constant SES_001_MULSTISIG  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    uint256 constant SES_001_EXPENSE    = 642_135;
 
     function flipperToClipper(Collateral memory col) internal {
         // Check constructor values of Clipper
@@ -157,6 +171,21 @@ contract DssSpellAction is DssAction {
         address FLIPPER_MOM     = DssExecLib.getChangelogAddress("FLIPPER_MOM");
         address CLIPPER_MOM     = DssExecLib.getChangelogAddress("CLIPPER_MOM");
         address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+
+        // ----------------------------- Global Debt Ceiling ----------------------------
+        DssExecLib.increaseGlobalDebtCeiling(500_000_000);
+
+        // --------------------------------- PSM Fee Out --------------------------------
+        Fileable(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A")).file("tout", 0);
+
+        // ----------------------------- Core Units Payments ----------------------------
+        DssExecLib.sendPaymentFromSurplusBuffer(RWF_001_MULSTISIG,  RWF_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(RISK_001_MULSTISIG, RISK_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_001_MULSTISIG,  GOV_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_001_MULSTISIG,   PE_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_001_MULSTISIG,  GRO_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(MKT_001_MULSTISIG,  MKT_001_EXPENSE);
+        DssExecLib.sendPaymentFromSurplusBuffer(SES_001_MULSTISIG,  SES_001_EXPENSE);
 
         // ----------------------------------- USDC-A -----------------------------------
         flipperToClipper(Collateral({

@@ -31,6 +31,11 @@ interface AuthLike {
 interface TokenCompatibleUSDT {
     function approve(address, uint256) external;
 }
+
+interface PSMLike {
+    function tout() external view returns (uint256);
+    function buyGem(address, uint256) external;
+}
 //
 
 contract DssSpellTest is DSTest, DSMath {
@@ -74,6 +79,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     struct SystemValues {
+        uint256 line_offset;
         uint256 pot_dsr;
         uint256 pause_delay;
         uint256 vow_wait;
@@ -240,6 +246,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for all system configuration changes
         //
         afterSpell = SystemValues({
+            line_offset:           500 * MILLION,           // Offset between the global line against the sum of local lines
             pot_dsr:               1,                       // In basis points
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
@@ -1628,7 +1635,7 @@ contract DssSpellTest is DSTest, DSMath {
             }
         }
         //       actual    expected
-        assertEq(sumlines, vat.Line(), "TestError/vat-Line");
+        assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
     }
 
     function getOSMPrice(address pip) internal returns (uint256) {
@@ -2237,6 +2244,79 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    function test_psm_tout() public {
+        PSMLike psm = PSMLike(addr.addr("MCD_PSM_USDC_A"));
+        DSTokenAbstract usdc = DSTokenAbstract(addr.addr("USDC"));
+
+        assertEq(psm.tout(), 0.0004 * 10**18);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(psm.tout(), 0);
+
+        giveTokens(DSTokenAbstract(address(dai)), 50_000 * 10**18);
+        assertEq(dai.balanceOf(address(this)), 50_000 * 10**18);
+        assertEq(usdc.balanceOf(address(this)), 0);
+
+        dai.approve(address(psm), 50_000 * 10**18);
+        psm.buyGem(address(this), 50_000 * 10**6);
+
+        assertEq(dai.balanceOf(address(this)), 0);
+        assertEq(usdc.balanceOf(address(this)), 50_000 * 10**6);
+    }
+
+    address constant RWF_001_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    uint256 constant RWF_001_EXPENSE    = 40_000;
+    address constant RISK_001_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    uint256 constant RISK_001_EXPENSE   = 100_500;
+    address constant GOV_001_MULSTISIG  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    uint256 constant GOV_001_EXPENSE    = 80_000;
+    address constant PE_001_MULSTISIG   = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    uint256 constant PE_001_EXPENSE     = 510_000;
+    address constant GRO_001_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
+    uint256 constant GRO_001_EXPENSE    = 126_117;
+    address constant MKT_001_MULSTISIG  = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+    uint256 constant MKT_001_EXPENSE    = 44_375;
+    address constant SES_001_MULSTISIG  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    uint256 constant SES_001_EXPENSE    = 642_135;
+
+    function test_core_units_payments() public {
+        uint256 prevSin = vat.sin(address(vow));
+
+        uint256 prevDaiRWF001  = dai.balanceOf(RWF_001_MULSTISIG);
+        uint256 prevDaiRisk001 = dai.balanceOf(RISK_001_MULSTISIG);
+        uint256 prevDaiGov001  = dai.balanceOf(GOV_001_MULSTISIG);
+        uint256 prevDaiPe001   = dai.balanceOf(PE_001_MULSTISIG);
+        uint256 prevDaiGro001  = dai.balanceOf(GRO_001_MULSTISIG);
+        uint256 prevDaiMkt001  = dai.balanceOf(MKT_001_MULSTISIG);
+        uint256 prevDaiSes001  = dai.balanceOf(SES_001_MULSTISIG);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            RWF_001_EXPENSE  * RAD +
+            RISK_001_EXPENSE * RAD +
+            GOV_001_EXPENSE  * RAD +
+            PE_001_EXPENSE   * RAD +
+            GRO_001_EXPENSE  * RAD +
+            MKT_001_EXPENSE  * RAD +
+            SES_001_EXPENSE  * RAD
+        );
+
+        assertEq(dai.balanceOf(RWF_001_MULSTISIG)  - prevDaiRWF001,  RWF_001_EXPENSE  * WAD);
+        assertEq(dai.balanceOf(RISK_001_MULSTISIG) - prevDaiRisk001, RISK_001_EXPENSE * WAD);
+        assertEq(dai.balanceOf(GOV_001_MULSTISIG)  - prevDaiGov001,  GOV_001_EXPENSE  * WAD);
+        assertEq(dai.balanceOf(PE_001_MULSTISIG)   - prevDaiPe001,   PE_001_EXPENSE   * WAD);
+        assertEq(dai.balanceOf(GRO_001_MULSTISIG)  - prevDaiGro001,  GRO_001_EXPENSE  * WAD);
+        assertEq(dai.balanceOf(MKT_001_MULSTISIG)  - prevDaiMkt001,  MKT_001_EXPENSE  * WAD);
+        assertEq(dai.balanceOf(SES_001_MULSTISIG)  - prevDaiSes001,  SES_001_EXPENSE  * WAD);
     }
 
     function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip) internal {
