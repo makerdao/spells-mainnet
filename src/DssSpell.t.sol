@@ -272,10 +272,10 @@ contract DssSpellTest is DSTest, DSMath {
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
-            aL_line:      15 * BILLION,  // In whole Dai units
+            aL_line:      15 * BILLION,    // In whole Dai units
             aL_gap:       80 * MILLION,    // In whole Dai units
             aL_ttl:       12 hours,        // In seconds
-            line:         0 * MILLION,     // In whole Dai units  // Not checked here as there is auto line
+            line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         5 * THOUSAND,    // In whole Dai units
             pct:          550,             // In basis points
             mat:          15000,           // In basis points
@@ -304,7 +304,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      50 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,     // Not checked as there is auto line
+            line:         0,
             dust:         15 * THOUSAND,
             pct:          1000,
             mat:          13000,
@@ -333,7 +333,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      2000 * MILLION,
             aL_gap:       100 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          17500,
@@ -362,7 +362,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      7 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          15000,
@@ -388,10 +388,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          0,
             mat:          10100,
@@ -417,10 +417,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDC-B"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          5000,
             mat:          12000,
@@ -449,7 +449,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      750 * MILLION,
             aL_gap:       15 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          450,
             mat:          15000,
@@ -475,10 +475,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          100,
             mat:          10100,
@@ -504,10 +504,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          17500,
@@ -536,7 +536,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      10 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          400,
             mat:          17500,
@@ -565,7 +565,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      5 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          17500,
@@ -591,8 +591,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
             line:         0,
             dust:         5 * THOUSAND,
@@ -620,10 +620,10 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          100,
             mat:          10100,
@@ -652,7 +652,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      30 * MILLION,
             aL_gap:       2 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          17500,
@@ -681,7 +681,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      5 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          400,
             mat:          17500,
@@ -710,7 +710,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      140 * MILLION,
             aL_gap:       7 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          17500,
@@ -739,7 +739,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      30 * MILLION,
             aL_gap:       3 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          200,
             mat:          17500,
@@ -768,7 +768,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      90 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          550,
             mat:          17500,
@@ -794,8 +794,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
             line:         5 * MILLION,
             dust:         5 * THOUSAND,
@@ -826,7 +826,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      50 * MILLION,
             aL_gap:       3 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          17500,
@@ -855,7 +855,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      10 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          500,
             mat:          17500,
@@ -884,7 +884,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      50 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
-            line:         0 * MILLION,
+            line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
             mat:          17500,
@@ -939,8 +939,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
             line:         3 * BILLION,
             dust:         0,
@@ -1229,8 +1229,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["RWA001-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
             line:         1 * THOUSAND,
             dust:         0,
@@ -1258,8 +1258,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["RWA002-A"] = CollateralValues({
             aL_enabled:   false,
-            aL_line:      0 * MILLION,
-            aL_gap:       0 * MILLION,
+            aL_line:      0,
+            aL_gap:       0,
             aL_ttl:       0,
             line:         5 * MILLION,
             dust:         0,
