@@ -25,7 +25,7 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<TODO hash>/governance/votes/Executive%20vote%20-%20June%211%2C%202021.md -q -O - 2> /dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d2eaa6d2b4ac8e286b998e8e1c2177fcd7733e8d/governance/votes/Executive%20vote%20-%20June%2011%2C%202021.md -q -O - 2> /dev/null)"
     string public constant description =
         "2021-06-11 MakerDAO Executive Spell | Hash: 0xDEADBEEF";
 
