@@ -232,10 +232,10 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x379746b2bd85Bb837D44F5f9299C308F33Ed214A),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1622815440,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0x8EFE2c82bD31B67fa262c0D364773629f6EA828A),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -273,11 +273,11 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
             aL_line:      15 * BILLION,    // In whole Dai units
-            aL_gap:       80 * MILLION,    // In whole Dai units
-            aL_ttl:       12 hours,        // In seconds
+            aL_gap:       100 * MILLION,   // In whole Dai units
+            aL_ttl:       8 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         5 * THOUSAND,    // In whole Dai units
-            pct:          550,             // In basis points
+            pct:          350,             // In basis points
             mat:          15000,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -287,7 +287,7 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,               // In seconds
             flip_tau:     0,               // In seconds
             flipper_mom:  0,               // 1 if circuit breaker enabled
-            dog_hole:     22 * MILLION,
+            dog_hole:     30 * MILLION,
             clip_buf:     13000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
@@ -301,12 +301,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
-            aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_line:      300 * MILLION,
+            aL_gap:       10 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          1000,
+            pct:          900,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -316,8 +316,8 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     8 * MILLION,
-            clip_buf:     13000,
+            dog_hole:     15 * MILLION,
+            clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -325,17 +325,17 @@ contract DssSpellTest is DSTest, DSMath {
             clipper_mom:  1,
             cm_tolerance: 5000,
             calc_tau:     0,
-            calc_step:    90,
+            calc_step:    60,
             calc_cut:     9900
         });
         afterSpell.collaterals["ETH-C"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      2000 * MILLION,
+            aL_line:      2 * BILLION,
             aL_gap:       100 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          300,
+            pct:          100,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -345,7 +345,7 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     5 * MILLION,
+            dog_hole:     20 * MILLION,
             clip_buf:     13000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
@@ -361,10 +361,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      7 * MILLION,
             aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          500,
+            pct:          400,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -447,11 +447,11 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      750 * MILLION,
-            aL_gap:       15 * MILLION,
-            aL_ttl:       12 hours,
+            aL_gap:       30 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          450,
+            pct:          350,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -533,9 +533,9 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_line:      3 * MILLION,
+            aL_gap:       500 * THOUSAND,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          400,
@@ -564,7 +564,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      5 * MILLION,
             aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
@@ -649,9 +649,9 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      30 * MILLION,
+            aL_line:      20 * MILLION,
             aL_gap:       2 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          300,
@@ -678,9 +678,9 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      5 * MILLION,
-            aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_line:      3 * MILLION,
+            aL_gap:       500 * THOUSAND,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          400,
@@ -709,10 +709,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      140 * MILLION,
             aL_gap:       7 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          500,
+            pct:          400,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -738,7 +738,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      30 * MILLION,
             aL_gap:       3 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          200,
@@ -765,12 +765,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      90 * MILLION,
-            aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_line:      130 * MILLION,
+            aL_gap:       7 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          550,
+            pct:          400,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -824,11 +824,11 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["UNI-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      50 * MILLION,
-            aL_gap:       3 * MILLION,
-            aL_ttl:       12 hours,
+            aL_gap:       5 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          300,
+            pct:          200,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -854,10 +854,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      10 * MILLION,
             aL_gap:       1 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          500,
+            pct:          400,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -883,10 +883,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      50 * MILLION,
             aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          300,
+            pct:          200,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -912,10 +912,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      50 * MILLION,
             aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          350,
+            pct:          250,
             mat:          12500,
             liqType:      "clip",
             liqOn:        true,
@@ -970,10 +970,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      20 * MILLION,
             aL_gap:       3 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          450,
+            pct:          350,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -999,10 +999,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      50 * MILLION,
             aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          450,
+            pct:          350,
             mat:          12500,
             liqType:      "clip",
             liqOn:        true,
@@ -1028,11 +1028,11 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      50 * MILLION,
             aL_gap:       10 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          100,
-            mat:          10500,
+            pct:          50,
+            mat:          10200,
             liqType:      "clip",
             liqOn:        false,
             chop:         1300,
@@ -1057,10 +1057,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      10 * MILLION,
             aL_gap:       2 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          500,
+            pct:          400,
             mat:          14000,
             liqType:      "clip",
             liqOn:        true,
@@ -1086,10 +1086,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      20 * MILLION,
             aL_gap:       2 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          400,
+            pct:          300,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -1115,10 +1115,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      20 * MILLION,
             aL_gap:       3 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          500,
+            pct:          400,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -1144,7 +1144,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      20 * MILLION,
             aL_gap:       3 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
             pct:          0,
@@ -1173,10 +1173,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      20 * MILLION,
             aL_gap:       2 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          400,
+            pct:          300,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -1202,10 +1202,10 @@ contract DssSpellTest is DSTest, DSMath {
             aL_enabled:   true,
             aL_line:      10 * MILLION,
             aL_gap:       2 * MILLION,
-            aL_ttl:       12 hours,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          300,
+            pct:          200,
             mat:          12500,
             liqType:      "clip",
             liqOn:        true,
@@ -1947,61 +1947,19 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testNewChainlogValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    // function testNewChainlogValues() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
 
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+    //     ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainLog.getAddress("MCD_CLIP_USDC_A"), addr.addr("MCD_CLIP_USDC_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_USDC_A"), addr.addr("MCD_CLIP_CALC_USDC_A"));
-        try chainLog.getAddress("MCD_FLIP_USDC_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_USDC_B"), addr.addr("MCD_CLIP_USDC_B"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_USDC_B"), addr.addr("MCD_CLIP_CALC_USDC_B"));
-        try chainLog.getAddress("MCD_FLIP_USDC_B") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_TUSD_A"), addr.addr("MCD_CLIP_TUSD_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TUSD_A"), addr.addr("MCD_CLIP_CALC_TUSD_A"));
-        try chainLog.getAddress("MCD_FLIP_TUSD_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_USDT_A"), addr.addr("MCD_CLIP_USDT_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_USDT_A"), addr.addr("MCD_CLIP_CALC_USDT_A"));
-        try chainLog.getAddress("MCD_FLIP_USDT_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_PAXUSD_A"), addr.addr("MCD_CLIP_PAXUSD_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_PAXUSD_A"), addr.addr("MCD_CLIP_CALC_PAXUSD_A"));
-        try chainLog.getAddress("MCD_FLIP_PAXUSD_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_GUSD_A"), addr.addr("MCD_CLIP_GUSD_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_GUSD_A"), addr.addr("MCD_CLIP_CALC_GUSD_A"));
-        try chainLog.getAddress("MCD_FLIP_GUSD_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_PSM_USDC_A"), addr.addr("MCD_CLIP_PSM_USDC_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_PSM_USDC_A"), addr.addr("MCD_CLIP_CALC_PSM_USDC_A"));
-        try chainLog.getAddress("MCD_FLIP_PSM_USDC_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-
-        assertEq(chainLog.getAddress("MCD_CLIP_UNIV2DAIUSDC_A"), addr.addr("MCD_CLIP_UNIV2DAIUSDC_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_UNIV2DAIUSDC_A"), addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDC_A"));
-        try chainLog.getAddress("MCD_FLIP_UNIV2DAIUSDC_A") returns (address) {
-            assertTrue(false);
-        } catch {}
-    }
+    //     assertEq(chainLog.getAddress("MCD_CLIP_USDC_A"), addr.addr("MCD_CLIP_USDC_A"));
+    //     assertEq(chainLog.getAddress("MCD_CLIP_CALC_USDC_A"), addr.addr("MCD_CLIP_CALC_USDC_A"));
+    //     try chainLog.getAddress("MCD_FLIP_USDC_A") returns (address) {
+    //         assertTrue(false);
+    //     } catch {}
+    // }
 
     // function testCollateralIntegrations() public {
     //     vote(address(spell));
@@ -2246,391 +2204,32 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function test_psm_tout() public {
-        PSMLike psm = PSMLike(addr.addr("MCD_PSM_USDC_A"));
-        DSTokenAbstract usdc = DSTokenAbstract(addr.addr("USDC"));
+    function testSpellIsCast_feeds_whitelisting() public {
+        address YEARN_UNI_OSM_READER  = 0x6987e6471D4e7312914Edce4a6f92737C5fd0A8A;
+        address YEARN_LINK_OSM_READER = 0xCd73F1Ed2b1078EA35DAB29a8B35d335e0137c83;
+        address YEARN_AAVE_OSM_READER = 0x17b20900320D7C23866203cA6808F857B2b3fdA3;
+        address YEARN_COMP_OSM_READER = 0x4e9452CD5ba694de87ea1d791aBfdc4a250800f4;
 
-        assertEq(psm.tout(), 0.0004 * 10**18);
+        address PIP_UNI  = addr.addr("PIP_UNI");
+        address PIP_LINK = addr.addr("PIP_LINK");
+        address PIP_AAVE = addr.addr("PIP_AAVE");
+        address PIP_COMP = addr.addr("PIP_COMP");
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(psm.tout(), 0);
-
-        giveTokens(DSTokenAbstract(address(dai)), 50_000 * 10**18);
-        assertEq(dai.balanceOf(address(this)), 50_000 * 10**18);
-        assertEq(usdc.balanceOf(address(this)), 0);
-
-        dai.approve(address(psm), 50_000 * 10**18);
-        psm.buyGem(address(this), 50_000 * 10**6);
-
-        assertEq(dai.balanceOf(address(this)), 0);
-        assertEq(usdc.balanceOf(address(this)), 50_000 * 10**6);
-    }
-
-    address constant RWF_001_MULSTISIG  = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    uint256 constant RWF_001_EXPENSE    = 40_000;
-    address constant RISK_001_MULSTISIG = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    uint256 constant RISK_001_EXPENSE   = 100_500;
-    address constant GOV_001_MULSTISIG  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    uint256 constant GOV_001_EXPENSE    = 80_000;
-    address constant PE_001_MULSTISIG   = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    uint256 constant PE_001_EXPENSE     = 510_000;
-    address constant GRO_001_MULSTISIG  = 0x7800C137A645c07132886539217ce192b9F0528e;
-    uint256 constant GRO_001_EXPENSE    = 126_117;
-    address constant MKT_001_MULSTISIG  = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
-    uint256 constant MKT_001_EXPENSE    = 44_375;
-    address constant SES_001_MULSTISIG  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    uint256 constant SES_001_EXPENSE    = 642_135;
-
-    function test_core_units_payments() public {
-        uint256 prevSin = vat.sin(address(vow));
-
-        uint256 prevDaiRWF001  = dai.balanceOf(RWF_001_MULSTISIG);
-        uint256 prevDaiRisk001 = dai.balanceOf(RISK_001_MULSTISIG);
-        uint256 prevDaiGov001  = dai.balanceOf(GOV_001_MULSTISIG);
-        uint256 prevDaiPe001   = dai.balanceOf(PE_001_MULSTISIG);
-        uint256 prevDaiGro001  = dai.balanceOf(GRO_001_MULSTISIG);
-        uint256 prevDaiMkt001  = dai.balanceOf(MKT_001_MULSTISIG);
-        uint256 prevDaiSes001  = dai.balanceOf(SES_001_MULSTISIG);
+        assertEq(MedianAbstract(PIP_UNI).bud(YEARN_UNI_OSM_READER), 0);
+        assertEq(MedianAbstract(PIP_LINK).bud(YEARN_LINK_OSM_READER), 0);
+        assertEq(MedianAbstract(PIP_AAVE).bud(YEARN_AAVE_OSM_READER), 0);
+        assertEq(MedianAbstract(PIP_COMP).bud(YEARN_COMP_OSM_READER), 0);
 
         vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
         assertTrue(spell.done());
 
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            RWF_001_EXPENSE  * RAD +
-            RISK_001_EXPENSE * RAD +
-            GOV_001_EXPENSE  * RAD +
-            PE_001_EXPENSE   * RAD +
-            GRO_001_EXPENSE  * RAD +
-            MKT_001_EXPENSE  * RAD +
-            SES_001_EXPENSE  * RAD
-        );
-
-        assertEq(dai.balanceOf(RWF_001_MULSTISIG)  - prevDaiRWF001,  RWF_001_EXPENSE  * WAD);
-        assertEq(dai.balanceOf(RISK_001_MULSTISIG) - prevDaiRisk001, RISK_001_EXPENSE * WAD);
-        assertEq(dai.balanceOf(GOV_001_MULSTISIG)  - prevDaiGov001,  GOV_001_EXPENSE  * WAD);
-        assertEq(dai.balanceOf(PE_001_MULSTISIG)   - prevDaiPe001,   PE_001_EXPENSE   * WAD);
-        assertEq(dai.balanceOf(GRO_001_MULSTISIG)  - prevDaiGro001,  GRO_001_EXPENSE  * WAD);
-        assertEq(dai.balanceOf(MKT_001_MULSTISIG)  - prevDaiMkt001,  MKT_001_EXPENSE  * WAD);
-        assertEq(dai.balanceOf(SES_001_MULSTISIG)  - prevDaiSes001,  SES_001_EXPENSE  * WAD);
+        assertEq(MedianAbstract(PIP_UNI).bud(YEARN_UNI_OSM_READER), 1);
+        assertEq(MedianAbstract(PIP_LINK).bud(YEARN_LINK_OSM_READER), 1);
+        assertEq(MedianAbstract(PIP_AAVE).bud(YEARN_AAVE_OSM_READER), 1);
+        assertEq(MedianAbstract(PIP_COMP).bud(YEARN_COMP_OSM_READER), 1);
     }
 
-    function checkIlkClipper(bytes32 ilk, GemJoinAbstract join, FlipAbstract flipper, ClipAbstract clipper, address calc, OsmAbstract pip) internal {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Contracts set
-        assertEq(dog.vat(), address(vat));
-        assertEq(dog.vow(), address(vow));
-        {
-        (address clip,,,) = dog.ilks(ilk);
-        assertEq(clip, address(clipper));
-        }
-        assertEq(clipper.ilk(), ilk);
-        assertEq(clipper.vat(), address(vat));
-        assertEq(clipper.vow(), address(vow));
-        assertEq(clipper.dog(), address(dog));
-        assertEq(clipper.spotter(), address(spotter));
-        assertEq(clipper.calc(), calc);
-
-        // Authorization
-        assertEq(flipper.wards(address(cat))    , 0);
-        assertEq(flipper.wards(address(flipMom)), 0);
-        assertEq(vat.wards(address(clipper))    , 1);
-        assertEq(dog.wards(address(clipper))    , 1);
-        assertEq(clipper.wards(address(dog))    , 1);
-        assertEq(clipper.wards(address(end))    , 1);
-        // assertEq(clipper.wards(address(clipMom)), 1); // This is actually checked in the GENERAL test
-        assertEq(clipper.wards(address(esm)), 1);
-
-        try pip.bud(address(clipMom)) returns (uint256 bud) {
-            assertEq(bud, 1);
-        } catch {}
-        try pip.bud(address(clipper)) returns (uint256 bud) {
-            assertEq(bud, 1);
-        } catch {}
-
-        // Force max Hole
-        hevm.store(
-            address(dog),
-            bytes32(uint256(4)),
-            bytes32(uint256(-1))
-        );
-
-        // Force max debt ceiling for ilk
-        hevm.store(
-            address(vat),
-            bytes32(uint256(keccak256(abi.encode(bytes32(ilk), uint256(2)))) + 3),
-            bytes32(uint256(-1))
-        );
-
-        if (ilk != "PSM-USDC-A") {
-            // ----------------------- Check Clipper can't actually be triggered -----------------------
-            uint256 ilkAmt;
-
-            {
-            // Generate new DAI to force a liquidation
-            uint256 rate;
-            int256 art;
-            {
-            uint256 spot;
-            uint256 dust;
-            (,rate, spot,, dust) = vat.ilks(ilk);
-            art = int256(dust * 2 / rate);
-            ilkAmt = dust * 2 / spot;
-            }
-
-            {
-            DSTokenAbstract token = DSTokenAbstract(join.gem());
-            uint256 tknAmt =  ilkAmt / 10 ** (18 - join.dec()) + 1;
-            ilkAmt = tknAmt * 10 ** (18 - join.dec());
-            if (ilk == "GUSD-A") {
-                // GUSD uses another contract for storing the balances
-                // which doens't have the balanceOf interface, then giveTokens
-                // can't be used as it is (even passing the store contract addr)
-                hevm.store(
-                    address(0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0),
-                    keccak256(abi.encode(address(this), uint256(6))),
-                    bytes32(uint256(tknAmt))
-                );
-            } else {
-                giveTokens(token, tknAmt);
-            }
-            assertEq(token.balanceOf(address(this)), tknAmt);
-
-            // Join to adapter
-            assertEq(vat.gem(ilk, address(this)), 0);
-            TokenCompatibleUSDT(address(token)).approve(address(join), tknAmt);
-            join.join(address(this), tknAmt);
-            assertEq(token.balanceOf(address(this)), 0);
-            assertEq(vat.gem(ilk, address(this)), ilkAmt);
-            }
-
-            // dart max amount of DAI
-            vat.frob(ilk, address(this), address(this), address(this), int256(ilkAmt), art);
-            hevm.warp(block.timestamp + 1);
-            jug.drip(ilk);
-            assertEq(clipper.kicks(), 0);
-            try dog.bark(ilk, address(this), address(this)) { assertTrue(false, "Liq 2.0 should be disabled"); } catch {}
-            // assertEq(clipper.kicks(), 1);
-            assertEq(clipper.kicks(), 0);
-        }
-
-        // (, rate,,,) = vat.ilks(ilk);
-        // uint256 debt = mul(mul(rate, uint256(art)), dog.chop(ilk)) / WAD;
-        // hevm.store(
-        //     address(vat),
-        //     keccak256(abi.encode(address(this), uint256(5))),
-        //     bytes32(debt)
-        // );
-        // assertEq(vat.dai(address(this)), debt);
-        // assertEq(vat.gem(ilk, address(this)), 0);
-
-        // hevm.warp(block.timestamp + 20 minutes);
-        // (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipper.sales(1);
-
-        // assertEq(usr, address(this));
-        // assertEq(tab, debt);
-        // assertEq(lot, ilkAmt);
-        // assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
-
-        // vat.hope(address(clipper));
-        // clipper.take(1, lot, top, address(this), bytes(""));
-        }
-
-        // {
-        // (, uint256 tab, uint256 lot, address usr,,) = clipper.sales(1);
-        // assertEq(usr, address(0));
-        // assertEq(tab, 0);
-        // assertEq(lot, 0);
-        // assertEq(vat.dai(address(this)), 0);
-        // assertEq(vat.gem(ilk, address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
-        // }
-
-        // ----------------------- Check ClipperMom doens't work -----------------------
-
-        // clipperMom is an authority-based contract, so here we set the Chieftain's hat
-        //  to the current contract to simulate governance authority.
-        hevm.store(
-            address(chief),
-            bytes32(uint256(12)),
-            bytes32(uint256(address(this)))
-        );
-
-        assertEq(clipper.stopped(), 3);
-        try clipMom.setBreaker(address(clipper), 0, 0) { assertTrue(false, "ClipperMom shouldn't be available for this ilk"); } catch {}
-
-        // assertEq(clipper.stopped(), 0);
-        // clipMom.setBreaker(address(clipper), 1, 0);
-        // assertEq(clipper.stopped(), 1);
-        // clipMom.setBreaker(address(clipper), 2, 0);
-        // assertEq(clipper.stopped(), 2);
-        // clipMom.setBreaker(address(clipper), 3, 0);
-        // assertEq(clipper.stopped(), 3);
-        // clipMom.setBreaker(address(clipper), 0, 0);
-        // assertEq(clipper.stopped(), 0);
-
-        // hevm.warp(clipMom.locked(address(clipper)) + 1);
-
-        // // Hacking nxt price to 0x123 (and making it valid)
-        // bytes32 hackedValue = 0x0000000000000000000000000000000100000000000000000000000000000123;
-
-        // hevm.store(address(pip), bytes32(uint256(4)), hackedValue);
-        // // Price is hacked, anyone can trip the breaker
-        // clipMom.tripBreaker(address(clipper));
-        // assertEq(clipper.stopped(), 2);
-
-        // clipMom.setBreaker(address(clipper), 0, 0);
-        // assertEq(clipper.stopped(), 0);
-
-        // // ----------------------- Check End works with the Clipper -----------------------
-
-        // {
-        // uint256 rate;
-        // int256 art;
-        // {
-        // uint256 spot;
-        // (,rate, spot,,) = vat.ilks(ilk);
-        // art = int256(mul(ilkAmt, spot) / rate);
-        // }
-
-        // vat.frob(ilk, address(this), address(this), address(this), int256(ilkAmt), art);
-        // hevm.warp(block.timestamp + 1);
-        // jug.drip(ilk);
-
-        // dog.bark(ilk, address(this), address(this));
-        // assertEq(clipper.kicks(), 2);
-
-        // // Give authority to cage the system
-        // giveAuth(address(end), address(this));
-        // assertEq(end.wards(address(this)), 1);
-
-        // end.cage();
-        // end.cage(ilk);
-
-        // (,,, address usr,,) = clipper.sales(2);
-        // assertTrue(usr != address(0));
-
-        // end.snip(ilk, 2);
-        // (,,, usr,,) = clipper.sales(2);
-        // assertTrue(usr == address(0));
-
-        // end.skim(ilk, address(this));
-        // end.free(ilk);
-
-        // hevm.warp(block.timestamp + end.wait());
-        // vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
-
-        // // Removing the surplus to allow continuing the execution.
-        // hevm.store(
-        //     address(vat),
-        //     keccak256(abi.encode(address(vow), uint256(5))),
-        //     bytes32(uint256(0))
-        // );
-
-        // end.thaw();
-        // end.flow(ilk);
-
-        // uint256 daiToRedeem = vat.dai(address(this)) / RAY;
-        // assertTrue(daiToRedeem > 0);
-
-        // vat.hope(address(end));
-        // end.pack(daiToRedeem);
-
-        // end.cash(ilk, daiToRedeem);
-        // }
-    }
-
-    function testSpellIsCast_USDC_A_clip() public {
-        checkIlkClipper(
-            "USDC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_USDC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_USDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_USDC_A")),
-            addr.addr("MCD_CLIP_CALC_USDC_A"),
-            OsmAbstract(addr.addr("PIP_USDC"))
-        );
-    }
-
-    function testSpellIsCast_USDC_B_clip() public {
-        checkIlkClipper(
-            "USDC-B",
-            GemJoinAbstract(addr.addr("MCD_JOIN_USDC_B")),
-            FlipAbstract(addr.addr("MCD_FLIP_USDC_B")),
-            ClipAbstract(addr.addr("MCD_CLIP_USDC_B")),
-            addr.addr("MCD_CLIP_CALC_USDC_B"),
-            OsmAbstract(addr.addr("PIP_USDC"))
-        );
-    }
-
-    function testSpellIsCast_TUSD_A_clip() public {
-        checkIlkClipper(
-            "TUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_TUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
-            addr.addr("MCD_CLIP_CALC_TUSD_A"),
-            OsmAbstract(addr.addr("PIP_TUSD"))
-        );
-    }
-
-    function testSpellIsCast_USDT_A_clip() public {
-        checkIlkClipper(
-            "USDT-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_USDT_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_USDT_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_USDT_A")),
-            addr.addr("MCD_CLIP_CALC_USDT_A"),
-            OsmAbstract(addr.addr("PIP_USDT"))
-        );
-    }
-
-    function testSpellIsCast_PAXUSD_A_clip() public {
-        checkIlkClipper(
-            "PAXUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PAXUSD_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_PAXUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PAXUSD_A")),
-            addr.addr("MCD_CLIP_CALC_PAXUSD_A"),
-            OsmAbstract(addr.addr("PIP_PAXUSD"))
-        );
-    }
-
-    function testSpellIsCast_GUSD_A_clip() public {
-        checkIlkClipper(
-            "GUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_GUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GUSD_A")),
-            addr.addr("MCD_CLIP_CALC_GUSD_A"),
-            OsmAbstract(addr.addr("PIP_GUSD"))
-        );
-    }
-
-    function testSpellIsCast_PSM_USDC_A_clip() public {
-        checkIlkClipper(
-            "PSM-USDC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_PSM_USDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
-            addr.addr("MCD_CLIP_CALC_PSM_USDC_A"),
-            OsmAbstract(addr.addr("PIP_USDC"))
-        );
-    }
-
-    function testSpellIsCast_UNIV2DAIUSDC_A_clip() public {
-        checkIlkClipper(
-            "UNIV2DAIUSDC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2DAIUSDC_A")),
-            FlipAbstract(addr.addr("MCD_FLIP_UNIV2DAIUSDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_UNIV2DAIUSDC_A")),
-            addr.addr("MCD_CLIP_CALC_UNIV2DAIUSDC_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2DAIUSDC"))
-        );
-    }
 }
