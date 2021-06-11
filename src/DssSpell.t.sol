@@ -27,17 +27,6 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
-// Specific for this spell
-interface TokenCompatibleUSDT {
-    function approve(address, uint256) external;
-}
-
-interface PSMLike {
-    function tout() external view returns (uint256);
-    function buyGem(address, uint256) external;
-}
-//
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -234,7 +223,7 @@ contract DssSpellTest is DSTest, DSMath {
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1622815440,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x8EFE2c82bD31B67fa262c0D364773629f6EA828A),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -942,7 +931,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         3 * BILLION,
+            line:         4 * BILLION,
             dust:         0,
             pct:          0,
             mat:          10000,

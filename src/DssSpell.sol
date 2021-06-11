@@ -19,7 +19,6 @@ pragma solidity 0.6.12;
 import {Fileable} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/ClipAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
@@ -32,6 +31,15 @@ contract DssSpellAction is DssAction {
     uint256 constant RAY = 10**27;
     uint256 constant RAD = 10**45;
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    // A table of rates can be found at
+    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
+    //
     uint256 constant POINT_FIVE_PCT       = 1000000000158153903837946257;
     uint256 constant ONE_PCT              = 1000000000315522921573372069;
     uint256 constant TWO_PCT              = 1000000000627937192491029810;
@@ -124,6 +132,10 @@ contract DssSpellAction is DssAction {
         DssExecLib.addReaderToOSMWhitelist(
             DssExecLib.getChangelogAddress("PIP_COMP"), YEARN_COMP_OSM_READER
         );
+
+        // -------------------------------- PSM-USDC-A line --------------------------------
+        // https://ipfs.io/ipfs/QmYhDkCvxBz3TRLGztY2gDPu4SkjQ6FEFtXp4fmKgFSxrb
+        DssExecLib.increaseIlkDebtCeiling("PSM-USDC-A", 1_000_000_000, true); // From to 3B to 4B
     }
 }
 
