@@ -27,6 +27,24 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
+// Specific for this spell
+interface FlashLike {
+    function vat() external view returns (address);
+    function daiJoin() external view returns (address);
+    function dai() external view returns (address);
+    function vow() external view returns (address);
+    function max() external view returns (uint256);
+    function toll() external view returns (uint256);
+    function locked() external view returns (uint256);
+    function maxFlashLoan(address) external view returns (uint256);
+    function flashFee(address, uint256) external view returns (uint256);
+    function flashLoan(address, address, uint256, bytes calldata) external returns (bool);
+    function vatDaiFlashLoan(address, uint256, bytes calldata) external returns (bool);
+    function convert() external;
+    function accrue() external;
+}
+//
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -221,13 +239,14 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x1dB8b702416D3174dC2F5b12287383AB693f894f),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1623430271,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            previous_spell:                 address(0x1dB8b702416D3174dC2F5b12287383AB693f894f),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
+        castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
 
@@ -265,7 +284,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       100 * MILLION,   // In whole Dai units
             aL_ttl:       8 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
-            dust:         5 * THOUSAND,    // In whole Dai units
+            dust:         10 * THOUSAND,   // In whole Dai units
             pct:          350,             // In basis points
             mat:          15000,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
@@ -294,7 +313,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         15 * THOUSAND,
+            dust:         30 * THOUSAND,
             pct:          900,
             mat:          13000,
             liqType:      "clip",
@@ -352,7 +371,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       1 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          15000,
             liqType:      "clip",
@@ -381,7 +400,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          0,
             mat:          10100,
             liqType:      "clip",
@@ -410,7 +429,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          5000,
             mat:          12000,
             liqType:      "clip",
@@ -439,7 +458,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       30 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          350,
             mat:          15000,
             liqType:      "clip",
@@ -468,7 +487,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          100,
             mat:          10100,
             liqType:      "clip",
@@ -497,7 +516,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          500,
             mat:          17500,
             liqType:      "clip",
@@ -526,7 +545,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       500 * THOUSAND,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          17500,
             liqType:      "clip",
@@ -555,7 +574,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       1 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          300,
             mat:          17500,
             liqType:      "clip",
@@ -584,7 +603,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          800,
             mat:          15000,
             liqType:      "clip",
@@ -613,7 +632,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          100,
             mat:          10100,
             liqType:      "clip",
@@ -642,7 +661,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       2 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          300,
             mat:          17500,
             liqType:      "clip",
@@ -671,7 +690,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       500 * THOUSAND,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          17500,
             liqType:      "clip",
@@ -700,7 +719,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       7 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          17500,
             liqType:      "clip",
@@ -729,7 +748,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          200,
             mat:          17500,
             liqType:      "clip",
@@ -758,7 +777,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       7 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          17500,
             liqType:      "clip",
@@ -787,7 +806,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         5 * MILLION,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          0,
             mat:          10100,
             liqType:      "clip",
@@ -816,7 +835,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          200,
             mat:          17500,
             liqType:      "clip",
@@ -845,7 +864,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       1 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          17500,
             liqType:      "clip",
@@ -874,7 +893,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          200,
             mat:          17500,
             liqType:      "clip",
@@ -903,7 +922,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          250,
             mat:          12500,
             liqType:      "clip",
@@ -961,7 +980,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          350,
             mat:          15000,
             liqType:      "clip",
@@ -990,7 +1009,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          350,
             mat:          12500,
             liqType:      "clip",
@@ -1019,7 +1038,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          50,
             mat:          10200,
             liqType:      "clip",
@@ -1048,7 +1067,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       2 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          14000,
             liqType:      "clip",
@@ -1077,7 +1096,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       2 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          300,
             mat:          16500,
             liqType:      "clip",
@@ -1106,7 +1125,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          16500,
             liqType:      "clip",
@@ -1135,7 +1154,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          0,
             mat:          12500,
             liqType:      "clip",
@@ -1164,7 +1183,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       2 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          300,
             mat:          16500,
             liqType:      "clip",
@@ -1193,7 +1212,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_gap:       2 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         10 * THOUSAND,
             pct:          200,
             mat:          12500,
             liqType:      "clip",
@@ -1275,7 +1294,6 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     0
         });
 
-        castPreviousSpell();
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1500,7 +1518,7 @@ contract DssSpellTest is DSTest, DSMath {
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust, string(abi.encodePacked("TestError/vat-dust-", ilk)));
-            assertTrue((dust >= RAD && dust < 20 * THOUSAND * RAD) || dust == 0, string(abi.encodePacked("TestError/vat-dust-range-", ilk))); // eq 0 or gt eq 1 and lt 20k
+            assertTrue((dust >= RAD && dust < 100 * THOUSAND * RAD) || dust == 0, string(abi.encodePacked("TestError/vat-dust-range-", ilk))); // eq 0 or gt eq 1 and lt 100k
             }
 
             {
@@ -2193,32 +2211,66 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function testSpellIsCast_feeds_whitelisting() public {
-        address YEARN_UNI_OSM_READER  = 0x6987e6471D4e7312914Edce4a6f92737C5fd0A8A;
-        address YEARN_LINK_OSM_READER = 0xCd73F1Ed2b1078EA35DAB29a8B35d335e0137c83;
-        address YEARN_AAVE_OSM_READER = 0x17b20900320D7C23866203cA6808F857B2b3fdA3;
-        address YEARN_COMP_OSM_READER = 0x4e9452CD5ba694de87ea1d791aBfdc4a250800f4;
-
-        address PIP_UNI  = addr.addr("PIP_UNI");
-        address PIP_LINK = addr.addr("PIP_LINK");
-        address PIP_AAVE = addr.addr("PIP_AAVE");
-        address PIP_COMP = addr.addr("PIP_COMP");
-
-        assertEq(MedianAbstract(PIP_UNI).bud(YEARN_UNI_OSM_READER), 0);
-        assertEq(MedianAbstract(PIP_LINK).bud(YEARN_LINK_OSM_READER), 0);
-        assertEq(MedianAbstract(PIP_AAVE).bud(YEARN_AAVE_OSM_READER), 0);
-        assertEq(MedianAbstract(PIP_COMP).bud(YEARN_COMP_OSM_READER), 0);
-
+    function testFlash() public {
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(MedianAbstract(PIP_UNI).bud(YEARN_UNI_OSM_READER), 1);
-        assertEq(MedianAbstract(PIP_LINK).bud(YEARN_LINK_OSM_READER), 1);
-        assertEq(MedianAbstract(PIP_AAVE).bud(YEARN_AAVE_OSM_READER), 1);
-        assertEq(MedianAbstract(PIP_COMP).bud(YEARN_COMP_OSM_READER), 1);
+        uint256 vowDai = vat.dai(address(vow));
+
+        // Give ourselves tokens for repayment in the callbacks
+        giveTokens(DSTokenAbstract(address(dai)), 1_000 * WAD);
+
+        FlashLike flash = FlashLike(addr.addr("MCD_FLASH"));
+        assertEq(flash.vat(), address(vat));
+        assertEq(flash.daiJoin(), address(daiJoin));
+        assertEq(flash.dai(), address(dai));
+        assertEq(flash.vow(), address(vow));
+        assertEq(flash.max(), 500 * MILLION * WAD);
+        assertEq(flash.toll(), 5 * WAD / 10000);
+        assertEq(flash.maxFlashLoan(address(dai)), 500 * MILLION * WAD);
+        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 500 * WAD); // 500 DAI fee on a 1M loan
+        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
+        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
+        assertEq(vat.sin(address(flash)), 0);
+        assertEq(vat.dai(address(flash)), 1000 * RAD);
+        flash.accrue();
+        assertEq(vat.dai(address(flash)), 0);
+        assertEq(vat.dai(address(vow)), vowDai + 1000 * RAD);
+    }
+
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));   
+        assertEq(token, address(dai));
+        assertEq(amount, 1 * MILLION * WAD);
+        assertEq(fee, 500 * WAD);
+
+        dai.approve(msg.sender, 1_000_500 * WAD);
+
+        return keccak256("ERC3156FlashBorrower.onFlashLoan");
+    }
+
+    function onVatDaiFlashLoan(
+        address initiator,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));   
+        assertEq(amount, 1 * MILLION * RAD);
+        assertEq(fee, 500 * RAD);
+
+        dai.approve(address(daiJoin), 500 * WAD);
+        daiJoin.join(address(this), 500 * WAD);
+        vat.move(address(this), msg.sender, 1_000_500 * RAD);
+
+        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
     }
 
 }

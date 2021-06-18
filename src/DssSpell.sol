@@ -20,16 +20,28 @@ import {Fileable} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface IlkRegistryLike {
+    function list() external view returns (bytes32[] memory);
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d2eaa6d2b4ac8e286b998e8e1c2177fcd7733e8d/governance/votes/Executive%20vote%20-%20June%2011%2C%202021.md -q -O - 2> /dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c424e1e507509bd5e721d4cf09979570a162a885/governance/votes/Executive%20vote%20-%20June%2018%2C%202021.md -q -O - 2> /dev/null)"
     string public constant description =
-        "2021-06-11 MakerDAO Executive Spell | Hash: 0x46e7883cb0adb7713ff078bea1ec97d1fbd0ee6cfab17e0f48083c171ad27a4f";
+        "2021-06-11 MakerDAO Executive Spell | Hash: 0x3ba3d9609358d3f0c8c3d39c582a2dcc44bf5ed4b2ea88ec68f5ab6416a3c8e9";
 
+    // Turn off office hours
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
+    uint256 constant WAD = 10**18;
     uint256 constant RAY = 10**27;
     uint256 constant RAD = 10**45;
+
+    address constant MCD_FLASH = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -40,102 +52,42 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant POINT_FIVE_PCT       = 1000000000158153903837946257;
-    uint256 constant ONE_PCT              = 1000000000315522921573372069;
-    uint256 constant TWO_PCT              = 1000000000627937192491029810;
-    uint256 constant TWO_POINT_FIVE_PCT   = 1000000000782997609082909351;
-    uint256 constant THREE_PCT            = 1000000000937303470807876289;
-    uint256 constant THREE_POINT_FIVE_PCT = 1000000001090862085746321732;
-    uint256 constant FOUR_PCT             = 1000000001243680656318820312;
-    uint256 constant NINE_PCT             = 1000000002732676825177582095;
 
     function actions() public override {
-        address MCD_DOG               = DssExecLib.getChangelogAddress("MCD_DOG");
-        address YEARN_UNI_OSM_READER  = 0x6987e6471D4e7312914Edce4a6f92737C5fd0A8A;
-        address YEARN_LINK_OSM_READER = 0xCd73F1Ed2b1078EA35DAB29a8B35d335e0137c83;
-        address YEARN_AAVE_OSM_READER = 0x17b20900320D7C23866203cA6808F857B2b3fdA3;
-        address YEARN_COMP_OSM_READER = 0x4e9452CD5ba694de87ea1d791aBfdc4a250800f4;
+        address MCD_VAT         = DssExecLib.vat();
+        address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
 
-        // ----------------------------- Ilk AutoLine Updates ---------------------------
-        //                                  ilk               DC              gap          ttl
-        DssExecLib.setIlkAutoLineParameters("ETH-A",          15_000_000_000, 100_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("ETH-B",             300_000_000,  10_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("ETH-C",           2_000_000_000, 100_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("BAT-A",               7_000_000,   1_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("WBTC-A",            750_000_000,  30_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("ZRX-A",               3_000_000,     500_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("MANA-A",              5_000_000,   1_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("COMP-A",             20_000_000,   2_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("LRC-A",               3_000_000,     500_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("LINK-A",            140_000_000,   7_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("BAL-A",              30_000_000,   3_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("YFI-A",             130_000_000,   7_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNI-A",              50_000_000,   5_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("RENBTC-A",           10_000_000,   1_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("AAVE-A",             50_000_000,   5_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2DAIETH-A",      50_000_000,   5_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCETH-A",     20_000_000,   3_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2USDCETH-A",     50_000_000,   5_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A",     50_000_000,  10_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2ETHUSDT-A",     10_000_000,   2_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2LINKETH-A",     20_000_000,   2_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2UNIETH-A",      20_000_000,   3_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCDAI-A",     20_000_000,   3_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2AAVEETH-A",     20_000_000,   2_000_000, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDT-A",     10_000_000,   2_000_000, 8 hours);
+        // ---------- Increase the Dust Parameter for ETH-B Vault Type ---------
 
-        // ----------------------------- Stability Fee updates --------------------------
-        DssExecLib.setIlkStabilityFee("ETH-A", THREE_POINT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("ETH-B", NINE_PCT, true);
-        DssExecLib.setIlkStabilityFee("ETH-C", ONE_PCT, true);
-        DssExecLib.setIlkStabilityFee("WBTC-A", THREE_POINT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("LINK-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("YFI-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNI-A", TWO_PCT, true);
-        DssExecLib.setIlkStabilityFee("AAVE-A", TWO_PCT, true);
-        DssExecLib.setIlkStabilityFee("BAT-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("RENBTC-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", TWO_POINT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", THREE_POINT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", THREE_POINT_FIVE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2ETHUSDT-A", FOUR_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2LINKETH-A", THREE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2AAVEETH-A", THREE_PCT, true);
-        DssExecLib.setIlkStabilityFee("UNIV2DAIUSDT-A", TWO_PCT, true);
+        DssExecLib.setIlkMinVaultAmount("ETH-B", 30_000);
 
-        // ----------------------------- UNIV2DAIUSDC-A SF and CR -----------------------
-        DssExecLib.setIlkLiquidationRatio("UNIV2DAIUSDC-A", 10200);
-        DssExecLib.setIlkStabilityFee("UNIV2DAIUSDC-A", POINT_FIVE_PCT, true);
+        // -------------------- Increase the Dust Parameter --------------------
 
-        // ----------------------------- ETH Auction Params -----------------------------
-        Fileable(MCD_DOG).file("ETH-A", "hole", 30_000_000 * RAD);
-        Fileable(MCD_DOG).file("ETH-B", "hole", 15_000_000 * RAD);
-        Fileable(MCD_DOG).file("ETH-C", "hole", 20_000_000 * RAD);
-        Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_CALC_ETH_B")).file(
-            "step", 60 seconds
-        );
-        Fileable(DssExecLib.getChangelogAddress("MCD_CLIP_ETH_B")).file(
-            "buf", 120 * RAY / 100
-        );
+        bytes32[] memory ilks = IlkRegistryLike(ILK_REGISTRY).list();
+        for (uint256 i = 0; i < ilks.length; i++) {
+            bytes32 ilk = ilks[i];
+            if (
+                   ilk == "PSM-USDC-A"
+                || ilk == "ETH-B"
+                || ilk == "ETH-C"
+                || ilk == "RWA001-A"
+                || ilk == "RWA002-A"
+            )  {
+                continue;
+            }
+            DssExecLib.setIlkMinVaultAmount(ilk, 10_000);
+        }
 
-        // ----------------------------- Yearn OSM Whitelist ----------------------------
-        DssExecLib.addReaderToOSMWhitelist(
-            DssExecLib.getChangelogAddress("PIP_UNI"), YEARN_UNI_OSM_READER
-        );
-        DssExecLib.addReaderToOSMWhitelist(
-            DssExecLib.getChangelogAddress("PIP_LINK"), YEARN_LINK_OSM_READER
-        );
-        DssExecLib.addReaderToOSMWhitelist(
-            DssExecLib.getChangelogAddress("PIP_AAVE"), YEARN_AAVE_OSM_READER
-        );
-        DssExecLib.addReaderToOSMWhitelist(
-            DssExecLib.getChangelogAddress("PIP_COMP"), YEARN_COMP_OSM_READER
-        );
+        // --------------------------- Add MCD_FLASH ---------------------------
 
-        // -------------------------------- PSM-USDC-A line --------------------------------
-        // https://ipfs.io/ipfs/QmYhDkCvxBz3TRLGztY2gDPu4SkjQ6FEFtXp4fmKgFSxrb
-        DssExecLib.increaseIlkDebtCeiling("PSM-USDC-A", 1_000_000_000, true); // From to 3B to 4B
+        Fileable(MCD_FLASH).file("max", 500_000_000 * WAD);
+        Fileable(MCD_FLASH).file("toll", 5 * WAD / 10000);
+        DssExecLib.authorize(MCD_VAT, MCD_FLASH);
+        DssExecLib.setChangelogAddress("MCD_FLASH", MCD_FLASH);
+
+        // -------------------------- Update Chainlog --------------------------
+
+        DssExecLib.setChangelogVersion("1.9.1");
     }
 }
 
