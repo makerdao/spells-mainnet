@@ -16,21 +16,17 @@
 
 pragma solidity 0.6.12;
 
-import {Fileable} from "dss-exec-lib/DssExecLib.sol";
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface IlkRegistryLike {
-    function list() external view returns (bytes32[] memory);
-}
-
 contract DssSpellAction is DssAction {
+
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c424e1e507509bd5e721d4cf09979570a162a885/governance/votes/Executive%20vote%20-%20June%2018%2C%202021.md -q -O - 2> /dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<TODO>/governance/votes/Executive%20vote%20-%20June%2025%2C%202021.md -q -O - 2> /dev/null)"
     string public constant description =
-        "2021-06-18 MakerDAO Executive Spell | Hash: 0x3ba3d9609358d3f0c8c3d39c582a2dcc44bf5ed4b2ea88ec68f5ab6416a3c8e9";
+        "2021-06-25 MakerDAO Executive Spell | Hash: 0x";
 
     // Turn off office hours
     function officeHours() public override returns (bool) {
@@ -41,7 +37,7 @@ contract DssSpellAction is DssAction {
     uint256 constant RAY = 10**27;
     uint256 constant RAD = 10**45;
 
-    address constant MCD_FLASH = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
+    bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -54,40 +50,9 @@ contract DssSpellAction is DssAction {
     //
 
     function actions() public override {
-        address MCD_VAT         = DssExecLib.vat();
-        address ILK_REGISTRY    = DssExecLib.getChangelogAddress("ILK_REGISTRY");
 
-        // ---------- Increase the Dust Parameter for ETH-B Vault Type ---------
-
-        DssExecLib.setIlkMinVaultAmount("ETH-B", 30_000);
-
-        // -------------------- Increase the Dust Parameter --------------------
-
-        bytes32[] memory ilks = IlkRegistryLike(ILK_REGISTRY).list();
-        for (uint256 i = 0; i < ilks.length; i++) {
-            bytes32 ilk = ilks[i];
-            if (
-                   ilk == "PSM-USDC-A"
-                || ilk == "ETH-B"
-                || ilk == "ETH-C"
-                || ilk == "RWA001-A"
-                || ilk == "RWA002-A"
-            )  {
-                continue;
-            }
-            DssExecLib.setIlkMinVaultAmount(ilk, 10_000);
-        }
-
-        // --------------------------- Add MCD_FLASH ---------------------------
-
-        Fileable(MCD_FLASH).file("max", 500_000_000 * WAD);
-        Fileable(MCD_FLASH).file("toll", 5 * WAD / 10000);
-        DssExecLib.authorize(MCD_VAT, MCD_FLASH);
-        DssExecLib.setChangelogAddress("MCD_FLASH", MCD_FLASH);
-
-        // -------------------------- Update Chainlog --------------------------
-
-        DssExecLib.setChangelogVersion("1.9.1");
+        // https://vote.makerdao.com/polling/QmZz4ssm?network=mainnet#poll-detail
+        DssExecLib.setIlkAutoLineParameters(ILK_PSM_USDC_A, 10_000_000_000, 1_000_000_000, 24 hours);
     }
 }
 

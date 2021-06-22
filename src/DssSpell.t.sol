@@ -27,24 +27,6 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
-// Specific for this spell
-interface FlashLike {
-    function vat() external view returns (address);
-    function daiJoin() external view returns (address);
-    function dai() external view returns (address);
-    function vow() external view returns (address);
-    function max() external view returns (uint256);
-    function toll() external view returns (uint256);
-    function locked() external view returns (uint256);
-    function maxFlashLoan(address) external view returns (uint256);
-    function flashFee(address, uint256) external view returns (uint256);
-    function flashLoan(address, address, uint256, bytes calldata) external returns (bool);
-    function vatDaiFlashLoan(address, uint256, bytes calldata) external returns (bool);
-    function convert() external;
-    function accrue() external;
-}
-//
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -239,9 +221,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xd498E7DEE467d1eb6Ed3933e579c427E168b6E6c),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1624042087,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0x1dB8b702416D3174dC2F5b12287383AB693f894f),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0xd498E7DEE467d1eb6Ed3933e579c427E168b6E6c),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -946,11 +928,11 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     9950
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
-            line:         4 * BILLION,
+            aL_enabled:   true,
+            aL_line:      10000 * MILLION,
+            aL_gap:       1000 * MILLION,
+            aL_ttl:       24 hours,
+            line:         0,
             dust:         0,
             pct:          0,
             mat:          10000,
@@ -2211,66 +2193,5 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
-    function testFlash() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        uint256 vowDai = vat.dai(address(vow));
-
-        // Give ourselves tokens for repayment in the callbacks
-        giveTokens(DSTokenAbstract(address(dai)), 1_000 * WAD);
-
-        FlashLike flash = FlashLike(addr.addr("MCD_FLASH"));
-        assertEq(flash.vat(), address(vat));
-        assertEq(flash.daiJoin(), address(daiJoin));
-        assertEq(flash.dai(), address(dai));
-        assertEq(flash.vow(), address(vow));
-        assertEq(flash.max(), 500 * MILLION * WAD);
-        assertEq(flash.toll(), 5 * WAD / 10000);
-        assertEq(flash.maxFlashLoan(address(dai)), 500 * MILLION * WAD);
-        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 500 * WAD); // 500 DAI fee on a 1M loan
-        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
-        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
-        assertEq(vat.sin(address(flash)), 0);
-        assertEq(vat.dai(address(flash)), 1000 * RAD);
-        flash.accrue();
-        assertEq(vat.dai(address(flash)), 0);
-        assertEq(vat.dai(address(vow)), vowDai + 1000 * RAD);
-    }
-
-    function onFlashLoan(
-        address initiator,
-        address token,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));   
-        assertEq(token, address(dai));
-        assertEq(amount, 1 * MILLION * WAD);
-        assertEq(fee, 500 * WAD);
-
-        dai.approve(msg.sender, 1_000_500 * WAD);
-
-        return keccak256("ERC3156FlashBorrower.onFlashLoan");
-    }
-
-    function onVatDaiFlashLoan(
-        address initiator,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));   
-        assertEq(amount, 1 * MILLION * RAD);
-        assertEq(fee, 500 * RAD);
-
-        dai.approve(address(daiJoin), 500 * WAD);
-        daiJoin.join(address(this), 500 * WAD);
-        vat.move(address(this), msg.sender, 1_000_500 * RAD);
-
-        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
-    }
 
 }
