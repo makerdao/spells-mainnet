@@ -53,3 +53,15 @@ ETH_GAS_PRICE line.
 ```
 export ETH_GAS_PRICE=$(seth --to-wei 420 "gwei")
 ```
+
+#### Verifying spells on etherscan
+
+The process of verifying code on etherscan is a little bit more involved because of `solc`'s weird behaviour around ABI Encoder v2.
+
+1. Run `make flatten`
+2. If your spell didn't use `DssExecLib.addNewCollateral` you need to tweak the flattened source.
+   1. Remove `pragma experimental ABIEncoderV2;`
+   2. Comment out `DssExecLib.addNewCollateral` method.
+3. Go to etherscan and verify source.
+   1. Add library: `DssExecLib:0xc061EDFC9C38912E0ad4F3922aA84ee11FB03347`
+   2. Ensure optimize runs = 1
