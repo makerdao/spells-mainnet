@@ -64,4 +64,4 @@ The process of verifying code on etherscan is a little bit more involved because
    2. Comment out `DssExecLib.addNewCollateral` method.
 3. Go to etherscan and verify source.
    1. Add library: `DssExecLib:0xc061EDFC9C38912E0ad4F3922aA84ee11FB03347`
-   2. Ensure optimize runs = 1
+   2. Ensure optimizer is on and optimize runs = 1
