@@ -121,6 +121,29 @@ contract DssSpellTest is DSTest, DSMath {
     ClipperMomAbstract   clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
     DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
 
+    // Specific for this spell
+
+    address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
+    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    address constant MKT_MULTISIG        = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237; // TODO VERIFY THIS WITH GOVALPHA!!! THIS ADDRESS IS IN THE MIP, GOV HAS ANOTHER ADDR
+    address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant RISK_MULTISIG       = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    address constant ORA_MULTISIG        = address(0); // TODO
+    address constant ORA_ER_MULTISIG     = address(1); // TODO
+
+    uint256 constant amountGro    = 126117;
+    uint256 constant amountSes    = 1;
+    uint256 constant amountMkt    = 44375;
+    uint256 constant amountGov    = 273334;
+    uint256 constant amountRwf    = 155000;
+    uint256 constant amountRisk   = 182000;
+    uint256 constant amountPe     = 510000;
+    uint256 constant amountOra    = 419677;
+    uint256 constant amountOraEr  = 800000;
+
+
     DssSpell   spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -2193,5 +2216,52 @@ contract DssSpellTest is DSTest, DSMath {
         checkAuth(true);
     }
 
+    function test_core_unit_budgets() public {
+        uint256 prevSin = vat.sin(address(vow));
+        uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
+        uint256 prevDaiSes   = dai.balanceOf(SES_MULTISIG);
+        uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
+        uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
+        uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
+        uint256 prevDaiRisk  = dai.balanceOf(RISK_MULTISIG);
+        uint256 prevDaiPe    = dai.balanceOf(PE_MULTISIG);
+        uint256 prevDaiOra   = dai.balanceOf(ORA_MULTISIG);
+        uint256 prevDaiOraEr = dai.balanceOf(ORA_ER_MULTISIG);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountGro
+            + amountSes
+            + amountMkt
+            + amountGov
+            + amountRwf
+            + amountRisk
+            + amountPe
+            + amountOra
+            + amountOraEr
+            ) * RAD
+        );
+        assertEq(dai.balanceOf(GRO_MULTISIG)    - prevDaiGro, amountGro * WAD);
+        assertEq(dai.balanceOf(SES_MULTISIG)    - prevDaiSes, amountSes * WAD);
+        assertEq(dai.balanceOf(MKT_MULTISIG)    - prevDaiMkt, amountMkt * WAD);
+        assertEq(dai.balanceOf(GOV_MULTISIG)    - prevDaiGov, amountGov * WAD);
+        assertEq(dai.balanceOf(RWF_MULTISIG)    - prevDaiRwf, amountRwf * WAD);
+        assertEq(dai.balanceOf(RISK_MULTISIG)   - prevDaiRisk, amountRisk * WAD);
+        assertEq(dai.balanceOf(PE_MULTISIG)     - prevDaiPe, amountPe * WAD);
+        assertEq(dai.balanceOf(ORA_MULTISIG)    - prevDaiOra, amountOra * WAD);
+        assertEq(dai.balanceOf(ORA_ER_MULTISIG) - prevDaiOraEr, amountOraEr * WAD);
+
+    }
 
 }

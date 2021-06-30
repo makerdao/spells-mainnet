@@ -39,6 +39,27 @@ contract DssSpellAction is DssAction {
 
     bytes32 constant ILK_PSM_USDC_A     = "PSM-USDC-A";
 
+    // Growth Core Unit
+    address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
+    // SES Core Unit
+    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    // Content Production Core Unit
+    // TODO VERIFY THIS WITH GOVALPHA!!! THIS ADDRESS IS IN THE MIP, GOV HAS ANOTHER ADDR
+    address constant MKT_MULTISIG        = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237;
+    // GovAlpha Core Unit
+    address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    // Real-World Finance Core Unit
+    address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    // Risk Core Unit
+    address constant RISK_MULTISIG       = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    // Protocol Engineering Multisig
+    address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    // Oracles Core Unit (Operating)
+    address constant ORA_MULTISIG        = address(0); // TODO
+    // Oracles Core Unit (Emergency Fund)
+    address constant ORA_ER_MULTISIG     = address(1); // TODO
+
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -81,9 +102,18 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", TWO_PCT, true);
         DssExecLib.setIlkStabilityFee("UNIV2ETHUSDT-A", TWO_PCT, true);
 
-        // Core Unit Payments
-        //DssExecLib.sendPaymentFromSurplusBuffer(TODO, TODO);
-
+        // Core Unit Budget Distributions - July
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    126_117);
+        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,          1); // TODO (Variable?)
+        DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,     44_375);
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    273_334);
+        DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(RISK_MULTISIG,   182_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG,     510_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ORA_MULTISIG,    419_677);
+        DssExecLib.sendPaymentFromSurplusBuffer(ORA_ER_MULTISIG, 800_000);
+        //                                                      __________
+        //                                           TOTAL DAI:      TBD
     }
 }
 
