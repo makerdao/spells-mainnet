@@ -44,8 +44,7 @@ contract DssSpellAction is DssAction {
     // SES Core Unit
     address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
     // Content Production Core Unit
-    // TODO VERIFY THIS WITH GOVALPHA!!! THIS ADDRESS IS IN THE MIP, GOV HAS ANOTHER ADDR
-    address constant MKT_MULTISIG        = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237;
+    address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
     // GovAlpha Core Unit
     address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
     // Real-World Finance Core Unit

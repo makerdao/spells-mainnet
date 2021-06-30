@@ -125,7 +125,9 @@ contract DssSpellTest is DSTest, DSMath {
 
     address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
     address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    address constant MKT_MULTISIG        = 0x6A0Ce7dBb43Fe537E3Fd0Be12dc1882393895237; // TODO VERIFY THIS WITH GOVALPHA!!! THIS ADDRESS IS IN THE MIP, GOV HAS ANOTHER ADDR
+    // TODO: MKT_MULTISIG does not match the address in the MIP.
+    //     The MIP content should be updated with this new address.
+    address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
     address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
     address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
     address constant RISK_MULTISIG       = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
