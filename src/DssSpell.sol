@@ -26,7 +26,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<TODO>/governance/votes/Executive%20vote%20-%20June%2025%2C%202021.md -q -O - 2> /dev/null)"
     string public constant description =
-        "2021-06-25 MakerDAO Executive Spell | Hash: 0x";
+        "2021-07-02 MakerDAO Executive Spell | Hash: 0x";
 
     // Turn off office hours
     function officeHours() public override returns (bool) {
@@ -48,11 +48,42 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant ZERO_PCT =            1000000000000000000000000000;
+    uint256 constant ZERO_POINT_FIVE_PCT = 1000000000158153903837946257;
+    uint256 constant ONE_PCT =             1000000000315522921573372069;
+    uint256 constant ONE_POINT_FIVE_PCT =  1000000000472114805215157978;
+    uint256 constant TWO_PCT =             1000000000627937192491029810;
+    uint256 constant SIX_PCT =             1000000001847694957439350562;
 
     function actions() public override {
 
+        // ----------- Auto-Line updates -----------
         // https://vote.makerdao.com/polling/QmZz4ssm?network=mainnet#poll-detail
         DssExecLib.setIlkAutoLineParameters(ILK_PSM_USDC_A, 10_000_000_000, 1_000_000_000, 24 hours);
+
+        // ----------- Stability Fee updates -----------
+        // https://vote.makerdao.com/polling/QmfZWY87?network=mainnet#poll-detail
+        DssExecLib.setIlkStabilityFee("ETH-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("ETH-B", SIX_PCT, true);
+        DssExecLib.setIlkStabilityFee("ETH-C", ZERO_POINT_FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("WBTC-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("LINK-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("YFI-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNI-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("AAVE-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("RENBTC-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("COMP-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("BAL-A", ONE_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", ONE_POINT_FIVE_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2DAIUSDC-A", ZERO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", TWO_PCT, true);
+        DssExecLib.setIlkStabilityFee("UNIV2ETHUSDT-A", TWO_PCT, true);
+
+        // Core Unit Payments
+        //DssExecLib.sendPaymentFromSurplusBuffer(TODO, TODO);
+
     }
 }
 
