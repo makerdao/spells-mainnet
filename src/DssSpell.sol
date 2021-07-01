@@ -41,8 +41,6 @@ contract DssSpellAction is DssAction {
 
     // Growth Core Unit
     address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
-    // SES Core Unit
-    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
     // Content Production Core Unit
     address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
     // GovAlpha Core Unit
@@ -54,9 +52,9 @@ contract DssSpellAction is DssAction {
     // Protocol Engineering Multisig
     address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
     // Oracles Core Unit (Operating)
-    address constant ORA_MULTISIG        = address(0); // TODO
+    address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
     // Oracles Core Unit (Emergency Fund)
-    address constant ORA_ER_MULTISIG     = address(1); // TODO
+    address constant ORA_ER_MULTISIG     = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -103,7 +101,6 @@ contract DssSpellAction is DssAction {
 
         // Core Unit Budget Distributions - July
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    126_117);
-        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,          1); // TODO (Variable?)
         DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,     44_375);
         DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    273_334);
         DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
@@ -111,8 +108,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG,     510_000);
         DssExecLib.sendPaymentFromSurplusBuffer(ORA_MULTISIG,    419_677);
         DssExecLib.sendPaymentFromSurplusBuffer(ORA_ER_MULTISIG, 800_000);
-        //                                                      __________
-        //                                           TOTAL DAI:      TBD
+        //                                                     _________
+        //                                         TOTAL DAI:  2,510,503
     }
 }
 

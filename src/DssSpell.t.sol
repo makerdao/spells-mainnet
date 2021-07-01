@@ -124,19 +124,15 @@ contract DssSpellTest is DSTest, DSMath {
     // Specific for this spell
 
     address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
-    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    // TODO: MKT_MULTISIG does not match the address in the MIP.
-    //     The MIP content should be updated with this new address.
     address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
     address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
     address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
     address constant RISK_MULTISIG       = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
     address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    address constant ORA_MULTISIG        = address(0); // TODO
-    address constant ORA_ER_MULTISIG     = address(1); // TODO
+    address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address constant ORA_ER_MULTISIG     = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
 
     uint256 constant amountGro    = 126117;
-    uint256 constant amountSes    = 1;
     uint256 constant amountMkt    = 44375;
     uint256 constant amountGov    = 273334;
     uint256 constant amountRwf    = 155000;
@@ -144,6 +140,7 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant amountPe     = 510000;
     uint256 constant amountOra    = 419677;
     uint256 constant amountOraEr  = 800000;
+    uint256 constant amountTotal  = 2510503;
 
 
     DssSpell   spell;
@@ -2221,7 +2218,6 @@ contract DssSpellTest is DSTest, DSMath {
     function test_core_unit_budgets() public {
         uint256 prevSin = vat.sin(address(vow));
         uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
-        uint256 prevDaiSes   = dai.balanceOf(SES_MULTISIG);
         uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
         uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
         uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
@@ -2244,7 +2240,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(
             vat.sin(address(vow)) - prevSin,
             ( amountGro
-            + amountSes
             + amountMkt
             + amountGov
             + amountRwf
@@ -2254,8 +2249,8 @@ contract DssSpellTest is DSTest, DSMath {
             + amountOraEr
             ) * RAD
         );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
         assertEq(dai.balanceOf(GRO_MULTISIG)    - prevDaiGro, amountGro * WAD);
-        assertEq(dai.balanceOf(SES_MULTISIG)    - prevDaiSes, amountSes * WAD);
         assertEq(dai.balanceOf(MKT_MULTISIG)    - prevDaiMkt, amountMkt * WAD);
         assertEq(dai.balanceOf(GOV_MULTISIG)    - prevDaiGov, amountGov * WAD);
         assertEq(dai.balanceOf(RWF_MULTISIG)    - prevDaiRwf, amountRwf * WAD);
