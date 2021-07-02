@@ -29,6 +29,7 @@ interface AuthLike {
 
 interface GnosisAllowanceModule {
     function executeAllowanceTransfer(address safe, address token, address to, uint96 amount, address paymentToken, uint96 payment, address delegate, bytes memory signature) external;
+    function getTokenAllowance(address safe, address delegate, address token) external view returns (uint256[5] memory);
 }
 
 contract TestSpell {
@@ -202,6 +203,7 @@ contract DssSpellTest is DSTest, DSMath {
     address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
     address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
     address constant ORA_ER_MULTISIG     = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
+    address constant ALLOWANCE_MODULE    = 0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134;
 
     uint256 constant amountGro    = 126117;
     uint256 constant amountMkt    = 44375;
@@ -2341,6 +2343,16 @@ contract DssSpellTest is DSTest, DSMath {
 
         uint256 daiBal = dai.balanceOf(pauseProxy);
 
+        uint256[5] memory allowancePre = GnosisAllowanceModule(ALLOWANCE_MODULE).getTokenAllowance(
+            ORA_MULTISIG, pauseProxy, address(dai)
+        );
+
+        assertEq(allowancePre[0], 10_000_000_000 * WAD); // amount
+        assertEq(allowancePre[1], 0);                    // spent
+        assertEq(allowancePre[2], 0);                    // resetTimeMin
+        assertEq(allowancePre[3], 27085100);             // lastResetMin
+        assertEq(allowancePre[4], 1);                    // nonce
+
         uint256 castTime = block.timestamp + 30 days;
         ClawSpell clawSpell = new ClawSpell();
         vote(address(clawSpell));
@@ -2349,5 +2361,16 @@ contract DssSpellTest is DSTest, DSMath {
         clawSpell.cast();
 
         assertEq(dai.balanceOf(pauseProxy), daiBal + 10**18);
+
+        uint256[5] memory allowancePost = GnosisAllowanceModule(ALLOWANCE_MODULE).getTokenAllowance(
+            ORA_MULTISIG, pauseProxy, address(dai)
+        );
+
+        assertEq(allowancePost[0], allowancePre[0]);            // amount
+        assertEq(allowancePost[1], allowancePre[1] + 1 * WAD);  // spent
+        assertEq(allowancePost[2], allowancePre[2]);            // resetTimeMin
+        assertEq(allowancePost[3], allowancePre[3]);            // lastResetMin
+        assertEq(allowancePost[4], allowancePre[4] + 1);        // nonce
+
     }
 }
