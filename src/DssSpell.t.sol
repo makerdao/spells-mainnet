@@ -127,7 +127,7 @@ contract DssSpellTest is DSTest, DSMath {
     address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
     address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
     address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    address constant RISK_MULTISIG       = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    address constant RISK_CU_EOA         = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
     address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
     address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
     address constant ORA_ER_MULTISIG     = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
@@ -141,7 +141,6 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant amountOra    = 419677;
     uint256 constant amountOraEr  = 800000;
     uint256 constant amountTotal  = 2510503;
-
 
     DssSpell   spell;
 
@@ -951,8 +950,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10000 * MILLION,
-            aL_gap:       1000 * MILLION,
+            aL_line:      10 * BILLION,
+            aL_gap:       1 * BILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -2216,12 +2215,12 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function test_core_unit_budgets() public {
-        uint256 prevSin = vat.sin(address(vow));
+        uint256 prevSin      = vat.sin(address(vow));
         uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
         uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
         uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
         uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
-        uint256 prevDaiRisk  = dai.balanceOf(RISK_MULTISIG);
+        uint256 prevDaiRisk  = dai.balanceOf(RISK_CU_EOA);
         uint256 prevDaiPe    = dai.balanceOf(PE_MULTISIG);
         uint256 prevDaiOra   = dai.balanceOf(ORA_MULTISIG);
         uint256 prevDaiOraEr = dai.balanceOf(ORA_ER_MULTISIG);
@@ -2254,7 +2253,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(MKT_MULTISIG)    - prevDaiMkt, amountMkt * WAD);
         assertEq(dai.balanceOf(GOV_MULTISIG)    - prevDaiGov, amountGov * WAD);
         assertEq(dai.balanceOf(RWF_MULTISIG)    - prevDaiRwf, amountRwf * WAD);
-        assertEq(dai.balanceOf(RISK_MULTISIG)   - prevDaiRisk, amountRisk * WAD);
+        assertEq(dai.balanceOf(RISK_CU_EOA)     - prevDaiRisk, amountRisk * WAD);
         assertEq(dai.balanceOf(PE_MULTISIG)     - prevDaiPe, amountPe * WAD);
         assertEq(dai.balanceOf(ORA_MULTISIG)    - prevDaiOra, amountOra * WAD);
         assertEq(dai.balanceOf(ORA_ER_MULTISIG) - prevDaiOraEr, amountOraEr * WAD);
