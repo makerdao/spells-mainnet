@@ -2349,6 +2349,5 @@ contract DssSpellTest is DSTest, DSMath {
         clawSpell.cast();
 
         assertEq(dai.balanceOf(pauseProxy), daiBal + 10**18);
-
     }
 }
