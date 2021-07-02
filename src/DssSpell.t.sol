@@ -27,6 +27,77 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
+interface GnosisAllowanceModule {
+    function executeAllowanceTransfer(address safe, address token, address to, uint96 amount, address paymentToken, uint96 payment, address delegate, bytes memory signature) external;
+}
+
+contract TestSpell {
+    ChainlogAbstract constant CHANGELOG =
+        ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    DSPauseAbstract public pause =
+        DSPauseAbstract(CHANGELOG.getAddress("MCD_PAUSE"));
+
+    address         public action;
+    bytes32         public tag;
+    uint256         public eta;
+    bytes           public sig;
+    uint256         public expiration;
+    bool            public done;
+
+    constructor() public {
+        sig = abi.encodeWithSignature("execute()");
+    }
+
+    function setTag() internal {
+        bytes32 _tag;
+        address _action = action;
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(eta == 0, "This spell has already been scheduled");
+        eta = block.timestamp + DSPauseAbstract(pause).delay();
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
+}
+
+contract ClawSpell is TestSpell {
+    constructor() public {
+        action = address(new ClawSpellAction());
+        setTag();
+    }
+}
+
+contract ClawSpellAction {
+
+    address constant ORA_MULTISIG     = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address constant ORA_ER_MULTISIG  = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
+    address constant MCD_PAUSE_PROXY  = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    address constant MCD_DAI          = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address constant ALLOWANCE_MODULE = 0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134;
+
+    function execute() public {
+        // Test Dai can be clawed back from Multisig
+        GnosisAllowanceModule(ALLOWANCE_MODULE).executeAllowanceTransfer(
+            ORA_MULTISIG,
+            MCD_DAI,
+            MCD_PAUSE_PROXY,
+            uint96(10**18),
+            address(0),
+            uint96(0),
+            address(this),
+            ""
+        );
+    }
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -2260,4 +2331,24 @@ contract DssSpellTest is DSTest, DSMath {
 
     }
 
+    function testClawBackMultisigFunds() public {
+        vote(address(spell));
+        spell.schedule();
+        castPreviousSpell();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        uint256 daiBal = dai.balanceOf(pauseProxy);
+
+        uint256 castTime = block.timestamp + 30 days;
+        ClawSpell clawSpell = new ClawSpell();
+        vote(address(clawSpell));
+        clawSpell.schedule();
+        hevm.warp(castTime);
+        clawSpell.cast();
+
+        assertEq(dai.balanceOf(pauseProxy), daiBal + 10**18);
+
+    }
 }
