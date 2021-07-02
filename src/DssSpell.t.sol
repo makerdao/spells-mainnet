@@ -83,6 +83,7 @@ contract ClawSpellAction {
     address constant MCD_PAUSE_PROXY  = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     address constant MCD_DAI          = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address constant ALLOWANCE_MODULE = 0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134;
+    uint256 constant amountOra        = 419677;
 
     function execute() public {
         // Test Dai can be clawed back from Multisig
@@ -90,7 +91,7 @@ contract ClawSpellAction {
             ORA_MULTISIG,
             MCD_DAI,
             MCD_PAUSE_PROXY,
-            uint96(10**18),
+            uint96(amountOra * 10**18),
             address(0),
             uint96(0),
             address(this),
@@ -2347,11 +2348,13 @@ contract DssSpellTest is DSTest, DSMath {
             ORA_MULTISIG, pauseProxy, address(dai)
         );
 
-        assertEq(allowancePre[0], 10_000_000_000 * WAD); // amount
-        assertEq(allowancePre[1], 0);                    // spent
-        assertEq(allowancePre[2], 0);                    // resetTimeMin
-        assertEq(allowancePre[3], 27085100);             // lastResetMin
-        assertEq(allowancePre[4], 1);                    // nonce
+        uint256 oneYrPmts = amountOra * WAD * 12;
+
+        assertTrue(allowancePre[0] > oneYrPmts);  // amount
+        assertEq(allowancePre[1], 0);             // spent
+        assertEq(allowancePre[2], 0);             // resetTimeMin
+        assertEq(allowancePre[3], 27085100);      // lastResetMin
+        assertEq(allowancePre[4], 1);             // nonce
 
         uint256 castTime = block.timestamp + 30 days;
         ClawSpell clawSpell = new ClawSpell();
@@ -2360,17 +2363,16 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(castTime);
         clawSpell.cast();
 
-        assertEq(dai.balanceOf(pauseProxy), daiBal + 10**18);
+        assertEq(dai.balanceOf(pauseProxy), daiBal + amountOra * 10**18);
 
         uint256[5] memory allowancePost = GnosisAllowanceModule(ALLOWANCE_MODULE).getTokenAllowance(
             ORA_MULTISIG, pauseProxy, address(dai)
         );
 
-        assertEq(allowancePost[0], allowancePre[0]);            // amount
-        assertEq(allowancePost[1], allowancePre[1] + 1 * WAD);  // spent
-        assertEq(allowancePost[2], allowancePre[2]);            // resetTimeMin
-        assertEq(allowancePost[3], allowancePre[3]);            // lastResetMin
-        assertEq(allowancePost[4], allowancePre[4] + 1);        // nonce
-
+        assertEq(allowancePost[0], allowancePre[0]);                    // amount
+        assertEq(allowancePost[1], allowancePre[1] + amountOra * WAD);  // spent
+        assertEq(allowancePost[2], allowancePre[2]);                    // resetTimeMin
+        assertEq(allowancePost[3], allowancePre[3]);                    // lastResetMin
+        assertEq(allowancePost[4], allowancePre[4] + 1);                // nonce
     }
 }
