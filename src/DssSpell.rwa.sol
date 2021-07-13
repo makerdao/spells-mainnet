@@ -196,6 +196,77 @@ contract DssSpellAction is DssAction {
         uint256 RWA004_MAT   = 11_000;
         uint48 RWA004_TAU    = 0;
 
+        // https://ipfs.io/ipfs/
+        string memory RWA004_DOC = "";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_RWA004_A).vat() == vat, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA004_A).ilk() == RWA004_ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA004_A).gem() == RWA004_GEM, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA004_A).dec() == DSTokenAbstract(RWA004_GEM).decimals(), "join-dec-not-match");
+
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
+            RWA004_ilk, RWA004_PRICE, RWA004_DOC, RWA004_TAU
+        );
+        (,address RWA004_pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(RWA004_ilk);
+
+        // Set price feed for RWA004
+        DssExecLib.setContract(DssExecLib.spotter(), RWA004_ilk, "pip", RWA004_pip);
+
+        // Init RWA-003 in Vat
+        Initializable(vat).init(RWA004_ilk);
+        // Init RWA-003 in Jug
+        Initializable(DssExecLib.jug()).init(RWA004_ilk);
+
+        // Allow RWA-003 Join to modify Vat registry
+        DssExecLib.authorize(vat, MCD_JOIN_RWA004_A);
+
+        // Allow RwaLiquidationOracle to modify Vat registry
+        // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
+
+        // Increase the global debt ceiling by the ilk ceiling
+        DssExecLib.increaseGlobalDebtCeiling(RWA004_CEIL);
+        // Set the ilk debt ceiling
+        DssExecLib.setIlkDebtCeiling(RWA004_ilk, RWA004_CEIL);
+
+        // No dust
+        // DssExecLib.setIlkMinVaultAmount(RWA004_ilk, 0);
+
+        // stability fee
+        DssExecLib.setIlkStabilityFee(RWA004_ilk, SEVEN_PCT, false);
+
+        // collateralization ratio
+        DssExecLib.setIlkLiquidationRatio(RWA004_ilk, RWA004_MAT);
+
+        // poke the spotter to pull in a price
+        DssExecLib.updateCollateralPrice(RWA004_ilk);
+
+        // give the urn permissions on the join adapter
+        // DssExecLib.authorize(MCD_JOIN_RWA004_A, RWA004_A_URN);
+
+        // set up the urn
+        Hopeable(RWA004_A_URN).hope(RWA004_OPERATOR);
+
+        // set up output conduit
+        // Hopeable(RWA004_A_OUTPUT_CONDUIT).hope(RWA004_OPERATOR);
+
+        // Authorize the SC Domain team deployer address on the output conduit
+        // during introductory phase. This allows the SC team to assist in the
+        // testing of a complete circuit. Once a broker dealer arrangement is
+        // established the deployer address should be `deny`ed on the conduit.
+        // Kissable(RWA004_A_OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
+
+        // add RWA-003 contract to the changelog
+        DssExecLib.setChangelogAddress("RWA004", RWA004_GEM);
+        DssExecLib.setChangelogAddress("PIP_RWA004", RWA004_pip);
+        DssExecLib.setChangelogAddress("MCD_JOIN_RWA004_A", MCD_JOIN_RWA004_A);
+        DssExecLib.setChangelogAddress("RWA004_A_URN", RWA004_A_URN);
+        DssExecLib.setChangelogAddress(
+            "RWA004_A_INPUT_CONDUIT", RWA004_A_INPUT_CONDUIT
+        );
+        DssExecLib.setChangelogAddress(
+            "RWA004_A_OUTPUT_CONDUIT", RWA004_A_OUTPUT_CONDUIT
+        );
 
         // -------------------------------- RWA005 --------------------------------
         bytes32 RWA005_ilk   = "RWA005-A";
@@ -205,12 +276,157 @@ contract DssSpellAction is DssAction {
         uint48 RWA005_TAU    = 0;
 
 
+        // https://ipfs.io/ipfs/
+        string memory RWA005_DOC = "";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_RWA005_A).vat() == vat, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA005_A).ilk() == RWA005_ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA005_A).gem() == RWA005_GEM, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA005_A).dec() == DSTokenAbstract(RWA005_GEM).decimals(), "join-dec-not-match");
+
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
+            RWA005_ilk, RWA005_PRICE, RWA005_DOC, RWA005_TAU
+        );
+        (,address RWA005_pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(RWA005_ilk);
+
+        // Set price feed for RWA005
+        DssExecLib.setContract(DssExecLib.spotter(), RWA005_ilk, "pip", RWA005_pip);
+
+        // Init RWA-003 in Vat
+        Initializable(vat).init(RWA005_ilk);
+        // Init RWA-003 in Jug
+        Initializable(DssExecLib.jug()).init(RWA005_ilk);
+
+        // Allow RWA-003 Join to modify Vat registry
+        DssExecLib.authorize(vat, MCD_JOIN_RWA005_A);
+
+        // Allow RwaLiquidationOracle to modify Vat registry
+        // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
+
+        // Increase the global debt ceiling by the ilk ceiling
+        DssExecLib.increaseGlobalDebtCeiling(RWA005_CEIL);
+        // Set the ilk debt ceiling
+        DssExecLib.setIlkDebtCeiling(RWA005_ilk, RWA005_CEIL);
+
+        // No dust
+        // DssExecLib.setIlkMinVaultAmount(RWA005_ilk, 0);
+
+        // stability fee
+        DssExecLib.setIlkStabilityFee(RWA005_ilk, SEVEN_PCT, false);
+
+        // collateralization ratio
+        DssExecLib.setIlkLiquidationRatio(RWA005_ilk, RWA005_MAT);
+
+        // poke the spotter to pull in a price
+        DssExecLib.updateCollateralPrice(RWA005_ilk);
+
+        // give the urn permissions on the join adapter
+        // DssExecLib.authorize(MCD_JOIN_RWA005_A, RWA005_A_URN);
+
+        // set up the urn
+        Hopeable(RWA005_A_URN).hope(RWA005_OPERATOR);
+
+        // set up output conduit
+        // Hopeable(RWA005_A_OUTPUT_CONDUIT).hope(RWA005_OPERATOR);
+
+        // Authorize the SC Domain team deployer address on the output conduit
+        // during introductory phase. This allows the SC team to assist in the
+        // testing of a complete circuit. Once a broker dealer arrangement is
+        // established the deployer address should be `deny`ed on the conduit.
+        // Kissable(RWA005_A_OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
+
+        // add RWA-003 contract to the changelog
+        DssExecLib.setChangelogAddress("RWA005", RWA005_GEM);
+        DssExecLib.setChangelogAddress("PIP_RWA005", RWA005_pip);
+        DssExecLib.setChangelogAddress("MCD_JOIN_RWA005_A", MCD_JOIN_RWA005_A);
+        DssExecLib.setChangelogAddress("RWA005_A_URN", RWA005_A_URN);
+        DssExecLib.setChangelogAddress(
+            "RWA005_A_INPUT_CONDUIT", RWA005_A_INPUT_CONDUIT
+        );
+        DssExecLib.setChangelogAddress(
+            "RWA005_A_OUTPUT_CONDUIT", RWA005_A_OUTPUT_CONDUIT
+        );
+
         // -------------------------------- RWA006 --------------------------------
         bytes32 RWA006_ilk   = "RWA006-A";
         uint256 RWA006_CEIL  = 20 * MILLION;
         uint256 RWA006_PRICE = 20_808_000 * WAD;
         uint256 RWA006_MAT   = 10_000;
         uint48 RWA006_TAU    = 0;
+
+
+        // https://ipfs.io/ipfs/
+        string memory RWA006_DOC = "";
+
+        // Sanity checks
+        require(GemJoinAbstract(MCD_JOIN_RWA006_A).vat() == vat, "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA006_A).ilk() == RWA006_ilk, "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA006_A).gem() == RWA006_GEM, "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA006_A).dec() == DSTokenAbstract(RWA006_GEM).decimals(), "join-dec-not-match");
+
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
+            RWA006_ilk, RWA006_PRICE, RWA006_DOC, RWA006_TAU
+        );
+        (,address RWA006_pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(RWA006_ilk);
+
+        // Set price feed for RWA006
+        DssExecLib.setContract(DssExecLib.spotter(), RWA006_ilk, "pip", RWA006_pip);
+
+        // Init RWA-003 in Vat
+        Initializable(vat).init(RWA006_ilk);
+        // Init RWA-003 in Jug
+        Initializable(DssExecLib.jug()).init(RWA006_ilk);
+
+        // Allow RWA-003 Join to modify Vat registry
+        DssExecLib.authorize(vat, MCD_JOIN_RWA006_A);
+
+        // Allow RwaLiquidationOracle to modify Vat registry
+        // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
+
+        // Increase the global debt ceiling by the ilk ceiling
+        DssExecLib.increaseGlobalDebtCeiling(RWA006_CEIL);
+        // Set the ilk debt ceiling
+        DssExecLib.setIlkDebtCeiling(RWA006_ilk, RWA006_CEIL);
+
+        // No dust
+        // DssExecLib.setIlkMinVaultAmount(RWA006_ilk, 0);
+
+        // stability fee
+        DssExecLib.setIlkStabilityFee(RWA006_ilk, SEVEN_PCT, false);
+
+        // collateralization ratio
+        DssExecLib.setIlkLiquidationRatio(RWA006_ilk, RWA006_MAT);
+
+        // poke the spotter to pull in a price
+        DssExecLib.updateCollateralPrice(RWA006_ilk);
+
+        // give the urn permissions on the join adapter
+        // DssExecLib.authorize(MCD_JOIN_RWA006_A, RWA006_A_URN);
+
+        // set up the urn
+        Hopeable(RWA006_A_URN).hope(RWA006_OPERATOR);
+
+        // set up output conduit
+        // Hopeable(RWA006_A_OUTPUT_CONDUIT).hope(RWA006_OPERATOR);
+
+        // Authorize the SC Domain team deployer address on the output conduit
+        // during introductory phase. This allows the SC team to assist in the
+        // testing of a complete circuit. Once a broker dealer arrangement is
+        // established the deployer address should be `deny`ed on the conduit.
+        // Kissable(RWA006_A_OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
+
+        // add RWA-003 contract to the changelog
+        DssExecLib.setChangelogAddress("RWA006", RWA006_GEM);
+        DssExecLib.setChangelogAddress("PIP_RWA006", RWA006_pip);
+        DssExecLib.setChangelogAddress("MCD_JOIN_RWA006_A", MCD_JOIN_RWA006_A);
+        DssExecLib.setChangelogAddress("RWA006_A_URN", RWA006_A_URN);
+        DssExecLib.setChangelogAddress(
+            "RWA006_A_INPUT_CONDUIT", RWA006_A_INPUT_CONDUIT
+        );
+        DssExecLib.setChangelogAddress(
+            "RWA006_A_OUTPUT_CONDUIT", RWA006_A_OUTPUT_CONDUIT
+        );
 
         // bump changelog version
         DssExecLib.setChangelogVersion("");
