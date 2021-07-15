@@ -144,32 +144,31 @@ contract DssSpellAction is DssAction {
             DOC: ""
         });
 
-        // TODO: replace mip21 addresses for rwa006
-        // CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
-        //     MCD_JOIN: 0x039B74bD0Adc35046B67E88509900D41b9D95430,
-        //     GEM: 0x4E65F06574F1630B4fF756C898Fe02f276D53E86,
-        //     OPERATOR: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-        //     INPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-        //     OUTPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-        //     URN:  0x6fa6F9C11f5F129f6ECA4B391D9d32038A9666cD,
-        //     LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
-        //     gemID: "RWA006",
-        //     joinID: "MCD_JOIN_RWA006_A",
-        //     urnID: "RWA006_A_URN",
-        //     inputConduitID: "RWA006_A_INPUT_CONDUIT",
-        //     outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
-        //     pipID: "PIP_RWA006",
-        //     ilk: "RWA006-A",
-        //     ilkRegistryName: "RWA006-A: Centrifuge: Peoples Company",
-        //     RATE: TWO_PCT,
-        //     CEIL: 20 * MILLION,
-        //     PRICE: 20_808_000 * WAD,
-        //     MAT: 10_000,
-        //     TAU: 0,
-        //     DOC: ""
-        // });
+        CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
+            MCD_JOIN: 0x5E11E34b6745FeBa9449Ae53c185413d6EdC66BE,
+            GEM: 0x4EE03cfBF6E784c462839f5954d60f7C2B60b113,
+            OPERATOR: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3,
+            INPUT_CONDUIT: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3,
+            OUTPUT_CONDUIT: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3,
+            URN:  0x0C185bf5388DdfDB288F4D875265d456D18FD9Cb,
+            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
+            gemID: "RWA006",
+            joinID: "MCD_JOIN_RWA006_A",
+            urnID: "RWA006_A_URN",
+            inputConduitID: "RWA006_A_INPUT_CONDUIT",
+            outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
+            pipID: "PIP_RWA006",
+            ilk: "RWA006-A",
+            ilkRegistryName: "RWA006-A: Centrifuge: Peoples Company",
+            RATE: TWO_PCT,
+            CEIL: 20 * MILLION,
+            PRICE: 20_808_000 * WAD,
+            MAT: 10_000,
+            TAU: 0,
+            DOC: ""
+        });
 
-        CentrifugeCollateralValues[3] memory collaterals = [RWA003, RWA004, RWA005]; // , RWA006
+        CentrifugeCollateralValues[4] memory collaterals = [RWA003, RWA004, RWA005, RWA006];
 
         // integrate rwa003-006
         for (uint i = 0; i < collaterals.length; i++) {

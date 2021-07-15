@@ -101,16 +101,16 @@ contract KovanManagerRPC is DSTest, DSMath {
             MGR: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66
         }));
 
-        // collaterals.push(CentrifugeCollateralTestValues({
-        //     ilk: "RWA006",
-        //     LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
-        //     URN: 0x6fa6F9C11f5F129f6ECA4B391D9d32038A9666cD,
-        //     ROOT: 0x09E5b61a15526753b8aF01e21Bd3853146472080,
-        //     COORDINATOR: 0x671954B36350D6B3f1427f1a3CD64C8eb6845913,
-        //     DROP: 0x0bDAA77Ba1cb0E7dAf18963A8f202Da077e867bA,
-        //     MEMBERLIST: 0x1b8413C9b1B93aFfa2fC04637778b810a9E2a8b2,
-        //     MGR: 0x652A3B3b91459504A8D1d785B0c923A34D638218
-        // }));
+        collaterals.push(CentrifugeCollateralTestValues({
+            ilk: "RWA006",
+            LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
+            URN: 0x0C185bf5388DdfDB288F4D875265d456D18FD9Cb,
+            ROOT: 0xA1C16730637445D141d6ee35E31a67993FBe3759,
+            COORDINATOR: 0xa3f5c408436c03f0fe58f32bb7FF17A4Cf18549E,
+            DROP: 0x20217cbDE2A609E429D84f7a267cE229Dc1506F2,
+            MEMBERLIST: 0xf02bD1eDBbC076c95C9aB18747D8f0c2d0365d58,
+            MGR: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3
+        }));
 
         // give this address 10000 dai
         hevm.store(address(dai), keccak256(abi.encode(address(this), uint(2))), bytes32(uint(initialSpellDaiBalance)));
