@@ -2261,7 +2261,7 @@ contract DssSpellTest is DSTest, DSMath {
                 extcodecopy(a, ptr, sub(size, 2), 2)
                 length := mload(ptr)
                 length := shr(240, length)
-                length := add(length, 2)  // the two bytes of the length are not counted in the length
+                length := add(length, 2)  // the two bytes used to specify the length are not counted in the length
             }
             // We'll return zero if the bytecode is shorter than two bytes.
         }
