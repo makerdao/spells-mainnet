@@ -49,7 +49,7 @@ interface TinlakeManagerLike {
     function exit(uint256 wad) external;
 }
 
-contract KovanManagerRPC is DSTest, DSMath {
+contract DssSpellManagerTest is DSTest, DSMath {
 
     Hevm hevm;
     DssSpell spell;
