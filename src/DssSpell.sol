@@ -73,13 +73,13 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         CentrifugeCollateralValues memory RWA003 = CentrifugeCollateralValues({
-            MCD_JOIN: 0x4CCc7fED3912A32B6Cf7Db2FdA1554a9FF574099,
-            GEM: 0xDBC559F5058E593981C48f4f09fA34323df42d51,
-            OPERATOR: 0x45e17E350279a2f28243983053B634897BA03b64,
-            INPUT_CONDUIT: 0x45e17E350279a2f28243983053B634897BA03b64,
-            OUTPUT_CONDUIT: 0x45e17E350279a2f28243983053B634897BA03b64,
-            URN:  0x993c239179D6858769996bcAb5989ab2DF75913F,
-            LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
+            MCD_JOIN: 0x1Fe789BBac5b141bdD795A3Bc5E12Af29dDB4b86,
+            GEM: 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9,
+            OPERATOR: 0x2A9798c6F165B6D60Cfb923Fe5BFD6f338695D9B,
+            INPUT_CONDUIT: 0x2A9798c6F165B6D60Cfb923Fe5BFD6f338695D9B,
+            OUTPUT_CONDUIT: 0x2A9798c6F165B6D60Cfb923Fe5BFD6f338695D9B,
+            URN:  0x7bF825718e7C388c3be16CFe9982539A7455540F,
+            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA003",
             joinID: "MCD_JOIN_RWA003_A",
             urnID: "RWA003_A_URN",
@@ -97,13 +97,13 @@ contract DssSpellAction is DssAction {
         });
 
         CentrifugeCollateralValues memory RWA004 = CentrifugeCollateralValues({
-            MCD_JOIN: 0xa92D4082BabF785Ba02f9C419509B7d08f2ef271,
-            GEM: 0x146b0abaB80a60Bfa3b4fDDb5056bBcFa4f1fec1,
-            OPERATOR: 0x303dFE04Be5731207c5213FbB54488B3aD9B9FE3,
-            INPUT_CONDUIT: 0x303dFE04Be5731207c5213FbB54488B3aD9B9FE3,
-            OUTPUT_CONDUIT: 0x303dFE04Be5731207c5213FbB54488B3aD9B9FE3,
-            URN:  0xf22C7F5A2AecE1E85263e3cec522BDCD3e392B59,
-            LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
+            MCD_JOIN: 0xD50a8e9369140539D1c2D113c4dC1e659c6242eB,
+            GEM: 0x873F2101047A62F84456E3B2B13df2287925D3F9,
+            OPERATOR: 0xe1ed3F588A98bF8a3744f4BF74Fd8540e81AdE3f,
+            INPUT_CONDUIT: 0xe1ed3F588A98bF8a3744f4BF74Fd8540e81AdE3f,
+            OUTPUT_CONDUIT: 0xe1ed3F588A98bF8a3744f4BF74Fd8540e81AdE3f,
+            URN:  0xeF1699548717aa4Cf47aD738316280b56814C821,
+            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA004",
             joinID: "MCD_JOIN_RWA004_A",
             urnID: "RWA004_A_URN",
@@ -121,13 +121,13 @@ contract DssSpellAction is DssAction {
         });
 
         CentrifugeCollateralValues memory RWA005 = CentrifugeCollateralValues({
-            MCD_JOIN: 0x1233d0DBb55A4Bb41D711d4B584f8DDB15A2Ff88,
-            GEM: 0xcB2A48D26970eE7193d66BAc6F1b3090f2E8f82B,
-            OPERATOR: 0x17E5954Cdd3611Dd84e444F0ed555CC3a06cB319,
-            INPUT_CONDUIT: 0x17E5954Cdd3611Dd84e444F0ed555CC3a06cB319,
-            OUTPUT_CONDUIT: 0x17E5954Cdd3611Dd84e444F0ed555CC3a06cB319,
-            URN:  0xdB9f0700EbBac596CCeF5b14D5e23664Db2A184f,
-            LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
+            MCD_JOIN: 0xA4fD373b93aD8e054970A3d6cd4Fd4C31D08192e,
+            GEM: 0x6DB236515E90fC831D146f5829407746EDdc5296,
+            OPERATOR: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66,
+            INPUT_CONDUIT: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66,
+            OUTPUT_CONDUIT: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66,
+            URN:  0xc40907545C57dB30F01a1c2acB242C7c7ACB2B90,
+            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA005",
             joinID: "MCD_JOIN_RWA005_A",
             urnID: "RWA005_A_URN",
@@ -144,31 +144,32 @@ contract DssSpellAction is DssAction {
             DOC: ""
         });
 
-        CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
-            MCD_JOIN: 0x039B74bD0Adc35046B67E88509900D41b9D95430,
-            GEM: 0x4E65F06574F1630B4fF756C898Fe02f276D53E86,
-            OPERATOR: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-            INPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-            OUTPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
-            URN:  0x6fa6F9C11f5F129f6ECA4B391D9d32038A9666cD,
-            LIQ: 0x2881c5dF65A8D81e38f7636122aFb456514804CC,
-            gemID: "RWA006",
-            joinID: "MCD_JOIN_RWA006_A",
-            urnID: "RWA006_A_URN",
-            inputConduitID: "RWA006_A_INPUT_CONDUIT",
-            outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
-            pipID: "PIP_RWA006",
-            ilk: "RWA006-A",
-            ilkRegistryName: "RWA006-A: Centrifuge: Peoples Company",
-            RATE: TWO_PCT,
-            CEIL: 20 * MILLION,
-            PRICE: 20_808_000 * WAD,
-            MAT: 10_000,
-            TAU: 0,
-            DOC: ""
-        });
+        // TODO: replace mip21 addresses for rwa006
+        // CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
+        //     MCD_JOIN: 0x039B74bD0Adc35046B67E88509900D41b9D95430,
+        //     GEM: 0x4E65F06574F1630B4fF756C898Fe02f276D53E86,
+        //     OPERATOR: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
+        //     INPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
+        //     OUTPUT_CONDUIT: 0x652A3B3b91459504A8D1d785B0c923A34D638218,
+        //     URN:  0x6fa6F9C11f5F129f6ECA4B391D9d32038A9666cD,
+        //     LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
+        //     gemID: "RWA006",
+        //     joinID: "MCD_JOIN_RWA006_A",
+        //     urnID: "RWA006_A_URN",
+        //     inputConduitID: "RWA006_A_INPUT_CONDUIT",
+        //     outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
+        //     pipID: "PIP_RWA006",
+        //     ilk: "RWA006-A",
+        //     ilkRegistryName: "RWA006-A: Centrifuge: Peoples Company",
+        //     RATE: TWO_PCT,
+        //     CEIL: 20 * MILLION,
+        //     PRICE: 20_808_000 * WAD,
+        //     MAT: 10_000,
+        //     TAU: 0,
+        //     DOC: ""
+        // });
 
-        CentrifugeCollateralValues[4] memory collaterals = [RWA003, RWA004, RWA005, RWA006];
+        CentrifugeCollateralValues[3] memory collaterals = [RWA003, RWA004, RWA005]; // , RWA006
 
         // integrate rwa003-006
         for (uint i = 0; i < collaterals.length; i++) {
