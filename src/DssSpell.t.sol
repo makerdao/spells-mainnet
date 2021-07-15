@@ -2251,4 +2251,66 @@ contract DssSpellTest is DSTest, DSMath {
     function test_auth_in_sources() public {
         checkAuth(true);
     }
+
+    function getBytecodeMetadataLength(address a) internal returns (uint256 length) {
+        // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
+        assembly {
+            let ptr  := mload(0x40)
+            let size := extcodesize(a)
+            if iszero(lt(size, 2)) {
+                extcodecopy(a, ptr, sub(size, 2), 2)
+                length := mload(ptr)
+                length := shr(240, length)
+                length := add(length, 2)  // the two bytes of the length are not counted in the length
+            }
+            // We'll return zero if the bytecode is shorter than two bytes.
+        }
+    }
+
+    // Verifies that the bytecode of the action of the spell used for testing
+    // matches what we'd expect.
+    //
+    // Not a complete replacement for Etherscan verification, unfortunately.
+    // This is because the DssSpell bytecode is non-deterministic because it 
+    // deploys the action in its constructor and incorporates the action
+    // address as an immutable variable--but the action address depends on the
+    // address of the DssSpel which depends on the address+nonce of the
+    // deploying address. If we had a way to simulate a contract creation by
+    // an arbitrary address+nonce, we could verify the bytecode of the DssSpell
+    // instead.
+    //
+    // Vacuous until the deployed_spell value is non-zero.
+    function test_bytecode_matches() public {
+        address expectedAction = (new DssSpell()).action();
+        address actualAction   = spell.action();
+        uint256 expectedBytecodeSize;
+        uint256 actualBytecodeSize;
+        assembly {
+            expectedBytecodeSize := extcodesize(expectedAction)
+            actualBytecodeSize   := extcodesize(actualAction)
+        }
+
+        uint256 metadataLength = getBytecodeMetadataLength(expectedAction);
+        assertTrue(metadataLength <= expectedBytecodeSize);
+        expectedBytecodeSize -= metadataLength;
+
+        metadataLength = getBytecodeMetadataLength(actualAction);
+        assertTrue(metadataLength <= actualBytecodeSize);
+        actualBytecodeSize -= metadataLength;
+
+        assertEq(actualBytecodeSize, expectedBytecodeSize);
+        uint256 size = actualBytecodeSize;
+        uint256 expectedHash;
+        uint256 actualHash;
+        assembly {
+            let ptr := mload(0x40)
+
+            extcodecopy(expectedAction, ptr, 0, size)
+            expectedHash := keccak256(ptr, size)
+
+            extcodecopy(actualAction, ptr, 0, size)
+            actualHash := keccak256(ptr, size)
+        }
+        assertEq(expectedHash, actualHash);
+    }
 }
