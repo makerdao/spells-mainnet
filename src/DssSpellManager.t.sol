@@ -133,6 +133,8 @@ contract KovanManagerRPC is DSTest, DSMath {
     }
 
     function setupCollateral(CentrifugeCollateralTestValues memory collateral) internal {
+        emit log_named_bytes32("setting up collateral", collateral.ilk);
+
         Root root = Root(collateral.ROOT);
         TinlakeManagerLike mgr = TinlakeManagerLike(collateral.MGR);
         DSTokenAbstract drop = DSTokenAbstract(address(mgr.gem()));
