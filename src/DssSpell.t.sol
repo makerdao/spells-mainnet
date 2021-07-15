@@ -27,6 +27,11 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
+interface GnosisAllowanceModule {
+    function executeAllowanceTransfer(address safe, address token, address to, uint96 amount, address paymentToken, uint96 payment, address delegate, bytes memory signature) external;
+    function getTokenAllowance(address safe, address delegate, address token) external view returns (uint256[5] memory);
+}
+
 contract TestSpell {
     ChainlogAbstract constant CHANGELOG =
         ChainlogAbstract(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
@@ -61,6 +66,37 @@ contract TestSpell {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
+    }
+}
+
+contract ClawSpell is TestSpell {
+    constructor() public {
+        action = address(new ClawSpellAction());
+        setTag();
+    }
+}
+
+contract ClawSpellAction {
+
+    address constant ORA_MULTISIG     = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address constant ORA_ER_MULTISIG  = 0x53CCAA8E3beF14254041500aCC3f1D4edb5B6D24;
+    address constant MCD_PAUSE_PROXY  = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+    address constant MCD_DAI          = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address constant ALLOWANCE_MODULE = 0xCFbFaC74C26F8647cBDb8c5caf80BB5b32E43134;
+    uint256 constant amountOra        = 419677;
+
+    function execute() public {
+        // Test Dai can be clawed back from Multisig
+        GnosisAllowanceModule(ALLOWANCE_MODULE).executeAllowanceTransfer(
+            ORA_MULTISIG,
+            MCD_DAI,
+            MCD_PAUSE_PROXY,
+            uint96(amountOra * 10**18),
+            address(0),
+            uint96(0),
+            address(this),
+            ""
+        );
     }
 }
 
@@ -2250,6 +2286,126 @@ contract DssSpellTest is DSTest, DSMath {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    function test_core_unit_budgets_distribute() public {
+        // Set done to false in previous spell
+        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
+
+        uint256 prevSin      = vat.sin(address(vow));
+        uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
+        uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
+        uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
+        uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
+        uint256 prevDaiRisk  = dai.balanceOf(RISK_CU_EOA);
+        uint256 prevDaiPe    = dai.balanceOf(PE_MULTISIG);
+        uint256 prevDaiOra   = dai.balanceOf(ORA_MULTISIG);
+        uint256 prevDaiOraEr = dai.balanceOf(ORA_ER_MULTISIG);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountGro
+            + amountMkt
+            + amountGov
+            + amountRwf
+            + amountRisk
+            + amountPe
+            + amountOra
+            + amountOraEr
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(GRO_MULTISIG)    - prevDaiGro, amountGro * WAD);
+        assertEq(dai.balanceOf(MKT_MULTISIG)    - prevDaiMkt, amountMkt * WAD);
+        assertEq(dai.balanceOf(GOV_MULTISIG)    - prevDaiGov, amountGov * WAD);
+        assertEq(dai.balanceOf(RWF_MULTISIG)    - prevDaiRwf, amountRwf * WAD);
+        assertEq(dai.balanceOf(RISK_CU_EOA)     - prevDaiRisk, amountRisk * WAD);
+        assertEq(dai.balanceOf(PE_MULTISIG)     - prevDaiPe, amountPe * WAD);
+        assertEq(dai.balanceOf(ORA_MULTISIG)    - prevDaiOra, amountOra * WAD);
+        assertEq(dai.balanceOf(ORA_ER_MULTISIG) - prevDaiOraEr, amountOraEr * WAD);
+    }
+
+    function test_core_unit_budgets_do_not_distribute() public {
+        uint256 prevSin      = vat.sin(address(vow));
+        uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
+        uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
+        uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
+        uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
+        uint256 prevDaiRisk  = dai.balanceOf(RISK_CU_EOA);
+        uint256 prevDaiPe    = dai.balanceOf(PE_MULTISIG);
+        uint256 prevDaiOra   = dai.balanceOf(ORA_MULTISIG);
+        uint256 prevDaiOraEr = dai.balanceOf(ORA_ER_MULTISIG);
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(vat.sin(address(vow)), prevSin);
+        assertEq(dai.balanceOf(GRO_MULTISIG), prevDaiGro);
+        assertEq(dai.balanceOf(MKT_MULTISIG), prevDaiMkt);
+        assertEq(dai.balanceOf(GOV_MULTISIG), prevDaiGov);
+        assertEq(dai.balanceOf(RWF_MULTISIG), prevDaiRwf);
+        assertEq(dai.balanceOf(RISK_CU_EOA), prevDaiRisk);
+        assertEq(dai.balanceOf(PE_MULTISIG), prevDaiPe);
+        assertEq(dai.balanceOf(ORA_MULTISIG), prevDaiOra);
+        assertEq(dai.balanceOf(ORA_ER_MULTISIG), prevDaiOraEr);
+    }
+
+    function testClawBackMultisigFunds() public {
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        uint256 daiBal = dai.balanceOf(pauseProxy);
+
+        uint256[5] memory allowancePre = GnosisAllowanceModule(ALLOWANCE_MODULE).getTokenAllowance(
+            ORA_MULTISIG, pauseProxy, address(dai)
+        );
+
+        uint256 oneYrPmts = amountOra * WAD * 12;
+
+        assertTrue(allowancePre[0] > oneYrPmts);  // amount
+        assertEq(allowancePre[1], 0);             // spent
+        assertEq(allowancePre[2], 0);             // resetTimeMin
+        assertEq(allowancePre[3], 27085100);      // lastResetMin
+        assertEq(allowancePre[4], 1);             // nonce
+
+        uint256 castTime = block.timestamp + 30 days;
+        ClawSpell clawSpell = new ClawSpell();
+        vote(address(clawSpell));
+        clawSpell.schedule();
+        hevm.warp(castTime);
+        clawSpell.cast();
+
+        assertEq(dai.balanceOf(pauseProxy), daiBal + amountOra * 10**18);
+
+        uint256[5] memory allowancePost = GnosisAllowanceModule(ALLOWANCE_MODULE).getTokenAllowance(
+            ORA_MULTISIG, pauseProxy, address(dai)
+        );
+
+        assertEq(allowancePost[0], allowancePre[0]);                    // amount
+        assertEq(allowancePost[1], allowancePre[1] + amountOra * WAD);  // spent
+        assertEq(allowancePost[2], allowancePre[2]);                    // resetTimeMin
+        assertEq(allowancePost[3], allowancePre[3]);                    // lastResetMin
+        assertEq(allowancePost[4], allowancePre[4] + 1);                // nonce
     }
 
     function getBytecodeMetadataLength(address a) internal returns (uint256 length) {
