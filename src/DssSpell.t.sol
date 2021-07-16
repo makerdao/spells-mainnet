@@ -2437,7 +2437,7 @@ contract DssSpellTest is DSTest, DSMath {
     // This is because the DssSpell bytecode is non-deterministic because it 
     // deploys the action in its constructor and incorporates the action
     // address as an immutable variable--but the action address depends on the
-    // address of the DssSpel which depends on the address+nonce of the
+    // address of the DssSpell which depends on the address+nonce of the
     // deploying address. If we had a way to simulate a contract creation by
     // an arbitrary address+nonce, we could verify the bytecode of the DssSpell
     // instead.
