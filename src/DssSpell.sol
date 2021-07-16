@@ -25,6 +25,12 @@ interface Doable {
 
 contract DssSpellAction is DssAction {
 
+    // Provides a descriptive tag for bot consumption
+    // This should be modified weekly to provide a summary of the actions
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20July%2016%2C%202021.md -q -O - 2> /dev/null)"
+    string public constant override description =
+        "2021-07-16 MakerDAO Executive Spell | Hash: TODO";
+
     // Turn off office hours
     function officeHours() public override returns (bool) {
         return false;
@@ -77,12 +83,5 @@ contract DssSpellAction is DssAction {
 }
 
 contract DssSpell is DssExec {
-
-    // Provides a descriptive tag for bot consumption
-    // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20July%2016%2C%202021.md -q -O - 2> /dev/null)"
-    string private constant description_ =
-        "2021-07-16 MakerDAO Executive Spell | Hash: TODO";
-
-    constructor() DssExec(description_, block.timestamp + 30 days, address(new DssSpellAction())) public {}
+    constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) public {}
 }
