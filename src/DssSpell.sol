@@ -20,7 +20,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 interface Doable {
-    function done() external returns (bool);
+    function done() external view returns (bool);
 }
 
 contract DssSpellAction is DssAction {
