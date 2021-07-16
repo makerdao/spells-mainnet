@@ -2291,6 +2291,7 @@ contract DssSpellTest is DSTest, DSMath {
     function test_core_unit_budgets_distribute() public {
         // Set done to false in previous spell
         hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
+        assertTrue(!SpellLike(spellValues.previous_spell).done());
 
         uint256 prevSin      = vat.sin(address(vow));
         uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
@@ -2336,6 +2337,8 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function test_core_unit_budgets_do_not_distribute() public {
+        assertTrue(SpellLike(spellValues.previous_spell).done());
+
         uint256 prevSin      = vat.sin(address(vow));
         uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
         uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
@@ -2368,6 +2371,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testClawBackMultisigFunds() public {
+        // Set done to false in previous spell
+        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
+        assertTrue(!SpellLike(spellValues.previous_spell).done());
+
         vote(address(spell));
         spell.schedule();
         hevm.warp(spell.nextCastTime());
@@ -2408,7 +2415,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(allowancePost[4], allowancePre[4] + 1);                // nonce
     }
 
-    function getBytecodeMetadataLength(address a) internal returns (uint256 length) {
+    function getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
         // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
         assembly {
             let ptr  := mload(0x40)
