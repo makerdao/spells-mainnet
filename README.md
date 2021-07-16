@@ -36,13 +36,18 @@ $ make deploy
 ```
 
 A few helpful tips to estimate gas.  You can use the following to get a
-gas estimate for the deploy.  Once you have that, add another million gas
-as a buffer against out-of-gas errors.  Feed this value back into ETH_GAS.
+gas estimate for the deploy.
 
 ```
-SOLC_FLAGS="--optimize --optimize-runs=1" dapp --use solc:0.5.12 build --extract
-seth estimate --create $(cat ./out/DssSpell.bin) 'DssSpell()'
-export ETH_GAS="$(($ETH_GAS + 0))"
+make all
+make estimate
+```
+
+Once you have that, add another million gas as a buffer against
+out-of-gas errors.  Set ETH_GAS to this value.
+
+```
+export ETH_GAS="$((<value from previous step> + 0))"
 export ETH_GAS=$(bc <<< "$ETH_GAS + 1000000")
 ```
 
