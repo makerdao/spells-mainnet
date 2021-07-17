@@ -27,6 +27,11 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
+interface RwaUrnLike {
+    function hope(address) external;
+    function draw(uint256) external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -2285,14 +2290,27 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         bytes32 ilk = bytes32("RWA002-A");
+        jug.drip(ilk);
 
         // Confirm pip value.
         DSValueAbstract pip = DSValueAbstract(addr.addr("PIP_RWA002"));
         assertEq(uint256(pip.read()), 22_495_725 * WAD);
 
         // Confirm Vat.ilk.spot value.
-        (,, uint256 spot,,) = vat.ilks(ilk);
+        (uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks(ilk);
         assertEq(spot, 21_424_500 * RAY);
-    }
 
+        // Test that a draw can be performed.
+        address urn = addr.addr("RWA002_A_URN");
+        giveAuth(urn, address(this));
+        RwaUrnLike(urn).hope(address(this));  // become operator
+        uint256 room = sub(line, mul(Art, rate));
+        uint256 drawAmt = room / RAY;
+        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
+        }
+        RwaUrnLike(urn).draw(drawAmt);
+        (Art,,,,) = vat.ilks(ilk);
+        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
+    }
 }
