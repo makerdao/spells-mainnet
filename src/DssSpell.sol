@@ -39,7 +39,7 @@ contract DssSpellAction is DssAction {
     uint256 constant WAD     = 10 ** 18;
     uint256 constant MILLION = 10 ** 6;
 
-    address constant RWA_LIQUIDATION_ORACLE = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
+    address constant MIP21_LIQUIDATION_ORACLE = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
 
     function actions() public override {
 
@@ -53,7 +53,7 @@ contract DssSpellAction is DssAction {
         // Must increase the price to enable DAI to be drawn--value corresponds to
         // [ (debt ceiling) + (2 years interest at current rate) ] * mat, i.e.
         // 20MM * 1.035^2 * 1.05 as a WAD
-        Bumpable(RWA_LIQUIDATION_ORACLE).bump(ilk, 22_495_725 * WAD);
+        Bumpable(MIP21_LIQUIDATION_ORACLE).bump(ilk, 22_495_725 * WAD);
         DssExecLib.updateCollateralPrice(ilk);
 
         // ---------------------------------------------------------------------
