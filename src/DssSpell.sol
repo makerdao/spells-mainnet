@@ -159,7 +159,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA006",
             ilk: "RWA006-A",
-            ilkRegistryName: "RWA006-A: Centrifuge: Peoples Company",
+            ilkRegistryName: "RWA006-A: Centrifuge: Alternative Equity Advisers",
             RATE: TWO_PCT,
             CEIL: 20 * MILLION,
             PRICE: 20_808_000 * WAD,
