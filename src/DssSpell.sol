@@ -72,6 +72,7 @@ contract DssSpellAction is DssAction {
     address public constant MAKER_CHANGELOG = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
     function actions() public override {
+        // https://vote.makerdao.com/polling/QmRCn7Mh#poll-detail
         CentrifugeCollateralValues memory RWA003 = CentrifugeCollateralValues({
             MCD_JOIN: 0x1Fe789BBac5b141bdD795A3Bc5E12Af29dDB4b86,
             GEM: 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9,
@@ -96,6 +97,7 @@ contract DssSpellAction is DssAction {
             DOC: "QmQMNfSbGS8qkJbatQgxMUsz27G8YELWgtXeLs8uFCZoY8"
         });
 
+        // https://vote.makerdao.com/polling/QmRWg6nZ#poll-detail
         CentrifugeCollateralValues memory RWA004 = CentrifugeCollateralValues({
             MCD_JOIN: 0xD50a8e9369140539D1c2D113c4dC1e659c6242eB,
             GEM: 0x873F2101047A62F84456E3B2B13df2287925D3F9,
@@ -120,6 +122,7 @@ contract DssSpellAction is DssAction {
             DOC: "QmYR2PXwLpdXS8Vp1yS39SPFT1XhmgbsK6XvZ9ApRpNV8M"
         });
 
+        // https://vote.makerdao.com/polling/QmZCPDVY#poll-detail
         CentrifugeCollateralValues memory RWA005 = CentrifugeCollateralValues({
             MCD_JOIN: 0xA4fD373b93aD8e054970A3d6cd4Fd4C31D08192e,
             GEM: 0x6DB236515E90fC831D146f5829407746EDdc5296,
@@ -144,6 +147,7 @@ contract DssSpellAction is DssAction {
             DOC: "QmbgDoPn6UcfSDENDqHLgatMFoqXikC8E8it9WaZXyLXmc"
         });
 
+        // https://vote.makerdao.com/polling/QmdHV2tW#poll-detail
         CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
             MCD_JOIN: 0x5E11E34b6745FeBa9449Ae53c185413d6EdC66BE,
             GEM: 0x4EE03cfBF6E784c462839f5954d60f7C2B60b113,
@@ -176,7 +180,7 @@ contract DssSpellAction is DssAction {
         }
 
         // bump changelog version
-        DssExecLib.setChangelogVersion("1.1.x");
+        DssExecLib.setChangelogVersion("1.9.2");
     }
 
     function integrateCentrifugeCollateral(CentrifugeCollateralValues memory collateral) internal {
