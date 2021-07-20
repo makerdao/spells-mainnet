@@ -80,7 +80,6 @@ contract DssSpellAction is DssAction {
             INPUT_CONDUIT: 0x2A9798c6F165B6D60Cfb923Fe5BFD6f338695D9B,
             OUTPUT_CONDUIT: 0x2A9798c6F165B6D60Cfb923Fe5BFD6f338695D9B,
             URN:  0x7bF825718e7C388c3be16CFe9982539A7455540F,
-            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA003",
             joinID: "MCD_JOIN_RWA003_A",
             urnID: "RWA003_A_URN",
@@ -88,6 +87,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA003_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA003",
             ilk: "RWA003-A",
+            ilk_string: "RWA003-A",
             ilkRegistryName: "RWA003-A: Centrifuge: ConsolFreight",
             RATE: SIX_PCT,
             CEIL: 2 * MILLION,
@@ -105,7 +105,6 @@ contract DssSpellAction is DssAction {
             INPUT_CONDUIT: 0xe1ed3F588A98bF8a3744f4BF74Fd8540e81AdE3f,
             OUTPUT_CONDUIT: 0xe1ed3F588A98bF8a3744f4BF74Fd8540e81AdE3f,
             URN:  0xeF1699548717aa4Cf47aD738316280b56814C821,
-            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA004",
             joinID: "MCD_JOIN_RWA004_A",
             urnID: "RWA004_A_URN",
@@ -113,6 +112,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA004_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA004",
             ilk: "RWA004-A",
+            ilk_string: "RWA004-A",
             ilkRegistryName: "RWA004-A: Centrifuge: Harbor Trade Credit",
             RATE: SEVEN_PCT,
             CEIL: 7 * MILLION,
@@ -130,7 +130,6 @@ contract DssSpellAction is DssAction {
             INPUT_CONDUIT: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66,
             OUTPUT_CONDUIT: 0x5b702e1fEF3F556cbe219eE697D7f170A236cc66,
             URN:  0xc40907545C57dB30F01a1c2acB242C7c7ACB2B90,
-            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA005",
             joinID: "MCD_JOIN_RWA005_A",
             urnID: "RWA005_A_URN",
@@ -138,6 +137,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA005_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA005",
             ilk: "RWA005-A",
+            ilk_string: "RWA005-A",
             ilkRegistryName: "RWA005-A: Centrifuge: Fortunafi",
             RATE: FOUR_PT_FIVE_PCT,
             CEIL: 15 * MILLION,
@@ -155,7 +155,6 @@ contract DssSpellAction is DssAction {
             INPUT_CONDUIT: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3,
             OUTPUT_CONDUIT: 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3,
             URN:  0x0C185bf5388DdfDB288F4D875265d456D18FD9Cb,
-            LIQ: 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30,
             gemID: "RWA006",
             joinID: "MCD_JOIN_RWA006_A",
             urnID: "RWA006_A_URN",
@@ -163,6 +162,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA006",
             ilk: "RWA006-A",
+            ilk_string: "RWA006-A",
             ilkRegistryName: "RWA006-A: Centrifuge: Alternative Equity Advisers",
             RATE: TWO_PCT,
             CEIL: 20 * MILLION,
@@ -268,16 +268,8 @@ contract DssSpellAction is DssAction {
             pip,
             address(0),
             collateral.ilkRegistryName,
-            bytes32ToStr(collateral.ilk)
+            collateral.ilk_string
         );
-    }
-
-    function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
-        bytes memory bytesArray = new bytes(32);
-        for (uint256 i; i < 32; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
     }
 
 }

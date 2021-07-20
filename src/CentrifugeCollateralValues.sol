@@ -8,7 +8,6 @@ struct CentrifugeCollateralValues {
     address INPUT_CONDUIT; // MGR
     address OUTPUT_CONDUIT; // MGR
     address URN;
-    address LIQ; // MIP21-LIQ-ORACLE
 
     // changelog ids
     bytes32 gemID;
@@ -20,6 +19,7 @@ struct CentrifugeCollateralValues {
 
     // misc
     bytes32 ilk;
+    string ilk_string;
     string ilkRegistryName;
     uint256 RATE;
     uint256 CEIL;

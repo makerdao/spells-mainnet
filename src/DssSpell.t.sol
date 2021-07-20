@@ -209,14 +209,6 @@ contract DssSpellTest is DSTest, DSMath {
         z = add(x, sub(y, 1)) / y;
     }
 
-    function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
-        bytes memory bytesArray = new bytes(32);
-        for (uint256 i; i < 32; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
-    }
-
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
@@ -1961,7 +1953,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertEq(ilkRegistry.pip("RWA003-A"), pip);
         assertEq(ilkRegistry.xlip("RWA003-A"), address(0));
         assertEq(ilkRegistry.name("RWA003-A"), "RWA003-A: Centrifuge: ConsolFreight");
-        assertEq(ilkRegistry.symbol("RWA003-A"), bytes32ToStr("RWA003-A"));
+        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003-A");
 
         assertEq(ilkRegistry.join("RWA004-A"), addr.addr("MCD_JOIN_RWA004_A"));
         assertEq(ilkRegistry.gem("RWA004-A"), addr.addr("RWA004"));
@@ -1971,7 +1963,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertEq(ilkRegistry.pip("RWA004-A"), pip);
         assertEq(ilkRegistry.xlip("RWA004-A"), address(0));
         assertEq(ilkRegistry.name("RWA004-A"), "RWA004-A: Centrifuge: Harbor Trade Credit");
-        assertEq(ilkRegistry.symbol("RWA004-A"), bytes32ToStr("RWA004-A"));
+        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004-A");
 
         assertEq(ilkRegistry.join("RWA005-A"), addr.addr("MCD_JOIN_RWA005_A"));
         assertEq(ilkRegistry.gem("RWA005-A"), addr.addr("RWA005"));
@@ -1981,7 +1973,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertEq(ilkRegistry.pip("RWA005-A"), pip);
         assertEq(ilkRegistry.xlip("RWA005-A"), address(0));
         assertEq(ilkRegistry.name("RWA005-A"), "RWA005-A: Centrifuge: Fortunafi");
-        assertEq(ilkRegistry.symbol("RWA005-A"), bytes32ToStr("RWA005-A"));
+        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005-A");
 
         assertEq(ilkRegistry.join("RWA006-A"), addr.addr("MCD_JOIN_RWA006_A"));
         assertEq(ilkRegistry.gem("RWA006-A"), addr.addr("RWA006"));
@@ -1990,8 +1982,8 @@ function checkCollateralValues(SystemValues storage values) internal {
         (,pip,,) = RwaLiqOracle.ilks("RWA006-A");
         assertEq(ilkRegistry.pip("RWA006-A"), pip);
         assertEq(ilkRegistry.xlip("RWA006-A"), address(0));
-        assertEq(ilkRegistry.name("RWA006-A"), "RWA006-A: Centrifuge: Peoples Company");
-        assertEq(ilkRegistry.symbol("RWA006-A"), bytes32ToStr("RWA006-A"));
+        assertEq(ilkRegistry.name("RWA006-A"), "RWA006-A: Centrifuge: Alternative Equity Advisers");
+        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006-A");
     }
 
     function testFailWrongDay() public {
