@@ -90,10 +90,10 @@ contract DssSpellAction is DssAction {
             ilkRegistryName: "RWA003-A: Centrifuge: ConsolFreight",
             RATE: SIX_PCT,
             CEIL: 2 * MILLION,
-            PRICE: 2_247_200 * WAD,
+            PRICE: 2_359_560 * WAD,
             MAT: 10_500,
             TAU: 0,
-            DOC: ""
+            DOC: "QmQMNfSbGS8qkJbatQgxMUsz27G8YELWgtXeLs8uFCZoY8"
         });
 
         CentrifugeCollateralValues memory RWA004 = CentrifugeCollateralValues({
@@ -114,10 +114,10 @@ contract DssSpellAction is DssAction {
             ilkRegistryName: "RWA004-A: Centrifuge: Harbor Trade Credit",
             RATE: SEVEN_PCT,
             CEIL: 7 * MILLION,
-            PRICE: 8_014_300 * WAD,
+            PRICE: 8_815_730 * WAD,
             MAT: 11_000,
             TAU: 0,
-            DOC: ""
+            DOC: "QmYR2PXwLpdXS8Vp1yS39SPFT1XhmgbsK6XvZ9ApRpNV8M"
         });
 
         CentrifugeCollateralValues memory RWA005 = CentrifugeCollateralValues({
@@ -138,10 +138,10 @@ contract DssSpellAction is DssAction {
             ilkRegistryName: "RWA005-A: Centrifuge: Fortunafi",
             RATE: FOUR_PT_FIVE_PCT,
             CEIL: 15 * MILLION,
-            PRICE: 16_380_375 * WAD,
+            PRICE: 17_199_394 * WAD,
             MAT: 10_500,
             TAU: 0,
-            DOC: ""
+            DOC: "QmbgDoPn6UcfSDENDqHLgatMFoqXikC8E8it9WaZXyLXmc"
         });
 
         CentrifugeCollateralValues memory RWA006 = CentrifugeCollateralValues({
@@ -175,10 +175,6 @@ contract DssSpellAction is DssAction {
             integrateCentrifugeCollateral(collaterals[i]);
         }
 
-        // increase debt ceiling of RWA002 from 5M to 20M
-        DssExecLib.increaseGlobalDebtCeiling(15 * MILLION);
-        DssExecLib.setIlkDebtCeiling("RWA002-A", 20 * MILLION);
-
         // bump changelog version
         DssExecLib.setChangelogVersion("1.1.x");
     }
@@ -200,7 +196,7 @@ contract DssSpellAction is DssAction {
         );
         (,address pip,,) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(collateral.ilk);
 
-        // Set price feed for RWA003
+        // Set price feed for RWA-00x
         DssExecLib.setContract(DssExecLib.spotter(), collateral.ilk, "pip", pip);
 
         // Init RWA-00x in Vat

@@ -46,6 +46,18 @@ interface RwaLiquidationLike {
     function ilks(bytes32) external returns (string memory,address,uint48,uint48);
 }
 
+interface RwaUrnLike {
+    function hope(address) external;
+    function draw(uint256) external;
+    function lock(uint256 wad) external;
+    function outputConduit() external view returns (address);
+}
+
+interface TinlakeManagerLike {
+    function lock(uint256 wad) external;
+    function file(bytes32 what, address data) external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -244,8 +256,8 @@ contract DssSpellTest is DSTest, DSMath {
         //
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
-            deployed_spell_created:         1623784720,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            deployed_spell_created:         1626524287,        // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -2034,4 +2046,51 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
+    function test_RWA_values() public {
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        _test_RWA_values(bytes32("RWA003-A"), addr.addr("RWA003_A_URN"), 2_359_560 * WAD, 2_247_200 * RAY, true);
+        _test_RWA_values(bytes32("RWA004-A"), addr.addr("RWA004_A_URN"), 8_815_730 * WAD, 8_014_300 * RAY, true);
+        _test_RWA_values(bytes32("RWA005-A"), addr.addr("RWA005_A_URN"), 17_199_394 * WAD, 16380375238095238095238095238095238, true);
+        _test_RWA_values(bytes32("RWA006-A"), addr.addr("RWA006_A_URN"), 20_808_000 * WAD, 20_808_000 * RAY, true);
+    }
+
+    function _test_RWA_values(bytes32 ilk, address urn_, uint256 price_, uint256 spot_, bool requiresLock) internal {
+        jug.drip(ilk);
+
+        // Confirm pip value.
+        RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        (,address pip_,,) = RwaLiqOracle.ilks(ilk);
+        DSValueAbstract pip = DSValueAbstract(pip_);
+        assertEq(uint256(pip.read()), price_);
+
+        // Confirm Vat.ilk.spot value.
+        (uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks(ilk);
+        assertEq(spot, spot_);
+
+        // Test that a draw can be performed.
+        giveAuth(urn_, address(this));
+        RwaUrnLike(urn_).hope(address(this));
+
+        if (requiresLock) {
+            address operator_ = RwaUrnLike(urn_).outputConduit();
+            giveAuth(operator_, address(this));
+            TinlakeManagerLike(operator_).file("urn", urn_);
+            TinlakeManagerLike(operator_).lock(1 ether);
+        }
+
+        uint256 room = sub(line, mul(Art, rate));
+        uint256 drawAmt = room / RAY;
+        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
+        }
+
+        RwaUrnLike(urn_).draw(drawAmt);
+        (Art,,,,) = vat.ilks(ilk);
+        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
+    }
 }
