@@ -2085,4 +2085,30 @@ function checkCollateralValues(SystemValues storage values) internal {
         (Art,,,,) = vat.ilks(ilk);
         assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
     }
+
+    function testManagerWards() public {
+        // RWA003-RWA005 don't have clerks deployed yet as they are existing pools
+        address RWA003_MGR = addr.addr("RWA003_A_INPUT_CONDUIT");
+        address RWA003_ROOT = 0xdB3bC9fB1893222d266762e9fF857EB74D75c7D6;
+        assertTrue(isWard(RWA003_MGR, RWA003_ROOT));
+
+        address RWA004_MGR = addr.addr("RWA004_A_INPUT_CONDUIT");
+        address RWA004_ROOT = 0x4cA805cE8EcE2E63FfC1F9f8F2731D3F48DF89Df;
+        assertTrue(isWard(RWA004_MGR, RWA004_ROOT));
+
+        address RWA005_MGR = addr.addr("RWA005_A_INPUT_CONDUIT");
+        address RWA005_ROOT = 0x4B6CA198d257D755A5275648D471FE09931b764A;
+        assertTrue(isWard(RWA005_MGR, RWA005_ROOT));
+
+        address RWA006_MGR = addr.addr("RWA006_A_INPUT_CONDUIT");
+        address RWA006_ROOT = 0xA1C16730637445D141d6ee35E31a67993FBe3759;
+        address RWA006_CLERK = 0xC5B888722069bCDFf4cAb541Da6CD09B0658d079;
+        assertTrue(isWard(RWA006_MGR, RWA006_ROOT));
+        assertTrue(isWard(RWA006_MGR, RWA006_CLERK));
+    }
+    
+    function isWard(address addr, address user) internal returns (bool) {
+        return AuthLike(addr).wards(user) == 1;
+    }
+
 }
