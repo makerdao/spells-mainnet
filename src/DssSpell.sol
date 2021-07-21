@@ -165,8 +165,8 @@ contract DssSpellAction is DssAction {
             ilk_string: "RWA006-A",
             ilkRegistryName: "RWA006-A: Centrifuge: Alternative Equity Advisers",
             RATE: TWO_PCT,
-            CEIL: 20 * MILLION,
-            PRICE: 20_808_000 * WAD,
+            CEIL: 0 * MILLION,
+            PRICE: 0 * WAD,
             MAT: 10_000,
             TAU: 0,
             DOC: ""
