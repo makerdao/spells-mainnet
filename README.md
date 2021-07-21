@@ -36,13 +36,18 @@ $ make deploy
 ```
 
 A few helpful tips to estimate gas.  You can use the following to get a
-gas estimate for the deploy.  Once you have that, add another million gas
-as a buffer against out-of-gas errors.  Feed this value back into ETH_GAS.
+gas estimate for the deploy.
 
 ```
-SOLC_FLAGS="--optimize --optimize-runs=1" dapp --use solc:0.5.12 build --extract
-seth estimate --create $(cat ./out/DssSpell.bin) 'DssSpell()'
-export ETH_GAS="$(($ETH_GAS + 0))"
+make all
+make estimate
+```
+
+Once you have that, add another million gas as a buffer against
+out-of-gas errors.  Set ETH_GAS to this value.
+
+```
+export ETH_GAS="$((<value from previous step> + 0))"
 export ETH_GAS=$(bc <<< "$ETH_GAS + 1000000")
 ```
 
@@ -63,5 +68,5 @@ The process of verifying code on etherscan is a little bit more involved because
    1. Remove `pragma experimental ABIEncoderV2;`
    2. Comment out `DssExecLib.addNewCollateral` method.
 3. Go to etherscan and verify source.
-   1. Add library: `DssExecLib:0xc061EDFC9C38912E0ad4F3922aA84ee11FB03347`
+   1. Add library: `DssExecLib:0x3117D2CbA81fC118fc471D383Ab20F11939A3CfF`
    2. Ensure optimizer is on and optimize runs = 1
