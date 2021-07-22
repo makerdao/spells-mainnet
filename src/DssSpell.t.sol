@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 pragma solidity 0.6.12;
 
 import "ds-math/math.sol";
 import "ds-test/test.sol";
-import "lib/dss-interfaces/src/Interfaces.sol";
+import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./CentrifugeCollateralValues.sol";
@@ -10,36 +12,20 @@ import "./CentrifugeCollateralValues.sol";
 import {DssSpell} from "./DssSpell.sol";
 
 interface Hevm {
-    function warp(uint) external;
+    function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
     function load(address,bytes32) external view returns (bytes32);
 }
 
 interface SpellLike {
     function done() external view returns (bool);
-    function cast() external;
     function eta() external view returns (uint256);
+    function cast() external;
     function nextCastTime() external returns (uint256);
 }
 
 interface AuthLike {
     function wards(address) external view returns (uint256);
-}
-
-interface FlashLike {
-    function vat() external view returns (address);
-    function daiJoin() external view returns (address);
-    function dai() external view returns (address);
-    function vow() external view returns (address);
-    function max() external view returns (uint256);
-    function toll() external view returns (uint256);
-    function locked() external view returns (uint256);
-    function maxFlashLoan(address) external view returns (uint256);
-    function flashFee(address, uint256) external view returns (uint256);
-    function flashLoan(address, address, uint256, bytes calldata) external returns (bool);
-    function vatDaiFlashLoan(address, uint256, bytes calldata) external returns (bool);
-    function convert() external;
-    function accrue() external;
 }
 
 interface RwaLiquidationLike {
@@ -127,8 +113,8 @@ contract DssSpellTest is DSTest, DSMath {
     Hevm hevm;
     Rates     rates = new Rates();
     Addresses addr  = new Addresses();
-    
-    // KOVAN ADDRESSES
+
+    // MAINNET ADDRESSES
     DSPauseAbstract        pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
     address           pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
     DSChiefAbstract        chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
@@ -162,8 +148,9 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant THOUSAND   = 10 ** 3;
     uint256 constant MILLION    = 10 ** 6;
     uint256 constant BILLION    = 10 ** 9;
+    // uint256 constant WAD        = 10 ** 18; // provided by ds-math
+    // uint256 constant RAY        = 10 ** 27; // provided by ds-math
     uint256 constant RAD        = 10 ** 45;
-
 
     uint256 constant monthly_expiration = 4 days;
     uint256 constant weekly_expiration = 30 days;
@@ -172,14 +159,6 @@ contract DssSpellTest is DSTest, DSMath {
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
     event Log(string message, address deployer, string contractName);
-
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.01)/(60 * 60 * 24 * 365) )'
-    //
-    // Rates table is in ./test/rates.sol
 
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
@@ -209,19 +188,31 @@ contract DssSpellTest is DSTest, DSMath {
         z = add(x, sub(y, 1)) / y;
     }
 
+    function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
+        bytes memory bytesArray = new bytes(32);
+        for (uint256 i; i < 32; i++) {
+            bytesArray[i] = _bytes32[i];
+        }
+        return string(bytesArray);
+    }
+
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
     function yearlyYield(uint256 duty) public pure returns (uint256) {
-        return rpow(duty, (365 * 24 * 60 *60), RAY);
+        return rpow(duty, (365 * 24 * 60 * 60), RAY);
     }
 
     function expectedRate(uint256 percentValue) public pure returns (uint256) {
         return (10000 + percentValue) * (10 ** 23);
     }
 
-    function diffCalc(uint256 expectedRate_, uint256 yearlyYield_) public pure returns (uint256) {
-        return (expectedRate_ > yearlyYield_) ? expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
+    function diffCalc(
+        uint256 expectedRate_,
+        uint256 yearlyYield_
+    ) public pure returns (uint256) {
+        return (expectedRate_ > yearlyYield_) ?
+            expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
     function castPreviousSpell() internal {
@@ -249,10 +240,12 @@ contract DssSpellTest is DSTest, DSMath {
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1626524287,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0x9e32B8317733AF825e25a235C99623B4103eb0b7), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
+        spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
+        castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
 
@@ -270,7 +263,7 @@ contract DssSpellTest is DSTest, DSMath {
             vow_hump_min:          30 * MILLION,            // In whole Dai units
             vow_hump_max:          60 * MILLION,            // In whole Dai units
             flap_beg:              400,                     // in basis points
-            flap_ttl:              1 hours,                 // in seconds
+            flap_ttl:              30 minutes,              // in seconds
             flap_tau:              72 hours,                // in seconds
             cat_box:               20 * MILLION,            // In whole Dai units
             dog_Hole:              100 * MILLION,           // In whole Dai units
@@ -1275,7 +1268,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         5 * MILLION,
+            line:         20 * MILLION,
             dust:         0,
             pct:          350,
             mat:          10500,
@@ -1299,7 +1292,6 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    0,
             calc_cut:     0
         });
-
         afterSpell.collaterals["RWA003-A"] = CollateralValues({
             aL_enabled:   false,
             aL_line:      0 * MILLION,
@@ -1358,7 +1350,7 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    0,
             calc_cut:     0
         });
-         afterSpell.collaterals["RWA005-A"] = CollateralValues({
+        afterSpell.collaterals["RWA005-A"] = CollateralValues({
             aL_enabled:   false,
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
@@ -1387,7 +1379,7 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    0,
             calc_cut:     0
         });
-         afterSpell.collaterals["RWA006-A"] = CollateralValues({
+        afterSpell.collaterals["RWA006-A"] = CollateralValues({
             aL_enabled:   false,
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
@@ -1481,6 +1473,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function scheduleWaitAndCast(address spell_) public {
         DssSpell(spell_).schedule();
+
         hevm.warp(DssSpell(spell_).nextCastTime());
 
         DssSpell(spell_).cast();
@@ -1492,7 +1485,7 @@ contract DssSpellTest is DSTest, DSMath {
         }
     }
 
-   function checkSystemValues(SystemValues storage values) internal {
+    function checkSystemValues(SystemValues storage values) internal {
         // dsr
         uint256 expectedDSRRate = rates.rates(values.pot_dsr);
         // make sure dsr is less than 100% APR
@@ -1564,14 +1557,14 @@ contract DssSpellTest is DSTest, DSMath {
         {
             uint256 normalizedBox = values.cat_box * RAD;
             assertEq(cat.box(), normalizedBox, "TestError/cat-box");
-            assertTrue(cat.box() >= THOUSAND * RAD && cat.box() <= 50 * MILLION * RAD, "TestError/cat-box-range");
+            assertTrue(cat.box() >= MILLION * RAD && cat.box() <= 50 * MILLION * RAD, "TestError/cat-box-range");
         }
 
         // Hole value in RAD
         {
             uint256 normalizedHole = values.dog_Hole * RAD;
             assertEq(dog.Hole(), normalizedHole, "TestError/dog-Hole");
-            assertTrue(dog.Hole() >= THOUSAND * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
+            assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
         }
 
         // check Pause authority
@@ -1602,8 +1595,8 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(flap.tau() > 0 && flap.tau() < 2678400, "TestError/flap-tau-range"); // gt 0 && lt 1 month
         assertTrue(flap.tau() >= flap.ttl(), "TestError/flap-tau-ttl");
     }
-    
-function checkCollateralValues(SystemValues storage values) internal {
+
+    function checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
         bytes32[] memory ilks = reg.list();
         for(uint256 i = 0; i < ilks.length; i++) {
@@ -1671,22 +1664,20 @@ function checkCollateralValues(SystemValues storage values) internal {
                 assertTrue(dunk >= RAD && dunk < MILLION * RAD, string(abi.encodePacked("TestError/cat-dunk-range-", ilk)));
 
                 (address flipper,,) = cat.ilks(ilk);
-                if (flipper != address(0)) {
-                    FlipAbstract flip = FlipAbstract(flipper);
-                    // Convert BP to system expected value
-                    uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
-                    assertEq(uint256(flip.beg()), normalizedTestBeg, string(abi.encodePacked("TestError/flip-beg-", ilk)));
-                    assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, string(abi.encodePacked("TestError/flip-beg-range-", ilk))); // gte 0% and lte 10%
-                    assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, string(abi.encodePacked("TestError/flip-ttl-", ilk)));
-                    assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, string(abi.encodePacked("TestError/flip-ttl-range-", ilk)));         // gt eq 10 minutes and lt 10 hours
-                    assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, string(abi.encodePacked("TestError/flip-tau-", ilk)));
-                    assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, string(abi.encodePacked("TestError/flip-tau-range-", ilk)));          // gt eq 10 minutes and lt eq 3 days
+                FlipAbstract flip = FlipAbstract(flipper);
+                // Convert BP to system expected value
+                uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
+                assertEq(uint256(flip.beg()), normalizedTestBeg, string(abi.encodePacked("TestError/flip-beg-", ilk)));
+                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, string(abi.encodePacked("TestError/flip-beg-range-", ilk))); // gte 0% and lte 10%
+                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, string(abi.encodePacked("TestError/flip-ttl-", ilk)));
+                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, string(abi.encodePacked("TestError/flip-ttl-range-", ilk)));         // gt eq 10 minutes and lt 10 hours
+                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, string(abi.encodePacked("TestError/flip-tau-", ilk)));
+                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, string(abi.encodePacked("TestError/flip-tau-range-", ilk)));          // gt eq 10 minutes and lt eq 3 days
 
-                    assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, string(abi.encodePacked("TestError/flip-flipperMom-auth-", ilk)));
+                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, string(abi.encodePacked("TestError/flip-flipperMom-auth-", ilk)));
 
-                    assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, string(abi.encodePacked("TestError/flip-liqOn-", ilk)));
-                    assertEq(flip.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/flip-pause-proxy-auth-", ilk))); // Check pause_proxy ward
-                }
+                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, string(abi.encodePacked("TestError/flip-liqOn-", ilk)));
+                assertEq(flip.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/flip-pause-proxy-auth-", ilk))); // Check pause_proxy ward
                 }
             }
             if (values.collaterals[ilk].liqType == "clip") {
@@ -1764,6 +1755,7 @@ function checkCollateralValues(SystemValues storage values) internal {
                 }
             }
         }
+        //       actual    expected
         assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
     }
 
@@ -1803,7 +1795,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
-        for (int i = 0; i < 200; i++) {
+        for (uint256 i = 0; i < 200; i++) {
             // Scan the storage for the balance storage slot
             bytes32 prevValue = hevm.load(
                 address(token),
@@ -1828,7 +1820,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         }
 
         // We have failed if we reach here
-        assertTrue(false);
+        assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
     function giveAuth(address _base, address target) internal {
@@ -1865,7 +1857,180 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertTrue(false);
     }
 
-    // check integrations for RWA003 - RWA006
+    function checkIlkIntegration(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        FlipAbstract flip,
+        address pip,
+        bool _isOSM,
+        bool _checkLiquidations,
+        bool _transferFee
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        if (_isOSM) OsmAbstract(pip).poke();
+        hevm.warp(block.timestamp + 3601);
+        if (_isOSM) OsmAbstract(pip).poke();
+        spotter.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(flip.wards(address(end)), 1);
+        assertEq(flip.wards(address(flipMom)), 1);
+        if (_isOSM) {
+            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1);
+            assertEq(OsmAbstract(pip).bud(address(spotter)), 1);
+            assertEq(OsmAbstract(pip).bud(address(end)), 1);
+            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1);
+        }
+
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        dust /= RAY;
+        uint256 amount = 2 * dust * WAD / (_isOSM ? getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
+        giveTokens(token, amount);
+
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        if (_transferFee) {
+            amount = vat.gem(_ilk, address(this));
+            assertTrue(amount > 0);
+        }
+        assertEq(vat.gem(_ilk, address(this)), amount);
+
+        // Tick the fees forward so that art != dai in wad units
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+
+        // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertTrue(vat.dai(address(this)) >= dust * RAY);
+        assertTrue(vat.dai(address(this)) <= (dust + 1) * RAY);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        join.exit(address(this), amount);
+        if (_transferFee) {
+            amount = token.balanceOf(address(this));
+        }
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        if (_transferFee) {
+            amount = vat.gem(_ilk, address(this));
+        }
+        // dart max amount of DAI
+        (,,uint256 spot,,) = vat.ilks(_ilk);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+        assertEq(flip.kicks(), 0);
+        if (_checkLiquidations) {
+            cat.bite(_ilk, address(this));
+            assertEq(flip.kicks(), 1);
+        }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function checkUNIV2LPIntegration(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        FlipAbstract flip,
+        LPOsmAbstract pip,
+        address _medianizer1,
+        address _medianizer2,
+        bool _isMedian1,
+        bool _isMedian2,
+        bool _checkLiquidations
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        pip.poke();
+        hevm.warp(block.timestamp + 3601);
+        pip.poke();
+        spotter.poke(_ilk);
+
+        // Check medianizer sources
+        assertEq(pip.src(), address(token));
+        assertEq(pip.orb0(), _medianizer1);
+        assertEq(pip.orb1(), _medianizer2);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(flip.wards(address(end)), 1);
+        assertEq(flip.wards(address(flipMom)), 1);
+        assertEq(pip.wards(address(osmMom)), 1);
+        assertEq(pip.bud(address(spotter)), 1);
+        assertEq(pip.bud(address(end)), 1);
+        if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
+        if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
+
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        dust /= RAY;
+        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
+        giveTokens(token, amount);
+
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(vat.gem(_ilk, address(this)), amount);
+
+        // Tick the fees forward so that art != dai in wad units
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+
+        // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
+        assertEq(vat.dai(address(this)), 0);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
+
+        // Payback DAI, withdraw collateral
+        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        join.exit(address(this), amount);
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        token.approve(address(join), amount);
+        join.join(address(this), amount);
+        // dart max amount of DAI
+        (,,uint256 spot,,) = vat.ilks(_ilk);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+        assertEq(flip.kicks(), 0);
+        if (_checkLiquidations) {
+            cat.bite(_ilk, address(this));
+            assertEq(flip.kicks(), 1);
+        }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
@@ -1986,6 +2151,16 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006-A");
     }
 
+    // function testCollateralIntegrations() public {
+    //     vote(address(spell));
+    //     spell.schedule();
+    //     hevm.warp(spell.nextCastTime());
+    //     spell.cast();
+    //     assertTrue(spell.done());
+
+    //     // Insert new collateral tests here
+    // }
+
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
@@ -2025,8 +2200,6 @@ function checkCollateralValues(SystemValues storage values) internal {
         vote(address(spell));
         spell.schedule();
 
-        castPreviousSpell();
-
         hevm.warp(spell.nextCastTime());
         uint256 startGas = gasleft();
         spell.cast();
@@ -2038,6 +2211,252 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
+    function test_nextCastTime() public {
+        hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        vote(address(spell));
+        spell.schedule();
+
+        uint256 monday_1400_UTC = 1606744800; // Nov 30, 2020
+        uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
+
+        // Day tests
+        hevm.warp(monday_1400_UTC);                                    // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);               // Monday,   14:00 UTC
+
+        if (spell.officeHours()) {
+            hevm.warp(monday_1400_UTC - 1 days);                       // Sunday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_1400_UTC - 2 days);                       // Saturday, 14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_1400_UTC - 3 days);                       // Friday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days);  // Able to cast
+
+            hevm.warp(monday_2100_UTC);                                // Monday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC + 1 days);  // Tuesday,  14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 1 days);                       // Sunday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 2 days);                       // Saturday, 21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 3 days);                       // Friday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            // Time tests
+            uint256 castTime;
+
+            for(uint256 i = 0; i < 5; i++) {
+                castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
+                hevm.warp(castTime - 1 seconds); // 13:59:59 UTC
+                assertEq(spell.nextCastTime(), castTime);
+
+                hevm.warp(castTime + 7 hours + 1 seconds); // 21:00:01 UTC
+                if (i < 4) {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + (i + 1) * 1 days); // Next day at 14:00 UTC
+                } else {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + 7 days); // Next monday at 14:00 UTC (friday case)
+                }
+            }
+        }
+    }
+
+    function testFail_notScheduled() public view {
+        spell.nextCastTime();
+    }
+
+    function test_use_eta() public {
+        hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        vote(address(spell));
+        spell.schedule();
+
+        uint256 castTime = spell.nextCastTime();
+        assertEq(castTime, spell.eta());
+    }
+
+    // function test_OSMs() public {
+    //     vote(address(spell));
+    //     spell.schedule();
+    //     hevm.warp(spell.nextCastTime());
+    //     spell.cast();
+    //     assertTrue(spell.done());
+
+    //     // Track OSM authorizations here
+
+    //     address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
+    //     assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
+
+    //     // Gnosis
+    //     address GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
+    //     assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(GNOSIS), 1);
+    //     assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(GNOSIS), 1);
+    //     assertEq(OsmAbstract(addr.addr("PIP_COMP")).bud(GNOSIS), 1);
+    //     assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(GNOSIS), 1);
+    //     assertEq(OsmAbstract(addr.addr("PIP_ZRX")).bud(GNOSIS), 1);
+
+    //     // Instadapp
+    //     address INSTADAPP = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
+    //     assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(INSTADAPP), 1);
+    // }
+
+    // function test_Medianizers() public {
+    //     vote(address(spell));
+    //     spell.schedule();
+    //     hevm.warp(spell.nextCastTime());
+    //     spell.cast();
+    //     assertTrue(spell.done());
+
+    //     // Track Median authorizations here
+
+    //     address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
+    //     address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
+    //     assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
+
+    //     address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
+    //     address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
+    //     assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
+
+    //     address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
+    //     address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
+    //     assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
+
+    //     address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
+    //     address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
+    //     assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
+
+    //     address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
+    //     address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
+    //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
+    // }
+
+    address[] deployerAddresses = [
+        0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
+        0xDa0FaB05039809e63C5D068c897c3e602fA97457,
+        0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
+        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
+        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
+        0xd200790f62c8da69973e61d4936cfE4f356ccD07,
+        0xdA0C0de01d90A5933692Edf03c7cE946C7c50445
+    ];
+
+    function checkWards(address _addr, string memory contractName) internal {
+        for (uint256 i = 0; i < deployerAddresses.length; i ++) {
+            (bool ok, bytes memory data) = _addr.call(
+                abi.encodeWithSignature("wards(address)", deployerAddresses[i])
+            );
+            if (!ok || data.length != 32) return;
+            uint256 ward = abi.decode(data, (uint256));
+            if (ward > 0) {
+                emit Log("Bad auth", deployerAddresses[i], contractName);
+                fail();
+            }
+        }
+    }
+
+    function checkSource(address _addr, string memory contractName) internal {
+        (bool ok, bytes memory data) =
+            _addr.call(abi.encodeWithSignature("src()"));
+        if (!ok || data.length != 32) return;
+        address source = abi.decode(data, (address));
+        string memory sourceName = string(
+            abi.encodePacked("source of ", contractName)
+        );
+        checkWards(source, sourceName);
+    }
+
+    function checkAuth(bool onlySource) internal {
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+        bytes32[] memory contractNames = chainLog.list();
+        for(uint256 i = 0; i < contractNames.length; i++) {
+            address _addr = chainLog.getAddress(contractNames[i]);
+            string memory contractName = string(
+                abi.encodePacked(contractNames[i])
+            );
+            if (onlySource) checkSource(_addr, contractName);
+            else checkWards(_addr, contractName);
+        }
+    }
+
+    function test_auth() public {
+        checkAuth(false);
+    }
+
+    function test_auth_in_sources() public {
+        checkAuth(true);
+    }
+
+    function getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
+        // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
+        assembly {
+            let ptr  := mload(0x40)
+            let size := extcodesize(a)
+            if iszero(lt(size, 2)) {
+                extcodecopy(a, ptr, sub(size, 2), 2)
+                length := mload(ptr)
+                length := shr(240, length)
+                length := add(length, 2)  // the two bytes used to specify the length are not counted in the length
+            }
+            // We'll return zero if the bytecode is shorter than two bytes.
+        }
+    }
+
+    // Verifies that the bytecode of the action of the spell used for testing
+    // matches what we'd expect.
+    //
+    // Not a complete replacement for Etherscan verification, unfortunately.
+    // This is because the DssSpell bytecode is non-deterministic because it 
+    // deploys the action in its constructor and incorporates the action
+    // address as an immutable variable--but the action address depends on the
+    // address of the DssSpell which depends on the address+nonce of the
+    // deploying address. If we had a way to simulate a contract creation by
+    // an arbitrary address+nonce, we could verify the bytecode of the DssSpell
+    // instead.
+    //
+    // Vacuous until the deployed_spell value is non-zero.
+    function test_bytecode_matches() public {
+        address expectedAction = (new DssSpell()).action();
+        address actualAction   = spell.action();
+        uint256 expectedBytecodeSize;
+        uint256 actualBytecodeSize;
+        assembly {
+            expectedBytecodeSize := extcodesize(expectedAction)
+            actualBytecodeSize   := extcodesize(actualAction)
+        }
+
+        uint256 metadataLength = getBytecodeMetadataLength(expectedAction);
+        assertTrue(metadataLength <= expectedBytecodeSize);
+        expectedBytecodeSize -= metadataLength;
+
+        metadataLength = getBytecodeMetadataLength(actualAction);
+        assertTrue(metadataLength <= actualBytecodeSize);
+        actualBytecodeSize -= metadataLength;
+
+        assertEq(actualBytecodeSize, expectedBytecodeSize);
+        uint256 size = actualBytecodeSize;
+        uint256 expectedHash;
+        uint256 actualHash;
+        assembly {
+            let ptr := mload(0x40)
+
+            extcodecopy(expectedAction, ptr, 0, size)
+            expectedHash := keccak256(ptr, size)
+
+            extcodecopy(actualAction, ptr, 0, size)
+            actualHash := keccak256(ptr, size)
+        }
+        assertEq(expectedHash, actualHash);
+    }
+
+    // check integrations for RWA003 - RWA006
     function test_RWA_values() public {
         vote(address(spell));
         spell.schedule();
@@ -2106,9 +2525,8 @@ function checkCollateralValues(SystemValues storage values) internal {
         assertTrue(isWard(RWA006_MGR, RWA006_ROOT));
         assertTrue(isWard(RWA006_MGR, RWA006_CLERK));
     }
-    
+
     function isWard(address addr, address user) internal returns (bool) {
         return AuthLike(addr).wards(user) == 1;
     }
-
 }
