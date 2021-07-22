@@ -2048,7 +2048,7 @@ function checkCollateralValues(SystemValues storage values) internal {
         _test_RWA_values(bytes32("RWA003-A"), addr.addr("RWA003_A_URN"), 2_359_560 * WAD, 2_247_200 * RAY, true);
         _test_RWA_values(bytes32("RWA004-A"), addr.addr("RWA004_A_URN"), 8_815_730 * WAD, 8_014_300 * RAY, true);
         _test_RWA_values(bytes32("RWA005-A"), addr.addr("RWA005_A_URN"), 17_199_394 * WAD, 16380375238095238095238095238095238, true);
-        _test_RWA_values(bytes32("RWA006-A"), addr.addr("RWA006_A_URN"), 20_808_000 * WAD, 20_808_000 * RAY, true);
+        _test_RWA_values(bytes32("RWA006-A"), addr.addr("RWA006_A_URN"), 0 * WAD, 0 * RAY, true);
     }
 
     function _test_RWA_values(bytes32 ilk, address urn_, uint256 price_, uint256 spot_, bool requiresLock) internal {
