@@ -234,6 +234,4 @@ contract DssSpellManagerTest is DSTest, DSMath {
 
         DssSpell(spell_).cast();
     }
-
-
 }
