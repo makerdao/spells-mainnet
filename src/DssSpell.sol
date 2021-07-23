@@ -179,12 +179,12 @@ contract DssSpellAction is DssAction {
 
         CentrifugeCollateralValues[4] memory collaterals = [RWA003, RWA004, RWA005, RWA006];
 
-        // integrate rwa003-006
+        // Integrate RWA003-006
         for (uint i = 0; i < collaterals.length; i++) {
             integrateCentrifugeCollateral(collaterals[i]);
         }
 
-        // bump changelog version
+        // Bump changelog version
         DssExecLib.setChangelogVersion("1.9.2");
     }
 
@@ -216,40 +216,22 @@ contract DssSpellAction is DssAction {
         // Allow RWA-00x Join to modify Vat registry
         DssExecLib.authorize(vat, collateral.MCD_JOIN);
 
-        // Allow RwaLiquidationOracle to modify Vat registry
-        // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
-
-        // set ilk/global DC
+        // Set ilk/global DC
         DssExecLib.increaseIlkDebtCeiling(collateral.ilk, collateral.CEIL, true);
 
-        // No dust
-        // DssExecLib.setIlkMinVaultAmount(collateral.ilk, 0);
-
-        // stability fee
+        // Set stability fee
         DssExecLib.setIlkStabilityFee(collateral.ilk, collateral.RATE, false);
 
-        // collateralization ratio
+        // Set collateralization ratio
         DssExecLib.setIlkLiquidationRatio(collateral.ilk, collateral.MAT);
 
-        // poke the spotter to pull in a price
+        // Poke the spotter to pull in a price
         DssExecLib.updateCollateralPrice(collateral.ilk);
 
-        // give the urn permissions on the join adapter
-        // DssExecLib.authorize(collateral.MCD_JOIN, collateral.URN);
-
-        // set up the urn
+        // Set up the urn
         Hopeable(collateral.URN).hope(collateral.OPERATOR);
 
-        // set up output conduit
-        // Hopeable(collateral.OUTPUT_CONDUIT).hope(collateral.OPERATOR));
-
-        // Authorize the SC Domain team deployer address on the output conduit
-        // during introductory phase. This allows the SC team to assist in the
-        // testing of a complete circuit. Once a broker dealer arrangement is
-        // established the deployer address should be `deny`ed on the conduit.
-        // Kissable(collateral.OUTPUT_CONDUIT).kiss(SC_DOMAIN_DEPLOYER_07);
-
-        // add RWA-00x contract to the changelog
+        // Add RWA-00x contract to the changelog
         DssExecLib.setChangelogAddress(collateral.gemID, collateral.GEM);
         DssExecLib.setChangelogAddress(collateral.pipID, pip);
         DssExecLib.setChangelogAddress(collateral.joinID, collateral.MCD_JOIN);
@@ -261,6 +243,7 @@ contract DssSpellAction is DssAction {
             collateral.outputConduitID, collateral.OUTPUT_CONDUIT
         );
 
+        // Add RWA-00x to the ilk registry
         address ILK_REGISTRY = DssExecLib.getChangelogAddress("ILK_REGISTRY");
         IlkRegistryAbstract(ILK_REGISTRY).put(
             collateral.ilk,
