@@ -219,10 +219,8 @@ contract DssSpellAction is DssAction {
         // Allow RwaLiquidationOracle to modify Vat registry
         // DssExecLib.authorize(vat, MIP21_LIQUIDATION_ORACLE);
 
-        // Increase the global debt ceiling by the ilk ceiling
-        DssExecLib.increaseGlobalDebtCeiling(collateral.CEIL);
-        // Set the ilk debt ceiling
-        DssExecLib.setIlkDebtCeiling(collateral.ilk, collateral.CEIL);
+        // set ilk/global DC
+        DssExecLib.increaseIlkDebtCeiling(collateral.ilk, collateral.CEIL, true);
 
         // No dust
         // DssExecLib.setIlkMinVaultAmount(collateral.ilk, 0);
