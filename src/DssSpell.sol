@@ -53,6 +53,27 @@ contract DssSpellAction is DssAction {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
+    // Growth Core Unit
+    address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
+    // Ses Core Unit
+    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    // Content Production Core Unit
+    address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+    // GovAlpha Core Unit
+    address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    // Real-World Finance Core Unit
+    address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    // Risk Core Unit
+    address constant RISK_CU_EOA         = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    // Protocol Engineering
+    address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    // Oracles Core Unit
+    address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    // Com Core Unit (Operating)
+    address constant COM_MULTISIG        = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    // Com Core Unit (Emergency Fund)
+    address constant COM_ER_MULTISIG     = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
+
     address public constant MAKER_CHANGELOG = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
     // Based on https://github.com/makerdao/vote-delegate/blob/master/README.md
@@ -61,7 +82,18 @@ contract DssSpellAction is DssAction {
     function actions() public override {
 
         // Core Unit Budget Payouts - August
-        // TODO: add poll link, e.g https://vote.makerdao.com/polling/QmRCn7Mh#poll-detail
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    637_900);
+        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    0); // TODO - fill up once decided
+        DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    44_375);
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    273_334);
+        DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(RISK_CU_EOA,     182_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG,     510_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ORA_MULTISIG,    419_677);
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_MULTISIG,    40_500);
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_ER_MULTISIG, 121_500);
+        //                                                     _________
+        //                                         TOTAL DAI:  2,384,286
 
         // ETH-B Stability Fee Decrease 6% to 5%
         // TODO: add poll link
