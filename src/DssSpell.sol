@@ -110,10 +110,8 @@ contract DssSpellAction is DssAction {
         // ETH-B Stability Fee Decrease 6% to 5%
         DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
 
-        // Maximum Debt Ceiling Decreases to zero.
-        DssExecLib.removeIlkFromAutoLine("LRC-A"); // Decrease 3 million to zero.
-        (,,,uint256 lrcLine,) = VatAbstract(MCD_VAT).ilks("LRC-A");
-        DssExecLib.setIlkDebtCeiling("LRC-A", 0); // -lrcLine
+        // Maximum Debt Ceiling Decreases.
+        DssExecLib.setIlkAutoLineDebtCeiling("LRC-A", 1 * MILLION); // Decrease 3 million to 1 million.
 
         DssExecLib.removeIlkFromAutoLine("UNIV2ETHUSDT-A");  // Decrease 10 million to zero.
         (,,,uint256 univ2EthUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2ETHUSDT-A");
@@ -123,10 +121,10 @@ contract DssSpellAction is DssAction {
         (,,,uint256 univ2DaiUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2DAIUSDT-A");
         DssExecLib.setIlkDebtCeiling("UNIV2DAIUSDT-A", 0); // -univ2DaiUsdtLine
 
-        uint256 reduced = add( add(lrcLine, univ2EthUsdtLine) , univ2DaiUsdtLine);
+        uint256 removed = add(univ2EthUsdtLine, univ2DaiUsdtLine);
 
         uint256 Line = VatAbstract(MCD_VAT).Line();
-        VatAbstract(MCD_VAT).file("Line", sub(Line, reduced));
+        VatAbstract(MCD_VAT).file("Line", sub(Line, removed));
 
         // -----------  Increase UNIV2DAUUSDC-A Maximum Debt Ceiling -----------
         // TODO: add poll link
