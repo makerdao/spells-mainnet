@@ -43,8 +43,7 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant SIX_PCT            = 1000000001847694957439350562;
-    // TODO: add more pcts needed for this spell
+    uint256 constant FIVE_PCT = 1000000001547125957863212448;
 
     // Math
     uint256 constant THOUSAND = 10 ** 3;
@@ -79,9 +78,17 @@ contract DssSpellAction is DssAction {
     // Based on https://github.com/makerdao/vote-delegate/blob/master/README.md
     address public constant VOTE_DELEGATE_PROXY_FACTORY = 0xD897F108670903D1d6070fcf818f9db3615AF272;
 
+    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x);
+    }
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x);
+    }
+
     function actions() public override {
 
-        // Core Unit Budget Payouts - August
+        // -----------  Core Unit Budget Payouts - August -----------
+
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    637_900);
         DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    0); // TODO - fill up once decided
         DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    44_375);
@@ -95,20 +102,24 @@ contract DssSpellAction is DssAction {
         //                                                     _________
         //                                         TOTAL DAI:  2,384,286
 
+        // ----------- Maker Open Market Commitee Proposal -----------
+        // TODO: add poll link
+
         // ETH-B Stability Fee Decrease 6% to 5%
+        DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
+
+        // Maximum Debt Ceiling Decreases to zero.
+        DssExecLib.removeIlkFromAutoLine("LRC-A");          // Decrease 3 million to zero.
+        DssExecLib.removeIlkFromAutoLine("UNIV2ETHUSDT-A"); // Decrease 10 million to zero.
+        DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDT-A"); // Decrease 10 million to zero.
+
+        // -----------  Increase UNIV2DAUUSDC-A Maximum Debt Ceiling -----------
         // TODO: add poll link
 
-        // LRC-A Maximum Debt Ceiling Decrease 3 million to zero.
-        // TODO: add poll link
+        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 250 * MILLION, 10 * MILLION, 8 hours); // 50 million to 250 million.
+        // TODO: should we update Line in VAT due to the 4 autoline changes above?
 
-        // UNIV2ETHUSDT-A Maximum Debt Ceiling Decrease 10 million to zero.
-        // TODO: add poll link
-
-        // UNIV2DAIUSDT-A Maximum Debt Ceiling Decrease 10 million to zero.
-        // TODO: add poll link
-
-        // Increase UNIV2DAUUSDC-A Maximum Debt Ceiling
-        // TODO: add poll link
+        // ----------- Housekeeping -----------
 
         // Update RWA tokens symbols in ilk registry
         IlkRegistryAbstract ILK_REGISTRY = IlkRegistryAbstract(DssExecLib.reg());

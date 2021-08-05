@@ -335,7 +335,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       8 hours,
             line:         0,
             dust:         30 * THOUSAND,
-            pct:          600,
+            pct:          500,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -706,10 +706,10 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     9900
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      3 * MILLION,
-            aL_gap:       500 * THOUSAND,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         10 * THOUSAND,
             pct:          400,
@@ -1055,7 +1055,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
+            aL_line:      250 * MILLION,
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -1083,10 +1083,10 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     9990
         });
         afterSpell.collaterals["UNIV2ETHUSDT-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       2 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         10 * THOUSAND,
             pct:          200,
@@ -1228,10 +1228,10 @@ contract DssSpellTest is DSTest, DSMath {
             calc_cut:     9900
         });
         afterSpell.collaterals["UNIV2DAIUSDT-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       2 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         10 * THOUSAND,
             pct:          200,
