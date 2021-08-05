@@ -7,7 +7,6 @@ import "ds-test/test.sol";
 import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
-import "./CentrifugeCollateralValues.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
@@ -2075,31 +2074,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         ChainlogAbstract chainlog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainlog.getAddress("RWA003"), addr.addr("RWA003"));
-        assertEq(chainlog.getAddress("MCD_JOIN_RWA003_A"), addr.addr("MCD_JOIN_RWA003_A"));
-        assertEq(chainlog.getAddress("RWA003_A_URN"), addr.addr("RWA003_A_URN"));
-        assertEq(chainlog.getAddress("RWA003_A_INPUT_CONDUIT"), addr.addr("RWA003_A_INPUT_CONDUIT"));
-        assertEq(chainlog.getAddress("RWA003_A_OUTPUT_CONDUIT"), addr.addr("RWA003_A_OUTPUT_CONDUIT"));
-
-        assertEq(chainlog.getAddress("RWA004"), addr.addr("RWA004"));
-        assertEq(chainlog.getAddress("MCD_JOIN_RWA004_A"), addr.addr("MCD_JOIN_RWA004_A"));
-        assertEq(chainlog.getAddress("RWA004_A_URN"), addr.addr("RWA004_A_URN"));
-        assertEq(chainlog.getAddress("RWA004_A_INPUT_CONDUIT"), addr.addr("RWA004_A_INPUT_CONDUIT"));
-        assertEq(chainlog.getAddress("RWA004_A_OUTPUT_CONDUIT"), addr.addr("RWA004_A_OUTPUT_CONDUIT"));
-
-        assertEq(chainlog.getAddress("RWA005"), addr.addr("RWA005"));
-        assertEq(chainlog.getAddress("MCD_JOIN_RWA005_A"), addr.addr("MCD_JOIN_RWA005_A"));
-        assertEq(chainlog.getAddress("RWA005_A_URN"), addr.addr("RWA005_A_URN"));
-        assertEq(chainlog.getAddress("RWA005_A_INPUT_CONDUIT"), addr.addr("RWA005_A_INPUT_CONDUIT"));
-        assertEq(chainlog.getAddress("RWA005_A_OUTPUT_CONDUIT"), addr.addr("RWA005_A_OUTPUT_CONDUIT"));
-
-        assertEq(chainlog.getAddress("RWA006"), addr.addr("RWA006"));
-        assertEq(chainlog.getAddress("MCD_JOIN_RWA006_A"), addr.addr("MCD_JOIN_RWA006_A"));
-        assertEq(chainlog.getAddress("RWA006_A_URN"), addr.addr("RWA006_A_URN"));
-        assertEq(chainlog.getAddress("RWA006_A_INPUT_CONDUIT"), addr.addr("RWA006_A_INPUT_CONDUIT"));
-        assertEq(chainlog.getAddress("RWA006_A_OUTPUT_CONDUIT"), addr.addr("RWA006_A_OUTPUT_CONDUIT"));
-
-        assertEq(chainlog.getAddress("MIP21_LIQUIDATION_ORACLE"), addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        assertEq(chainlog.getAddress("VOTE_DELEGATE_PROXY_FACTORY"), addr.addr("VOTE_DELEGATE_PROXY_FACTORY"));
     }
 
     function testNewIlkRegistryValues() public {
@@ -2110,45 +2085,80 @@ contract DssSpellTest is DSTest, DSMath {
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
         RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
+        assertEq(ilkRegistry.join("RWA001-A"), addr.addr("MCD_JOIN_RWA001_A"));
+        assertEq(ilkRegistry.gem("RWA001-A"), addr.addr("RWA001"));
+        assertEq(ilkRegistry.dec("RWA001-A"), DSTokenAbstract(addr.addr("RWA001")).decimals());
+        assertEq(ilkRegistry.class("RWA001-A"), 3);
+        (,address pip,,) = RwaLiqOracle.ilks("RWA001-A");
+        assertEq(ilkRegistry.pip("RWA001-A"), pip);
+        assertEq(ilkRegistry.xlip("RWA001-A"), address(0));
+        assertEq(ilkRegistry.name("RWA001-A"), "RWA001-A: 6s Capital");
+        assertEq(ilkRegistry.symbol("RWA001-A"), "RWA001");
+
+
+        assertEq(ilkRegistry.join("RWA002-A"), addr.addr("MCD_JOIN_RWA002_A"));
+        assertEq(ilkRegistry.gem("RWA002-A"), addr.addr("RWA002"));
+        assertEq(ilkRegistry.dec("RWA002-A"), DSTokenAbstract(addr.addr("RWA002")).decimals());
+        assertEq(ilkRegistry.class("RWA002-A"), 3);
+        (, pip,,) = RwaLiqOracle.ilks("RWA002-A");
+        assertEq(ilkRegistry.pip("RWA002-A"), pip);
+        assertEq(ilkRegistry.xlip("RWA002-A"), address(0));
+        assertEq(ilkRegistry.name("RWA002-A"), "RWA002-A: Centrifuge: New Silver");
+        assertEq(ilkRegistry.symbol("RWA002-A"), "RWA002");
+
+
         assertEq(ilkRegistry.join("RWA003-A"), addr.addr("MCD_JOIN_RWA003_A"));
         assertEq(ilkRegistry.gem("RWA003-A"), addr.addr("RWA003"));
         assertEq(ilkRegistry.dec("RWA003-A"), DSTokenAbstract(addr.addr("RWA003")).decimals());
         assertEq(ilkRegistry.class("RWA003-A"), 3);
-        (,address pip,,) = RwaLiqOracle.ilks("RWA003-A");
+        (, pip,,) = RwaLiqOracle.ilks("RWA003-A");
         assertEq(ilkRegistry.pip("RWA003-A"), pip);
         assertEq(ilkRegistry.xlip("RWA003-A"), address(0));
         assertEq(ilkRegistry.name("RWA003-A"), "RWA003-A: Centrifuge: ConsolFreight");
-        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003-A");
+        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003");
+
 
         assertEq(ilkRegistry.join("RWA004-A"), addr.addr("MCD_JOIN_RWA004_A"));
         assertEq(ilkRegistry.gem("RWA004-A"), addr.addr("RWA004"));
         assertEq(ilkRegistry.dec("RWA004-A"), DSTokenAbstract(addr.addr("RWA004")).decimals());
         assertEq(ilkRegistry.class("RWA004-A"), 3);
-        (,pip,,) = RwaLiqOracle.ilks("RWA004-A");
+        (, pip,,) = RwaLiqOracle.ilks("RWA004-A");
         assertEq(ilkRegistry.pip("RWA004-A"), pip);
         assertEq(ilkRegistry.xlip("RWA004-A"), address(0));
         assertEq(ilkRegistry.name("RWA004-A"), "RWA004-A: Centrifuge: Harbor Trade Credit");
-        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004-A");
+        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004");
+
 
         assertEq(ilkRegistry.join("RWA005-A"), addr.addr("MCD_JOIN_RWA005_A"));
         assertEq(ilkRegistry.gem("RWA005-A"), addr.addr("RWA005"));
         assertEq(ilkRegistry.dec("RWA005-A"), DSTokenAbstract(addr.addr("RWA005")).decimals());
         assertEq(ilkRegistry.class("RWA005-A"), 3);
-        (,pip,,) = RwaLiqOracle.ilks("RWA005-A");
+        (, pip,,) = RwaLiqOracle.ilks("RWA005-A");
         assertEq(ilkRegistry.pip("RWA005-A"), pip);
         assertEq(ilkRegistry.xlip("RWA005-A"), address(0));
         assertEq(ilkRegistry.name("RWA005-A"), "RWA005-A: Centrifuge: Fortunafi");
-        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005-A");
+        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005");
+
 
         assertEq(ilkRegistry.join("RWA006-A"), addr.addr("MCD_JOIN_RWA006_A"));
         assertEq(ilkRegistry.gem("RWA006-A"), addr.addr("RWA006"));
         assertEq(ilkRegistry.dec("RWA006-A"), DSTokenAbstract(addr.addr("RWA006")).decimals());
         assertEq(ilkRegistry.class("RWA006-A"), 3);
-        (,pip,,) = RwaLiqOracle.ilks("RWA006-A");
+        (, pip,,) = RwaLiqOracle.ilks("RWA006-A");
         assertEq(ilkRegistry.pip("RWA006-A"), pip);
         assertEq(ilkRegistry.xlip("RWA006-A"), address(0));
         assertEq(ilkRegistry.name("RWA006-A"), "RWA006-A: Centrifuge: Alternative Equity Advisers");
-        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006-A");
+        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006");
+
+
+        assertEq(ilkRegistry.join("KNC-A"), addr.addr("MCD_JOIN_KNC_A"));
+        assertEq(ilkRegistry.gem("KNC-A"), addr.addr("KNC"));
+        assertEq(ilkRegistry.dec("KNC-A"), DSTokenAbstract(addr.addr("KNC")).decimals());
+        assertEq(ilkRegistry.class("KNC-A"), 1);
+        assertEq(ilkRegistry.pip("KNC-A"), addr.addr("PIP_KNC"));
+        assertEq(ilkRegistry.xlip("KNC-A"), addr.addr("MCD_CLIP_KNC_A"));
+        assertEq(ilkRegistry.name("KNC-A"), "KNC-A");
+        assertEq(ilkRegistry.symbol("KNC-A"), "KNC");
     }
 
     // function testCollateralIntegrations() public {
@@ -2454,79 +2464,5 @@ contract DssSpellTest is DSTest, DSMath {
             actualHash := keccak256(ptr, size)
         }
         assertEq(expectedHash, actualHash);
-    }
-
-    // check integrations for RWA003 - RWA006
-    function test_RWA_values() public {
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        _test_RWA_values(bytes32("RWA003-A"), addr.addr("RWA003_A_URN"), 2_359_560 * WAD, 2_247_200 * RAY, true);
-        _test_RWA_values(bytes32("RWA004-A"), addr.addr("RWA004_A_URN"), 8_815_730 * WAD, 8_014_300 * RAY, true);
-        _test_RWA_values(bytes32("RWA005-A"), addr.addr("RWA005_A_URN"), 17_199_394 * WAD, 16380375238095238095238095238095238, true);
-        _test_RWA_values(bytes32("RWA006-A"), addr.addr("RWA006_A_URN"), 0 * WAD, 0 * RAY, true);
-    }
-
-    function _test_RWA_values(bytes32 ilk, address urn_, uint256 price_, uint256 spot_, bool requiresLock) internal {
-        jug.drip(ilk);
-
-        // Confirm pip value.
-        RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-        (,address pip_,,) = RwaLiqOracle.ilks(ilk);
-        DSValueAbstract pip = DSValueAbstract(pip_);
-        assertEq(uint256(pip.read()), price_);
-
-        // Confirm Vat.ilk.spot value.
-        (uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks(ilk);
-        assertEq(spot, spot_);
-
-        // Test that a draw can be performed.
-        giveAuth(urn_, address(this));
-        RwaUrnLike(urn_).hope(address(this));
-
-        if (requiresLock) {
-            address operator_ = RwaUrnLike(urn_).outputConduit();
-            giveAuth(operator_, address(this));
-            TinlakeManagerLike(operator_).file("urn", urn_);
-            TinlakeManagerLike(operator_).lock(1 ether);
-        }
-
-        uint256 room = sub(line, mul(Art, rate));
-        uint256 drawAmt = room / RAY;
-        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
-            drawAmt = sub(room, rate) / RAY;
-        }
-
-        RwaUrnLike(urn_).draw(drawAmt);
-        (Art,,,,) = vat.ilks(ilk);
-        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
-    }
-
-    function testManagerWards() public {
-        // RWA003-RWA005 don't have clerks deployed yet as they are existing pools
-        address RWA003_MGR = addr.addr("RWA003_A_INPUT_CONDUIT");
-        address RWA003_ROOT = 0xdB3bC9fB1893222d266762e9fF857EB74D75c7D6;
-        assertTrue(isWard(RWA003_MGR, RWA003_ROOT));
-
-        address RWA004_MGR = addr.addr("RWA004_A_INPUT_CONDUIT");
-        address RWA004_ROOT = 0x4cA805cE8EcE2E63FfC1F9f8F2731D3F48DF89Df;
-        assertTrue(isWard(RWA004_MGR, RWA004_ROOT));
-
-        address RWA005_MGR = addr.addr("RWA005_A_INPUT_CONDUIT");
-        address RWA005_ROOT = 0x4B6CA198d257D755A5275648D471FE09931b764A;
-        assertTrue(isWard(RWA005_MGR, RWA005_ROOT));
-
-        address RWA006_MGR = addr.addr("RWA006_A_INPUT_CONDUIT");
-        address RWA006_ROOT = 0xA1C16730637445D141d6ee35E31a67993FBe3759;
-        address RWA006_CLERK = 0xC5B888722069bCDFf4cAb541Da6CD09B0658d079;
-        assertTrue(isWard(RWA006_MGR, RWA006_ROOT));
-        assertTrue(isWard(RWA006_MGR, RWA006_CLERK));
-    }
-
-    function isWard(address addr, address user) internal returns (bool) {
-        return AuthLike(addr).wards(user) == 1;
     }
 }
