@@ -93,8 +93,8 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    637_900);
         DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    702_883);
-        DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    44_375);
-        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    273_334);
+        DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    98_067);
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    123_333);
         DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
         DssExecLib.sendPaymentFromSurplusBuffer(RISK_CU_EOA,     182_000);
         DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG,     510_000);
@@ -102,7 +102,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(COM_MULTISIG,    40_500);
         DssExecLib.sendPaymentFromSurplusBuffer(COM_ER_MULTISIG, 121_500);
         //                                                     _________
-        //                                         TOTAL DAI:  3,087,169
+        //                                         TOTAL DAI:  2,990,860 - need to update test
 
         // ----------- Maker Open Market Commitee Proposal -----------
         // https://vote.makerdao.com/polling/QmVG38FK?network=mainnet#poll-detail

@@ -150,15 +150,15 @@ contract DssSpellTest is DSTest, DSMath {
 
     uint256 constant amountGro    = 637900;
     uint256 constant amountSes    = 702883;
-    uint256 constant amountMkt    = 44375;
-    uint256 constant amountGov    = 273334;
+    uint256 constant amountMkt    = 98067;
+    uint256 constant amountGov    = 123333;
     uint256 constant amountRwf    = 155000;
     uint256 constant amountRisk   = 182000;
     uint256 constant amountPe     = 510000;
     uint256 constant amountOra    = 419677;
     uint256 constant amountCom    = 40500;
     uint256 constant amountComEr  = 121500;
-    uint256 constant amountTotal  = 3087169;
+    uint256 constant amountTotal  = 2990860;
 
     DssSpell spell;
 
