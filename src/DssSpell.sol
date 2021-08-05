@@ -92,7 +92,7 @@ contract DssSpellAction is DssAction {
         // -----------  Core Unit Budget Payouts - August -----------
 
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    637_900);
-        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    0); // TODO - fill up once decided
+        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    702_883);
         DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    44_375);
         DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    273_334);
         DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
@@ -102,7 +102,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(COM_MULTISIG,    40_500);
         DssExecLib.sendPaymentFromSurplusBuffer(COM_ER_MULTISIG, 121_500);
         //                                                     _________
-        //                                         TOTAL DAI:  2,384,286
+        //                                         TOTAL DAI:  3,087,169
 
         // ----------- Maker Open Market Commitee Proposal -----------
         // TODO: add poll link

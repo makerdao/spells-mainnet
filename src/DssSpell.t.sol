@@ -149,7 +149,7 @@ contract DssSpellTest is DSTest, DSMath {
     address constant COM_EMERGENCY       = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
 
     uint256 constant amountGro    = 637900;
-    uint256 constant amountSes    = 0; // TODO: set once known
+    uint256 constant amountSes    = 702883;
     uint256 constant amountMkt    = 44375;
     uint256 constant amountGov    = 273334;
     uint256 constant amountRwf    = 155000;
@@ -158,7 +158,7 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant amountOra    = 419677;
     uint256 constant amountCom    = 40500;
     uint256 constant amountComEr  = 121500;
-    uint256 constant amountTotal  = 2384286;
+    uint256 constant amountTotal  = 3087169;
 
     DssSpell spell;
 
