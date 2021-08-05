@@ -21,6 +21,7 @@ import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/GemJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
@@ -86,6 +87,7 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
+        address MCD_VAT  = DssExecLib.vat();
 
         // -----------  Core Unit Budget Payouts - August -----------
 
@@ -109,15 +111,28 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
 
         // Maximum Debt Ceiling Decreases to zero.
-        DssExecLib.removeIlkFromAutoLine("LRC-A");          // Decrease 3 million to zero.
-        DssExecLib.removeIlkFromAutoLine("UNIV2ETHUSDT-A"); // Decrease 10 million to zero.
-        DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDT-A"); // Decrease 10 million to zero.
+        DssExecLib.removeIlkFromAutoLine("LRC-A"); // Decrease 3 million to zero.
+        (,,,uint256 lrcLine,) = VatAbstract(MCD_VAT).ilks("LRC-A");
+        DssExecLib.setIlkDebtCeiling("LRC-A", 0); // -lrcLine
+
+        DssExecLib.removeIlkFromAutoLine("UNIV2ETHUSDT-A");  // Decrease 10 million to zero.
+        (,,,uint256 univ2EthUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2ETHUSDT-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2ETHUSDT-A", 0); // -univ2EthUsdtLine
+
+        DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDT-A");  // Decrease 10 million to zero.
+        (,,,uint256 univ2DaiUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2DAIUSDT-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2DAIUSDT-A", 0); // -univ2DaiUsdtLine
+
+        uint256 reduced = add( add(lrcLine, univ2EthUsdtLine) , univ2DaiUsdtLine);
+
+        uint256 Line = VatAbstract(MCD_VAT).Line();
+        VatAbstract(MCD_VAT).file("Line", sub(Line, reduced));
 
         // -----------  Increase UNIV2DAUUSDC-A Maximum Debt Ceiling -----------
         // TODO: add poll link
 
         DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 250 * MILLION, 10 * MILLION, 8 hours); // 50 million to 250 million.
-        // TODO: should we update Line in VAT due to the 4 autoline changes above?
+        // TODO: should we update Line in VAT due to this autoline changes?
 
         // ----------- Housekeeping -----------
 

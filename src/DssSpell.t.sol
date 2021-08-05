@@ -2180,7 +2180,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.class("KNC-A"), 1);
         assertEq(ilkRegistry.pip("KNC-A"), addr.addr("PIP_KNC"));
         assertEq(ilkRegistry.xlip("KNC-A"), addr.addr("MCD_CLIP_KNC_A"));
-        assertEq(ilkRegistry.name("KNC-A"), "KNC-A");
+        assertEq(ilkRegistry.name("KNC-A"), "Kyber Network Crystal");
         assertEq(ilkRegistry.symbol("KNC-A"), "KNC");
     }
 
