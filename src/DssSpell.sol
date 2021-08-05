@@ -105,7 +105,7 @@ contract DssSpellAction is DssAction {
         //                                         TOTAL DAI:  3,087,169
 
         // ----------- Maker Open Market Commitee Proposal -----------
-        // TODO: add poll link
+        // https://vote.makerdao.com/polling/QmVG38FK?network=mainnet#poll-detail
 
         // ETH-B Stability Fee Decrease 6% to 5%
         DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
@@ -127,10 +127,9 @@ contract DssSpellAction is DssAction {
         VatAbstract(MCD_VAT).file("Line", sub(Line, removed));
 
         // -----------  Increase UNIV2DAUUSDC-A Maximum Debt Ceiling -----------
-        // TODO: add poll link
+        // https://vote.makerdao.com/polling/QmRAuMND?network=mainnet#poll-detail
 
         DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 250 * MILLION, 10 * MILLION, 8 hours); // 50 million to 250 million.
-        // TODO: should we update Line in VAT due to this autoline changes?
 
         // ----------- Housekeeping -----------
 
