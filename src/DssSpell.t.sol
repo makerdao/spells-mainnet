@@ -1775,10 +1775,48 @@ contract DssSpellTest is DSTest, DSMath {
                 GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
                 assertEq(join.wards(address(pauseProxy)), 1, string(abi.encodePacked("TestError/join-pause-proxy-auth-", ilk))); // Check pause_proxy ward
                 }
+            } else if (reg.class(ilk) == 3) {
+                checkRwaDrawUpToDebtCeiling(ilk);
             }
         }
         //       actual    expected
         assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
+    }
+
+    function checkRwaDrawUpToDebtCeiling(bytes32 ilk) internal {
+        giveAuth(address(vat), address(this));
+
+        bytes32 urnId = ilk & bytes32(bytes8(0xFFFFFFFFFFFF00FF));
+        urnId = urnId | bytes32(bytes12(0x0000000000005f005f55524e));
+        address urn = ChainlogAbstract(addr.addr("CHANGELOG")).getAddress(urnId);
+        giveAuth(urn, address(this));
+        RwaUrnLike(urn).hope(address(this));  // become operator
+
+        (uint256 ink,) = vat.urns(ilk, urn);
+        if (ink == 0) {
+            // Quick way to encumber collateral for the urn.
+            vat.slip(ilk, address(this), int256(WAD));
+            vat.frob(ilk, address(urn), address(this), address(this), int256(WAD), 0);
+        }
+
+        jug.drip(ilk);
+        (uint256 Art, uint256 rate,, uint256 line,) = vat.ilks(ilk);
+        uint256 room = sub(line, mul(Art, rate));
+        uint256 drawAmt = room / RAY;
+        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
+        }
+        uint256 dai = mul(divup(mul(RAY, drawAmt), rate), rate);
+        uint256 Line = vat.Line();
+        if (add(vat.debt(), dai) > Line) {
+            vat.file("Line", add(vat.debt(), dai));
+        }
+        RwaUrnLike(urn).draw(drawAmt);
+        (Art,,,,) = vat.ilks(ilk);
+        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
+        vat.file("Line", Line);
+
+        vat.deny(address(this));
     }
 
     function getOSMPrice(address pip) internal returns (uint256) {
@@ -2089,39 +2127,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         checkCollateralValues(afterSpell);
     }
-/*
-    function test_withdraw_ceiling() public {
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
 
-        bytes32 ilk = bytes32("UNIV2DAIUSDC-A");
-        jug.drip(ilk);
-
-        // Confirm pip value.
-        //DSValueAbstract pip = DSValueAbstract(addr.addr("PIP_UNIV2DAIUSDC_A"));
-        //assertEq(uint256(pip.read()), 22_495_725 * WAD);
-
-        // Confirm Vat.ilk.spot value.
-        (uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks(ilk);
-        //assertEq(spot, 21_424_500 * RAY);
-
-        // Test that a draw can be performed.
-        address urn = addr.addr("RWA002_A_URN");
-        giveAuth(urn, address(this));
-        RwaUrnLike(urn).hope(address(this));  // become operator
-        uint256 room = sub(line, mul(Art, rate));
-        uint256 drawAmt = room / RAY;
-        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
-            drawAmt = sub(room, rate) / RAY;
-        }
-        RwaUrnLike(urn).draw(drawAmt);
-        (Art,,,,) = vat.ilks(ilk);
-        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
-    }
-*/
     function testNewChainlogValues() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
