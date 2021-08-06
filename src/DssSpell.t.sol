@@ -2092,6 +2092,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function testRwaDrawUpToDebtCeiling() public {
         giveAuth(address(vat), address(this));
+        vat.file("Line", uint256(-1));  // ensure the global debt ceiling doesn't interfere with draws
         bytes32[] memory ilks = reg.list();
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
@@ -2116,10 +2117,6 @@ contract DssSpellTest is DSTest, DSMath {
             uint256 drawAmt = room / RAY;
             if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
                 drawAmt = sub(room, rate) / RAY;
-            }
-            uint256 dai = mul(divup(mul(RAY, drawAmt), rate), rate);
-            if (add(vat.debt(), dai) > vat.Line()) {
-                vat.file("Line", add(vat.debt(), dai));
             }
             RwaUrnLike(urn).draw(drawAmt);
             (Art,,,,) = vat.ilks(ilk);
