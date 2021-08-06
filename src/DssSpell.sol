@@ -33,6 +33,7 @@ contract DssSpellAction is DssAction {
     function officeHours() public override returns (bool) {
         return false;
     }
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -100,7 +101,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(COM_MULTISIG,    40_500);
         DssExecLib.sendPaymentFromSurplusBuffer(COM_ER_MULTISIG, 121_500);
         //                                                     _________
-        //                                         TOTAL DAI:  2,990,860 - need to update test
+        //                                         TOTAL DAI:  2,990,860
 
         // ----------- Maker Open Market Commitee Proposal -----------
         // https://vote.makerdao.com/polling/QmVG38FK?network=mainnet#poll-detail
@@ -140,10 +141,6 @@ contract DssSpellAction is DssAction {
         ILK_REGISTRY.file("RWA004-A", "symbol", "RWA004");
         ILK_REGISTRY.file("RWA005-A", "symbol", "RWA005");
         ILK_REGISTRY.file("RWA006-A", "symbol", "RWA006");
-
-        // Update early RWA tokens names in ilk registry
-        ILK_REGISTRY.file("RWA001-A", "name", "RWA001-A: 6s Capital");
-        ILK_REGISTRY.file("RWA002-A", "name", "RWA002-A: Centrifuge: New Silver");
 
         // Add vote delegate factory to changelog
         DssExecLib.setChangelogAddress("VOTE_DELEGATE_PROXY_FACTORY", VOTE_DELEGATE_PROXY_FACTORY);
