@@ -2118,7 +2118,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.pip("RWA003-A"), pip);
         assertEq(ilkRegistry.xlip("RWA003-A"), address(0));
         assertEq(ilkRegistry.name("RWA003-A"), "RWA003-A: Centrifuge: ConsolFreight");
-        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003-A");
+        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003-A"); // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
 
         assertEq(ilkRegistry.join("RWA004-A"), addr.addr("MCD_JOIN_RWA004_A"));
         assertEq(ilkRegistry.gem("RWA004-A"), addr.addr("RWA004"));
@@ -2128,7 +2128,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.pip("RWA004-A"), pip);
         assertEq(ilkRegistry.xlip("RWA004-A"), address(0));
         assertEq(ilkRegistry.name("RWA004-A"), "RWA004-A: Centrifuge: Harbor Trade Credit");
-        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004-A");
+        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004-A"); // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
 
         assertEq(ilkRegistry.join("RWA005-A"), addr.addr("MCD_JOIN_RWA005_A"));
         assertEq(ilkRegistry.gem("RWA005-A"), addr.addr("RWA005"));
@@ -2138,7 +2138,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.pip("RWA005-A"), pip);
         assertEq(ilkRegistry.xlip("RWA005-A"), address(0));
         assertEq(ilkRegistry.name("RWA005-A"), "RWA005-A: Centrifuge: Fortunafi");
-        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005-A");
+        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005-A"); // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
 
         assertEq(ilkRegistry.join("RWA006-A"), addr.addr("MCD_JOIN_RWA006_A"));
         assertEq(ilkRegistry.gem("RWA006-A"), addr.addr("RWA006"));
@@ -2148,7 +2148,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.pip("RWA006-A"), pip);
         assertEq(ilkRegistry.xlip("RWA006-A"), address(0));
         assertEq(ilkRegistry.name("RWA006-A"), "RWA006-A: Centrifuge: Alternative Equity Advisers");
-        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006-A");
+        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006-A"); // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
     }
 
     // function testCollateralIntegrations() public {

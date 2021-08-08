@@ -62,6 +62,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmUNouQ7?network=mainnet#poll-detail
         // Will also increase the global debt ceiling.
         DssExecLib.increaseIlkDebtCeiling(bytes32("RWA002-A"), 15 * MILLION, true);
+        // NOTE - missing bump here! see July 17th replacement spell.
 
         // https://vote.makerdao.com/polling/Qmb65Ynh?network=mainnet#poll-detail
         DssExecLib.setSurplusAuctionBidDuration(30 minutes);

@@ -92,7 +92,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA003_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA003",
             ilk: "RWA003-A",
-            ilk_string: "RWA003-A",
+            ilk_string: "RWA003-A", // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
             ilkRegistryName: "RWA003-A: Centrifuge: ConsolFreight",
             RATE: SIX_PCT,
             CEIL: 2 * MILLION,
@@ -117,7 +117,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA004_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA004",
             ilk: "RWA004-A",
-            ilk_string: "RWA004-A",
+            ilk_string: "RWA004-A", // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
             ilkRegistryName: "RWA004-A: Centrifuge: Harbor Trade Credit",
             RATE: SEVEN_PCT,
             CEIL: 7 * MILLION,
@@ -142,7 +142,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA005_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA005",
             ilk: "RWA005-A",
-            ilk_string: "RWA005-A",
+            ilk_string: "RWA005-A", // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
             ilkRegistryName: "RWA005-A: Centrifuge: Fortunafi",
             RATE: FOUR_PT_FIVE_PCT,
             CEIL: 15 * MILLION,
@@ -167,7 +167,7 @@ contract DssSpellAction is DssAction {
             outputConduitID: "RWA006_A_OUTPUT_CONDUIT",
             pipID: "PIP_RWA006",
             ilk: "RWA006-A",
-            ilk_string: "RWA006-A",
+            ilk_string: "RWA006-A", // NOTE - this symbol synthax is wrong! Suffix removed in Aug 6th spell.
             ilkRegistryName: "RWA006-A: Centrifuge: Alternative Equity Advisers",
             RATE: TWO_PCT,
             CEIL: 0 * MILLION,

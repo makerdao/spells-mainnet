@@ -109,6 +109,9 @@ contract DssSpellAction is DssAction {
         // ETH-B Stability Fee Decrease 6% to 5%
         DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
 
+        // NOTE - reducing/removing collateral types can potentially decrease Line to less than the outstanding debt, as
+        // currently alters Line without taking the debt into account. This should be considered for future reductions.
+
         // Maximum Debt Ceiling Decreases.
         DssExecLib.setIlkAutoLineDebtCeiling("LRC-A", 1 * MILLION); // Decrease 3 million to 1 million.
 
