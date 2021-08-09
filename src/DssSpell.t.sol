@@ -2097,7 +2097,8 @@ contract DssSpellTest is DSTest, DSMath {
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             if (reg.class(ilk) != 3) continue;
-// XXXXXXX-X=> XXXXXX_X_URN 
+
+            // XXXXXXX-X=> XXXXXX_X_URN 
             bytes32 urnId = ilk & bytes32(bytes8(0xFFFFFFFFFFFF00FF));
             urnId = urnId | bytes32(bytes12(0x0000000000005f005f55524e));
             address urn = ChainlogAbstract(addr.addr("CHANGELOG")).getAddress(urnId);
