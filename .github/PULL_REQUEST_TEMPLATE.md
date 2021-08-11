@@ -3,7 +3,6 @@
 # Contribution Checklist
 
 - [ ] PR title starts with `(PE-<TICKET_NUMBER>)`
-- [ ] Link to clubhouse ticket
 - [ ] Code approved
 - [ ] Tests approved
 - [ ] CI Tests pass
