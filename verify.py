@@ -32,6 +32,10 @@ if len(sys.argv) not in [3, 4]:
 
 contract_name = sys.argv[1]
 contract_address = sys.argv[2]
+print('Attempting to verify contract {0} at address {1}...'.format(
+    contract_name,
+    contract_address
+))
 if len(contract_address) !=  42:
     exit('malformed address')
 constructor_arguments = ''
