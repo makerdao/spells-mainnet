@@ -84,7 +84,30 @@ flatten = subprocess.run([
     contract_path
 ], capture_output=True)
 
-source_code = flatten.stdout
+original_code = flatten.stdout.decode('utf-8')
+
+code = original_code.replace(
+    'pragma experimental ABIEncoderV2;',
+    '// pragma experimental ABIEncoderV2;'
+)
+
+def get_function(signature, code):
+    after_function = code[code.find(signature) :]
+    in_body = False
+    counter = 0
+    for i, char in enumerate(after_function):
+        if char == '{':
+            in_body = True
+            counter += 1
+        elif char == '}':
+            counter -= 1
+        if in_body and counter == 0:
+            return after_function[: i+1]
+    return None
+
+function_signature = 'function addNewCollateral'
+function_body = get_function(function_signature, code)
+code = code.replace(function_body, '// removed addNewCollateral function')
 
 def get_library_info():
     try:
@@ -117,7 +140,7 @@ data = {
     'module': module,
     'action': action,
     'contractaddress': contract_address,
-    'sourceCode': source_code,
+    'sourceCode': code,
     'codeFormat': code_format,
     'contractName': contract_name,
     'compilerversion': compiler_version,
