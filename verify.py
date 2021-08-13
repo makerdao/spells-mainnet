@@ -91,76 +91,82 @@ flatten = subprocess.run([
     contract_path
 ], capture_output=True)
 
-original_code = flatten.stdout.decode('utf-8')
+code = flatten.stdout.decode('utf-8')
 
-def get_function(signature, code):
-    after_function = code[code.find(signature) :]
-    in_body = False
-    counter = 0
-    for i, char in enumerate(after_function):
+def get_block(signature, code, with_frame=False):
+    block_and_tail = code[code.find(signature) :]
+    start = float('inf')
+    level = 0
+    for i, char in enumerate(block_and_tail):
         if char == '{':
-            in_body = True
-            counter += 1
+            if i < start:
+                start = i + 1
+            level += 1
         elif char == '}':
-            counter -= 1
-        if in_body and counter == 0:
-            return after_function[: i+1]
-    return None
+            level -= 1
+        if i >= start and level == 0:
+            if with_frame:
+                return block_and_tail[: i+1].strip()
+            else:
+                return block_and_tail[start : i].strip()
+    raise ValueError('not found: ' + signature)
 
-in_library = False
+def remove_line_comments(line):
+    no_inline = re.sub('//.*', '', line)
+    no_block_start = re.sub('/\*.*', '', no_inline)
+    no_block_end = re.sub('.*\*/', '', no_block_start)
+    return no_block_end
+
+def remove_comments(original_block):
+    original_lines = original_block.split('\n')
+    lines = []
+    in_comment = False
+    for original_line in original_lines:
+        line = remove_line_comments(original_line)
+        if not in_comment and line.strip() != '':
+            lines.append(line)
+        if '/*' in original_line:
+            in_comment = True
+        if '*/' in original_line:
+            in_comment = False
+    block = '\n'.join(lines)
+    return block
+
+lines = code.split('\n')
 in_comment = False
-level = 0
-library_level = 0
-original_lines = original_code.split('\n')
-lines = []
-functions_to_remove = []
-for original_line in original_lines:
-    if in_library and level < library_level:
-        in_library = False
+libraries = {}
+
+for original_line in lines:
+    line = remove_line_comments(original_line)
+    if not in_comment and 'library' in line:
+        signature = re.sub('{.*', '', line).strip()
+        block = get_block(signature, code)
+        libraries[signature] = block
     if '/*' in original_line:
         in_comment = True
-    line = re.sub('//.*', '', original_line)
-    line = re.sub('/\*.*\*/', '', line)
-
-    if not in_library:
-        if 'library' in line:
-            library_name = re.sub('library ', '', line)
-            library_name = re.sub('{.*', '', library_name)
-            line = '''
-
-/* Warning: the following library code is present here only as an interface. Its
-implementation shouldn't be trusted. Please refer to the actual {0}
-library code in its own contract address. */
-
-{1}'''.format(library_name, original_line)
-            lines.append(line)
-        else:
-            lines.append(original_line)
-    elif not in_comment:
-        if 'function' in line:
-            signature = re.sub('\(.*', '', line)
-            name = re.sub('function ', '', signature).strip()
-            if original_code.count(name) == 1:
-                functions_to_remove.append(signature)
-            lines.append(line)
-        elif not re.fullmatch('\s*', line):
-            lines.append(line)
-
     if '*/' in original_line:
         in_comment = False
-    if '{' in line:
-        level += 1
-    if '}' in line:
-        level -= 1
-    if 'library' in line:
-        in_library = True
-        library_level = level
 
-code = '\n'.join(lines)
+def select(library_name, block, external_code):
+    lines = block.split('\n')
+    lines.reverse()
+    for line in lines:
+        if 'function' in line:
+            signature = re.sub('\(.*', '', line).strip()
+            name = re.sub('function', '', signature).strip()
+            full_name = library_name + '.' + name
+            if (external_code.count(full_name) == 0
+                and block.count(name) == block.count(signature)):
+                function_block = get_block(signature, block, with_frame=True)
+                block = block.replace(function_block, '')
+    return block
 
-for function_name in functions_to_remove:
-    function_body = get_function(function_name, code)
-    code = code.replace(function_body + '\n', '')
+for signature, block in libraries.items():
+    external_code = code.replace(block, '')
+    library_name = re.sub('library ', '', signature).strip()
+    no_comments = remove_comments(block)
+    selected = select(library_name, no_comments, external_code)
+    code = code.replace(block, selected)
 
 code = code.replace(
     'pragma experimental ABIEncoderV2;',
