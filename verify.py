@@ -106,7 +106,7 @@ def get_block(signature, code, with_frame=False):
             level -= 1
         if i >= start and level == 0:
             if with_frame:
-                return block_and_tail[: i+1].strip()
+                return block_and_tail[: i+1]
             else:
                 return block_and_tail[start : i].strip()
     raise ValueError('not found: ' + signature)
@@ -139,7 +139,7 @@ libraries = {}
 for original_line in lines:
     line = remove_line_comments(original_line)
     if not in_comment and 'library' in line:
-        signature = re.sub('{.*', '', line).strip()
+        signature = re.sub('{.*', '', line)
         block = get_block(signature, code)
         libraries[signature] = block
     if '/*' in original_line:
@@ -152,26 +152,39 @@ def select(library_name, block, external_code):
     lines.reverse()
     for line in lines:
         if 'function' in line:
-            signature = re.sub('\(.*', '', line).strip()
+            signature = re.sub('\(.*', '', line)
             name = re.sub('function', '', signature).strip()
             full_name = library_name + '.' + name
             if (external_code.count(full_name) == 0
                 and block.count(name) == block.count(signature)):
                 function_block = get_block(signature, block, with_frame=True)
-                block = block.replace(function_block, '')
+                block = block.replace(function_block + '\n', '')
     return block
+
+def get_warning(library_name):
+    return '''/* WARNING
+
+The following library code acts as an interface to the actual {}
+library, which can be found in its own deployed contract. Only trust the actual
+library's implementation.
+
+    */
+
+    '''.format(library_name)
 
 for signature, block in libraries.items():
     external_code = code.replace(block, '')
     library_name = re.sub('library ', '', signature).strip()
     no_comments = remove_comments(block)
     selected = select(library_name, no_comments, external_code)
-    code = code.replace(block, selected)
+    new_block = get_warning(library_name) + selected.strip()
+    code = code.replace(block, new_block)
 
-code = code.replace(
-    'pragma experimental ABIEncoderV2;',
-    '// pragma experimental ABIEncoderV2;'
-)
+if 'addNewCollateral' not in code:
+    code = code.replace(
+        'pragma experimental ABIEncoderV2;',
+        '// pragma experimental ABIEncoderV2;'
+    )
 
 # function_signature = 'function addNewCollateral'
 # function_body = get_function(function_signature, code)
