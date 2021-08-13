@@ -36,6 +36,9 @@ print('Attempting to verify contract {0} at address {1}...'.format(
     contract_name,
     contract_address
 ))
+
+time.sleep(15)
+
 if len(contract_address) !=  42:
     exit('malformed address')
 constructor_arguments = ''
@@ -90,11 +93,6 @@ flatten = subprocess.run([
 
 original_code = flatten.stdout.decode('utf-8')
 
-code = original_code.replace(
-    'pragma experimental ABIEncoderV2;',
-    '// pragma experimental ABIEncoderV2;'
-)
-
 def get_function(signature, code):
     after_function = code[code.find(signature) :]
     in_body = False
@@ -109,9 +107,69 @@ def get_function(signature, code):
             return after_function[: i+1]
     return None
 
-function_signature = 'function addNewCollateral'
-function_body = get_function(function_signature, code)
-code = code.replace(function_body, '// removed addNewCollateral function')
+in_library = False
+in_comment = False
+level = 0
+library_level = 0
+original_lines = original_code.split('\n')
+lines = []
+functions_to_remove = []
+for original_line in original_lines:
+    if in_library and level < library_level:
+        in_library = False
+    if '/*' in original_line:
+        in_comment = True
+    line = re.sub('//.*', '', original_line)
+    line = re.sub('/\*.*\*/', '', line)
+
+    if not in_library:
+        if 'library' in line:
+            library_name = re.sub('library ', '', line)
+            library_name = re.sub('{.*', '', library_name)
+            line = '''
+
+/* Warning: the following library code is present here only as an interface. Its
+implementation shouldn't be trusted. Please refer to the actual {0}
+library code in its own contract address. */
+
+{1}'''.format(library_name, original_line)
+            lines.append(line)
+        else:
+            lines.append(original_line)
+    elif not in_comment:
+        if 'function' in line:
+            signature = re.sub('\(.*', '', line)
+            name = re.sub('function ', '', signature).strip()
+            if original_code.count(name) == 1:
+                functions_to_remove.append(signature)
+            lines.append(line)
+        elif not re.fullmatch('\s*', line):
+            lines.append(line)
+
+    if '*/' in original_line:
+        in_comment = False
+    if '{' in line:
+        level += 1
+    if '}' in line:
+        level -= 1
+    if 'library' in line:
+        in_library = True
+        library_level = level
+
+code = '\n'.join(lines)
+
+for function_name in functions_to_remove:
+    function_body = get_function(function_name, code)
+    code = code.replace(function_body + '\n', '')
+
+code = code.replace(
+    'pragma experimental ABIEncoderV2;',
+    '// pragma experimental ABIEncoderV2;'
+)
+
+# function_signature = 'function addNewCollateral'
+# function_body = get_function(function_signature, code)
+# code = code.replace(function_body, '// removed addNewCollateral function')
 
 def get_library_info():
     try:
