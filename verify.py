@@ -37,8 +37,6 @@ print('Attempting to verify contract {0} at address {1}...'.format(
     contract_address
 ))
 
-time.sleep(15)
-
 if len(contract_address) !=  42:
     exit('malformed address')
 constructor_arguments = ''
@@ -250,17 +248,25 @@ headers = {
     'User-Agent': ''
 }
 
-print('Sending verification request...')
+def send():
+    print('Sending verification request...')
+    verify = requests.post(url, headers = headers, data = data)
+    log(verify.request)
+    verify_response = {}
+    try:
+        verify_response = json.loads(verify.text)
+    except json.decoder.JSONDecodeError:
+        print(verify.text)
+        exit('Error: Etherscan responded with invalid JSON.')
+    return verify_response
 
-verify = requests.post(url, headers = headers, data = data)
+verify_response = send()
 
-log(verify.request)
-
-try:
-    verify_response = json.loads(verify.text)
-except json.decoder.JSONDecodeError:
-    print(verify.text)
-    exit('Error: Etherscan responded with invalid JSON.')
+while 'locate' in verify_response['result'].lower():
+    print(verify_response['result'])
+    print('Waiting for 10 seconds for the network to update...')
+    time.sleep(10)
+    verify_response = send()
 
 if verify_response['status'] != '1' or verify_response['message'] != 'OK':
     print('Error: ' + verify_response['result'])
