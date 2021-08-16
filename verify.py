@@ -168,14 +168,29 @@ library's implementation.
 
     */
 
-    '''.format(library_name)
+'''.format(library_name)
+
+def get_stubs(block):
+    original_lines = block.split('\n')
+    lines = []
+    level = 0
+    for original_line in original_lines:
+        line = original_line
+        if 'function' in original_line:
+            line = re.sub('{.*', '{}', original_line)
+        if level == 0:
+            lines.append(line)
+        level += original_line.count('{')
+        level -= original_line.count('}')
+    return '\n'.join(lines)
 
 for signature, block in libraries.items():
     external_code = code.replace(block, '')
     library_name = re.sub('library ', '', signature).strip()
     no_comments = remove_comments(block)
     selected = select(library_name, no_comments, external_code)
-    new_block = get_warning(library_name) + selected.strip()
+    stubs = get_stubs(selected)
+    new_block = get_warning(library_name) + stubs
     code = code.replace(block, new_block)
 
 if 'addNewCollateral' not in code:
