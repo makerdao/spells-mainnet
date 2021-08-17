@@ -193,7 +193,7 @@ for signature, block in libraries.items():
     while len(selected_post) < len(selected_pre):
         selected_pre = selected_post
         selected_post = select(library_name, selected_pre, external_code)
-    stubs = get_stubs(selected)
+    stubs = get_stubs(selected_post)
     new_block = get_warning(library_name) + stubs
     code = code.replace(block, new_block)
 
@@ -202,10 +202,6 @@ if 'addNewCollateral' not in code:
         'pragma experimental ABIEncoderV2;',
         '// pragma experimental ABIEncoderV2;'
     )
-
-# function_signature = 'function addNewCollateral'
-# function_body = get_function(function_signature, code)
-# code = code.replace(function_body, '// removed addNewCollateral function')
 
 def get_library_info():
     try:
