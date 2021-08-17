@@ -260,10 +260,10 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xfe3c12D746A4b1Bc2952BfF2e5EB6c9E91f68E5a),        // populate with deployed spell if deployed
-            deployed_spell_created:         1628263580,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0xD97677Cdc4e5797fE68cf5B935C156399c2370e0), // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0xfe3c12D746A4b1Bc2952BfF2e5EB6c9E91f68E5a), // supply if there is a need to test prior to its cast() function being called on-chain.
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -2102,7 +2102,7 @@ contract DssSpellTest is DSTest, DSMath {
             bytes32 ilk = ilks[i];
             if (reg.class(ilk) != 3) continue;
 
-            // XXXXXXX-X=> XXXXXX_X_URN 
+            // XXXXXXX-X=> XXXXXX_X_URN
             bytes32 urnId = ilk & bytes32(bytes8(0xFFFFFFFFFFFF00FF));
             urnId = urnId | bytes32(bytes12(0x0000000000005f005f55524e));
             address urn = ChainlogAbstract(addr.addr("CHANGELOG")).getAddress(urnId);
@@ -2223,7 +2223,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(ilkRegistry.symbol("KNC-A"), "KNC");
     }
 
-    function test_core_unit_budgets() public {
+    /* function test_core_unit_budgets() public {
         uint256 prevSin      = vat.sin(address(vow));
         uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
         uint256 prevDaiSes   = dai.balanceOf(SES_MULTISIG);
@@ -2272,7 +2272,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(ORA_MULTISIG)    - prevDaiOra, amountOra * WAD);
         assertEq(dai.balanceOf(COM_MULTISIG)    - prevDaiCom, amountCom * WAD);
         assertEq(dai.balanceOf(COM_EMERGENCY)   - prevDaiComEr, amountComEr * WAD);
-    }
+    } */
 
     // function testCollateralIntegrations() public {
     //     vote(address(spell));
@@ -2536,7 +2536,7 @@ contract DssSpellTest is DSTest, DSMath {
     // matches what we'd expect.
     //
     // Not a complete replacement for Etherscan verification, unfortunately.
-    // This is because the DssSpell bytecode is non-deterministic because it 
+    // This is because the DssSpell bytecode is non-deterministic because it
     // deploys the action in its constructor and incorporates the action
     // address as an immutable variable--but the action address depends on the
     // address of the DssSpell which depends on the address+nonce of the

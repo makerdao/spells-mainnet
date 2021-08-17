@@ -18,21 +18,14 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/67317d1cacd8cd2ad74b3627680631ec3edc56d6/governance/votes/Executive%20vote%20-%20August%206,%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%206,%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-08-06 MakerDAO Executive Spell | Hash: 0xe64f6b5cde09dbc711b833a0adba5a2e970fafbeeee848bb7ff5b80e7b54d8d2";
-
-    // Turn off office hours
-    function officeHours() public override returns (bool) {
-        return false;
-    }
+        "2021-08-20 MakerDAO Executive Spell | Hash: <TODO>";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -43,7 +36,6 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant FIVE_PCT = 1000000001547125957863212448;
 
     // Math
     uint256 constant THOUSAND = 10 ** 3;
@@ -52,104 +44,26 @@ contract DssSpellAction is DssAction {
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
 
-    // Growth Core Unit
-    address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
-    // Ses Core Unit
-    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    // Content Production Core Unit
-    address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
-    // GovAlpha Core Unit
-    address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    // Real-World Finance Core Unit
-    address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    // Risk Core Unit
-    address constant RISK_CU_EOA         = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    // Protocol Engineering
-    address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    // Oracles Core Unit
-    address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
-    // Com Core Unit (Operating)
-    address constant COM_MULTISIG        = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    // Com Core Unit (Emergency Fund)
-    address constant COM_ER_MULTISIG     = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
-
-    address public constant MAKER_CHANGELOG = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
-
-    // Based on https://github.com/makerdao/vote-delegate/blob/master/README.md
-    address public constant VOTE_DELEGATE_PROXY_FACTORY = 0xD897F108670903D1d6070fcf818f9db3615AF272;
-
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x + y) >= x);
-    }
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x - y) <= x);
-    }
-
     function actions() public override {
-        address MCD_VAT  = DssExecLib.vat();
 
-        // -----------  Core Unit Budget Payouts - August -----------
+        // RWA Updates
+        // TODO
 
-        DssExecLib.sendPaymentFromSurplusBuffer(GRO_MULTISIG,    637_900);
-        DssExecLib.sendPaymentFromSurplusBuffer(SES_MULTISIG,    702_883);
-        DssExecLib.sendPaymentFromSurplusBuffer(MKT_MULTISIG,    98_067);
-        DssExecLib.sendPaymentFromSurplusBuffer(GOV_MULTISIG,    123_333);
-        DssExecLib.sendPaymentFromSurplusBuffer(RWF_MULTISIG,    155_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(RISK_CU_EOA,     182_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(PE_MULTISIG,     510_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(ORA_MULTISIG,    419_677);
-        DssExecLib.sendPaymentFromSurplusBuffer(COM_MULTISIG,    40_500);
-        DssExecLib.sendPaymentFromSurplusBuffer(COM_ER_MULTISIG, 121_500);
-        //                                                     _________
-        //                                         TOTAL DAI:  2,990,860
 
-        // ----------- Maker Open Market Commitee Proposal -----------
-        // https://vote.makerdao.com/polling/QmVG38FK?network=mainnet#poll-detail
+        // PAX PSM
+        // TODO
 
-        // ETH-B Stability Fee Decrease 6% to 5%
-        DssExecLib.setIlkStabilityFee("ETH-B", FIVE_PCT, true);
 
-        // NOTE - reducing/removing collateral types can potentially decrease Line to less than the outstanding debt, as
-        // currently alters Line without taking the debt into account. This should be considered for future reductions.
+        // MATIC Onboarding
+        // TODO
 
-        // Maximum Debt Ceiling Decreases.
-        DssExecLib.setIlkAutoLineDebtCeiling("LRC-A", 1 * MILLION); // Decrease 3 million to 1 million.
 
-        DssExecLib.removeIlkFromAutoLine("UNIV2ETHUSDT-A");  // Decrease 10 million to zero.
-        (,,,uint256 univ2EthUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2ETHUSDT-A");
-        DssExecLib.setIlkDebtCeiling("UNIV2ETHUSDT-A", 0); // -univ2EthUsdtLine
+        // Housekeeping
+        // TODO
 
-        DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDT-A");  // Decrease 10 million to zero.
-        (,,,uint256 univ2DaiUsdtLine,) = VatAbstract(MCD_VAT).ilks("UNIV2DAIUSDT-A");
-        DssExecLib.setIlkDebtCeiling("UNIV2DAIUSDT-A", 0); // -univ2DaiUsdtLine
-
-        uint256 removed = add(univ2EthUsdtLine, univ2DaiUsdtLine);
-
-        uint256 Line = VatAbstract(MCD_VAT).Line();
-        VatAbstract(MCD_VAT).file("Line", sub(Line, removed));
-
-        // -----------  Increase UNIV2DAUUSDC-A Maximum Debt Ceiling -----------
-        // https://vote.makerdao.com/polling/QmRAuMND?network=mainnet#poll-detail
-
-        DssExecLib.setIlkAutoLineParameters("UNIV2DAIUSDC-A", 250 * MILLION, 10 * MILLION, 8 hours); // 50 million to 250 million.
-
-        // ----------- Housekeeping -----------
-
-        // Update RWA tokens symbols in ilk registry
-        IlkRegistryAbstract ILK_REGISTRY = IlkRegistryAbstract(DssExecLib.reg());
-
-        ILK_REGISTRY.file("RWA001-A", "symbol", "RWA001");
-        ILK_REGISTRY.file("RWA002-A", "symbol", "RWA002");
-        ILK_REGISTRY.file("RWA003-A", "symbol", "RWA003");
-        ILK_REGISTRY.file("RWA004-A", "symbol", "RWA004");
-        ILK_REGISTRY.file("RWA005-A", "symbol", "RWA005");
-        ILK_REGISTRY.file("RWA006-A", "symbol", "RWA006");
-
-        // Add vote delegate factory to changelog
-        DssExecLib.setChangelogAddress("VOTE_DELEGATE_PROXY_FACTORY", VOTE_DELEGATE_PROXY_FACTORY);
 
         // Bump changelog version
-        DssExecLib.setChangelogVersion("1.9.3");
+        DssExecLib.setChangelogVersion("1.9.4");
     }
 }
 
