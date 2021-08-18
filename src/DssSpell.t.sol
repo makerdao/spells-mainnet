@@ -10,6 +10,13 @@ import "./test/addresses_mainnet.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
+interface RwaOutputConduitLike {
+    function hope(address) external;
+    function bud(address) external view returns (uint256);
+    function pick(address) external;
+    function push() external;
+}
+
 interface Hevm {
     function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
@@ -1261,7 +1268,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         1 * THOUSAND,
+            line:         15 * MILLION,
             dust:         0,
             pct:          300,
             mat:          10000,
@@ -2578,4 +2585,87 @@ contract DssSpellTest is DSTest, DSMath {
         }
         assertEq(expectedHash, actualHash);
     }
+
+    // tests the RWA updates for 6s
+    function testRWAUpdates() public {
+        address SC_DOMAIN_DEPLOYER_07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
+        address GENESIS_6S = 0xE5C35757c296FD19faA2bFF85e66C6B25AC8b978;
+
+        RwaOutputConduitLike conduit = RwaOutputConduitLike(
+            addr.addr("RWA001_A_OUTPUT_CONDUIT")
+        );
+
+        // test that the old deployer address a ward
+        assertEq(conduit.bud(SC_DOMAIN_DEPLOYER_07), 1);
+
+        // test that the new Genesis broker/dealer isn't added yet
+        assertEq(conduit.bud(GENESIS_6S), 0);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        // test that the old deployer address is removed
+        assertEq(conduit.bud(SC_DOMAIN_DEPLOYER_07), 0);
+
+        // test that the new Genesis broker/dealer is added
+        assertEq(conduit.bud(GENESIS_6S), 1);
+
+        // test that the PIP returns the correct price
+        bytes32 ilk = bytes32("RWA001-A");
+        jug.drip(ilk);
+
+        // Confirm pip value.
+        DSValueAbstract pip = DSValueAbstract(addr.addr("PIP_RWA001"));
+        assertEq(uint256(pip.read()), 15_913_500 * WAD);
+
+        // Confirm Vat.ilk.spot value.
+        (uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks(ilk);
+        assertEq(spot, 15_913_500 * RAY);
+
+        // Test that a draw can be performed.
+        assertEq(dai.balanceOf(address(conduit)), 0); // conduit before
+
+        address urn = addr.addr("RWA001_A_URN");
+        giveAuth(urn, address(this));
+        RwaUrnLike(urn).hope(address(this));  // become operator
+        uint256 room = sub(line, mul(Art, rate));
+        uint256 drawAmt = room / RAY;
+        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
+        }
+        RwaUrnLike(urn).draw(drawAmt);
+        (Art,,,,) = vat.ilks(ilk);
+
+        // got very close to line
+        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));
+        assertEq(dai.balanceOf(address(conduit)), drawAmt); // conduit after
+
+        assertEq(dai.balanceOf(address(GENESIS_6S)), 0); // genesis before
+
+        // become a ward on the conduit
+        hevm.store(
+            address(conduit),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1))
+        );
+        conduit.hope(address(this));  // become operator
+        conduit.pick(GENESIS_6S);     // set broker dealer
+
+        // magic up 1 conti of MKR so we can call push()
+        hevm.store(
+            address(gov),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+
+        // Test that an MKR holder can bump the DAI along to the broker/dealer
+        conduit.push();
+
+        // conduit has DAI    
+        assertEq(dai.balanceOf(address(GENESIS_6S)), drawAmt); // genesis after
+    }
+
 }
