@@ -19,6 +19,15 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface RwaOutputConduitLike {
+    function kiss(address) external;
+    function diss(address) external;
+}
+
+interface Bumpable {
+    function bump(bytes32, uint256) external;
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
@@ -26,6 +35,13 @@ contract DssSpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%206,%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2021-08-20 MakerDAO Executive Spell | Hash: <TODO>";
+
+    // Foundation SC team old deployer address (for removal)
+    address constant SC_DOMAIN_DEPLOYER_07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
+
+    // Genesis broker/dealer address for 6s (for addition):
+    // https://forum.makerdao.com/t/6s-broker-dealer-dai-address/9780
+    address constant GENESIS_6S = 0xE5C35757c296FD19faA2bFF85e66C6B25AC8b978;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -46,18 +62,54 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
+        //
         // RWA Updates
-        // TODO
+        //
+        bytes32 ilk = bytes32("RWA001-A");
+        address MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress(
+            "MIP21_LIQUIDATION_ORACLE"
+        );
+        address RWA001_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress(
+            "RWA001_A_OUTPUT_CONDUIT"
+        );
+
+        // This old foundation deployer address address was only used to test
+        // the circuit, and must be removed before the debt ceiling goes live.
+        RwaOutputConduitLike(RWA001_A_OUTPUT_CONDUIT).diss(
+            SC_DOMAIN_DEPLOYER_07
+        );
+
+        // Adds the Genesis broker/dealer address to the output conduit
+        RwaOutputConduitLike(RWA001_A_OUTPUT_CONDUIT).kiss(GENESIS_6S);
+
+        // increase the ilk and global DC. Check page 9 of the term sheet here:
+        // https://forum.makerdao.com/t/mip13c3-sp4-declaration-of-intent-commercial-points-off-chain-asset-backed-lender-to-onboard-real-world-assets-as-collateral-for-a-dai-loan/3914
+        // executive ratification here:
+        // https://vote.makerdao.com/executive/template-executive-vote-approve-october-2020-governance-cycle-bundle-october-26-2020?network=mainnet#proposal-detail 
+        DssExecLib.increaseIlkDebtCeiling(
+            ilk,
+            14_999_000,  // DC to 15 million less the existing 1000
+            true
+        );
+
+        // Increase the price to enable DAI to be drawn -- value corresponds to
+        // [ (debt ceiling) + (2 years interest at current rate) ] * mat, i.e.
+        // 15MM * 1.03^2 * 1.00 as a WAD
+        Bumpable(MIP21_LIQUIDATION_ORACLE).bump(ilk, 15_913_500 * WAD);
+        DssExecLib.updateCollateralPrice(ilk);
 
 
+        //
         // PAX PSM
         // TODO
 
 
+        //
         // MATIC Onboarding
         // TODO
 
 
+        //
         // Housekeeping
         // TODO
 
