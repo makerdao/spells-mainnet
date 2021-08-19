@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
@@ -59,6 +60,12 @@ contract DssSpellAction is DssAction {
     uint256 constant WAD      = 10 ** 18;
     uint256 constant RAY      = 10 ** 27;
     uint256 constant RAD      = 10 ** 45;
+
+    address constant MATIC                 = 0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0;
+    address constant MCD_JOIN_MATIC_A      = 0x885f16e177d45fC9e7C87e1DA9fd47A9cfcE8E13;
+    address constant MCD_CLIP_MATIC_A      = 0x29342F530ed6120BDB219D602DaFD584676293d1;
+    address constant MCD_CLIP_CALC_MATIC_A = 0xdF8C347B06a31c6ED11f8213C2366348BFea68dB;
+    address constant PIP_MATIC             = 0x8874964279302e6d4e523Fb1789981C39a1034Ba;
 
     function actions() public override {
 
@@ -106,8 +113,43 @@ contract DssSpellAction is DssAction {
 
         //
         // MATIC Onboarding
-        // TODO
+        // https://vote.makerdao.com/polling/QmeRhDHX?network=mainnet#poll-detail
+        // https://forum.makerdao.com/t/matic-collateral-onboarding-risk-evaluation/9069
 
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_MATIC_A, 90 seconds, 9900);
+
+        CollateralOpts memory MATIC_A = CollateralOpts({
+            ilk:                   "MATIC-A",
+            gem:                   MATIC,
+            join:                  MCD_JOIN_MATIC_A,
+            clip:                  MCD_CLIP_MATIC_A,
+            calc:                  MCD_CLIP_CALC_MATIC_A,
+            pip:                   PIP_MATIC,
+            isLiquidatable:        true,
+            isOSM:                 true,
+            whitelistOSM:          true,
+            ilkDebtCeiling:        3 * MILLION,
+            minVaultAmount:        10 * THOUSAND,
+            maxLiquidationAmount:  3 * MILLION,
+            liquidationPenalty:    1300,
+            ilkStabilityFee:       1000000000937303470807876289,
+            startingPriceFactor:   13000,
+            breakerTolerance:      5000, // Allows for a 50% hourly price drop before disabling liquidations
+            auctionDuration:       140 minutes,
+            permittedDrop:         4000,
+            liquidationRatio:      17500,
+            kprFlatReward:         300,
+            kprPctReward:          10 // 0.1%
+        });
+
+        DssExecLib.addNewCollateral(MATIC_A);
+        DssExecLib.setIlkAutoLineParameters("MATIC-A", 10 * MILLION, 3 * MILLION, 8 hours);
+
+        DssExecLib.setChangelogAddress("MATIC", MATIC);
+        DssExecLib.setChangelogAddress("MCD_JOIN_MATIC_A", MCD_JOIN_MATIC_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_MATIC_A", MCD_CLIP_MATIC_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_MATIC_A", MCD_CLIP_CALC_MATIC_A);
+        DssExecLib.setChangelogAddress("PIP_MATIC", PIP_MATIC);
 
         //
         // Housekeeping

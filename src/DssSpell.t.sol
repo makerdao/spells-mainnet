@@ -300,7 +300,7 @@ contract DssSpellTest is DSTest, DSMath {
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
             clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             39                       // Num expected in system
+            ilk_count:             40                       // Num expected in system
         });
 
         //
@@ -1437,6 +1437,36 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    0,
             calc_cut:     0
         });
+        afterSpell.collaterals["MATIC-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      10 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         10 * THOUSAND,
+            pct:          300,
+            mat:          17500,
+            liqType:      "clip",
+            liqOn:        true,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
+            calc_tau:     0,
+            calc_step:    90,
+            calc_cut:     9900
+        });
+
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -1893,7 +1923,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkIlkIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
-        FlipAbstract flip,
+        ClipAbstract clip,
         address pip,
         bool _isOSM,
         bool _checkLiquidations,
@@ -1909,8 +1939,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
-        assertEq(flip.wards(address(end)), 1);
-        assertEq(flip.wards(address(flipMom)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
         if (_isOSM) {
             assertEq(OsmAbstract(pip).wards(address(osmMom)), 1);
             assertEq(OsmAbstract(pip).bud(address(spotter)), 1);
@@ -1941,13 +1971,13 @@ contract DssSpellTest is DSTest, DSMath {
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        vat.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(divup(mul(RAY, dust), rate)));
         assertEq(vat.gem(_ilk, address(this)), 0);
         assertTrue(vat.dai(address(this)) >= dust * RAY);
         assertTrue(vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        vat.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(divup(mul(RAY, dust), rate)));
         assertEq(vat.gem(_ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 
@@ -1967,17 +1997,34 @@ contract DssSpellTest is DSTest, DSMath {
         }
         // dart max amount of DAI
         (,,uint256 spot,,) = vat.ilks(_ilk);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        vat.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(mul(amount, spot) / rate));
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
-        assertEq(flip.kicks(), 0);
+        assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
-            cat.bite(_ilk, address(this));
-            assertEq(flip.kicks(), 1);
+            dog.bark(_ilk, address(this), address(this));
+            assertEq(clip.kicks(), 1);
         }
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function testCollateralIntegrations() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new collateral tests here
+        checkIlkIntegration(
+            "MATIC-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
+            addr.addr("PIP_MATIC"),
+            true,
+            true,
+            true
+        );
     }
 
     function checkUNIV2LPIntegration(
