@@ -173,6 +173,11 @@ contract Addresses {
         addr["MCD_FLIP_AAVE_A"]                 = 0x16e1b844094c885a37509a8f76c533B5fbFED13a;
         addr["MCD_CLIP_AAVE_A"]                 = 0x8723b74F598DE2ea49747de5896f9034CC09349e;
         addr["MCD_CLIP_CALC_AAVE_A"]            = 0x76024a8EfFCFE270e089964a562Ece6ea5f3a14C;
+        addr["MATIC"]                           = 0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0;
+        addr["PIP_MATIC"]                       = 0x8874964279302e6d4e523Fb1789981C39a1034Ba;
+        addr["MCD_JOIN_MATIC_A"]                = 0x885f16e177d45fC9e7C87e1DA9fd47A9cfcE8E13;
+        addr["MCD_CLIP_MATIC_A"]                = 0x29342F530ed6120BDB219D602DaFD584676293d1;
+        addr["MCD_CLIP_CALC_MATIC_A"]           = 0xdF8C347B06a31c6ED11f8213C2366348BFea68dB;
         addr["UNIV2DAIETH"]                     = 0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11;
         addr["PIP_UNIV2DAIETH"]                 = 0xFc8137E1a45BAF0030563EC4F0F851bd36a85b7D;
         addr["MCD_JOIN_UNIV2DAIETH_A"]          = 0x2502F65D77cA13f183850b5f9272270454094A08;
