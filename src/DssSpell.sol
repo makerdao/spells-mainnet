@@ -68,10 +68,10 @@ contract DssSpellAction is DssAction {
     address constant PIP_MATIC             = 0x8874964279302e6d4e523Fb1789981C39a1034Ba;
 
     address constant PAX                     = 0x8E870D67F660D95d5be530380D0eC0bd388289E1;
-    address constant MCD_JOIN_PSM_PAX_A      = ;
-    address constant MCD_CLIP_PSM_PAX_A      = ;
-    address constant MCD_CLIP_CALC_PSM_PAX_A = ;
-    address constant MCD_PSM_USDC_A          = ;
+    address constant MCD_JOIN_PSM_PAX_A      = 0x7bbd8cA5e413bCa521C2c80D8d1908616894Cf21;
+    address constant MCD_CLIP_PSM_PAX_A      = 0x5322a3551bc6a1b39d5D142e5e38Dc5B4bc5B3d2;
+    address constant MCD_CLIP_CALC_PSM_PAX_A = 0xC19eAc21A4FccdD30812F5fF5FebFbD6817b7593;
+    address constant MCD_PSM_PAX_A           = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
     address constant PIP_PSM_PAX             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
 
     function actions() public override {
@@ -119,7 +119,7 @@ contract DssSpellAction is DssAction {
 
         CollateralOpts memory PSM_PAX_A = CollateralOpts({
             ilk:                   "PSM-PAX-A",
-            gem:                   PSM_PAX,
+            gem:                   PAX,
             join:                  MCD_JOIN_PSM_PAX_A,
             clip:                  MCD_CLIP_PSM_PAX_A,
             calc:                  MCD_CLIP_CALC_PSM_PAX_A,
@@ -141,15 +141,16 @@ contract DssSpellAction is DssAction {
             kprPctReward:          10 // 0.1%
         });
 
-        DssExecLib.setContract(PSM_PAX_A);
+        DssExecLib.addNewCollateral(PSM_PAX_A);
 
-        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tin", 1 * WAD / 1000);
-        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tout", 0);
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 1 * WAD / 1000);
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tout", 0);
+        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tin", 2 * WAD / 1000);
 
         DssExecLib.setChangelogAddress("MCD_JOIN_PSM_PAX_A", MCD_JOIN_PSM_PAX_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_PSM_PAX_A", MCD_CLIP_PSM_PAX_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_PSM_PAX_A", MCD_CLIP_CALC_PSM_PAX_A);
-        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A", MCD_PSM_USDC_A);
+        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A", MCD_PSM_PAX_A);
         DssExecLib.setChangelogAddress("PIP_PSM_PAX", PIP_PSM_PAX);
 
 
