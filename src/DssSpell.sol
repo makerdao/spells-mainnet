@@ -158,6 +158,26 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.setChangelogAddress("CALC_FAB", CALC_FAB);
 
+        // Liquidation Ratio Adjustments
+        DssExecLib.setIlkLiquidationRatio("ETH-A", 14500);
+        DssExecLib.setIlkLiquidationRatio("WBTC-A", 14500);
+        DssExecLib.setIlkLiquidationRatio("ETH-C", 17000);
+        DssExecLib.setIlkLiquidationRatio("LINK-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("UNIV2DAIETH-A", 12000);
+        DssExecLib.setIlkLiquidationRatio("YFI-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("UNIV2WBTCETH-A", 14500);
+        DssExecLib.setIlkLiquidationRatio("UNIV2UNIETH-A", 16000);
+        DssExecLib.setIlkLiquidationRatio("UNIV2USDCETH-A", 12000);
+        DssExecLib.setIlkLiquidationRatio("RENBTC-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("UNI-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("AAVE-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("UNIV2WBTCDAI-A", 12000);
+        DssExecLib.setIlkLiquidationRatio("BAL-A", 16500);
+        DssExecLib.setIlkLiquidationRatio("COMP-A", 16500);
+
+
+
+
 
         // Bump changelog version
         DssExecLib.setChangelogVersion("1.9.4");
