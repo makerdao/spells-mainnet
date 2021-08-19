@@ -108,7 +108,7 @@ contract DssSpellAction is DssAction {
 
         //
         // PAX PSM
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_PAX_A, 90 seconds, 9900);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_PAX_A, 120 seconds, 9990);
 
         CollateralOpts memory PSM_PAX_A = CollateralOpts({
             ilk:                   "PSM-PAX-A",
@@ -125,16 +125,19 @@ contract DssSpellAction is DssAction {
             maxLiquidationAmount:  0,
             liquidationPenalty:    1300,
             ilkStabilityFee:       1000000000000000000000000000,
-            startingPriceFactor:   13000,
-            breakerTolerance:      5000, // Allows for a 50% hourly price drop before disabling liquidations
-            auctionDuration:       140 minutes,
-            permittedDrop:         4000,
+            startingPriceFactor:   10500,
+            breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
+            auctionDuration:       220 minutes,
+            permittedDrop:         9000,
             liquidationRatio:      10000,
             kprFlatReward:         300,
             kprPctReward:          10 // 0.1%
         });
 
-        DssExecLib.addNewCollateral(MATIC_A);
+        DssExecLib.setContract(PSM_PAX_A);
+
+        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tin", 1 * WAD / 1000);
+        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tout", 0);
 
         DssExecLib.setChangelogAddress("MCD_JOIN_PSM_PAX_A", MCD_JOIN_PSM_PAX_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_PSM_PAX_A", MCD_CLIP_PSM_PAX_A);
