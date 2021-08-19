@@ -67,6 +67,8 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_MATIC_A = 0xdF8C347B06a31c6ED11f8213C2366348BFea68dB;
     address constant PIP_MATIC             = 0x8874964279302e6d4e523Fb1789981C39a1034Ba;
 
+    address constant CALC_FAB              = 0xE1820A2780193d74939CcA104087CADd6c1aA13A;
+
     function actions() public override {
 
         //
@@ -92,7 +94,7 @@ contract DssSpellAction is DssAction {
         // increase the ilk and global DC. Check page 9 of the term sheet here:
         // https://forum.makerdao.com/t/mip13c3-sp4-declaration-of-intent-commercial-points-off-chain-asset-backed-lender-to-onboard-real-world-assets-as-collateral-for-a-dai-loan/3914
         // executive ratification here:
-        // https://vote.makerdao.com/executive/template-executive-vote-approve-october-2020-governance-cycle-bundle-october-26-2020?network=mainnet#proposal-detail 
+        // https://vote.makerdao.com/executive/template-executive-vote-approve-october-2020-governance-cycle-bundle-october-26-2020?network=mainnet#proposal-detail
         DssExecLib.increaseIlkDebtCeiling(
             ilk,
             14_999_000,  // DC to 15 million less the existing 1000
@@ -153,7 +155,8 @@ contract DssSpellAction is DssAction {
 
         //
         // Housekeeping
-        // TODO
+
+        DssExecLib.setChangelogAddress("CALC_FAB", CALC_FAB);
 
 
         // Bump changelog version
