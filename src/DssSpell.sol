@@ -67,6 +67,13 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_MATIC_A = 0xdF8C347B06a31c6ED11f8213C2366348BFea68dB;
     address constant PIP_MATIC             = 0x8874964279302e6d4e523Fb1789981C39a1034Ba;
 
+    address constant PAX                     = 0x8E870D67F660D95d5be530380D0eC0bd388289E1;
+    address constant MCD_JOIN_PSM_PAX_A      = ;
+    address constant MCD_CLIP_PSM_PAX_A      = ;
+    address constant MCD_CLIP_CALC_PSM_PAX_A = ;
+    address constant MCD_PSM_USDC_A          = ;
+    address constant PIP_PSM_PAX             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
+
     function actions() public override {
 
         //
@@ -108,7 +115,42 @@ contract DssSpellAction is DssAction {
 
         //
         // PAX PSM
-        // TODO
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_PAX_A, 120 seconds, 9990);
+
+        CollateralOpts memory PSM_PAX_A = CollateralOpts({
+            ilk:                   "PSM-PAX-A",
+            gem:                   PSM_PAX,
+            join:                  MCD_JOIN_PSM_PAX_A,
+            clip:                  MCD_CLIP_PSM_PAX_A,
+            calc:                  MCD_CLIP_CALC_PSM_PAX_A,
+            pip:                   PIP_PSM_PAX,
+            isLiquidatable:        false,
+            isOSM:                 false,
+            whitelistOSM:          false,
+            ilkDebtCeiling:        500 * MILLION,
+            minVaultAmount:        0,
+            maxLiquidationAmount:  0,
+            liquidationPenalty:    1300,
+            ilkStabilityFee:       1000000000000000000000000000,
+            startingPriceFactor:   10500,
+            breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
+            auctionDuration:       220 minutes,
+            permittedDrop:         9000,
+            liquidationRatio:      10000,
+            kprFlatReward:         300,
+            kprPctReward:          10 // 0.1%
+        });
+
+        DssExecLib.setContract(PSM_PAX_A);
+
+        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tin", 1 * WAD / 1000);
+        DssExecLib.addNewCollateral(MCD_PSM_USDC_A, "tout", 0);
+
+        DssExecLib.setChangelogAddress("MCD_JOIN_PSM_PAX_A", MCD_JOIN_PSM_PAX_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_PSM_PAX_A", MCD_CLIP_PSM_PAX_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_PSM_PAX_A", MCD_CLIP_CALC_PSM_PAX_A);
+        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A", MCD_PSM_USDC_A);
+        DssExecLib.setChangelogAddress("PIP_PSM_PAX", PIP_PSM_PAX);
 
 
         //

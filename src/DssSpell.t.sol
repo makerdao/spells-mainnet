@@ -2715,4 +2715,78 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(address(GENESIS_6S)), drawAmt); // genesis after
     }
 
+    function testSpellIsCast_PSM_PAX_A_INTEGRATION() public {
+        vote();
+        scheduleWaitAndCast();
+        assertTrue(spell.done());
+
+        spot.poke("PSM-PAX-A");
+
+        // Add balance to the test address
+        uint256 onePax = 1e18;
+        uint256 ilkAmt = 1 * THOUSAND * onePax;
+
+        giveTokens(pax, ilkAmt);
+
+        // Authorization
+        assertEq(joinPSMPAXA.wards(pauseProxy), 1);
+        assertEq(joinPSMPAXA.wards(address(psmPSMPAXA)), 1);
+        assertEq(psmPSMPAXA.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(joinPSMPAXA)), 1);
+        assertEq(clipPSMPAXA.wards(address(end)), 1);
+        assertEq(clipPSMPAXA.wards(address(clipMom)), 1);
+
+        // Check psm + lerp is set up correctly
+        assertEq(psmPSMUSDCA.tin(), WAD * 1 / 100);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+
+        // Convert all USDC to DAI with a 1% fee
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 99 / 100;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
+
+        // Convert 50 DAI to USDC with a 0.1% fee
+        ilkAmt = 50 * oneUsdc;
+        dai.approve(address(psmPSMUSDCA), uint256(-1));
+        psmPSMUSDCA.buyGem(address(this), ilkAmt);
+        dai.transfer(address(0), dai.balanceOf(address(this)));     // Throw away extra
+        assertEq(usdc.balanceOf(address(this)), ilkAmt);
+
+        // Convert 50 USDC to DAI with a 0.55% fee (halfway through lerp)
+        hevm.warp(now + 3.5 days);
+        lerpPSMUSDCA.tick();
+        assertTrue(!lerpPSMUSDCA.done());
+        assertEq(psmPSMUSDCA.tin(), WAD * 55 / 10000);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 9945 / 10000;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
+
+        // Convert 20 DAI to USDC with a 1% fee
+        ilkAmt = 20 * oneUsdc;
+        psmPSMUSDCA.buyGem(address(this), ilkAmt);
+        dai.transfer(address(0), dai.balanceOf(address(this)));     // Throw away extra
+        assertEq(usdc.balanceOf(address(this)), ilkAmt);
+
+        // Convert 20 USDC to DAI with a 0.1% fee (lerp is done)
+        hevm.warp(now + 4 days);
+        lerpPSMUSDCA.tick();
+        assertTrue(lerpPSMUSDCA.done());
+        assertEq(psmPSMUSDCA.wards(address(lerpPSMUSDCA)), 0);    // Lerp de-auths itself
+        assertEq(psmPSMUSDCA.tin(), WAD * 1 / 1000);
+        assertEq(psmPSMUSDCA.tout(), WAD * 1 / 1000);
+        usdc.approve(address(joinPSMUSDCA), ilkAmt);
+        psmPSMUSDCA.sellGem(address(this), ilkAmt);
+        ilkAmt = ilkAmt * 999 / 1000;
+        ilkAmtWad = ilkAmt * (10 ** (18 - usdc.decimals()));
+        assertEq(usdc.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), ilkAmtWad);
+    }
+
 }
