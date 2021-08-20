@@ -73,7 +73,7 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_PSM_PAX_A = 0xC19eAc21A4FccdD30812F5fF5FebFbD6817b7593;
     address constant MCD_PSM_PAX_A           = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
     address constant PIP_PSM_PAX             = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
-    
+
     address constant CALC_FAB              = 0xE1820A2780193d74939CcA104087CADd6c1aA13A;
 
     function actions() public override {
@@ -129,7 +129,7 @@ contract DssSpellAction is DssAction {
             isLiquidatable:        false,
             isOSM:                 false,
             whitelistOSM:          false,
-            ilkDebtCeiling:        500 * MILLION,
+            ilkDebtCeiling:        50 * MILLION,
             minVaultAmount:        0,
             maxLiquidationAmount:  0,
             liquidationPenalty:    1300,
