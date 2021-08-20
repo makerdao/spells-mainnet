@@ -119,6 +119,7 @@ contract DssSpellAction is DssAction {
 
         //
         // PAX PSM
+        // https://vote.makerdao.com/polling/QmdBrVKD#poll-detail
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_PAX_A, 120 seconds, 9990);
 
         CollateralOpts memory PSM_PAX_A = CollateralOpts({
@@ -203,7 +204,8 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.setChangelogAddress("CALC_FAB", CALC_FAB);
 
-        // Liquidation Ratio Adjustments
+        // Liquidation Ratio
+        // https://vote.makerdao.com/polling/QmZQdJpG?network=mainnet#poll-detail
         DssExecLib.setIlkLiquidationRatio("ETH-A", 14500);
         DssExecLib.setIlkLiquidationRatio("WBTC-A", 14500);
         DssExecLib.setIlkLiquidationRatio("ETH-C", 17000);
