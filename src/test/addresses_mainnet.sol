@@ -84,6 +84,7 @@ contract Addresses {
         addr["MCD_CLIP_PSM_PAX_A"]              = 0x5322a3551bc6a1b39d5D142e5e38Dc5B4bc5B3d2;
         addr["MCD_CLIP_CALC_PSM_PAX_A"]         = 0xC19eAc21A4FccdD30812F5fF5FebFbD6817b7593;
         addr["MCD_PSM_PAX_A"]                   = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
+        addr["PIP_PSM_PAX"]                     = 0x043B963E1B2214eC90046167Ea29C2c8bDD7c0eC;
         addr["WBTC"]                            = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
         addr["PIP_WBTC"]                        = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
         addr["MCD_JOIN_WBTC_A"]                 = 0xBF72Da2Bd84c5170618Fbe5914B0ECA9638d5eb5;
