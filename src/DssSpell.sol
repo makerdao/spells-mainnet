@@ -33,14 +33,14 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%206,%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/40b362fc70793e9980a8d53c47b1937e05d0c6d3/governance/votes/Executive%20vote%20-%20August%2020%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-08-20 MakerDAO Executive Spell | Hash: <TODO>";
+        "2021-08-20 MakerDAO Executive Spell | Hash: 0x2b31d3c81f06eac1e304c3c8b257878729f518d1f9632d95c37efa19241eb8a7";
 
-    // Foundation SC team old deployer address (for removal)
+    // Foundation SC team old deployer address (for removal from RWA output conduit)
     address constant SC_DOMAIN_DEPLOYER_07 = 0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf;
 
-    // Genesis broker/dealer address for 6s (for addition):
+    // Genesis broker/dealer address for 6s (for addition to RWA output conduit):
     // https://forum.makerdao.com/t/6s-broker-dealer-dai-address/9780
     address constant GENESIS_6S = 0xE5C35757c296FD19faA2bFF85e66C6B25AC8b978;
 
@@ -117,7 +117,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice(ilk);
 
 
-        //
         // PAX PSM
         // https://vote.makerdao.com/polling/QmdBrVKD#poll-detail
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_PAX_A, 120 seconds, 9990);
@@ -150,7 +149,6 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 1 * WAD / 1000);
         DssExecLib.setValue(MCD_PSM_PAX_A, "tout", 0);
-        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tin", 2 * WAD / 1000);
 
         DssExecLib.setChangelogAddress("MCD_JOIN_PSM_PAX_A", MCD_JOIN_PSM_PAX_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_PSM_PAX_A", MCD_CLIP_PSM_PAX_A);
@@ -158,6 +156,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_PSM_PAX_A", MCD_PSM_PAX_A);
         DssExecLib.setChangelogAddress("PIP_PSM_PAX", PIP_PSM_PAX);
 
+        // Set USDC tin value to 0.2%
+        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_PSM_USDC_A"), "tin", 2 * WAD / 1000);
 
         //
         // MATIC Onboarding
@@ -199,10 +199,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_MATIC_A", MCD_CLIP_CALC_MATIC_A);
         DssExecLib.setChangelogAddress("PIP_MATIC", PIP_MATIC);
 
-        //
-        // Housekeeping
-
-        DssExecLib.setChangelogAddress("CALC_FAB", CALC_FAB);
 
         // Liquidation Ratio
         // https://vote.makerdao.com/polling/QmZQdJpG?network=mainnet#poll-detail
@@ -223,7 +219,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkLiquidationRatio("COMP-A", 16500);
 
 
-
+        // Housekeeping
+        DssExecLib.setChangelogAddress("CALC_FAB", CALC_FAB);
 
 
         // Bump changelog version
