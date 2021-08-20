@@ -2185,7 +2185,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(psm.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
         assertEq(clip.wards(address(end)), 1);
-        assertEq(clip.wards(address(clipMom)), 1);
 
         // Check toll in/out
         assertEq(psm.tin(), tin);
@@ -2207,7 +2206,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Convert all DAI to TOKEN
         amount -= amount * tout / WAD;
         psm.buyGem(address(this), amount);
-        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), 0);
         assertEq(token.balanceOf(address(this)), amount);
 
         // Dump all dai for next run
