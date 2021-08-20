@@ -2177,6 +2177,8 @@ contract DssSpellTest is DSTest, DSMath {
     ) public {
         DSTokenAbstract token = DSTokenAbstract(join.gem());
 
+        assertTrue(pip != address(0));
+
         spotter.poke(_ilk);
 
         // Authorization
@@ -2813,7 +2815,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test that an MKR holder can bump the DAI along to the broker/dealer
         conduit.push();
 
-        // conduit has DAI    
+        // conduit has DAI
         assertEq(dai.balanceOf(address(GENESIS_6S)), drawAmt); // genesis after
     }
 
