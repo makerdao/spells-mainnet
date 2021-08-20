@@ -53,6 +53,8 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant ZERO_PCT_RATE  = 1000000000000000000000000000;
+    uint256 constant THREE_PCT_RATE = 1000000000937303470807876289;
 
     // Math
     uint256 constant THOUSAND = 10 ** 3;
@@ -133,7 +135,7 @@ contract DssSpellAction is DssAction {
             minVaultAmount:        0,
             maxLiquidationAmount:  0,
             liquidationPenalty:    1300,
-            ilkStabilityFee:       1000000000000000000000000000,
+            ilkStabilityFee:       ZERO_PCT_RATE,
             startingPriceFactor:   10500,
             breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
             auctionDuration:       220 minutes,
@@ -177,7 +179,7 @@ contract DssSpellAction is DssAction {
             minVaultAmount:        10 * THOUSAND,
             maxLiquidationAmount:  3 * MILLION,
             liquidationPenalty:    1300,
-            ilkStabilityFee:       1000000000937303470807876289,
+            ilkStabilityFee:       THREE_PCT_RATE,
             startingPriceFactor:   13000,
             breakerTolerance:      5000, // Allows for a 50% hourly price drop before disabling liquidations
             auctionDuration:       140 minutes,
