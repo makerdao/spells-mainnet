@@ -2431,16 +2431,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(COM_EMERGENCY)   - prevDaiComEr, amountComEr * WAD);
     } */
 
-    // function testCollateralIntegrations() public {
-    //     vote(address(spell));
-    //     spell.schedule();
-    //     hevm.warp(spell.nextCastTime());
-    //     spell.cast();
-    //     assertTrue(spell.done());
-
-    //     // Insert new collateral tests here
-    // }
-
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
