@@ -50,6 +50,21 @@ interface TinlakeManagerLike {
     function file(bytes32 what, address data) external;
 }
 
+interface PsmAbstract {
+    function wards(address) external returns (uint256);
+    function vat() external returns (address);
+    function gemJoin() external returns (address);
+    function dai() external returns (address);
+    function daiJoin() external returns (address);
+    function ilk() external returns (bytes32);
+    function vow() external returns (address);
+    function tin() external returns (uint256);
+    function tout() external returns (uint256);
+    function file(bytes32 what, uint256 data) external;
+    function sellGem(address usr, uint256 gemAmt) external;
+    function buyGem(address usr, uint256 gemAmt) external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -300,7 +315,7 @@ contract DssSpellTest is DSTest, DSMath {
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
             clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             40                       // Num expected in system
+            ilk_count:             41                       // Num expected in system
         });
 
         //
@@ -1466,6 +1481,35 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    90,
             calc_cut:     9900
         });
+        afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
+            line:         50 * MILLION,
+            dust:         0,
+            pct:          0,
+            mat:          10000,
+            liqType:      "clip",
+            liqOn:        false,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     0,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  0,
+            cm_tolerance: 9500,
+            calc_tau:     0,
+            calc_step:    120,
+            calc_cut:     9990
+        });
 
     }
 
@@ -2025,6 +2069,16 @@ contract DssSpellTest is DSTest, DSMath {
             true,
             true
         );
+        checkPsmIlkIntegration(
+            "PSM-PAX-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
+            addr.addr("PIP_PSM_PAX"),
+            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
+            1 * WAD / 1000,
+            0
+        );
+        assertEq(PsmAbstract(addr.addr("MCD_PSM_USDC_A")).tin(), 2 * WAD / 1000);  // Check the USDC PSM tin as well as it's a small/related check
     }
 
     function checkUNIV2LPIntegration(
@@ -2107,6 +2161,54 @@ contract DssSpellTest is DSTest, DSMath {
             cat.bite(_ilk, address(this));
             assertEq(flip.kicks(), 1);
         }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function checkPsmIlkIntegration(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        ClipAbstract clip,
+        address pip,
+        PsmAbstract psm,
+        uint256 tin,
+        uint256 tout
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        spotter.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(join.wards(address(psm)), 1);
+        assertEq(psm.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
+
+        // Check toll in/out
+        assertEq(psm.tin(), tin);
+        assertEq(psm.tout(), tout);
+
+        uint256 amount = 1000 * (10 ** token.decimals());
+        giveTokens(token, amount);
+
+        // Approvals
+        token.approve(address(join), amount);
+        dai.approve(address(psm), uint256(-1));
+
+        // Convert all TOKEN to DAI
+        psm.sellGem(address(this), amount);
+        amount -= amount * tin / WAD;
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), amount);
+
+        // Convert all DAI to TOKEN
+        amount -= amount * tout / WAD;
+        psm.buyGem(address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(token.balanceOf(address(this)), amount);
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
