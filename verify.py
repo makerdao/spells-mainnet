@@ -1,9 +1,6 @@
-#! /bin/env python3
+#! /usr/bin/env python3
 
 import os, sys, subprocess, time, re, json, requests
-
-def log(r):
-    print('{0} {1} {2} {3}'.format(r.method, r.url, r.headers, r.body))
 
 api_key = ''
 try:
@@ -32,7 +29,7 @@ if len(sys.argv) not in [3, 4]:
 
 contract_name = sys.argv[1]
 contract_address = sys.argv[2]
-print('Attempting to verify contract {0} at address {1}...'.format(
+print('Attempting to verify contract {0} at address {1} ...'.format(
     contract_name,
     contract_address
 ))
@@ -174,14 +171,12 @@ def get_stubs(block):
     original_lines = block.split('\n')
     lines = []
     level = 0
-    for original_line in original_lines:
-        line = original_line
-        if 'function' in original_line:
-            line = re.sub('{.*', '{}', original_line)
+    for line in original_lines:
         if level == 0:
-            lines.append(line)
-        level += original_line.count('{')
-        level -= original_line.count('}')
+            difference = line.count('{') - line.count('}')
+            lines.append(line + '}' * difference)
+        level += line.count('{')
+        level -= line.count('}')
     return '\n'.join(lines)
 
 for signature, block in libraries.items():
@@ -266,7 +261,6 @@ headers = {
 def send():
     print('Sending verification request...')
     verify = requests.post(url, headers = headers, data = data)
-    log(verify.request)
     verify_response = {}
     try:
         verify_response = json.loads(verify.text)
@@ -279,8 +273,8 @@ verify_response = send()
 
 while 'locate' in verify_response['result'].lower():
     print(verify_response['result'])
-    print('Waiting for 10 seconds for the network to update...')
-    time.sleep(10)
+    print('Waiting for 15 seconds for the network to update...')
+    time.sleep(15)
     verify_response = send()
 
 if verify_response['status'] != '1' or verify_response['message'] != 'OK':
@@ -296,8 +290,9 @@ check_response = {}
 while check_response == {} or 'pending' in check_response['result'].lower():
 
     if check_response != {}:
-        print('Verification pending...')
-        time.sleep(1)
+        print(check_response['result'])
+        print('Waiting for 15 seconds for Etherscan to process the request...')
+        time.sleep(15)
 
     check = requests.post(url, headers = headers, data = {
         'apikey': api_key,
@@ -305,9 +300,6 @@ while check_response == {} or 'pending' in check_response['result'].lower():
         'action': 'checkverifystatus',
         'guid': guid,
     })
-
-    if check_response == {}:
-        log(check.request)
 
     try:
         check_response = json.loads(check.text)
