@@ -1513,11 +1513,15 @@ contract DssSpellTest is DSTest, DSMath {
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
+        assertEq(pot.dsr(), expectedDSRRate, "TestError/pot-dsr-expected-value");
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027,
             "TestError/pot-dsr-range"
         );
-        assertTrue(diffCalc(expectedRate(values.pot_dsr), yearlyYield(expectedDSRRate)) <= TOLERANCE);
+        assertTrue(
+            diffCalc(expectedRate(values.pot_dsr), yearlyYield(expectedDSRRate)) <= TOLERANCE,
+            "TestError/pot-dsr-rates-table"
+        );
 
         {
         // Line values in RAD
