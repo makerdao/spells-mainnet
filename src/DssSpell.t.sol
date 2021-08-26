@@ -2293,7 +2293,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         ChainlogAbstract chainlog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainlog.getAddress("VOTE_DELEGATE_PROXY_FACTORY"), addr.addr("VOTE_DELEGATE_PROXY_FACTORY"));
+        assertEq(chainlog.getAddress("PAX"), addr.addr("PAX"));
+        assertEq(chainlog.getAddress("PIP_PAX"), addr.addr("PIP_PAX"));
+
+        try chainlog.getAddress("PIP_PSM_PAX") returns (address) {
+            assertTrue(false);
+        } catch {}
     }
 
     function testNewIlkRegistryValues() public {
