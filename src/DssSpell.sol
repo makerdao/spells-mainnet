@@ -32,11 +32,72 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2021-09-03 MakerDAO Executive Spell | Hash: ";
 
+    // Many of the settings that change weekly rely on the rate accumulator
+    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
+    // To check this yourself, use the following rate calculation (example 8%):
+    //
+    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
+    //
+    // A table of rates can be found at
+    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
+    //
+    uint256 constant ONE_PCT_RATE = 1000000000315522921573372069;
+
+    // Math
+    uint256 constant THOUSAND = 10 ** 3;
+    uint256 constant MILLION  = 10 ** 6;
+    uint256 constant WAD      = 10 ** 18;
+    uint256 constant RAY      = 10 ** 27;
+    uint256 constant RAD      = 10 ** 45;
+
+    address constant GUNI                   = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
+    address constant MCD_JOIN_GUNI_A        = ;
+    address constant MCD_CLIP_GUNI_A        = ;
+    address constant MCD_CLIP_CALC_GUNI_A   = ;
+    address constant PIP_GUNI               = ;
+
     function actions() public override {
         DssExecLib.setChangelogAddress("PAX", DssExecLib.getChangelogAddress("PAXUSD"));
         DssExecLib.setChangelogAddress("PIP_PAX", DssExecLib.getChangelogAddress("PIP_PAXUSD"));
 
         ChainlogLike(DssExecLib.LOG).removeAddress("PIP_PSM_PAX");
+
+        // G-UNI DAI/USDC
+
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNI_A, 90 seconds, 9900);
+
+        CollateralOpts memory GUNI_A = CollateralOpts({
+            ilk:                   "GUNIDAIUSDC1-A",
+            gem:                   GUNI,
+            join:                  MCD_JOIN_GUNI_A,
+            clip:                  MCD_CLIP_GUNI_A,
+            calc:                  MCD_CLIP_CALC_GUNI_A,
+            pip:                   PIP_GUNI,
+            isLiquidatable:        false,
+            isOSM:                 false,
+            whitelistOSM:          false,
+            ilkDebtCeiling:        3 * MILLION,
+            minVaultAmount:        10 * THOUSAND,
+            maxLiquidationAmount:  5 * MILLION,
+            liquidationPenalty:    1300,
+            ilkStabilityFee:       ONE_PCT_RATE,
+            startingPriceFactor:   10500,
+            breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
+            auctionDuration:       220 minutes,
+            permittedDrop:         9000,
+            liquidationRatio:      10500,
+            kprFlatReward:         300,
+            kprPctReward:          10 // 0.1%
+        });
+
+        DssExecLib.addNewCollateral(GUNI_A);
+        DssExecLib.setIlkAutoLineParameters("GUNIDAIUSDC1-A", 3 * MILLION, 3 * MILLION, 8 hours);
+
+        DssExecLib.setChangelogAddress("GUNIDAIUSDC1", GUNI);
+        DssExecLib.setChangelogAddress("MCD_JOIN_GUNIDAIUSDC1_A", MCD_JOIN_GUNI_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_GUNIDAIUSDC1_A", MCD_CLIP_GUNI_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIDAIUSDC1_A", MCD_CLIP_CALC_GUNI_A);
+        DssExecLib.setChangelogAddress("PIP_GUNIDAIUSDC1", PIP_GUNI);
 
         // Bump changelog version
         DssExecLib.setChangelogVersion("1.9.5");

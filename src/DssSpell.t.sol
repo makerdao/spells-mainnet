@@ -1510,6 +1510,35 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    120,
             calc_cut:     9990
         });
+        afterSpell.collaterals["GUNIDAIUSDC1-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      3 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          10500,
+            liqType:      "clip",
+            liqOn:        false,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     0,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  0,
+            cm_tolerance: 9500,
+            calc_tau:     0,
+            calc_step:    120,
+            calc_cut:     9990
+        });
 
     }
 
@@ -2057,7 +2086,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkUNIV2LPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
-        FlipAbstract flip,
+        ClipAbstract clip,
         LPOsmAbstract pip,
         address _medianizer1,
         address _medianizer2,
@@ -2080,8 +2109,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
-        assertEq(flip.wards(address(end)), 1);
-        assertEq(flip.wards(address(flipMom)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
@@ -2129,10 +2158,10 @@ contract DssSpellTest is DSTest, DSMath {
         vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
-        assertEq(flip.kicks(), 0);
+        assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
             cat.bite(_ilk, address(this));
-            assertEq(flip.kicks(), 1);
+            assertEq(clip.kicks(), 1);
         }
 
         // Dump all dai for next run
@@ -2194,25 +2223,17 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
-            "MATIC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
-            addr.addr("PIP_MATIC"),
-            true,
-            true,
-            true
+        checkUNIV2LPIntegration(
+            "GUNIDAIUSDC1-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GUNIDAIUSDC1_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GUNIDAIUSDC1_A")),
+            addr.addr("PIP_GUNIDAIUSDC1"),
+            addr.addr("PIP_DAI"),
+            addr.addr("PIP_USDC"),
+            false,
+            false,
+            false
         );
-        checkPsmIlkIntegration(
-            "PSM-PAX-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
-            addr.addr("PIP_PSM_PAX"),
-            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            1 * WAD / 1000,
-            0
-        );
-        assertEq(PsmAbstract(addr.addr("MCD_PSM_USDC_A")).tin(), 2 * WAD / 1000);  // Check the USDC PSM tin as well as it's a small/related check
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
