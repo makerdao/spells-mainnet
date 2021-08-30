@@ -197,6 +197,8 @@ def get_library_info():
         if len(libraries_flags) == 0:
             raise ValueError('No library flags found in Makefile')
         libraries_flag = libraries_flags[0].strip().split(' ')
+        if len(libraries_flag) > 1:
+            exit('Only one library supported.')
         library_flag = libraries_flag[0]
         library_components = library_flag.split(':')
         if len(library_components) != 3:
