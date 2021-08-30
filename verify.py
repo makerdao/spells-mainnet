@@ -18,7 +18,10 @@ try:
     document = open('out/dapp.sol.json')
 except FileNotFoundError:
     exit('run dapp build first')
-content = json.load(document)
+try:
+    content = json.load(document)
+except json.decoder.JSONDecodeError:
+    exit('run dapp build again')
 
 if len(sys.argv) not in [3, 4]:
     print('''usage:
