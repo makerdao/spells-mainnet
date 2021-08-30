@@ -42,9 +42,11 @@ if len(sys.argv) == 4:
 contract_path = ''
 
 for path in content['contracts'].keys():
-    for name in content['contracts'][path].keys():
-        if name == contract_name:
-            contract_path = path
+    try:
+        content['contracts'][path][contract_name]
+        contract_path = path
+    except KeyError:
+        continue
 if contract_path == '':
     exit('contract name not found.')
 
