@@ -7,8 +7,7 @@ try:
     api_key = os.environ['ETHERSCAN_API_KEY']
 except KeyError:
     print('''  You need an Etherscan Api Key to verify contracts.
-  Create one at https://etherscan.io/myapikey
-
+  Create one at https://etherscan.io/myapikey\n
   Then export it with `export ETHERSCAN_API_KEY=xxxxxxxx'
 ''')
     exit()
@@ -24,8 +23,7 @@ except json.decoder.JSONDecodeError:
     exit('run dapp build again')
 
 if len(sys.argv) not in [3, 4]:
-    print('''usage:
-
+    print('''usage:\n
 ./verify.py <contractname> <address> [constructorArgs]
 ''')
     exit()
@@ -42,8 +40,8 @@ if len(contract_address) !=  42:
 constructor_arguments = ''
 if len(sys.argv) == 4:
     constructor_arguments = sys.argv[3]
-contract_path = ''
 
+contract_path = ''
 for path in content['contracts'].keys():
     try:
         content['contracts'][path][contract_name]
@@ -60,28 +58,18 @@ print(chain)
 
 text_metadata = content['contracts'][contract_path][contract_name]['metadata']
 metadata = json.loads(text_metadata)
-
 compiler_version = 'v' + metadata['compiler']['version']
-
 evm_version = metadata['settings']['evmVersion']
-
 optimizer_enabled = metadata['settings']['optimizer']['enabled']
-
 optimizer_runs = metadata['settings']['optimizer']['runs']
-
 license_name = metadata['sources'][contract_path]['license']
-
 license_numbers = {
     'GPL-3.0-or-later': 5,
     'AGPL-3.0-or-later': 13
 }
-
 license_number = license_numbers[license_name]
-
 module = 'contract'
-
 action = 'verifysourcecode'
-
 code_format = 'solidity-single-file'
 
 flatten = subprocess.run([
@@ -90,7 +78,6 @@ flatten = subprocess.run([
     '--source-file',
     contract_path
 ], capture_output=True)
-
 code = flatten.stdout.decode('utf-8')
 
 def get_block(signature, code, with_frame=False):
