@@ -282,7 +282,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x675099a42b236ad27045e3Eb7bcEF4A9106BFD53),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1629477825,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0xfe3c12D746A4b1Bc2952BfF2e5EB6c9E91f68E5a), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
@@ -1486,7 +1486,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         50 * MILLION,
+            line:         500 * MILLION,
             dust:         0,
             pct:          0,
             mat:          10000,
@@ -2291,14 +2291,10 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        ChainlogAbstract chainlog = ChainlogAbstract(addr.addr("CHANGELOG"));
+        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainlog.getAddress("PAX"), addr.addr("PAX"));
-        assertEq(chainlog.getAddress("PIP_PAX"), addr.addr("PIP_PAX"));
-
-        try chainlog.getAddress("PIP_PSM_PAX") returns (address) {
-            assertTrue(false);
-        } catch {}
+        assertEq(chainLog.getAddress("MCD_VEST_DAI"), addr.addr("MCD_VEST_DAI"));
+        assertEq(chainLog.getAddress("MCD_VEST_MKR"), addr.addr("MCD_VEST_MKR"));
     }
 
     function testNewIlkRegistryValues() public {
@@ -2306,83 +2302,18 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-        RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        // IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+        // RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
-        assertEq(ilkRegistry.join("RWA001-A"), addr.addr("MCD_JOIN_RWA001_A"));
-        assertEq(ilkRegistry.gem("RWA001-A"), addr.addr("RWA001"));
-        assertEq(ilkRegistry.dec("RWA001-A"), DSTokenAbstract(addr.addr("RWA001")).decimals());
-        assertEq(ilkRegistry.class("RWA001-A"), 3);
-        (,address pip,,) = RwaLiqOracle.ilks("RWA001-A");
-        assertEq(ilkRegistry.pip("RWA001-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA001-A"), address(0));
-        assertEq(ilkRegistry.name("RWA001-A"), "RWA001-A: 6s Capital");
-        assertEq(ilkRegistry.symbol("RWA001-A"), "RWA001");
-
-
-        assertEq(ilkRegistry.join("RWA002-A"), addr.addr("MCD_JOIN_RWA002_A"));
-        assertEq(ilkRegistry.gem("RWA002-A"), addr.addr("RWA002"));
-        assertEq(ilkRegistry.dec("RWA002-A"), DSTokenAbstract(addr.addr("RWA002")).decimals());
-        assertEq(ilkRegistry.class("RWA002-A"), 3);
-        (, pip,,) = RwaLiqOracle.ilks("RWA002-A");
-        assertEq(ilkRegistry.pip("RWA002-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA002-A"), address(0));
-        assertEq(ilkRegistry.name("RWA002-A"), "RWA002-A: Centrifuge: New Silver");
-        assertEq(ilkRegistry.symbol("RWA002-A"), "RWA002");
-
-
-        assertEq(ilkRegistry.join("RWA003-A"), addr.addr("MCD_JOIN_RWA003_A"));
-        assertEq(ilkRegistry.gem("RWA003-A"), addr.addr("RWA003"));
-        assertEq(ilkRegistry.dec("RWA003-A"), DSTokenAbstract(addr.addr("RWA003")).decimals());
-        assertEq(ilkRegistry.class("RWA003-A"), 3);
-        (, pip,,) = RwaLiqOracle.ilks("RWA003-A");
-        assertEq(ilkRegistry.pip("RWA003-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA003-A"), address(0));
-        assertEq(ilkRegistry.name("RWA003-A"), "RWA003-A: Centrifuge: ConsolFreight");
-        assertEq(ilkRegistry.symbol("RWA003-A"), "RWA003");
-
-
-        assertEq(ilkRegistry.join("RWA004-A"), addr.addr("MCD_JOIN_RWA004_A"));
-        assertEq(ilkRegistry.gem("RWA004-A"), addr.addr("RWA004"));
-        assertEq(ilkRegistry.dec("RWA004-A"), DSTokenAbstract(addr.addr("RWA004")).decimals());
-        assertEq(ilkRegistry.class("RWA004-A"), 3);
-        (, pip,,) = RwaLiqOracle.ilks("RWA004-A");
-        assertEq(ilkRegistry.pip("RWA004-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA004-A"), address(0));
-        assertEq(ilkRegistry.name("RWA004-A"), "RWA004-A: Centrifuge: Harbor Trade Credit");
-        assertEq(ilkRegistry.symbol("RWA004-A"), "RWA004");
-
-
-        assertEq(ilkRegistry.join("RWA005-A"), addr.addr("MCD_JOIN_RWA005_A"));
-        assertEq(ilkRegistry.gem("RWA005-A"), addr.addr("RWA005"));
-        assertEq(ilkRegistry.dec("RWA005-A"), DSTokenAbstract(addr.addr("RWA005")).decimals());
-        assertEq(ilkRegistry.class("RWA005-A"), 3);
-        (, pip,,) = RwaLiqOracle.ilks("RWA005-A");
-        assertEq(ilkRegistry.pip("RWA005-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA005-A"), address(0));
-        assertEq(ilkRegistry.name("RWA005-A"), "RWA005-A: Centrifuge: Fortunafi");
-        assertEq(ilkRegistry.symbol("RWA005-A"), "RWA005");
-
-
-        assertEq(ilkRegistry.join("RWA006-A"), addr.addr("MCD_JOIN_RWA006_A"));
-        assertEq(ilkRegistry.gem("RWA006-A"), addr.addr("RWA006"));
-        assertEq(ilkRegistry.dec("RWA006-A"), DSTokenAbstract(addr.addr("RWA006")).decimals());
-        assertEq(ilkRegistry.class("RWA006-A"), 3);
-        (, pip,,) = RwaLiqOracle.ilks("RWA006-A");
-        assertEq(ilkRegistry.pip("RWA006-A"), pip);
-        assertEq(ilkRegistry.xlip("RWA006-A"), address(0));
-        assertEq(ilkRegistry.name("RWA006-A"), "RWA006-A: Centrifuge: Alternative Equity Advisers");
-        assertEq(ilkRegistry.symbol("RWA006-A"), "RWA006");
-
-
-        assertEq(ilkRegistry.join("KNC-A"), addr.addr("MCD_JOIN_KNC_A"));
-        assertEq(ilkRegistry.gem("KNC-A"), addr.addr("KNC"));
-        assertEq(ilkRegistry.dec("KNC-A"), DSTokenAbstract(addr.addr("KNC")).decimals());
-        assertEq(ilkRegistry.class("KNC-A"), 1);
-        assertEq(ilkRegistry.pip("KNC-A"), addr.addr("PIP_KNC"));
-        assertEq(ilkRegistry.xlip("KNC-A"), addr.addr("MCD_CLIP_KNC_A"));
-        assertEq(ilkRegistry.name("KNC-A"), "Kyber Network Crystal");
-        assertEq(ilkRegistry.symbol("KNC-A"), "KNC");
+        // assertEq(ilkRegistry.join("RWA001-A"), addr.addr("MCD_JOIN_RWA001_A"));
+        // assertEq(ilkRegistry.gem("RWA001-A"), addr.addr("RWA001"));
+        // assertEq(ilkRegistry.dec("RWA001-A"), DSTokenAbstract(addr.addr("RWA001")).decimals());
+        // assertEq(ilkRegistry.class("RWA001-A"), 3);
+        // (,address pip,,) = RwaLiqOracle.ilks("RWA001-A");
+        // assertEq(ilkRegistry.pip("RWA001-A"), pip);
+        // assertEq(ilkRegistry.xlip("RWA001-A"), address(0));
+        // assertEq(ilkRegistry.name("RWA001-A"), "RWA001-A: 6s Capital");
+        // assertEq(ilkRegistry.symbol("RWA001-A"), "RWA001");
     }
 
     /* function test_core_unit_budgets() public {
@@ -2814,4 +2745,53 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(address(GENESIS_6S)), drawAmt); // genesis after
     }
 
+    function testVestDAI() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+
+        // Give admin powers to test address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(1);
+        //
+
+        address COM_WALLET = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+        uint256 OCT_01_2021 = 1633046400;
+        hevm.warp(OCT_01_2021);
+        uint256 prevBalance = dai.balanceOf(COM_WALLET);
+        vest.vest(1);
+        assertEq(dai.balanceOf(COM_WALLET), prevBalance + 30172134009955032820567); // About 1/4 of 122,700 DAI
+    }
+
+    function testVestMKR() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_MKR"));
+
+        assertEq(vest.cap(), 1_100 * WAD / 365 days);
+
+        address WALLET = 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD;
+
+        uint256 prevBalance = gov.balanceOf(WALLET);
+        uint256 MAY_01_2022 = 1651363200;
+        hevm.warp(MAY_01_2022);
+        vest.vest(1);
+        assertEq(gov.balanceOf(WALLET), prevBalance + 995 * WAD / 4);
+    }
+}
+
+interface DssVestLike {
+    function cap() external returns (uint256);
+    function unrestrict(uint256) external;
+    function vest(uint256) external;
 }
