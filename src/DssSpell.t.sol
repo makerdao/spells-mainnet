@@ -2176,32 +2176,32 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function testCollateralIntegrations() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    // function testCollateralIntegrations() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
 
-        // Insert new collateral tests here
-        checkIlkIntegration(
-            "MATIC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
-            addr.addr("PIP_MATIC"),
-            true,
-            true,
-            true
-        );
-        checkPsmIlkIntegration(
-            "PSM-PAX-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
-            addr.addr("PIP_PSM_PAX"),
-            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            1 * WAD / 1000,
-            0
-        );
-        assertEq(PsmAbstract(addr.addr("MCD_PSM_USDC_A")).tin(), 2 * WAD / 1000);  // Check the USDC PSM tin as well as it's a small/related check
-    }
+    //     // Insert new collateral tests here
+    //     checkIlkIntegration(
+    //         "MATIC-A",
+    //         GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
+    //         ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
+    //         addr.addr("PIP_MATIC"),
+    //         true,
+    //         true,
+    //         true
+    //     );
+    //     checkPsmIlkIntegration(
+    //         "PSM-PAX-A",
+    //         GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
+    //         ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
+    //         addr.addr("PIP_PSM_PAX"),
+    //         PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
+    //         1 * WAD / 1000,
+    //         0
+    //     );
+    //     assertEq(PsmAbstract(addr.addr("MCD_PSM_USDC_A")).tin(), 2 * WAD / 1000);  // Check the USDC PSM tin as well as it's a small/related check
+    // }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
