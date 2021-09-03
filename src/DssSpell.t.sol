@@ -3020,6 +3020,58 @@ contract DssSpellTest is DSTest, DSMath {
         vest.vest(3);
         assertEq(gov.balanceOf(ONE_WALLET), prevBalance + 995 * WAD / 4);
     }
+
+    function testFlash() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 vowDai = vat.dai(address(vow));
+
+        // Give ourselves tokens for repayment in the callbacks
+        FlashLike flash = FlashLike(addr.addr("MCD_FLASH"));
+        assertEq(flash.toll(), 0);
+        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 0); // 0 DAI fee on a 1M loan (on any actually)
+        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
+        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
+        assertEq(vat.sin(address(flash)), 0);
+        assertEq(vat.dai(address(flash)), 0);
+        flash.accrue();
+        assertEq(vat.dai(address(flash)), 0);
+        assertEq(vat.dai(address(vow)), vowDai);
+    }
+
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(token, address(dai));
+        assertEq(amount, 1 * MILLION * WAD);
+        assertEq(fee, 0);
+
+        dai.approve(msg.sender, 1_000_000 * WAD);
+
+        return keccak256("ERC3156FlashBorrower.onFlashLoan");
+    }
+
+    function onVatDaiFlashLoan(
+        address initiator,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(amount, 1 * MILLION * RAD);
+        assertEq(fee, 0);
+
+        vat.move(address(this), msg.sender, 1_000_000 * RAD);
+
+        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
+    }
 }
 
 interface DssVestLike {
@@ -3035,4 +3087,20 @@ interface DssVestLike {
     function rxd(uint256) external view returns (uint256);
     function unrestrict(uint256) external;
     function vest(uint256) external;
+}
+
+interface FlashLike {
+    function vat() external view returns (address);
+    function daiJoin() external view returns (address);
+    function dai() external view returns (address);
+    function vow() external view returns (address);
+    function max() external view returns (uint256);
+    function toll() external view returns (uint256);
+    function locked() external view returns (uint256);
+    function maxFlashLoan(address) external view returns (uint256);
+    function flashFee(address, uint256) external view returns (uint256);
+    function flashLoan(address, address, uint256, bytes calldata) external returns (bool);
+    function vatDaiFlashLoan(address, uint256, bytes calldata) external returns (bool);
+    function convert() external;
+    function accrue() external;
 }
