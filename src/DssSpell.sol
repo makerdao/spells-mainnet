@@ -199,7 +199,7 @@ contract DssSpellAction is DssAction {
         );
 
         // Increase PAX-PSM-A DC from 50 million DAI to 500 million DAI
-        DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 500 * MILLION);
+        DssExecLib.increaseIlkDebtCeiling("PSM-PAX-A", 450 * MILLION, true);
 
         // Decrease Flash Mint Fee (toll) from 0.05% to 0%
         DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_FLASH"), "toll", 0);
