@@ -132,7 +132,7 @@ contract DssSpellAction is DssAction {
             DssVestLike(MCD_VEST_DAI).create(                                MKT_WALLET,   103_134.00 * 10**18, SEP_01_2021, NOV_01_2021 - SEP_01_2021,            0, address(0))
         );
         DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(                                ORA_WALLET,   196_771.00 * 10**18, SEP_01_2021, JUL_01_2022 - SEP_01_2021,            0, address(0))
+            DssVestLike(MCD_VEST_DAI).create(                                ORA_WALLET, 4_196_771.00 * 10**18, SEP_01_2021, JUL_01_2022 - SEP_01_2021,            0, address(0))
         );
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(                                 PE_WALLET, 4_080_000.00 * 10**18, SEP_01_2021, MAY_01_2022 - SEP_01_2021,            0, address(0))

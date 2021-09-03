@@ -2727,7 +2727,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vest.fin(6), SEP_01_2021 + 303 days);
         assertEq(vest.mgr(6), address(0));
         assertEq(vest.res(6), 1);
-        assertEq(vest.tot(6), 196_771.00 * 10**18);
+        assertEq(vest.tot(6), 4_196_771.00 * 10**18);
         assertEq(vest.rxd(6), 0);
         // -----
         assertEq(vest.usr(7), PE_WALLET);
