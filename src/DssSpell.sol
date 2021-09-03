@@ -191,7 +191,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 500 * MILLION);
 
         // Decrease Flash Mint Fee (toll) from 0.05% to 0%
-        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_FLASH"), "toll", WAD);
+        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_FLASH"), "toll", 0);
 
         // Bump changelog version
         DssExecLib.setChangelogVersion("1.9.5");
