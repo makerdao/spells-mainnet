@@ -2892,13 +2892,158 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
         assertEq(vest.ids(), 16);
 
-        address WALLET = 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD;
+        address ONE_WALLET = 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD;
 
-        uint256 prevBalance = gov.balanceOf(WALLET);
+        // -----
+        assertEq(vest.usr(1), GRO_WALLET);
+        assertEq(vest.bgn(1), JUL_01_2021);
+        assertEq(vest.clf(1), JUL_01_2021 + 365 days);
+        assertEq(vest.fin(1), JUL_01_2021 + 365 days);
+        assertEq(vest.mgr(1), address(0));
+        assertEq(vest.res(1), 1);
+        assertEq(vest.tot(1), 803.18 * 10**18);
+        assertEq(vest.rxd(1), 0);
+        // -----
+        assertEq(vest.usr(2), ORA_WALLET);
+        assertEq(vest.bgn(2), JUL_01_2021);
+        assertEq(vest.clf(2), JUL_01_2021 + 365 days);
+        assertEq(vest.fin(2), JUL_01_2021 + 365 days);
+        assertEq(vest.mgr(2), address(0));
+        assertEq(vest.res(2), 1);
+        assertEq(vest.tot(2), 1_051.25 * 10**18);
+        assertEq(vest.rxd(2), 0);
+        // -----
+        assertEq(vest.usr(3), ONE_WALLET);
+        assertEq(vest.bgn(3), MAY_01_2021);
+        assertEq(vest.clf(3), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(3), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(3), PE_WALLET);
+        assertEq(vest.res(3), 0);
+        assertEq(vest.tot(3), 995.00 * 10**18);
+        assertEq(vest.rxd(3), 0);
+        // -----
+        assertEq(vest.usr(4), 0xBe4De3E151D52668c2C0610C985b4297833239C8);
+        assertEq(vest.bgn(4), MAY_01_2021);
+        assertEq(vest.clf(4), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(4), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(4), PE_WALLET);
+        assertEq(vest.res(4), 1);
+        assertEq(vest.tot(4), 995.00 * 10**18);
+        assertEq(vest.rxd(4), 0);
+        // -----
+        assertEq(vest.usr(5), 0x58EA3C96a8b81abC01EB78B98deCe2AD1e5fd7fc);
+        assertEq(vest.bgn(5), MAY_01_2021);
+        assertEq(vest.clf(5), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(5), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(5), PE_WALLET);
+        assertEq(vest.res(5), 1);
+        assertEq(vest.tot(5), 995.00 * 10**18);
+        assertEq(vest.rxd(5), 0);
+        // -----
+        assertEq(vest.usr(6), 0xBAB4Cd1cB31Cd28f842335973712a6015eB0EcD5);
+        assertEq(vest.bgn(6), MAY_01_2021);
+        assertEq(vest.clf(6), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(6), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(6), PE_WALLET);
+        assertEq(vest.res(6), 1);
+        assertEq(vest.tot(6), 995.00 * 10**18);
+        assertEq(vest.rxd(6), 0);
+        // -----
+        assertEq(vest.usr(7), 0xB5c86aff90944CFB3184902482799bD5fA3B18dD);
+        assertEq(vest.bgn(7), MAY_01_2021);
+        assertEq(vest.clf(7), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(7), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(7), PE_WALLET);
+        assertEq(vest.res(7), 0);
+        assertEq(vest.tot(7), 995.00 * 10**18);
+        assertEq(vest.rxd(7), 0);
+        // -----
+        assertEq(vest.usr(8), 0x780f478856ebE01e46d9A432e8776bAAB5A81b5b);
+        assertEq(vest.bgn(8), MAY_01_2021);
+        assertEq(vest.clf(8), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(8), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(8), PE_WALLET);
+        assertEq(vest.res(8), 1);
+        assertEq(vest.tot(8), 995.00 * 10**18);
+        assertEq(vest.rxd(8), 0);
+        // -----
+        assertEq(vest.usr(9), 0x34364E234b3DD02FF5c8A2ad9ba86bbD3D3D3284);
+        assertEq(vest.bgn(9), MAY_01_2021);
+        assertEq(vest.clf(9), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(9), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(9), PE_WALLET);
+        assertEq(vest.res(9), 0);
+        assertEq(vest.tot(9), 995.00 * 10**18);
+        assertEq(vest.rxd(9), 0);
+        // -----
+        assertEq(vest.usr(10), 0x46E5DBad3966453Af57e90Ec2f3548a0e98ec979);
+        assertEq(vest.bgn(10), MAY_01_2021);
+        assertEq(vest.clf(10), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(10), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(10), PE_WALLET);
+        assertEq(vest.res(10), 1);
+        assertEq(vest.tot(10), 995.00 * 10**18);
+        assertEq(vest.rxd(10), 0);
+        // -----
+        assertEq(vest.usr(11), 0x18CaE82909C31b60Fe0A9656D76406345C9cb9FB);
+        assertEq(vest.bgn(11), MAY_01_2021);
+        assertEq(vest.clf(11), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(11), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(11), PE_WALLET);
+        assertEq(vest.res(11), 1);
+        assertEq(vest.tot(11), 995.00 * 10**18);
+        assertEq(vest.rxd(11), 0);
+        // -----
+        assertEq(vest.usr(12), 0x301dD8eB831ddb93F128C33b9d9DC333210d9B25);
+        assertEq(vest.bgn(12), MAY_01_2021);
+        assertEq(vest.clf(12), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(12), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(12), PE_WALLET);
+        assertEq(vest.res(12), 0);
+        assertEq(vest.tot(12), 995.00 * 10**18);
+        assertEq(vest.rxd(12), 0);
+        // -----
+        assertEq(vest.usr(13), 0xBFC47D0D7452a25b7d3AA4d7379c69A891bD5d43);
+        assertEq(vest.bgn(13), MAY_01_2021);
+        assertEq(vest.clf(13), MAY_01_2021 + 365 days);
+        assertEq(vest.fin(13), MAY_01_2021 + 4 * 365 days);
+        assertEq(vest.mgr(13), PE_WALLET);
+        assertEq(vest.res(13), 0);
+        assertEq(vest.tot(13), 995.00 * 10**18);
+        assertEq(vest.rxd(13), 0);
+        // -----
+        assertEq(vest.usr(14), 0xcD16aa978A89Aa26b3121Fc8dd32228d7D0fcF4a);
+        assertEq(vest.bgn(14), SEP_13_2021);
+        assertEq(vest.clf(14), SEP_13_2021 + 365 days);
+        assertEq(vest.fin(14), SEP_13_2021 + 4 * 365 days);
+        assertEq(vest.mgr(14), PE_WALLET);
+        assertEq(vest.res(14), 0);
+        assertEq(vest.tot(14), 995.00 * 10**18);
+        assertEq(vest.rxd(14), 0);
+        // -----
+        assertEq(vest.usr(15), 0x3189cfe40CF011AAb13aDD8aE7284deD4CD30602);
+        assertEq(vest.bgn(15), JUN_21_2021);
+        assertEq(vest.clf(15), JUN_21_2021 + 365 days);
+        assertEq(vest.fin(15), JUN_21_2021 + 4 * 365 days);
+        assertEq(vest.mgr(15), PE_WALLET);
+        assertEq(vest.res(15), 1);
+        assertEq(vest.tot(15), 995.00 * 10**18);
+        assertEq(vest.rxd(15), 0);
+        // -----
+        assertEq(vest.usr(16), 0x29b37159C09a65af6a7CFb062998B169879442B6);
+        assertEq(vest.bgn(16), SEP_20_2021);
+        assertEq(vest.clf(16), SEP_20_2021 + 365 days);
+        assertEq(vest.fin(16), SEP_20_2021 + 4 * 365 days);
+        assertEq(vest.mgr(16), PE_WALLET);
+        assertEq(vest.res(16), 1);
+        assertEq(vest.tot(16), 995.00 * 10**18);
+        assertEq(vest.rxd(16), 0);
+
+        uint256 prevBalance = gov.balanceOf(ONE_WALLET);
         uint256 MAY_01_2022 = 1651363200;
         hevm.warp(MAY_01_2022);
-        vest.vest(1);
-        assertEq(gov.balanceOf(WALLET), prevBalance + 995 * WAD / 4);
+        vest.vest(3);
+        assertEq(gov.balanceOf(ONE_WALLET), prevBalance + 995 * WAD / 4);
     }
 }
 
