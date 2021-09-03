@@ -2745,16 +2745,126 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(dai.balanceOf(address(GENESIS_6S)), drawAmt); // genesis after
     }
 
+    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant DAIF_WALLET    = 0x34D8d61050Ef9D2B48Ab00e6dc8A8CA6581c5d63;
+    address constant DAIF_EF_WALLET = 0x5F5c328732c9E52DfCb81067b8bA56459b33921f;
+    address constant GOV_WALLET     = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address constant GRO_WALLET     = 0x7800C137A645c07132886539217ce192b9F0528e;
+    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+    address constant ORA_WALLET     = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address constant PE_WALLET      = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    address constant RISK_WALLET    = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant SES_WALLET     = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+
+    uint256 constant MAY_01_2021 = 1619827200;
+    uint256 constant JUN_21_2021 = 1624233600;
+    uint256 constant JUL_01_2021 = 1625097600;
+    uint256 constant SEP_01_2021 = 1630454400;
+    uint256 constant SEP_13_2021 = 1631491200;
+    uint256 constant SEP_20_2021 = 1632096000;
+    uint256 constant OCT_01_2021 = 1633046400;
+    uint256 constant NOV_01_2021 = 1635724800;
+    uint256 constant JAN_01_2022 = 1640995200;
+    uint256 constant MAY_01_2022 = 1651363200;
+    uint256 constant JUL_01_2022 = 1656633600;
+    uint256 constant SEP_01_2022 = 1661990400;
+
     function testVestDAI() public {
+        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.ids(), 0);
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
-
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.ids(), 9);
 
-        // Give admin powers to test address and make the vesting unrestricted for testing
+        // -----
+        assertEq(vest.usr(1), COM_WALLET);
+        assertEq(vest.bgn(1), SEP_01_2021);
+        assertEq(vest.clf(1), SEP_01_2021);
+        assertEq(vest.fin(1), SEP_01_2021 + 122 days);
+        assertEq(vest.mgr(1), address(0));
+        assertEq(vest.res(1), 1);
+        assertEq(vest.tot(1), 122_700.00 * 10**18);
+        assertEq(vest.rxd(1), 0);
+        // -----
+        assertEq(vest.usr(2), DAIF_WALLET);
+        assertEq(vest.bgn(2), OCT_01_2021);
+        assertEq(vest.clf(2), OCT_01_2021);
+        assertEq(vest.fin(2), OCT_01_2021 + 335 days);
+        assertEq(vest.mgr(2), address(0));
+        assertEq(vest.res(2), 1);
+        assertEq(vest.tot(2), 492_971.00 * 10**18);
+        assertEq(vest.rxd(2), 0);
+        // -----
+        assertEq(vest.usr(3), GOV_WALLET);
+        assertEq(vest.bgn(3), SEP_01_2021);
+        assertEq(vest.clf(3), SEP_01_2021);
+        assertEq(vest.fin(3), SEP_01_2021 + 30 days);
+        assertEq(vest.mgr(3), address(0));
+        assertEq(vest.res(3), 1);
+        assertEq(vest.tot(3), 123_333.00 * 10**18);
+        assertEq(vest.rxd(3), 0);
+        // -----
+        assertEq(vest.usr(4), GRO_WALLET);
+        assertEq(vest.bgn(4), SEP_01_2021);
+        assertEq(vest.clf(4), SEP_01_2021);
+        assertEq(vest.fin(4), SEP_01_2021 + 61 days);
+        assertEq(vest.mgr(4), address(0));
+        assertEq(vest.res(4), 1);
+        assertEq(vest.tot(4), 300_050.00 * 10**18);
+        assertEq(vest.rxd(4), 0);
+        // -----
+        assertEq(vest.usr(5), MKT_WALLET);
+        assertEq(vest.bgn(5), SEP_01_2021);
+        assertEq(vest.clf(5), SEP_01_2021);
+        assertEq(vest.fin(5), SEP_01_2021 + 61 days);
+        assertEq(vest.mgr(5), address(0));
+        assertEq(vest.res(5), 1);
+        assertEq(vest.tot(5), 103_134.00 * 10**18);
+        assertEq(vest.rxd(5), 0);
+        // -----
+        assertEq(vest.usr(6), ORA_WALLET);
+        assertEq(vest.bgn(6), SEP_01_2021);
+        assertEq(vest.clf(6), SEP_01_2021);
+        assertEq(vest.fin(6), SEP_01_2021 + 303 days);
+        assertEq(vest.mgr(6), address(0));
+        assertEq(vest.res(6), 1);
+        assertEq(vest.tot(6), 196_771.00 * 10**18);
+        assertEq(vest.rxd(6), 0);
+        // -----
+        assertEq(vest.usr(7), PE_WALLET);
+        assertEq(vest.bgn(7), SEP_01_2021);
+        assertEq(vest.clf(7), SEP_01_2021);
+        assertEq(vest.fin(7), SEP_01_2021 + 242 days);
+        assertEq(vest.mgr(7), address(0));
+        assertEq(vest.res(7), 1);
+        assertEq(vest.tot(7), 4_080_000.00 * 10**18);
+        assertEq(vest.rxd(7), 0);
+        // -----
+        assertEq(vest.usr(8), RISK_WALLET);
+        assertEq(vest.bgn(8), SEP_01_2021);
+        assertEq(vest.clf(8), SEP_01_2021);
+        assertEq(vest.fin(8), SEP_01_2021 + 365 days);
+        assertEq(vest.mgr(8), address(0));
+        assertEq(vest.res(8), 1);
+        assertEq(vest.tot(8), 184_000.00 * 10**18);
+        assertEq(vest.rxd(8), 0);
+        // -----
+        assertEq(vest.usr(9), RWF_WALLET);
+        assertEq(vest.bgn(9), SEP_01_2021);
+        assertEq(vest.clf(9), SEP_01_2021);
+        assertEq(vest.fin(9), SEP_01_2021 + 122 days);
+        assertEq(vest.mgr(9), address(0));
+        assertEq(vest.res(9), 1);
+        assertEq(vest.tot(9), 620_000.00 * 10**18);
+        assertEq(vest.rxd(9), 0);
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
         hevm.store(
             address(vest),
             keccak256(abi.encode(address(this), uint256(1))),
@@ -2763,22 +2873,24 @@ contract DssSpellTest is DSTest, DSMath {
         vest.unrestrict(1);
         //
 
-        address COM_WALLET = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
         uint256 OCT_01_2021 = 1633046400;
         hevm.warp(OCT_01_2021);
         uint256 prevBalance = dai.balanceOf(COM_WALLET);
         vest.vest(1);
-        assertEq(dai.balanceOf(COM_WALLET), prevBalance + 30172134009955032820567); // About 1/4 of 122,700 DAI
+        uint256 added = 30172131147540983606557; // 122_700 * 10**18 * 30 / 122;
+        assertEq(dai.balanceOf(COM_WALLET), prevBalance + added);
     }
 
     function testVestMKR() public {
+        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_MKR"));
+        assertEq(vest.ids(), 0);
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_MKR"));
-
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
+        assertEq(vest.ids(), 16);
 
         address WALLET = 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD;
 
@@ -2792,6 +2904,15 @@ contract DssSpellTest is DSTest, DSMath {
 
 interface DssVestLike {
     function cap() external returns (uint256);
+    function ids() external returns (uint256);
+    function usr(uint256) external view returns (address);
+    function bgn(uint256) external view returns (uint256);
+    function clf(uint256) external view returns (uint256);
+    function fin(uint256) external view returns (uint256);
+    function mgr(uint256) external view returns (address);
+    function res(uint256) external view returns (uint256);
+    function tot(uint256) external view returns (uint256);
+    function rxd(uint256) external view returns (uint256);
     function unrestrict(uint256) external;
     function vest(uint256) external;
 }
