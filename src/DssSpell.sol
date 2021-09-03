@@ -133,6 +133,16 @@ contract DssSpellAction is DssAction {
             DssVestLike(MCD_VEST_DAI).create(                                RWF_WALLET,   620_000.00 * 10**18, SEP_01_2021, JAN_01_2022 - 1 - SEP_01_2021,        0, address(0))
         );
 
+        // Growth MKR whole team vesting
+        DssVestLike(MCD_VEST_MKR).restrict(
+            DssVestLike(MCD_VEST_MKR).create(GRO_WALLET,                                       803.18 * 10**18, JUL_01_2021,                      365 days, 365 days, address(0))
+        );
+
+        // Oracles MKR whole team vesting
+        DssVestLike(MCD_VEST_MKR).restrict(
+            DssVestLike(MCD_VEST_MKR).create(ORA_WALLET,                                     1_051.25 * 10**18, JUL_01_2021,                      365 days, 365 days, address(0))
+        );
+
         // PE MKR vestings (per individual)
         (
             DssVestLike(MCD_VEST_MKR).create(0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD,       995.00 * 10**18, MAY_01_2021,                  4 * 365 days, 365 days,  PE_WALLET)
@@ -175,11 +185,6 @@ contract DssSpellAction is DssAction {
         );
         DssVestLike(MCD_VEST_MKR).restrict(
             DssVestLike(MCD_VEST_MKR).create(0x29b37159C09a65af6a7CFb062998B169879442B6,       995.00 * 10**18, SEP_20_2021,                  4 * 365 days, 365 days,  PE_WALLET)
-        );
-
-        // Oracles MKR whole team vesting
-        DssVestLike(MCD_VEST_MKR).restrict(
-            DssVestLike(MCD_VEST_MKR).create(ORA_WALLET,                                     1_051.25 * 10**18, JUL_01_2021,                      365 days, 365 days, address(0))
         );
 
         // Increase PAX-PSM-A DC from 50 million DAI to 500 million DAI
