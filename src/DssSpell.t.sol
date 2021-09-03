@@ -2766,7 +2766,6 @@ contract DssSpellTest is DSTest, DSMath {
         vest.unrestrict(1);
         //
 
-        uint256 OCT_01_2021 = 1633046400;
         hevm.warp(OCT_01_2021);
         uint256 prevBalance = dai.balanceOf(COM_WALLET);
         vest.vest(1);
