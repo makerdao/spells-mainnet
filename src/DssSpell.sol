@@ -104,6 +104,17 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_VEST_DAI", MCD_VEST_DAI);
         DssExecLib.setChangelogAddress("MCD_VEST_MKR", MCD_VEST_MKR);
 
+        // DssVestLike(VEST).restrict( Only recipient can request funds
+        //     DssVestLike(VEST).create(
+        //         Recipient of vest,
+        //         Total token amount of vest over period,
+        //         Start timestamp of vest,
+        //         Duration of the vesting period (in seconds),
+        //         Length of cliff period (in seconds),
+        //         Manager address
+        //     )
+        // );
+
         // Set DAI stream payments
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(                                COM_WALLET,   122_700.00 * 10**18, SEP_01_2021, JAN_01_2022 - SEP_01_2021,            0, address(0))
