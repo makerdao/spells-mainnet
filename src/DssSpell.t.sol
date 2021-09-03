@@ -2932,7 +2932,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vest.rxd(16), 0);
 
         uint256 prevBalance = gov.balanceOf(ONE_WALLET);
-        uint256 MAY_01_2022 = 1651363200;
         hevm.warp(MAY_01_2022);
         vest.vest(3);
         assertEq(gov.balanceOf(ONE_WALLET), prevBalance + 995 * WAD / 4);
