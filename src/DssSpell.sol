@@ -173,7 +173,7 @@ contract DssSpellAction is DssAction {
         DssVestLike(MCD_VEST_MKR).restrict(
             DssVestLike(MCD_VEST_MKR).create(0x780f478856ebE01e46d9A432e8776bAAB5A81b5b,       995.00 * 10**18, MAY_01_2021,                  4 * 365 days, 365 days,  PE_WALLET)
         );
-        (
+        DssVestLike(MCD_VEST_MKR).restrict(
             DssVestLike(MCD_VEST_MKR).create(0x34364E234b3DD02FF5c8A2ad9ba86bbD3D3D3284,       995.00 * 10**18, MAY_01_2021,                  4 * 365 days, 365 days,  PE_WALLET)
         );
         DssVestLike(MCD_VEST_MKR).restrict(
