@@ -170,18 +170,6 @@ contract DssSpellTest is DSTest, DSMath {
     address constant COM_MULTISIG        = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
     address constant COM_EMERGENCY       = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
 
-    uint256 constant amountGro    = 637900;
-    uint256 constant amountSes    = 702883;
-    uint256 constant amountMkt    = 98067;
-    uint256 constant amountGov    = 123333;
-    uint256 constant amountRwf    = 155000;
-    uint256 constant amountRisk   = 182000;
-    uint256 constant amountPe     = 510000;
-    uint256 constant amountOra    = 419677;
-    uint256 constant amountCom    = 40500;
-    uint256 constant amountComEr  = 121500;
-    uint256 constant amountTotal  = 2990860;
-
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
@@ -2316,57 +2304,6 @@ contract DssSpellTest is DSTest, DSMath {
         // assertEq(ilkRegistry.symbol("RWA001-A"), "RWA001");
     }
 
-    /* function test_core_unit_budgets() public {
-        uint256 prevSin      = vat.sin(address(vow));
-        uint256 prevDaiGro   = dai.balanceOf(GRO_MULTISIG);
-        uint256 prevDaiSes   = dai.balanceOf(SES_MULTISIG);
-        uint256 prevDaiMkt   = dai.balanceOf(MKT_MULTISIG);
-        uint256 prevDaiGov   = dai.balanceOf(GOV_MULTISIG);
-        uint256 prevDaiRwf   = dai.balanceOf(RWF_MULTISIG);
-        uint256 prevDaiRisk  = dai.balanceOf(RISK_CU_EOA);
-        uint256 prevDaiPe    = dai.balanceOf(PE_MULTISIG);
-        uint256 prevDaiOra   = dai.balanceOf(ORA_MULTISIG);
-        uint256 prevDaiCom   = dai.balanceOf(COM_MULTISIG);
-        uint256 prevDaiComEr = dai.balanceOf(COM_EMERGENCY);
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        vote(address(spell));
-        spell.schedule();
-        castPreviousSpell();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            ( amountGro
-            + amountSes
-            + amountMkt
-            + amountGov
-            + amountRwf
-            + amountRisk
-            + amountPe
-            + amountOra
-            + amountCom
-            + amountComEr
-            ) * RAD
-        );
-        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
-        assertEq(dai.balanceOf(GRO_MULTISIG)    - prevDaiGro, amountGro * WAD);
-        assertEq(dai.balanceOf(SES_MULTISIG)    - prevDaiSes, amountSes * WAD);
-        assertEq(dai.balanceOf(MKT_MULTISIG)    - prevDaiMkt, amountMkt * WAD);
-        assertEq(dai.balanceOf(GOV_MULTISIG)    - prevDaiGov, amountGov * WAD);
-        assertEq(dai.balanceOf(RWF_MULTISIG)    - prevDaiRwf, amountRwf * WAD);
-        assertEq(dai.balanceOf(RISK_CU_EOA)     - prevDaiRisk, amountRisk * WAD);
-        assertEq(dai.balanceOf(PE_MULTISIG)     - prevDaiPe, amountPe * WAD);
-        assertEq(dai.balanceOf(ORA_MULTISIG)    - prevDaiOra, amountOra * WAD);
-        assertEq(dai.balanceOf(COM_MULTISIG)    - prevDaiCom, amountCom * WAD);
-        assertEq(dai.balanceOf(COM_EMERGENCY)   - prevDaiComEr, amountComEr * WAD);
-    } */
-
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
@@ -2769,6 +2706,44 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant MAY_01_2022 = 1651363200;
     uint256 constant JUL_01_2022 = 1656633600;
     uint256 constant SEP_01_2022 = 1661990400;
+
+    function testOneTimePaymentDistributions() public {
+        // Set done to false in previous spell
+        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
+        assertTrue(!SpellLike(spellValues.previous_spell).done());
+
+        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevDaiDaiFEF   = dai.balanceOf(DAIF_EF_WALLET);
+        uint256 prevDaiDaiF     = dai.balanceOf(DAIF_WALLET);
+        uint256 prevDaiSes      = dai.balanceOf(SES_WALLET);
+
+        uint256 amountDaiFEF = 2_000_000;
+        uint256 amountDaiF   =   138_591;
+        uint256 amountSes    =   155_237;
+        uint256 amountTotal  = amountDaiFEF + amountDaiF + amountSes;
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountDaiFEF
+            + amountDaiF
+            + amountSes
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(DAIF_EF_WALLET) - prevDaiDaiFEF, amountDaiFEF * WAD);
+        assertEq(dai.balanceOf(DAIF_WALLET) - prevDaiDaiF, amountDaiF * WAD);
+        assertEq(dai.balanceOf(SES_WALLET) - prevDaiSes, amountSes * WAD);
+    }
 
     function testVestDAI() public {
         DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));

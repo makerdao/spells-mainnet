@@ -92,9 +92,9 @@ contract DssSpellAction is DssAction {
         ChainlogLike(DssExecLib.LOG).removeAddress("PIP_PSM_PAX");
 
         // Set unique payments
-        DssExecLib.sendPaymentFromSurplusBuffer(DAIF_WALLET,    2_000_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(DAIF_EF_WALLET,   138_591);
-        DssExecLib.sendPaymentFromSurplusBuffer(SES_WALLET,       155_237);
+        DssExecLib.sendPaymentFromSurplusBuffer(DAIF_EF_WALLET, 2_000_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(DAIF_WALLET,    138_591);
+        DssExecLib.sendPaymentFromSurplusBuffer(SES_WALLET,     155_237);
 
         // Setup both DssVest modules
         DssExecLib.authorize(DssExecLib.vat(), MCD_VEST_DAI);
