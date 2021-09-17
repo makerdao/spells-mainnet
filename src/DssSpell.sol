@@ -28,6 +28,8 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2021-09-17 MakerDAO Executive Spell | Hash: 0x613a50aee82adca6f6f32a4f7298c70b1c9d061648e786c84b3872ffc5963e3e";
 
+    string public constant in_memory_of = "Jeffrey Blechschmidt";
+    
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
