@@ -8,7 +8,7 @@ mkShell {
   DAPP_SOLC = solc-static-versions.solc_0_6_12 + "/bin/solc-0.6.12";
   DAPP_BUILD_OPTIMIZE = 1;
   DAPP_BUILD_OPTIMIZE_RUNS = 1;
-  DAPP_LIBRARIES = " lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x3117D2CbA81fC118fc471D383Ab20F11939A3CfF";
+  DAPP_LIBRARIES = " lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xfd88cee74f7d78697775abdae53f9da1559728e4";
   DAPP_LINK_TEST_LIBRARIES = 0;
   buildInputs = [
     dapp
