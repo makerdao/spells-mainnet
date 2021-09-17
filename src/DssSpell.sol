@@ -47,11 +47,11 @@ contract DssSpellAction is DssAction {
     uint256 constant BILLION  = 10 ** 9;
     uint256 constant RAY      = 10 ** 27;
 
-    address constant GUNI                   = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
-    address constant MCD_JOIN_GUNI_A        = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
-    address constant MCD_CLIP_GUNI_A        = 0x5048c5Cd3102026472f8914557A1FD35c8Dc6c9e;
-    address constant MCD_CLIP_CALC_GUNI_A   = 0x25B17065b94e3fDcD97d94A2DA29E7F77105aDd7;
-    address constant PIP_GUNI               = address(0); // TODO
+    address constant GUNIV3DAIUSDC1                 = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
+    address constant MCD_JOIN_GUNIV3DAIUSDC1_A      = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
+    address constant MCD_CLIP_GUNIV3DAIUSDC1_A      = 0x5048c5Cd3102026472f8914557A1FD35c8Dc6c9e;
+    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC1_A = 0x25B17065b94e3fDcD97d94A2DA29E7F77105aDd7;
+    address constant PIP_GUNIV3DAIUSDC1             = address(0); // TODO
 
     // Turn on office hours
     function officeHours() public override returns (bool) {
@@ -90,15 +90,15 @@ contract DssSpellAction is DssAction {
         });
 
         // G-UNI DAI/USDC
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNI_A, 120 seconds, 9990);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC1_A, 120 seconds, 9990);
 
-        CollateralOpts memory GUNI_A = CollateralOpts({
+        CollateralOpts memory GUNIV3DAIUSDC1_A = CollateralOpts({
             ilk:                   "GUNIV3DAIUSDC1-A",
-            gem:                   GUNI,
-            join:                  MCD_JOIN_GUNI_A,
-            clip:                  MCD_CLIP_GUNI_A,
-            calc:                  MCD_CLIP_CALC_GUNI_A,
-            pip:                   PIP_GUNI,
+            gem:                   GUNIV3DAIUSDC1,
+            join:                  MCD_JOIN_GUNIV3DAIUSDC1_A,
+            clip:                  MCD_CLIP_GUNIV3DAIUSDC1_A,
+            calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC1_A,
+            pip:                   PIP_GUNIV3DAIUSDC1,
             isLiquidatable:        false,
             isOSM:                 true,
             whitelistOSM:          false,
@@ -116,14 +116,14 @@ contract DssSpellAction is DssAction {
             kprPctReward:          10 // 0.1%
         });
 
-        DssExecLib.addNewCollateral(GUNI_A);
+        DssExecLib.addNewCollateral(GUNIV3DAIUSDC1_A);
         DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 10 * MILLION, 10 * MILLION, 8 hours);
 
-        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC1", GUNI);
-        DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC1_A", MCD_JOIN_GUNI_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC1_A", MCD_CLIP_GUNI_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC1_A", MCD_CLIP_CALC_GUNI_A);
-        DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC1", PIP_GUNI);
+        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC1", GUNIV3DAIUSDC1);
+        DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC1_A", MCD_JOIN_GUNIV3DAIUSDC1_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC1_A", MCD_CLIP_GUNIV3DAIUSDC1_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC1_A", MCD_CLIP_CALC_GUNIV3DAIUSDC1_A);
+        DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC1", PIP_GUNIV3DAIUSDC1);
         DssExecLib.setChangelogVersion("1.9.6");
     }
 
