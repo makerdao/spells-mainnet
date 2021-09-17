@@ -2038,7 +2038,7 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkUNIV3LPIntegration(
+    function checkUNILPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
         ClipAbstract clip,
@@ -2178,7 +2178,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkUNIV3LPIntegration(
+        checkUNILPIntegration(
             "GUNIV3DAIUSDC1-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A")),
             ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A")),

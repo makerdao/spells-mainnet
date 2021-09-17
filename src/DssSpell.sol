@@ -126,7 +126,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC1", PIP_GUNIV3DAIUSDC1);
         DssExecLib.setChangelogVersion("1.9.6");
     }
-
 }
 
 contract DssSpell is DssExec {
