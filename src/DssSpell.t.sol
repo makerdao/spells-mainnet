@@ -1870,7 +1870,7 @@ contract DssSpellTest is DSTest, DSMath {
         // hevm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(hevm.load(
             pip,
-            bytes32(uint256(6))
+            bytes32(uint256(3))
         )) & uint128(-1);   // Price is in the second half of the 32-byte storage slot
 
         // Price is bounded in the spot by around 10^23
@@ -2065,7 +2065,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
         assertEq(clip.wards(address(end)), 1);
-        assertEq(clip.wards(address(clipMom)), 1);
+        assertEq(clip.wards(address(clipMom)), 0);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
