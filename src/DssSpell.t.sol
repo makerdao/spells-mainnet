@@ -10,13 +10,6 @@ import "./test/addresses_mainnet.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
-interface RwaOutputConduitLike {
-    function hope(address) external;
-    function bud(address) external view returns (uint256);
-    function pick(address) external;
-    function push() external;
-}
-
 interface Hevm {
     function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
@@ -32,22 +25,6 @@ interface SpellLike {
 
 interface AuthLike {
     function wards(address) external view returns (uint256);
-}
-
-interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory,address,uint48,uint48);
-}
-
-interface RwaUrnLike {
-    function hope(address) external;
-    function draw(uint256) external;
-    function lock(uint256 wad) external;
-    function outputConduit() external view returns (address);
-}
-
-interface TinlakeManagerLike {
-    function lock(uint256 wad) external;
-    function file(bytes32 what, address data) external;
 }
 
 interface PsmAbstract {
@@ -154,21 +131,11 @@ contract DssSpellTest is DSTest, DSMath {
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapAbstract            flap = FlapAbstract(       addr.addr("MCD_FLAP"));
 
-    OsmMomAbstract        osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
-    FlipperMomAbstract   flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
-    ClipperMomAbstract   clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
-    DssAutoLineAbstract autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
-
-    address constant GRO_MULTISIG        = 0x7800C137A645c07132886539217ce192b9F0528e;
-    address constant SES_MULTISIG        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    address constant MKT_MULTISIG        = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
-    address constant GOV_MULTISIG        = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    address constant RWF_MULTISIG        = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    address constant RISK_CU_EOA         = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    address constant PE_MULTISIG         = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    address constant ORA_MULTISIG        = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
-    address constant COM_MULTISIG        = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant COM_EMERGENCY       = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
+    OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
+    FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
+    ClipperMomAbstract      clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
+    DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
+    LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
 
     DssSpell spell;
 
@@ -270,10 +237,10 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x838777A418ffbB9a0399FA1E5e7a3618933F54c6),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1630695203,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0xfe3c12D746A4b1Bc2952BfF2e5EB6c9E91f68E5a), // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
+            previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -2042,7 +2009,7 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkUNIV2LPIntegration(
+    function checkUNIV3LPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
         FlipAbstract flip,
@@ -2176,32 +2143,24 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    // function testCollateralIntegrations() public {
-    //     vote(address(spell));
-    //     scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testCollateralIntegrations() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     // Insert new collateral tests here
-    //     checkIlkIntegration(
-    //         "MATIC-A",
-    //         GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
-    //         ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
-    //         addr.addr("PIP_MATIC"),
-    //         true,
-    //         true,
-    //         true
-    //     );
-    //     checkPsmIlkIntegration(
-    //         "PSM-PAX-A",
-    //         GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
-    //         ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
-    //         addr.addr("PIP_PSM_PAX"),
-    //         PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-    //         1 * WAD / 1000,
-    //         0
-    //     );
-    //     assertEq(PsmAbstract(addr.addr("MCD_PSM_USDC_A")).tin(), 2 * WAD / 1000);  // Check the USDC PSM tin as well as it's a small/related check
-    // }
+        // Insert new collateral tests here
+        checkUNIV3LPIntegration(
+            "GUNIV3DAIUSDC1-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A")),
+            LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC1")),
+            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,     // PIP_DAI
+            addr.addr("PIP_USDC"),
+            false,
+            false,
+            false
+        );
+    }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
@@ -2237,41 +2196,6 @@ contract DssSpellTest is DSTest, DSMath {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-    }
-
-    function testRwaDrawUpToDebtCeiling() public {
-        giveAuth(address(vat), address(this));
-        vat.file("Line", uint256(-1));  // ensure the global debt ceiling doesn't interfere with draws
-        bytes32[] memory ilks = reg.list();
-        for(uint256 i = 0; i < ilks.length; i++) {
-            bytes32 ilk = ilks[i];
-            if (reg.class(ilk) != 3) continue;
-
-            // XXXXXXX-X=> XXXXXX_X_URN
-            bytes32 urnId = ilk & bytes32(bytes8(0xFFFFFFFFFFFF00FF));
-            urnId = urnId | bytes32(bytes12(0x0000000000005f005f55524e));
-            address urn = ChainlogAbstract(addr.addr("CHANGELOG")).getAddress(urnId);
-            giveAuth(urn, address(this));
-            RwaUrnLike(urn).hope(address(this));  // become operator
-
-            (uint256 ink,) = vat.urns(ilk, urn);
-            if (ink == 0) {
-                // Quick way to encumber collateral for the urn.
-                vat.slip(ilk, address(this), int256(WAD));
-                vat.frob(ilk, address(urn), address(this), address(this), int256(WAD), 0);
-            }
-
-            jug.drip(ilk);
-            (uint256 Art, uint256 rate,, uint256 line,) = vat.ilks(ilk);
-            uint256 room = sub(line, mul(Art, rate));
-            uint256 drawAmt = room / RAY;
-            if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
-                drawAmt = sub(room, rate) / RAY;
-            }
-            RwaUrnLike(urn).draw(drawAmt);
-            (Art,,,,) = vat.ilks(ilk);
-            assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
-        }
     }
 
     function testNewChainlogValues() public {
@@ -2600,423 +2524,24 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(expectedHash, actualHash);
     }
 
-    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant DAIF_WALLET    = 0x34D8d61050Ef9D2B48Ab00e6dc8A8CA6581c5d63;
-    address constant DAIF_EF_WALLET = 0x5F5c328732c9E52DfCb81067b8bA56459b33921f;
-    address constant GOV_WALLET     = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    address constant GRO_WALLET     = 0x7800C137A645c07132886539217ce192b9F0528e;
-    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
-    address constant ORA_WALLET     = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
-    address constant PE_WALLET      = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
-    address constant RISK_WALLET    = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    address constant SES_WALLET     = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-
-    uint256 constant MAY_01_2021 = 1619827200;
-    uint256 constant JUN_21_2021 = 1624233600;
-    uint256 constant JUL_01_2021 = 1625097600;
-    uint256 constant SEP_01_2021 = 1630454400;
-    uint256 constant SEP_13_2021 = 1631491200;
-    uint256 constant SEP_20_2021 = 1632096000;
-    uint256 constant OCT_01_2021 = 1633046400;
-    uint256 constant NOV_01_2021 = 1635724800;
-    uint256 constant JAN_01_2022 = 1640995200;
-    uint256 constant MAY_01_2022 = 1651363200;
-    uint256 constant JUL_01_2022 = 1656633600;
-    uint256 constant SEP_01_2022 = 1661990400;
-
-    function testOneTimePaymentDistributions() public {
-        // Set done to false in previous spell
-        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
-        assertTrue(!SpellLike(spellValues.previous_spell).done());
-
-        uint256 prevSin         = vat.sin(address(vow));
-        uint256 prevDaiDaiFEF   = dai.balanceOf(DAIF_EF_WALLET);
-        uint256 prevDaiDaiF     = dai.balanceOf(DAIF_WALLET);
-        uint256 prevDaiSes      = dai.balanceOf(SES_WALLET);
-
-        uint256 amountDaiFEF = 2_000_000;
-        uint256 amountDaiF   =   138_591;
-        uint256 amountSes    =   155_237;
-        uint256 amountTotal  = amountDaiFEF + amountDaiF + amountSes;
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            ( amountDaiFEF
-            + amountDaiF
-            + amountSes
-            ) * RAD
-        );
-        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
-        assertEq(dai.balanceOf(DAIF_EF_WALLET) - prevDaiDaiFEF, amountDaiFEF * WAD);
-        assertEq(dai.balanceOf(DAIF_WALLET) - prevDaiDaiF, amountDaiF * WAD);
-        assertEq(dai.balanceOf(SES_WALLET) - prevDaiSes, amountSes * WAD);
+    function getKNCMat() internal returns (uint256 mat) {
+        (, mat) = spotter.ilks("KNC-A");
     }
 
-    function testVestDAI() public {
-        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
-
-        assertEq(vest.ids(), 0);
-
+    function testKNCOffboarding() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("KNC Offboarding"));
 
-        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
-        assertEq(vest.ids(), 9);
+        hevm.warp(block.timestamp + 30 days);
+        assertEq(getKNCMat(), 175 * RAY / 100);
+        lerp.tick();
+        assertGt(getKNCMat(), 2000 * RAY / 100);
+        assertLt(getKNCMat(), 3000 * RAY / 100);
 
-        // -----
-        assertEq(vest.usr(1), COM_WALLET);
-        assertEq(vest.bgn(1), SEP_01_2021);
-        assertEq(vest.clf(1), SEP_01_2021);
-        assertEq(vest.fin(1), SEP_01_2021 + 122 days);
-        assertEq(vest.mgr(1), address(0));
-        assertEq(vest.res(1), 1);
-        assertEq(vest.tot(1), 122_700.00 * 10**18);
-        assertEq(vest.rxd(1), 0);
-        // -----
-        assertEq(vest.usr(2), DAIF_WALLET);
-        assertEq(vest.bgn(2), OCT_01_2021);
-        assertEq(vest.clf(2), OCT_01_2021);
-        assertEq(vest.fin(2), OCT_01_2021 + 335 days);
-        assertEq(vest.mgr(2), address(0));
-        assertEq(vest.res(2), 1);
-        assertEq(vest.tot(2), 492_971.00 * 10**18);
-        assertEq(vest.rxd(2), 0);
-        // -----
-        assertEq(vest.usr(3), GOV_WALLET);
-        assertEq(vest.bgn(3), SEP_01_2021);
-        assertEq(vest.clf(3), SEP_01_2021);
-        assertEq(vest.fin(3), SEP_01_2021 + 30 days);
-        assertEq(vest.mgr(3), address(0));
-        assertEq(vest.res(3), 1);
-        assertEq(vest.tot(3), 123_333.00 * 10**18);
-        assertEq(vest.rxd(3), 0);
-        // -----
-        assertEq(vest.usr(4), GRO_WALLET);
-        assertEq(vest.bgn(4), SEP_01_2021);
-        assertEq(vest.clf(4), SEP_01_2021);
-        assertEq(vest.fin(4), SEP_01_2021 + 61 days);
-        assertEq(vest.mgr(4), address(0));
-        assertEq(vest.res(4), 1);
-        assertEq(vest.tot(4), 300_050.00 * 10**18);
-        assertEq(vest.rxd(4), 0);
-        // -----
-        assertEq(vest.usr(5), MKT_WALLET);
-        assertEq(vest.bgn(5), SEP_01_2021);
-        assertEq(vest.clf(5), SEP_01_2021);
-        assertEq(vest.fin(5), SEP_01_2021 + 61 days);
-        assertEq(vest.mgr(5), address(0));
-        assertEq(vest.res(5), 1);
-        assertEq(vest.tot(5), 103_134.00 * 10**18);
-        assertEq(vest.rxd(5), 0);
-        // -----
-        assertEq(vest.usr(6), ORA_WALLET);
-        assertEq(vest.bgn(6), SEP_01_2021);
-        assertEq(vest.clf(6), SEP_01_2021);
-        assertEq(vest.fin(6), SEP_01_2021 + 303 days);
-        assertEq(vest.mgr(6), address(0));
-        assertEq(vest.res(6), 1);
-        assertEq(vest.tot(6), 4_196_771.00 * 10**18);
-        assertEq(vest.rxd(6), 0);
-        // -----
-        assertEq(vest.usr(7), PE_WALLET);
-        assertEq(vest.bgn(7), SEP_01_2021);
-        assertEq(vest.clf(7), SEP_01_2021);
-        assertEq(vest.fin(7), SEP_01_2021 + 242 days);
-        assertEq(vest.mgr(7), address(0));
-        assertEq(vest.res(7), 1);
-        assertEq(vest.tot(7), 4_080_000.00 * 10**18);
-        assertEq(vest.rxd(7), 0);
-        // -----
-        assertEq(vest.usr(8), RISK_WALLET);
-        assertEq(vest.bgn(8), SEP_01_2021);
-        assertEq(vest.clf(8), SEP_01_2021);
-        assertEq(vest.fin(8), SEP_01_2021 + 365 days);
-        assertEq(vest.mgr(8), address(0));
-        assertEq(vest.res(8), 1);
-        assertEq(vest.tot(8), 2_184_000.00 * 10**18);
-        assertEq(vest.rxd(8), 0);
-        // -----
-        assertEq(vest.usr(9), RWF_WALLET);
-        assertEq(vest.bgn(9), SEP_01_2021);
-        assertEq(vest.clf(9), SEP_01_2021);
-        assertEq(vest.fin(9), SEP_01_2021 + 122 days);
-        assertEq(vest.mgr(9), address(0));
-        assertEq(vest.res(9), 1);
-        assertEq(vest.tot(9), 620_000.00 * 10**18);
-        assertEq(vest.rxd(9), 0);
-
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        hevm.store(
-            address(vest),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-        vest.unrestrict(1);
-        //
-
-        hevm.warp(OCT_01_2021);
-        uint256 prevBalance = dai.balanceOf(COM_WALLET);
-        vest.vest(1);
-        uint256 added = 30172131147540983606557; // 122_700 * 10**18 * 30 / 122;
-        assertEq(dai.balanceOf(COM_WALLET), prevBalance + added);
+        hevm.warp(block.timestamp + 60 days);
+        lerp.tick();
+        assertEq(getKNCMat(), 5000 * RAY / 100);
     }
 
-    function testVestMKR() public {
-        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_MKR"));
-        assertEq(vest.ids(), 0);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 16);
-
-        address ONE_WALLET = 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD;
-
-        // -----
-        assertEq(vest.usr(1), GRO_WALLET);
-        assertEq(vest.bgn(1), JUL_01_2021);
-        assertEq(vest.clf(1), JUL_01_2021 + 365 days);
-        assertEq(vest.fin(1), JUL_01_2021 + 365 days);
-        assertEq(vest.mgr(1), address(0));
-        assertEq(vest.res(1), 1);
-        assertEq(vest.tot(1), 803.18 * 10**18);
-        assertEq(vest.rxd(1), 0);
-        // -----
-        assertEq(vest.usr(2), ORA_WALLET);
-        assertEq(vest.bgn(2), JUL_01_2021);
-        assertEq(vest.clf(2), JUL_01_2021 + 365 days);
-        assertEq(vest.fin(2), JUL_01_2021 + 365 days);
-        assertEq(vest.mgr(2), address(0));
-        assertEq(vest.res(2), 1);
-        assertEq(vest.tot(2), 1_051.25 * 10**18);
-        assertEq(vest.rxd(2), 0);
-        // -----
-        assertEq(vest.usr(3), ONE_WALLET);
-        assertEq(vest.bgn(3), MAY_01_2021);
-        assertEq(vest.clf(3), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(3), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(3), PE_WALLET);
-        assertEq(vest.res(3), 0);
-        assertEq(vest.tot(3), 995.00 * 10**18);
-        assertEq(vest.rxd(3), 0);
-        // -----
-        assertEq(vest.usr(4), 0xBe4De3E151D52668c2C0610C985b4297833239C8);
-        assertEq(vest.bgn(4), MAY_01_2021);
-        assertEq(vest.clf(4), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(4), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(4), PE_WALLET);
-        assertEq(vest.res(4), 1);
-        assertEq(vest.tot(4), 995.00 * 10**18);
-        assertEq(vest.rxd(4), 0);
-        // -----
-        assertEq(vest.usr(5), 0x58EA3C96a8b81abC01EB78B98deCe2AD1e5fd7fc);
-        assertEq(vest.bgn(5), MAY_01_2021);
-        assertEq(vest.clf(5), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(5), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(5), PE_WALLET);
-        assertEq(vest.res(5), 1);
-        assertEq(vest.tot(5), 995.00 * 10**18);
-        assertEq(vest.rxd(5), 0);
-        // -----
-        assertEq(vest.usr(6), 0xBAB4Cd1cB31Cd28f842335973712a6015eB0EcD5);
-        assertEq(vest.bgn(6), MAY_01_2021);
-        assertEq(vest.clf(6), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(6), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(6), PE_WALLET);
-        assertEq(vest.res(6), 1);
-        assertEq(vest.tot(6), 995.00 * 10**18);
-        assertEq(vest.rxd(6), 0);
-        // -----
-        assertEq(vest.usr(7), 0xB5c86aff90944CFB3184902482799bD5fA3B18dD);
-        assertEq(vest.bgn(7), MAY_01_2021);
-        assertEq(vest.clf(7), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(7), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(7), PE_WALLET);
-        assertEq(vest.res(7), 0);
-        assertEq(vest.tot(7), 995.00 * 10**18);
-        assertEq(vest.rxd(7), 0);
-        // -----
-        assertEq(vest.usr(8), 0x780f478856ebE01e46d9A432e8776bAAB5A81b5b);
-        assertEq(vest.bgn(8), MAY_01_2021);
-        assertEq(vest.clf(8), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(8), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(8), PE_WALLET);
-        assertEq(vest.res(8), 1);
-        assertEq(vest.tot(8), 995.00 * 10**18);
-        assertEq(vest.rxd(8), 0);
-        // -----
-        assertEq(vest.usr(9), 0x34364E234b3DD02FF5c8A2ad9ba86bbD3D3D3284);
-        assertEq(vest.bgn(9), MAY_01_2021);
-        assertEq(vest.clf(9), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(9), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(9), PE_WALLET);
-        assertEq(vest.res(9), 1);
-        assertEq(vest.tot(9), 995.00 * 10**18);
-        assertEq(vest.rxd(9), 0);
-        // -----
-        assertEq(vest.usr(10), 0x46E5DBad3966453Af57e90Ec2f3548a0e98ec979);
-        assertEq(vest.bgn(10), MAY_01_2021);
-        assertEq(vest.clf(10), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(10), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(10), PE_WALLET);
-        assertEq(vest.res(10), 1);
-        assertEq(vest.tot(10), 995.00 * 10**18);
-        assertEq(vest.rxd(10), 0);
-        // -----
-        assertEq(vest.usr(11), 0x18CaE82909C31b60Fe0A9656D76406345C9cb9FB);
-        assertEq(vest.bgn(11), MAY_01_2021);
-        assertEq(vest.clf(11), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(11), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(11), PE_WALLET);
-        assertEq(vest.res(11), 1);
-        assertEq(vest.tot(11), 995.00 * 10**18);
-        assertEq(vest.rxd(11), 0);
-        // -----
-        assertEq(vest.usr(12), 0x301dD8eB831ddb93F128C33b9d9DC333210d9B25);
-        assertEq(vest.bgn(12), MAY_01_2021);
-        assertEq(vest.clf(12), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(12), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(12), PE_WALLET);
-        assertEq(vest.res(12), 0);
-        assertEq(vest.tot(12), 995.00 * 10**18);
-        assertEq(vest.rxd(12), 0);
-        // -----
-        assertEq(vest.usr(13), 0xBFC47D0D7452a25b7d3AA4d7379c69A891bD5d43);
-        assertEq(vest.bgn(13), MAY_01_2021);
-        assertEq(vest.clf(13), MAY_01_2021 + 365 days);
-        assertEq(vest.fin(13), MAY_01_2021 + 4 * 365 days);
-        assertEq(vest.mgr(13), PE_WALLET);
-        assertEq(vest.res(13), 0);
-        assertEq(vest.tot(13), 995.00 * 10**18);
-        assertEq(vest.rxd(13), 0);
-        // -----
-        assertEq(vest.usr(14), 0xcD16aa978A89Aa26b3121Fc8dd32228d7D0fcF4a);
-        assertEq(vest.bgn(14), SEP_13_2021);
-        assertEq(vest.clf(14), SEP_13_2021 + 365 days);
-        assertEq(vest.fin(14), SEP_13_2021 + 4 * 365 days);
-        assertEq(vest.mgr(14), PE_WALLET);
-        assertEq(vest.res(14), 0);
-        assertEq(vest.tot(14), 995.00 * 10**18);
-        assertEq(vest.rxd(14), 0);
-        // -----
-        assertEq(vest.usr(15), 0x3189cfe40CF011AAb13aDD8aE7284deD4CD30602);
-        assertEq(vest.bgn(15), JUN_21_2021);
-        assertEq(vest.clf(15), JUN_21_2021 + 365 days);
-        assertEq(vest.fin(15), JUN_21_2021 + 4 * 365 days);
-        assertEq(vest.mgr(15), PE_WALLET);
-        assertEq(vest.res(15), 1);
-        assertEq(vest.tot(15), 995.00 * 10**18);
-        assertEq(vest.rxd(15), 0);
-        // -----
-        assertEq(vest.usr(16), 0x29b37159C09a65af6a7CFb062998B169879442B6);
-        assertEq(vest.bgn(16), SEP_20_2021);
-        assertEq(vest.clf(16), SEP_20_2021 + 365 days);
-        assertEq(vest.fin(16), SEP_20_2021 + 4 * 365 days);
-        assertEq(vest.mgr(16), PE_WALLET);
-        assertEq(vest.res(16), 1);
-        assertEq(vest.tot(16), 995.00 * 10**18);
-        assertEq(vest.rxd(16), 0);
-
-        uint256 prevBalance = gov.balanceOf(ONE_WALLET);
-        hevm.warp(MAY_01_2022);
-        vest.vest(3);
-        assertEq(gov.balanceOf(ONE_WALLET), prevBalance + 995 * WAD / 4);
-    }
-
-    function testFlash() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        uint256 vowDai = vat.dai(address(vow));
-
-        // Give ourselves tokens for repayment in the callbacks
-        FlashLike flash = FlashLike(addr.addr("MCD_FLASH"));
-        assertEq(flash.toll(), 0);
-        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 0); // 0 DAI fee on a 1M loan (on any actually)
-        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
-        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
-        assertEq(vat.sin(address(flash)), 0);
-        assertEq(vat.dai(address(flash)), 0);
-        flash.accrue();
-        assertEq(vat.dai(address(flash)), 0);
-        assertEq(vat.dai(address(vow)), vowDai);
-    }
-
-    function onFlashLoan(
-        address initiator,
-        address token,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));
-        assertEq(token, address(dai));
-        assertEq(amount, 1 * MILLION * WAD);
-        assertEq(fee, 0);
-
-        dai.approve(msg.sender, 1_000_000 * WAD);
-
-        return keccak256("ERC3156FlashBorrower.onFlashLoan");
-    }
-
-    function onVatDaiFlashLoan(
-        address initiator,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));
-        assertEq(amount, 1 * MILLION * RAD);
-        assertEq(fee, 0);
-
-        vat.move(address(this), msg.sender, 1_000_000 * RAD);
-
-        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
-    }
-}
-
-interface DssVestLike {
-    function cap() external returns (uint256);
-    function ids() external returns (uint256);
-    function usr(uint256) external view returns (address);
-    function bgn(uint256) external view returns (uint256);
-    function clf(uint256) external view returns (uint256);
-    function fin(uint256) external view returns (uint256);
-    function mgr(uint256) external view returns (address);
-    function res(uint256) external view returns (uint256);
-    function tot(uint256) external view returns (uint256);
-    function rxd(uint256) external view returns (uint256);
-    function unrestrict(uint256) external;
-    function vest(uint256) external;
-}
-
-interface FlashLike {
-    function vat() external view returns (address);
-    function daiJoin() external view returns (address);
-    function dai() external view returns (address);
-    function vow() external view returns (address);
-    function max() external view returns (uint256);
-    function toll() external view returns (uint256);
-    function locked() external view returns (uint256);
-    function maxFlashLoan(address) external view returns (uint256);
-    function flashFee(address, uint256) external view returns (uint256);
-    function flashLoan(address, address, uint256, bytes calldata) external returns (bool);
-    function vatDaiFlashLoan(address, uint256, bytes calldata) external returns (bool);
-    function convert() external;
-    function accrue() external;
 }
