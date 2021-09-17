@@ -2249,13 +2249,13 @@ contract DssSpellTest is DSTest, DSMath {
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
 
         assertEq(ilkRegistry.join("GUNIV3DAIUSDC1-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A"));
-        assertEq(ilkRegistry.gem("GUNIV3DAIUSDC1-A"), addr.addr("GUNIV3DAIUSDC1_A"));
-        assertEq(ilkRegistry.dec("GUNIV3DAIUSDC1-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC1_A")).decimals());
+        assertEq(ilkRegistry.gem("GUNIV3DAIUSDC1-A"), addr.addr("GUNIV3DAIUSDC1"));
+        assertEq(ilkRegistry.dec("GUNIV3DAIUSDC1-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC1")).decimals());
         assertEq(ilkRegistry.class("GUNIV3DAIUSDC1-A"), 1);
         assertEq(ilkRegistry.pip("GUNIV3DAIUSDC1-A"), addr.addr("PIP_GUNIV3DAIUSDC1"));
         assertEq(ilkRegistry.xlip("GUNIV3DAIUSDC1-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A"));
-        assertEq(ilkRegistry.name("GUNIV3DAIUSDC1-A"), "GUNIV3DAIUSDC1");
-        assertEq(ilkRegistry.symbol("GUNIV3DAIUSDC1-A"), "GUNIV3DAIUSDC1");
+        assertEq(ilkRegistry.name("GUNIV3DAIUSDC1-A"), "Gelato Uniswap DAI/USDC LP");
+        assertEq(ilkRegistry.symbol("GUNIV3DAIUSDC1-A"), "G-UNI");
     }
 
     function testFailWrongDay() public {
