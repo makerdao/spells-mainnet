@@ -52,7 +52,7 @@ contract DssSpellAction is DssAction {
     address constant MCD_JOIN_GUNIV3DAIUSDC1_A      = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
     address constant MCD_CLIP_GUNIV3DAIUSDC1_A      = 0x5048c5Cd3102026472f8914557A1FD35c8Dc6c9e;
     address constant MCD_CLIP_CALC_GUNIV3DAIUSDC1_A = 0x25B17065b94e3fDcD97d94A2DA29E7F77105aDd7;
-    address constant PIP_GUNIV3DAIUSDC1             = address(0); // TODO
+    address constant PIP_GUNIV3DAIUSDC1             = 0xDCbC54439ac0AF5FEa1d8394Fb177E4BFdA426f0;
 
     // Turn on office hours
     function officeHours() public override returns (bool) {
