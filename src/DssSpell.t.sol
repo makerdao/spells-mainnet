@@ -2041,7 +2041,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkUNIV3LPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
-        FlipAbstract flip,
+        ClipAbstract flip,
         LPOsmAbstract pip,
         address _medianizer1,
         address _medianizer2,
