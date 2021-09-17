@@ -270,7 +270,7 @@ contract DssSpellTest is DSTest, DSMath {
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
             clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             41                       // Num expected in system
+            ilk_count:             42                       // Num expected in system
         });
 
         //
@@ -1445,6 +1445,35 @@ contract DssSpellTest is DSTest, DSMath {
             dust:         0,
             pct:          0,
             mat:          10000,
+            liqType:      "clip",
+            liqOn:        false,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     0,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  0,
+            cm_tolerance: 9500,
+            calc_tau:     0,
+            calc_step:    120,
+            calc_cut:     9990
+        });
+        afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      10 * MILLION,
+            aL_gap:       10 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          10500,
             liqType:      "clip",
             liqOn:        false,
             chop:         1300,
