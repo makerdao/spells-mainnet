@@ -2065,7 +2065,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
         assertEq(clip.wards(address(end)), 1);
-        assertEq(clip.wards(address(clipMom)), 0);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
@@ -2115,7 +2114,7 @@ contract DssSpellTest is DSTest, DSMath {
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
-            cat.bite(_ilk, address(this));
+            dog.bark(_ilk, address(this), address(this));
             assertEq(clip.kicks(), 1);
         }
 
