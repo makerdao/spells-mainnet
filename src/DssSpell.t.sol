@@ -2041,7 +2041,7 @@ contract DssSpellTest is DSTest, DSMath {
     function checkUNIV3LPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
-        ClipAbstract flip,
+        ClipAbstract clip,
         LPOsmAbstract pip,
         address _medianizer1,
         address _medianizer2,
@@ -2064,8 +2064,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Authorization
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
-        assertEq(flip.wards(address(end)), 1);
-        assertEq(flip.wards(address(flipMom)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
@@ -2113,10 +2113,10 @@ contract DssSpellTest is DSTest, DSMath {
         vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
-        assertEq(flip.kicks(), 0);
+        assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
             cat.bite(_ilk, address(this));
-            assertEq(flip.kicks(), 1);
+            assertEq(clip.kicks(), 1);
         }
 
         // Dump all dai for next run
@@ -2243,18 +2243,16 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-        // RwaLiquidationLike RwaLiqOracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
 
-        // assertEq(ilkRegistry.join("RWA001-A"), addr.addr("MCD_JOIN_RWA001_A"));
-        // assertEq(ilkRegistry.gem("RWA001-A"), addr.addr("RWA001"));
-        // assertEq(ilkRegistry.dec("RWA001-A"), DSTokenAbstract(addr.addr("RWA001")).decimals());
-        // assertEq(ilkRegistry.class("RWA001-A"), 3);
-        // (,address pip,,) = RwaLiqOracle.ilks("RWA001-A");
-        // assertEq(ilkRegistry.pip("RWA001-A"), pip);
-        // assertEq(ilkRegistry.xlip("RWA001-A"), address(0));
-        // assertEq(ilkRegistry.name("RWA001-A"), "RWA001-A: 6s Capital");
-        // assertEq(ilkRegistry.symbol("RWA001-A"), "RWA001");
+        assertEq(ilkRegistry.join("GUNIV3DAIUSDC1-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A"));
+        assertEq(ilkRegistry.gem("GUNIV3DAIUSDC1-A"), addr.addr("GUNIV3DAIUSDC1_A"));
+        assertEq(ilkRegistry.dec("GUNIV3DAIUSDC1-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC1_A")).decimals());
+        assertEq(ilkRegistry.class("GUNIV3DAIUSDC1-A"), 1);
+        assertEq(ilkRegistry.pip("GUNIV3DAIUSDC1-A"), addr.addr("PIP_GUNIV3DAIUSDC1"));
+        assertEq(ilkRegistry.xlip("GUNIV3DAIUSDC1-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A"));
+        assertEq(ilkRegistry.name("GUNIV3DAIUSDC1-A"), "GUNIV3DAIUSDC1");
+        assertEq(ilkRegistry.symbol("GUNIV3DAIUSDC1-A"), "GUNIV3DAIUSDC1");
     }
 
     function testFailWrongDay() public {
