@@ -2295,7 +2295,6 @@ contract DssSpellTest is DSTest, DSMath {
         spell.schedule();
 
         castPreviousSpell();
-
         hevm.warp(spell.nextCastTime());
         uint256 startGas = gasleft();
         spell.cast();
@@ -2572,5 +2571,4 @@ contract DssSpellTest is DSTest, DSMath {
         lerp.tick();
         assertEq(getKNCMat(), 5000 * RAY / 100);
     }
-
 }
