@@ -1751,7 +1751,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(dunk >= RAD && dunk < MILLION * RAD, string(abi.encodePacked("TestError/cat-dunk-range-", ilk)));
 
                 (address flipper,,) = cat.ilks(ilk);
-                assertTrue(flipper != address(0), string(abi.encodePacked("TestError/invalid-flip-address-", ilk));
+                assertTrue(flipper != address(0), string(abi.encodePacked("TestError/invalid-flip-address-", ilk)));
                 FlipAbstract flip = FlipAbstract(flipper);
                 // Convert BP to system expected value
                 uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
@@ -1789,7 +1789,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(hole == 0 || hole >= RAD && hole <= 50 * MILLION * RAD, string(abi.encodePacked("TestError/dog-hole-range-", ilk)));
                 }
                 (address clipper,,,) = dog.ilks(ilk);
-                assertTrue(clipper != address(0), string(abi.encodePacked("TestError/invalid-clip-address-", ilk));
+                assertTrue(clipper != address(0), string(abi.encodePacked("TestError/invalid-clip-address-", ilk)));
                 ClipAbstract clip = ClipAbstract(clipper);
                 {
                 // Convert BP to system expected value
