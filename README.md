@@ -1,5 +1,6 @@
 # spells-mainnet
 ![Build Status](https://github.com/makerdao/spells-mainnet/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=master)
+
 Staging repo for MakerDAO weekly executive spells.
 
 
