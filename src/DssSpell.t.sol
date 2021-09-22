@@ -1538,11 +1538,7 @@ contract DssSpellTest is DSTest, DSMath {
 
     function vote(address spell_) internal {
         if (chief.hat() != spell_) {
-            hevm.store(
-                address(gov),
-                keccak256(abi.encode(address(this), uint256(1))),
-                bytes32(uint256(999999999999 ether))
-            );
+            giveTokens(gov, 999999999999 ether);
             gov.approve(address(chief), uint256(-1));
             chief.lock(999999999999 ether);
 
@@ -1755,6 +1751,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(dunk >= RAD && dunk < MILLION * RAD, string(abi.encodePacked("TestError/cat-dunk-range-", ilk)));
 
                 (address flipper,,) = cat.ilks(ilk);
+                assertTrue(flipper != address(0), string(abi.encodePacked("TestError/invalid-flip-address-", ilk)));
                 FlipAbstract flip = FlipAbstract(flipper);
                 // Convert BP to system expected value
                 uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
@@ -1792,6 +1789,7 @@ contract DssSpellTest is DSTest, DSMath {
                 assertTrue(hole == 0 || hole >= RAD && hole <= 50 * MILLION * RAD, string(abi.encodePacked("TestError/dog-hole-range-", ilk)));
                 }
                 (address clipper,,,) = dog.ilks(ilk);
+                assertTrue(clipper != address(0), string(abi.encodePacked("TestError/invalid-clip-address-", ilk)));
                 ClipAbstract clip = ClipAbstract(clipper);
                 {
                 // Convert BP to system expected value
@@ -2296,6 +2294,7 @@ contract DssSpellTest is DSTest, DSMath {
         vote(address(spell));
         spell.schedule();
 
+        castPreviousSpell();
         hevm.warp(spell.nextCastTime());
         uint256 startGas = gasleft();
         spell.cast();
@@ -2572,5 +2571,4 @@ contract DssSpellTest is DSTest, DSMath {
         lerp.tick();
         assertEq(getKNCMat(), 5000 * RAY / 100);
     }
-
 }
