@@ -237,10 +237,10 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 0x958ddD605BE8d0955F6AEec8569ad623e1130F02,        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1631922260,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -293,8 +293,8 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,               // In seconds
             flip_tau:     0,               // In seconds
             flipper_mom:  0,               // 1 if circuit breaker enabled
-            dog_hole:     30 * MILLION,
-            clip_buf:     13000,
+            dog_hole:     40 * MILLION,
+            clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -322,7 +322,7 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     15 * MILLION,
+            dog_hole:     25 * MILLION,
             clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
@@ -351,8 +351,8 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     20 * MILLION,
-            clip_buf:     13000,
+            dog_hole:     30 * MILLION,
+            clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -467,8 +467,8 @@ contract DssSpellTest is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     15 * MILLION,
-            clip_buf:     13000,
+            dog_hole:     25 * MILLION,
+            clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
@@ -2175,17 +2175,6 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkUNILPIntegration(
-            "GUNIV3DAIUSDC1-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A")),
-            LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC1")),
-            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,     // PIP_DAI
-            addr.addr("PIP_USDC"),
-            false,
-            false,
-            false
-        );
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
@@ -2231,11 +2220,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
-        assertEq(chainLog.getAddress("GUNIV3DAIUSDC1"), addr.addr("GUNIV3DAIUSDC1"));
-        assertEq(chainLog.getAddress("PIP_GUNIV3DAIUSDC1"), addr.addr("PIP_GUNIV3DAIUSDC1"));
-        assertEq(chainLog.getAddress("MCD_JOIN_GUNIV3DAIUSDC1_A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_GUNIV3DAIUSDC1_A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC1_A"), addr.addr("MCD_CLIP_CALC_GUNIV3DAIUSDC1_A"));
+        // Insert new changelog values tests here
     }
 
     function testNewIlkRegistryValues() public {
@@ -2245,14 +2230,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
 
-        assertEq(ilkRegistry.join("GUNIV3DAIUSDC1-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC1_A"));
-        assertEq(ilkRegistry.gem("GUNIV3DAIUSDC1-A"), addr.addr("GUNIV3DAIUSDC1"));
-        assertEq(ilkRegistry.dec("GUNIV3DAIUSDC1-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC1")).decimals());
-        assertEq(ilkRegistry.class("GUNIV3DAIUSDC1-A"), 1);
-        assertEq(ilkRegistry.pip("GUNIV3DAIUSDC1-A"), addr.addr("PIP_GUNIV3DAIUSDC1"));
-        assertEq(ilkRegistry.xlip("GUNIV3DAIUSDC1-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC1_A"));
-        assertEq(ilkRegistry.name("GUNIV3DAIUSDC1-A"), "Gelato Uniswap DAI/USDC LP");
-        assertEq(ilkRegistry.symbol("GUNIV3DAIUSDC1-A"), "G-UNI");
+        // Insert new ilk registry values tests here
     }
 
     function testFailWrongDay() public {
@@ -2552,23 +2530,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(expectedHash, actualHash);
     }
 
-    function getKNCMat() internal returns (uint256 mat) {
-        (, mat) = spotter.ilks("KNC-A");
-    }
-
-    function testKNCOffboarding() public {
+    function testIlkOffboarding() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
-        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("KNC Offboarding"));
+        assertTrue(spell.done());
+        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(""));
 
-        hevm.warp(block.timestamp + 30 days);
-        assertEq(getKNCMat(), 175 * RAY / 100);
-        lerp.tick();
-        assertGt(getKNCMat(), 2000 * RAY / 100);
-        assertLt(getKNCMat(), 3000 * RAY / 100);
-
-        hevm.warp(block.timestamp + 60 days);
-        lerp.tick();
-        assertEq(getKNCMat(), 5000 * RAY / 100);
+        // Insert ilk offboarding tests here
     }
 }
