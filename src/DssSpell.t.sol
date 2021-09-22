@@ -1441,7 +1441,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_line:      500 * MILLION,
             aL_gap:       50 * MILLION,
             aL_ttl:       24 hours,
-            line:         500 * MILLION,
+            line:         0,
             dust:         0,
             pct:          0,
             mat:          10000,
