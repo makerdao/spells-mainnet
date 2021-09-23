@@ -44,11 +44,6 @@ contract DssSpellAction is DssAction {
     // Math
     uint256 constant MILLION  = 10 ** 6;
 
-    // Turn off office hours
-    function officeHours() public override returns (bool) {
-        return false;
-    }
-
     function actions() public override {
 
         // Adjusting Auction Parameters for ETH-A, ETH-B, ETH-C, and WBTC-A
