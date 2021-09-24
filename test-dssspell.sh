@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+source ~/.dapprc
+
 [[ "$ETH_RPC_URL" && "$(seth chain)" == "ethlive"  ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1;  }
 
 export DAPP_BUILD_OPTIMIZE=1
