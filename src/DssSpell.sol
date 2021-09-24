@@ -31,9 +31,9 @@ contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20September%2017%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3d3670a98ca02e74c001bdf083765ab4eb4bc2cd/governance/votes/Executive%20vote%20-%20September%2024%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-09-24 MakerDAO Executive Spell | Hash: TODO";
+        "2021-09-24 MakerDAO Executive Spell | Hash: 0x655e71cb00b63a11c14db615d43d3e59202ff9d2b2bc6a6a03de42e258bd1be8";
 
     // L2 Test Spells
     address constant OPTIMISM_L1_GOVERNANCE_RELAY         = 0x09B354CDA89203BB7B3131CC728dFa06ab09Ae2F;
