@@ -4,6 +4,6 @@ all     :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xfD8
 clean   :; dapp clean
            # Usage example: make test match=SpellIsCast
 test    :; ./test-dssspell.sh $(match)
-deploy  :; make && dapp create DssSpell
+deploy  :; make && dapp create DssSpell | xargs ./verify.py DssSpell
 estimate:; ./estimate-deploy-gas.sh
 flatten :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
