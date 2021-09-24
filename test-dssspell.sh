@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-[[ "$ETH_RPC_URL" ]] || source ~/.dapprc
+[[ "$ETH_RPC_URL" ]] || source ~/.sethrc
 
 [[ "$ETH_RPC_URL" && "$(seth chain)" == "ethlive"  ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1;  }
 
