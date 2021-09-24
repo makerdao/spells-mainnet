@@ -2169,13 +2169,13 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function testCollateralIntegrations() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Insert new collateral tests here
-    }
+    // function testCollateralIntegrations() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+    //
+    //     // Insert new collateral tests here
+    // }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
@@ -2213,25 +2213,25 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testNewChainlogValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    // function testNewChainlogValues() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+    //
+    //     ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
+    //
+    //     // Insert new changelog values tests here
+    // }
 
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
-
-        // Insert new changelog values tests here
-    }
-
-    function testNewIlkRegistryValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-
-        // Insert new ilk registry values tests here
-    }
+    // function testNewIlkRegistryValues() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+    //
+    //     IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    //
+    //     // Insert new ilk registry values tests here
+    // }
 
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
@@ -2530,12 +2530,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(expectedHash, actualHash);
     }
 
-    function testIlkOffboarding() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(""));
-
-        // Insert ilk offboarding tests here
-    }
+    // function testIlkOffboarding() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+    //     LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(""));
+    //
+    //     // Insert ilk offboarding tests here
+    // }
 }
