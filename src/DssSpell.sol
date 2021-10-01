@@ -15,67 +15,93 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface OptimismL1GovernanceRelayLike {
-    function relay(address, bytes calldata, uint32) external;
-}
-interface ArbitrumL1GovernanceRelayLike {
-    function relay(address, bytes calldata, uint256, uint256, uint256, uint256) external;
+interface DssVestLike {
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function file(bytes32, uint256) external;
+    function restrict(uint256) external;
 }
 
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3d3670a98ca02e74c001bdf083765ab4eb4bc2cd/governance/votes/Executive%20vote%20-%20September%2024%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/989a2ee92df41ef7aee75a1ccdbedbe6071e28a7/governance/votes/Executive%20vote%20-%20October%201%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-09-24 MakerDAO Executive Spell | Hash: 0x655e71cb00b63a11c14db615d43d3e59202ff9d2b2bc6a6a03de42e258bd1be8";
+        "2021-10-01 MakerDAO Executive Spell | Hash: 0x240a8946c4c5f2463a1fcd6c7036409087af1c2407d502330e27c9149bfa7ed7";
 
-    // L2 Test Spells
-    address constant OPTIMISM_L1_GOVERNANCE_RELAY         = 0x09B354CDA89203BB7B3131CC728dFa06ab09Ae2F;
-    address constant OPTIMISM_L2_SPELL                    = 0x71d75C3D100D14d4db0cE7a83d0De48ecEC32D19;
-    address constant ARBITRUM_L1_GOVERNANCE_RELAY         = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
-    address constant ARBITRUM_L2_SPELL                    = 0xAeFc25750d8C2bd331293076E2DC5d5ad414b4a2;
+    // GovAlpha Core Unit
+    address constant GOV_ALPHA_WALLET = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+
+    uint256 constant OCT_01_2021 = 1633046400;
+    uint256 constant MAR_03_2022 = 1648684800;
 
     // Math
-    uint256 constant MILLION  = 10 ** 6;
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant WAD     = 10 ** 18;
+
+    // Turn on office hours
+    function officeHours() public override returns (bool) {
+        return true;
+    }
 
     function actions() public override {
+        address MCD_CLIP_USDT_A = DssExecLib.getChangelogAddress("MCD_CLIP_USDT_A");
+        address MCD_VEST_DAI    = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
 
-        // Adjusting Auction Parameters for ETH-A, ETH-B, ETH-C, and WBTC-A
-        // https://vote.makerdao.com/polling/QmfGk3Dm?network=mainnet#poll-detail
+        // Offboard USDT-A
+        // https://vote.makerdao.com/polling/QmRNwrTy?network=mainnet#vote-breakdown
 
-        // Decrease the Auction Price Multiplier (buf) for ETH-A, ETH-C, and WBTC-A vaults from 1.3 to 1.2
-        DssExecLib.setStartingPriceMultiplicativeFactor("ETH-A",  12000);
-        DssExecLib.setStartingPriceMultiplicativeFactor("ETH-C",  12000);
-        DssExecLib.setStartingPriceMultiplicativeFactor("WBTC-A", 12000);
+        // 15 thousand DAI maximum liquidation amount
+        DssExecLib.setIlkMaxLiquidationAmount("USDT-A", 15_000);
 
-        // Increase the Local Liquidation Limit (ilk.hole)
-        DssExecLib.setIlkMaxLiquidationAmount("ETH-A",  40 * MILLION); //  from 30 Million DAI to 40 Million DAI
-        DssExecLib.setIlkMaxLiquidationAmount("ETH-B",  25 * MILLION); //  from 15 Million DAI to 25 Million DAI
-        DssExecLib.setIlkMaxLiquidationAmount("ETH-C",  30 * MILLION); //  from 20 Million DAI to 30 Million DAI
-        DssExecLib.setIlkMaxLiquidationAmount("WBTC-A", 25 * MILLION); //  from 15 Million DAI to 25 Million DAI
+        // flip breaker to enable liquidations
+        DssExecLib.setValue(MCD_CLIP_USDT_A, "stopped", 0);
 
-        // Perform a Test Spell on Optimism
-        OptimismL1GovernanceRelayLike(OPTIMISM_L1_GOVERNANCE_RELAY).relay(
-            OPTIMISM_L2_SPELL,                /* target */
-            abi.encodeWithSignature("act()"), /* targetData */
-            3000000                           /* l2gas */
+        // authorize breaker
+        DssExecLib.authorize(MCD_CLIP_USDT_A, DssExecLib.clipperMom());
+
+        // set liquidation ratio to 300%
+        DssExecLib.setIlkLiquidationRatio("USDT-A", 30000);
+
+        // remove liquidation penalty
+        DssExecLib.setIlkLiquidationPenalty("USDT-A", 0);
+
+
+        // DssVestLike(VEST).restrict( Only recipient can request funds
+        //     DssVestLike(VEST).create(
+        //         Recipient of vest,
+        //         Total token amount of vest over period,
+        //         Start timestamp of vest,
+        //         Duration of the vesting period (in seconds),
+        //         Length of cliff period (in seconds),
+        //         Manager address
+        //     )
+        // );
+
+        // GOV-001 | 2021-10-01 to 2022-03-31 | 538,400 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
+        // https://vote.makerdao.com/polling/QmVtkcqW?network=mainnet#poll-detail
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(
+                GOV_ALPHA_WALLET,
+                538_400 * WAD,
+                OCT_01_2021,
+                MAR_03_2022 - OCT_01_2021,
+                0,
+                address(0)
+            )
         );
 
-        // Perform a Test Spell on Arbitrum
-        ArbitrumL1GovernanceRelayLike(ARBITRUM_L1_GOVERNANCE_RELAY).relay(
-            ARBITRUM_L2_SPELL,                /* target */
-            abi.encodeWithSignature("act()"), /* targetData */
-            680168429264,                     /* l1CallValue */
-            0,                                /* maxGas */
-            0,                                /* gasPriceBid */
-            680168429264                      /* maxSubmissionCost */
-        );
+        // SNE-001 | 2021-10-01 to 2021-12-31 | 135,375 DAI | 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
+        // https://vote.makerdao.com/polling/QmesWgnC?network=mainnet
+
+        // SH-001 | 2021-10-01 to 2021-12-31 | 58,000 DAI | 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550
+        // https://vote.makerdao.com/polling/Qme27ywB?network=mainnet#vote-breakdown
     }
 }
 
