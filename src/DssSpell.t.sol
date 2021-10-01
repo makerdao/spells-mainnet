@@ -2616,9 +2616,71 @@ contract DssSpellTest is DSTest, DSMath {
     // }
 
     address constant GOV_ALPHA_WALLET = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address constant SNE_WALLET       = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+    address constant SH_WALLET        = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
+    address constant SES_WALLET       = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    address constant DUX_WALLET       = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address constant RISK_WALLET      = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+
 
     uint256 constant OCT_01_2021 = 1633046400;
-    uint256 constant MAR_03_2022 = 1648684800;
+    uint256 constant DEC_31_2021 = 1640908800;
+    uint256 constant MAR_31_2022 = 1648684800;
+
+    function testOneTimeMkrDistributions() public {
+        uint256 prevMkrPP   = gov.balanceOf(pauseProxy);
+        uint256 prevMkrRisk = gov.balanceOf(RISK_WALLET);
+
+        uint256 amountMkrRisk =  300;
+        uint256 amountTotal   =  amountMkrRisk;
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(gov.balanceOf(pauseProxy),  prevMkrPP   - (amountTotal   * WAD));
+        assertEq(gov.balanceOf(RISK_WALLET), prevMkrRisk + (amountMkrRisk * WAD));
+    }
+
+    function testOneTimePaymentDistributions() public {
+        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevDaiSes      = dai.balanceOf(SES_WALLET);
+        uint256 prevDaiDux      = dai.balanceOf(DUX_WALLET);
+        uint256 prevDaiSne      = dai.balanceOf(SNE_WALLET);
+        uint256 prevDaiSh       = dai.balanceOf(SH_WALLET);
+
+        uint256 amountDaiSes =   307_631;
+        uint256 amountDaiDux =   483_575;
+        uint256 amountDaiSne =    75_000;
+        uint256 amountDaiSh  =   106_500;
+        uint256 amountTotal  =  amountDaiSes + amountDaiDux + amountDaiSne + amountDaiSh;
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountDaiSes
+            + amountDaiDux
+            + amountDaiSne
+            + amountDaiSh
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(SES_WALLET) - prevDaiSes, amountDaiSes * WAD);
+        assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDux, amountDaiDux * WAD);
+        assertEq(dai.balanceOf(SNE_WALLET) - prevDaiSne, amountDaiSne * WAD);
+        assertEq(dai.balanceOf(SH_WALLET)  - prevDaiSh , amountDaiSh  * WAD);
+    }
 
     function testVestDAI() public {
         DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
@@ -2629,7 +2691,7 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 10);
+        assertEq(vest.ids(), 12);
 
         // -----
         assertEq(vest.usr(10), GOV_ALPHA_WALLET);
@@ -2640,6 +2702,24 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(vest.res(10), 1);
         assertEq(vest.tot(10), 538_400 * WAD);
         assertEq(vest.rxd(10), 0);
+        // -----
+        assertEq(vest.usr(11), SNE_WALLET);
+        assertEq(vest.bgn(11), OCT_01_2021);
+        assertEq(vest.clf(11), OCT_01_2021);
+        assertEq(vest.fin(11), OCT_01_2021 + 91 days);
+        assertEq(vest.mgr(11), address(0));
+        assertEq(vest.res(11), 1);
+        assertEq(vest.tot(11), 135_375 * WAD);
+        assertEq(vest.rxd(11), 0);
+        // -----
+        assertEq(vest.usr(12), SH_WALLET);
+        assertEq(vest.bgn(12), OCT_01_2021);
+        assertEq(vest.clf(12), OCT_01_2021);
+        assertEq(vest.fin(12), OCT_01_2021 + 91 days);
+        assertEq(vest.mgr(12), address(0));
+        assertEq(vest.res(12), 1);
+        assertEq(vest.tot(12), 58_000 * WAD);
+        assertEq(vest.rxd(12), 0);
     }
 
     function checkIlkClipper(
