@@ -20,13 +20,20 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface DssVestLike {
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function restrict(uint256) external;
+interface VatLike {
+    function ilks(bytes32) external view returns (uint256, uint256, uint256, uint256, uint256);
+    function Line() external view returns (uint256);
+    function file(bytes32, uint256) external;
 }
 
-interface GemLike {
-    function transfer(address, uint256) external returns (bool);
+interface TokenLike {
+    function approve(address, uint256) external returns (bool);
+}
+
+interface DssVestLike {
+    function file(bytes32, uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function restrict(uint256) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -35,23 +42,38 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/989a2ee92df41ef7aee75a1ccdbedbe6071e28a7/governance/votes/Executive%20vote%20-%20October%201%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-10-01 MakerDAO Executive Spell | Hash: 0x240a8946c4c5f2463a1fcd6c7036409087af1c2407d502330e27c9149bfa7ed7";
+        "2021-10-08 MakerDAO Executive Spell | Hash: 0x240a8946c4c5f2463a1fcd6c7036409087af1c2407d502330e27c9149bfa7ed7";
 
-    // wallet addresses
-    address constant GOV_ALPHA_WALLET = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    address constant SNE_WALLET       = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
-    address constant SH_WALLET        = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
-    address constant SES_WALLET       = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    address constant DUX_WALLET       = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-    address constant RISK_WALLET      = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
-
-    uint256 constant OCT_01_2021 = 1633046400;
-    uint256 constant DEC_31_2021 = 1640908800;
-    uint256 constant MAR_31_2022 = 1648684800;
-
-    // Math
     uint256 constant MILLION = 10 ** 6;
     uint256 constant WAD     = 10 ** 18;
+    uint256 constant RAY     = 10 ** 27;
+
+    address constant CES_WALLET  = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
+    address constant RISK_WALLET = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+
+    address constant MCD_VEST_MKR_TREASURY = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+
+    uint256 constant APR_01_2021 = 1617235200;
+
+    uint256 constant CURRENT_BAT_MAT          = 150 * RAY / 100;
+    uint256 constant CURRENT_LRC_MAT          = 175 * RAY / 100;
+    uint256 constant CURRENT_ZRX_MAT          = 175 * RAY / 100;
+    uint256 constant CURRENT_UNIV2AAVEETH_MAT = 165 * RAY / 100;
+    uint256 constant CURRENT_UNIV2LINKETH_MAT = 165 * RAY / 100;
+
+    // The end parameter of dss-lerp is calculated as Math.round(CRmax / 100 * 1.5) * RAY where CRmax is the maximum collateral ratio for the ilk
+    uint256 constant TARGET_BAT_MAT          = 3800 * RAY / 100;
+    uint256 constant TARGET_LRC_MAT          = 2700 * RAY / 100;
+    uint256 constant TARGET_ZRX_MAT          = 2600 * RAY / 100;
+    uint256 constant TARGET_UNIV2AAVEETH_MAT = 400 * RAY / 100;
+    uint256 constant TARGET_UNIV2LINKETH_MAT = 700 * RAY / 100;
+
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "ds-math-add-overflow");
+    }
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "ds-math-sub-underflow");
+    }
 
     // Turn on office hours
     function officeHours() public override returns (bool) {
@@ -59,27 +81,21 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
-        address MCD_CLIP_USDT_A = DssExecLib.getChangelogAddress("MCD_CLIP_USDT_A");
-        address MCD_VEST_DAI    = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+       
+        //
+        // Direct payment
+        //
+        
+        // CES-001 - 1_223_552 DAI - 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da
+        // https://vote.makerdao.com/polling/QmbM8u7Q?network=mainnet#vote-breakdown
+        DssExecLib.sendPaymentFromSurplusBuffer(CES_WALLET, 1_223_552);
 
-        // Offboard USDT-A
-        // https://vote.makerdao.com/polling/QmRNwrTy?network=mainnet#vote-breakdown
+        //
+        // MKR vesting
+        //
 
-        // 15 thousand DAI maximum liquidation amount
-        DssExecLib.setIlkMaxLiquidationAmount("USDT-A", 15_000);
-
-        // flip breaker to enable liquidations
-        DssExecLib.setValue(MCD_CLIP_USDT_A, "stopped", 0);
-
-        // authorize breaker
-        DssExecLib.authorize(MCD_CLIP_USDT_A, DssExecLib.clipperMom());
-
-        // set liquidation ratio to 300%
-        DssExecLib.setIlkLiquidationRatio("USDT-A", 30000);
-
-        // remove liquidation penalty
-        DssExecLib.setIlkLiquidationPenalty("USDT-A", 0);
-
+        TokenLike(DssExecLib.getChangelogAddress("MCD_GOV")).approve(MCD_VEST_MKR_TREASURY, 700 * WAD);
+        DssVestLike(MCD_VEST_MKR_TREASURY).file("cap", 700 * WAD / 365 days);
 
         // DssVestLike(VEST).restrict( Only recipient can request funds
         //     DssVestLike(VEST).create(
@@ -92,72 +108,132 @@ contract DssSpellAction is DssAction {
         //     )
         // );
 
-        // GOV-001 | 2021-10-01 to 2022-03-31 | 538,400 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
-        // https://vote.makerdao.com/polling/QmVtkcqW?network=mainnet#poll-detail
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(
-                GOV_ALPHA_WALLET,
-                538_400 * WAD,
-                OCT_01_2021,
-                MAR_31_2022 - OCT_01_2021,
-                0,
+        // RISK-001 - 700 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
+        // https://vote.makerdao.com/polling/QmUAXKm4?network=mainnet#vote-breakdown
+
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create(
+                RISK_WALLET,
+                700 * WAD,
+                APR_01_2021,
+                365 days,
+                365 days,
                 address(0)
             )
         );
 
-        // SNE-001 | 2021-10-01 to 2021-12-31 | 135,375 DAI | 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
-        // https://vote.makerdao.com/polling/QmesWgnC?network=mainnet
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(
-                SNE_WALLET,
-                135_375 * WAD,
-                OCT_01_2021,
-                DEC_31_2021 - OCT_01_2021,
-                0,
-                address(0)
-            )
-        );
+        //
+        // Collateral offboarding
+        //
 
-        // SH-001 | 2021-10-01 to 2021-12-31 | 58,000 DAI | 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550
-        // https://vote.makerdao.com/polling/Qme27ywB?network=mainnet#vote-breakdown
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(
-                SH_WALLET,
-                58_000 * WAD,
-                OCT_01_2021,
-                DEC_31_2021 - OCT_01_2021,
-                0,
-                address(0)
-            )
-        );
+        uint256 totalLineReduction;
+        uint256 line;
+        VatLike vat = VatLike(DssExecLib.vat());
 
+        // Offboard BAT-A
+        // https://vote.makerdao.com/polling/QmWJfX8U?network=mainnet#vote-breakdown
 
-        // direct payments
+        (,,,line,) = vat.ilks("BAT-A");
+        totalLineReduction = add(totalLineReduction, line);
+        DssExecLib.setIlkLiquidationPenalty("BAT-A", 0);
+        DssExecLib.removeIlkFromAutoLine("BAT-A");
+        DssExecLib.setIlkDebtCeiling("BAT-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "BAT Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "BAT-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_BAT_MAT,
+            _end:       TARGET_BAT_MAT,
+            _duration:  60 days
+        });
 
-        // SES-001 - 307,631 DAI - 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
-        // https://vote.makerdao.com/polling/QmSkTmAx?network=mainnet
-        DssExecLib.sendPaymentFromSurplusBuffer(SES_WALLET, 307_631);
+        // Offboard LRC-A 
+        // https://vote.makerdao.com/polling/QmUx9LVs?network=mainnet#vote-breakdown
 
-        // DUX-001 - 483,575 DAI - 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
-        // https://vote.makerdao.com/polling/QmSYLL9K?network=mainnet
-        DssExecLib.sendPaymentFromSurplusBuffer(DUX_WALLET, 483_575);
+        (,,,line,) = vat.ilks("LRC-A");
+        totalLineReduction = add(totalLineReduction, line);
+        DssExecLib.setIlkLiquidationPenalty("LRC-A", 0);
+        DssExecLib.removeIlkFromAutoLine("LRC-A");
+        DssExecLib.setIlkDebtCeiling("LRC-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "LRC Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "LRC-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_LRC_MAT,
+            _end:       TARGET_LRC_MAT,
+            _duration:  60 days
+        });
 
-        // SNE-001 - 75,000 DAI - 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
-        // https://vote.makerdao.com/polling/QmesWgnC?network=mainnet
-        DssExecLib.sendPaymentFromSurplusBuffer(SNE_WALLET, 75_000);
+        // Offboard ZRX-A 
+        // https://vote.makerdao.com/polling/QmPfuF2W?network=mainnet#vote-breakdown
 
-        // SH-001 - 106,500 DAI - 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550
-        // https://vote.makerdao.com/polling/Qme27ywB?network=mainnet
-        DssExecLib.sendPaymentFromSurplusBuffer(SH_WALLET, 106_500);
+        (,,,line,) = vat.ilks("ZRX-A");
+        totalLineReduction = add(totalLineReduction, line);
+        DssExecLib.setIlkLiquidationPenalty("ZRX-A", 0);
+        DssExecLib.removeIlkFromAutoLine("ZRX-A");
+        DssExecLib.setIlkDebtCeiling("ZRX-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "ZRX Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "ZRX-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_ZRX_MAT,
+            _end:       TARGET_ZRX_MAT,
+            _duration:  60 days
+        });
 
+        // Offboard UNIV2AAVEETH-A
+        // https://vote.makerdao.com/polling/QmcuJHkq?network=mainnet#vote-breakdown
 
-        // direct MKR distribution
+        (,,,line,) = vat.ilks("UNIV2AAVEETH-A");
+        totalLineReduction = add(totalLineReduction, line);
+        DssExecLib.setIlkLiquidationPenalty("UNIV2AAVEETH-A", 0);
+        DssExecLib.removeIlkFromAutoLine("UNIV2AAVEETH-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2AAVEETH-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2AAVEETH Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2AAVEETH-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2AAVEETH_MAT,
+            _end:       TARGET_UNIV2AAVEETH_MAT,
+            _duration:  60 days
+        });
 
-        // Send 300 MKR from treasury to Risk
-        // RISK-001 - 300 MKR (from treasury) - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
-        // https://vote.makerdao.com/polling/QmUAXKm4?network=mainnet
-        GemLike(DssExecLib.getChangelogAddress("MCD_GOV")).transfer(RISK_WALLET, 300 * WAD);
+        // Offboard UNIV2LINKETH-A
+        // https://vote.makerdao.com/polling/Qmd7DPye?network=mainnet#vote-breakdown
 
+        (,,,line,) = vat.ilks("UNIV2LINKETH-A");
+        totalLineReduction = add(totalLineReduction, line);
+        DssExecLib.setIlkLiquidationPenalty("UNIV2LINKETH-A", 0);
+        DssExecLib.removeIlkFromAutoLine("UNIV2LINKETH-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2LINKETH-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2LINKETH Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2LINKETH-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2LINKETH_MAT,
+            _end:       TARGET_UNIV2LINKETH_MAT,
+            _duration:  60 days
+        });
+
+        // Decrease global debt ceiling in accordance with offboarded ilks
+        vat.file("Line", sub(vat.Line(), totalLineReduction));
+
+        //
+        // Update Changelog
+        //
+
+        DssExecLib.setChangelogAddress("MCD_VEST_MKR_TREASURY", MCD_VEST_MKR_TREASURY);
+        DssExecLib.setChangelogVersion("1.9.7");
     }
 }
 
