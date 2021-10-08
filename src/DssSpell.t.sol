@@ -1770,8 +1770,8 @@ contract DssSpellTest is DSTest, DSMath {
             } else {
                 uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
                 assertEq(mat, normalizedTestMat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
+                assertTrue(mat >= RAY && mat < 10 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));    // cr eq 100% and lt 1000%
             }
-            assertTrue(mat >= RAY && mat < 10 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));    // cr eq 100% and lt 1000%
             }
 
             if (values.collaterals[ilk].liqType == "flip") {
