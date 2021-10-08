@@ -2687,10 +2687,10 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testUNIV2AAVEETHOffboardings() public {
-        checkIlkLerpOffboarding("UNIV2AAVEETH-A", "UNIV2AAVEETH Offboarding", 165, 200, 400, 400);
+        checkIlkLerpOffboarding("UNIV2AAVEETH-A", "UNIV2AAVEETH Offboarding", 165, 250, 300, 400);
     }
 
     function testUNIV2LINKETHOffboardings() public {
-        checkIlkLerpOffboarding("UNIV2LINKETH-A", "UNIV2LINKETH Offboarding", 165, 100, 300, 300);
+        checkIlkLerpOffboarding("UNIV2LINKETH-A", "UNIV2LINKETH Offboarding", 165, 200, 260, 300);
     }
 }
