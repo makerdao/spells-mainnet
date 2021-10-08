@@ -67,16 +67,11 @@ contract DssSpellAction is DssAction {
     uint256 constant TARGET_UNIV2AAVEETH_MAT = 400 * RAY / 100;
     uint256 constant TARGET_UNIV2LINKETH_MAT = 300 * RAY / 100;
 
-    function add(uint x, uint y) internal pure returns (uint z) {
+    function _add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
     }
-    function sub(uint x, uint y) internal pure returns (uint z) {
+    function _sub(uint x, uint y) internal pure returns (uint z) {
         require((z = x - y) <= x, "ds-math-sub-underflow");
-    }
-
-    // Turn on office hours
-    function officeHours() public override returns (bool) {
-        return true;
     }
 
     function actions() public override {
@@ -94,7 +89,7 @@ contract DssSpellAction is DssAction {
         //
 
         TokenLike(DssExecLib.getChangelogAddress("MCD_GOV")).approve(MCD_VEST_MKR_TREASURY, 700 * WAD);
-        DssVestLike(MCD_VEST_MKR_TREASURY).file("cap", 700 * WAD / 365 days);
+        DssVestLike(MCD_VEST_MKR_TREASURY).file("cap", 1000 * WAD / 365 days);
 
         // DssVestLike(VEST).restrict( Only recipient can request funds
         //     DssVestLike(VEST).create(
@@ -133,7 +128,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmWJfX8U?network=mainnet#vote-breakdown
 
         (,,,line,) = vat.ilks("BAT-A");
-        totalLineReduction = add(totalLineReduction, line);
+        totalLineReduction = _add(totalLineReduction, line);
         DssExecLib.setIlkLiquidationPenalty("BAT-A", 0);
         DssExecLib.removeIlkFromAutoLine("BAT-A");
         DssExecLib.setIlkDebtCeiling("BAT-A", 0);
@@ -152,7 +147,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmUx9LVs?network=mainnet#vote-breakdown
 
         (,,,line,) = vat.ilks("LRC-A");
-        totalLineReduction = add(totalLineReduction, line);
+        totalLineReduction = _add(totalLineReduction, line);
         DssExecLib.setIlkLiquidationPenalty("LRC-A", 0);
         DssExecLib.removeIlkFromAutoLine("LRC-A");
         DssExecLib.setIlkDebtCeiling("LRC-A", 0);
@@ -171,7 +166,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmPfuF2W?network=mainnet#vote-breakdown
 
         (,,,line,) = vat.ilks("ZRX-A");
-        totalLineReduction = add(totalLineReduction, line);
+        totalLineReduction = _add(totalLineReduction, line);
         DssExecLib.setIlkLiquidationPenalty("ZRX-A", 0);
         DssExecLib.removeIlkFromAutoLine("ZRX-A");
         DssExecLib.setIlkDebtCeiling("ZRX-A", 0);
@@ -190,7 +185,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmcuJHkq?network=mainnet#vote-breakdown
 
         (,,,line,) = vat.ilks("UNIV2AAVEETH-A");
-        totalLineReduction = add(totalLineReduction, line);
+        totalLineReduction = _add(totalLineReduction, line);
         DssExecLib.setIlkLiquidationPenalty("UNIV2AAVEETH-A", 0);
         DssExecLib.removeIlkFromAutoLine("UNIV2AAVEETH-A");
         DssExecLib.setIlkDebtCeiling("UNIV2AAVEETH-A", 0);
@@ -209,7 +204,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/Qmd7DPye?network=mainnet#vote-breakdown
 
         (,,,line,) = vat.ilks("UNIV2LINKETH-A");
-        totalLineReduction = add(totalLineReduction, line);
+        totalLineReduction = _add(totalLineReduction, line);
         DssExecLib.setIlkLiquidationPenalty("UNIV2LINKETH-A", 0);
         DssExecLib.removeIlkFromAutoLine("UNIV2LINKETH-A");
         DssExecLib.setIlkDebtCeiling("UNIV2LINKETH-A", 0);
@@ -225,7 +220,7 @@ contract DssSpellAction is DssAction {
         });
 
         // Decrease global debt ceiling in accordance with offboarded ilks
-        vat.file("Line", sub(vat.Line(), totalLineReduction));
+        vat.file("Line", _sub(vat.Line(), totalLineReduction));
 
         //
         // Update Changelog
