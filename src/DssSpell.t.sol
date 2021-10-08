@@ -2283,6 +2283,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertTrue(spell.done());
 
         assertEq(chainLog.getAddress("MCD_VEST_MKR_TREASURY"), addr.addr("MCD_VEST_MKR_TREASURY"));
+        assertEq(chainLog.getAddress("OPTIMISM_DAI_BRIDGE"),   addr.addr("OPTIMISM_DAI_BRIDGE"));
+        assertEq(chainLog.getAddress("OPTIMISM_ESCROW"),       addr.addr("OPTIMISM_ESCROW"));
+        assertEq(chainLog.getAddress("OPTIMISM_GOV_RELAY"),    addr.addr("OPTIMISM_GOV_RELAY"));
+        assertEq(chainLog.getAddress("ARBITRUM_DAI_BRIDGE"),   addr.addr("ARBITRUM_DAI_BRIDGE"));
+        assertEq(chainLog.getAddress("ARBITRUM_ESCROW"),       addr.addr("ARBITRUM_ESCROW"));
+        assertEq(chainLog.getAddress("ARBITRUM_GOV_RELAY"),    addr.addr("ARBITRUM_GOV_RELAY"));
     }
 
     // function testNewIlkRegistryValues() public {
@@ -2476,7 +2482,8 @@ contract DssSpellTest is DSTest, DSMath {
         0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
         0xd200790f62c8da69973e61d4936cfE4f356ccD07,
         0xdA0C0de01d90A5933692Edf03c7cE946C7c50445,
-        0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3
+        0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3,
+        0x075da589886BA445d7c7e81c472059dE7AE65250 // Used for Optimism & Arbitrum bridge contracts
     ];
 
     function checkWards(address _addr, string memory contractName) internal {

@@ -51,6 +51,12 @@ contract DssSpellAction is DssAction {
     address constant RISK_WALLET = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
 
     address constant MCD_VEST_MKR_TREASURY = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+    address constant OPTIMISM_DAI_BRIDGE   = 0x10E6593CDda8c58a1d0f14C5164B376352a55f2F;
+    address constant OPTIMISM_ESCROW       = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+    address constant OPTIMISM_GOV_RELAY    = 0x09B354CDA89203BB7B3131CC728dFa06ab09Ae2F;
+    address constant ARBITRUM_DAI_BRIDGE   = 0xD3B5b60020504bc3489D6949d545893982BA3011;
+    address constant ARBITRUM_ESCROW       = 0xA10c7CE4b876998858b1a9E12b10092229539400;
+    address constant ARBITRUM_GOV_RELAY    = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
 
     uint256 constant APR_01_2021 = 1617235200;
 
@@ -228,6 +234,12 @@ contract DssSpellAction is DssAction {
         //
 
         DssExecLib.setChangelogAddress("MCD_VEST_MKR_TREASURY", MCD_VEST_MKR_TREASURY);
+        DssExecLib.setChangelogAddress("OPTIMISM_DAI_BRIDGE", OPTIMISM_DAI_BRIDGE);
+        DssExecLib.setChangelogAddress("OPTIMISM_ESCROW", OPTIMISM_ESCROW);
+        DssExecLib.setChangelogAddress("OPTIMISM_GOV_RELAY", OPTIMISM_GOV_RELAY);
+        DssExecLib.setChangelogAddress("ARBITRUM_DAI_BRIDGE", ARBITRUM_DAI_BRIDGE);
+        DssExecLib.setChangelogAddress("ARBITRUM_ESCROW", ARBITRUM_ESCROW);
+        DssExecLib.setChangelogAddress("ARBITRUM_GOV_RELAY", ARBITRUM_GOV_RELAY);
         DssExecLib.setChangelogVersion("1.9.7");
     }
 }
