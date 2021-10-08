@@ -138,6 +138,7 @@ contract DssSpellTest is DSTest, DSMath {
     Addresses addr  = new Addresses();
 
     // ADDRESSES
+    ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
     DSPauseAbstract        pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
     address           pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
     DSChiefAbstract        chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
@@ -2281,7 +2282,6 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         assertEq(chainLog.getAddress("MCD_VEST_MKR_TREASURY"), addr.addr("MCD_VEST_MKR_TREASURY"));
     }
 
@@ -2510,7 +2510,6 @@ contract DssSpellTest is DSTest, DSMath {
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
         bytes32[] memory contractNames = chainLog.list();
         for(uint256 i = 0; i < contractNames.length; i++) {
             address _addr = chainLog.getAddress(contractNames[i]);
