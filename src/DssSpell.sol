@@ -44,7 +44,6 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2021-10-08 MakerDAO Executive Spell | Hash: 0xe1126241f8df6e094363eac12a5c4620f0dbf54c4d7da7fa94f5b8dd499e30d2";
 
-    uint256 constant MILLION = 10 ** 6;
     uint256 constant WAD     = 10 ** 18;
     uint256 constant RAY     = 10 ** 27;
 
@@ -89,7 +88,9 @@ contract DssSpellAction is DssAction {
         //
 
         TokenLike(DssExecLib.getChangelogAddress("MCD_GOV")).approve(MCD_VEST_MKR_TREASURY, 700 * WAD);
-        DssVestLike(MCD_VEST_MKR_TREASURY).file("cap", 1000 * WAD / 365 days);
+
+        // Set system-wide cap on maximum vesting speed
+        DssVestLike(MCD_VEST_MKR_TREASURY).file("cap", 1100 * WAD / 365 days);
 
         // DssVestLike(VEST).restrict( Only recipient can request funds
         //     DssVestLike(VEST).create(
