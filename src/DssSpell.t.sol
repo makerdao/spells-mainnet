@@ -2623,7 +2623,7 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.cap(), 1000 * WAD / 365 days);
+        assertEq(vest.cap(), 1100 * WAD / 365 days);
         assertEq(vest.ids(), 1);
 
         assertEq(vest.usr(1), RISK_WALLET);
