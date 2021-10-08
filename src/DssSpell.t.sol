@@ -1753,7 +1753,7 @@ contract DssSpellTest is DSTest, DSMath {
             if (ilk == "KNC-A") {
                 // TODO: remove this when we are done with the lerp
                 assertEq(mat, values.collaterals[ilk].mat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
-                assertTrue(mat >= RAY && mat <= 5_000 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));
+                assertTrue(mat >= RAY && mat <= 50 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));
             } else {
                 uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
                 assertEq(mat, normalizedTestMat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
