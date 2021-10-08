@@ -2675,15 +2675,15 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testBATOffboardings() public {
-        checkIlkLerpOffboarding("BAT-A", "BAT Offboarding", 150, 1500, 2500, 3800);
+        checkIlkLerpOffboarding("BAT-A", "BAT Offboarding", 150, 400, 600, 800);
     }
 
     function testLRCOffboardings() public {
-        checkIlkLerpOffboarding("LRC-A", "LRC Offboarding", 175, 1000, 2000, 2700);
+        checkIlkLerpOffboarding("LRC-A", "LRC Offboarding", 175, 1300, 1500, 2600);
     }
 
     function testZRXOffboardings() public {
-        checkIlkLerpOffboarding("ZRX-A", "ZRX Offboarding", 175, 1000, 2000, 2600);
+        checkIlkLerpOffboarding("ZRX-A", "ZRX Offboarding", 175, 400, 600, 900);
     }
 
     function testUNIV2AAVEETHOffboardings() public {
@@ -2691,6 +2691,6 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testUNIV2LINKETHOffboardings() public {
-        checkIlkLerpOffboarding("UNIV2LINKETH-A", "UNIV2LINKETH Offboarding", 165, 300, 500, 700);
+        checkIlkLerpOffboarding("UNIV2LINKETH-A", "UNIV2LINKETH Offboarding", 165, 100, 300, 300);
     }
 }
