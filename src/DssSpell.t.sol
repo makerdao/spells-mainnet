@@ -555,7 +555,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          500,
-            mat:          8295749131944444423000000000, // TODO fix after lerp
+            mat:          12280925491898148141000000000, // TODO fix after lerp
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
