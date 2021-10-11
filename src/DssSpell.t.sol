@@ -263,9 +263,9 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x9400d4D59134af2a48a4bf4237E809A80f90Fe63),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1633724568,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0x9400d4D59134af2a48a4bf4237E809A80f90Fe63), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -2598,105 +2598,9 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(expectedHash, actualHash);
     }
 
-    address constant CES_WALLET      = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
-    address constant RISK_WALLET     = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
-
-    uint256 constant APR_01_2021 = 1617235200;
-
-    function testOneTimeDaiDistribution() public {
-        uint256 prevSin         = vat.sin(address(vow));
-        uint256 prevDaiCes      = dai.balanceOf(CES_WALLET);
-        uint256 amountDaiCes =   1_223_552;
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(vat.sin(address(vow)) - prevSin, amountDaiCes * RAD);
-        assertEq(dai.balanceOf(CES_WALLET) - prevDaiCes, amountDaiCes * WAD);
-    }
-
-    function testVestMKR() public {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 0);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vest.cap(), 1100 * WAD / 365 days);
-        assertEq(vest.ids(), 1);
-
-        assertEq(vest.usr(1), RISK_WALLET);
-        assertEq(vest.bgn(1), APR_01_2021);
-        assertEq(vest.clf(1), APR_01_2021 + 365 days);
-        assertEq(vest.fin(1), APR_01_2021 + 365 days);
-        assertEq(vest.mgr(1), address(0));
-        assertEq(vest.res(1), 1);
-        assertEq(vest.tot(1), 700 * WAD);
-        assertEq(vest.rxd(1), 0);
-
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        hevm.store(
-            address(vest),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-        vest.unrestrict(1);
-        //
-
-        uint256 prevRecipientBalance = gov.balanceOf(RISK_WALLET);
-        uint256 prevPauseBalance = gov.balanceOf(pauseProxy);
-        hevm.warp(APR_01_2021 + 365 days);
-        vest.vest(1);
-        assertEq(gov.balanceOf(RISK_WALLET), prevRecipientBalance + 700 * WAD, "recipient wallet should have 700 MKR more");
-        assertEq(gov.balanceOf(pauseProxy), prevPauseBalance - 700 * WAD, "pauseProxy should have 700 MKR less");
-    }
-
     function getMat(bytes32 _ilk) internal returns (uint256 mat) {
         (, mat) = spotter.ilks(_ilk);
     }
 
-    function checkIlkLerpOffboarding(bytes32 _ilk, bytes32 _lerp, uint256 _startMat, uint256 _lowMidMat, uint256 _highMidMat, uint256 _endMat) internal {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(_lerp));
 
-        hevm.warp(block.timestamp + 30 days);
-        assertEq(getMat(_ilk), _startMat * RAY / 100);
-        lerp.tick();
-        assertGt(getMat(_ilk), _lowMidMat * RAY / 100);
-        assertLt(getMat(_ilk), _highMidMat * RAY / 100);
-
-        hevm.warp(block.timestamp + 60 days);
-        lerp.tick();
-        assertEq(getMat(_ilk), _endMat * RAY / 100);
-    }
-
-    function testBATOffboardings() public {
-        checkIlkLerpOffboarding("BAT-A", "BAT Offboarding", 150, 400, 600, 800);
-    }
-
-    function testLRCOffboardings() public {
-        checkIlkLerpOffboarding("LRC-A", "LRC Offboarding", 175, 1300, 1500, 2600);
-    }
-
-    function testZRXOffboardings() public {
-        checkIlkLerpOffboarding("ZRX-A", "ZRX Offboarding", 175, 400, 600, 900);
-    }
-
-    function testUNIV2AAVEETHOffboardings() public {
-        checkIlkLerpOffboarding("UNIV2AAVEETH-A", "UNIV2AAVEETH Offboarding", 165, 250, 300, 400);
-    }
-
-    function testUNIV2LINKETHOffboardings() public {
-        checkIlkLerpOffboarding("UNIV2LINKETH-A", "UNIV2LINKETH Offboarding", 165, 200, 260, 300);
-    }
 }
