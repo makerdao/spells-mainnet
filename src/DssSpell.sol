@@ -43,7 +43,7 @@ contract DssSpellAction is DssAction {
 
         // Increase the GUNIV3DAIUSDC1-A Debt Ceiling - October 11, 2021
         //  https://vote.makerdao.com/polling/QmU6fTQx#poll-detail
-        DssExecLib.increaseIlkDebtCeiling("GUNIV3DAIUSDC1-A", 50 * MILLION, true);
+        DssExecLib.increaseIlkDebtCeiling("GUNIV3DAIUSDC1-A", 40 * MILLION, true);
     }
 }
 
