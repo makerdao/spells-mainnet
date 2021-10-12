@@ -23,13 +23,27 @@ import "dss-exec-lib/DssAction.sol";
 
 contract DssSpellAction is DssAction {
 
+    uint256 constant THOUSAND = 10**3;
+    uint256 constant MILLION  = 10**6;
+
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
     string public constant override description =
         "2021-10-15 MakerDAO Executive Spell | Hash: 0x";
 
+    address constant public PI_WALLET = 0xBde950A3588C680fee26A7cFC7A34aE97EB45B8C;
+
     function actions() public override {
+
+
+        // PaperImperium Supplemental Compensation - October 11, 2021
+        //  https://vote.makerdao.com/polling/QmdmeUjv#poll-detail
+        DssExecLib.sendPaymentFromSurplusBuffer(PI_WALLET, 50 * THOUSAND);
+
+        // Increase the GUNIV3DAIUSDC1-A Debt Ceiling - October 11, 2021
+        //  https://vote.makerdao.com/polling/QmU6fTQx#poll-detail
+        DssExecLib.increaseIlkDebtCeiling("GUNIV3DAIUSDC1-A", 50 * MILLION, true);
     }
 }
 
