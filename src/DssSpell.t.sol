@@ -67,6 +67,11 @@ interface BrokeTokenAbstract {
     function setAuthority(address) external;
 }
 
+interface DirectDepositLike is GemJoinAbstract {
+    function file(bytes32, uint256) external;
+    function exec() external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -296,7 +301,7 @@ contract DssSpellTest is DSTest, DSMath {
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
             clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             42                       // Num expected in system
+            ilk_count:             43                       // Num expected in system
         });
 
         //
@@ -1520,6 +1525,35 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    120,
             calc_cut:     9990
         });
+        afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
+            line:         3 * MILLION,
+            dust:         0,
+            pct:          100,
+            mat:          10000,
+            liqType:      "clip",
+            liqOn:        false,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     0,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  0,
+            cm_tolerance: 9500,
+            calc_tau:     0,
+            calc_step:    120,
+            calc_cut:     9990
+        });
 
     }
 
@@ -2233,13 +2267,67 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    // function testCollateralIntegrations() public {
-    //     vote(address(spell));
-    //     scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function checkDirectIlkIntegration(
+        bytes32 _ilk,
+        DirectDepositLike join,
+        ClipAbstract clip,
+        address pip,
+        uint256 tau
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
 
-    //     // Insert new collateral tests here
-    // }
+        assertTrue(pip != address(0));
+
+        spotter.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(join.wards(address(esm)), 1);  // Required in case of gov. attack
+
+        // Check the tau is set correctly
+        assertEq(psm.tau(), tau);
+
+        // Set the target bar to be super low to max out the debt ceiling
+        giveAuth(address(join), address(this));
+        join.file("bar", 1);
+        join.deny(address(this));
+        join.exec();
+
+        // Module should be maxed out
+        (,,,, uint256 line,) = vat.ilks(_ilk);
+        (uint256 ink, uint256 art) = vat.urns(_ilk, address(join));
+        assertEq(ink*RAY, line);
+        assertEq(art*RAY, line);
+        assertGe(DSTokenAbstract(join.gem()).balanceOf(address(join)), ink - 1);         // Allow for small rounding error
+
+        // Disable the module
+        giveAuth(address(join), address(this));
+        join.file("bar", 0);
+        join.deny(address(this));
+        join.exec();
+
+        // Module should clear out
+        assertEq(ink, 0);
+        assertEq(art, 0);
+        assertGe(DSTokenAbstract(join.gem()).balanceOf(address(join)), 0);
+    }
+
+    function testCollateralIntegrations() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new collateral tests here
+        checkDirectIlkIntegration(
+            "DIRECT-AAVEV2-DAI",
+            DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")),
+            ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI")),
+            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,     // PIP_DAI
+            7 days
+        );
+    }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {

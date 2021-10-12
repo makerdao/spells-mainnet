@@ -20,7 +20,6 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
@@ -50,6 +49,9 @@ contract DssSpellAction is DssAction {
 
         // D3M
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, 120 seconds, 9990);
+        DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "bar", 4 * RAY / 100);      // 4%
+        DssExecLib.setContract(MCD_JOIN_DIRECT_AAVEV2_DAI, "king", address(this));
+
 
         CollateralOpts memory DIRECT_AAVEV2_DAI = CollateralOpts({
             ilk:                   "DIRECT-AAVEV2-DAI",
