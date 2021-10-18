@@ -75,15 +75,15 @@ contract DssSpellAction is DssAction {
             ilkDebtCeiling:        5 * MILLION,
             minVaultAmount:        10000,
             maxLiquidationAmount:  3 * MILLION,
-            liquidationPenalty:    1300,
+            liquidationPenalty:    1300,        // 13% penalty fee
             ilkStabilityFee:       FOUR_PCT_RATE,
-            startingPriceFactor:   13000,
-            breakerTolerance:      5000,   // Allows for a 50% hourly price drop before disabling liquidations
+            startingPriceFactor:   13000,       // Auction price begins at 130% of oracle
+            breakerTolerance:      5000,        // Allows for a 50% hourly price drop before disabling liquidations
             auctionDuration:       140 minutes,
-            permittedDrop:         4000,
-            liquidationRatio:      13000,
-            kprFlatReward:         300,     // 300 Dai
-            kprPctReward:          10       // 0.1%
+            permittedDrop:         4000,        // 40% price drop before reset
+            liquidationRatio:      16000,       // 160% collateralization
+            kprFlatReward:         300,         // 300 Dai
+            kprPctReward:          10           // 0.1%
         });
         DssExecLib.addNewCollateral(WSTETH_A);
         DssExecLib.setIlkAutoLineParameters("WSTETH-A", 5 * MILLION, 3 * MILLION, 8 hours);
