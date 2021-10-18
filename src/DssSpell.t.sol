@@ -296,7 +296,7 @@ contract DssSpellTest is DSTest, DSMath {
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
             clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             42                       // Num expected in system
+            ilk_count:             43                       // Num expected in system
         });
 
         //
@@ -1519,6 +1519,35 @@ contract DssSpellTest is DSTest, DSMath {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990
+        });
+        afterSpell.collaterals["WSTETH-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         10 * THOUSAND,
+            pct:          400,
+            mat:          16000,
+            liqType:      "clip",
+            liqOn:        true,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    400,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
+            calc_tau:     0,
+            calc_step:    90,
+            calc_cut:     9900
         });
 
     }
