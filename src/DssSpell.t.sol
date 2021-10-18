@@ -305,8 +305,8 @@ contract DssSpellTest is DSTest, DSMath {
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
             aL_line:      15 * BILLION,    // In whole Dai units
-            aL_gap:       100 * MILLION,   // In whole Dai units
-            aL_ttl:       8 hours,         // In seconds
+            aL_gap:       150 * MILLION,   // In whole Dai units
+            aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         10 * THOUSAND,   // In whole Dai units
             pct:          200,             // In basis points
@@ -333,9 +333,9 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      300 * MILLION,
-            aL_gap:       10 * MILLION,
-            aL_ttl:       8 hours,
+            aL_line:      500 * MILLION,
+            aL_gap:       20 * MILLION,
+            aL_ttl:       6 hours,
             line:         0,
             dust:         30 * THOUSAND,
             pct:          500,
@@ -397,7 +397,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          400,
-            mat:          15000,
+            mat:          80000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -478,9 +478,9 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      750 * MILLION,
-            aL_gap:       30 * MILLION,
-            aL_ttl:       8 hours,
+            aL_line:      1_500 * MILLION,
+            aL_gap:       60 * MILLION,
+            aL_ttl:       6 hours,
             line:         0,
             dust:         10 * THOUSAND,
             pct:          200,
@@ -542,7 +542,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          500,
-            mat:          12280925491898148141000000000, // TODO fix after lerp
+            mat:          500000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -571,7 +571,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          400,
-            mat:          17500,
+            mat:          90000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -716,7 +716,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          400,
-            mat:          17500,
+            mat:          26000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -1122,7 +1122,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          300,
-            mat:          16500,
+            mat:          30000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -1209,7 +1209,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          300,
-            mat:          16500,
+            mat:          40000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -1540,7 +1540,7 @@ contract DssSpellTest is DSTest, DSMath {
             dog_hole:     3 * MILLION,
             clip_buf:     13000,
             clip_tail:    140 minutes,
-            clip_cusp:    400,
+            clip_cusp:    4000,
             clip_chip:    10,
             clip_tip:     300,
             clipper_mom:  1,
@@ -1779,13 +1779,19 @@ contract DssSpellTest is DSTest, DSMath {
 
             {
             (,uint256 mat) = spotter.ilks(ilk);
+            uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
             // Convert BP to system expected value
-            if (ilk == "KNC-A") {
-                // TODO: remove this when we are done with the lerp
-                assertEq(mat, values.collaterals[ilk].mat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
+            if ( ilk == "KNC-A" ||
+                 ilk == "BAT-A" ||
+                 ilk == "ZRX-A" ||
+                 ilk == "LRC-A" ||
+                 ilk == "UNIV2AAVEETH-A" ||
+                 ilk == "UNIV2LINKETH-A"
+                ) {
+                // TODO: remove these when we are done with the lerp
+                assertTrue(mat <= normalizedTestMat, string(abi.encodePacked("TestError/vat-lerping-mat-", ilk)));
                 assertTrue(mat >= RAY && mat <= 50 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));
             } else {
-                uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
                 assertEq(mat, normalizedTestMat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
                 assertTrue(mat >= RAY && mat < 10 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));    // cr eq 100% and lt 1000%
             }

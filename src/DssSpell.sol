@@ -57,6 +57,13 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 50 * MILLION, 10 * MILLION, 8 hours);
 
 
+        // Parameter Changes Proposal - MakerDAO Open Market Committee - October 18, 2021
+        //  https://vote.makerdao.com/polling/QmP6GPeK?network=mainnet#poll-detail
+        DssExecLib.setIlkAutoLineParameters("ETH-A", 15_000 * MILLION, 150 * MILLION, 6 hours);
+        DssExecLib.setIlkAutoLineParameters("ETH-B", 500 * MILLION, 20 * MILLION, 6 hours);
+        DssExecLib.setIlkAutoLineParameters("WBTC-A", 1_500 * MILLION, 60 * MILLION, 6 hours);
+
+
         // Add stETH (Lido Staked ETH) as a new Vault Type - October 11, 2021
         //  https://vote.makerdao.com/polling/QmXXHpYi?network=mainnet#poll-detail
         //  https://forum.makerdao.com/t/steth-collateral-onboarding-risk-evaluation/9061
