@@ -716,7 +716,7 @@ contract DssSpellTest is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          400,
-            mat:          26000,
+            mat:          260000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -2316,8 +2316,6 @@ contract DssSpellTest is DSTest, DSMath {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-
-        ChainlogAbstract chainLog = ChainlogAbstract(addr.addr("CHANGELOG"));
 
         assertEq(chainLog.getAddress("STETH"), addr.addr("STETH"));
         assertEq(chainLog.getAddress("WSTETH"), addr.addr("WSTETH"));
