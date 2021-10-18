@@ -54,7 +54,7 @@ contract DssSpellAction is DssAction {
 
         // Increase the GUNIV3DAIUSDC1-A Debt Ceiling - October 11, 2021
         //  https://vote.makerdao.com/polling/QmU6fTQx?network=mainnet#poll-detail
-        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 50 * MILLION, 50 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 50 * MILLION, 10 * MILLION, 8 hours);
 
 
         // Add stETH (Lido Staked ETH) as a new Vault Type - October 11, 2021
