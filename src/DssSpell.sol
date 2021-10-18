@@ -64,10 +64,10 @@ contract DssSpellAction is DssAction {
 
         CollateralOpts memory WSTETH_A = CollateralOpts({
             ilk:                   "WSTETH-A",
-            gem:                   address(WSTETH_GEM),
-            join:                  address(MCD_JOIN_WSTETH_A),
-            clip:                  address(MCD_CLIP_WSTETH_A),
-            calc:                  address(MCD_CLIP_CALC_WSTETH_A),
+            gem:                   WSTETH_GEM,
+            join:                  MCD_JOIN_WSTETH_A,
+            clip:                  MCD_CLIP_WSTETH_A,
+            calc:                  MCD_CLIP_CALC_WSTETH_A,
             pip:                   MCD_PIP_WSTETH,
             isLiquidatable:        true,
             isOSM:                 true,
@@ -98,7 +98,7 @@ contract DssSpellAction is DssAction {
 
 
         // bump changelog version
-        DssExecLib.setChangelogVersion("TODO");
+        DssExecLib.setChangelogVersion("1.9.8");
     }
 }
 
