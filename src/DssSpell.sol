@@ -91,10 +91,10 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.setChangelogAddress("STETH", STETH_GEM);
         DssExecLib.setChangelogAddress("WSTETH", WSTETH_GEM);
+        DssExecLib.setChangelogAddress("PIP_WSTETH", MCD_PIP_WSTETH);
         DssExecLib.setChangelogAddress("MCD_JOIN_WSTETH_A", MCD_JOIN_WSTETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_WSTETH_A", MCD_CLIP_WSTETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_WSTETH_A", MCD_CLIP_CALC_WSTETH_A);
-        DssExecLib.setChangelogAddress("MCD_PIP_WSTETH", MCD_PIP_WSTETH);
 
 
         // bump changelog version
