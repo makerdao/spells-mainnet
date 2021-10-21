@@ -47,7 +47,7 @@ contract DssSpellAction is DssAction {
     address public constant MCD_JOIN_WSTETH_A      = 0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2;
     address public constant MCD_CLIP_WSTETH_A      = 0x49A33A28C4C7D9576ab28898F4C9ac7e52EA457A;
     address public constant MCD_CLIP_CALC_WSTETH_A = 0x15282b886675cc1Ce04590148f456428E87eaf13;
-    address public constant MCD_PIP_WSTETH         = 0xFe7a2aC0B945f12089aEEB6eCebf4F384D9f043F;
+    address public constant PIP_WSTETH             = 0xFe7a2aC0B945f12089aEEB6eCebf4F384D9f043F;
 
     function actions() public override {
 
@@ -67,7 +67,7 @@ contract DssSpellAction is DssAction {
         // Add stETH (Lido Staked ETH) as a new Vault Type - October 11, 2021
         //  https://vote.makerdao.com/polling/QmXXHpYi?network=mainnet#poll-detail
         //  https://forum.makerdao.com/t/steth-collateral-onboarding-risk-evaluation/9061
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_WSTETH_A, 90 seconds, 9900);
+
 
         CollateralOpts memory WSTETH_A = CollateralOpts({
             ilk:                   "WSTETH-A",
@@ -75,7 +75,7 @@ contract DssSpellAction is DssAction {
             join:                  MCD_JOIN_WSTETH_A,
             clip:                  MCD_CLIP_WSTETH_A,
             calc:                  MCD_CLIP_CALC_WSTETH_A,
-            pip:                   MCD_PIP_WSTETH,
+            pip:                   PIP_WSTETH,
             isLiquidatable:        true,
             isOSM:                 true,
             whitelistOSM:          true,
@@ -93,12 +93,13 @@ contract DssSpellAction is DssAction {
             kprPctReward:          10           // 0.1%
         });
         DssExecLib.addNewCollateral(WSTETH_A);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_WSTETH_A, 90 seconds, 9900);
         DssExecLib.setIlkAutoLineParameters("WSTETH-A", 5 * MILLION, 3 * MILLION, 8 hours);
 
 
         DssExecLib.setChangelogAddress("STETH", STETH_GEM);
         DssExecLib.setChangelogAddress("WSTETH", WSTETH_GEM);
-        DssExecLib.setChangelogAddress("PIP_WSTETH", MCD_PIP_WSTETH);
+        DssExecLib.setChangelogAddress("PIP_WSTETH", PIP_WSTETH);
         DssExecLib.setChangelogAddress("MCD_JOIN_WSTETH_A", MCD_JOIN_WSTETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_WSTETH_A", MCD_CLIP_WSTETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_WSTETH_A", MCD_CLIP_CALC_WSTETH_A);
