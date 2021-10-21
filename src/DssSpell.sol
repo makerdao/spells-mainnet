@@ -67,8 +67,6 @@ contract DssSpellAction is DssAction {
         // Add stETH (Lido Staked ETH) as a new Vault Type - October 11, 2021
         //  https://vote.makerdao.com/polling/QmXXHpYi?network=mainnet#poll-detail
         //  https://forum.makerdao.com/t/steth-collateral-onboarding-risk-evaluation/9061
-
-
         CollateralOpts memory WSTETH_A = CollateralOpts({
             ilk:                   "WSTETH-A",
             gem:                   WSTETH_GEM,
