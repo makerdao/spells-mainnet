@@ -72,6 +72,10 @@ interface DirectDepositLike is GemJoinAbstract {
     function exec() external;
 }
 
+interface DirectMomLike {
+    function authority() external view returns (address);
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -165,6 +169,7 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     ClipperMomAbstract      clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
+    DirectMomLike         directMom = DirectMomLike(      addr.addr("DIRECT_MOM"));
     DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
 
@@ -2307,6 +2312,7 @@ contract DssSpellTest is DSTest, DSMath {
         DirectDepositLike join,
         ClipAbstract clip,
         address pip,
+        uint256 bar,
         uint256 tau
     ) public {
         DSTokenAbstract token = DSTokenAbstract(join.gem());
@@ -2318,10 +2324,12 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
         assertEq(clip.wards(address(end)), 1);
-        assertEq(join.wards(address(esm)), 1);  // Required in case of gov. attack
+        assertEq(join.wards(address(esm)), 1);          // Required in case of gov. attack
+        assertEq(join.wards(address(directMom)), 1);    // Zero-delay shutdown for Aave gov. attack
 
-        // Check the tau is set correctly
-        assertEq(psm.tau(), tau);
+        // Check the bar/tau are set correctly
+        assertEq(join.bar(), bar);
+        assertEq(join.tau(), tau);
 
         // Set the target bar to be super low to max out the debt ceiling
         giveAuth(address(join), address(this));
@@ -2358,7 +2366,8 @@ contract DssSpellTest is DSTest, DSMath {
             "DIRECT-AAVEV2-DAI",
             DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")),
             ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI")),
-            0x0,     // TODO PIP_ADAI
+            addr.addr("PIP_ADAI"),
+            4 * RAY / 100,
             7 days
         );
     }

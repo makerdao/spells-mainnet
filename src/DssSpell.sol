@@ -94,6 +94,7 @@ contract DssSpellAction is DssAction {
             kprFlatReward:         300,
             kprPctReward:          10 // 0.1%
         });
+        DssExecLib.addNewCollateral(DIRECT_AAVEV2_DAI);
 
         DssExecLib.setChangelogAddress("ADAI", ADAI);
         DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI", MCD_JOIN_DIRECT_AAVEV2_DAI);
