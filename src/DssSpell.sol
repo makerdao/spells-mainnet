@@ -21,6 +21,10 @@ pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface MomLike {
+    function setAuthority(address authority_) external;
+}
+
 contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
@@ -38,11 +42,64 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
+    uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
+
+    address constant ADAI                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
+    address constant PIP_ADAI                        = ;
+    address constant MCD_JOIN_DIRECT_AAVEV2_DAI      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
+    address constant MCD_CLIP_DIRECT_AAVEV2_DAI      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
+    address constant MCD_CLIP_CALC_DIRECT_AAVEV2_DAI = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
+    address constant DIRECT_MOM                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
 
     address constant JOIN_FAB = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
     address constant LERP_FAB = 0x9175561733D138326FDeA86CdFdF53e92b588276;
 
     function actions() public override {
+
+        // Add Aave V2 D3M
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, 120 seconds, 9990);
+        DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "bar", 4 * RAY / 100);      // 4%
+        DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "tau", 7 days);
+        DssExecLib.setContract(MCD_JOIN_DIRECT_AAVEV2_DAI, "king", address(this));
+
+        // Set the D3M Mom authority to be the chief
+        MomLike(DIRECT_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
+
+        // Authorize ESM to shut down during governance attack
+        DssExecLib.authorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DssExecLib.esm());
+
+        // Authorize D3M Mom to allow no wait delay
+        DssExecLib.authorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DIRECT_MOM);
+
+        CollateralOpts memory DIRECT_AAVEV2_DAI = CollateralOpts({
+            ilk:                   "DIRECT-AAVEV2-DAI",
+            gem:                   ADAI,
+            join:                  MCD_JOIN_DIRECT_AAVEV2_DAI,
+            clip:                  MCD_CLIP_DIRECT_AAVEV2_DAI,
+            calc:                  MCD_CLIP_CALC_DIRECT_AAVEV2_DAI,
+            pip:                   PIP_DIRECT_AAVEV2_DAI,
+            isLiquidatable:        false,
+            isOSM:                 false,
+            whitelistOSM:          false,
+            ilkDebtCeiling:        10 * MILLION,
+            minVaultAmount:        0,
+            maxLiquidationAmount:  0,
+            liquidationPenalty:    1300,
+            ilkStabilityFee:       ZERO_PCT_RATE,
+            startingPriceFactor:   10500,
+            breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
+            auctionDuration:       220 minutes,
+            permittedDrop:         9000,
+            liquidationRatio:      10000,
+            kprFlatReward:         300,
+            kprPctReward:          10 // 0.1%
+        });
+
+        DssExecLib.setChangelogAddress("ADAI", ADAI);
+        DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI", MCD_JOIN_DIRECT_AAVEV2_DAI);
+        DssExecLib.setChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI", MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI", MCD_CLIP_CALC_DIRECT_AAVEV2_DAI);
+        DssExecLib.setChangelogAddress("PIP_ADAI", PIP_ADAI);
 
         // Add Join factory to ChainLog
         DssExecLib.setChangelogAddress("JOIN_FAB", JOIN_FAB);
