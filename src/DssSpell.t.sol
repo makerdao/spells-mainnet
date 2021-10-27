@@ -1583,7 +1583,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         10 * MILLION,
             dust:         0,
-            pct:          100,
+            pct:          0,
             mat:          10000,
             liqType:      "clip",
             liqOn:        false,
