@@ -263,8 +263,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xc0Dc70048F678e0c9DA82aD11CdC063aA081d950),        // populate with deployed spell if deployed
-            deployed_spell_created:         1634923566,        // use get-created-timestamp.sh if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
@@ -2317,12 +2317,8 @@ contract DssSpellTest is DSTest, DSMath {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(chainLog.getAddress("STETH"), addr.addr("STETH"));
-        assertEq(chainLog.getAddress("WSTETH"), addr.addr("WSTETH"));
-        assertEq(chainLog.getAddress("PIP_WSTETH"), addr.addr("PIP_WSTETH"));
-        assertEq(chainLog.getAddress("MCD_JOIN_WSTETH_A"), addr.addr("MCD_JOIN_WSTETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_WSTETH_A"), addr.addr("MCD_CLIP_WSTETH_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WSTETH_A"), addr.addr("MCD_CLIP_CALC_WSTETH_A"));
+        assertEq(chainLog.getAddress("LERP_FAB"), addr.addr("LERP_FAB"));
+        assertEq(chainLog.getAddress("JOIN_FAB"), addr.addr("JOIN_FAB"));
     }
 
     function testNewIlkRegistryValues() public {

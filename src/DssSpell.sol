@@ -39,7 +39,16 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
 
+    address constant JOIN_FAB = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
+    address constant LERP_FAB = 0x9175561733D138326FDeA86CdFdF53e92b588276;
+
     function actions() public override {
+
+        // Add Join factory to ChainLog
+        DssExecLib.setChangelogAddress("JOIN_FAB", JOIN_FAB);
+
+        // Update Lerp factory in ChainLog
+        DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
 
         // bump changelog version
         DssExecLib.setChangelogVersion("1.9.8");

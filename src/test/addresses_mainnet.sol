@@ -273,7 +273,8 @@ contract Addresses {
         addr["RWA002_A_URN"]                    = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]          = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
         addr["RWA002_A_OUTPUT_CONDUIT"]         = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-        addr["LERP_FAB"]                        = 0x00B416da876fe42dd02813da435Cc030F0d72434;
+        addr["LERP_FAB"]                        = 0x9175561733D138326FDeA86CdFdF53e92b588276;
+        addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
         addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["RWA003"]                          = 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9;
         addr["MCD_JOIN_RWA003_A"]               = 0x1Fe789BBac5b141bdD795A3Bc5E12Af29dDB4b86;
