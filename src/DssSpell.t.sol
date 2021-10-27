@@ -78,6 +78,21 @@ interface DirectMomLike {
     function authority() external view returns (address);
 }
 
+interface DssVestLike {
+    function cap() external returns (uint256);
+    function ids() external returns (uint256);
+    function usr(uint256) external view returns (address);
+    function bgn(uint256) external view returns (uint256);
+    function clf(uint256) external view returns (uint256);
+    function fin(uint256) external view returns (uint256);
+    function mgr(uint256) external view returns (address);
+    function res(uint256) external view returns (uint256);
+    function tot(uint256) external view returns (uint256);
+    function rxd(uint256) external view returns (uint256);
+    function unrestrict(uint256) external;
+    function vest(uint256) external;
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -2344,7 +2359,7 @@ contract DssSpellTest is DSTest, DSMath {
         (uint256 ink, uint256 art) = vat.urns(_ilk, address(join));
         assertEq(ink*RAY, line);
         assertEq(art*RAY, line);
-        assertGe(DSTokenAbstract(join.gem()).balanceOf(address(join)), ink - 1);         // Allow for small rounding error
+        assertGe(token.balanceOf(address(join)), ink - 1);         // Allow for small rounding error
 
         // Disable the module
         giveAuth(address(join), address(this));
@@ -2355,7 +2370,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Module should clear out
         assertEq(ink, 0);
         assertEq(art, 0);
-        assertGe(DSTokenAbstract(join.gem()).balanceOf(address(join)), 0);
+        assertGe(token.balanceOf(address(join)), 0);
     }
 
     function testCollateralIntegrations() public {
@@ -2738,5 +2753,99 @@ contract DssSpellTest is DSTest, DSMath {
         (, mat) = spotter.ilks(_ilk);
     }
 
+    address constant DIN_WALLET   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
+    address constant GRO_WALLET   = 0x7800C137A645c07132886539217ce192b9F0528e;
 
+    uint256 constant NOV_01_2021 = 1635724800;
+    uint256 constant JAN_01_2022 = 1640995200;
+    uint256 constant MAY_01_2022 = 1651363200;
+    uint256 constant JUL_01_2022 = 1656633600;
+
+    function testOneTimePaymentDistributions() public {
+        // Set done to false in previous spell
+        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
+        assertTrue(!SpellLike(spellValues.previous_spell).done());
+
+        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevDaiDaiDIN   = dai.balanceOf(DIN_WALLET);
+        uint256 prevDaiDGRO     = dai.balanceOf(GRO_WALLET);
+
+        uint256 amountDaiDIN = 107_500;
+        uint256 amountDaiGRO = 791_138;
+
+        uint256 amountTotal  = amountDaiDIN + amountDaiGRO;
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountDaiDIN
+            + amountDaiGRO
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(DIN_WALLET) - prevDaiDaiDIN, amountDaiDIN * WAD);
+        assertEq(dai.balanceOf(GRO_WALLET) - prevDaiDGRO  , amountDaiGRO * WAD);
+    }
+
+    function testVestDAI() public {
+        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.ids(), 12);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.ids(), 14);
+
+        // -----
+        assertEq(vest.usr(13), DIN_WALLET);
+        assertEq(vest.bgn(13), NOV_01_2021);
+        assertEq(vest.clf(13), NOV_01_2021);
+        assertEq(vest.fin(13), NOV_01_2021 + 181 days); // (30+31+31+28+31+30)
+        assertEq(vest.mgr(13), address(0));
+        assertEq(vest.res(13), 1);
+        assertEq(vest.tot(13), 357_000.00 * 10**18);
+        assertEq(vest.rxd(13), 0);
+        // -----
+        assertEq(vest.usr(14), GRO_WALLET);
+        assertEq(vest.bgn(14), NOV_01_2021);
+        assertEq(vest.clf(14), NOV_01_2021);
+        assertEq(vest.fin(14), NOV_01_2021 + 242 days); // (30+31+31+28+31+30+31+30)
+        assertEq(vest.mgr(14), address(0));
+        assertEq(vest.res(14), 1);
+        assertEq(vest.tot(14), 942_663.00 * 10**18);
+        assertEq(vest.rxd(14), 0);
+        // -----
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(1);
+        //
+
+        hevm.warp(JAN_01_2022);
+        uint256 prevBalanceDIN = dai.balanceOf(DIN_WALLET);
+        uint256 prevBalanceGRO = dai.balanceOf(GRO_WALLET);
+        vest.vest(1);
+
+        uint256 addedDIN = 120314917127071823204419; // 357_000 * 10**18 * 61 / 181;
+        uint256 addedGRO = 237613400826446280991735; // 942_663 * 10**18 * 61 / 242;
+
+        assertEq(dai.balanceOf(DIN_WALLET), prevBalanceDIN + addedDIN);
+        assertEq(dai.balanceOf(GRO_WALLET), prevBalanceGRO + addedGRO);
+    }
 }
