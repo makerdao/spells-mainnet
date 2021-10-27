@@ -70,6 +70,8 @@ interface BrokeTokenAbstract {
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
+    function tau() external view returns (uint256);
+    function bar() external view returns (uint256);
 }
 
 interface DirectMomLike {
@@ -2338,7 +2340,7 @@ contract DssSpellTest is DSTest, DSMath {
         join.exec();
 
         // Module should be maxed out
-        (,,,, uint256 line,) = vat.ilks(_ilk);
+        (,,, uint256 line,) = vat.ilks(_ilk);
         (uint256 ink, uint256 art) = vat.urns(_ilk, address(join));
         assertEq(ink*RAY, line);
         assertEq(art*RAY, line);
