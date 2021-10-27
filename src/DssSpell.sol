@@ -73,6 +73,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
+        // https://vote.makerdao.com/polling/QmexUjoD?network=mainnet#poll-detail
         // Add Aave V2 D3M
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, 120 seconds, 9990);
         DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "bar", 4 * RAY / 100);      // 4%
@@ -119,12 +120,14 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI", MCD_CLIP_CALC_DIRECT_AAVEV2_DAI);
         DssExecLib.setChangelogAddress("PIP_ADAI", PIP_ADAI);
 
+        // https://mips.makerdao.com/mips/details/MIP40c3SP34
         // Data Insights Core Unit Budget
         DssExecLib.sendPaymentFromSurplusBuffer(DIN_WALLET, 107_500);
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(DIN_WALLET, 357_000.00 * 10**18, NOV_01_2021, MAY_01_2022 - NOV_01_2021, 0, address(0))
         );
 
+        // https://mips.makerdao.com/mips/details/MIP40c3SP37
         // Growth Core Unit Budget
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_WALLET, 791_138);
         DssVestLike(MCD_VEST_DAI).restrict(
