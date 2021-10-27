@@ -309,7 +309,7 @@ contract Addresses {
         addr["ARBITRUM_ESCROW"]                 = 0xA10c7CE4b876998858b1a9E12b10092229539400;
         addr["ARBITRUM_GOV_RELAY"]              = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
         addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
-        addr["PIP_ADAI"]                        = ;
+        addr["PIP_ADAI"]                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
         addr["MCD_JOIN_DIRECT_AAVEV2_DAI"]      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
         addr["MCD_CLIP_DIRECT_AAVEV2_DAI"]      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
         addr["MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"] = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;

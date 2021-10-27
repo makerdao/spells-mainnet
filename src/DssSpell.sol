@@ -27,6 +27,9 @@ interface MomLike {
 
 contract DssSpellAction is DssAction {
 
+    uint256 constant MILLION  = 10**6;
+    uint256 constant RAY      = 10**27;
+
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/TODO.md -q -O - 2>/dev/null)"
@@ -45,7 +48,7 @@ contract DssSpellAction is DssAction {
     uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
 
     address constant ADAI                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
-    address constant PIP_ADAI                        = ;
+    address constant PIP_ADAI                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
     address constant MCD_JOIN_DIRECT_AAVEV2_DAI      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
     address constant MCD_CLIP_DIRECT_AAVEV2_DAI      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
     address constant MCD_CLIP_CALC_DIRECT_AAVEV2_DAI = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
@@ -77,7 +80,7 @@ contract DssSpellAction is DssAction {
             join:                  MCD_JOIN_DIRECT_AAVEV2_DAI,
             clip:                  MCD_CLIP_DIRECT_AAVEV2_DAI,
             calc:                  MCD_CLIP_CALC_DIRECT_AAVEV2_DAI,
-            pip:                   PIP_DIRECT_AAVEV2_DAI,
+            pip:                   PIP_ADAI,
             isLiquidatable:        false,
             isOSM:                 false,
             whitelistOSM:          false,
