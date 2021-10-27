@@ -25,6 +25,11 @@ interface MomLike {
     function setAuthority(address authority_) external;
 }
 
+interface DssVestLike {
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function restrict(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
 
     uint256 constant MILLION  = 10**6;
@@ -54,8 +59,17 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_CALC_DIRECT_AAVEV2_DAI = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
     address constant DIRECT_MOM                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
 
-    address constant JOIN_FAB = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
-    address constant LERP_FAB = 0x9175561733D138326FDeA86CdFdF53e92b588276;
+    address constant JOIN_FAB     = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
+    address constant LERP_FAB     = 0x9175561733D138326FDeA86CdFdF53e92b588276;
+
+    address constant MCD_VEST_DAI = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
+
+    address constant DIN_WALLET   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
+    address constant GRO_WALLET   = 0x7800C137A645c07132886539217ce192b9F0528e;
+
+    uint256 constant NOV_01_2021 = 1635724800;
+    uint256 constant MAY_01_2022 = 1651363200;
+    uint256 constant JUL_01_2022 = 1656633600;
 
     function actions() public override {
 
@@ -104,6 +118,18 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI", MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI", MCD_CLIP_CALC_DIRECT_AAVEV2_DAI);
         DssExecLib.setChangelogAddress("PIP_ADAI", PIP_ADAI);
+
+        // Data Insights Core Unit Budget
+        DssExecLib.sendPaymentFromSurplusBuffer(DIN_WALLET, 107_500);
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(DIN_WALLET, 357_000.00 * 10**18, NOV_01_2021, MAY_01_2022 - NOV_01_2021, 0, address(0))
+        );
+
+        // Growth Core Unit Budget
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_WALLET, 791_138);
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(GRO_WALLET, 942_663.00 * 10**18, NOV_01_2021, JUL_01_2022 - NOV_01_2021, 0, address(0))
+        );
 
         // Add Join factory to ChainLog
         DssExecLib.setChangelogAddress("JOIN_FAB", JOIN_FAB);
