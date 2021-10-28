@@ -76,6 +76,7 @@ interface DirectDepositLike is GemJoinAbstract {
 
 interface DirectMomLike {
     function authority() external view returns (address);
+    function disable(address) external;
 }
 
 interface DssVestLike {
@@ -2350,7 +2351,7 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Set the target bar to be super low to max out the debt ceiling
         giveAuth(address(join), address(this));
-        join.file("bar", 1);
+        join.file("bar", 1 * RAY / 10000);     // 0.01%
         join.deny(address(this));
         join.exec();
 
@@ -2368,9 +2369,10 @@ contract DssSpellTest is DSTest, DSMath {
         join.exec();
 
         // Module should clear out
+        (ink, art) = vat.urns(_ilk, address(join));
         assertEq(ink, 0);
         assertEq(art, 0);
-        assertGe(token.balanceOf(address(join)), 0);
+        assertEq(token.balanceOf(address(join)), 0);
     }
 
     function testCollateralIntegrations() public {
@@ -2387,6 +2389,38 @@ contract DssSpellTest is DSTest, DSMath {
             4 * RAY / 100,
             7 days
         );
+    }
+
+    function testDirectMom() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(directMom.authority(), address(chief));
+
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+
+        // Wind up the D3M
+        giveAuth(address(join), address(this));
+        join.file("bar", 1 * RAY / 10000);     // 0.01%
+        join.deny(address(this));
+        join.exec();
+        (, uint256 art) = vat.urns("DIRECT-AAVEV2-DAI", address(join));
+        assertGt(art, 0);
+
+        // Verify we can disable the D3M through the mom
+        hevm.store(
+            address(directMom),
+            0,
+            bytes32(uint256(address(this)))
+        );      // Set this contract as the owner
+        directMom.disable(address(join));
+        assertEq(join.bar(), 0);
+
+        // Should close out the D3M
+        join.exec();
+        (, art) = vat.urns("DIRECT-AAVEV2-DAI", address(join));
+        assertEq(art, 0);
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
