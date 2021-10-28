@@ -113,6 +113,7 @@ contract DssSpellAction is DssAction {
             kprPctReward:          10 // 0.1%
         });
         DssExecLib.addNewCollateral(DIRECT_AAVEV2_DAI);
+        DssExecLib.setIlkAutoLineParameters("DIRECT-AAVEV2-DAI", 10 * MILLION, 10 * MILLION, 12 hours);
 
         DssExecLib.setChangelogAddress("ADAI", ADAI);
         DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI", MCD_JOIN_DIRECT_AAVEV2_DAI);
