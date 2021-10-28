@@ -72,6 +72,7 @@ interface DirectDepositLike is GemJoinAbstract {
     function exec() external;
     function tau() external view returns (uint256);
     function bar() external view returns (uint256);
+    function king() external view returns (address);
 }
 
 interface DirectMomLike {
@@ -2345,9 +2346,10 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(join.wards(address(esm)), 1);          // Required in case of gov. attack
         assertEq(join.wards(address(directMom)), 1);    // Zero-delay shutdown for Aave gov. attack
 
-        // Check the bar/tau are set correctly
+        // Check the bar/tau/king are set correctly
         assertEq(join.bar(), bar);
         assertEq(join.tau(), tau);
+        assertEq(join.king(), pauseProxy);
 
         // Set the target bar to be super low to max out the debt ceiling
         giveAuth(address(join), address(this));
