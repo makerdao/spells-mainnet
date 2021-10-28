@@ -2370,8 +2370,8 @@ contract DssSpellTest is DSTest, DSMath {
 
         // Module should clear out
         (ink, art) = vat.urns(_ilk, address(join));
-        assertEq(ink, 0);
-        assertEq(art, 0);
+        assertLe(ink, 1);
+        assertLe(art, 1);
         assertEq(token.balanceOf(address(join)), 0);
     }
 
@@ -2420,7 +2420,7 @@ contract DssSpellTest is DSTest, DSMath {
         // Should close out the D3M
         join.exec();
         (, art) = vat.urns("DIRECT-AAVEV2-DAI", address(join));
-        assertEq(art, 0);
+        assertLe(art, 1);
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
