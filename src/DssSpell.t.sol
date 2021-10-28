@@ -2834,13 +2834,15 @@ contract DssSpellTest is DSTest, DSMath {
             keccak256(abi.encode(address(this), uint256(1))),
             bytes32(uint256(1))
         );
-        vest.unrestrict(1);
+        vest.unrestrict(13);
+        vest.unrestrict(14);
         //
 
         hevm.warp(JAN_01_2022);
         uint256 prevBalanceDIN = dai.balanceOf(DIN_WALLET);
         uint256 prevBalanceGRO = dai.balanceOf(GRO_WALLET);
-        vest.vest(1);
+        vest.vest(13);
+        vest.vest(14);
 
         uint256 addedDIN = 120314917127071823204419; // 357_000 * 10**18 * 61 / 181;
         uint256 addedGRO = 237613400826446280991735; // 942_663 * 10**18 * 61 / 242;
