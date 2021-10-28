@@ -141,7 +141,7 @@ contract DssSpellAction is DssAction {
         // Update Lerp factory in ChainLog
         DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
 
-        // bump changelog version
+        // Bump changelog version
         DssExecLib.setChangelogVersion("1.9.9");
     }
 }
