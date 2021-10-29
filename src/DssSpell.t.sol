@@ -2468,6 +2468,12 @@ contract DssSpellTest is DSTest, DSMath {
 
         assertEq(chainLog.getAddress("LERP_FAB"), addr.addr("LERP_FAB"));
         assertEq(chainLog.getAddress("JOIN_FAB"), addr.addr("JOIN_FAB"));
+
+        assertEq(chainLog.getAddress("ADAI"), addr.addr("ADAI"));
+        assertEq(chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
+        assertEq(chainLog.getAddress("PIP_ADAI"), addr.addr("PIP_ADAI"));
     }
 
     function testNewIlkRegistryValues() public {
@@ -2477,14 +2483,14 @@ contract DssSpellTest is DSTest, DSMath {
 
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
 
-        assertEq(ilkRegistry.join("WSTETH-A"), addr.addr("MCD_JOIN_WSTETH_A"));
-        assertEq(ilkRegistry.gem("WSTETH-A"), addr.addr("WSTETH"));
-        assertEq(ilkRegistry.dec("WSTETH-A"), DSTokenAbstract(addr.addr("WSTETH")).decimals());
-        assertEq(ilkRegistry.class("WSTETH-A"), 1);
-        assertEq(ilkRegistry.pip("WSTETH-A"), addr.addr("PIP_WSTETH"));
-        assertEq(ilkRegistry.xlip("WSTETH-A"), addr.addr("MCD_CLIP_WSTETH_A"));
-        assertEq(ilkRegistry.name("WSTETH-A"), "Wrapped liquid staked Ether 2.0");
-        assertEq(ilkRegistry.symbol("WSTETH-A"), "wstETH");
+        assertEq(ilkRegistry.join("DIRECT-AAVEV2-DAI"), addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(ilkRegistry.gem("DIRECT-AAVEV2-DAI"), addr.addr("ADAI"));
+        assertEq(ilkRegistry.dec("DIRECT-AAVEV2-DAI"), DSTokenAbstract(addr.addr("ADAI")).decimals());
+        assertEq(ilkRegistry.class("DIRECT-AAVEV2-DAI"), 1);
+        assertEq(ilkRegistry.pip("DIRECT-AAVEV2-DAI"), addr.addr("PIP_ADAI"));
+        assertEq(ilkRegistry.xlip("DIRECT-AAVEV2-DAI"), addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
+        assertEq(ilkRegistry.name("DIRECT-AAVEV2-DAI"), "Aave interest bearing DAI");
+        assertEq(ilkRegistry.symbol("DIRECT-AAVEV2-DAI"), "aDAI");
     }
 
     function testFailWrongDay() public {
