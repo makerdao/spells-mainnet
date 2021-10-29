@@ -69,8 +69,6 @@ contract DssSpellAction is DssAction {
     uint256 constant MAY_01_2022 = 1651363200;
     uint256 constant JUL_01_2022 = 1656633600;
 
-    address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-
     function actions() public override {
 
         // https://vote.makerdao.com/polling/QmexUjoD?network=mainnet#poll-detail
@@ -124,6 +122,7 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP34
         // Data Insights Core Unit Budget
+        address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
         DssExecLib.sendPaymentFromSurplusBuffer(DIN_WALLET, 107_500);
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(DIN_WALLET, 357_000.00 * 10**18, NOV_01_2021, MAY_01_2022 - NOV_01_2021, 0, address(0))
