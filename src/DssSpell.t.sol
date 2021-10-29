@@ -80,20 +80,6 @@ interface DirectMomLike {
     function disable(address) external;
 }
 
-interface DssVestLike {
-    function cap() external returns (uint256);
-    function ids() external returns (uint256);
-    function usr(uint256) external view returns (address);
-    function bgn(uint256) external view returns (uint256);
-    function clf(uint256) external view returns (uint256);
-    function fin(uint256) external view returns (uint256);
-    function mgr(uint256) external view returns (address);
-    function res(uint256) external view returns (uint256);
-    function tot(uint256) external view returns (uint256);
-    function rxd(uint256) external view returns (uint256);
-    function unrestrict(uint256) external;
-    function vest(uint256) external;
-}
 
 contract DssSpellTest is DSTest, DSMath {
 
@@ -2840,7 +2826,7 @@ contract DssSpellTest is DSTest, DSMath {
     }
 
     function testVestDAI() public {
-        DssVestLike vest = DssVestLike(addr.addr("MCD_VEST_DAI"));
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         assertEq(vest.ids(), 12);
 
