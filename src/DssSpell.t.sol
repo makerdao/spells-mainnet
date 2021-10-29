@@ -2791,10 +2791,6 @@ contract DssSpellTest is DSTest, DSMath {
     uint256 constant JUL_01_2022 = 1656633600;
 
     function testOneTimePaymentDistributions() public {
-        // Set done to false in previous spell
-        hevm.store(spellValues.previous_spell, bytes32(uint256(2)), bytes32(0));
-        assertTrue(!SpellLike(spellValues.previous_spell).done());
-
         uint256 prevSin         = vat.sin(address(vow));
         uint256 prevDaiDaiDIN   = dai.balanceOf(DIN_WALLET);
         uint256 prevDaiDGRO     = dai.balanceOf(GRO_WALLET);
