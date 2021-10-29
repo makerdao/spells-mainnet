@@ -2474,6 +2474,7 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
         assertEq(chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
         assertEq(chainLog.getAddress("PIP_ADAI"), addr.addr("PIP_ADAI"));
+        assertEq(chainLog.getAddress("DIRECT_MOM"), addr.addr("DIRECT_MOM"));
     }
 
     function testNewIlkRegistryValues() public {

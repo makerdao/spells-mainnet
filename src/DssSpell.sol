@@ -120,6 +120,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI", MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI", MCD_CLIP_CALC_DIRECT_AAVEV2_DAI);
         DssExecLib.setChangelogAddress("PIP_ADAI", PIP_ADAI);
+        DssExecLib.setChangelogAddress("DIRECT_MOM", DIRECT_MOM);
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP34
         // Data Insights Core Unit Budget
