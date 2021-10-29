@@ -62,14 +62,14 @@ contract DssSpellAction is DssAction {
     address constant JOIN_FAB     = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
     address constant LERP_FAB     = 0x9175561733D138326FDeA86CdFdF53e92b588276;
 
-    address constant MCD_VEST_DAI = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
-
     address constant DIN_WALLET   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
     address constant GRO_WALLET   = 0x7800C137A645c07132886539217ce192b9F0528e;
 
     uint256 constant NOV_01_2021 = 1635724800;
     uint256 constant MAY_01_2022 = 1651363200;
     uint256 constant JUL_01_2022 = 1656633600;
+
+    address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
 
     function actions() public override {
 
