@@ -44,6 +44,7 @@ contract Addresses {
         addr["OSM_MOM"]                         = 0x76416A4d5190d071bfed309861527431304aA14f;
         addr["FLIPPER_MOM"]                     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]                     = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
+        addr["DIRECT_MOM"]                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
         addr["MCD_VEST_DAI"]                    = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
@@ -273,7 +274,8 @@ contract Addresses {
         addr["RWA002_A_URN"]                    = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]          = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
         addr["RWA002_A_OUTPUT_CONDUIT"]         = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-        addr["LERP_FAB"]                        = 0x00B416da876fe42dd02813da435Cc030F0d72434;
+        addr["LERP_FAB"]                        = 0x9175561733D138326FDeA86CdFdF53e92b588276;
+        addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
         addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["RWA003"]                          = 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9;
         addr["MCD_JOIN_RWA003_A"]               = 0x1Fe789BBac5b141bdD795A3Bc5E12Af29dDB4b86;
@@ -306,5 +308,10 @@ contract Addresses {
         addr["ARBITRUM_DAI_BRIDGE"]             = 0xD3B5b60020504bc3489D6949d545893982BA3011;
         addr["ARBITRUM_ESCROW"]                 = 0xA10c7CE4b876998858b1a9E12b10092229539400;
         addr["ARBITRUM_GOV_RELAY"]              = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
+        addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
+        addr["PIP_ADAI"]                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
+        addr["MCD_JOIN_DIRECT_AAVEV2_DAI"]      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
+        addr["MCD_CLIP_DIRECT_AAVEV2_DAI"]      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
+        addr["MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"] = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
     }
 }
