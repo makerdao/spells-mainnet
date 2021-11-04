@@ -21,25 +21,25 @@ pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface MomLike {
-    function setAuthority(address authority_) external;
+interface VatLike {
+    function suck(address, address, uint256) external;
 }
 
-interface DssVestLike {
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function restrict(uint256) external;
+interface DaiJoinLike {
+    function exit(address, uint256) external;
 }
 
 contract DssSpellAction is DssAction {
 
     uint256 constant MILLION  = 10**6;
-    uint256 constant RAY      = 10**27;
+    uint256 constant WAD      = 10**18;
+    uint256 constant RAD      = 10**45;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/4f799577686e4a1ca4f6f922943c1ca7c9c9e57d/governance/votes/Executive%20vote%20-%20October%2029%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20November%2005%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-10-29 MakerDAO Executive Spell | Hash: 0x0e564f437297cae84ae7b0e71457d352cff5cd636107f05653b91dd81e1fe908";
+        "2021-11-05 MakerDAO Executive Spell | Hash: TODO";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -50,102 +50,44 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
     //
-    uint256 constant ZERO_PCT_RATE = 1000000000000000000000000000;
+    uint256 constant ONE_PCT_RATE      = 1000000000315522921573372069;
+    uint256 constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
+    uint256 constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
+    uint256 constant SIX_PCT_RATE      = 1000000001847694957439350562;
 
-    address constant ADAI                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
-    address constant PIP_ADAI                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
-    address constant MCD_JOIN_DIRECT_AAVEV2_DAI      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
-    address constant MCD_CLIP_DIRECT_AAVEV2_DAI      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
-    address constant MCD_CLIP_CALC_DIRECT_AAVEV2_DAI = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
-    address constant DIRECT_MOM                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
+    address constant PSM_USDC_A = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
+    address constant PSM_USDP_A = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
 
-    address constant JOIN_FAB     = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
-    address constant LERP_FAB     = 0x9175561733D138326FDeA86CdFdF53e92b588276;
-
-    address constant DIN_WALLET   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
-    address constant GRO_WALLET   = 0x7800C137A645c07132886539217ce192b9F0528e;
-
-    uint256 constant NOV_01_2021 = 1635724800;
-    uint256 constant MAY_01_2022 = 1651363200;
-    uint256 constant JUL_01_2022 = 1656633600;
+    address constant DUX_WALLET   = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address constant MCD_VAT      = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    address constant MCD_VOW      = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
+    address constant MCD_JOIN_DAI = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
 
     function actions() public override {
+        // ----------------------------- Stability Fee updates ----------------------------
+        DssExecLib.setIlkStabilityFee("ETH-A",          TWO_FIVE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("ETH-B",          SIX_PCT_RATE,      true);
+        DssExecLib.setIlkStabilityFee("WBTC-A",         TWO_FIVE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("LINK-A",         ONE_FIVE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("RENBTC-A",       TWO_FIVE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("USDC-A",         ONE_PCT_RATE,      true);
+        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", TWO_FIVE_PCT_RATE, true);
 
-        // https://vote.makerdao.com/polling/QmexUjoD?network=mainnet#poll-detail
-        // Add Aave V2 D3M
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, 120 seconds, 9990);
-        DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "bar", 4 * RAY / 100);      // 4%
-        DssExecLib.setValue(MCD_JOIN_DIRECT_AAVEV2_DAI, "tau", 7 days);
-        DssExecLib.setContract(MCD_JOIN_DIRECT_AAVEV2_DAI, "king", address(this));
+        // ------------------------------ Debt ceiling updates -----------------------------
+        DssExecLib.setIlkAutoLineDebtCeiling("MANA-A", 10 * MILLION);
+        DssExecLib.setIlkAutoLineParameters("MATIC-A", 20 * MILLION, 20 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCETH-A", 50 * MILLION, 5 * MILLION, 8 hours);
 
-        // Set the D3M Mom authority to be the chief
-        MomLike(DIRECT_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
+        // ------------------------------ PSM updates --------------------------------------
+        DssExecLib.setValue(PSM_USDC_A, "tin", 0);
+        DssExecLib.setValue(PSM_USDP_A, "tin", 0);
 
-        // Authorize ESM to shut down during governance attack
-        DssExecLib.authorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DssExecLib.esm());
-
-        // Authorize D3M Mom to allow no wait delay
-        DssExecLib.authorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DIRECT_MOM);
-
-        CollateralOpts memory DIRECT_AAVEV2_DAI = CollateralOpts({
-            ilk:                   "DIRECT-AAVEV2-DAI",
-            gem:                   ADAI,
-            join:                  MCD_JOIN_DIRECT_AAVEV2_DAI,
-            clip:                  MCD_CLIP_DIRECT_AAVEV2_DAI,
-            calc:                  MCD_CLIP_CALC_DIRECT_AAVEV2_DAI,
-            pip:                   PIP_ADAI,
-            isLiquidatable:        false,
-            isOSM:                 false,
-            whitelistOSM:          false,
-            ilkDebtCeiling:        10 * MILLION,
-            minVaultAmount:        0,
-            maxLiquidationAmount:  0,
-            liquidationPenalty:    1300,
-            ilkStabilityFee:       ZERO_PCT_RATE,
-            startingPriceFactor:   10500,
-            breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
-            auctionDuration:       220 minutes,
-            permittedDrop:         9000,
-            liquidationRatio:      10000,
-            kprFlatReward:         300,
-            kprPctReward:          10 // 0.1%
-        });
-        DssExecLib.addNewCollateral(DIRECT_AAVEV2_DAI);
-        DssExecLib.setIlkAutoLineParameters("DIRECT-AAVEV2-DAI", 10 * MILLION, 10 * MILLION, 12 hours);
-
-        DssExecLib.setChangelogAddress("ADAI", ADAI);
-        DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI", MCD_JOIN_DIRECT_AAVEV2_DAI);
-        DssExecLib.setChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI", MCD_CLIP_DIRECT_AAVEV2_DAI);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI", MCD_CLIP_CALC_DIRECT_AAVEV2_DAI);
-        DssExecLib.setChangelogAddress("PIP_ADAI", PIP_ADAI);
-        DssExecLib.setChangelogAddress("DIRECT_MOM", DIRECT_MOM);
-
-        // https://mips.makerdao.com/mips/details/MIP40c3SP34
-        // Data Insights Core Unit Budget
-        address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-        DssExecLib.sendPaymentFromSurplusBuffer(DIN_WALLET, 107_500);
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(DIN_WALLET, 357_000.00 * 10**18, NOV_01_2021, MAY_01_2022 - NOV_01_2021, 0, address(0))
-        );
-
-        // https://mips.makerdao.com/mips/details/MIP40c3SP37
-        // Growth Core Unit Budget
-        DssExecLib.sendPaymentFromSurplusBuffer(GRO_WALLET, 791_138);
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(GRO_WALLET, 942_663.00 * 10**18, NOV_01_2021, JUL_01_2022 - NOV_01_2021, 0, address(0))
-        );
-
-        // Add Join factory to ChainLog
-        DssExecLib.setChangelogAddress("JOIN_FAB", JOIN_FAB);
-
-        // Update Lerp factory in ChainLog
-        DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
-
-        // Bump changelog version
-        DssExecLib.setChangelogVersion("1.9.9");
+        // ------------------------------ CU payments --------------------------------------
+        // DssExecLib does not support less than one DAI of precision so we have to do this the old-fashioned way.
+        VatLike(MCD_VAT).suck(MCD_VOW, address(this), 3591208 * RAD / 10);
+        DaiJoinLike(MCD_JOIN_DAI).exit(DUX_WALLET, 3591208 * WAD / 10);
     }
 }
-
 
 contract DssSpell is DssExec {
     constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) public {}

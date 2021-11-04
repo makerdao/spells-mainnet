@@ -67,20 +67,6 @@ interface BrokeTokenAbstract {
     function setAuthority(address) external;
 }
 
-interface DirectDepositLike is GemJoinAbstract {
-    function file(bytes32, uint256) external;
-    function exec() external;
-    function tau() external view returns (uint256);
-    function bar() external view returns (uint256);
-    function king() external view returns (address);
-}
-
-interface DirectMomLike {
-    function authority() external view returns (address);
-    function disable(address) external;
-}
-
-
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -174,9 +160,7 @@ contract DssSpellTest is DSTest, DSMath {
     OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     ClipperMomAbstract      clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
-    DirectMomLike         directMom = DirectMomLike(      addr.addr("DIRECT_MOM"));
     DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
-    LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
 
     DssSpell spell;
 
@@ -278,8 +262,8 @@ contract DssSpellTest is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xf86D621f42ec36B6fd4e5dc660A47Ad98D50CfC0),        // populate with deployed spell if deployed
-            deployed_spell_created:         1635531332,        // use get-created-timestamp.sh if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
@@ -324,7 +308,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         10 * THOUSAND,   // In whole Dai units
-            pct:          200,             // In basis points
+            pct:          250,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -353,7 +337,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       6 hours,
             line:         0,
             dust:         30 * THOUSAND,
-            pct:          500,
+            pct:          600,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -440,7 +424,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       0,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          0,
+            pct:          100,
             mat:          10100,
             liqType:      "clip",
             liqOn:        false,
@@ -498,7 +482,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       6 hours,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          200,
+            pct:          250,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -609,7 +593,7 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      5 * MILLION,
+            aL_line:      10 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -759,7 +743,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       8 hours,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          100,
+            pct:          150,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -904,7 +888,7 @@ contract DssSpellTest is DSTest, DSMath {
             aL_ttl:       8 hours,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          200,
+            pct:          250,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -1015,12 +999,12 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["UNIV2WBTCETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      20 * MILLION,
-            aL_gap:       3 * MILLION,
+            aL_line:      50 * MILLION,
+            aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          200,
+            pct:          250,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -1450,8 +1434,8 @@ contract DssSpellTest is DSTest, DSMath {
         });
         afterSpell.collaterals["MATIC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       3 * MILLION,
+            aL_line:      20 * MILLION,
+            aL_gap:       20 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         10 * THOUSAND,
@@ -1593,7 +1577,6 @@ contract DssSpellTest is DSTest, DSMath {
             calc_step:    120,
             calc_cut:     9990
         });
-
     }
 
     function scheduleWaitAndCastFailDay() public {
@@ -2312,103 +2295,12 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkDirectIlkIntegration(
-        bytes32 _ilk,
-        DirectDepositLike join,
-        ClipAbstract clip,
-        address pip,
-        uint256 bar,
-        uint256 tau
-    ) public {
-        DSTokenAbstract token = DSTokenAbstract(join.gem());
-        assertTrue(pip != address(0));
-
-        spotter.poke(_ilk);
-
-        // Authorization
-        assertEq(join.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(join)), 1);
-        assertEq(clip.wards(address(end)), 1);
-        assertEq(join.wards(address(esm)), 1);          // Required in case of gov. attack
-        assertEq(join.wards(address(directMom)), 1);    // Zero-delay shutdown for Aave gov. attack
-
-        // Check the bar/tau/king are set correctly
-        assertEq(join.bar(), bar);
-        assertEq(join.tau(), tau);
-        assertEq(join.king(), pauseProxy);
-
-        // Set the target bar to be super low to max out the debt ceiling
-        giveAuth(address(join), address(this));
-        join.file("bar", 1 * RAY / 10000);     // 0.01%
-        join.deny(address(this));
-        join.exec();
-
-        // Module should be maxed out
-        (,,, uint256 line,) = vat.ilks(_ilk);
-        (uint256 ink, uint256 art) = vat.urns(_ilk, address(join));
-        assertEq(ink*RAY, line);
-        assertEq(art*RAY, line);
-        assertGe(token.balanceOf(address(join)), ink - 1);         // Allow for small rounding error
-
-        // Disable the module
-        giveAuth(address(join), address(this));
-        join.file("bar", 0);
-        join.deny(address(this));
-        join.exec();
-
-        // Module should clear out
-        (ink, art) = vat.urns(_ilk, address(join));
-        assertLe(ink, 1);
-        assertLe(art, 1);
-        assertEq(token.balanceOf(address(join)), 0);
-    }
-
     function testCollateralIntegrations() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkDirectIlkIntegration(
-            "DIRECT-AAVEV2-DAI",
-            DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")),
-            ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI")),
-            addr.addr("PIP_ADAI"),
-            4 * RAY / 100,
-            7 days
-        );
-    }
-
-    function testDirectMom() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(directMom.authority(), address(chief));
-
-        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-
-        // Wind up the D3M
-        giveAuth(address(join), address(this));
-        join.file("bar", 1 * RAY / 10000);     // 0.01%
-        join.deny(address(this));
-        join.exec();
-        (, uint256 art) = vat.urns("DIRECT-AAVEV2-DAI", address(join));
-        assertGt(art, 0);
-
-        // Verify we can disable the D3M through the mom
-        hevm.store(
-            address(directMom),
-            0,
-            bytes32(uint256(address(this)))
-        );      // Set this contract as the owner
-        directMom.disable(address(join));
-        assertEq(join.bar(), 0);
-
-        // Should close out the D3M
-        join.exec();
-        (, art) = vat.urns("DIRECT-AAVEV2-DAI", address(join));
-        assertLe(art, 1);
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
@@ -2782,97 +2674,29 @@ contract DssSpellTest is DSTest, DSMath {
         (, mat) = spotter.ilks(_ilk);
     }
 
-    address constant DIN_WALLET   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
-    address constant GRO_WALLET   = 0x7800C137A645c07132886539217ce192b9F0528e;
-
-    uint256 constant NOV_01_2021 = 1635724800;
-    uint256 constant JAN_01_2022 = 1640995200;
-    uint256 constant MAY_01_2022 = 1651363200;
-    uint256 constant JUL_01_2022 = 1656633600;
-
-    function testOneTimePaymentDistributions() public {
-        uint256 prevSin         = vat.sin(address(vow));
-        uint256 prevDaiDaiDIN   = dai.balanceOf(DIN_WALLET);
-        uint256 prevDaiDGRO     = dai.balanceOf(GRO_WALLET);
-
-        uint256 amountDaiDIN = 107_500;
-        uint256 amountDaiGRO = 791_138;
-
-        uint256 amountTotal  = amountDaiDIN + amountDaiGRO;
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
+    function testPsmParamChanges() public {
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            ( amountDaiDIN
-            + amountDaiGRO
-            ) * RAD
-        );
-        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
-        assertEq(dai.balanceOf(DIN_WALLET) - prevDaiDaiDIN, amountDaiDIN * WAD);
-        assertEq(dai.balanceOf(GRO_WALLET) - prevDaiDGRO  , amountDaiGRO * WAD);
+        assertEq(PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A).tin(), 0);
+        assertEq(PsmAbstract(0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf).tin(), 0);
     }
 
-    function testVestDAI() public {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+    address constant DUX_WALLET = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    function testOneTimePaymentDistributions() public {
+        uint256 prevSin      = vat.sin(address(vow));
+        uint256 prevDaiDUX   = dai.balanceOf(DUX_WALLET);
 
-        assertEq(vest.ids(), 12);
+        uint256 amountDaiDUX = 3591208 * WAD / 10;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
-        assertEq(vest.ids(), 14);
-
-        // -----
-        assertEq(vest.usr(13), DIN_WALLET);
-        assertEq(vest.bgn(13), NOV_01_2021);
-        assertEq(vest.clf(13), NOV_01_2021);
-        assertEq(vest.fin(13), NOV_01_2021 + 181 days); // (30+31+31+28+31+30)
-        assertEq(vest.mgr(13), address(0));
-        assertEq(vest.res(13), 1);
-        assertEq(vest.tot(13), 357_000.00 * 10**18);
-        assertEq(vest.rxd(13), 0);
-        // -----
-        assertEq(vest.usr(14), GRO_WALLET);
-        assertEq(vest.bgn(14), NOV_01_2021);
-        assertEq(vest.clf(14), NOV_01_2021);
-        assertEq(vest.fin(14), NOV_01_2021 + 242 days); // (30+31+31+28+31+30+31+30)
-        assertEq(vest.mgr(14), address(0));
-        assertEq(vest.res(14), 1);
-        assertEq(vest.tot(14), 942_663.00 * 10**18);
-        assertEq(vest.rxd(14), 0);
-        // -----
-
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        hevm.store(
-            address(vest),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-        vest.unrestrict(13);
-        vest.unrestrict(14);
-        //
-
-        hevm.warp(JAN_01_2022);
-        uint256 prevBalanceDIN = dai.balanceOf(DIN_WALLET);
-        uint256 prevBalanceGRO = dai.balanceOf(GRO_WALLET);
-        vest.vest(13);
-        vest.vest(14);
-
-        uint256 addedDIN = 120314917127071823204419; // 357_000 * 10**18 * 61 / 181;
-        uint256 addedGRO = 237613400826446280991735; // 942_663 * 10**18 * 61 / 242;
-
-        assertEq(dai.balanceOf(DIN_WALLET), prevBalanceDIN + addedDIN);
-        assertEq(dai.balanceOf(GRO_WALLET), prevBalanceGRO + addedGRO);
+        assertGt(vat.sin(address(vow)), prevSin);
+        assertEq(vat.sin(address(vow)) - prevSin, amountDaiDUX * RAY);
+        assertGt(dai.balanceOf(DUX_WALLET), prevDaiDUX);
+        assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDUX, amountDaiDUX);
     }
 }
