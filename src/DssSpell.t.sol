@@ -67,6 +67,14 @@ interface BrokeTokenAbstract {
     function setAuthority(address) external;
 }
 
+interface DirectDepositLike is GemJoinAbstract {
+    function file(bytes32, uint256) external;
+    function exec() external;
+    function tau() external view returns (uint256);
+    function bar() external view returns (uint256);
+    function king() external view returns (address);
+}
+
 contract DssSpellTest is DSTest, DSMath {
 
     struct SpellValues {
@@ -265,7 +273,7 @@ contract DssSpellTest is DSTest, DSMath {
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
@@ -2295,6 +2303,57 @@ contract DssSpellTest is DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
+    function checkDirectIlkIntegration(
+        bytes32 _ilk,
+        DirectDepositLike join,
+        ClipAbstract clip,
+        address pip,
+        uint256 bar,
+        uint256 tau
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+        assertTrue(pip != address(0));
+
+        spotter.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(join.wards(address(esm)), 1);             // Required in case of gov. attack
+        assertEq(join.wards(addr.addr("DIRECT_MOM")), 1);  // Zero-delay shutdown for Aave gov. attack
+
+        // Check the bar/tau/king are set correctly
+        assertEq(join.bar(), bar);
+        assertEq(join.tau(), tau);
+        assertEq(join.king(), pauseProxy);
+
+        // Set the target bar to be super low to max out the debt ceiling
+        giveAuth(address(join), address(this));
+        join.file("bar", 1 * RAY / 10000);     // 0.01%
+        join.deny(address(this));
+        join.exec();
+
+        // Module should be maxed out
+        (,,, uint256 line,) = vat.ilks(_ilk);
+        (uint256 ink, uint256 art) = vat.urns(_ilk, address(join));
+        assertEq(ink*RAY, line);
+        assertEq(art*RAY, line);
+        assertGe(token.balanceOf(address(join)), ink - 1);         // Allow for small rounding error
+
+        // Disable the module
+        giveAuth(address(join), address(this));
+        join.file("bar", 0);
+        join.deny(address(this));
+        join.exec();
+
+        // Module should clear out
+        (ink, art) = vat.urns(_ilk, address(join));
+        assertLe(ink, 1);
+        assertLe(art, 1);
+        assertEq(token.balanceOf(address(join)), 0);
+    }
+
     function testCollateralIntegrations() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -2339,38 +2398,19 @@ contract DssSpellTest is DSTest, DSMath {
         checkCollateralValues(afterSpell);
     }
 
-    function testNewChainlogValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+//    function testNewChainlogValues() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//    }
 
-        assertEq(chainLog.getAddress("LERP_FAB"), addr.addr("LERP_FAB"));
-        assertEq(chainLog.getAddress("JOIN_FAB"), addr.addr("JOIN_FAB"));
-
-        assertEq(chainLog.getAddress("ADAI"), addr.addr("ADAI"));
-        assertEq(chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"), addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
-        assertEq(chainLog.getAddress("PIP_ADAI"), addr.addr("PIP_ADAI"));
-        assertEq(chainLog.getAddress("DIRECT_MOM"), addr.addr("DIRECT_MOM"));
-    }
-
-    function testNewIlkRegistryValues() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-
-        assertEq(ilkRegistry.join("DIRECT-AAVEV2-DAI"), addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(ilkRegistry.gem("DIRECT-AAVEV2-DAI"), addr.addr("ADAI"));
-        assertEq(ilkRegistry.dec("DIRECT-AAVEV2-DAI"), DSTokenAbstract(addr.addr("ADAI")).decimals());
-        assertEq(ilkRegistry.class("DIRECT-AAVEV2-DAI"), 1);
-        assertEq(ilkRegistry.pip("DIRECT-AAVEV2-DAI"), addr.addr("PIP_ADAI"));
-        assertEq(ilkRegistry.xlip("DIRECT-AAVEV2-DAI"), addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
-        assertEq(ilkRegistry.name("DIRECT-AAVEV2-DAI"), "Aave interest bearing DAI");
-        assertEq(ilkRegistry.symbol("DIRECT-AAVEV2-DAI"), "aDAI");
-    }
+//    function testNewIlkRegistryValues() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//
+//        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+//    }
 
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);

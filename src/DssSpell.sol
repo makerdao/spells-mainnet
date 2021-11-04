@@ -16,7 +16,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
@@ -62,6 +61,10 @@ contract DssSpellAction is DssAction {
     address constant MCD_VAT      = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
     address constant MCD_VOW      = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
     address constant MCD_JOIN_DAI = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
+
+    function officeHours() public override returns (bool) {
+        return false;
+    }
 
     function actions() public override {
         // ----------------------------- Stability Fee updates ----------------------------
