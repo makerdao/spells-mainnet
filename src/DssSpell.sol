@@ -54,8 +54,8 @@ contract DssSpellAction is DssAction {
     uint256 constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
     uint256 constant SIX_PCT_RATE      = 1000000001847694957439350562;
 
-    address constant PSM_USDC_A = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
-    address constant PSM_USDP_A = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
+    address constant MCD_PSM_USDC_A = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
+    address constant MCD_PSM_PAX_A  = 0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf;
 
     address constant DUX_WALLET   = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
     address constant MCD_VAT      = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
@@ -68,6 +68,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ----------------------------- Stability Fee updates ----------------------------
+        // https://vote.makerdao.com/polling/QmXDCCPH?network=mainnet#poll-detail
         DssExecLib.setIlkStabilityFee("ETH-A",          TWO_FIVE_PCT_RATE, true);
         DssExecLib.setIlkStabilityFee("ETH-B",          SIX_PCT_RATE,      true);
         DssExecLib.setIlkStabilityFee("WBTC-A",         TWO_FIVE_PCT_RATE, true);
@@ -77,13 +78,15 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", TWO_FIVE_PCT_RATE, true);
 
         // ------------------------------ Debt ceiling updates -----------------------------
+        // https://vote.makerdao.com/polling/QmXDCCPH?network=mainnet#poll-detail
         DssExecLib.setIlkAutoLineDebtCeiling("MANA-A", 10 * MILLION);
-        DssExecLib.setIlkAutoLineParameters("MATIC-A", 20 * MILLION, 20 * MILLION, 8 hours);
-        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCETH-A", 50 * MILLION, 5 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("MATIC-A",        20 * MILLION, 20 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("UNIV2WBTCETH-A", 50 * MILLION,  5 * MILLION, 8 hours);
 
         // ------------------------------ PSM updates --------------------------------------
-        DssExecLib.setValue(PSM_USDC_A, "tin", 0);
-        DssExecLib.setValue(PSM_USDP_A, "tin", 0);
+        // https://vote.makerdao.com/polling/QmSkYED5?network=mainnet#poll-detail
+        DssExecLib.setValue(MCD_PSM_USDC_A, "tin", 0);
+        DssExecLib.setValue(MCD_PSM_PAX_A,  "tin", 0);
 
         // ------------------------------ CU payments --------------------------------------
         // DssExecLib does not support less than one DAI of precision so we have to do this the old-fashioned way.
