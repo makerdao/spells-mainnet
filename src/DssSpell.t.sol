@@ -2354,13 +2354,13 @@ contract DssSpellTest is DSTest, DSMath {
         assertEq(token.balanceOf(address(join)), 0);
     }
 
-    function testCollateralIntegrations() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Insert new collateral tests here
-    }
+//    function testCollateralIntegrations() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//
+//        // Insert new collateral tests here
+//    }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
         assembly {
