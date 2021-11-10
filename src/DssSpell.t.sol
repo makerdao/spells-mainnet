@@ -36,6 +36,14 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
+//    function testCollateralIntegrations() public {
+//        vote(address(spell));
+//        scheduleWaitAndCast(address(spell));
+//        assertTrue(spell.done());
+//
+//        // Insert new collateral tests here
+//    }
+
 //    function testNewChainlogValues() public {
 //        vote(address(spell));
 //        scheduleWaitAndCast(address(spell));
