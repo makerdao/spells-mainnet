@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-import {DssSpellTestBase} from "./DssSpell.t.base.sol";
+import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
