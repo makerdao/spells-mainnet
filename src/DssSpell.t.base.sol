@@ -2370,6 +2370,21 @@ contract DssSpellTestBase is DSTest, DSMath {
         }
     }
 
+    function getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
+        // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
+        assembly {
+            let ptr  := mload(0x40)
+            let size := extcodesize(a)
+            if iszero(lt(size, 2)) {
+                extcodecopy(a, ptr, sub(size, 2), 2)
+                length := mload(ptr)
+                length := shr(240, length)
+                length := add(length, 2)  // the two bytes used to specify the length are not counted in the length
+            }
+            // We'll return zero if the bytecode is shorter than two bytes.
+        }
+    }
+
     address[] deployerAddresses = [
         0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
         0xDa0FaB05039809e63C5D068c897c3e602fA97457,
@@ -2422,21 +2437,6 @@ contract DssSpellTestBase is DSTest, DSMath {
             );
             if (onlySource) checkSource(_addr, contractName);
             else checkWards(_addr, contractName);
-        }
-    }
-
-    function getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
-        // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
-        assembly {
-            let ptr  := mload(0x40)
-            let size := extcodesize(a)
-            if iszero(lt(size, 2)) {
-                extcodecopy(a, ptr, sub(size, 2), 2)
-                length := mload(ptr)
-                length := shr(240, length)
-                length := add(length, 2)  // the two bytes used to specify the length are not counted in the length
-            }
-            // We'll return zero if the bytecode is shorter than two bytes.
         }
     }
 
