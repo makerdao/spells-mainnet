@@ -222,6 +222,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         z = add(x, sub(y, 1)) / y;
     }
 
+    // Not currently used
     // function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
     //     bytes memory bytesArray = new bytes(32);
     //     for (uint256 i; i < 32; i++) {
