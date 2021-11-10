@@ -2431,7 +2431,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
-        
+
         bytes32[] memory contractNames = chainLog.list();
         for(uint256 i = 0; i < contractNames.length; i++) {
             address _addr = chainLog.getAddress(contractNames[i]);
