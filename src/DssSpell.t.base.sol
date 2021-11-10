@@ -218,6 +218,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         }
       }
     }
+
     function divup(uint256 x, uint256 y) internal pure returns (uint256 z) {
         z = add(x, sub(y, 1)) / y;
     }
@@ -1817,8 +1818,8 @@ contract DssSpellTestBase is DSTest, DSMath {
 
             {
             (,uint256 mat) = spotter.ilks(ilk);
-            uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
             // Convert BP to system expected value
+            uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
             if ( ilk == "KNC-A" ||
                  ilk == "BAT-A" ||
                  ilk == "ZRX-A" ||
@@ -2430,6 +2431,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         hevm.warp(spell.nextCastTime());
         spell.cast();
         assertTrue(spell.done());
+        
         bytes32[] memory contractNames = chainLog.list();
         for(uint256 i = 0; i < contractNames.length; i++) {
             address _addr = chainLog.getAddress(contractNames[i]);
