@@ -7,4 +7,4 @@ test    :; ./test-dssspell.sh $(match)
 deploy  :; make && dapp create DssSpell | xargs ./verify.py DssSpell
 estimate:; ./estimate-deploy-gas.sh
 flatten :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
-archive-spell :; ./archive-dssspell.sh $(name)
+archive-spell :; ./archive-dssspell.sh $(date)

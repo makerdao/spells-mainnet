@@ -18,5 +18,5 @@
 - [ ] Deploy spell `ETH_GAS="XXX" ETH_GAS_PRICE="YYY" make deploy`
 - [ ] Verify `mainnet` contract on etherscan
 - [ ] Change test to use mainnet spell address and deploy timestamp
-- [ ] Run `make name="YYYY-MM-DD-archive-directory-name" archive-spell` to make an archive directory and copy `DssSpell.sol`, `DssSpell.t.sol`, and `DssSpell.t.base.sol`
+- [ ] Run `make date="YYYY-MM-DD" archive-spell` to make an archive directory and copy `DssSpell.sol`, `DssSpell.t.sol`, and `DssSpell.t.base.sol`
 - [ ] `squash and merge` this PR
