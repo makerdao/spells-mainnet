@@ -323,14 +323,18 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testSendFundsFromPauseToVow() public {
-        assertEq(dai.balanceOf(address(this)), 218_059.1 * 10**18);
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+
+        jug.drip("GUNIV3DAIUSDC1-A"); // So we do not affect surplus when executing the spell
+        assertEq(dai.balanceOf(address(pauseProxy)), 218_059.1 * 10**18);
         uint256 prevDaiVowBalance = vat.dai(address(vow));
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+        spell.cast();
         assertTrue(spell.done());
 
-        assertEq(dai.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(pauseProxy)), 0);
         assertEq(vat.dai(address(vow)), prevDaiVowBalance + 218_059.1 * 10**45);
     }
 }
