@@ -192,8 +192,6 @@ contract DssSpellTestBase is DSTest, DSMath {
     event Debug(uint256 index, bytes32 what);
     event Log(string message, address deployer, string contractName);
 
-    address constant DUX_WALLET = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
       assembly {
