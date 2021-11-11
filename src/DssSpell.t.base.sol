@@ -2108,6 +2108,8 @@ contract DssSpellTestBase is DSTest, DSMath {
         if (_isOSM) {
             assertEq(OsmAbstract(pip).wards(address(osmMom)), 1);
             assertEq(OsmAbstract(pip).bud(address(spotter)), 1);
+            assertEq(OsmAbstract(pip).bud(address(clip)), 1);
+            assertEq(OsmAbstract(pip).bud(address(clipMom)), 1);
             assertEq(OsmAbstract(pip).bud(address(end)), 1);
             assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1);
         }
