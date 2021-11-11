@@ -2110,6 +2110,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             assertEq(OsmAbstract(pip).bud(address(clipMom)), 1);
             assertEq(OsmAbstract(pip).bud(address(end)), 1);
             assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1);
+            assertEq(OsmMomAbstract(osmMom).osms(_ilk), pip);
         }
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
