@@ -286,28 +286,51 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(expectedHash, actualHash);
     }
 
-    function testPsmParamChanges() public {
+    // function testPsmParamChanges() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+
+    //     assertEq(PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A).tin(), 0);
+    //     assertEq(PsmAbstract(0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf).tin(), 0);
+    // }
+
+    // function testOneTimePaymentDistributions() public {
+    //     uint256 prevSin      = vat.sin(address(vow));
+    //     uint256 prevDaiDUX   = dai.balanceOf(DUX_WALLET);
+
+    //     uint256 amountDaiDUX = 3591208 * WAD / 10;
+
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
+
+    //     assertGt(vat.sin(address(vow)), prevSin);
+    //     assertEq(vat.sin(address(vow)) - prevSin, amountDaiDUX * RAY);
+    //     assertGt(dai.balanceOf(DUX_WALLET), prevDaiDUX);
+    //     assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDUX, amountDaiDUX);
+    // }
+
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 4 * 10**27 / 100);
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A).tin(), 0);
-        assertEq(PsmAbstract(0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf).tin(), 0);
+        assertEq(join.bar(), 3.9 * 10**27 / 100);
     }
 
-    function testOneTimePaymentDistributions() public {
-        uint256 prevSin      = vat.sin(address(vow));
-        uint256 prevDaiDUX   = dai.balanceOf(DUX_WALLET);
-
-        uint256 amountDaiDUX = 3591208 * WAD / 10;
+    function testSendFundsFromPauseToVow() public {
+        assertEq(dai.balanceOf(address(this)), 218_059.1 * 10**18);
+        uint256 prevDaiVowBalance = vat.dai(address(vow));
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertGt(vat.sin(address(vow)), prevSin);
-        assertEq(vat.sin(address(vow)) - prevSin, amountDaiDUX * RAY);
-        assertGt(dai.balanceOf(DUX_WALLET), prevDaiDUX);
-        assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDUX, amountDaiDUX);
+        assertEq(dai.balanceOf(address(this)), 0);
+        assertEq(vat.dai(address(vow)), prevDaiVowBalance + 218_059.1 * 10**45);
     }
 }

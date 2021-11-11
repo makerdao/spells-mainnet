@@ -272,7 +272,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x3381CaEaA980f78Aa1895f98E645e35cBDD4C593),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1636122331,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0), // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
@@ -1502,13 +1502,13 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
+            aL_line:      500 * MILLION,
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         10 * THOUSAND,
-            pct:          100,
-            mat:          10500,
+            pct:          50,
+            mat:          10200,
             liqType:      "clip",
             liqOn:        false,
             chop:         1300,
@@ -1531,7 +1531,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["WSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      5 * MILLION,
+            aL_line:      50 * MILLION,
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -1560,8 +1560,8 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_line:      50 * MILLION,
+            aL_gap:       25 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         0,
