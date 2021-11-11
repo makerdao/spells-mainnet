@@ -27,9 +27,6 @@ interface DaiJoinLike {
 }
 
 contract DssSpellAction is DssAction {
-
-    uint256 constant MILLION  = 10**6;
-
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ -q -O - 2>/dev/null)"
@@ -47,6 +44,8 @@ contract DssSpellAction is DssAction {
     //
     uint256 constant ZERO_FIVE_PCT_RATE = 1000000000158153903837946257;
 
+    uint256 constant MILLION  = 10**6;
+
     function officeHours() public override returns (bool) {
         return false;
     }
@@ -62,13 +61,13 @@ contract DssSpellAction is DssAction {
         // WSTETH-A Parameter Adjustments
         // https://vote.makerdao.com/polling/QmeQUKFm?network=mainnet
         // https://forum.makerdao.com/t/request-to-raise-staked-eth-dc-to-50m/11402
-        DssExecLib.setIlkAutoLineParameters("WSTETH-A", 50 * MILLION, 3 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineDebtCeiling("WSTETH-A", 50 * MILLION);
 
         // DIRECT-AAVEV2-DAI Parameter Adjustments
         // https://vote.makerdao.com/polling/QmNbTzG1?network=mainnet
         // https://forum.makerdao.com/t/discussion-direct-deposit-dai-module-d3m/7357
         DssExecLib.setIlkAutoLineParameters("DIRECT-AAVEV2-DAI", 50 * MILLION, 25 * MILLION, 12 hours);
-        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), "bar", 39 * 10**27 / 1000); // 3.9%
+        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), "bar", 3.9 * 10**27 / 100); // 3.9%
 
         // Send funds in the PAUSE_PROXY to the surplus buffer
         address daiJoin = DssExecLib.getChangelogAddress("MCD_JOIN_DAI");
