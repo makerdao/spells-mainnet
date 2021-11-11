@@ -315,3 +315,13 @@ contract Addresses {
         addr["MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"] = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
     }
 }
+
+
+// contract CuAddresses {
+
+//     mapping (bytes32 => address) public cu_addr;
+
+//     constructor() public {
+//         cu_addr["DUX"] = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+//     }
+// }
