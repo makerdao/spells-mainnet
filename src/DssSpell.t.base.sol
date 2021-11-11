@@ -2419,10 +2419,8 @@ contract DssSpellTestBase is DSTest, DSMath {
 
     function checkAuth(bool onlySource) internal {
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
         bytes32[] memory contractNames = chainLog.list();
         for(uint256 i = 0; i < contractNames.length; i++) {
