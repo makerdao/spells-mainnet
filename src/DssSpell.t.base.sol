@@ -743,7 +743,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          100,
-            mat:          16500,
+            mat:          200000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -830,7 +830,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          100,
-            mat:          16500,
+            mat:          230000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -975,7 +975,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          100,
-            mat:          16500,
+            mat:          210000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -1178,7 +1178,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             line:         0,
             dust:         10 * THOUSAND,
             pct:          300,
-            mat:          30000,
+            mat:          160000,
             liqType:      "clip",
             liqOn:        true,
             chop:         0,
@@ -1865,10 +1865,13 @@ contract DssSpellTestBase is DSTest, DSMath {
             (,uint256 mat) = spotter.ilks(ilk);
             // Convert BP to system expected value
             uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
-            if ( ilk == "KNC-A" ||
-                 ilk == "BAT-A" ||
-                 ilk == "ZRX-A" ||
-                 ilk == "LRC-A" ||
+            if ( ilk == "AAVE-A" ||
+                 ilk == "BAL-A"  ||
+                 ilk == "COMP-A" ||
+                 ilk == "KNC-A"  ||
+                 ilk == "BAT-A"  ||
+                 ilk == "ZRX-A"  ||
+                 ilk == "LRC-A"  ||
                  ilk == "UNIV2AAVEETH-A" ||
                  ilk == "UNIV2LINKETH-A"
                 ) {
@@ -2426,6 +2429,31 @@ contract DssSpellTestBase is DSTest, DSMath {
         hevm.warp(block.timestamp + lerp.duration());
         lerp.tick();
         assertEq(getMat(_ilk), _endMat * RAY / 100);
+    }
+
+    function checkIlkLerpIncreaseMatOffboarding(bytes32 _ilk, bytes32 _oldLerp, bytes32 _newLerp, uint256 _newEndMat) public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        LerpFactoryAbstract OLD_LERP_FAB = LerpFactoryAbstract(0x00B416da876fe42dd02813da435Cc030F0d72434);
+        LerpAbstract oldLerp = LerpAbstract(OLD_LERP_FAB.lerps(_oldLerp));
+
+        uint256 t = (block.timestamp - oldLerp.startTime()) * WAD / oldLerp.duration();
+        uint256 tickMat = oldLerp.end() * t / WAD + oldLerp.start() - oldLerp.start() * t / WAD;
+        assertEq(getMat(_ilk), tickMat);
+        assertEq(spotter.wards(address(oldLerp)), 0);
+
+        LerpAbstract newLerp = LerpAbstract(lerpFactory.lerps(_newLerp));
+
+        hevm.warp(block.timestamp + newLerp.duration() / 2);
+        assertEq(getMat(_ilk), tickMat);
+        newLerp.tick();
+        assertEqApprox(getMat(_ilk), (tickMat + _newEndMat * RAY / 100) / 2, RAY / 100);
+
+        hevm.warp(block.timestamp + newLerp.duration());
+        newLerp.tick();
+        assertEq(getMat(_ilk), _newEndMat * RAY / 100);
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
