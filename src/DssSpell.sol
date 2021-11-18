@@ -58,8 +58,8 @@ contract DssSpellAction is DssAction {
     uint256 constant CURRENT_COMP_MAT       =  165 * RAY / 100;
 
     // --- Offboarding: Target Liquidation Ratio ---
-    uint256 constant TARGET_AAVE_MAT        = 2200 * RAY / 100;
-    uint256 constant TARGET_BAL_MAT         = 2200 * RAY / 100;
+    uint256 constant TARGET_AAVE_MAT        = 2100 * RAY / 100;
+    uint256 constant TARGET_BAL_MAT         = 2300 * RAY / 100;
     uint256 constant TARGET_COMP_MAT        = 2000 * RAY / 100;
 
     function _add(uint x, uint y) internal pure returns (uint z) {

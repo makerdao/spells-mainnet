@@ -84,10 +84,10 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAAVELerpOffboardings() public {
-        checkIlkLerpOffboarding("AAVE-A", "AAVE-A Offboarding", 165, 2200);
+        checkIlkLerpOffboarding("AAVE-A", "AAVE-A Offboarding", 165, 2100);
     }
     function testBALLerpOffboardings() public {
-        checkIlkLerpOffboarding("BAL-A", "BAL-A Offboarding", 165, 2200);
+        checkIlkLerpOffboarding("BAL-A", "BAL-A Offboarding", 165, 2300);
     }
     function testCOMPLerpOffboardings() public {
         checkIlkLerpOffboarding("COMP-A", "COMP-A Offboarding", 165, 2000);
