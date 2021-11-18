@@ -36,27 +36,64 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-//    function testCollateralIntegrations() public {
-//        vote(address(spell));
-//        scheduleWaitAndCast(address(spell));
-//        assertTrue(spell.done());
-//
-//        // Insert new collateral tests here
-//    }
+    function testCollateralIntegrations() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-//    function testNewChainlogValues() public {
-//        vote(address(spell));
-//        scheduleWaitAndCast(address(spell));
-//        assertTrue(spell.done());
-//    }
+        // Insert new collateral tests here
+        checkIlkIntegration(
+            "WBTC-B",
+            GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_B")),
+            ClipAbstract(addr.addr("MCD_CLIP_WBTC_B")),
+            addr.addr("PIP_WBTC"),
+            true,
+            true,
+            false
+        );
+    }
 
-//    function testNewIlkRegistryValues() public {
-//        vote(address(spell));
-//        scheduleWaitAndCast(address(spell));
-//        assertTrue(spell.done());
-//
-//        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-//    }
+    function testNewChainlogValues() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new chainlog tests here
+        assertEq(chainLog.getAddress("WBTC"), addr.addr("WBTC"));
+        assertEq(chainLog.getAddress("PIP_WBTC"), addr.addr("PIP_WBTC"));
+        assertEq(chainLog.getAddress("MCD_JOIN_WBTC_B"), addr.addr("MCD_JOIN_WBTC_B"));
+        assertEq(chainLog.getAddress("MCD_CLIP_WBTC_B"), addr.addr("MCD_CLIP_WBTC_B"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WBTC_B"), addr.addr("MCD_CLIP_CALC_WBTC_B"));
+        assertEq(chainLog.version(), "1.9.10");
+    }
+
+    function testNewIlkRegistryValues() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new ilk registry tests here
+        assertEq(reg.pos("WBTC-B"), 44);
+        assertEq(reg.join("WBTC-B"), addr.addr("MCD_JOIN_WBTC_B"));
+        assertEq(reg.gem("WBTC-B"), addr.addr("WBTC"));
+        assertEq(reg.dec("WBTC-B"), DSTokenAbstract(addr.addr("WBTC")).decimals());
+        assertEq(reg.class("WBTC-B"), 1);
+        assertEq(reg.pip("WBTC-B"), addr.addr("PIP_WBTC"));
+        assertEq(reg.xlip("WBTC-B"), addr.addr("MCD_CLIP_WBTC_B"));
+        assertEq(reg.name("WBTC-B"), "Wrapped BTC");
+        assertEq(reg.symbol("WBTC-B"), "WBTC");
+
+    }
+
+    function testAAVELerpOffboardings() public {
+        checkIlkLerpOffboarding("AAVE-A", "AAVE Offboarding", 165, 2200);
+    }
+    function testBALLerpOffboardings() public {
+        checkIlkLerpOffboarding("BAL-A", "BAL Offboarding", 165, 2200);
+    }
+    function testCOMPLerpOffboardings() public {
+        checkIlkLerpOffboarding("COMP-A", "COMP Offboarding", 165, 2000);
+    }
 
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
@@ -311,30 +348,30 @@ contract DssSpellTest is DssSpellTestBase {
     //     assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDUX, amountDaiDUX);
     // }
 
-    function testAAVEDirectBarChange() public {
-        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(join.bar(), 4 * 10**27 / 100);
+    // function testAAVEDirectBarChange() public {
+    //    DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+    //    assertEq(join.bar(), 4 * 10**27 / 100);
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    //    vote(address(spell));
+    //    scheduleWaitAndCast(address(spell));
+    //    assertTrue(spell.done());
 
-        assertEq(join.bar(), 3.9 * 10**27 / 100);
-    }
+    //    assertEq(join.bar(), 3.9 * 10**27 / 100);
+    // }
 
-    function testSendFundsFromPauseToVow() public {
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
+    // function testSendFundsFromPauseToVow() public {
+    //    vote(address(spell));
+    //    spell.schedule();
+    //    hevm.warp(spell.nextCastTime());
 
-        jug.drip("GUNIV3DAIUSDC1-A"); // So we do not affect surplus when executing the spell
-        assertEq(dai.balanceOf(address(pauseProxy)), 218_059.1 * 10**18);
-        uint256 prevDaiVowBalance = vat.dai(address(vow));
+    //    jug.drip("GUNIV3DAIUSDC1-A"); // So we do not affect surplus when executing the spell
+    //    assertEq(dai.balanceOf(address(pauseProxy)), 218_059.1 * 10**18);
+    //    uint256 prevDaiVowBalance = vat.dai(address(vow));
 
-        spell.cast();
-        assertTrue(spell.done());
+    //    spell.cast();
+    //    assertTrue(spell.done());
 
-        assertEq(dai.balanceOf(address(pauseProxy)), 0);
-        assertEq(vat.dai(address(vow)), prevDaiVowBalance + 218_059.1 * 10**45);
-    }
+    //    assertEq(dai.balanceOf(address(pauseProxy)), 0);
+    //    assertEq(vat.dai(address(vow)), prevDaiVowBalance + 218_059.1 * 10**45);
+    // }
 }
