@@ -58,9 +58,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new chainlog tests here
-        assertEq(chainLog.getAddress("WBTC"), addr.addr("WBTC"));
-        assertEq(chainLog.getAddress("PIP_WBTC"), addr.addr("PIP_WBTC"));
+        // Insert new chainlog values tests here
         assertEq(chainLog.getAddress("MCD_JOIN_WBTC_B"), addr.addr("MCD_JOIN_WBTC_B"));
         assertEq(chainLog.getAddress("MCD_CLIP_WBTC_B"), addr.addr("MCD_CLIP_WBTC_B"));
         assertEq(chainLog.getAddress("MCD_CLIP_CALC_WBTC_B"), addr.addr("MCD_CLIP_CALC_WBTC_B"));
@@ -72,7 +70,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new ilk registry tests here
+        // Insert new ilk registry values tests here
         assertEq(reg.pos("WBTC-B"), 44);
         assertEq(reg.join("WBTC-B"), addr.addr("MCD_JOIN_WBTC_B"));
         assertEq(reg.gem("WBTC-B"), addr.addr("WBTC"));
@@ -86,13 +84,13 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAAVELerpOffboardings() public {
-        checkIlkLerpOffboarding("AAVE-A", "AAVE Offboarding", 165, 2200);
+        checkIlkLerpOffboarding("AAVE-A", "AAVE-A Offboarding", 165, 2200);
     }
     function testBALLerpOffboardings() public {
-        checkIlkLerpOffboarding("BAL-A", "BAL Offboarding", 165, 2200);
+        checkIlkLerpOffboarding("BAL-A", "BAL-A Offboarding", 165, 2200);
     }
     function testCOMPLerpOffboardings() public {
-        checkIlkLerpOffboarding("COMP-A", "COMP Offboarding", 165, 2000);
+        checkIlkLerpOffboarding("COMP-A", "COMP-A Offboarding", 165, 2000);
     }
 
     function testFailWrongDay() public {
@@ -322,56 +320,4 @@ contract DssSpellTest is DssSpellTestBase {
         }
         assertEq(expectedHash, actualHash);
     }
-
-    // function testPsmParamChanges() public {
-    //     vote(address(spell));
-    //     scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
-
-    //     assertEq(PsmAbstract(0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A).tin(), 0);
-    //     assertEq(PsmAbstract(0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf).tin(), 0);
-    // }
-
-    // function testOneTimePaymentDistributions() public {
-    //     uint256 prevSin      = vat.sin(address(vow));
-    //     uint256 prevDaiDUX   = dai.balanceOf(DUX_WALLET);
-
-    //     uint256 amountDaiDUX = 3591208 * WAD / 10;
-
-    //     vote(address(spell));
-    //     scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
-
-    //     assertGt(vat.sin(address(vow)), prevSin);
-    //     assertEq(vat.sin(address(vow)) - prevSin, amountDaiDUX * RAY);
-    //     assertGt(dai.balanceOf(DUX_WALLET), prevDaiDUX);
-    //     assertEq(dai.balanceOf(DUX_WALLET) - prevDaiDUX, amountDaiDUX);
-    // }
-
-    // function testAAVEDirectBarChange() public {
-    //    DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-    //    assertEq(join.bar(), 4 * 10**27 / 100);
-
-    //    vote(address(spell));
-    //    scheduleWaitAndCast(address(spell));
-    //    assertTrue(spell.done());
-
-    //    assertEq(join.bar(), 3.9 * 10**27 / 100);
-    // }
-
-    // function testSendFundsFromPauseToVow() public {
-    //    vote(address(spell));
-    //    spell.schedule();
-    //    hevm.warp(spell.nextCastTime());
-
-    //    jug.drip("GUNIV3DAIUSDC1-A"); // So we do not affect surplus when executing the spell
-    //    assertEq(dai.balanceOf(address(pauseProxy)), 218_059.1 * 10**18);
-    //    uint256 prevDaiVowBalance = vat.dai(address(vow));
-
-    //    spell.cast();
-    //    assertTrue(spell.done());
-
-    //    assertEq(dai.balanceOf(address(pauseProxy)), 0);
-    //    assertEq(vat.dai(address(vow)), prevDaiVowBalance + 218_059.1 * 10**45);
-    // }
 }

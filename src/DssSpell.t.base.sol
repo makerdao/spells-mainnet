@@ -171,8 +171,6 @@ contract DssSpellTestBase is DSTest, DSMath {
     DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
 
-    // Insert spell-only addresses here
-
     DssSpell spell;
 
     // CHEAT_CODE = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D
