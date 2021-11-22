@@ -13,7 +13,7 @@ contract Addresses {
         addr["FLIP_FAB"]                        = 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b;
         addr["CLIP_FAB"]                        = 0x0716F25fBaAae9b63803917b6125c10c313dF663;
         addr["CALC_FAB"]                        = 0xE1820A2780193d74939CcA104087CADd6c1aA13A;
-        addr["LERP_FAB"]                        = 0x00B416da876fe42dd02813da435Cc030F0d72434;
+        addr["LERP_FAB"]                        = 0x9175561733D138326FDeA86CdFdF53e92b588276;
         addr["MCD_GOV"]                         = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
         addr["GOV_GUARD"]                       = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
         addr["MCD_ADM"]                         = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
@@ -91,6 +91,9 @@ contract Addresses {
         addr["MCD_FLIP_WBTC_A"]                 = 0x58CD24ac7322890382eE45A3E4F903a5B22Ee930;
         addr["MCD_CLIP_WBTC_A"]                 = 0x0227b54AdbFAEec5f1eD1dFa11f54dcff9076e2C;
         addr["MCD_CLIP_CALC_WBTC_A"]            = 0x5f4CEa97ca1030C6Bd38429c8a0De7Cd4981C70A;
+        addr["MCD_JOIN_WBTC_B"]                 = 0xfA8c996e158B80D77FbD0082BB437556A65B96E0;
+        addr["MCD_CLIP_WBTC_B"]                 = 0xe30663C6f83A06eDeE6273d72274AE24f1084a22;
+        addr["MCD_CLIP_CALC_WBTC_B"]            = 0xeb911E99D7ADD1350DC39d84D60835BA9B287D96;
         addr["TUSD"]                            = 0x0000000000085d4780B73119b644AE5ecd22b376;
         addr["PIP_TUSD"]                        = 0xeE13831ca96d191B688A670D47173694ba98f1e5;
         addr["MCD_JOIN_TUSD_A"]                 = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
@@ -274,7 +277,6 @@ contract Addresses {
         addr["RWA002_A_URN"]                    = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]          = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
         addr["RWA002_A_OUTPUT_CONDUIT"]         = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-        addr["LERP_FAB"]                        = 0x9175561733D138326FDeA86CdFdF53e92b588276;
         addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
         addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["RWA003"]                          = 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9;
