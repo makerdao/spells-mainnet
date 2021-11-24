@@ -49,6 +49,7 @@ contract DssSpellAction is DssAction {
 
     // --- Math ---
     uint256 constant MILLION                  = 10 ** 6;
+    uint256 constant RAD                      = 10 ** 45;
 
     // --- WBTC-C ---
     address constant MCD_JOIN_WBTC_C          = 0x7f62f9592b823331E012D3c5DdF2A7714CfB9de2;
@@ -69,6 +70,18 @@ contract DssSpellAction is DssAction {
         //  Set Aave D3M Max Debt Ceiling
         //  https://vote.makerdao.com/polling/QmZhvNu5?network=mainnet#poll-detail
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-AAVEV2-DAI", 100 * MILLION);
+
+        //  Increase the Surplus Buffer via Lerp
+        //  https://vote.makerdao.com/polling/QmUqfZRv?network=mainnet#poll-detail
+        DssExecLib.linearInterpolation({
+            _name:      "Increase SB - 20211126",
+            _target:    DssExecLib.vow(),
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     60 * MILLION * RAD,
+            _end:       90 * MILLION * RAD,
+            _duration:  210 days
+        });
 
         //  Add WBTC-C as a new Vault Type
         //  https://vote.makerdao.com/polling/QmdVYMRo?network=mainnet#poll-detail
@@ -127,8 +140,8 @@ contract DssSpellAction is DssAction {
                 kprPctReward:          10 // 0.1%
             })
         );
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_GUSD_A, 90 seconds, 9900);
-        DssExecLib.setIlkAutoLineParameters("WBTC-C", 100 * MILLION, 10 * MILLION, 24 hours);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_GUSD_A, 120 seconds, 9990);
+        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 100 * MILLION, 10 * MILLION, 24 hours);
 
         // Changelog
         DssExecLib.setChangelogAddress("MCD_JOIN_WBTC_C", MCD_JOIN_WBTC_C);

@@ -62,6 +62,24 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
+    function testLerpSurplusBuffer() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
+
+        uint256 duration = 210 days;
+        hevm.warp(block.timestamp + duration / 2);
+        assertEq(vow.hump(), 60 * MILLION * RAD);
+        lerp.tick();
+        assertEq(vow.hump(), 75 * MILLION * RAD);
+        hevm.warp(block.timestamp + duration / 2);
+        lerp.tick();
+        assertEq(vow.hump(), 90 * MILLION * RAD);
+        assertTrue(lerp.done());
+    }
+
     function testNewChainlogValues() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
