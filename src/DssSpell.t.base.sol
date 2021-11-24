@@ -1636,7 +1636,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
+            aL_line:      100 * MILLION,
             aL_gap:       25 * MILLION,
             aL_ttl:       12 hours,
             line:         0,

@@ -66,8 +66,12 @@ contract DssSpellAction is DssAction {
         address GUSD     = DssExecLib.getChangelogAddress("GUSD");
         address PIP_GUSD = DssExecLib.getChangelogAddress("PIP_GUSD");
 
+        //  Set Aave D3M Max Debt Ceiling
+        //  https://vote.makerdao.com/polling/QmZhvNu5?network=mainnet#poll-detail
+        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-AAVEV2-DAI", 100 * MILLION);
+
         //  Add WBTC-C as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmdVYMRo?network=mainnet#poll-detail (WBTC-C Onboarding)
+        //  https://vote.makerdao.com/polling/QmdVYMRo?network=mainnet#poll-detail
         DssExecLib.addNewCollateral(
             CollateralOpts({
                 ilk:                   "WBTC-C",
@@ -97,7 +101,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("WBTC-C", 1000 * MILLION, 100 * MILLION, 8 hours);
 
         //  Add PSM-GUSD-A as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmayeEjz?network=mainnet#poll-detail (PSM-GUSD-C Onboarding)
+        //  https://vote.makerdao.com/polling/QmayeEjz?network=mainnet#poll-detail
         DssExecLib.addNewCollateral(
             CollateralOpts({
                 ilk:                   "PSM-GUSD-A",
