@@ -51,6 +51,15 @@ contract DssSpellTest is DssSpellTestBase {
             true,
             false
         );
+        checkPsmIlkIntegration(
+            "PSM-GUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
+            addr.addr("PIP_GUSD"),
+            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
+            0,
+            0
+        );
     }
 
     function testNewChainlogValues() public {
