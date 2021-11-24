@@ -51,9 +51,9 @@ contract DssSpellAction is DssAction {
     uint256 constant MILLION                 = 10 ** 6;
 
     // --- WBTC-C ---
-    address constant MCD_JOIN_WBTC_C         = ;
-    address constant MCD_CLIP_WBTC_C         = ;
-    address constant MCD_CLIP_CALC_WBTC_C    = ;
+    address constant MCD_JOIN_WBTC_C         = 0x7f62f9592b823331E012D3c5DdF2A7714CfB9de2;
+    address constant MCD_CLIP_WBTC_C         = 0x39F29773Dcb94A32529d0612C6706C49622161D1;
+    address constant MCD_CLIP_CALC_WBTC_C    = 0x4fa2A328E7f69D023fE83454133c273bF5ACD435;
 
     function actions() public override {
 

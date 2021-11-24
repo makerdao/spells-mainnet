@@ -94,6 +94,9 @@ contract Addresses {
         addr["MCD_JOIN_WBTC_B"]                 = 0xfA8c996e158B80D77FbD0082BB437556A65B96E0;
         addr["MCD_CLIP_WBTC_B"]                 = 0xe30663C6f83A06eDeE6273d72274AE24f1084a22;
         addr["MCD_CLIP_CALC_WBTC_B"]            = 0xeb911E99D7ADD1350DC39d84D60835BA9B287D96;
+        addr["MCD_JOIN_WBTC_C"]                 = 0x7f62f9592b823331E012D3c5DdF2A7714CfB9de2;
+        addr["MCD_CLIP_WBTC_C"]                 = 0x39F29773Dcb94A32529d0612C6706C49622161D1;
+        addr["MCD_CLIP_CALC_WBTC_C"]            = 0x4fa2A328E7f69D023fE83454133c273bF5ACD435;
         addr["TUSD"]                            = 0x0000000000085d4780B73119b644AE5ecd22b376;
         addr["PIP_TUSD"]                        = 0xeE13831ca96d191B688A670D47173694ba98f1e5;
         addr["MCD_JOIN_TUSD_A"]                 = 0x4454aF7C8bb9463203b66C816220D41ED7837f44;
