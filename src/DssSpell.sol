@@ -183,7 +183,7 @@ contract DssSpellAction is DssAction {
             VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 424_944.00 * 10**18, DEC_01_2021, APR_30_2022 - DEC_01_2021, 0, address(0))
         );
         VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 5_121_875.00 * 10**18, DEC_01_2021, SEP_01_2024 - DEC_01_2021, 0, address(0))
+            VestAbstract(MCD_VEST_DAI).create(DECO_WALLET, 5_121_875.00 * 10**18, DEC_01_2021, SEP_01_2024 - DEC_01_2021, 0, address(0))
         );
 
         // Changelog
