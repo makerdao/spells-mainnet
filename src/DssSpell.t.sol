@@ -89,6 +89,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.getAddress("MCD_JOIN_WBTC_C"), addr.addr("MCD_JOIN_WBTC_C"));
         assertEq(chainLog.getAddress("MCD_CLIP_WBTC_C"), addr.addr("MCD_CLIP_WBTC_C"));
         assertEq(chainLog.getAddress("MCD_CLIP_CALC_WBTC_C"), addr.addr("MCD_CLIP_CALC_WBTC_C"));
+
+        assertEq(chainLog.getAddress("MCD_JOIN_PSM_GUSD_A"), addr.addr("MCD_JOIN_PSM_GUSD_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_PSM_GUSD_A"), addr.addr("MCD_CLIP_PSM_GUSD_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_PSM_GUSD_A"), addr.addr("MCD_CLIP_CALC_PSM_GUSD_A"));
+        assertEq(chainLog.getAddress("MCD_PSM_GUSD_A"), addr.addr("MCD_PSM_GUSD_A"));
+
         assertEq(chainLog.version(), "1.9.11");
     }
 
@@ -107,6 +113,65 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.xlip("WBTC-C"), addr.addr("MCD_CLIP_WBTC_C"));
         assertEq(reg.name("WBTC-C"), "Wrapped BTC");
         assertEq(reg.symbol("WBTC-C"), "WBTC");
+
+        assertEq(reg.pos("PSM-GUSD-A"), 46);
+        assertEq(reg.join("PSM-GUSD-A"), addr.addr("MCD_JOIN_PSM_GUSD_A"));
+        assertEq(reg.gem("PSM-GUSD-A"), addr.addr("GUSD"));
+        assertEq(reg.dec("PSM-GUSD-A"), DSTokenAbstract(addr.addr("GUSD")).decimals());
+        assertEq(reg.class("PSM-GUSD-A"), 1);
+        assertEq(reg.pip("PSM-GUSD-A"), addr.addr("PIP_GUSD"));
+        assertEq(reg.xlip("PSM-GUSD-A"), addr.addr("MCD_CLIP_PSM_GUSD_A"));
+        assertEq(reg.name("PSM-GUSD-A"), "Gemini dollar");
+        assertEq(reg.symbol("PSM-GUSD-A"), "GUSD");
+    }
+
+    function testCollateralIntegrations() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new collateral tests here
+        checkIlkIntegration(
+            "WBTC-C",
+            GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_C")),
+            ClipAbstract(addr.addr("MCD_CLIP_WBTC_C")),
+            addr.addr("PIP_WBTC"),
+            true,
+            true,
+            false
+        );
+        checkPsmIlkIntegration(
+            "PSM-GUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
+            addr.addr("PIP_GUSD"),
+            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
+            0,
+            0
+        );
+    }
+
+    function testDaiVests() public {
+        uint256 lastId = vestDai.ids();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Confirm all new dai vests are under the upper limit of 2M / year
+        // Manually specify special exceptions
+        for(uint256 i = lastId + 1; i <= vestDai.ids(); i++) {
+            assertTrue(vest.usr(i) != address(0));
+            assertGt(vest.bgn(i), block.timestamp - 90 days);       // Start time is above ~3 months ago
+            assertGt(vest.clf(i), vest.bgn(i));
+            assertEq(vest.mgr(i), address(0));
+            assertEq(vest.res(i), 1);
+            assertEq(vest.tot(i), 122_700.00 * 10**18);
+            assertEq(vest.rxd(i), 0);
+
+            uint256 rate = vest.tot(i) / (vest.fin(i) - vest.bgn(i));       // DAI / sec
+            assertLt(rate, 2_000_000 * 1e18 / 365 days);
+        }
     }
 
     function testFailWrongDay() public {

@@ -170,6 +170,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     ClipperMomAbstract      clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
     DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
+    VestAbstract            vestDai = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
     DssSpell spell;
 
