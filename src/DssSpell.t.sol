@@ -36,6 +36,90 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
+    function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
+        // Special exception GUSD has its storage in a separate contract
+        address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
+
+        // Edge case - balance is already set for some reason
+        if (token.balanceOf(address(this)) == amount) return;
+
+        for (uint256 i = 0; i < 200; i++) {
+            // Scan the storage for the balance storage slot
+            bytes32 prevValue = hevm.load(
+                STORE,
+                keccak256(abi.encode(address(this), uint256(i)))
+            );
+            hevm.store(
+                STORE,
+                keccak256(abi.encode(address(this), uint256(i))),
+                bytes32(amount)
+            );
+            if (token.balanceOf(address(this)) == amount) {
+                // Found it
+                return;
+            } else {
+                // Keep going after restoring the original value
+                hevm.store(
+                    STORE,
+                    keccak256(abi.encode(address(this), uint256(i))),
+                    prevValue
+                );
+            }
+        }
+
+        // We have failed if we reach here
+        assertTrue(false, "TestError/GiveTokens-slot-not-found");
+    }
+
+    function checkPsmIlkIntegrationGUSD(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        ClipAbstract clip,
+        address pip,
+        PsmAbstract psm,
+        uint256 tin,
+        uint256 tout
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        assertTrue(pip != address(0));
+
+        spotter.poke(_ilk);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(join.wards(address(psm)), 1);
+        assertEq(psm.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
+
+        // Check toll in/out
+        assertEq(psm.tin(), tin);
+        assertEq(psm.tout(), tout);
+
+        uint256 amount = 1000 * (10 ** token.decimals());
+        giveTokensGUSD(token, amount);
+
+        // Approvals
+        token.approve(address(join), amount);
+        dai.approve(address(psm), uint256(-1));
+
+        // Convert all TOKEN to DAI
+        psm.sellGem(address(this), amount);
+        amount -= amount * tin / WAD;
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - token.decimals())));
+
+        // Convert all DAI to TOKEN
+        amount -= amount * tout / WAD;
+        psm.buyGem(address(this), amount);
+        assertEq(dai.balanceOf(address(this)), 0);
+        assertEq(token.balanceOf(address(this)), amount);
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
     function testCollateralIntegrations() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -51,7 +135,7 @@ contract DssSpellTest is DssSpellTestBase {
             true,
             false
         );
-        checkPsmIlkIntegration(
+        checkPsmIlkIntegrationGUSD(
             "PSM-GUSD-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
             ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),

@@ -2406,7 +2406,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         psm.sellGem(address(this), amount);
         amount -= amount * tin / WAD;
         assertEq(token.balanceOf(address(this)), 0);
-        assertEq(dai.balanceOf(address(this)), amount);
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - token.decimals())));
 
         // Convert all DAI to TOKEN
         amount -= amount * tout / WAD;
