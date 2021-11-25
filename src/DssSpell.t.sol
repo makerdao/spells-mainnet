@@ -6,6 +6,24 @@ import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
+
+    address constant SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+    address constant IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+    address constant DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+
+    uint256 constant DEC_01_2021    = 1638316800;
+    uint256 constant DEC_31_2021    = 1640908800;
+    uint256 constant JAN_01_2022    = 1640995200;
+    uint256 constant APR_30_2022    = 1651276800;
+    uint256 constant JUN_30_2022    = 1656547200;
+    uint256 constant AUG_01_2022    = 1659312000;
+    uint256 constant NOV_30_2022    = 1669766400;
+    uint256 constant DEC_31_2022    = 1672444800;
+    uint256 constant SEP_01_2024    = 1725148800;
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -216,6 +234,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // General sanity checks
         // Confirm all new dai vests are under the upper limit of 2M / year
         // Manually specify special exceptions
         for(uint256 i = lastId + 1; i <= vestDai.ids(); i++) {
@@ -227,15 +246,20 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(vestDai.rxd(i), 0);
 
             uint256 rate = vestDai.tot(i) / (vestDai.fin(i) - vestDai.bgn(i));       // DAI / sec
-            assertLt(rate,2_000_000 * WAD / 365 days);
+            assertLt(rate, 2_000_000 * WAD / 365 days);
         }
+
+        // Verify individual payments
+        checkDaiVest(++lastId, RWF_WALLET, JAN_01_2022, DEC_31_2022, 1_860_000);
+        checkDaiVest(++lastId, COM_WALLET, DEC_01_2021, DEC_31_2021, 12_242);
+        checkDaiVest(++lastId, COM_WALLET, JAN_01_2022, JUN_30_2022, 257_500);
+        checkDaiVest(++lastId, SAS_WALLET, DEC_01_2021, NOV_30_2022, 1_130_393);
+        checkDaiVest(++lastId, IS_WALLET, DEC_01_2021, AUG_01_2022, 366_563);
+        checkDaiVest(++lastId, MKT_WALLET, DEC_01_2021, APR_30_2022, 424_944);
+        checkDaiVest(++lastId, DECO_WALLET, DEC_01_2021, SEP_01_2024, 5_121_875);
     }
 
     function testOneTimePaymentDistributions() public {
-        address SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
-        address IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
-        address DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-
         uint256 prevSin         = vat.sin(address(vow));
         uint256 prevDaiSas   = dai.balanceOf(SAS_WALLET);
         uint256 prevDaiIs     = dai.balanceOf(IS_WALLET);

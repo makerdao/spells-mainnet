@@ -170,7 +170,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     ClipperMomAbstract      clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
     DssAutoLineAbstract    autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
-    VestAbstract            vestDai = VestAbstract(addr.addr("MCD_VEST_DAI"));
+    VestAbstract            vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
 
     DssSpell spell;
 
@@ -2467,6 +2467,13 @@ contract DssSpellTestBase is DSTest, DSMath {
         assertLe(ink, 1);
         assertLe(art, 1);
         assertEq(token.balanceOf(address(join)), 0);
+    }
+
+    function checkDaiVest(uint256 _index, address _wallet, uint256 _start, uint256 _end, uint256 _amount) public {
+        assertEq(vestDai.usr(_index), _wallet);
+        assertEq(vestDai.bgn(_index), _start);
+        assertEq(vestDai.fin(_index), _end);
+        assertEq(vestDai.tot(_index), _amount * WAD);
     }
 
     function getMat(bytes32 _ilk) internal returns (uint256 mat) {
