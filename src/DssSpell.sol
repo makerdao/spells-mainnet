@@ -20,11 +20,7 @@ pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { VatAbstract, LerpFactoryAbstract, SpotAbstract} from "dss-interfaces/Interfaces.sol";
-
-interface LerpAbstract {
-    function tick() external returns (uint256);
-}
+import {VestAbstract} from "dss-interfaces/Interfaces.sol";
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -56,16 +52,36 @@ contract DssSpellAction is DssAction {
     address constant MCD_CLIP_WBTC_C          = 0x39F29773Dcb94A32529d0612C6706C49622161D1;
     address constant MCD_CLIP_CALC_WBTC_C     = 0x4fa2A328E7f69D023fE83454133c273bF5ACD435;
 
-    address constant MCD_JOIN_PSM_GUSD_A      = 0xF0C8fbBC793903ed9FA1e59792d496e866a7Cbc1;
+    // --- PSM-GUSD-A ---
+    address constant MCD_JOIN_PSM_GUSD_A      = 0x79A0FA989fb7ADf1F8e80C93ee605Ebb94F7c6A5;
     address constant MCD_CLIP_PSM_GUSD_A      = 0xf93CC3a50f450ED245e003BFecc8A6Ec1732b0b2;
     address constant MCD_CLIP_CALC_PSM_GUSD_A = 0x7f67a68a0ED74Ea89A82eD9F243C159ed43a502a;
-    address constant MCD_PSM_GUSD_A           = 0xfd21BAEFe8F2D10cF7d16562203b4ed89fB3BFAF;
+    address constant MCD_PSM_GUSD_A           = 0x204659B2Fd2aD5723975c362Ce2230Fba11d3900;
+
+    // --- Wallets + Dates ---
+    address constant SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+    address constant IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+    address constant DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+
+    uint256 constant DEC_01_2021    = 1638316800;
+    uint256 constant DEC_31_2021    = 1640908800;
+    uint256 constant JAN_01_2022    = 1640995200;
+    uint256 constant APR_30_2022    = 1651276800;
+    uint256 constant JUN_30_2022    = 1656547200;
+    uint256 constant AUG_01_2022    = 1659312000;
+    uint256 constant NOV_30_2022    = 1669766400;
+    uint256 constant DEC_31_2022    = 1672444800;
+    uint256 constant SEP_01_2024    = 1725148800;
 
     function actions() public override {
-        address WBTC     = DssExecLib.getChangelogAddress("WBTC");
-        address PIP_WBTC = DssExecLib.getChangelogAddress("PIP_WBTC");
-        address GUSD     = DssExecLib.getChangelogAddress("GUSD");
-        address PIP_GUSD = DssExecLib.getChangelogAddress("PIP_GUSD");
+        address WBTC            = DssExecLib.getChangelogAddress("WBTC");
+        address PIP_WBTC        = DssExecLib.getChangelogAddress("PIP_WBTC");
+        address GUSD            = DssExecLib.getChangelogAddress("GUSD");
+        address PIP_GUSD        = DssExecLib.getChangelogAddress("PIP_GUSD");
+        address MCD_VEST_DAI    = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
 
         //  Set Aave D3M Max Debt Ceiling
         //  https://vote.makerdao.com/polling/QmZhvNu5?network=mainnet#poll-detail
@@ -76,7 +92,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.linearInterpolation({
             _name:      "Increase SB - 20211126",
             _target:    DssExecLib.vow(),
-            _what:      "mat",
+            _what:      "hump",
             _startTime: block.timestamp,
             _start:     60 * MILLION * RAD,
             _end:       90 * MILLION * RAD,
@@ -141,7 +157,34 @@ contract DssSpellAction is DssAction {
             })
         );
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_GUSD_A, 120 seconds, 9990);
-        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 100 * MILLION, 10 * MILLION, 24 hours);
+        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 10 * MILLION, 10 * MILLION, 24 hours);
+
+        //  Core Unit Budget Distributions
+        DssExecLib.sendPaymentFromSurplusBuffer(SAS_WALLET, 245_738);
+        DssExecLib.sendPaymentFromSurplusBuffer(IS_WALLET, 195_443);
+        DssExecLib.sendPaymentFromSurplusBuffer(DECO_WALLET, 465_625);
+
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(RWF_WALLET, 1_860_000.00 * 10**18, JAN_01_2022, DEC_31_2022 - JAN_01_2022, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 12_242.00 * 10**18, DEC_01_2021, DEC_31_2021 - DEC_01_2021, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 257_500.00 * 10**18, JAN_01_2022, JUN_30_2022 - JAN_01_2022, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(SAS_WALLET, 1_130_393.00 * 10**18, DEC_01_2021, NOV_30_2022 - DEC_01_2021, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(IS_WALLET, 366_563.00 * 10**18, DEC_01_2021, AUG_01_2022 - DEC_01_2021, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 424_944.00 * 10**18, DEC_01_2021, APR_30_2022 - DEC_01_2021, 0, address(0))
+        );
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 5_121_875.00 * 10**18, DEC_01_2021, SEP_01_2024 - DEC_01_2021, 0, address(0))
+        );
 
         // Changelog
         DssExecLib.setChangelogAddress("MCD_JOIN_WBTC_C", MCD_JOIN_WBTC_C);

@@ -175,10 +175,10 @@ contract Addresses {
         addr["MCD_FLIP_GUSD_A"]                 = 0xCAa8D152A8b98229fB77A213BE16b234cA4f612f;
         addr["MCD_CLIP_GUSD_A"]                 = 0xa47D68b9dB0A0361284fA04BA40623fcBd1a263E;
         addr["MCD_CLIP_CALC_GUSD_A"]            = 0xF7e80359Cb9C4E6D178E6689eD8A6A6f91060747;
-        addr["MCD_JOIN_PSM_GUSD_A"]             = 0xF0C8fbBC793903ed9FA1e59792d496e866a7Cbc1;
+        addr["MCD_JOIN_PSM_GUSD_A"]             = 0x79A0FA989fb7ADf1F8e80C93ee605Ebb94F7c6A5;
         addr["MCD_CLIP_PSM_GUSD_A"]             = 0xf93CC3a50f450ED245e003BFecc8A6Ec1732b0b2;
         addr["MCD_CLIP_CALC_PSM_GUSD_A"]        = 0x7f67a68a0ED74Ea89A82eD9F243C159ed43a502a;
-        addr["MCD_PSM_GUSD_A"]                  = 0xfd21BAEFe8F2D10cF7d16562203b4ed89fB3BFAF;
+        addr["MCD_PSM_GUSD_A"]                  = 0x204659B2Fd2aD5723975c362Ce2230Fba11d3900;
         addr["UNI"]                             = 0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984;
         addr["PIP_UNI"]                         = 0xf363c7e351C96b910b92b45d34190650df4aE8e7;
         addr["MCD_JOIN_UNI_A"]                  = 0x3BC3A58b4FC1CbE7e98bB4aB7c99535e8bA9b8F1;
