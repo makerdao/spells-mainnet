@@ -140,13 +140,51 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(vestDai.clf(i), vestDai.bgn(i));
             assertEq(vestDai.mgr(i), address(0));
             assertEq(vestDai.res(i), 1);
-            assertEq(vestDai.tot(i), 122_700.00 * 10**18);
             assertEq(vestDai.rxd(i), 0);
 
             uint256 rate = vestDai.tot(i) / (vestDai.fin(i) - vestDai.bgn(i));       // DAI / sec
-            assertLt(rate, uint256(2_000_000 * 1e18 / 365 days));
+            assertLt(rate,2_000_000 * WAD / 365 days);
         }
     }
+
+    function testOneTimePaymentDistributions() public {
+        address SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+        address IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+        address DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+
+        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevDaiSas   = dai.balanceOf(SAS_WALLET);
+        uint256 prevDaiIs     = dai.balanceOf(IS_WALLET);
+        uint256 prevDaiDeco      = dai.balanceOf(DECO_WALLET);
+
+        uint256 amountSas    = 245_738;
+        uint256 amountIs     = 195_443;
+        uint256 amountDeco   = 465_625;
+        uint256 amountTotal  = amountSas + amountIs + amountDeco;
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountSas
+            + amountIs
+            + amountDeco
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(SAS_WALLET) - prevDaiSas, amountSas * WAD);
+        assertEq(dai.balanceOf(IS_WALLET) - prevDaiIs, amountIs * WAD);
+        assertEq(dai.balanceOf(DECO_WALLET) - prevDaiDeco, amountDeco * WAD);
+    }
+
 
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
