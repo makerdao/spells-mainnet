@@ -314,7 +314,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             vow_sump:              50 * THOUSAND,           // In whole Dai units
             vow_bump:              30 * THOUSAND,           // In whole Dai units
             vow_hump_min:          60 * MILLION,            // In whole Dai units
-            vow_hump_max:          60 * MILLION,            // In whole Dai units
+            vow_hump_max:          90 * MILLION,            // In whole Dai units
             flap_beg:              400,                     // in basis points
             flap_ttl:              30 minutes,              // in seconds
             flap_tau:              72 hours,                // in seconds
