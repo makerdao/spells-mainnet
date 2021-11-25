@@ -125,32 +125,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.symbol("PSM-GUSD-A"), "GUSD");
     }
 
-    function testCollateralIntegrations() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Insert new collateral tests here
-        checkIlkIntegration(
-            "WBTC-C",
-            GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_C")),
-            ClipAbstract(addr.addr("MCD_CLIP_WBTC_C")),
-            addr.addr("PIP_WBTC"),
-            true,
-            true,
-            false
-        );
-        checkPsmIlkIntegration(
-            "PSM-GUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
-            addr.addr("PIP_GUSD"),
-            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
-            0,
-            0
-        );
-    }
-
     function testDaiVests() public {
         uint256 lastId = vestDai.ids();
 
@@ -161,16 +135,16 @@ contract DssSpellTest is DssSpellTestBase {
         // Confirm all new dai vests are under the upper limit of 2M / year
         // Manually specify special exceptions
         for(uint256 i = lastId + 1; i <= vestDai.ids(); i++) {
-            assertTrue(vest.usr(i) != address(0));
-            assertGt(vest.bgn(i), block.timestamp - 90 days);       // Start time is above ~3 months ago
-            assertGt(vest.clf(i), vest.bgn(i));
-            assertEq(vest.mgr(i), address(0));
-            assertEq(vest.res(i), 1);
-            assertEq(vest.tot(i), 122_700.00 * 10**18);
-            assertEq(vest.rxd(i), 0);
+            assertTrue(vestDai.usr(i) != address(0));
+            assertGt(vestDai.bgn(i), block.timestamp - 90 days);       // Start time is above ~3 months ago
+            assertEq(vestDai.clf(i), vestDai.bgn(i));
+            assertEq(vestDai.mgr(i), address(0));
+            assertEq(vestDai.res(i), 1);
+            assertEq(vestDai.tot(i), 122_700.00 * 10**18);
+            assertEq(vestDai.rxd(i), 0);
 
-            uint256 rate = vest.tot(i) / (vest.fin(i) - vest.bgn(i));       // DAI / sec
-            assertLt(rate, 2_000_000 * 1e18 / 365 days);
+            uint256 rate = vestDai.tot(i) / (vestDai.fin(i) - vestDai.bgn(i));       // DAI / sec
+            assertLt(rate, uint256(2_000_000 * 1e18 / 365 days));
         }
     }
 
