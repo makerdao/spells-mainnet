@@ -6,7 +6,6 @@ import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-
     address constant SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
     address constant IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
     address constant DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
@@ -260,10 +259,10 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testOneTimePaymentDistributions() public {
-        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevSin      = vat.sin(address(vow));
         uint256 prevDaiSas   = dai.balanceOf(SAS_WALLET);
-        uint256 prevDaiIs     = dai.balanceOf(IS_WALLET);
-        uint256 prevDaiDeco      = dai.balanceOf(DECO_WALLET);
+        uint256 prevDaiIs    = dai.balanceOf(IS_WALLET);
+        uint256 prevDaiDeco  = dai.balanceOf(DECO_WALLET);
 
         uint256 amountSas    = 245_738;
         uint256 amountIs     = 195_443;
@@ -280,13 +279,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
-        assertEq(
-            vat.sin(address(vow)) - prevSin,
-            ( amountSas
-            + amountIs
-            + amountDeco
-            ) * RAD
-        );
         assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
         assertEq(dai.balanceOf(SAS_WALLET) - prevDaiSas, amountSas * WAD);
         assertEq(dai.balanceOf(IS_WALLET) - prevDaiIs, amountIs * WAD);
