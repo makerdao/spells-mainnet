@@ -285,6 +285,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(DECO_WALLET) - prevDaiDeco, amountDeco * WAD);
     }
 
+
     function testFailWrongDay() public {
         require(spell.officeHours() == spellValues.office_hours_enabled);
         if (spell.officeHours()) {
