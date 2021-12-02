@@ -28,6 +28,7 @@ contract DssSpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/194592d74ae225132c1963527ae90190b8bfa476/governance/votes/Executive%20vote%20-%20November%2026,%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2021-12-03 MakerDAO Executive Spell | Hash: ??";
+    // TODO: add in hash - PE handover
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -58,12 +59,52 @@ contract DssSpellAction is DssAction {
     uint256 constant RAD                      = 10 ** 45;
 
     // --- GUNIV3DAIUSDC2-A ---
-    address constant MCD_JOIN_GUNIV3DAIUSDC2_A        = 0xabc; // Todo: deploy from factory - std clip
+    address constant GUNIV3DAIUSDC2                   = 0x50379f632ca68d36e50cfbc8f78fe16bd1499d1e;
+    address constant MCD_JOIN_GUNIV3DAIUSDC2_A        = 0xabc; // Todo: deploy from factory - std join
     address constant MCD_CLIP_GUNIV3DAIUSDC2_A        = 0xabc; // Todo: deploy from factory
     address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A   = 0xabc; // Todo: deploy from factory
 
+    // --- Wallets ---
+    address constant COM_WALLET                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant FLIPFLOPFLAP_WALLET          = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBACKLOOPS_WALLET         = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
+
     function actions() public override {
         // --- 2021-12-03 Weekly Executive ---
+
+        // ----------------------------- Collateral onboarding -----------------------------
+        //  Add GUNIV3DAIUSDC2-A as a new Vault Type
+        //  https://vote.makerdao.com/polling/QmSkHE8T?network=mainnet#poll-detail
+        DssExecLib.addNewCollateral(
+            CollateralOpts({
+                ilk:                   "GUNIV3DAIUSDC2-A",
+                gem:                   GUNIV3DAIUSDC2,
+                join:                  MCD_JOIN_GUNIV3DAIUSDC2_A,
+                clip:                  MCD_CLIP_GUNIV3DAIUSDC2_A,
+                calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC2_A,
+                pip:                   PIP_GUNIV3DAIUSDC2, // TODO: maybe need new "2" PIP  -  confim with PE
+                isLiquidatable:        false,
+                isOSM:                 true,
+                whitelistOSM:          true, // TODO:  confirm if new oracle is onboarded
+                ilkDebtCeiling:        10 * MILLION,
+                minVaultAmount:        10_000,
+                maxLiquidationAmount:  5 * MILLION,
+                liquidationPenalty:    1300,
+                ilkStabilityFee:       ONE_PCT_RATE,
+                startingPriceFactor:   10500,
+                breakerTolerance:      9500,
+                auctionDuration:       220 minutes,
+                permittedDrop:         9000,
+                liquidationRatio:      10500,
+                kprFlatReward:         300,
+                kprPctReward:          10
+            })
+        );
+
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC2_A, 120 seconds, 9990);
+        DssExecLib.setIlkAutoLineParameters("UNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
 
         // ----------------------------- Rates updates -----------------------------
         // Increase the ETH-A Stability Fee from 2.5% to 2.75%
@@ -135,76 +176,29 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("UNIV2AAVEETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC2-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("WBTC-B", 15_000);
         DssExecLib.setIlkMinVaultAmount("WBTC-C", 15_000);
 
-        // ----------------------------- Collateral onboarding -----------------------------
-        //  Add GUNIV3DAIUSDC2-A as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmSkHE8T?network=mainnet#poll-detail
-        DssExecLib.addNewCollateral(
-            CollateralOpts({
-                ilk:                   "GUNIV3DAIUSDC2-A",
-                gem:                   GUNIV3DAIUSDC2, // TODO: need new "2" GEM
-                join:                  MCD_JOIN_GUNIV3DAIUSDC2_A,
-                clip:                  MCD_CLIP_GUNIV3DAIUSDC2_A,
-                calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC2_A,
-                pip:                   PIP_GUNIV3DAIUSDC2, // TODO: need new "2" PIP
-                isLiquidatable:        true,
-                isOSM:                 true,
-                whitelistOSM:          true,
-                ilkDebtCeiling:        10 * MILLION,
-                minVaultAmount:        10_000,
-                maxLiquidationAmount:  5 * MILLION,
-                liquidationPenalty:    1300,
-                ilkStabilityFee:       ONE_PCT_RATE,
-                startingPriceFactor:   10500,
-                breakerTolerance:      9500,
-                auctionDuration:       220 minutes,
-                permittedDrop:         9000,
-                liquidationRatio:      10500,
-                kprFlatReward:         300,
-                kprPctReward:          10
-            })
-        );
+        // ----------------------------- Budget distributions -----------------------------
+        // Core Unit Budget Distributions
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
+        // Delegate Compensation Payments
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBACKLOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET, 8_093);
+        DssExecLib.sendPaymentFromSurplusBuffer(FIELDTECHNOLOGIES_WALLET, 3_690);
 
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC2_A, 120 seconds, 9990);
-        DssExecLib.setIlkAutoLineParameters("UNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
-
-        // TODO: confirm 
-        //  Core Unit Budget Distributions
-        DssExecLib.sendPaymentFromSurplusBuffer(SAS_WALLET, 245_738);
-        DssExecLib.sendPaymentFromSurplusBuffer(IS_WALLET, 195_443);
-        DssExecLib.sendPaymentFromSurplusBuffer(DECO_WALLET, 465_625);
-
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(RWF_WALLET, 1_860_000.00 * 10**18, JAN_01_2022, DEC_31_2022 - JAN_01_2022, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 12_242.00 * 10**18, DEC_01_2021, DEC_31_2021 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 257_500.00 * 10**18, JAN_01_2022, JUN_30_2022 - JAN_01_2022, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(SAS_WALLET, 1_130_393.00 * 10**18, DEC_01_2021, NOV_30_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(IS_WALLET, 366_563.00 * 10**18, DEC_01_2021, AUG_01_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 424_944.00 * 10**18, DEC_01_2021, APR_30_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(DECO_WALLET, 5_121_875.00 * 10**18, DEC_01_2021, SEP_01_2024 - DEC_01_2021, 0, address(0))
-        );
 
         // Changelog
+        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC2A", GUNIV3DAIUSDC2);
+
         DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC2_A", MCD_JOIN_GUNIV3DAIUSDC2_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC2_A", MCD_CLIP_GUNIV3DAIUSDC2_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A", MCD_CLIP_CALC_GUNIV3DAIUSDC2_A);
 
-        DssExecLib.setChangelogVersion("1.9.13"); // TODO: confirm
+        DssExecLib.setChangelogVersion("1.9.12");
     }
 }
 
