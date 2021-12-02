@@ -110,7 +110,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amountCom       = 27_058;
         uint256 amountFlipFlop  = 12_000;
         uint256 amountFeedblack = 12_000;
-        uint256 amountUltra     = 8093;
+        uint256 amountUltra     = 8144;
         uint256 amountField     = 3690;
 
         uint256 amountTotal     = amountCom + amountFlipFlop + amountFeedblack

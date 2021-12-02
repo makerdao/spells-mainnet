@@ -79,7 +79,7 @@ contract DssSpellAction is DssAction {
         // ------------------------------- Delegate Payments ----------------------------------------
         DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP, 12_000);
         DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(ULTRA_SCHUPPI, 8093);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRA_SCHUPPI, 8144);
         DssExecLib.sendPaymentFromSurplusBuffer(FIELD_TECHNOLOGIES_INC, 3690);
 
 
