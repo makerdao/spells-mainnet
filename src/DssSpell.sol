@@ -71,6 +71,11 @@ contract DssSpellAction is DssAction {
     address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
     address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
+    // Office Hours On
+    function officeHours() public override returns (bool) {
+        return true;
+    }
+
     function actions() public override {
         // --- 2021-12-03 Weekly Executive ---
 
