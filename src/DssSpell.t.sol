@@ -6,12 +6,12 @@ import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    address constant SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
-    address constant IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
-    address constant DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
+    
     address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
+    address constant FLIP_FLOP_FLAP         = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBLACK_LOOPS    = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRA_SCHUPPI         = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant FIELD_TECHNOLOGIES_INC = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
     uint256 constant DEC_01_2021    = 1638316800;
     uint256 constant DEC_31_2021    = 1640908800;
@@ -51,135 +51,34 @@ contract DssSpellTest is DssSpellTestBase {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
+
     }
-
-    function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
-        // Special exception GUSD has its storage in a separate contract
-        address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
-
-        // Edge case - balance is already set for some reason
-        if (token.balanceOf(address(this)) == amount) return;
-
-        for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                hevm.store(
-                    STORE,
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
-    }
-
-    function checkPsmIlkIntegrationGUSD(
-        bytes32 _ilk,
-        GemJoinAbstract join,
-        ClipAbstract clip,
-        address pip,
-        PsmAbstract psm,
-        uint256 tin,
-        uint256 tout
-    ) public {
-        DSTokenAbstract token = DSTokenAbstract(join.gem());
-
-        assertTrue(pip != address(0));
-
-        spotter.poke(_ilk);
-
-        // Authorization
-        assertEq(join.wards(pauseProxy), 1);
-        assertEq(join.wards(address(psm)), 1);
-        assertEq(psm.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(join)), 1);
-        assertEq(clip.wards(address(end)), 1);
-
-        // Check toll in/out
-        assertEq(psm.tin(), tin);
-        assertEq(psm.tout(), tout);
-
-        uint256 amount = 1000 * (10 ** token.decimals());
-        giveTokensGUSD(token, amount);
-
-        // Approvals
-        token.approve(address(join), amount);
-        dai.approve(address(psm), uint256(-1));
-
-        // Convert all TOKEN to DAI
-        psm.sellGem(address(this), amount);
-        amount -= amount * tin / WAD;
-        assertEq(token.balanceOf(address(this)), 0);
-        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - token.decimals())));
-
-        // Convert all DAI to TOKEN
-        amount -= amount * tout / WAD;
-        psm.buyGem(address(this), amount);
-        assertEq(dai.balanceOf(address(this)), 0);
-        assertEq(token.balanceOf(address(this)), amount);
-
-        // Dump all dai for next run
-        vat.move(address(this), address(0x0), vat.dai(address(this)));
-    }
-
     function testCollateralIntegrations() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
-            "WBTC-C",
-            GemJoinAbstract(addr.addr("MCD_JOIN_WBTC_C")),
-            ClipAbstract(addr.addr("MCD_CLIP_WBTC_C")),
-            addr.addr("PIP_WBTC"),
-            true,
-            true,
-            false
-        );
-        checkPsmIlkIntegrationGUSD(
-            "PSM-GUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
-            addr.addr("PIP_GUSD"),
-            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
-            0,
-            0
-        );
+       
     }
 
-    function testLerpSurplusBuffer() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    // function testLerpSurplusBuffer() public {
+    //     vote(address(spell));
+    //     scheduleWaitAndCast(address(spell));
+    //     assertTrue(spell.done());
 
-        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
+    //     LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
 
-        uint256 duration = 210 days;
-        hevm.warp(block.timestamp + duration / 2);
-        assertEq(vow.hump(), 60 * MILLION * RAD);
-        lerp.tick();
-        assertEq(vow.hump(), 75 * MILLION * RAD);
-        hevm.warp(block.timestamp + duration / 2);
-        lerp.tick();
-        assertEq(vow.hump(), 90 * MILLION * RAD);
-        assertTrue(lerp.done());
-    }
+    //     uint256 duration = 210 days;
+    //     hevm.warp(block.timestamp + duration / 2);
+    //     assertEq(vow.hump(), 60 * MILLION * RAD);
+    //     lerp.tick();
+    //     assertEq(vow.hump(), 75 * MILLION * RAD);
+    //     hevm.warp(block.timestamp + duration / 2);
+    //     lerp.tick();
+    //     assertEq(vow.hump(), 90 * MILLION * RAD);
+    //     assertTrue(lerp.done());
+    // }
 
     function testNewChainlogValues() public {
         vote(address(spell));
@@ -187,16 +86,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_WBTC_C"), addr.addr("MCD_JOIN_WBTC_C"));
-        assertEq(chainLog.getAddress("MCD_CLIP_WBTC_C"), addr.addr("MCD_CLIP_WBTC_C"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WBTC_C"), addr.addr("MCD_CLIP_CALC_WBTC_C"));
-
-        assertEq(chainLog.getAddress("MCD_JOIN_PSM_GUSD_A"), addr.addr("MCD_JOIN_PSM_GUSD_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_PSM_GUSD_A"), addr.addr("MCD_CLIP_PSM_GUSD_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_PSM_GUSD_A"), addr.addr("MCD_CLIP_CALC_PSM_GUSD_A"));
-        assertEq(chainLog.getAddress("MCD_PSM_GUSD_A"), addr.addr("MCD_PSM_GUSD_A"));
-
-        assertEq(chainLog.version(), "1.9.11");
+       
     }
 
     function testNewIlkRegistryValues() public {
@@ -205,69 +95,27 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("WBTC-C"), 45);
-        assertEq(reg.join("WBTC-C"), addr.addr("MCD_JOIN_WBTC_C"));
-        assertEq(reg.gem("WBTC-C"), addr.addr("WBTC"));
-        assertEq(reg.dec("WBTC-C"), DSTokenAbstract(addr.addr("WBTC")).decimals());
-        assertEq(reg.class("WBTC-C"), 1);
-        assertEq(reg.pip("WBTC-C"), addr.addr("PIP_WBTC"));
-        assertEq(reg.xlip("WBTC-C"), addr.addr("MCD_CLIP_WBTC_C"));
-        assertEq(reg.name("WBTC-C"), "Wrapped BTC");
-        assertEq(reg.symbol("WBTC-C"), "WBTC");
-
-        assertEq(reg.pos("PSM-GUSD-A"), 46);
-        assertEq(reg.join("PSM-GUSD-A"), addr.addr("MCD_JOIN_PSM_GUSD_A"));
-        assertEq(reg.gem("PSM-GUSD-A"), addr.addr("GUSD"));
-        assertEq(reg.dec("PSM-GUSD-A"), DSTokenAbstract(addr.addr("GUSD")).decimals());
-        assertEq(reg.class("PSM-GUSD-A"), 1);
-        assertEq(reg.pip("PSM-GUSD-A"), addr.addr("PIP_GUSD"));
-        assertEq(reg.xlip("PSM-GUSD-A"), addr.addr("MCD_CLIP_PSM_GUSD_A"));
-        assertEq(reg.name("PSM-GUSD-A"), "Gemini dollar");
-        assertEq(reg.symbol("PSM-GUSD-A"), "GUSD");
+       
     }
 
-    function testDaiVests() public {
-        uint256 lastId = vestDai.ids();
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // General sanity checks
-        // Confirm all new dai vests are under the upper limit of 2M / year
-        // Manually specify special exceptions
-        for(uint256 i = lastId + 1; i <= vestDai.ids(); i++) {
-            assertTrue(vestDai.usr(i) != address(0));
-            assertGt(vestDai.bgn(i), block.timestamp - 90 days);       // Start time is above ~3 months ago
-            assertEq(vestDai.clf(i), vestDai.bgn(i));
-            assertEq(vestDai.mgr(i), address(0));
-            assertEq(vestDai.res(i), 1);
-            assertEq(vestDai.rxd(i), 0);
-
-            uint256 rate = vestDai.tot(i) / (vestDai.fin(i) - vestDai.bgn(i));       // DAI / sec
-            assertLt(rate, 2_000_000 * WAD / 365 days);
-        }
-
-        // Verify individual payments
-        checkDaiVest(++lastId, RWF_WALLET, JAN_01_2022, DEC_31_2022, 1_860_000);
-        checkDaiVest(++lastId, COM_WALLET, DEC_01_2021, DEC_31_2021, 12_242);
-        checkDaiVest(++lastId, COM_WALLET, JAN_01_2022, JUN_30_2022, 257_500);
-        checkDaiVest(++lastId, SAS_WALLET, DEC_01_2021, NOV_30_2022, 1_130_393);
-        checkDaiVest(++lastId, IS_WALLET, DEC_01_2021, AUG_01_2022, 366_563);
-        checkDaiVest(++lastId, MKT_WALLET, DEC_01_2021, APR_30_2022, 424_944);
-        checkDaiVest(++lastId, DECO_WALLET, DEC_01_2021, SEP_01_2024, 5_121_875);
-    }
 
     function testOneTimePaymentDistributions() public {
-        uint256 prevSin      = vat.sin(address(vow));
-        uint256 prevDaiSas   = dai.balanceOf(SAS_WALLET);
-        uint256 prevDaiIs    = dai.balanceOf(IS_WALLET);
-        uint256 prevDaiDeco  = dai.balanceOf(DECO_WALLET);
+        uint256 prevSin              = vat.sin(address(vow));
+        uint256 prevDaiCom           = dai.balanceOf(COM_WALLET);
+        uint256 prevDaiFlipFlop      = dai.balanceOf(FLIP_FLOP_FLAP);
+        uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACK_LOOPS);
+        uint256 prevDaiUltra         = dai.balanceOf(ULTRA_SCHUPPI);
+        uint256 prevDaiField         = dai.balanceOf(FIELD_TECHNOLOGIES_INC);
 
-        uint256 amountSas    = 245_738;
-        uint256 amountIs     = 195_443;
-        uint256 amountDeco   = 465_625;
-        uint256 amountTotal  = amountSas + amountIs + amountDeco;
+        uint256 amountCom       = 27_058;
+        uint256 amountFlipFlop  = 12_000;
+        uint256 amountFeedblack = 12_000;
+        uint256 amountUltra     = 8093;
+        uint256 amountField     = 3690;
+
+        uint256 amountTotal     = amountCom + amountFlipFlop + amountFeedblack
+                                + amountUltra + amountField;
+    
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
@@ -280,9 +128,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
-        assertEq(dai.balanceOf(SAS_WALLET) - prevDaiSas, amountSas * WAD);
-        assertEq(dai.balanceOf(IS_WALLET) - prevDaiIs, amountIs * WAD);
-        assertEq(dai.balanceOf(DECO_WALLET) - prevDaiDeco, amountDeco * WAD);
+        assertEq(dai.balanceOf(COM_WALLET) - prevDaiCom, amountCom * WAD);
+        assertEq(dai.balanceOf(FLIP_FLOP_FLAP) - prevDaiFlipFlop, amountFlipFlop * WAD);
+        assertEq(dai.balanceOf(FEEDBLACK_LOOPS) - prevDaiFeedblack, amountFeedblack * WAD);
+        assertEq(dai.balanceOf(ULTRA_SCHUPPI) - prevDaiUltra, amountUltra * WAD);
+        assertEq(dai.balanceOf(FIELD_TECHNOLOGIES_INC) - prevDaiField, amountField * WAD);
     }
 
     function testFailWrongDay() public {
