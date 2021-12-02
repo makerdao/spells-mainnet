@@ -171,7 +171,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.xlip("GUNIV3DAIUSDC2-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
         assertEq(reg.name("GUNIV3DAIUSDC2-A"), "Gelato Uniswap DAI/USDC LP");
         assertEq(reg.symbol("GUNIV3DAIUSDC2-A"), "G-UNI");
-        
     }
 
     // function testDaiVests() public {

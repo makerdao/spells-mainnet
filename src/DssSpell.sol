@@ -54,22 +54,23 @@ contract DssSpellAction is DssAction {
     uint256 constant SIX_FIVE_PCT_RATE       = 1000000001996917783620820123;
 
     // --- Math ---
-    uint256 constant MILLION                  = 10 ** 6;
-    uint256 constant BILLION                  = 10 ** 3;
-    uint256 constant RAD                      = 10 ** 45;
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant BILLION = 10 ** 3;
+    uint256 constant RAD     = 10 ** 45;
 
     // --- GUNIV3DAIUSDC2-A ---
-    address constant GUNIV3DAIUSDC2                   = 0x50379f632ca68d36e50cfbc8f78fe16bd1499d1e;
-    address constant MCD_JOIN_GUNIV3DAIUSDC2_A        = 0xabc; // Todo: deploy from factory - std join
-    address constant MCD_CLIP_GUNIV3DAIUSDC2_A        = 0xabc; // Todo: deploy from factory
-    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A   = 0xabc; // Todo: deploy from factory
+    address constant GUNIV3DAIUSDC2                 = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
+    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory - std join
+    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory
+    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = address(0); // TODO: deploy from factory
+    address constant PIP_GUNIV3DAIUSDC2             = address(0); // TODO: wait for the Oracle team to deploy it
 
     // --- Wallets ---
-    address constant COM_WALLET                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant FLIPFLOPFLAP_WALLET          = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBACKLOOPS_WALLET         = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
-    address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
+    address constant COM_WALLET               = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant FLIPFLOPFLAP_WALLET      = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBACKLOOPS_WALLET     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET      = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant FIELDTECHNOLOGIES_WALLET = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
     // Office Hours On
     function officeHours() public override returns (bool) {
@@ -109,7 +110,7 @@ contract DssSpellAction is DssAction {
         );
 
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC2_A, 120 seconds, 9990);
-        DssExecLib.setIlkAutoLineParameters("UNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
 
         // ----------------------------- Rates updates -----------------------------
         // Increase the ETH-A Stability Fee from 2.5% to 2.75%
@@ -197,11 +198,11 @@ contract DssSpellAction is DssAction {
 
 
         // Changelog
-        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC2A", GUNIV3DAIUSDC2);
-
+        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC2", GUNIV3DAIUSDC2);
         DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC2_A", MCD_JOIN_GUNIV3DAIUSDC2_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC2_A", MCD_CLIP_GUNIV3DAIUSDC2_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A", MCD_CLIP_CALC_GUNIV3DAIUSDC2_A);
+        DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC2", PIP_GUNIV3DAIUSDC2);
 
         DssExecLib.setChangelogVersion("1.9.12");
     }
