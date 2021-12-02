@@ -1936,7 +1936,7 @@ contract DssSpellTestBase is DSTest, DSMath {
                 ) {
                 // TODO: remove these when we are done with the lerp
                 assertTrue(mat <= normalizedTestMat, string(abi.encodePacked("TestError/vat-lerping-mat-", ilk)));
-                assertTrue(mat >= RAY && mat <= 50 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));
+                assertTrue(mat >= RAY && mat <= 150 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));
             } else {
                 assertEq(mat, normalizedTestMat, string(abi.encodePacked("TestError/vat-mat-", ilk)));
                 assertTrue(mat >= RAY && mat < 10 * RAY, string(abi.encodePacked("TestError/vat-mat-range-", ilk)));    // cr eq 100% and lt 1000%
