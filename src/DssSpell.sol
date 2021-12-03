@@ -154,36 +154,33 @@ contract DssSpellAction is DssAction {
         // Increase the Dust Parameter from 10,000 DAI to 15,000 DAI for all vault-types excluding ETH-B and ETH-C
         // https://vote.makerdao.com/polling/QmUYLPcr?network=mainnet#poll-detail
         DssExecLib.setIlkMinVaultAmount("ETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("BAT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("USDC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("USDC-B", 15_000);
-        DssExecLib.setIlkMinVaultAmount("TUSD-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("WBTC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WBTC-B", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WBTC-C", 15_000);
-        DssExecLib.setIlkMinVaultAmount("KNC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("TUSD-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("MANA-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("USDT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("PAXUSD-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("LINK-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("YFI-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("GUSD-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNI-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("RENBTC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("MATIC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2DAIETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2WBTCETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2ETHUSDT-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("USDT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2AAVEETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDT-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("MATIC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("KNC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC2-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);        
+        
 
         // ----------------------------- Budget distributions -----------------------------
-        //
+
         // Core Unit Budget Distributions
         DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
         // Delegate Compensation Payments
