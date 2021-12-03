@@ -24,7 +24,7 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wgethttps://raw.githubusercontent.com/makerdao/community/e225b6b1897467e1c2ca20c5f8432b8aea9688f3/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e225b6b1897467e1c2ca20c5f8432b8aea9688f3/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description = "2021-12-03 MakerDAO Executive Spell | Hash: 0x0def7756ce99fc6998ebc153948f59a86a417e351487badbc30aad59822fa5e3";
 
 
