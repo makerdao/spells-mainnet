@@ -26,7 +26,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wgethttps://raw.githubusercontent.com/makerdao/community/e225b6b1897467e1c2ca20c5f8432b8aea9688f3/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description = "2021-12-03 MakerDAO Executive Spell | Hash: 0x0def7756ce99fc6998ebc153948f59a86a417e351487badbc30aad59822fa5e3";
-  
+
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -58,9 +58,9 @@ contract DssSpellAction is DssAction {
 
     // --- GUNIV3DAIUSDC2-A ---
     address constant GUNIV3DAIUSDC2                 = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
-    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = 0xa7e4ddde3cbcef122851a7c8f7a55f23c0daf335;
-    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = 0xb55da3d3100c4ebf9de755b6ddc24bf209f6cc06;
-    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = 0xef051ca2a2d809ba47ee0fc8caaed06e3d832225;
+    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
+    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
+    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
     address constant PIP_GUNIV3DAIUSDC2             = 0xcCBa43231aC6eceBd1278B90c3a44711a00F4e93;
 
     // --- Wallets ---
@@ -181,7 +181,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);
 
         // ----------------------------- Budget distributions -----------------------------
-        // 
+        //
         // Core Unit Budget Distributions
         DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
         // Delegate Compensation Payments
