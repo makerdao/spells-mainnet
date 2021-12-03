@@ -72,7 +72,6 @@ contract DssSpellAction is DssAction {
     address constant FIELDTECHNOLOGIES_WALLET = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
     function actions() public override {
-        // --- 2021-12-03 Weekly Executive ---
 
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add GUNIV3DAIUSDC2-A as a new Vault Type
