@@ -24,9 +24,9 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20November%2026,%202021.md -q -O - 2>/dev/null)"
-    string public constant override description = "2021-12-03 MakerDAO Executive Spell | Hash: ??";
-    // TODO: add in hash - PE handover
+    // Hash: seth keccak -- "$(wgethttps://raw.githubusercontent.com/makerdao/community/e225b6b1897467e1c2ca20c5f8432b8aea9688f3/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
+    string public constant override description = "2021-12-03 MakerDAO Executive Spell | Hash: 0x0def7756ce99fc6998ebc153948f59a86a417e351487badbc30aad59822fa5e3";
+  
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -59,22 +59,17 @@ contract DssSpellAction is DssAction {
 
     // --- GUNIV3DAIUSDC2-A ---
     address constant GUNIV3DAIUSDC2                 = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
-    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory - std join
-    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory
-    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = address(0); // TODO: deploy from factory
-    address constant PIP_GUNIV3DAIUSDC2             = address(0); // TODO: wait for the Oracle team to deploy it
+    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = 0xa7e4ddde3cbcef122851a7c8f7a55f23c0daf335;
+    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = 0xb55da3d3100c4ebf9de755b6ddc24bf209f6cc06;
+    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = 0xef051ca2a2d809ba47ee0fc8caaed06e3d832225;
+    address constant PIP_GUNIV3DAIUSDC2             = 0xcCBa43231aC6eceBd1278B90c3a44711a00F4e93;
 
     // --- Wallets ---
     address constant COM_WALLET               = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
     address constant FLIPFLOPFLAP_WALLET      = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBACKLOOPS_WALLET     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant FEEDBLACKLOOPS_WALLET    = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
     address constant ULTRASCHUPPI_WALLET      = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
     address constant FIELDTECHNOLOGIES_WALLET = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
-
-    // Office Hours On
-    function officeHours() public override returns (bool) {
-        return true;
-    }
 
     function actions() public override {
         // --- 2021-12-03 Weekly Executive ---
@@ -94,7 +89,7 @@ contract DssSpellAction is DssAction {
                 isOSM:                 true,
                 whitelistOSM:          true, // TODO:  confirm if new oracle is onboarded
                 ilkDebtCeiling:        10 * MILLION,
-                minVaultAmount:        10_000,
+                minVaultAmount:        15_000,
                 maxLiquidationAmount:  5 * MILLION,
                 liquidationPenalty:    1300,
                 ilkStabilityFee:       ONE_PCT_RATE,
@@ -112,6 +107,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
 
         // ----------------------------- Rates updates -----------------------------
+        // https://vote.makerdao.com/polling/QmNqCZGa?network=mainnet
         // Increase the ETH-A Stability Fee from 2.5% to 2.75%
         DssExecLib.setIlkStabilityFee("ETH-A", TWO_SEVEN_FIVE_PCT_RATE, true);
 
@@ -151,6 +147,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("WBTC-A", 2 * BILLION, 80 * MILLION, 6 hours);
 
         // Increase the Dust Parameter from 30,000 DAI to 40,000 DAI for the ETH-B
+        // https://vote.makerdao.com/polling/QmZXnn16?network=mainnet#poll-detail
         DssExecLib.setIlkMinVaultAmount("ETH-B", 40_000);
 
         // Increase the Dust Parameter from 10,000 DAI to 15,000 DAI for all vault-types excluding ETH-B and ETH-C
@@ -174,7 +171,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("UNIV2DAIETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2WBTCETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2ETHUSDT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 15_000);
@@ -183,16 +179,15 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC2-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WBTC-B", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WBTC-C", 15_000);
 
         // ----------------------------- Budget distributions -----------------------------
+        // 
         // Core Unit Budget Distributions
         DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
         // Delegate Compensation Payments
         DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBACKLOOPS_WALLET, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET, 8_093);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET, 8_144);
         DssExecLib.sendPaymentFromSurplusBuffer(FIELDTECHNOLOGIES_WALLET, 3_690);
 
 

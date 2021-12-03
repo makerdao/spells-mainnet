@@ -8,7 +8,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     address constant COM_WALLET                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
     address constant FLIPFLOPFLAP_WALLET          = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBACKLOOPS_WALLET         = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant FEEDBLACKLOOPS_WALLET        = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
     address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
     address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
@@ -200,7 +200,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
-    // @dev The specific date doesn't matter that much since function in checking for difference between warps
+    // @dev The specific date doesn't matter that much since function is checking for difference between warps
     function test_nextCastTime() public {
         hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
 
