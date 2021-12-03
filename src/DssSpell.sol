@@ -20,14 +20,14 @@ pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VestAbstract.sol";
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/194592d74ae225132c1963527ae90190b8bfa476/governance/votes/Executive%20vote%20-%20November%2026,%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-11-26 MakerDAO Executive Spell | Hash: 0x7be806b3c9fa08603c0e25a1d73066384dcb0770407aeeb57668742321823d2c";
+        "2021-12-03 MakerDAO Executive Spell | Hash: ??";
+    // TODO: add in hash - PE handover
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -40,163 +40,170 @@ contract DssSpellAction is DssAction {
     //
 
     // --- Rates ---
-    uint256 constant ZERO_PCT_RATE            = 1000000000000000000000000000;
-    uint256 constant ONE_FIVE_PCT_RATE        = 1000000000472114805215157978;
+    uint256 constant ZERO_PCT_RATE           = 1000000000000000000000000000;
+    uint256 constant ZERO_ONE_PCT_RATE       = 1000000000031693947650284507;
+    uint256 constant ONE_PCT_RATE            = 1000000000315522921573372069;
+    uint256 constant ONE_FIVE_PCT_RATE       = 1000000000472114805215157978;
+    uint256 constant TWO_PCT_RATE            = 1000000000627937192491029810;
+    uint256 constant TWO_FIVE_PCT_RATE       = 1000000000782997609082909351;
+    uint256 constant TWO_SEVEN_FIVE_PCT_RATE = 1000000000860244400048238898;
+    uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
+    uint256 constant FOUR_PCT_RATE           = 1000000001243680656318820312;
+    uint256 constant SIX_PCT_RATE            = 1000000001847694957439350562;
+    uint256 constant SIX_FIVE_PCT_RATE       = 1000000001996917783620820123;
 
     // --- Math ---
-    uint256 constant MILLION                  = 10 ** 6;
-    uint256 constant RAD                      = 10 ** 45;
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant BILLION = 10 ** 3;
+    uint256 constant RAD     = 10 ** 45;
 
-    // --- WBTC-C ---
-    address constant MCD_JOIN_WBTC_C          = 0x7f62f9592b823331E012D3c5DdF2A7714CfB9de2;
-    address constant MCD_CLIP_WBTC_C          = 0x39F29773Dcb94A32529d0612C6706C49622161D1;
-    address constant MCD_CLIP_CALC_WBTC_C     = 0x4fa2A328E7f69D023fE83454133c273bF5ACD435;
+    // --- GUNIV3DAIUSDC2-A ---
+    address constant GUNIV3DAIUSDC2                 = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
+    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory - std join
+    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = address(0); // TODO: deploy from factory
+    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = address(0); // TODO: deploy from factory
+    address constant PIP_GUNIV3DAIUSDC2             = address(0); // TODO: wait for the Oracle team to deploy it
 
-    // --- PSM-GUSD-A ---
-    address constant MCD_JOIN_PSM_GUSD_A      = 0x79A0FA989fb7ADf1F8e80C93ee605Ebb94F7c6A5;
-    address constant MCD_CLIP_PSM_GUSD_A      = 0xf93CC3a50f450ED245e003BFecc8A6Ec1732b0b2;
-    address constant MCD_CLIP_CALC_PSM_GUSD_A = 0x7f67a68a0ED74Ea89A82eD9F243C159ed43a502a;
-    address constant MCD_PSM_GUSD_A           = 0x204659B2Fd2aD5723975c362Ce2230Fba11d3900;
+    // --- Wallets ---
+    address constant COM_WALLET               = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant FLIPFLOPFLAP_WALLET      = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBACKLOOPS_WALLET     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET      = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant FIELDTECHNOLOGIES_WALLET = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
-    // --- Wallets + Dates ---
-    address constant SAS_WALLET     = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
-    address constant IS_WALLET      = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
-    address constant DECO_WALLET    = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-    address constant RWF_WALLET     = 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09;
-    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant MKT_WALLET     = 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60;
-
-    uint256 constant DEC_01_2021    = 1638316800;
-    uint256 constant DEC_31_2021    = 1640908800;
-    uint256 constant JAN_01_2022    = 1640995200;
-    uint256 constant APR_30_2022    = 1651276800;
-    uint256 constant JUN_30_2022    = 1656547200;
-    uint256 constant AUG_01_2022    = 1659312000;
-    uint256 constant NOV_30_2022    = 1669766400;
-    uint256 constant DEC_31_2022    = 1672444800;
-    uint256 constant SEP_01_2024    = 1725148800;
+    // Office Hours On
+    function officeHours() public override returns (bool) {
+        return true;
+    }
 
     function actions() public override {
-        address WBTC            = DssExecLib.getChangelogAddress("WBTC");
-        address PIP_WBTC        = DssExecLib.getChangelogAddress("PIP_WBTC");
-        address GUSD            = DssExecLib.getChangelogAddress("GUSD");
-        address PIP_GUSD        = DssExecLib.getChangelogAddress("PIP_GUSD");
-        address MCD_VEST_DAI    = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+        // --- 2021-12-03 Weekly Executive ---
 
-        //  Set Aave D3M Max Debt Ceiling
-        //  https://vote.makerdao.com/polling/QmZhvNu5?network=mainnet#poll-detail
-        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-AAVEV2-DAI", 100 * MILLION);
-
-        //  Increase the Surplus Buffer via Lerp
-        //  https://vote.makerdao.com/polling/QmUqfZRv?network=mainnet#poll-detail
-        DssExecLib.linearInterpolation({
-            _name:      "Increase SB - 20211126",
-            _target:    DssExecLib.vow(),
-            _what:      "hump",
-            _startTime: block.timestamp,
-            _start:     60 * MILLION * RAD,
-            _end:       90 * MILLION * RAD,
-            _duration:  210 days
-        });
-
-        //  Add WBTC-C as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmdVYMRo?network=mainnet#poll-detail
+        // ----------------------------- Collateral onboarding -----------------------------
+        //  Add GUNIV3DAIUSDC2-A as a new Vault Type
+        //  https://vote.makerdao.com/polling/QmSkHE8T?network=mainnet#poll-detail
         DssExecLib.addNewCollateral(
             CollateralOpts({
-                ilk:                   "WBTC-C",
-                gem:                   WBTC,
-                join:                  MCD_JOIN_WBTC_C,
-                clip:                  MCD_CLIP_WBTC_C,
-                calc:                  MCD_CLIP_CALC_WBTC_C,
-                pip:                   PIP_WBTC,
-                isLiquidatable:        true,
+                ilk:                   "GUNIV3DAIUSDC2-A",
+                gem:                   GUNIV3DAIUSDC2,
+                join:                  MCD_JOIN_GUNIV3DAIUSDC2_A,
+                clip:                  MCD_CLIP_GUNIV3DAIUSDC2_A,
+                calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC2_A,
+                pip:                   PIP_GUNIV3DAIUSDC2, // TODO: maybe need new "2" PIP  -  confim with PE
+                isLiquidatable:        false,
                 isOSM:                 true,
-                whitelistOSM:          true,
-                ilkDebtCeiling:        100 * MILLION,
-                minVaultAmount:        7500,
-                maxLiquidationAmount:  25 * MILLION,
+                whitelistOSM:          true, // TODO:  confirm if new oracle is onboarded
+                ilkDebtCeiling:        10 * MILLION,
+                minVaultAmount:        10_000,
+                maxLiquidationAmount:  5 * MILLION,
                 liquidationPenalty:    1300,
-                ilkStabilityFee:       ONE_FIVE_PCT_RATE,
-                startingPriceFactor:   12000,
-                breakerTolerance:      5000,
-                auctionDuration:       90 minutes,
-                permittedDrop:         4000,
-                liquidationRatio:      17500,
+                ilkStabilityFee:       ONE_PCT_RATE,
+                startingPriceFactor:   10500,
+                breakerTolerance:      9500,
+                auctionDuration:       220 minutes,
+                permittedDrop:         9000,
+                liquidationRatio:      10500,
                 kprFlatReward:         300,
                 kprPctReward:          10
             })
         );
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_WBTC_C, 90 seconds, 9900);
-        DssExecLib.setIlkAutoLineParameters("WBTC-C", 1000 * MILLION, 100 * MILLION, 8 hours);
 
-        //  Add PSM-GUSD-A as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmayeEjz?network=mainnet#poll-detail
-        DssExecLib.addNewCollateral(
-            CollateralOpts({
-                ilk:                   "PSM-GUSD-A",
-                gem:                   GUSD,
-                join:                  MCD_JOIN_PSM_GUSD_A,
-                clip:                  MCD_CLIP_PSM_GUSD_A,
-                calc:                  MCD_CLIP_CALC_PSM_GUSD_A,
-                pip:                   PIP_GUSD,
-                isLiquidatable:        false,
-                isOSM:                 false,
-                whitelistOSM:          false,
-                ilkDebtCeiling:        10 * MILLION,
-                minVaultAmount:        0,
-                maxLiquidationAmount:  0,
-                liquidationPenalty:    1300,
-                ilkStabilityFee:       ZERO_PCT_RATE,
-                startingPriceFactor:   10500,
-                breakerTolerance:      9500, // Allows for a 5% hourly price drop before disabling liquidations
-                auctionDuration:       220 minutes,
-                permittedDrop:         9000,
-                liquidationRatio:      10000,
-                kprFlatReward:         300,
-                kprPctReward:          10 // 0.1%
-            })
-        );
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_PSM_GUSD_A, 120 seconds, 9990);
-        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 10 * MILLION, 10 * MILLION, 24 hours);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC2_A, 120 seconds, 9990);
+        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
 
-        //  Core Unit Budget Distributions
-        DssExecLib.sendPaymentFromSurplusBuffer(SAS_WALLET, 245_738);
-        DssExecLib.sendPaymentFromSurplusBuffer(IS_WALLET, 195_443);
-        DssExecLib.sendPaymentFromSurplusBuffer(DECO_WALLET, 465_625);
+        // ----------------------------- Rates updates -----------------------------
+        // Increase the ETH-A Stability Fee from 2.5% to 2.75%
+        DssExecLib.setIlkStabilityFee("ETH-A", TWO_SEVEN_FIVE_PCT_RATE, true);
 
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(RWF_WALLET, 1_860_000.00 * 10**18, JAN_01_2022, DEC_31_2022 - JAN_01_2022, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 12_242.00 * 10**18, DEC_01_2021, DEC_31_2021 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(COM_WALLET, 257_500.00 * 10**18, JAN_01_2022, JUN_30_2022 - JAN_01_2022, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(SAS_WALLET, 1_130_393.00 * 10**18, DEC_01_2021, NOV_30_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(IS_WALLET, 366_563.00 * 10**18, DEC_01_2021, AUG_01_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(MKT_WALLET, 424_944.00 * 10**18, DEC_01_2021, APR_30_2022 - DEC_01_2021, 0, address(0))
-        );
-        VestAbstract(MCD_VEST_DAI).restrict(
-            VestAbstract(MCD_VEST_DAI).create(DECO_WALLET, 5_121_875.00 * 10**18, DEC_01_2021, SEP_01_2024 - DEC_01_2021, 0, address(0))
-        );
+        // Increase the ETH-B Stability Fee from 6.0% to 6.5%
+        DssExecLib.setIlkStabilityFee("ETH-B", SIX_FIVE_PCT_RATE, true);
+
+        // Increase the LINK-A Stability Fee from 1.5% to 2.5%
+        DssExecLib.setIlkStabilityFee("LINK-A", TWO_FIVE_PCT_RATE, true);
+
+        // Increase the MANA-A Stability Fee from 3.0% to 6.0%
+        DssExecLib.setIlkStabilityFee("MANA-A", SIX_PCT_RATE, true);
+
+        // Increase the UNI-A Stability Fee from 1.0% to 3.0%
+        DssExecLib.setIlkStabilityFee("UNI-A", THREE_PCT_RATE, true);
+
+        // Increase the GUSD-A Stability Fee from 0.0% to 1.0%
+        DssExecLib.setIlkStabilityFee("GUSD-A", ONE_PCT_RATE, true);
+
+        // Increase the UNIV2DAIETH-A Stability Fee from 1.5% to 2.0%
+        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", TWO_PCT_RATE, true);
+
+        // Increase the UNIV2WBTCETH-A Stability Fee from 2.5% to 3.0%
+        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", THREE_PCT_RATE, true);
+
+        // Increase the UNIV2USDCETH-A Stability Fee from 2.0% to 2.5%
+        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", TWO_FIVE_PCT_RATE, true);
+
+        // Increase the UNIV2UNIETH-A Stability Fee from 2.0% to 4.0%
+        DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", FOUR_PCT_RATE, true);
+
+        // Decrease the GUNIV3DAIUSDC1-A Stability Fee from 0.5% to 0.1%
+        DssExecLib.setIlkStabilityFee("GUNIV3DAIUSDC1-A", ZERO_ONE_PCT_RATE, true);
+
+        // ----------------------------- Debt Ceiling updates -----------------------------
+        // Increase the WBTC-A Maximum Debt Ceiling (line) from 1.5 billion DAI to 2 billion DAI
+        // Increase the WBTC-A Target Available Debt (gap) from 60 million DAI to 80 million DAI
+        DssExecLib.setIlkAutoLineParameters("WBTC-A", 2 * BILLION, 80 * MILLION, 6 hours);
+
+        // Increase the Dust Parameter from 30,000 DAI to 40,000 DAI for the ETH-B
+        DssExecLib.setIlkMinVaultAmount("ETH-B", 40_000);
+
+        // Increase the Dust Parameter from 10,000 DAI to 15,000 DAI for all vault-types excluding ETH-B and ETH-C
+        DssExecLib.setIlkMinVaultAmount("ETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("USDC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("USDC-B", 15_000);
+        DssExecLib.setIlkMinVaultAmount("TUSD-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WBTC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WBTC-B", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WBTC-C", 15_000);
+        DssExecLib.setIlkMinVaultAmount("KNC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("MANA-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("USDT-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("PAXUSD-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("LINK-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("YFI-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("GUSD-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNI-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("RENBTC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("MATIC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2DAIETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDC-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2ETHUSDT-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2AAVEETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDT-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC2-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WBTC-B", 15_000);
+        DssExecLib.setIlkMinVaultAmount("WBTC-C", 15_000);
+
+        // ----------------------------- Budget distributions -----------------------------
+        // Core Unit Budget Distributions
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
+        // Delegate Compensation Payments
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBACKLOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET, 8_093);
+        DssExecLib.sendPaymentFromSurplusBuffer(FIELDTECHNOLOGIES_WALLET, 3_690);
+
 
         // Changelog
-        DssExecLib.setChangelogAddress("MCD_JOIN_WBTC_C", MCD_JOIN_WBTC_C);
-        DssExecLib.setChangelogAddress("MCD_CLIP_WBTC_C", MCD_CLIP_WBTC_C);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_WBTC_C", MCD_CLIP_CALC_WBTC_C);
+        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC2", GUNIV3DAIUSDC2);
+        DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC2_A", MCD_JOIN_GUNIV3DAIUSDC2_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC2_A", MCD_CLIP_GUNIV3DAIUSDC2_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A", MCD_CLIP_CALC_GUNIV3DAIUSDC2_A);
+        DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC2", PIP_GUNIV3DAIUSDC2);
 
-        DssExecLib.setChangelogAddress("MCD_JOIN_PSM_GUSD_A", MCD_JOIN_PSM_GUSD_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_PSM_GUSD_A", MCD_CLIP_PSM_GUSD_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_PSM_GUSD_A", MCD_CLIP_CALC_PSM_GUSD_A);
-        DssExecLib.setChangelogAddress("MCD_PSM_GUSD_A", MCD_PSM_GUSD_A);
-
-        DssExecLib.setChangelogVersion("1.9.11");
+        DssExecLib.setChangelogVersion("1.9.12");
     }
 }
 
