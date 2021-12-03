@@ -53,7 +53,7 @@ contract DssSpellTest is DssSpellTestBase {
             "GUNIV3DAIUSDC2-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
             ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
-            addr.addr("PIP_GUNIV3DAIUSDC2"),
+            LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC2")),
             0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,
             addr.addr("PIP_USDC"),
             false,
