@@ -25,7 +25,8 @@ contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/e225b6b1897467e1c2ca20c5f8432b8aea9688f3/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
-    string public constant override description = "2021-12-03 MakerDAO Executive Spell | Hash: 0x0def7756ce99fc6998ebc153948f59a86a417e351487badbc30aad59822fa5e3";
+    string public constant override description = 
+        "2021-12-03 MakerDAO Executive Spell | Hash: 0x0def7756ce99fc6998ebc153948f59a86a417e351487badbc30aad59822fa5e3";
 
 
 
@@ -83,10 +84,10 @@ contract DssSpellAction is DssAction {
                 join:                  MCD_JOIN_GUNIV3DAIUSDC2_A,
                 clip:                  MCD_CLIP_GUNIV3DAIUSDC2_A,
                 calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC2_A,
-                pip:                   PIP_GUNIV3DAIUSDC2, // TODO: maybe need new "2" PIP  -  confim with PE
+                pip:                   PIP_GUNIV3DAIUSDC2,
                 isLiquidatable:        false,
                 isOSM:                 true,
-                whitelistOSM:          true, // TODO:  confirm if new oracle is onboarded
+                whitelistOSM:          true,
                 ilkDebtCeiling:        10 * MILLION,
                 minVaultAmount:        15_000,
                 maxLiquidationAmount:  5 * MILLION,
@@ -143,6 +144,7 @@ contract DssSpellAction is DssAction {
         // ----------------------------- Debt Ceiling updates -----------------------------
         // Increase the WBTC-A Maximum Debt Ceiling (line) from 1.5 billion DAI to 2 billion DAI
         // Increase the WBTC-A Target Available Debt (gap) from 60 million DAI to 80 million DAI
+        // https://vote.makerdao.com/polling/QmNqCZGa?network=mainnet
         DssExecLib.setIlkAutoLineParameters("WBTC-A", 2 * BILLION, 80 * MILLION, 6 hours);
 
         // Increase the Dust Parameter from 30,000 DAI to 40,000 DAI for the ETH-B
