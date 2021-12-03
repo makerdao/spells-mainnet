@@ -6,22 +6,11 @@ import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    
-    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant FLIP_FLOP_FLAP         = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBLACK_LOOPS    = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address constant ULTRA_SCHUPPI         = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
-    address constant FIELD_TECHNOLOGIES_INC = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
-
-    uint256 constant DEC_01_2021    = 1638316800;
-    uint256 constant DEC_31_2021    = 1640908800;
-    uint256 constant JAN_01_2022    = 1640995200;
-    uint256 constant APR_30_2022    = 1651276800;
-    uint256 constant JUN_30_2022    = 1656547200;
-    uint256 constant AUG_01_2022    = 1659312000;
-    uint256 constant NOV_30_2022    = 1669766400;
-    uint256 constant DEC_31_2022    = 1672444800;
-    uint256 constant SEP_01_2024    = 1725148800;
+    address constant COM_WALLET                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant FLIPFLOPFLAP_WALLET          = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBACKLOOPS_WALLET         = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -59,6 +48,16 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
+        checkIlkIntegration(
+            "GUNIV3DAIUSDC2-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
+            addr.addr("PIP_GUNIV3DAIUSDC2"),
+            true,
+            false,
+            false
+        );
+    }
        
     }
 
@@ -80,12 +79,20 @@ contract DssSpellTest is DssSpellTestBase {
     //     assertTrue(lerp.done());
     // }
 
+
     function testNewChainlogValues() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
+        assertEq(chainLog.getAddress("GUNIV3DAIUSDC2"), addr.addr("GUNIV3DAIUSDC2"));
+        assertEq(chainLog.getAddress("MCD_JOIN_GUNIV3DAIUSDC2_A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_GUNIV3DAIUSDC2_A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"), addr.addr("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"));
+        assertEq(chainLog.getAddress("PIP_GUNIV3DAIUSDC2"), addr.addr("PIP_GUNIV3DAIUSDC2"));
+
+        assertEq(chainLog.version(), "1.9.12");
        
     }
 
@@ -95,7 +102,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-       
+        assertEq(reg.pos("GUNIV3DAIUSDC2-A"), 46);
+        assertEq(reg.join("GUNIV3DAIUSDC2-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
+        assertEq(reg.gem("GUNIV3DAIUSDC2-A"), addr.addr("GUNIV3DAIUSDC2"));
+        assertEq(reg.dec("GUNIV3DAIUSDC2-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC2")).decimals());
+        assertEq(reg.class("GUNIV3DAIUSDC2-A"), 1);
+        assertEq(reg.pip("GUNIV3DAIUSDC2-A"), addr.addr("PIP_GUNIV3DAIUSDC2"));
+        assertEq(reg.xlip("GUNIV3DAIUSDC2-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
+        assertEq(reg.name("GUNIV3DAIUSDC2-A"), "Gelato Uniswap DAI/USDC LP");
+        assertEq(reg.symbol("GUNIV3DAIUSDC2-A"), "G-UNI");
     }
 
 
@@ -115,7 +130,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 amountTotal     = amountCom + amountFlipFlop + amountFeedblack
                                 + amountUltra + amountField;
-    
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
@@ -186,6 +200,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
+    // @dev The specific date doesn't matter that much since function in checking for difference between warps
     function test_nextCastTime() public {
         hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
 
