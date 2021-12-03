@@ -201,7 +201,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
-    // @dev The specific date doesn't matter that much since function is checking for difference between warps
+    // The specific date doesn't matter that much since function is checking for difference between warps
     function test_nextCastTime() public {
         hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
 
