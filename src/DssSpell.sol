@@ -156,7 +156,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("ETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("BAT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("USDC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("USDC-B", 15_000);
         DssExecLib.setIlkMinVaultAmount("WBTC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("TUSD-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("MANA-A", 15_000);
@@ -171,10 +170,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("USDT-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("MATIC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("KNC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);        
         
