@@ -58,7 +58,7 @@ contract DssSpellTest is DssSpellTestBase {
             addr.addr("PIP_USDC"),
             false,
             false,
-            false,
+            false
         );
     }
 
