@@ -54,7 +54,7 @@ contract DssSpellAction is DssAction {
 
     // --- Math ---
     uint256 constant MILLION = 10 ** 6;
-    uint256 constant BILLION = 10 ** 3;
+    uint256 constant BILLION = 10 ** 9;
     uint256 constant RAD     = 10 ** 45;
 
     // --- GUNIV3DAIUSDC2-A ---
