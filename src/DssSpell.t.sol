@@ -58,8 +58,8 @@ contract DssSpellTest is DssSpellTestBase {
             false
         );
     }
-       
-    
+
+
 
     // function testLerpSurplusBuffer() public {
     //     vote(address(spell));
@@ -93,7 +93,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.getAddress("PIP_GUNIV3DAIUSDC2"), addr.addr("PIP_GUNIV3DAIUSDC2"));
 
         assertEq(chainLog.version(), "1.9.12");
-       
+
     }
 
     function testNewIlkRegistryValues() public {
@@ -117,10 +117,10 @@ contract DssSpellTest is DssSpellTestBase {
     function testOneTimePaymentDistributions() public {
         uint256 prevSin              = vat.sin(address(vow));
         uint256 prevDaiCom           = dai.balanceOf(COM_WALLET);
-        uint256 prevDaiFlipFlop      = dai.balanceOf(FLIP_FLOP_FLAP);
-        uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACK_LOOPS);
-        uint256 prevDaiUltra         = dai.balanceOf(ULTRA_SCHUPPI);
-        uint256 prevDaiField         = dai.balanceOf(FIELD_TECHNOLOGIES_INC);
+        uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP_WALLET);
+        uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACKLOOPS_WALLET);
+        uint256 prevDaiUltra         = dai.balanceOf(ULTRASCHUPPI_WALLET);
+        uint256 prevDaiField         = dai.balanceOf(FIELDTECHNOLOGIES_WALLET);
 
         uint256 amountCom       = 27_058;
         uint256 amountFlipFlop  = 12_000;
@@ -143,10 +143,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
         assertEq(dai.balanceOf(COM_WALLET) - prevDaiCom, amountCom * WAD);
-        assertEq(dai.balanceOf(FLIP_FLOP_FLAP) - prevDaiFlipFlop, amountFlipFlop * WAD);
-        assertEq(dai.balanceOf(FEEDBLACK_LOOPS) - prevDaiFeedblack, amountFeedblack * WAD);
-        assertEq(dai.balanceOf(ULTRA_SCHUPPI) - prevDaiUltra, amountUltra * WAD);
-        assertEq(dai.balanceOf(FIELD_TECHNOLOGIES_INC) - prevDaiField, amountField * WAD);
+        assertEq(dai.balanceOf(FLIPFLOPFLAP_WALLET) - prevDaiFlipFlop, amountFlipFlop * WAD);
+        assertEq(dai.balanceOf(FEEDBLACKLOOPS_WALLET) - prevDaiFeedblack, amountFeedblack * WAD);
+        assertEq(dai.balanceOf(ULTRASCHUPPI_WALLET) - prevDaiUltra, amountUltra * WAD);
+        assertEq(dai.balanceOf(FIELDTECHNOLOGIES_WALLET) - prevDaiField, amountField * WAD);
     }
 
     function testFailWrongDay() public {
