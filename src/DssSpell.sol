@@ -150,6 +150,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMinVaultAmount("ETH-B", 40_000);
 
         // Increase the Dust Parameter from 10,000 DAI to 15,000 DAI for all vault-types excluding ETH-B and ETH-C
+        // https://vote.makerdao.com/polling/QmUYLPcr?network=mainnet#poll-detail
         DssExecLib.setIlkMinVaultAmount("ETH-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("USDC-A", 15_000);
         DssExecLib.setIlkMinVaultAmount("USDC-B", 15_000);
