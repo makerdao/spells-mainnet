@@ -59,7 +59,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
        
-    }
+    
 
     // function testLerpSurplusBuffer() public {
     //     vote(address(spell));
