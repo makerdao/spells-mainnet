@@ -28,8 +28,6 @@ contract DssSpellAction is DssAction {
     string public constant override description = 
         "2021-12-03 MakerDAO Executive Spell | Hash: 0x9068bf87d0ec441f57ff92e2544a3df16d42a481b3e94ec2c37a443031833b84";
 
-
-
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -41,10 +39,8 @@ contract DssSpellAction is DssAction {
     //
 
     // --- Rates ---
-    uint256 constant ZERO_PCT_RATE           = 1000000000000000000000000000;
     uint256 constant ZERO_ONE_PCT_RATE       = 1000000000031693947650284507;
     uint256 constant ONE_PCT_RATE            = 1000000000315522921573372069;
-    uint256 constant ONE_FIVE_PCT_RATE       = 1000000000472114805215157978;
     uint256 constant TWO_PCT_RATE            = 1000000000627937192491029810;
     uint256 constant TWO_FIVE_PCT_RATE       = 1000000000782997609082909351;
     uint256 constant TWO_SEVEN_FIVE_PCT_RATE = 1000000000860244400048238898;
