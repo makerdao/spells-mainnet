@@ -48,18 +48,19 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
+
+        checkUNILPIntegration(
             "GUNIV3DAIUSDC2-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
             ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
             addr.addr("PIP_GUNIV3DAIUSDC2"),
-            true,
+            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,
+            addr.addr("PIP_USDC"),
             false,
-            false
+            false,
+            false,
         );
     }
-
-
 
     // function testLerpSurplusBuffer() public {
     //     vote(address(spell));
