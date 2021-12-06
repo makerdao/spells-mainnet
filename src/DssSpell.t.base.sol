@@ -423,7 +423,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             aL_gap:       0,
             aL_ttl:       0,
             line:         0,
-            dust:         0,
+            dust:         10 * THOUSAND,
             pct:          400,
             mat:          1120000,
             liqType:      "clip",
