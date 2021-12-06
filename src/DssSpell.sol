@@ -25,7 +25,7 @@ contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/2dfe2a94162345e448c0353ec0e522038572366a/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
-    string public constant override description = 
+    string public constant override description =
         "2021-12-03 MakerDAO Executive Spell | Hash: 0x9068bf87d0ec441f57ff92e2544a3df16d42a481b3e94ec2c37a443031833b84";
 
     // Many of the settings that change weekly rely on the rate accumulator
