@@ -40,8 +40,8 @@ contract DssSpellTest is DssSpellTestBase {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
-
     }
+
     function testCollateralIntegrations() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));

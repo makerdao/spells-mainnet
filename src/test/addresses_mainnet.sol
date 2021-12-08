@@ -330,11 +330,3 @@ contract Addresses {
     }
 }
 
-// contract CuAddresses {
-
-//     mapping (bytes32 => address) public cu_addr;
-
-//     constructor() public {
-//         cu_addr["DUX"] = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-//     }
-// }
