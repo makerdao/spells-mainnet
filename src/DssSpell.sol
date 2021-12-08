@@ -16,179 +16,293 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface DssVestLike {
+    function yank(uint256 _id, uint256 _end) external;
+    function restrict(uint256) external;
+    function create(
+        address _usr,
+        uint256 _tot,
+        uint256 _bgn,
+        uint256 _tau,
+        uint256 _eta,
+        address _mgr
+  ) external returns (uint256)
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/2dfe2a94162345e448c0353ec0e522038572366a/governance/votes/Executive%20vote%20-%20December%203%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20December%2010%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2021-12-03 MakerDAO Executive Spell | Hash: 0x9068bf87d0ec441f57ff92e2544a3df16d42a481b3e94ec2c37a443031833b84";
+        "2021-12-10 MakerDAO Executive Spell | Hash: TODO";
 
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmefQMseb3AiTapiAKKexdKHig8wroKuZbmLtPLv4u2YwW
-    //
+    // --- MKR vesting contracts ---
+    address constant MCD_VEST_MKR          = 0x0fc8d4f2151453ca0ca56f07359049c8f07997bd;
+    address constant MCD_VEST_MKR_TREASURY = 0x6d635c8d08a1ea2f1687a5e46b666949c977b7dd;
 
-    // --- Rates ---
-    uint256 constant ZERO_ONE_PCT_RATE       = 1000000000031693947650284507;
-    uint256 constant ONE_PCT_RATE            = 1000000000315522921573372069;
-    uint256 constant TWO_PCT_RATE            = 1000000000627937192491029810;
-    uint256 constant TWO_FIVE_PCT_RATE       = 1000000000782997609082909351;
-    uint256 constant TWO_SEVEN_FIVE_PCT_RATE = 1000000000860244400048238898;
-    uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
-    uint256 constant FOUR_PCT_RATE           = 1000000001243680656318820312;
-    uint256 constant SIX_PCT_RATE            = 1000000001847694957439350562;
-    uint256 constant SIX_FIVE_PCT_RATE       = 1000000001996917783620820123;
+    // --- Wallet addresses ---
+    address constant GRO_WALLET = 0x7800C137A645c07132886539217ce192b9F0528e;
+    address constant ORA_WALLET = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address constant PE_WALLET  = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
 
-    // --- Math ---
-    uint256 constant MILLION = 10 ** 6;
-    uint256 constant BILLION = 10 ** 9;
-
-    // --- GUNIV3DAIUSDC2-A ---
-    address constant GUNIV3DAIUSDC2                 = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
-    address constant MCD_JOIN_GUNIV3DAIUSDC2_A      = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
-    address constant MCD_CLIP_GUNIV3DAIUSDC2_A      = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
-    address constant MCD_CLIP_CALC_GUNIV3DAIUSDC2_A = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
-    address constant PIP_GUNIV3DAIUSDC2             = 0xcCBa43231aC6eceBd1278B90c3a44711a00F4e93;
-
-    // --- Wallets ---
-    address constant COM_WALLET               = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant FLIPFLOPFLAP_WALLET      = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBLACKLOOPS_WALLET    = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address constant ULTRASCHUPPI_WALLET      = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
-    address constant FIELDTECHNOLOGIES_WALLET = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
+    // --- Dates ---
+    uint256 constant MAY_01_2021 = 1619827200;
+    uint256 constant JUN_21_2021 = 1624233600;
+    uint256 constant JUL_01_2021 = 1625097600;
+    uint256 constant SEP_13_2021 = 1631491200;
+    uint256 constant SEP_20_2021 = 1632096000;
 
     function actions() public override {
 
-        // ----------------------------- Collateral onboarding -----------------------------
-        //  Add GUNIV3DAIUSDC2-A as a new Vault Type
-        //  https://vote.makerdao.com/polling/QmSkHE8T?network=mainnet#poll-detail
-        DssExecLib.addNewCollateral(
-            CollateralOpts({
-                ilk:                   "GUNIV3DAIUSDC2-A",
-                gem:                   GUNIV3DAIUSDC2,
-                join:                  MCD_JOIN_GUNIV3DAIUSDC2_A,
-                clip:                  MCD_CLIP_GUNIV3DAIUSDC2_A,
-                calc:                  MCD_CLIP_CALC_GUNIV3DAIUSDC2_A,
-                pip:                   PIP_GUNIV3DAIUSDC2,
-                isLiquidatable:        false,
-                isOSM:                 true,
-                whitelistOSM:          true,
-                ilkDebtCeiling:        10 * MILLION,
-                minVaultAmount:        15_000,
-                maxLiquidationAmount:  5 * MILLION,
-                liquidationPenalty:    1300,
-                ilkStabilityFee:       ONE_PCT_RATE,
-                startingPriceFactor:   10500,
-                breakerTolerance:      9500,
-                auctionDuration:       220 minutes,
-                permittedDrop:         9000,
-                liquidationRatio:      10500,
-                kprFlatReward:         300,
-                kprPctReward:          10
+        // ------------- Move vesting from MCD_VEST_MKR to MCD_VEST_MKR_TREASURY -------------
+        // TODO add link
+
+        // Growth MKR whole team vesting
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  1,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: GRO_WALLET,
+                _tot: 803.18 * 10**18,
+                _bgn: JUL_01_2021,
+                _tau: 365 days,
+                _eta: 365 days,
+                _mgr: address(0)
             })
         );
 
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GUNIV3DAIUSDC2_A, 120 seconds, 9990);
-        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC2-A", 10 * MILLION, 10 * MILLION, 8 hours);
+        // Oracles MKR whole team vesting
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  2,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: ORA_WALLET,
+                _tot: 1_051.25 * 10**18,
+                _bgn: JUL_01_2021,
+                _tau: 365 days,
+                _eta: 365 days,
+                _mgr: address(0))
+        );
 
-        // ----------------------------- Rates updates -----------------------------
-        // https://vote.makerdao.com/polling/QmNqCZGa?network=mainnet
-        // Increase the ETH-A Stability Fee from 2.5% to 2.75%
-        DssExecLib.setIlkStabilityFee("ETH-A", TWO_SEVEN_FIVE_PCT_RATE, true);
+        // PE MKR vestings (per individual)
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  3,
+            _end: block.timestamp
+        });
+        (
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xfDB9F5e045D7326C1da87d0e199a05CDE5378EdD,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the ETH-B Stability Fee from 6.0% to 6.5%
-        DssExecLib.setIlkStabilityFee("ETH-B", SIX_FIVE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  4,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xBe4De3E151D52668c2C0610C985b4297833239C8,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the LINK-A Stability Fee from 1.5% to 2.5%
-        DssExecLib.setIlkStabilityFee("LINK-A", TWO_FIVE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  5,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x58EA3C96a8b81abC01EB78B98deCe2AD1e5fd7fc,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the MANA-A Stability Fee from 3.0% to 6.0%
-        DssExecLib.setIlkStabilityFee("MANA-A", SIX_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  6,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xBAB4Cd1cB31Cd28f842335973712a6015eB0EcD5,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the UNI-A Stability Fee from 1.0% to 3.0%
-        DssExecLib.setIlkStabilityFee("UNI-A", THREE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  7,
+            _end: block.timestamp
+        });
+        (
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xB5c86aff90944CFB3184902482799bD5fA3B18dD,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the GUSD-A Stability Fee from 0.0% to 1.0%
-        DssExecLib.setIlkStabilityFee("GUSD-A", ONE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  8,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x780f478856ebE01e46d9A432e8776bAAB5A81b5b,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the UNIV2DAIETH-A Stability Fee from 1.5% to 2.0%
-        DssExecLib.setIlkStabilityFee("UNIV2DAIETH-A", TWO_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  9,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x34364E234b3DD02FF5c8A2ad9ba86bbD3D3D3284,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the UNIV2WBTCETH-A Stability Fee from 2.5% to 3.0%
-        DssExecLib.setIlkStabilityFee("UNIV2WBTCETH-A", THREE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  10,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x46E5DBad3966453Af57e90Ec2f3548a0e98ec979,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the UNIV2USDCETH-A Stability Fee from 2.0% to 2.5%
-        DssExecLib.setIlkStabilityFee("UNIV2USDCETH-A", TWO_FIVE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  11,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x18CaE82909C31b60Fe0A9656D76406345C9cb9FB,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
+        (
 
-        // Increase the UNIV2UNIETH-A Stability Fee from 2.0% to 4.0%
-        DssExecLib.setIlkStabilityFee("UNIV2UNIETH-A", FOUR_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  12,
+            _end: block.timestamp
+        });
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x301dD8eB831ddb93F128C33b9d9DC333210d9B25,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
+        (
 
-        // Decrease the GUNIV3DAIUSDC1-A Stability Fee from 0.5% to 0.1%
-        DssExecLib.setIlkStabilityFee("GUNIV3DAIUSDC1-A", ZERO_ONE_PCT_RATE, true);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  13,
+            _end: block.timestamp
+        });
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xBFC47D0D7452a25b7d3AA4d7379c69A891bD5d43,
+                _tot: 995.00 * 10**18,
+                _bgn: MAY_01_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // ----------------------------- Debt Ceiling updates -----------------------------
-        // Increase the WBTC-A Maximum Debt Ceiling (line) from 1.5 billion DAI to 2 billion DAI
-        // Increase the WBTC-A Target Available Debt (gap) from 60 million DAI to 80 million DAI
-        // https://vote.makerdao.com/polling/QmNqCZGa?network=mainnet
-        DssExecLib.setIlkAutoLineParameters("WBTC-A", 2 * BILLION, 80 * MILLION, 6 hours);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  14,
+            _end: block.timestamp
+        });
+        (
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0xcD16aa978A89Aa26b3121Fc8dd32228d7D0fcF4a,
+                _tot: 995.00 * 10**18,
+                _bgn: SEP_13_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the Dust Parameter from 30,000 DAI to 40,000 DAI for the ETH-B
-        // https://vote.makerdao.com/polling/QmZXnn16?network=mainnet#poll-detail
-        DssExecLib.setIlkMinVaultAmount("ETH-B", 40_000);
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  15,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x3189cfe40CF011AAb13aDD8aE7284deD4CD30602,
+                _tot: 995.00 * 10**18,
+                _bgn: JUN_21_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // Increase the Dust Parameter from 10,000 DAI to 15,000 DAI for all vault-types excluding ETH-B and ETH-C
-        // https://vote.makerdao.com/polling/QmUYLPcr?network=mainnet#poll-detail
-        DssExecLib.setIlkMinVaultAmount("ETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("USDC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WBTC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("TUSD-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("MANA-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("PAXUSD-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("LINK-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("YFI-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("GUSD-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNI-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("RENBTC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2DAIETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2DAIUSDC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("MATIC-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("GUNIV3DAIUSDC1-A", 15_000);
-        DssExecLib.setIlkMinVaultAmount("WSTETH-A", 15_000);        
-        
+        DssVestLike(MCD_VEST_MKR).yank({
+            _id:  16,
+            _end: block.timestamp
+        });
+        DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
+            DssVestLike(MCD_VEST_MKR_TREASURY).create({
+                _usr: 0x29b37159C09a65af6a7CFb062998B169879442B6,
+                _tot: 995.00 * 10**18,
+                _bgn: SEP_20_2021,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
+                _mgr: PE_WALLET
+            })
+        );
 
-        // ----------------------------- Budget distributions -----------------------------
-
-        // Core Unit Budget Distributions
-        DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 27_058);
-        // Delegate Compensation Payments
-        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS_WALLET, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET, 8_144);
-        DssExecLib.sendPaymentFromSurplusBuffer(FIELDTECHNOLOGIES_WALLET, 3_690);
-
-
-        // Changelog
-        DssExecLib.setChangelogAddress("GUNIV3DAIUSDC2", GUNIV3DAIUSDC2);
-        DssExecLib.setChangelogAddress("MCD_JOIN_GUNIV3DAIUSDC2_A", MCD_JOIN_GUNIV3DAIUSDC2_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC2_A", MCD_CLIP_GUNIV3DAIUSDC2_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A", MCD_CLIP_CALC_GUNIV3DAIUSDC2_A);
-        DssExecLib.setChangelogAddress("PIP_GUNIV3DAIUSDC2", PIP_GUNIV3DAIUSDC2);
-
-        DssExecLib.setChangelogVersion("1.9.12");
     }
 }
 
