@@ -25,7 +25,7 @@ interface TokenLike {
 }
 
 interface DssVestLike {
-    function yank(uint256 _id, uint256 _end) external;
+    function yank(uint256) external;
     function restrict(uint256) external;
     function create(
         address _usr,
@@ -34,7 +34,7 @@ interface DssVestLike {
         uint256 _tau,
         uint256 _eta,
         address _mgr
-  ) external returns (uint256)
+  ) external returns (uint256);
 }
 
 contract DssSpellAction is DssAction {
@@ -55,6 +55,10 @@ contract DssSpellAction is DssAction {
     uint256 constant JUL_01_2021 = 1625097600;
     uint256 constant SEP_13_2021 = 1631491200;
     uint256 constant SEP_20_2021 = 1632096000;
+
+    function officeHours() public override returns (bool) {
+        return false;
+    }
 
     function actions() public override {
 
@@ -88,7 +92,8 @@ contract DssSpellAction is DssAction {
                 _bgn: JUL_01_2021,
                 _tau: 365 days,
                 _eta: 365 days,
-                _mgr: address(0))
+                _mgr: address(0)
+            })
         );
 
         // PE MKR vestings (per individual)
@@ -183,7 +188,7 @@ contract DssSpellAction is DssAction {
                 _tot: 995.00 * 10**18,
                 _bgn: MAY_01_2021,
                 _tau: 4 * 365 days,
-                _eta: 365 days,
+                _eta: 365 days,
                 _mgr: PE_WALLET
             })
         );
@@ -195,7 +200,7 @@ contract DssSpellAction is DssAction {
                 _tot: 995.00 * 10**18,
                 _bgn: MAY_01_2021,
                 _tau: 4 * 365 days,
-                _eta: 365 days,
+                _eta: 365 days,
                 _mgr: PE_WALLET
             })
         );
@@ -207,7 +212,7 @@ contract DssSpellAction is DssAction {
                 _tot: 995.00 * 10**18,
                 _bgn: MAY_01_2021,
                 _tau: 4 * 365 days,
-                _eta: 365 days,
+                _eta: 365 days,
                 _mgr: PE_WALLET
             })
         );
@@ -230,7 +235,7 @@ contract DssSpellAction is DssAction {
                 _usr: 0xcD16aa978A89Aa26b3121Fc8dd32228d7D0fcF4a,
                 _tot: 995.00 * 10**18,
                 _bgn: SEP_13_2021,
-                _tau: 4 * 365 days,
+                _tau: 4 * 365 days,
                 _eta: 365 days,
                 _mgr: PE_WALLET
             })
@@ -241,7 +246,7 @@ contract DssSpellAction is DssAction {
             DssVestLike(MCD_VEST_MKR_TREASURY).create({
                 _usr: 0x3189cfe40CF011AAb13aDD8aE7284deD4CD30602,
                 _tot: 995.00 * 10**18,
-                _bgn: JUN_21_2021,
+                _bgn: JUN_21_2021,
                 _tau: 4 * 365 days,
                 _eta: 365 days,
                 _mgr: PE_WALLET
@@ -254,8 +259,8 @@ contract DssSpellAction is DssAction {
                 _usr: 0x29b37159C09a65af6a7CFb062998B169879442B6,
                 _tot: 995.00 * 10**18,
                 _bgn: SEP_20_2021,
-                _tau: 4 * 365 days,
-                _eta: 365 days,
+                _tau: 4 * 365 days,
+                _eta: 365 days,
                 _mgr: PE_WALLET
             })
         );

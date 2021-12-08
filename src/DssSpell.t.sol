@@ -6,12 +6,6 @@ import "./DssSpell.t.base.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    address constant COM_WALLET                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
-    address constant FLIPFLOPFLAP_WALLET          = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant FEEDBLACKLOOPS_WALLET        = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address constant ULTRASCHUPPI_WALLET          = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
-    address constant FIELDTECHNOLOGIES_WALLET     = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -48,52 +42,51 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-
-        checkUNILPIntegration(
-            "GUNIV3DAIUSDC2-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
-            LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC2")),
-            0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,
-            addr.addr("PIP_USDC"),
-            false,
-            false,
-            false
-        );
+        // Example:
+        //
+        // checkUNILPIntegration(
+        //     "GUNIV3DAIUSDC2-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
+        //     LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC2")),
+        //     0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,
+        //     addr.addr("PIP_USDC"),
+        //     false,
+        //     false,
+        //     false
+        // );
     }
 
-    // function testLerpSurplusBuffer() public {
-    //     vote(address(spell));
-    //     scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testLerps() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
-
-    //     uint256 duration = 210 days;
-    //     hevm.warp(block.timestamp + duration / 2);
-    //     assertEq(vow.hump(), 60 * MILLION * RAD);
-    //     lerp.tick();
-    //     assertEq(vow.hump(), 75 * MILLION * RAD);
-    //     hevm.warp(block.timestamp + duration / 2);
-    //     lerp.tick();
-    //     assertEq(vow.hump(), 90 * MILLION * RAD);
-    //     assertTrue(lerp.done());
-    // }
-
+        // Insert tests for new lerps here
+        // Example:
+        // LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
+        // uint256 duration = 210 days;
+        // hevm.warp(block.timestamp + duration / 2);
+        // assertEq(vow.hump(), 60 * MILLION * RAD);
+        // lerp.tick();
+        // assertEq(vow.hump(), 75 * MILLION * RAD);
+        // hevm.warp(block.timestamp + duration / 2);
+        // lerp.tick();
+        // assertEq(vow.hump(), 90 * MILLION * RAD);
+        // assertTrue(lerp.done());
+    }
 
     function testNewChainlogValues() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("GUNIV3DAIUSDC2"), addr.addr("GUNIV3DAIUSDC2"));
-        assertEq(chainLog.getAddress("MCD_JOIN_GUNIV3DAIUSDC2_A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_GUNIV3DAIUSDC2_A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"), addr.addr("MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"));
-        assertEq(chainLog.getAddress("PIP_GUNIV3DAIUSDC2"), addr.addr("PIP_GUNIV3DAIUSDC2"));
-
         assertEq(chainLog.version(), "1.9.12");
+
+        // Insert new chainlog values tests here
+        // Example:
+        //
+        // assertEq(chainLog.getAddress("GUNIV3DAIUSDC2"), addr.addr("GUNIV3DAIUSDC2"));
 
     }
 
@@ -103,51 +96,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("GUNIV3DAIUSDC2-A"), 47);
-        assertEq(reg.join("GUNIV3DAIUSDC2-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
-        assertEq(reg.gem("GUNIV3DAIUSDC2-A"), addr.addr("GUNIV3DAIUSDC2"));
-        assertEq(reg.dec("GUNIV3DAIUSDC2-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC2")).decimals());
-        assertEq(reg.class("GUNIV3DAIUSDC2-A"), 1);
-        assertEq(reg.pip("GUNIV3DAIUSDC2-A"), addr.addr("PIP_GUNIV3DAIUSDC2"));
-        assertEq(reg.xlip("GUNIV3DAIUSDC2-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
-        assertEq(reg.name("GUNIV3DAIUSDC2-A"), "Gelato Uniswap DAI/USDC LP");
-        assertEq(reg.symbol("GUNIV3DAIUSDC2-A"), "G-UNI");
-    }
-
-
-    function testOneTimePaymentDistributions() public {
-        uint256 prevSin              = vat.sin(address(vow));
-        uint256 prevDaiCom           = dai.balanceOf(COM_WALLET);
-        uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP_WALLET);
-        uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACKLOOPS_WALLET);
-        uint256 prevDaiUltra         = dai.balanceOf(ULTRASCHUPPI_WALLET);
-        uint256 prevDaiField         = dai.balanceOf(FIELDTECHNOLOGIES_WALLET);
-
-        uint256 amountCom       = 27_058;
-        uint256 amountFlipFlop  = 12_000;
-        uint256 amountFeedblack = 12_000;
-        uint256 amountUltra     = 8144;
-        uint256 amountField     = 3690;
-
-        uint256 amountTotal     = amountCom + amountFlipFlop + amountFeedblack
-                                + amountUltra + amountField;
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
-
-        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
-        assertEq(dai.balanceOf(COM_WALLET) - prevDaiCom, amountCom * WAD);
-        assertEq(dai.balanceOf(FLIPFLOPFLAP_WALLET) - prevDaiFlipFlop, amountFlipFlop * WAD);
-        assertEq(dai.balanceOf(FEEDBLACKLOOPS_WALLET) - prevDaiFeedblack, amountFeedblack * WAD);
-        assertEq(dai.balanceOf(ULTRASCHUPPI_WALLET) - prevDaiUltra, amountUltra * WAD);
-        assertEq(dai.balanceOf(FIELDTECHNOLOGIES_WALLET) - prevDaiField, amountField * WAD);
+        // Example:
+        //
+        // assertEq(reg.pos("GUNIV3DAIUSDC2-A"), 47);
+        // assertEq(reg.join("GUNIV3DAIUSDC2-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
+        // assertEq(reg.gem("GUNIV3DAIUSDC2-A"), addr.addr("GUNIV3DAIUSDC2"));
+        // assertEq(reg.dec("GUNIV3DAIUSDC2-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC2")).decimals());
+        // assertEq(reg.class("GUNIV3DAIUSDC2-A"), 1);
+        // assertEq(reg.pip("GUNIV3DAIUSDC2-A"), addr.addr("PIP_GUNIV3DAIUSDC2"));
+        // assertEq(reg.xlip("GUNIV3DAIUSDC2-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
+        // assertEq(reg.name("GUNIV3DAIUSDC2-A"), "Gelato Uniswap DAI/USDC LP");
+        // assertEq(reg.symbol("GUNIV3DAIUSDC2-A"), "G-UNI");
     }
 
     function testFailWrongDay() public {
@@ -269,60 +228,34 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    // function test_OSMs() public {
-    //     vote(address(spell));
-    //     spell.schedule();
-    //     hevm.warp(spell.nextCastTime());
-    //     spell.cast();
-    //     assertTrue(spell.done());
+    function test_OSMs() public {
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
 
-    //     // Track OSM authorizations here
+        // Track OSM authorizations here
+        // Example:
+        //
+        // address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
+        // assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
+    }
 
-    //     address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
-    //     assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
+    function test_Medianizers() public {
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
 
-    //     // Gnosis
-    //     address GNOSIS = 0xD5885fbCb9a8a8244746010a3BC6F1C6e0269777;
-    //     assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(GNOSIS), 1);
-    //     assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(GNOSIS), 1);
-    //     assertEq(OsmAbstract(addr.addr("PIP_COMP")).bud(GNOSIS), 1);
-    //     assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(GNOSIS), 1);
-    //     assertEq(OsmAbstract(addr.addr("PIP_ZRX")).bud(GNOSIS), 1);
-
-    //     // Instadapp
-    //     address INSTADAPP = 0xDF3CDd10e646e4155723a3bC5b1191741DD90333;
-    //     assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(INSTADAPP), 1);
-    // }
-
-    // function test_Medianizers() public {
-    //     vote(address(spell));
-    //     spell.schedule();
-    //     hevm.warp(spell.nextCastTime());
-    //     spell.cast();
-    //     assertTrue(spell.done());
-
-    //     // Track Median authorizations here
-
-    //     address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-    //     address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
-    //     assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
-
-    //     address SET_LRC     = 0x1D5d9a2DDa0843eD9D8a9Bddc33F1fca9f9C64a0;
-    //     address LRCUSD_MED  = OsmAbstract(addr.addr("PIP_LRC")).src();
-    //     assertEq(MedianAbstract(LRCUSD_MED).bud(SET_LRC), 1);
-
-    //     address SET_YFI     = 0x1686d01Bd776a1C2A3cCF1579647cA6D39dd2465;
-    //     address YFIUSD_MED  = OsmAbstract(addr.addr("PIP_YFI")).src();
-    //     assertEq(MedianAbstract(YFIUSD_MED).bud(SET_YFI), 1);
-
-    //     address SET_ZRX     = 0xFF60D1650696238F81BE53D23b3F91bfAAad938f;
-    //     address ZRXUSD_MED  = OsmAbstract(addr.addr("PIP_ZRX")).src();
-    //     assertEq(MedianAbstract(ZRXUSD_MED).bud(SET_ZRX), 1);
-
-    //     address SET_UNI     = 0x3c3Afa479d8C95CF0E1dF70449Bb5A14A3b7Af67;
-    //     address UNIUSD_MED  = OsmAbstract(addr.addr("PIP_UNI")).src();
-    //     assertEq(MedianAbstract(UNIUSD_MED).bud(SET_UNI), 1);
-    // }
+        // Track Median authorizations here
+        // Example:
+        //
+        // address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
+        // address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
+        // assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
+    }
 
     function test_auth() public {
         checkAuth(false);
