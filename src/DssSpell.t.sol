@@ -129,19 +129,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        // Example:
-        //
-        // checkUNILPIntegration(
-        //     "GUNIV3DAIUSDC2-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A")),
-        //     LPOsmAbstract(addr.addr("PIP_GUNIV3DAIUSDC2")),
-        //     0x47c3dC029825Da43BE595E21fffD0b66FfcB7F6e,
-        //     addr.addr("PIP_USDC"),
-        //     false,
-        //     false,
-        //     false
-        // );
     }
 
     function testLerps() public {
@@ -150,18 +137,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert tests for new lerps here
-        // Example:
-        //
-        // LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
-        // uint256 duration = 210 days;
-        // hevm.warp(block.timestamp + duration / 2);
-        // assertEq(vow.hump(), 60 * MILLION * RAD);
-        // lerp.tick();
-        // assertEq(vow.hump(), 75 * MILLION * RAD);
-        // hevm.warp(block.timestamp + duration / 2);
-        // lerp.tick();
-        // assertEq(vow.hump(), 90 * MILLION * RAD);
-        // assertTrue(lerp.done());
     }
 
     function testNewChainlogValues() public {
@@ -172,10 +147,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.version(), "1.9.12");
 
         // Insert new chainlog values tests here
-        // Example:
-        //
-        // assertEq(chainLog.getAddress("GUNIV3DAIUSDC2"), addr.addr("GUNIV3DAIUSDC2"));
-
     }
 
     function testNewIlkRegistryValues() public {
@@ -184,17 +155,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // Example:
-        //
-        // assertEq(reg.pos("GUNIV3DAIUSDC2-A"), 47);
-        // assertEq(reg.join("GUNIV3DAIUSDC2-A"), addr.addr("MCD_JOIN_GUNIV3DAIUSDC2_A"));
-        // assertEq(reg.gem("GUNIV3DAIUSDC2-A"), addr.addr("GUNIV3DAIUSDC2"));
-        // assertEq(reg.dec("GUNIV3DAIUSDC2-A"), DSTokenAbstract(addr.addr("GUNIV3DAIUSDC2")).decimals());
-        // assertEq(reg.class("GUNIV3DAIUSDC2-A"), 1);
-        // assertEq(reg.pip("GUNIV3DAIUSDC2-A"), addr.addr("PIP_GUNIV3DAIUSDC2"));
-        // assertEq(reg.xlip("GUNIV3DAIUSDC2-A"), addr.addr("MCD_CLIP_GUNIV3DAIUSDC2_A"));
-        // assertEq(reg.name("GUNIV3DAIUSDC2-A"), "Gelato Uniswap DAI/USDC LP");
-        // assertEq(reg.symbol("GUNIV3DAIUSDC2-A"), "G-UNI");
     }
 
     function testFailWrongDay() public {
@@ -324,10 +284,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Track OSM authorizations here
-        // Example:
-        //
-        // address YEARN_PROXY = 0x208EfCD7aad0b5DD49438E0b6A0f38E951A50E5f;
-        // assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(YEARN_PROXY), 1);
     }
 
     function test_Medianizers() public {
@@ -338,11 +294,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Track Median authorizations here
-        // Example:
-        //
-        // address SET_AAVE    = 0x8b1C079f8192706532cC0Bf0C02dcC4fF40d045D;
-        // address AAVEUSD_MED = OsmAbstract(addr.addr("PIP_AAVE")).src();
-        // assertEq(MedianAbstract(AAVEUSD_MED).bud(SET_AAVE), 1);
     }
 
     function test_auth() public {
