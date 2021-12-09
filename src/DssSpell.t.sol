@@ -123,7 +123,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testCollateralIntegrations() public {
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -131,7 +131,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new collateral tests here
     }
 
-    function testLerps() public {
+    function testLerps() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -139,7 +139,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert tests for new lerps here
     }
 
-    function testNewChainlogValues() public {
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -149,7 +149,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new chainlog values tests here
     }
 
-    function testNewIlkRegistryValues() public {
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -276,7 +276,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function test_OSMs() public {
+    function test_OSMs() private { // make public to use
         vote(address(spell));
         spell.schedule();
         hevm.warp(spell.nextCastTime());
@@ -286,7 +286,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Track OSM authorizations here
     }
 
-    function test_Medianizers() public {
+    function test_Medianizers() private { // make public to use
         vote(address(spell));
         spell.schedule();
         hevm.warp(spell.nextCastTime());
