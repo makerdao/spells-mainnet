@@ -1624,7 +1624,7 @@ contract DssSpellTestBase is DSTest, DSMath {
             flip_tau:     0,
             flipper_mom:  0,
             dog_hole:     15 * MILLION,
-            clip_buf:     120_00,
+            clip_buf:     120_00, // 120%
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
