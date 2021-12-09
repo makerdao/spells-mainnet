@@ -24,7 +24,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testVestTransfer() public {
 
-        uint256 totalMint = 0;
+        uint256 prevTotalVest = 0;
 
         for(uint256 i = 1; i <= VestAbstract(addr.addr("MCD_VEST_MKR")).ids(); i++) {
             assertTrue(VestAbstract(addr.addr("MCD_VEST_MKR")).valid(i));
@@ -48,7 +48,7 @@ contract DssSpellTest is DssSpellTestBase {
                 tot: tot,
                 rxd: rxd
             });
-            totalMint += tot;
+            prevTotalVest += tot;
         }
 
         uint256 prevIds = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY")).ids();
@@ -61,7 +61,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        uint256 totalTreasury = 0;
+        uint256 totalVest = 0;
 
         for(uint256 i = 1; i <= VestAbstract(addr.addr("MCD_VEST_MKR")).ids(); i++) {
             assertTrue(!VestAbstract(addr.addr("MCD_VEST_MKR")).valid(i));
@@ -83,14 +83,14 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(uint256(res), uint256(awards[i].res));
             assertEq(uint256(tot), uint256(awards[i].tot));
             assertEq(uint256(rxd), uint256(awards[i].rxd));
-            totalTreasury += tot;
+            totalVest += tot;
         }
-        assertEq(totalMint, totalTreasury);
+        assertEq(prevTotalVest, totalVest);
         uint256 allowance = DSTokenAbstract(addr.addr("MCD_GOV")).allowance(
             addr.addr("MCD_PAUSE_PROXY"),
             addr.addr("MCD_VEST_MKR_TREASURY")
         );
-        assertEq(totalTreasury, allowance - prevAllowance);
+        assertEq(totalVest, allowance - prevAllowance);
     }
 
     function testSpellIsCast_GENERAL() public {
