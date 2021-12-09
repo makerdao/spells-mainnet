@@ -49,6 +49,7 @@ contract DssSpellAction is DssAction {
 
     // --- Ilks ---
     bytes32 constant WSTETH_A = "WSTETH-A";
+    bytes32 constant MATIC_A  = "MATIC-A";
 
     // --- Wallet addresses ---
     address constant GRO_WALLET = 0x7800C137A645c07132886539217ce192b9F0528e;
@@ -283,6 +284,17 @@ contract DssSpellAction is DssAction {
         });
         DssExecLib.setStartingPriceMultiplicativeFactor(WSTETH_A, 120_00);
         DssExecLib.setIlkMaxLiquidationAmount(WSTETH_A, 15 * MILLION);
+
+
+        // ------------------- MATIC-A Parameter Changes --------------------------
+        // https://vote.makerdao.com/polling/QmdzwZyS
+
+        DssExecLib.setIlkAutoLineParameters({
+            _ilk:    MATIC_A,
+            _amount: 35 * MILLION,
+            _gap:    10 * MILLION,
+            _ttl:    8 hours
+        });
     }
 }
 

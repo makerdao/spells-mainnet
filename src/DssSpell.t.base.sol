@@ -1521,8 +1521,8 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["MATIC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      20 * MILLION,
-            aL_gap:       20 * MILLION,
+            aL_line:      35 * MILLION,
+            aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
