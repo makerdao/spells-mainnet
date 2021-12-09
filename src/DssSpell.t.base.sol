@@ -2505,7 +2505,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         assertEq(vestDai.tot(_index), _amount * WAD);
     }
 
-    function getMat(bytes32 _ilk) internal returns (uint256 mat) {
+    function getMat(bytes32 _ilk) internal view returns (uint256 mat) {
         (, mat) = spotter.ilks(_ilk);
     }
 
