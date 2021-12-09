@@ -1608,9 +1608,9 @@ contract DssSpellTestBase is DSTest, DSMath {
         });
         afterSpell.collaterals["WSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
-            aL_gap:       3 * MILLION,
-            aL_ttl:       8 hours,
+            aL_line:      200 * MILLION,
+            aL_gap:       20 * MILLION,
+            aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          400,
@@ -1623,8 +1623,8 @@ contract DssSpellTestBase is DSTest, DSMath {
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
-            dog_hole:     7 * MILLION,
-            clip_buf:     13000,
+            dog_hole:     15 * MILLION,
+            clip_buf:     120_00,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,

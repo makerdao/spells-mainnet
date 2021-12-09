@@ -44,6 +44,12 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2021-12-10 MakerDAO Executive Spell | Hash: TODO";
 
+    // --- Math ---
+    uint256 constant MILLION = 10**6;
+
+    // --- Ilks ---
+    bytes32 constant WSTETH_A = "WSTETH-A";
+
     // --- Wallet addresses ---
     address constant GRO_WALLET = 0x7800C137A645c07132886539217ce192b9F0528e;
     address constant ORA_WALLET = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
@@ -264,6 +270,19 @@ contract DssSpellAction is DssAction {
                 _mgr: PE_WALLET
             })
         );
+
+
+        // -------------------- wstETH-A Parameter Changes ------------------------
+        // https://vote.makerdao.com/polling/QmYuK441
+
+        DssExecLib.setIlkAutoLineParameters({
+            _ilk:    WSTETH_A,
+            _amount: 200 * MILLION,
+            _gap:    20 * MILLION,
+            _ttl:    6 hours
+        });
+        DssExecLib.setStartingPriceMultiplicativeFactor(WSTETH_A, 120_00);
+        DssExecLib.setIlkMaxLiquidationAmount(WSTETH_A, 15 * MILLION);
     }
 }
 
