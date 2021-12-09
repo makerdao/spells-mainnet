@@ -28,5 +28,8 @@ contract AddressesWallets {
         addr_wallet["FEEDBLACKLOOPS"]               = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
         addr_wallet["ULTRASCHUPPI"]                 = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
         addr_wallet["FIELDTECHNOLOGIES"]            = 0x0988E41C02915Fe1beFA78c556f946E5F20ffBD3;
+        addr_wallet["GRO_WALLET"]                   = 0x7800C137A645c07132886539217ce192b9F0528e;
+        addr_wallet["ORA_WALLET"]                   = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+        addr_wallet["PE_WALLET"]                    = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
     }
 }
