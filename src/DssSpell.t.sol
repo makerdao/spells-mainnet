@@ -151,6 +151,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert tests for new lerps here
         // Example:
+        //
         // LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("Increase SB - 20211126"));
         // uint256 duration = 210 days;
         // hevm.warp(block.timestamp + duration / 2);

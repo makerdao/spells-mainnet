@@ -62,10 +62,10 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
-        // ------------- Move vesting from MCD_VEST_MKR to MCD_VEST_MKR_TREASURY -------------
-        // TODO add link
+        // ------------- Transfer vesting streams from MCD_VEST_MKR to MCD_VEST_MKR_TREASURY -------------
+        // https://vote.makerdao.com/polling/QmYdDTsn
 
-        address MCD_VEST_MKR = DssExecLib.getChangelogAddress("MCD_VEST_MKR");
+        address MCD_VEST_MKR          = DssExecLib.getChangelogAddress("MCD_VEST_MKR");
         address MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
 
         TokenLike(DssExecLib.getChangelogAddress("MCD_GOV")).approve(MCD_VEST_MKR_TREASURY, 16_484.43 * 10**18);
