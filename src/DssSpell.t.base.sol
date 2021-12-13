@@ -7,6 +7,7 @@ import "ds-test/test.sol";
 import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
+import "./test/addresses_deployers.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
@@ -2572,28 +2573,16 @@ contract DssSpellTestBase is DSTest, DSMath {
         }
     }
 
-    address[] deployerAddresses = [
-        0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
-        0xDa0FaB05039809e63C5D068c897c3e602fA97457,
-        0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
-        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
-        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
-        0xd200790f62c8da69973e61d4936cfE4f356ccD07,
-        0xdA0C0de01d90A5933692Edf03c7cE946C7c50445,
-        0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3,  // Oracles
-        0x1f42e41A34B71606FcC60b4e624243b365D99745,  // Oracles
-        0x075da589886BA445d7c7e81c472059dE7AE65250   // Used for Optimism & Arbitrum bridge contracts
-    ];
-
     function checkWards(address _addr, string memory contractName) internal {
-        for (uint256 i = 0; i < deployerAddresses.length; i ++) {
+        AddressesDeployers deployers = new AddressesDeployers();
+        for (uint256 i = 0; i < deployers.addressesLength(); i ++) {
             (bool ok, bytes memory data) = _addr.call(
-                abi.encodeWithSignature("wards(address)", deployerAddresses[i])
+                abi.encodeWithSignature("wards(address)", deployers.addresses(i))
             );
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                emit Log("Bad auth", deployerAddresses[i], contractName);
+                emit Log("Bad auth", deployers.addresses(i), contractName);
                 fail();
             }
         }
