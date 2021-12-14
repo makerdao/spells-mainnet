@@ -6,8 +6,10 @@ if [[ -z "$1" ]]; then
 else
   rm -rf "./archive/$1-DssSpell"
   mkdir "./archive/$1-DssSpell"
+  mkdir "./archive/$1-DssSpell/test"
   cp "./src/DssSpell.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.base.sol" "./archive/$1-DssSpell"
+  cp ./src/test/* "./archive/$1-DssSpell/test"
   echo "Spell, tests and base copied to archive directory $1-DssSpell"
 fi
