@@ -106,7 +106,6 @@ contract DssSpellTestBase is DSTest, DSMath {
     Addresses       addr = new Addresses();
     Deployers  deployers = new Deployers();
     Wallets      wallets = new Wallets();
- 
 
     // ADDRESSES
     ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
