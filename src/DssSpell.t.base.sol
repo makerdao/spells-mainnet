@@ -26,10 +26,6 @@ interface DssExecSpellLike {
     function nextCastTime() external returns (uint256);
 }
 
-interface AuthLike {
-    function wards(address) external view returns (uint256);
-}
-
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
@@ -2122,7 +2118,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function giveAuth(address _base, address target) internal {
-        AuthLike base = AuthLike(_base);
+        WardsAbstract base = WardsAbstract(_base);
 
         // Edge case - ward is already set
         if (base.wards(target) == 1) return;
