@@ -93,7 +93,7 @@ contract DssSpellTestBase is Collaterals, DSTest, DSMath {
     // uint256 constant BILLION    = 10 ** 9;  // provided by collaterals
     // uint256 constant WAD        = 10 ** 18; // provided by ds-math
     // uint256 constant RAY        = 10 ** 27; // provided by ds-math
-    // uint256 constant RAD        = 10 ** 45; // provided by collaterals
+    uint256 constant RAD        = 10 ** 45;
 
     uint256 constant monthly_expiration = 4 days;
     uint256 constant weekly_expiration = 30 days;
