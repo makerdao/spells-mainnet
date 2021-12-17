@@ -2522,12 +2522,12 @@ contract DssSpellTestBase is DSTest, DSMath {
     function checkWards(address _addr, string memory contractName) internal {
         for (uint256 i = 0; i < deployers.addressesLength(); i ++) {
             (bool ok, bytes memory data) = _addr.call(
-                abi.encodeWithSignature("wards(address)", deployers.addresses(i))
+                abi.encodeWithSignature("wards(address)", deployers.addr(i))
             );
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                emit Log("Bad auth", deployers.addresses(i), contractName);
+                emit Log("Bad auth", deployers.addr(i), contractName);
                 fail();
             }
         }
