@@ -30,21 +30,6 @@ interface AuthLike {
     function wards(address) external view returns (uint256);
 }
 
-interface PsmAbstract {
-    function wards(address) external returns (uint256);
-    function vat() external returns (address);
-    function gemJoin() external returns (address);
-    function dai() external returns (address);
-    function daiJoin() external returns (address);
-    function ilk() external returns (bytes32);
-    function vow() external returns (address);
-    function tin() external returns (uint256);
-    function tout() external returns (uint256);
-    function file(bytes32 what, uint256 data) external;
-    function sellGem(address usr, uint256 gemAmt) external;
-    function buyGem(address usr, uint256 gemAmt) external;
-}
-
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
