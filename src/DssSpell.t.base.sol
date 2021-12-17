@@ -9,8 +9,8 @@ import "dss-interfaces/Interfaces.sol";
 import "./test/rates.sol";
 import "./test/collaterals.sol";
 import "./test/addresses_mainnet.sol";
-import "./test/addresses_wallets.sol";
 import "./test/addresses_deployers.sol";
+import "./test/addresses_wallets.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
@@ -125,6 +125,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     Rates          rates = new Rates();
     Addresses       addr = new Addresses();
     Deployers  deployers = new Deployers();
+    Wallets      wallets = new Wallets();
  
 
     // ADDRESSES
