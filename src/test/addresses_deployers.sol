@@ -17,7 +17,7 @@
 
 pragma solidity 0.6.12;
 
-contract AddressesDeployers {
+contract Deployers {
 
     address[] public addresses;
 

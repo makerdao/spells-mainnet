@@ -17,7 +17,7 @@
 
 pragma solidity 0.6.12;
 
-contract AddressesWallets {
+contract Wallets {
 
     mapping (bytes32 => address) public addr_wallet;
 

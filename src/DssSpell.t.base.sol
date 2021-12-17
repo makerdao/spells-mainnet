@@ -119,10 +119,10 @@ contract DssSpellTestBase is DSTest, DSMath {
 
     Hevm hevm;
 
-    Rates                   rates = new Rates();
-    Addresses                addr = new Addresses();
-    AddressesDeployers  deployers = new AddressesDeployers();
-    // AddressesWallets      wallets = new AddressesWallets();
+    Rates          rates = new Rates();
+    Addresses       addr = new Addresses();
+    Deployers  deployers = new Deployers();
+ 
 
     // ADDRESSES
     ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
