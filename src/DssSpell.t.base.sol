@@ -5,8 +5,11 @@ pragma solidity 0.6.12;
 import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "dss-interfaces/Interfaces.sol";
+
 import "./test/rates.sol";
+import "./test/collaterals.sol";
 import "./test/addresses_mainnet.sol";
+import "./test/addresses_wallets.sol";
 import "./test/addresses_deployers.sol";
 
 import {DssSpell} from "./DssSpell.sol";
