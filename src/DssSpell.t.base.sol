@@ -118,8 +118,11 @@ contract DssSpellTestBase is DSTest, DSMath {
     SpellValues  spellValues;
 
     Hevm hevm;
-    Rates     rates = new Rates();
-    Addresses addr  = new Addresses();
+
+    Rates                   rates = new Rates();
+    Addresses                addr = new Addresses();
+    AddressesDeployers  deployers = new AddressesDeployers();
+    // AddressesWallets      wallets = new AddressesWallets();
 
     // ADDRESSES
     ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -2517,7 +2520,6 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function checkWards(address _addr, string memory contractName) internal {
-        AddressesDeployers deployers = new AddressesDeployers();
         for (uint256 i = 0; i < deployers.addressesLength(); i ++) {
             (bool ok, bytes memory data) = _addr.call(
                 abi.encodeWithSignature("wards(address)", deployers.addresses(i))
