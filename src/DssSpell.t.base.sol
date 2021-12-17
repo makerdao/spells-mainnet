@@ -17,7 +17,7 @@ interface Hevm {
     function load(address,bytes32) external view returns (bytes32);
 }
 
-interface ExecSpellLike {
+interface DssExecSpellLike {
     function done() external view returns (bool);
     function eta() external view returns (uint256);
     function cast() external;
@@ -248,9 +248,9 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function castPreviousSpell() internal {
-        ExecSpellLike prevSpell = ExecSpellLike(spellValues.previous_spell);
+        DssExecSpellLike prevSpell = DssExecSpellLike(spellValues.previous_spell);
         // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != ExecSpellLike(0) && !prevSpell.done()) {
+        if (prevSpell != DssExecSpellLike(0) && !prevSpell.done()) {
             if (prevSpell.eta() == 0) {
                 vote(address(prevSpell));
                 scheduleWaitAndCast(address(prevSpell));
