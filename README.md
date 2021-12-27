@@ -17,13 +17,22 @@ $ dapp update
 $ make
 ```
 
-### Test
+### Test (DappTools with Optimizations)
 
 Set `ETH_RPC_URL` to a Mainnet node.
 
 ```
 $ export ETH_RPC_URL=<Mainnet URL>
 $ make test
+```
+
+### Test (Forge without Optimizations)
+
+Set `ETH_RPC_URL` to a Mainnet node.
+
+```
+$ export ETH_RPC_URL=<Mainnet URL>
+$ make test-forge
 ```
 
 ### Deploy
