@@ -5,8 +5,11 @@ pragma solidity 0.6.12;
 import "ds-math/math.sol";
 import "ds-test/test.sol";
 import "dss-interfaces/Interfaces.sol";
+
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
+import "./test/addresses_deployers.sol";
+import "./test/addresses_wallets.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
@@ -16,55 +19,11 @@ interface Hevm {
     function load(address,bytes32) external view returns (bytes32);
 }
 
-interface SpellLike {
+interface DssExecSpellLike {
     function done() external view returns (bool);
     function eta() external view returns (uint256);
     function cast() external;
     function nextCastTime() external returns (uint256);
-}
-
-interface AuthLike {
-    function wards(address) external view returns (uint256);
-}
-
-interface PsmAbstract {
-    function wards(address) external returns (uint256);
-    function vat() external returns (address);
-    function gemJoin() external returns (address);
-    function dai() external returns (address);
-    function daiJoin() external returns (address);
-    function ilk() external returns (bytes32);
-    function vow() external returns (address);
-    function tin() external returns (uint256);
-    function tout() external returns (uint256);
-    function file(bytes32 what, uint256 data) external;
-    function sellGem(address usr, uint256 gemAmt) external;
-    function buyGem(address usr, uint256 gemAmt) external;
-}
-
-interface BrokeTokenAbstract {
-    function name() external view returns (bytes32);
-    function symbol() external view returns (bytes32);
-    function decimals() external view returns (uint256);
-    function totalSupply() external view returns (uint256);
-    function balanceOf(address) external view returns (uint256);
-    function transfer(address, uint256) external;
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external;
-    function approve(address) external;
-    function transferFrom(address, address, uint256) external;
-    function push(address, uint256) external;
-    function pull(address, uint256) external;
-    function move(address, address, uint256) external;
-    function mint(uint256) external;
-    function mint(address,uint) external;
-    function burn(uint256) external;
-    function burn(address,uint) external;
-    function setName(bytes32) external;
-    function authority() external view returns (address);
-    function owner() external view returns (address);
-    function setOwner(address) external;
-    function setAuthority(address) external;
 }
 
 interface DirectDepositLike is GemJoinAbstract {
@@ -142,8 +101,11 @@ contract DssSpellTestBase is DSTest, DSMath {
     SpellValues  spellValues;
 
     Hevm hevm;
-    Rates     rates = new Rates();
-    Addresses addr  = new Addresses();
+
+    Rates          rates = new Rates();
+    Addresses       addr = new Addresses();
+    Deployers  deployers = new Deployers();
+    Wallets      wallets = new Wallets();
 
     // ADDRESSES
     ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -269,9 +231,9 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function castPreviousSpell() internal {
-        SpellLike prevSpell = SpellLike(spellValues.previous_spell);
+        DssExecSpellLike prevSpell = DssExecSpellLike(spellValues.previous_spell);
         // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != SpellLike(0) && !prevSpell.done()) {
+        if (prevSpell != DssExecSpellLike(0) && !prevSpell.done()) {
             if (prevSpell.eta() == 0) {
                 vote(address(prevSpell));
                 scheduleWaitAndCast(address(prevSpell));
@@ -291,7 +253,7 @@ contract DssSpellTestBase is DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xA867399B43aF7790aC800f2fF3Fa7387dc52Ec5E),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1639162896,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
@@ -2122,38 +2084,6 @@ contract DssSpellTestBase is DSTest, DSMath {
         return price;
     }
 
-    function giveBrokeTokens(BrokeTokenAbstract token, uint256 amount) internal {
-        // Edge case - balance is already set for some reason
-        if (token.balanceOf(address(this)) == amount) return;
-
-        for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                address(token),
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                address(token),
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                hevm.store(
-                    address(token),
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
-    }
-
     function giveTokens(DSTokenAbstract token, uint256 amount) internal {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
@@ -2187,7 +2117,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function giveAuth(address _base, address target) internal {
-        AuthLike base = AuthLike(_base);
+        WardsAbstract base = WardsAbstract(_base);
 
         // Edge case - ward is already set
         if (base.wards(target) == 1) return;
@@ -2572,28 +2502,15 @@ contract DssSpellTestBase is DSTest, DSMath {
         }
     }
 
-    address[] deployerAddresses = [
-        0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
-        0xDa0FaB05039809e63C5D068c897c3e602fA97457,
-        0xda0fab060e6cc7b1C0AA105d29Bd50D71f036711,
-        0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
-        0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
-        0xd200790f62c8da69973e61d4936cfE4f356ccD07,
-        0xdA0C0de01d90A5933692Edf03c7cE946C7c50445,
-        0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3,  // Oracles
-        0x1f42e41A34B71606FcC60b4e624243b365D99745,  // Oracles
-        0x075da589886BA445d7c7e81c472059dE7AE65250   // Used for Optimism & Arbitrum bridge contracts
-    ];
-
     function checkWards(address _addr, string memory contractName) internal {
-        for (uint256 i = 0; i < deployerAddresses.length; i ++) {
+        for (uint256 i = 0; i < deployers.count(); i ++) {
             (bool ok, bytes memory data) = _addr.call(
-                abi.encodeWithSignature("wards(address)", deployerAddresses[i])
+                abi.encodeWithSignature("wards(address)", deployers.addr(i))
             );
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                emit Log("Bad auth", deployerAddresses[i], contractName);
+                emit Log("Bad auth", deployers.addr(i), contractName);
                 fail();
             }
         }
