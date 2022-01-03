@@ -17,6 +17,15 @@ $ dapp update
 $ make
 ```
 
+### Adding Collaterals to the System
+
+If the weekly executive needs to onboard a new collateral:
+
+1. Copy the `DssSpellCollateralOnboarding.sol` from `templates` to `src`.
+2. Import the contract in `DssSpell.sol`
+3. Inherit the onboarding spell into the main `DssSpellAction` contract (i.e. `is DssAction, DssSpellCollateralOnboarding`)
+4. add `onboardNewCollaterals();` to the `actions()` function in `DssSpellAction`
+
 ### Test
 
 Set `ETH_RPC_URL` to a Mainnet node.
