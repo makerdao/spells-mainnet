@@ -82,6 +82,7 @@ contract Collaterals {
     function setCollateralValues() public {
         //
         // Values for all collateral
+        // Update when adding or modifying Collateral Values
         //
         afterSpell.collaterals["ETH-A"] = CollateralValues({
             aL_enabled:   true,            // DssAutoLine is enabled?
