@@ -2503,7 +2503,7 @@ contract DssSpellTestBase is DSTest, DSMath {
     }
 
     function checkWards(address _addr, string memory contractName) internal {
-        for (uint256 i = 0; i < deployers.addressesLength(); i ++) {
+        for (uint256 i = 0; i < deployers.count(); i ++) {
             (bool ok, bytes memory data) = _addr.call(
                 abi.encodeWithSignature("wards(address)", deployers.addr(i))
             );

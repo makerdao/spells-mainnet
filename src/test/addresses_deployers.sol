@@ -36,7 +36,7 @@ contract Deployers {
         ];
     }
 
-    function addressesLength() external view returns (uint256) {
+    function count() external view returns (uint256) {
         return addr.length;
     }
 }
