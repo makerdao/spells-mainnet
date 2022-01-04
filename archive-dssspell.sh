@@ -8,12 +8,7 @@ else
   mkdir "./archive/$1-DssSpell"
   mkdir "./archive/$1-DssSpell/test"
   cp "./src/DssSpell.sol" "./archive/$1-DssSpell"
-
-  COL_SPELL_FILE = "./src/DssSpellCollateralOnboarding.sol" 
-  if [[ -f "$COL_SPELL_FILE" ]]; then
-    cp "$COL_SPELL_FILE" "./archive/$1-DssSpell"
-  fi
-  
+  cp "./src/DssSpellCollateralOnboarding.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.base.sol" "./archive/$1-DssSpell"
   cp ./src/test/* "./archive/$1-DssSpell/test"
