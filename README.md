@@ -21,10 +21,9 @@ $ make
 
 If the weekly executive needs to onboard a new collateral:
 
-1. Copy the `DssSpellCollateralOnboarding.sol` from `templates` to `src`.
-2. Import the contract in `DssSpell.sol`
-3. Inherit the onboarding spell into the main `DssSpellAction` contract (i.e. `is DssAction, DssSpellCollateralOnboarding`)
-4. add `onboardNewCollaterals();` to the `actions()` function in `DssSpellAction`
+1. Update the `onboardNewCollaterals()` function in `DssSpellCollateralOnboarding.sol`.
+2. Update the values in `src/tests/collaterals.sol`
+3. uncomment the `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
 ### Test
 
