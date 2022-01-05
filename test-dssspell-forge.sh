@@ -6,5 +6,5 @@ set -e
 if [[ -z "$1" ]]; then
   forge test --fork-url "$ETH_RPC_URL" --libraries "src/DssSpell.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4" -vvv --force --match "$1"
 else
-  forge test --fork-url "$ETH_RPC_URL" --libraries "src/DssSpell.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4" -vvv --force 
+  forge test --fork-url "$ETH_RPC_URL" --libraries "src/DssSpell.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4" -vvv --force
 fi
