@@ -28,6 +28,12 @@ $ make test
 
 ### Test (Forge without Optimizations)
 
+#### Prerequisites
+1. [Install](https://www.rust-lang.org/tools/install) Rust.
+2. [Install](https://github.com/gakonst/foundry#forge) Forge.
+3. Add the Cargo binaries directory (e.g. `~/.cargo/bin`) to your PATH env var.
+
+#### Operation
 Set `ETH_RPC_URL` to a Mainnet node.
 
 ```
