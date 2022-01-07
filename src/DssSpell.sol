@@ -71,7 +71,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     function actions() public override {
 
-        // Uncomment to include changes from the DssSpellCollateralOnboardingAction
+        // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
         // ------------- Transfer vesting streams from MCD_VEST_MKR to MCD_VEST_MKR_TREASURY -------------
