@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-[[ "$(seth chain --rpc-url="$ETH_RPC_URL")" == "ethlive"  ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1;  }
+[[ "$(seth chain --rpc-url="$ETH_RPC_URL")" == "ethlive" ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1; }
 
 for ARGUMENT in "$@"
 do
