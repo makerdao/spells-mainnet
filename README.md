@@ -17,6 +17,14 @@ $ dapp update
 $ make
 ```
 
+### Adding Collaterals to the System
+
+If the weekly executive needs to onboard a new collateral:
+
+1. Update the `onboardNewCollaterals()` function in `DssSpellCollateralOnboarding.sol`.
+2. Update the values in `src/tests/collaterals.sol`
+3. uncomment the `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
+
 ### Test
 
 Set `ETH_RPC_URL` to a Mainnet node.
