@@ -61,6 +61,28 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(GFXLABS) - prevDaiGfxLabs, amountGfxLabs * WAD);
     }
 
+    function testOptimismRecovery() public {
+        uint256 amountLost = 10 * MILLION;
+        address l1Escrow     = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+        address lostSomeDai = 0xc9b48B787141595156d9a7aca4BC7De1Ca7b5eF6;
+
+        uint256 prevDaiEscrow = dai.balanceOf(l1Escrow);
+        uint256 prevDaiLostSomeDai = dai.balanceOf(lostSomeDai);
+
+        assertEq(dai.allowance(l1Escrow, pauseProxy), 0);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(dai.allowance(l1Escrow, pauseProxy), 0);
+
+        assertEq(prevDaiEscrow - dai.balanceOf(l1Escrow), amountLost * WAD);
+        assertEq(dai.balanceOf(lostSomeDai) - prevDaiLostSomeDai, amountLost * WAD);
+    }
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");

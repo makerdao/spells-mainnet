@@ -26,6 +26,10 @@ interface TokenLike {
     function transferFrom(address, address, uint256) external returns (bool);
 }
 
+interface L1EscrowLike {
+    function approve(address, address, uint256) external;
+}
+
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
@@ -35,7 +39,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         "2022-01-14 MakerDAO Executive Spell | Hash: ";
 
     // --- Math ---
-    uint256 constant MILLION = 10**6;
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant WAD     = 10 ** 18;
 
     // --- Ilks ---
     bytes32 constant UNIV2DAIETH_A  = "UNIV2DAIETH-A";
@@ -52,6 +57,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+
+    // --- Optimism Recovery Mainnet Addresses
+    address constant MCD_DAI              = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address constant L1_ESCROW            = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+    address constant LOST_SOME_DAI_WALLET = 0xc9b48B787141595156d9a7aca4BC7De1Ca7b5eF6;
 
     function officeHours() public override returns (bool) {
         return false;
@@ -78,8 +88,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // forum: https://forum.makerdao.com/t/signal-request-should-makerdao-assist-in-recovering-dai-locked-on-optimism-escrow/12307
 
         // Optimism L1 Escrow Address
-        L1EscrowLike(L1_ESCROW).approve(MCD_DAI, address(this), 10 * MILLION);
-        TokenLike(MCD_DAI).transferFrom(L1_ESCROW, LOST_SOME_DAI_WALLET, 10 * MILLION);
+        L1EscrowLike(L1_ESCROW).approve(MCD_DAI, address(this), 10 * MILLION * WAD);
+        TokenLike(MCD_DAI).transferFrom(L1_ESCROW, LOST_SOME_DAI_WALLET, 10 * MILLION * WAD);
 
         // ---------------------- Dust Parameter Updates for LP Tokens ---------------------
         // https://vote.makerdao.com/polling/QmUSfhmF
