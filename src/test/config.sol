@@ -17,7 +17,7 @@
 
 pragma solidity 0.6.12;
 
-contract Collaterals {
+contract Config {
     struct SystemValues {
         uint256 line_offset;
         uint256 pot_dsr;
