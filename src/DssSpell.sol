@@ -20,6 +20,8 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
+
 interface TokenLike {
     function approve(address, uint256) external returns (bool);
 }
@@ -37,7 +39,7 @@ interface DssVestLike {
   ) external returns (uint256);
 }
 
-contract DssSpellAction is DssAction {
+contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3224f50b0b5a9301831213ed858bc1d206de8e40/governance/votes/Executive%20vote%20-%20December%2010%2C%202021.md -q -O - 2>/dev/null)"
@@ -68,6 +70,9 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
+
+        // Includes changes from the DssSpellCollateralOnboardingAction
+        // onboardNewCollaterals();
 
         // ------------- Transfer vesting streams from MCD_VEST_MKR to MCD_VEST_MKR_TREASURY -------------
         // https://vote.makerdao.com/polling/QmYdDTsn

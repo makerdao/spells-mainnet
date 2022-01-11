@@ -8,6 +8,7 @@ else
   mkdir "./archive/$1-DssSpell"
   mkdir "./archive/$1-DssSpell/test"
   cp "./src/DssSpell.sol" "./archive/$1-DssSpell"
+  cp "./src/DssSpellCollateralOnboarding.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.sol" "./archive/$1-DssSpell"
   cp "./src/DssSpell.t.base.sol" "./archive/$1-DssSpell"
   cp ./src/test/* "./archive/$1-DssSpell/test"
