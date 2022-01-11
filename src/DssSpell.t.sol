@@ -8,89 +8,57 @@ import "dss-interfaces/Interfaces.sol";
 contract DssSpellTest is DssSpellTestBase {
 
     // Insert custom tests here
+    address FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
+    address ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
+    address FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
+    address MAKERMAN       = wallets.addr("MAKERMAN");
+    address ACREINVEST     = wallets.addr("ACREINVEST");
+    address JUSTINCASE     = wallets.addr("JUSTINCASE");
+    address GFXLABS        = wallets.addr("GFXLABS");
 
-    struct Award {
-        address usr;
-        uint48  bgn;
-        uint48  clf;
-        uint48  fin;
-        address mgr;
-        uint8   res;
-        uint128 tot;
-        uint128 rxd;
-    }
+    uint256 constant amountFlipFlop   = 12_000;
+    uint256 constant amountSchuppi    = 12_000;
+    uint256 constant amountFeedblack  = 12_000;
+    uint256 constant amountMakerMan   = 8597;
+    uint256 constant amountAcreInvest = 2203;
+    uint256 constant amountJustinCase = 791;
+    uint256 constant amountGfxLabs    = 699;
 
-    mapping (uint256 => Award) internal awards;
+    function testDelegatePayments() public {
+        uint256 prevSin              = vat.sin(address(vow));
+        uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP);
+        uint256 prevDaiSchuppi       = dai.balanceOf(ULTRASCHUPPI);
+        uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACKLOOPS);
+        uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
+        uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
+        uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
+        uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
 
-    function testVestTransfer() public {
 
-        uint256 prevTotalVest = 0;
+        uint256 amountTotal     = amountFlipFlop + amountSchuppi + amountFeedblack
+                                + amountMakerMan + amountAcreInvest + amountJustinCase
+                                + amountGfxLabs;
 
-        for(uint256 i = 1; i <= VestAbstract(addr.addr("MCD_VEST_MKR")).ids(); i++) {
-            assertTrue(VestAbstract(addr.addr("MCD_VEST_MKR")).valid(i));
-            (
-                address usr,
-                uint48 bgn,
-                uint48 clf,
-                uint48 fin,
-                address mgr,
-                uint8 res,
-                uint128 tot,
-                uint128 rxd
-            ) = VestAbstract(addr.addr("MCD_VEST_MKR")).awards(i);
-            awards[i] = Award({
-                usr: usr,
-                bgn: bgn,
-                clf: clf,
-                fin: fin,
-                mgr: mgr,
-                res: res,
-                tot: tot,
-                rxd: rxd
-            });
-            prevTotalVest += tot;
-        }
+        assertEq(amountTotal, 48_290);
 
-        uint256 prevIds = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY")).ids();
-        uint256 prevAllowance = DSTokenAbstract(addr.addr("MCD_GOV")).allowance(
-            addr.addr("MCD_PAUSE_PROXY"),
-            addr.addr("MCD_VEST_MKR_TREASURY")
-        );
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
 
-        uint256 totalVest = 0;
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
-        for(uint256 i = 1; i <= VestAbstract(addr.addr("MCD_VEST_MKR")).ids(); i++) {
-            assertTrue(!VestAbstract(addr.addr("MCD_VEST_MKR")).valid(i));
-            (
-                address usr,
-                uint48 bgn,
-                uint48 clf,
-                uint48 fin,
-                address mgr,
-                uint8 res,
-                uint128 tot,
-                uint128 rxd
-            ) = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY")).awards(prevIds + i);
-            assertEq(usr, awards[i].usr);
-            assertEq(uint256(bgn), uint256(awards[i].bgn));
-            assertEq(uint256(clf), uint256(awards[i].clf));
-            assertEq(uint256(fin), uint256(awards[i].fin));
-            assertEq(mgr, awards[i].mgr);
-            assertEq(uint256(res), uint256(awards[i].res));
-            assertEq(uint256(tot), uint256(awards[i].tot));
-            assertEq(uint256(rxd), uint256(awards[i].rxd));
-            totalVest += tot;
-        }
-        assertEq(prevTotalVest, totalVest);
-        uint256 allowance = DSTokenAbstract(addr.addr("MCD_GOV")).allowance(
-            addr.addr("MCD_PAUSE_PROXY"),
-            addr.addr("MCD_VEST_MKR_TREASURY")
-        );
-        assertEq(totalVest, allowance - prevAllowance);
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(FLIPFLOPFLAP) - prevDaiFlipFlop, amountFlipFlop * WAD);
+        assertEq(dai.balanceOf(ULTRASCHUPPI) - prevDaiSchuppi, amountSchuppi * WAD);
+        assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedblack, amountFeedblack * WAD);
+        assertEq(dai.balanceOf(MAKERMAN) - prevDaiMakerMan, amountMakerMan * WAD);
+        assertEq(dai.balanceOf(ACREINVEST) - prevDaiAcreInvest, amountAcreInvest * WAD);
+        assertEq(dai.balanceOf(JUSTINCASE) - prevDaiJustinCase, amountJustinCase * WAD);
+        assertEq(dai.balanceOf(GFXLABS) - prevDaiGfxLabs, amountGfxLabs * WAD);
     }
 
     function testSpellIsCast_GENERAL() public {
