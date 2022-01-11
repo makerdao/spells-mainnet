@@ -10,7 +10,7 @@ import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
-import "./test/system_config.sol";
+import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
