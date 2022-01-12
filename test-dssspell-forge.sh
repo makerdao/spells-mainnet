@@ -18,11 +18,11 @@ done
 export DAPP_LIBRARIES='src/DssSpell.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4'
 
 if [[ -z "$MATCH" && -z "$BLOCK" ]]; then
-    forge test --fork-url "$ETH_RPC_URL" -vvv --force
+    forge test --fork-url "$ETH_RPC_URL" --force
 elif [[ -z "$BLOCK" ]]; then
     forge test --fork-url "$ETH_RPC_URL" --match "$MATCH" -vvv --force
 elif [[ -z "$MATCH" ]]; then
-    forge test --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK" -vvv --force
+    forge test --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK" --force
 else
     forge test --fork-url "$ETH_RPC_URL" --match "$MATCH" --fork-block-number "$BLOCK" -vvv --force
 fi
