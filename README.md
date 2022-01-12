@@ -25,13 +25,27 @@ If the weekly executive needs to onboard a new collateral:
 2. Update the values in `src/tests/collaterals.sol`
 3. uncomment the `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
-### Test
+### Test (DappTools with Optimizations)
 
 Set `ETH_RPC_URL` to a Mainnet node.
 
 ```
 $ export ETH_RPC_URL=<Mainnet URL>
 $ make test
+```
+
+### Test (Forge without Optimizations)
+
+#### Prerequisites
+1. [Install](https://www.rust-lang.org/tools/install) Rust.
+2. [Install](https://github.com/gakonst/foundry#forge) Forge.
+
+#### Operation
+Set `ETH_RPC_URL` to a Mainnet node.
+
+```
+$ export ETH_RPC_URL=<Mainnet URL>
+$ make test-forge
 ```
 
 ### Deploy
