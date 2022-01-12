@@ -59,8 +59,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
     // --- Optimism Recovery Mainnet Addresses
-    address constant MCD_DAI              = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-    address constant L1_ESCROW            = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+    address immutable MCD_DAI             = DssExecLib.dai();
+    address immutable OPTIMISM_ESCROW     = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
     address constant LOST_SOME_DAI_WALLET = 0xc9b48B787141595156d9a7aca4BC7De1Ca7b5eF6;
 
     function officeHours() public override returns (bool) {
@@ -88,19 +88,19 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // forum: https://forum.makerdao.com/t/signal-request-should-makerdao-assist-in-recovering-dai-locked-on-optimism-escrow/12307
 
         // Optimism L1 Escrow Address
-        L1EscrowLike(L1_ESCROW).approve(MCD_DAI, address(this), 10 * MILLION * WAD);
-        TokenLike(MCD_DAI).transferFrom(L1_ESCROW, LOST_SOME_DAI_WALLET, 10 * MILLION * WAD);
+        L1EscrowLike(OPTIMISM_ESCROW).approve(MCD_DAI, address(this), 10 * MILLION * WAD);
+        TokenLike(MCD_DAI).transferFrom(OPTIMISM_ESCROW, LOST_SOME_DAI_WALLET, 10 * MILLION * WAD);
 
         // ---------------------- Dust Parameter Updates for LP Tokens ---------------------
         // https://vote.makerdao.com/polling/QmUSfhmF
 
 
-        DssExecLib.setIlkMinVaultAmount("UNIV2DAIETH-A", 60_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2USDCETH-A", 60_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCDAI-A", 60_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2DAIETH_A, 60_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2USDCETH_A, 60_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCDAI_A, 60_000);
 
-        DssExecLib.setIlkMinVaultAmount("UNIV2WBTCETH-A", 25_000);
-        DssExecLib.setIlkMinVaultAmount("UNIV2UNIETH-A", 25_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCETH_A, 25_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2UNIETH_A, 25_000);
     }
 }
 

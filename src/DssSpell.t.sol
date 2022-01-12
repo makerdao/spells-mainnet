@@ -8,19 +8,19 @@ import "dss-interfaces/Interfaces.sol";
 contract DssSpellTest is DssSpellTestBase {
 
     // Insert custom tests here
-    address FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
-    address ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
-    address FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
-    address MAKERMAN       = wallets.addr("MAKERMAN");
-    address ACREINVEST     = wallets.addr("ACREINVEST");
-    address JUSTINCASE     = wallets.addr("JUSTINCASE");
-    address GFXLABS        = wallets.addr("GFXLABS");
+    address immutable FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
+    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
+    address immutable FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
+    address immutable MAKERMAN       = wallets.addr("MAKERMAN");
+    address immutable ACREINVEST     = wallets.addr("ACREINVEST");
+    address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
+    address immutable GFXLABS        = wallets.addr("GFXLABS");
 
     uint256 constant amountFlipFlop   = 12_000;
     uint256 constant amountSchuppi    = 12_000;
     uint256 constant amountFeedblack  = 12_000;
-    uint256 constant amountMakerMan   = 8597;
-    uint256 constant amountAcreInvest = 2203;
+    uint256 constant amountMakerMan   = 8_597;
+    uint256 constant amountAcreInvest = 2_203;
     uint256 constant amountJustinCase = 791;
     uint256 constant amountGfxLabs    = 699;
 
@@ -63,7 +63,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testOptimismRecovery() public {
         uint256 amountLost = 10 * MILLION;
-        address l1Escrow     = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+        address l1Escrow     = addr.addr("OPTIMISM_ESCROW");
         address lostSomeDai = 0xc9b48B787141595156d9a7aca4BC7De1Ca7b5eF6;
 
         uint256 prevDaiEscrow = dai.balanceOf(l1Escrow);
