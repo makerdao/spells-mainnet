@@ -9,16 +9,16 @@ contract DssSpellTest is DssSpellTestBase {
 
     // Insert custom tests here
     address immutable FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
-    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
     address immutable FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
+    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
     address immutable MAKERMAN       = wallets.addr("MAKERMAN");
     address immutable ACREINVEST     = wallets.addr("ACREINVEST");
     address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
     address immutable GFXLABS        = wallets.addr("GFXLABS");
 
     uint256 constant amountFlipFlop   = 12_000;
-    uint256 constant amountSchuppi    = 12_000;
     uint256 constant amountFeedblack  = 12_000;
+    uint256 constant amountSchuppi    = 12_000;
     uint256 constant amountMakerMan   = 8_597;
     uint256 constant amountAcreInvest = 2_203;
     uint256 constant amountJustinCase = 791;
@@ -27,15 +27,15 @@ contract DssSpellTest is DssSpellTestBase {
     function testDelegatePayments() public {
         uint256 prevSin              = vat.sin(address(vow));
         uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP);
-        uint256 prevDaiSchuppi       = dai.balanceOf(ULTRASCHUPPI);
         uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACKLOOPS);
+        uint256 prevDaiSchuppi       = dai.balanceOf(ULTRASCHUPPI);
         uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
         uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
         uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
         uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
 
 
-        uint256 amountTotal     = amountFlipFlop + amountSchuppi + amountFeedblack
+        uint256 amountTotal     = amountFlipFlop + amountFeedblack + amountSchuppi
                                 + amountMakerMan + amountAcreInvest + amountJustinCase
                                 + amountGfxLabs;
 
@@ -53,8 +53,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
         assertEq(dai.balanceOf(FLIPFLOPFLAP) - prevDaiFlipFlop, amountFlipFlop * WAD);
-        assertEq(dai.balanceOf(ULTRASCHUPPI) - prevDaiSchuppi, amountSchuppi * WAD);
         assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedblack, amountFeedblack * WAD);
+        assertEq(dai.balanceOf(ULTRASCHUPPI) - prevDaiSchuppi, amountSchuppi * WAD);
         assertEq(dai.balanceOf(MAKERMAN) - prevDaiMakerMan, amountMakerMan * WAD);
         assertEq(dai.balanceOf(ACREINVEST) - prevDaiAcreInvest, amountAcreInvest * WAD);
         assertEq(dai.balanceOf(JUSTINCASE) - prevDaiJustinCase, amountJustinCase * WAD);

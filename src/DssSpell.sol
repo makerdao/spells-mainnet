@@ -43,16 +43,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant WAD     = 10 ** 18;
 
     // --- Ilks ---
+    bytes32 constant UNIV2WBTCETH_A = "UNIV2WBTCETH-A";
+    bytes32 constant UNIV2UNIETH_A  = "UNIV2UNIETH-A";
     bytes32 constant UNIV2DAIETH_A  = "UNIV2DAIETH-A";
     bytes32 constant UNIV2USDCETH_A = "UNIV2USDCETH-A";
     bytes32 constant UNIV2WBTCDAI_A = "UNIV2WBTCDAI-A";
-    bytes32 constant UNIV2WBTCETH_A = "UNIV2WBTCETH-A";
-    bytes32 constant UNIV2UNIETH_A  = "UNIV2UNIETH-A";
 
     // --- Wallet addresses ---
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant SCHUPPI_WALLET         = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
     address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant SCHUPPI_WALLET         = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
     address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
     address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
@@ -76,12 +76,23 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://forum.makerdao.com/t/delegate-compensation-breakdown-december-2021/12462
 
         DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET, 12_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(SCHUPPI_WALLET, 12_000);
         DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(SCHUPPI_WALLET, 12_000);
         DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET, 8_597);
         DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET, 2_203);
         DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET, 791);
         DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET, 699);
+
+        // ---------------------- Dust Parameter Updates for LP Tokens ---------------------
+        // https://vote.makerdao.com/polling/QmUSfhmF
+
+
+        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCETH_A, 25_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2UNIETH_A, 25_000);
+
+        DssExecLib.setIlkMinVaultAmount(UNIV2DAIETH_A, 60_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2USDCETH_A, 60_000);
+        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCDAI_A, 60_000);
 
         // ----------------------------- Optimism Dai Recovery -----------------------------
         // https://vote.makerdao.com/polling/Qmcfb72e
@@ -91,16 +102,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         L1EscrowLike(OPTIMISM_ESCROW).approve(MCD_DAI, address(this), 10 * MILLION * WAD);
         TokenLike(MCD_DAI).transferFrom(OPTIMISM_ESCROW, LOST_SOME_DAI_WALLET, 10 * MILLION * WAD);
 
-        // ---------------------- Dust Parameter Updates for LP Tokens ---------------------
-        // https://vote.makerdao.com/polling/QmUSfhmF
-
-
-        DssExecLib.setIlkMinVaultAmount(UNIV2DAIETH_A, 60_000);
-        DssExecLib.setIlkMinVaultAmount(UNIV2USDCETH_A, 60_000);
-        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCDAI_A, 60_000);
-
-        DssExecLib.setIlkMinVaultAmount(UNIV2WBTCETH_A, 25_000);
-        DssExecLib.setIlkMinVaultAmount(UNIV2UNIETH_A, 25_000);
     }
 }
 
