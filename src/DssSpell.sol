@@ -34,9 +34,9 @@ interface L1EscrowLike {
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3224f50b0b5a9301831213ed858bc1d206de8e40/governance/votes/Executive%20vote%20-%20December%2010%2C%202021.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20January%2014%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-01-14 MakerDAO Executive Spell | Hash: ";
+        "2022-01-14 MakerDAO Executive Spell | Hash: 0x0a164696e92dd0353081c8a7c3213bc0b766574a52157821296d1d217cf20625";
 
     // --- Math ---
     uint256 constant MILLION = 10 ** 6;
