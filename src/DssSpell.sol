@@ -59,8 +59,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
     // --- Optimism Recovery Mainnet Addresses
-    address immutable MCD_DAI             = DssExecLib.dai();
-    address immutable OPTIMISM_ESCROW     = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
+    address public immutable OPTIMISM_ESCROW = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
+    address public immutable MCD_DAI         = DssExecLib.dai();
+
     address constant LOST_SOME_DAI_WALLET = 0xc9b48B787141595156d9a7aca4BC7De1Ca7b5eF6;
 
     function officeHours() public override returns (bool) {
