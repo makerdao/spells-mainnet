@@ -91,7 +91,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         15 * THOUSAND,   // In whole Dai units
-            pct:          275,             // In basis points
+            pct:          250,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -1411,7 +1411,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          400,
+            pct:          300,
             mat:          16000,
             liqType:      "clip",
             liqOn:        true,

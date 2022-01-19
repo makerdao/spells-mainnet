@@ -39,7 +39,7 @@ contract DssSpellCollateralOnboardingAction {
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add ______________ as a new Vault Type
-        //  Poll Link: 
+        //  Poll Link:
 
         // DssExecLib.addNewCollateral(
         //     CollateralOpts({
