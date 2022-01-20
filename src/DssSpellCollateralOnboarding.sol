@@ -63,12 +63,12 @@ contract DssSpellCollateralOnboardingAction {
         //         permittedDrop:         ,
         //         liquidationRatio:      ,
         //         kprFlatReward:         ,
-        //         kprPctReward:          
+        //         kprPctReward:
         //     })
         // );
 
         // DssExecLib.setStairstepExponentialDecrease(
-        //     CALC_ADDR, 
+        //     CALC_ADDR,
         //     DURATION,
         //     PCT_BPS
         // );
@@ -82,9 +82,9 @@ contract DssSpellCollateralOnboardingAction {
 
         // ChainLog Updates
         // Add the new flip and join to the Chainlog
-        // address constant CHAINLOG        = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
+        // address constant CHAINLOG        = DssExecLib.LOG();
         // ChainlogAbstract(CHAINLOG).setAddress("<join-name>", <join-address>);
-        // ChainlogAbstract(CHAINLOG).setAddress("<flip-name>", <flip-address>);
+        // ChainlogAbstract(CHAINLOG).setAddress("<clip-name>", <clip-address>);
         // ChainlogAbstract(CHAINLOG).setVersion("<new-version>");
     }
 }
