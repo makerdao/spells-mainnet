@@ -8,6 +8,16 @@ import "dss-interfaces/Interfaces.sol";
 contract DssSpellTest is DssSpellTestBase {
 
     // Insert custom tests here
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 3.9 * 10**27 / 100);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(join.bar(), 3.75 * 10**27 / 100);
+    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -265,16 +275,5 @@ contract DssSpellTest is DssSpellTestBase {
             actualHash := keccak256(ptr, size)
         }
         assertEq(expectedHash, actualHash);
-    }
-
-    function testAAVEDirectBarChange() public {
-        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(join.bar(), 3.9 * 10**27 / 100);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(join.bar(), 3.75 * 10**27 / 100);
     }
 }
