@@ -25,9 +25,9 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/45ce05217966639a20dda7334f75e2c6ac0c69af/governance/votes/Executive%20vote%20-%20January%2014%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c421b8a52031169aa55170b752206250ab2d15cf/governance/votes/Executive%20Vote%20-%20January%2021%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-01-21 MakerDAO Executive Spell | Hash: 0x0 TODO";
+        "2022-01-21 MakerDAO Executive Spell | Hash: 0x741fefda04e07fbdcceb7b5e3f9704694f353771154380b3fd13b52ead67837d";
 
     // --- Rates ---
     uint256 constant ZERO_FIVE_PCT_RATE      = 1000000000158153903837946257;
