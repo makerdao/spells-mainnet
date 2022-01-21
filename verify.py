@@ -179,7 +179,7 @@ def get_stubs(block):
     return '\n'.join(lines)
 
 for signature, block in libraries.items():
-    external_code = code.replace(block, '')
+    external_code = remove_comments(code.replace(block, ''))
     library_name = re.sub('library ', '', signature).strip()
     no_comments = remove_comments(block)
     selected_pre = no_comments
