@@ -38,9 +38,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant MILLION = 10**6;
 
     // Turn office hours off
-    // function officeHours() public override returns (bool) {
-    //     return false;
-    // }
+    function officeHours() public override returns (bool) {
+        return false;
+    }
 
     function actions() public override {
 
