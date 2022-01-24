@@ -46,12 +46,20 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new collateral tests here
     }
 
-    function testLerps() private { // make public to use
+    function testLerps() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert tests for new lerps here
+        address lerp = 0x0239311B645A8EF91Dc899471497732A1085BA8b;
+
+        uint256 hump = vow.hump();
+
+        (bool ok, bytes memory val) = lerp.call(abi.encodeWithSignature("tall()"));
+
+        assertTrue(!ok); // Lerp call should have failed
+        assertEq(vow.hump(), hump);
+
     }
 
     function testNewChainlogValues() private { // make public to use
