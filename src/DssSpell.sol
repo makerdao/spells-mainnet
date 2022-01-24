@@ -31,11 +31,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     address constant SB_LERP = 0x0239311B645A8EF91Dc899471497732A1085BA8b;
 
-    // --- Rates ---
-    uint256 constant ZERO_FIVE_PCT_RATE      = 1000000000158153903837946257;
-    uint256 constant TWO_FIVE_PCT_RATE       = 1000000000782997609082909351;
-    uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
-
     // Math
     uint256 constant MILLION = 10**6;
 
