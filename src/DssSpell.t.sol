@@ -47,15 +47,23 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testLerps() public { // make public to use
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
 
         address lerp = 0x0239311B645A8EF91Dc899471497732A1085BA8b;
 
         uint256 hump = vow.hump();
-
         (bool ok, bytes memory val) = lerp.call(abi.encodeWithSignature("tick()"));
+        assertTrue(ok); // Lerp call should have passed
+        assertTrue(vow.hump() > hump); // Hump should be increased
+
+        hevm.warp(block.timestamp + 1 days);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        hump = vow.hump();
+
+        (ok, val) = lerp.call(abi.encodeWithSignature("tick()"));
 
         assertTrue(!ok); // Lerp call should have failed
         assertEq(vow.hump(), hump);
