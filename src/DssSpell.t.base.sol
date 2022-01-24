@@ -200,9 +200,9 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         // Test for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xE246C4ba65d95C2F902E39FBeb0047a67aB4F25a),        // populate with deployed spell if deployed
-            deployed_spell_created:         1642785985,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
+            previous_spell:                 address(0xE246C4ba65d95C2F902E39FBeb0047a67aB4F25a),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -222,8 +222,8 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             vow_dump:              250,                     // In whole Dai units
             vow_sump:              50 * THOUSAND,           // In whole Dai units
             vow_bump:              30 * THOUSAND,           // In whole Dai units
-            vow_hump_min:          60 * MILLION,            // In whole Dai units
-            vow_hump_max:          90 * MILLION,            // In whole Dai units
+            vow_hump_min:          250 * MILLION,           // In whole Dai units
+            vow_hump_max:          250 * MILLION,           // In whole Dai units
             flap_beg:              400,                     // in basis points
             flap_ttl:              30 minutes,              // in seconds
             flap_tau:              72 hours,                // in seconds
@@ -376,7 +376,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         uint256 normalizedHumpMax = values.vow_hump_max * RAD;
         assertTrue(vow.hump() >= normalizedHumpMin && vow.hump() <= normalizedHumpMax, "TestError/vow-hump-min-max");
         assertTrue(
-            (vow.hump() >= RAD && vow.hump() < HUNDRED * MILLION * RAD) ||
+            (vow.hump() >= RAD && vow.hump() < THOUSAND * MILLION * RAD) ||
             vow.hump() == 0,
             "TestError/vow-hump-range"
         );
