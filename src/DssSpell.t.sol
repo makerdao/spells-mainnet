@@ -55,7 +55,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 hump = vow.hump();
 
-        (bool ok, bytes memory val) = lerp.call(abi.encodeWithSignature("tall()"));
+        (bool ok, bytes memory val) = lerp.call(abi.encodeWithSignature("tick()"));
 
         assertTrue(!ok); // Lerp call should have failed
         assertEq(vow.hump(), hump);
