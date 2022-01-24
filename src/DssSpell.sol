@@ -25,9 +25,9 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<TBD>/governance/votes/Executive%20Vote%20-%20January%2021%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5a8f09353e2a7d7f0d9f6a357cd05901348fe227/governance/votes/Executive%20vote%20-%20January%2024%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-01-24 MakerDAO Emergency Executive Spell | Hash: 0x";
+        "2022-01-24 MakerDAO Emergency Executive Spell | Hash: 0x75da13d2bed7612e2e1960e7fe193453b66ead6e5d68b9a553258b0d421a21db";
 
     address constant SB_LERP = 0x0239311B645A8EF91Dc899471497732A1085BA8b;
 
