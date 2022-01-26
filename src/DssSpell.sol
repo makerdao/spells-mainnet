@@ -25,6 +25,7 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 interface DssVestLike {
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
     function restrict(uint256) external;
+    function yank(uint256) external;
 }
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
@@ -36,6 +37,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     address constant MCD_VEST_DAI          = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
     address constant MCD_VEST_MKR_TREASURY = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+
 
     address constant SNE_001_WALLET    = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
     address constant TECH_001_WALLET   = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
@@ -57,7 +59,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant JUL_31_2023 = 1690761600;
 
 
-
     // Math
     uint256 constant MILLION = 10**6;
     uint256 constant WAD = 10**18;
@@ -72,51 +73,51 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
+        // Revoking Content Production Budget (MKT-001)
+        // https://mips.makerdao.com/mips/details/MIP40c3SP49
+        DssVestLike(MCD_VEST_DAI).yank(20);
+
+
+        //Core Unit DAI Budget Transfers
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
         DssExecLib.sendPaymentFromSurplusBuffer(SNE_001_WALLET, 229_792);
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP53
         DssExecLib.sendPaymentFromSurplusBuffer(TECH_001_WALLET, 1_069_250);
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP45
         DssExecLib.sendPaymentFromSurplusBuffer(ORA_001_GAS, 6_966_070);
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP45
         DssExecLib.sendPaymentFromSurplusBuffer(ORA_001_EMERGENCY, 1_805_407);
 
 
+        // Core Unit DAI Budget Streams
         // https://mips.makerdao.com/mips/details/MIP40c3SP52
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(DUX_001_WALLET,   1_934_300 * WAD, FEB_01_2022, JAN_31_2023 - FEB_01_2022,            0, address(0))
         );
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP55
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(SES_001_WALLET,   5_844_444 * WAD, FEB_01_2022, JAN_31_2023 - FEB_01_2022,            0, address(0))
         );
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(SNE_001_WALLET,     257_500 * WAD, FEB_01_2022, JUL_31_2023 - FEB_01_2022,            0, address(0))
         );
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP53
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(TECH_001_WALLET,  2_566_200 * WAD, FEB_01_2022, JAN_31_2023 - FEB_01_2022,            0, address(0))
         );
-
         // https://mips.makerdao.com/mips/details/MIP40c3SP46
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(SF_001_WALLET,      494_502 * WAD, FEB_01_2022, JUL_31_2023 - FEB_01_2022,            0, address(0))
         );
-
-        // -
+        // - Forum Post TODO
+        DssVestLike(MCD_VEST_DAI).yank(15);
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(RWF_001_WALLET,   1_705_000 * WAD, FEB_01_2022, DEC_31_2022 - FEB_01_2022,            0, address(0))
         );
 
 
-        // MKR Vesting (per individual)
+        // Core Unit MKR Vesting Streams (sourced from treasury)
         // https://mips.makerdao.com/mips/details/MIP40c3SP48
         DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
             DssVestLike(MCD_VEST_MKR_TREASURY).create(
@@ -128,6 +129,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 SF_001_WALLET    // Manager
             )
         );
+        // https://mips.makerdao.com/mips/details/MIP40c3SP48
         DssVestLike(MCD_VEST_MKR_TREASURY).restrict(
             DssVestLike(MCD_VEST_MKR_TREASURY).create(
                 SF_001_VEST_02,
