@@ -166,6 +166,20 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(wallets.addr("RWF_WALLET")), prevBalanceRWF + vestedRWF);
     }
 
+    function testYankedDaiStreams() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.fin(20), 1651276800, "MKT Vest Pre fin");
+        assertEq(vest.fin(15), 1672444800, "RWF Vest Pre fin");
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.fin(20), block.timestamp, "MKT Vest Post fin should be now");
+        assertEq(vest.fin(15), block.timestamp, "RWF Vest Post fin should be now");
+    }
+
     function testVestMKR() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         uint streams = vest.ids();
