@@ -25,6 +25,7 @@ contract Wallets {
 
         // Core Units
         addr["COM_WALLET"]                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+        addr["DIN_WALLET"]                   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
         addr["DUX_WALLET"]                   = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
         addr["GRO_WALLET"]                   = 0x7800C137A645c07132886539217ce192b9F0528e;
         addr["ORA_WALLET"]                   = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
