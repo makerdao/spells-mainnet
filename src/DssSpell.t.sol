@@ -14,6 +14,9 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant JAN_31_2023 = 1675123200;
     uint256 constant JUL_31_2023 = 1690761600;
 
+    address constant SF_001_VEST_01    = 0xBC7fd5AA2016C3e2C8F0dBf4e919485C6BBb59e2;
+    address constant SF_001_VEST_02    = 0xCC81578d163A04ea8d2EaE6904d0C8E61A84E1Bb;
+
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -114,31 +117,59 @@ contract DssSpellTest is DssSpellTestBase {
         // // -----
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        // hevm.store(
-        //     address(vest),
-        //     keccak256(abi.encode(address(this), uint256(1))),
-        //     bytes32(uint256(1))
-        // );
-        // vest.unrestrict(13);
-        // vest.unrestrict(14);
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(22);
+        vest.unrestrict(23);
+        vest.unrestrict(24);
+        vest.unrestrict(25);
+        vest.unrestrict(26);
+        vest.unrestrict(27);
         // //
 
-        // hevm.warp(JAN_01_2022);
-        // uint256 prevBalanceDIN = dai.balanceOf(DIN_WALLET);
-        // uint256 prevBalanceGRO = dai.balanceOf(GRO_WALLET);
-        // vest.vest(13);
-        // vest.vest(14);
+        hevm.warp(DEC_31_2022);
+        uint256 prevBalanceDUX  = dai.balanceOf(wallets.addr("DUX_WALLET"));
+        uint256 prevBalanceSES  = dai.balanceOf(wallets.addr("SES_WALLET"));
+        uint256 prevBalanceSNE  = dai.balanceOf(wallets.addr("SNE_WALLET"));
+        uint256 prevBalanceTECH = dai.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevBalanceSF   = dai.balanceOf(wallets.addr("SF_WALLET"));
+        uint256 prevBalanceRWF  = dai.balanceOf(wallets.addr("RWF_WALLET"));
 
-        // uint256 addedDIN = 120314917127071823204419; // 357_000 * 10**18 * 61 / 181;
-        // uint256 addedGRO = 237613400826446280991735; // 942_663 * 10**18 * 61 / 242;
+        uint256 vestedDUX = vest.accrued(22);
+        assertEq(vestedDUX, 1769565659340659340659340);
+        uint256 vestedSES = vest.accrued(23);
+        assertEq(vestedSES, 5346702890109890109890109);
+        uint256 vestedSNE = vest.accrued(24);
+        assertEq(vestedSNE, 157334862385321100917431);
+        uint256 vestedTECH = vest.accrued(25);
+        assertEq(vestedTECH, 2347650000000000000000000);
+        uint256 vestedSF = vest.accrued(26);
+        assertEq(vestedSF, 302145258715596330275229);
+        uint256 vestedRWF = vest.accrued(27);
+        assertEq(vestedRWF, 1705000000000000000000000);
 
-        // assertEq(dai.balanceOf(DIN_WALLET), prevBalanceDIN + addedDIN);
-        // assertEq(dai.balanceOf(GRO_WALLET), prevBalanceGRO + addedGRO);
+        vest.vest(22);
+        vest.vest(23);
+        vest.vest(24);
+        vest.vest(25);
+        vest.vest(26);
+        vest.vest(27);
+
+        assertEq(dai.balanceOf(wallets.addr("DUX_WALLET")), prevBalanceDUX + vestedDUX);
+        assertEq(dai.balanceOf(wallets.addr("SES_WALLET")), prevBalanceSES + vestedSES);
+        assertEq(dai.balanceOf(wallets.addr("SNE_WALLET")), prevBalanceSNE + vestedSNE);
+        assertEq(dai.balanceOf(wallets.addr("TECH_WALLET")), prevBalanceTECH + vestedTECH);
+        assertEq(dai.balanceOf(wallets.addr("SF_WALLET")), prevBalanceSF + vestedSF);
+        assertEq(dai.balanceOf(wallets.addr("RWF_WALLET")), prevBalanceRWF + vestedRWF);
     }
 
     function testVestMKR() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         uint streams = vest.ids();
+        assertEq(streams, 17, "17 existing streams");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -147,30 +178,48 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.cap(), 1100 * WAD / 365 days);
         assertEq(vest.ids(), streams + 2);
 
-        // assertEq(vest.usr(1), RISK_WALLET);
-        // assertEq(vest.bgn(1), APR_01_2021);
-        // assertEq(vest.clf(1), APR_01_2021 + 365 days);
-        // assertEq(vest.fin(1), APR_01_2021 + 365 days);
-        // assertEq(vest.mgr(1), address(0));
-        // assertEq(vest.res(1), 1);
-        // assertEq(vest.tot(1), 700 * WAD);
-        // assertEq(vest.rxd(1), 0);
+        assertEq(vest.usr(18), SF_001_VEST_01);
+        assertEq(vest.bgn(18), SEP_01_2021);
+        assertEq(vest.clf(18), SEP_01_2021 + 365 days);
+        assertEq(vest.fin(18), SEP_01_2021 + 3 * 365 days);
+        assertEq(vest.mgr(18), wallets.addr("SF_WALLET"));
+        assertEq(vest.res(18), 1);
+        assertEq(vest.tot(18), 240 * WAD);
+        assertEq(vest.rxd(18), 0);
 
-        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        // hevm.store(
-        //     address(vest),
-        //     keccak256(abi.encode(address(this), uint256(1))),
-        //     bytes32(uint256(1))
-        // );
-        // vest.unrestrict(1);
-        // //
+        assertEq(vest.usr(19), SF_001_VEST_02);
+        assertEq(vest.bgn(19), APR_01_2021);
+        assertEq(vest.clf(19), APR_01_2021 + 365 days);
+        assertEq(vest.fin(19), APR_01_2021 + 3 * 365 days);
+        assertEq(vest.mgr(19), wallets.addr("SF_WALLET"));
+        assertEq(vest.res(19), 1);
+        assertEq(vest.tot(19), 240 * WAD);
+        assertEq(vest.rxd(19), 0);
 
-        // uint256 prevRecipientBalance = gov.balanceOf(RISK_WALLET);
-        // uint256 prevPauseBalance = gov.balanceOf(pauseProxy);
-        // hevm.warp(APR_01_2021 + 365 days);
-        // vest.vest(1);
-        // assertEq(gov.balanceOf(RISK_WALLET), prevRecipientBalance + 700 * WAD, "recipient wallet should have 700 MKR more");
-        // assertEq(gov.balanceOf(pauseProxy), prevPauseBalance - 700 * WAD, "pauseProxy should have 700 MKR less");
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(18);
+        vest.unrestrict(19);
+        //
+
+        uint256 prevRecipientBalance01 = gov.balanceOf(SF_001_VEST_01);
+        uint256 prevRecipientBalance02 = gov.balanceOf(SF_001_VEST_02);
+        uint256 prevPauseBalance = gov.balanceOf(pauseProxy);
+        hevm.warp(SEP_01_2021 + 365 days);
+        uint256 vested01 = vest.accrued(18);
+        assertEq(vested01, 80000000000000000000, "vested01 eq 80000000000000000000");
+        uint256 vested02 = vest.accrued(19);
+        assertEq(vested02, 113534246575342465753, "vested02 eq 113534246575342465753"); // vesting starts earlier
+        vest.vest(18);
+        vest.vest(19);
+
+        assertEq(gov.balanceOf(SF_001_VEST_01), prevRecipientBalance01 + vested01, "token balance sfvest01");
+        assertEq(gov.balanceOf(SF_001_VEST_02), prevRecipientBalance02 + vested02, "token balance sfvest02");
+        assertEq(gov.balanceOf(pauseProxy), prevPauseBalance - (vested01 + vested02), "pauseProxy should have equivalent less MKR");
     }
 
     function testCollateralIntegrations() private { // make public to use
