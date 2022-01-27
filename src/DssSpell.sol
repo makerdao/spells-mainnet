@@ -140,6 +140,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 SF_001_WALLET
             )
         );
+        
+        
+        // Housekeeping
+        // Add CLIP_FAB to the Chainlog
+        DssExecLib.setChangelogAddress("CLIP_FAB", 0x0716F25fBaAae9b63803917b6125c10c313dF663);
 
     }
 }
