@@ -7,6 +7,13 @@ import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
+    uint256 constant APR_01_2021 = 1617235200;
+    uint256 constant SEP_01_2021 = 1630454400;
+    uint256 constant FEB_01_2022 = 1643673600;
+    uint256 constant DEC_31_2022 = 1672444800;
+    uint256 constant JAN_31_2023 = 1675123200;
+    uint256 constant JUL_31_2023 = 1690761600;
+
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -36,6 +43,134 @@ contract DssSpellTest is DssSpellTestBase {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
+    }
+
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        uint streams = vest.ids();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.ids(), streams + 6);
+
+        // // -----
+        assertEq(vest.usr(22), wallets.addr("DUX_WALLET"));
+        assertEq(vest.bgn(22), FEB_01_2022);
+        assertEq(vest.clf(22), FEB_01_2022);
+        assertEq(vest.fin(22), FEB_01_2022 + 364 days); // (28+31+30+31+30+31+31+30+31+30+31+31)
+        assertEq(vest.mgr(22), address(0));
+        assertEq(vest.res(22), 1);
+        assertEq(vest.tot(22), 1_934_300 * 10**18);
+        assertEq(vest.rxd(22), 0);
+        // // -----
+        assertEq(vest.usr(23), wallets.addr("SES_WALLET"));
+        assertEq(vest.bgn(23), FEB_01_2022);
+        assertEq(vest.clf(23), FEB_01_2022);
+        assertEq(vest.fin(23), FEB_01_2022 + 364 days); // (28+31+30+31+30+31+31+30+31+30+31+31)
+        assertEq(vest.mgr(23), address(0));
+        assertEq(vest.res(23), 1);
+        assertEq(vest.tot(23), 5_844_444 * 10**18);
+        assertEq(vest.rxd(23), 0);
+        // // -----
+        assertEq(vest.usr(24), wallets.addr("SNE_WALLET"));
+        assertEq(vest.bgn(24), FEB_01_2022);
+        assertEq(vest.clf(24), FEB_01_2022);
+        assertEq(vest.fin(24), FEB_01_2022 + 545 days); // (28+31+30+31+30+31+31+30+31+30+31+31+28+31+30+31+30+31)
+        assertEq(vest.mgr(24), address(0));
+        assertEq(vest.res(24), 1);
+        assertEq(vest.tot(24), 257_500 * 10**18);
+        assertEq(vest.rxd(24), 0);
+        // // -----
+        assertEq(vest.usr(25), wallets.addr("TECH_WALLET"));
+        assertEq(vest.bgn(25), FEB_01_2022);
+        assertEq(vest.clf(25), FEB_01_2022);
+        assertEq(vest.fin(25), FEB_01_2022 + 364 days); // (28+31+30+31+30+31+31+30+31+30+31+31)
+        assertEq(vest.mgr(25), address(0));
+        assertEq(vest.res(25), 1);
+        assertEq(vest.tot(25), 2_566_200 * 10**18);
+        assertEq(vest.rxd(25), 0);
+        // // -----
+        assertEq(vest.usr(26), wallets.addr("SF_WALLET"));
+        assertEq(vest.bgn(26), FEB_01_2022);
+        assertEq(vest.clf(26), FEB_01_2022);
+        assertEq(vest.fin(26), FEB_01_2022 + 545 days); // (28+31+30+31+30+31+31+30+31+30+31+31+28+31+30+31+30+31)
+        assertEq(vest.mgr(26), address(0));
+        assertEq(vest.res(26), 1);
+        assertEq(vest.tot(26), 494_502 * 10**18);
+        assertEq(vest.rxd(26), 0);
+        // // -----
+        assertEq(vest.usr(27), wallets.addr("RWF_WALLET"));
+        assertEq(vest.bgn(27), FEB_01_2022);
+        assertEq(vest.clf(27), FEB_01_2022);
+        assertEq(vest.fin(27), FEB_01_2022 + 333 days); // (28+31+30+31+30+31+31+30+31+30+31)
+        assertEq(vest.mgr(27), address(0));
+        assertEq(vest.res(27), 1);
+        assertEq(vest.tot(27), 1_705_000 * 10**18);
+        assertEq(vest.rxd(27), 0);
+        // // -----
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        // hevm.store(
+        //     address(vest),
+        //     keccak256(abi.encode(address(this), uint256(1))),
+        //     bytes32(uint256(1))
+        // );
+        // vest.unrestrict(13);
+        // vest.unrestrict(14);
+        // //
+
+        // hevm.warp(JAN_01_2022);
+        // uint256 prevBalanceDIN = dai.balanceOf(DIN_WALLET);
+        // uint256 prevBalanceGRO = dai.balanceOf(GRO_WALLET);
+        // vest.vest(13);
+        // vest.vest(14);
+
+        // uint256 addedDIN = 120314917127071823204419; // 357_000 * 10**18 * 61 / 181;
+        // uint256 addedGRO = 237613400826446280991735; // 942_663 * 10**18 * 61 / 242;
+
+        // assertEq(dai.balanceOf(DIN_WALLET), prevBalanceDIN + addedDIN);
+        // assertEq(dai.balanceOf(GRO_WALLET), prevBalanceGRO + addedGRO);
+    }
+
+    function testVestMKR() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint streams = vest.ids();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1100 * WAD / 365 days);
+        assertEq(vest.ids(), streams + 2);
+
+        // assertEq(vest.usr(1), RISK_WALLET);
+        // assertEq(vest.bgn(1), APR_01_2021);
+        // assertEq(vest.clf(1), APR_01_2021 + 365 days);
+        // assertEq(vest.fin(1), APR_01_2021 + 365 days);
+        // assertEq(vest.mgr(1), address(0));
+        // assertEq(vest.res(1), 1);
+        // assertEq(vest.tot(1), 700 * WAD);
+        // assertEq(vest.rxd(1), 0);
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        // hevm.store(
+        //     address(vest),
+        //     keccak256(abi.encode(address(this), uint256(1))),
+        //     bytes32(uint256(1))
+        // );
+        // vest.unrestrict(1);
+        // //
+
+        // uint256 prevRecipientBalance = gov.balanceOf(RISK_WALLET);
+        // uint256 prevPauseBalance = gov.balanceOf(pauseProxy);
+        // hevm.warp(APR_01_2021 + 365 days);
+        // vest.vest(1);
+        // assertEq(gov.balanceOf(RISK_WALLET), prevRecipientBalance + 700 * WAD, "recipient wallet should have 700 MKR more");
+        // assertEq(gov.balanceOf(pauseProxy), prevPauseBalance - 700 * WAD, "pauseProxy should have 700 MKR less");
     }
 
     function testCollateralIntegrations() private { // make public to use
