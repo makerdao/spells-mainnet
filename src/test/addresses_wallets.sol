@@ -34,6 +34,13 @@ contract Wallets {
         addr["GFXLABS"]                      = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
         addr["GRO_WALLET"]                   = 0x7800C137A645c07132886539217ce192b9F0528e;
         addr["ORA_WALLET"]                   = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+        addr["ORA_GAS"]                      = 0x2B6180b413511ce6e3DA967Ec503b2Cc19B78Db6;
+        addr["ORA_EMERGENCY"]                = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
         addr["PE_WALLET"]                    = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+        addr["SNE_WALLET"]                   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+        addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+        addr["SES_WALLET"]                   = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+        addr["SF_WALLET"]                    = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+        addr["RWF_WALLET"]                   = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
     }
 }
