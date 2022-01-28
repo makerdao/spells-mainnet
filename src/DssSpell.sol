@@ -35,8 +35,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-01-28 MakerDAO Executive Spell | Hash: 0x";
 
-    address constant MCD_VEST_DAI          = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
-    address constant MCD_VEST_MKR_TREASURY = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+    address public immutable MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address public immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
 
 
     address constant SNE_001_WALLET        = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
