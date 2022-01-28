@@ -10,8 +10,8 @@ do
 
     case "$KEY" in
             match)      MATCH="$VALUE" ;;
-            optimizer)  OPTIMIZER="$VALUE" ;;     
-            *)   
+            optimizer)  OPTIMIZER="$VALUE" ;;
+            *)
     esac
 done
 
@@ -20,8 +20,10 @@ if [[ -z "$OPTIMIZER" ]]; then
   OPTIMIZER=1
 fi
 
-export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
-export DAPP_BUILD_OPTIMIZE_RUNS=1
+# 2022-01-28 Disabled optimizer on due to engineering costs
+# export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
+# export DAPP_BUILD_OPTIMIZE_RUNS=1
+
 export DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4'
 export DAPP_LINK_TEST_LIBRARIES=0
 
