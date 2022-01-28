@@ -191,7 +191,12 @@ contract DssSpellTest is DssSpellTestBase {
     function testYankedDaiStreams() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
+        // MKT
+        assertEq(vest.usr(20), 0xDCAF2C84e1154c8DdD3203880e5db965bfF09B60);
         assertEq(vest.fin(20), 1651276800, "MKT Vest Pre fin");
+
+        // RWF
+        assertEq(vest.usr(15), 0x9e1585d9CA64243CE43D42f7dD7333190F66Ca09);
         assertEq(vest.fin(15), 1672444800, "RWF Vest Pre fin");
 
         vote(address(spell));
