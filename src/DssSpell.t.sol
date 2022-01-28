@@ -63,7 +63,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(dai.balanceOf(sne) - snebal, 229_792 * WAD);
+        assertEq(dai.balanceOf(sne) - snebal, 257_500 * WAD);
         assertEq(dai.balanceOf(tech) - techbal, 1_069_250 * WAD);
         assertEq(dai.balanceOf(oraGas) - oraGasbal, 6_966_070 * WAD);
         assertEq(dai.balanceOf(oraGasEmerg) - oraGasEmergbal, 1_805_407 * WAD);
