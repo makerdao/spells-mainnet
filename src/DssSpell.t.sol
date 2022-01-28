@@ -277,9 +277,10 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(chainLog.version(), "1.9.12");
-
         // Insert new chainlog values tests here
+        assertEq(chainLog.getAddress("CLIP_FAB"), addr.addr("CLIP_FAB"));
+
+        assertEq(chainLog.version(), "1.9.12");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
