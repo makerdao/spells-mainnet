@@ -110,7 +110,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(SF_001_WALLET,      494_502 * WAD, FEB_01_2022, JUL_31_2023 - FEB_01_2022,            0, address(0))
         );
-        // - Forum Post TODO
+        // https://forum.makerdao.com/t/transition-of-the-rwf-cu-multisig/12801/3
         DssVestLike(MCD_VEST_DAI).yank(15);
         DssVestLike(MCD_VEST_DAI).restrict(
             DssVestLike(MCD_VEST_DAI).create(RWF_001_WALLET,   1_705_000 * WAD, FEB_01_2022, DEC_31_2022 - FEB_01_2022,            0, address(0))
@@ -140,8 +140,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 SF_001_WALLET
             )
         );
-        
-        
+
+
         // Housekeeping
         // Add CLIP_FAB to the Chainlog
         DssExecLib.setChangelogAddress("CLIP_FAB", 0x0716F25fBaAae9b63803917b6125c10c313dF663);
