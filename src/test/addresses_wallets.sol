@@ -30,7 +30,7 @@ contract Wallets {
         addr["GRO_WALLET"]                   = 0x7800C137A645c07132886539217ce192b9F0528e;
         addr["ORA_WALLET"]                   = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
         addr["ORA_GAS"]                      = 0x2B6180b413511ce6e3DA967Ec503b2Cc19B78Db6;
-        addr["ORA_EMERGENCY"]                = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
+        addr["ORA_GAS_EMERGENCY"]            = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
         addr["PE_WALLET"]                    = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
         addr["RWF_WALLET"]                   = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
         addr["SES_WALLET"]                   = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;

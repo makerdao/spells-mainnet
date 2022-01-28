@@ -39,16 +39,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant MCD_VEST_MKR_TREASURY = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
 
 
-    address constant SNE_001_WALLET    = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
-    address constant TECH_001_WALLET   = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
-    address constant ORA_001_GAS       = 0x2B6180b413511ce6e3DA967Ec503b2Cc19B78Db6;
-    address constant ORA_001_EMERGENCY = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
-    address constant DUX_001_WALLET    = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-    address constant SES_001_WALLET    = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-    address constant SF_001_WALLET     = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
-    address constant RWF_001_WALLET    = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
-    address constant SF_001_VEST_01    = 0xBC7fd5AA2016C3e2C8F0dBf4e919485C6BBb59e2;
-    address constant SF_001_VEST_02    = 0xCC81578d163A04ea8d2EaE6904d0C8E61A84E1Bb;
+    address constant SNE_001_WALLET        = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+    address constant TECH_001_WALLET       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+    address constant ORA_001_GAS           = 0x2B6180b413511ce6e3DA967Ec503b2Cc19B78Db6;
+    address constant ORA_001_GAS_EMERGENCY = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
+    address constant DUX_001_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address constant SES_001_WALLET        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    address constant SF_001_WALLET         = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+    address constant RWF_001_WALLET        = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
+    address constant SF_001_VEST_01        = 0xBC7fd5AA2016C3e2C8F0dBf4e919485C6BBb59e2;
+    address constant SF_001_VEST_02        = 0xCC81578d163A04ea8d2EaE6904d0C8E61A84E1Bb;
 
 
     uint256 constant APR_01_2021 = 1617235200;
@@ -86,7 +86,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP45
         DssExecLib.sendPaymentFromSurplusBuffer(ORA_001_GAS, 6_966_070);
         // https://mips.makerdao.com/mips/details/MIP40c3SP45
-        DssExecLib.sendPaymentFromSurplusBuffer(ORA_001_EMERGENCY, 1_805_407);
+        DssExecLib.sendPaymentFromSurplusBuffer(ORA_001_GAS_EMERGENCY, 1_805_407);
 
 
         // Core Unit DAI Budget Streams
