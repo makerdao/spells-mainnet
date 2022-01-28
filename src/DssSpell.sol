@@ -80,7 +80,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         //Core Unit DAI Budget Transfers
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
-        DssExecLib.sendPaymentFromSurplusBuffer(SNE_001_WALLET, 257_500);
+        DssExecLib.sendPaymentFromSurplusBuffer(SNE_001_WALLET, 229_792);
         // https://mips.makerdao.com/mips/details/MIP40c3SP53
         DssExecLib.sendPaymentFromSurplusBuffer(TECH_001_WALLET, 1_069_250);
         // https://mips.makerdao.com/mips/details/MIP40c3SP45
