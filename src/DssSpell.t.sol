@@ -116,7 +116,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(25), FEB_01_2022 + 364 days); // (28+31+30+31+30+31+31+30+31+30+31+31)
         assertEq(vest.mgr(25), address(0));
         assertEq(vest.res(25), 1);
-        assertEq(vest.tot(25), 2_566_200 * WAD);
+        assertEq(vest.tot(25), 2_486_400 * WAD);
         assertEq(vest.rxd(25), 0);
         // // -----
         assertEq(vest.usr(26), wallets.addr("SF_WALLET"));
@@ -167,7 +167,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 vestedSNE = vest.accrued(24);
         assertEq(vestedSNE, 157334862385321100917431);
         uint256 vestedTECH = vest.accrued(25);
-        assertEq(vestedTECH, 2347650000000000000000000);
+        assertEq(vestedTECH, 2274646153846153846153846);
         uint256 vestedSF = vest.accrued(26);
         assertEq(vestedSF, 302145258715596330275229);
         uint256 vestedRWF = vest.accrued(27);

@@ -104,7 +104,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         );
         // https://mips.makerdao.com/mips/details/MIP40c3SP53
         DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(TECH_001_WALLET,  2_566_200 * WAD, FEB_01_2022, JAN_31_2023 - FEB_01_2022,            0, address(0))
+            DssVestLike(MCD_VEST_DAI).create(TECH_001_WALLET,  2_486_400 * WAD, FEB_01_2022, JAN_31_2023 - FEB_01_2022,            0, address(0))
         );
         // https://mips.makerdao.com/mips/details/MIP40c3SP46
         DssVestLike(MCD_VEST_DAI).restrict(
