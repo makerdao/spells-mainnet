@@ -5,6 +5,10 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
+interface DenyProxyLike {
+    function denyProxy(address) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -51,12 +55,91 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
 
-    function testNewChainlogValues() private { // make public to use
+    bytes32[] items;
+    function testESMOffboarding() public {
+        delete items; // reset array
+        address _oldEsm = chainLog.getAddress("MCD_ESM");
+
+        bytes32[] memory contractNames = chainLog.list();
+        uint256 nameLen = contractNames.length;
+        for(uint256 i = 0; i < nameLen; i++) {
+            bytes32 _name = contractNames[i];
+            if (_name == "DEPLOYER" ||
+            _name == "ETH"||
+                _name == "PROXY_DEPLOYER"
+            ) { continue; }
+            address _addr = chainLog.getAddress(_name);
+            (bool ok, bytes memory val) = _addr.call(abi.encodeWithSignature("wards(address)", _oldEsm));
+            log_bytes(val);
+            if (ok) {
+                uint256 isWard = abi.decode(val, (uint256));
+                log_uint(isWard);
+                if (isWard == 1) {
+                    items.push(_name);
+                }
+            }
+        }
+        assertTrue(items.length > 0);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        address _newEsm = chainLog.getAddress("MCD_ESM");
+
+        uint256 itemLen = items.length;
+        for(uint256 i = 0; i < itemLen; i++) {
+            WardsAbstract _base = WardsAbstract(chainLog.getAddress(items[i]));
+            assertEq(_base.wards(_oldEsm), 0);
+            assertEq(_base.wards(_newEsm), 1);
+        }
+    }
+
+    function testFireESM() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertTrue(esm.revokesGovernanceAccess());
+
+        uint256 amt = 100 * THOUSAND * WAD;
+        assertEq(esm.min(), amt);
+        giveTokens(gov, amt);
+        gov.approve(address(esm), amt);
+        esm.join(amt);
+
+        assertEq(vat.wards(address(pauseProxy)), 1);
+        esm.fire();
+        assertEq(vat.wards(address(pauseProxy)), 0);
+        assertEq(end.live(), 0);
+        assertEq(vat.live(), 0);
+
+        ClipAbstract clipLINKA = ClipAbstract(addr.addr("MCD_CLIP_LINK_A"));
+        assertEq(clipLINKA.wards(address(pauseProxy)), 1);
+        DenyProxyLike(address(esm)).denyProxy(address(clipLINKA));
+        assertEq(clipLINKA.wards(address(pauseProxy)), 0);
+    }
+
+    function testFailFireESM() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 amt = 99 * THOUSAND * WAD;
+        giveTokens(gov, amt);
+        gov.approve(address(esm), amt);
+        esm.join(amt);
+        esm.fire();
+    }
+
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
+        assertEq(chainLog.getAddress("MCD_ESM"), addr.addr("MCD_ESM"));
+        assertEq(chainLog.version(), "1.10.0");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
