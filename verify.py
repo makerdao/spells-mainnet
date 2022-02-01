@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import os, sys, subprocess, time, re, json, requests
+from datetime import datetime
 
 api_key = ''
 try:
@@ -191,7 +192,7 @@ for signature, block in libraries.items():
     new_block = get_warning(library_name) + stubs
     code = code.replace(block, new_block)
 
-if 'addNewCollateral' not in code:
+if 'addNewCollateral' not in remove_comments(code):
     code = code.replace(
         'pragma experimental ABIEncoderV2;',
         '// pragma experimental ABIEncoderV2;'
@@ -310,6 +311,11 @@ while check_response == {} or 'pending' in check_response['result'].lower():
 
 if check_response['status'] != '1' or check_response['message'] != 'OK':
     print('Error: ' + check_response['result'])
+    log_name = 'verify-{}.log'.format(datetime.now().timestamp())
+    log = open(log_name, 'w')
+    log.write(code)
+    log.close()
+    print('log written to {}'.format(log_name))
     exit()
 
 print('Contract verified at https://{0}{1}etherscan.io/address/{2}#code'.format(
