@@ -51,8 +51,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant FOUR_PCT_RATE                = 1000000001243680656318820312;
     uint256 constant FIVE_PCT_RATE                = 1000000001547125957863212448;
 
-    address constant NEW_MCD_ESM = address(0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58);
+    address constant NEW_MCD_ESM = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
     bytes32 constant MCD_ESM = "MCD_ESM";
+
+    address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant SCHUPPI_WALLET         = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant MONETSUPPLY_WALLET     = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
+    address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
     // Math
     uint256 constant MILLION = 10**6;
@@ -368,7 +377,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // ARBITRUM_DAI_BRIDGE
         addr = DssExecLib.getChangelogAddress("ARBITRUM_DAI_BRIDGE");
         DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
+        DssExecLib.authorize(addr, NEW_MCD_ESM);https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-january-2022/13001
 
         // ARBITRUM_ESCROW
         addr = DssExecLib.getChangelogAddress("ARBITRUM_ESCROW");
@@ -387,6 +396,19 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         DssExecLib.setChangelogAddress(MCD_ESM, NEW_MCD_ESM);
         DssExecLib.setChangelogVersion("1.10.0");
+
+        //////////////////////////////////////////////////////////
+        // Delegate Compensation January Distribution
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-january-2022/13001
+
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET,  12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(SCHUPPI_WALLET,         12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET,         8_620);
+        DssExecLib.sendPaymentFromSurplusBuffer(MONETSUPPLY_WALLET,      4_807);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET,      3_795);
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,        889);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,           641);
     }
 }
 
