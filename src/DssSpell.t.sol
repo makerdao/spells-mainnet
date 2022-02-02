@@ -55,6 +55,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
 
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 3.75 * 10**27 / 100);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(join.bar(), 3.5 * 10**27 / 100);
+    }
+
     bytes32[] items;
     function testESMOffboarding() public {
         delete items; // reset array

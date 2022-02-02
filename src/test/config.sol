@@ -91,7 +91,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         15 * THOUSAND,   // In whole Dai units
-            pct:          250,             // In basis points
+            pct:          225,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -121,7 +121,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         40 * THOUSAND,
-            pct:          650,
+            pct:          400,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -271,7 +271,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          400,
+            pct:          375,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -301,7 +301,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         30 * THOUSAND,
-            pct:          700,
+            pct:          500,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -331,7 +331,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         75 * HUNDRED,
-            pct:          150,
+            pct:          75,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -361,7 +361,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          100,
+            pct:          0,
             mat:          10100,
             liqType:      "clip",
             liqOn:        false,
@@ -811,7 +811,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         60 * THOUSAND,
-            pct:          200,
+            pct:          100,
             mat:          12000,
             liqType:      "clip",
             liqOn:        true,
@@ -871,7 +871,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          300,
+            pct:          200,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -901,7 +901,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         60 * THOUSAND,
-            pct:          250,
+            pct:          150,
             mat:          12000,
             liqType:      "clip",
             liqOn:        true,
@@ -1376,7 +1376,7 @@ contract Config {
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      500 * MILLION,
+            aL_line:      100 * MILLION,
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -1411,7 +1411,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          300,
+            pct:          250,
             mat:          16000,
             liqType:      "clip",
             liqOn:        true,
@@ -1496,12 +1496,12 @@ contract Config {
         });
         afterSpell.collaterals["GUNIV3DAIUSDC2-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      500 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_line:      750 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          50,
+            pct:          25,
             mat:          10200,
             liqType:      "clip",
             liqOn:        false,
