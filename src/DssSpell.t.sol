@@ -65,7 +65,7 @@ contract DssSpellTest is DssSpellTestBase {
         for(uint256 i = 0; i < nameLen; i++) {
             bytes32 _name = contractNames[i];
             if (_name == "DEPLOYER" ||
-            _name == "ETH"||
+                _name == "ETH"||
                 _name == "PROXY_DEPLOYER"
             ) { continue; }
             address _addr = chainLog.getAddress(_name);

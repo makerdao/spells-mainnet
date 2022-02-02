@@ -29,7 +29,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-02-04 MakerDAO Executive Spell | Hash: TODO";
 
-    address constant NEW_MCD_ESM = address(0); // TODO
+    address constant NEW_MCD_ESM = address(0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58);
     bytes32 constant MCD_ESM = "MCD_ESM";
 
     // Math
