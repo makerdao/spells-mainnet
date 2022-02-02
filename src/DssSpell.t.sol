@@ -5,10 +5,6 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
-interface DenyProxyLike {
-    function denyProxy(address) external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -127,7 +123,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         ClipAbstract clipLINKA = ClipAbstract(addr.addr("MCD_CLIP_LINK_A"));
         assertEq(clipLINKA.wards(address(pauseProxy)), 1);
-        DenyProxyLike(address(esm)).denyProxy(address(clipLINKA));
+        ESMAbstract(address(esm)).denyProxy(address(clipLINKA));
         assertEq(clipLINKA.wards(address(pauseProxy)), 0);
     }
 
