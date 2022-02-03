@@ -142,7 +142,7 @@ contract DssSpellTest is DssSpellTestBase {
                 }
             }
         }
-        assertTrue(items.length > 0);
+        assertTrue(items.length >= 51);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
