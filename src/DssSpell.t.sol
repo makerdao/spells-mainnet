@@ -136,6 +136,80 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
+    // Basically a mirror of the above test but we simulate vesting just before the cast to ensure it is not blocked
+    function testVestDAINotBlocking() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        uint streams = vest.ids();
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(24);
+        vest.unrestrict(26);
+        // //
+
+        // Ensure that vested contracts do not block casting of the spell
+        vest.vest(24);
+        vest.vest(26);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.ids(), streams + 2);
+
+        // // -----
+        assertEq(vest.usr(28), wallets.addr("SNE_WALLET"));
+        assertEq(vest.bgn(28), MAR_01_2022, "bgn");
+        assertEq(vest.clf(28), MAR_01_2022, "clf");
+        assertEq(vest.fin(28), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
+        assertEq(vest.mgr(28), address(0));
+        assertEq(vest.res(28), 1);
+        assertEq(vest.tot(28), 214_583 * WAD);
+        assertEq(vest.rxd(28), 0);
+        // // -----
+        assertEq(vest.usr(29), wallets.addr("SF_WALLET"));
+        assertEq(vest.bgn(29), MAR_01_2022, "bgn");
+        assertEq(vest.clf(29), MAR_01_2022, "clf");
+        assertEq(vest.fin(29), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
+        assertEq(vest.mgr(29), address(0));
+        assertEq(vest.res(29), 1);
+        assertEq(vest.tot(29), 412_805 * WAD);
+        assertEq(vest.rxd(29), 0);
+
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(28);
+        vest.unrestrict(29);
+        // //
+
+        hevm.warp(JUL_31_2022);
+        uint256 prevBalanceSNE  = dai.balanceOf(wallets.addr("SNE_WALLET"));
+        uint256 prevBalanceSF  = dai.balanceOf(wallets.addr("SF_WALLET"));
+
+        uint256 vestedSNE = vest.accrued(28);
+        assertEq(vestedSNE, 214583 * WAD);
+        uint256 vestedSF = vest.accrued(29);
+        assertEq(vestedSF, 412805 * WAD);
+
+        vest.vest(28);
+        vest.vest(29);
+
+        assertEq(dai.balanceOf(wallets.addr("SNE_WALLET")), prevBalanceSNE + vestedSNE);
+        assertEq(dai.balanceOf(wallets.addr("SF_WALLET")), prevBalanceSF + vestedSF);
+
+    }
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
