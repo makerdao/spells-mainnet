@@ -130,9 +130,9 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevBalanceSF  = dai.balanceOf(wallets.addr("SF_WALLET"));
 
         uint256 vestedSNE = vest.accrued(28);
-        assertEq(vestedSNE, 214583000000000000000000);
+        assertEq(vestedSNE, 214583 * WAD);
         uint256 vestedSF = vest.accrued(29);
-        assertEq(vestedSF, 412805000000000000000000);
+        assertEq(vestedSF, 412805 * WAD);
 
         vest.vest(28);
         vest.vest(29);
