@@ -25,14 +25,6 @@ import "lib/dss-interfaces/src/dss/VestAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface VestLike {
-    function accrued(uint256) external view returns (uint256);
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function vest(uint256) external;
-    function yank(uint256) external;
-    function unrestrict(uint256) external;
-    function restrict(uint256) external;
-}
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
@@ -62,7 +54,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant FOUR_PCT_RATE                = 1000000001243680656318820312;
     uint256 constant FIVE_PCT_RATE                = 1000000001547125957863212448;
 
-    address constant NEW_MCD_ESM = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
+    address constant NEW_MCD_ESM  = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
     bytes32 constant MCD_ESM_NAME = "MCD_ESM";
 
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
@@ -74,7 +66,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
-    VestLike immutable VEST                 = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    VestAbstract immutable VEST             = VestAbstract(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     address constant SF_001_WALLET          = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
     address constant SNE_001_WALLET         = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
 
@@ -445,7 +437,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
         uint256 _sneId = 24;
         // Send first month payment minus accrued amount
-        uint256 snePayment = sub(42_917 * WAD, VestAbstract(MCD_VEST_DAI).accrued(24));
+        uint256 snePayment = sub(42_917 * WAD, VEST.accrued(24));
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), snePayment * RAY);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(SNE_001_WALLET, snePayment);
         // Cancel
@@ -462,7 +454,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP46
         uint256 _sfId = 26;
         // Send first month payment minus accrued amount
-        uint256 sfPayment = sub(82_417 * WAD, VestAbstract(MCD_VEST_DAI).accrued(26));
+        uint256 sfPayment = sub(82_417 * WAD, VEST.accrued(26));
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), sfPayment * RAY);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(SF_001_WALLET, sfPayment);
         // Cancel stream
