@@ -377,7 +377,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // ARBITRUM_DAI_BRIDGE
         addr = DssExecLib.getChangelogAddress("ARBITRUM_DAI_BRIDGE");
         DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-january-2022/13001
+        DssExecLib.authorize(addr, NEW_MCD_ESM);
 
         // ARBITRUM_ESCROW
         addr = DssExecLib.getChangelogAddress("ARBITRUM_ESCROW");
