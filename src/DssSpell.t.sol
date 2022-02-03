@@ -16,6 +16,9 @@ contract DssSpellTest is DssSpellTestBase {
     address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
     address immutable GFXLABS        = wallets.addr("GFXLABS");
 
+    address immutable SNE            = wallets.addr("SNE_WALLET");
+    address immutable SF             = wallets.addr("SF_WALLET");
+
     uint256 constant amountFlipFlop     = 12_000;
     uint256 constant amountFeedblack    = 12_000;
     uint256 constant amountSchuppi      = 12_000;
@@ -25,10 +28,13 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant amountJustinCase   =    889;
     uint256 constant amountGfxLabs      =    641;
 
+    uint256 constant amountSNE          = 42_917;
+    uint256 constant amountSF           = 82_417;
+
     uint256 constant MAR_01_2022        = 1646092800;
     uint256 constant JUL_31_2022        = 1659225600;
 
-    function testDelegatePayments() public {
+    function testPayments() public {
         uint256 prevSin              = vat.sin(address(vow));
         uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP);
         uint256 prevDaiFeedblack     = dai.balanceOf(FEEDBLACKLOOPS);
@@ -39,11 +45,14 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
         uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
 
+        uint256 prevDaiSNE              = dai.balanceOf(SNE);
+        uint256 prevDaiSF               = dai.balanceOf(SF);
+
         uint256 amountTotal = amountFlipFlop + amountFeedblack + amountSchuppi
         + amountMakerMan + amountMonetSupply + amountAcreInvest + amountJustinCase
-        + amountGfxLabs;
+        + amountGfxLabs + amountSNE + amountSF;
 
-        assertEq(amountTotal, 54_752);
+        assertEq(amountTotal, 180_086);
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
@@ -64,23 +73,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,  amountAcreInvest   * WAD);
         assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,  amountJustinCase   * WAD);
         assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,     amountGfxLabs      * WAD);
-    }
-
-    function testPayouts() public {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-
-        address sne = wallets.addr("SNE_WALLET");
-        address sf = wallets.addr("SF_WALLET");
-
-        uint256 snebal = dai.balanceOf(sne);
-        uint256 sfbal = dai.balanceOf(sf);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq((dai.balanceOf(sne) - snebal), 42917 * WAD);
-        assertEq((dai.balanceOf(sf) - sfbal), 82417 * WAD);
+        assertEq(dai.balanceOf(SNE)            - prevDaiSNE,         amountSNE          * WAD);
+        assertEq(dai.balanceOf(SF)             - prevDaiSF,          amountSF           * WAD);
     }
 
     function testVestDAI() public {
