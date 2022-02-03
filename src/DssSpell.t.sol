@@ -79,8 +79,8 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq((dai.balanceOf(sne) - snebal) / WAD * WAD, 42917 * WAD);
-        assertEq((dai.balanceOf(sf) - sfbal) / WAD * WAD, 82417 * WAD);
+        assertEq((dai.balanceOf(sne) - snebal), 42917 * WAD);
+        assertEq((dai.balanceOf(sf) - sfbal), 82417 * WAD);
     }
 
     function testVestDAI() public {

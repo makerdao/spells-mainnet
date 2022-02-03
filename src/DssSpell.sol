@@ -19,6 +19,9 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
+import "lib/dss-interfaces/src/dss/VatAbstract.sol";
+import "lib/dss-interfaces/src/dss/VestAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
@@ -60,7 +63,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant FIVE_PCT_RATE                = 1000000001547125957863212448;
 
     address constant NEW_MCD_ESM = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
-    bytes32 constant MCD_ESM = "MCD_ESM";
+    bytes32 constant MCD_ESM_NAME = "MCD_ESM";
 
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
     address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
@@ -81,13 +84,22 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Math
     uint256 constant MILLION = 10**6;
     uint256 constant WAD = 10**18;
+    uint256 constant RAY = 10**27;
+
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "sub-underflow");
+    }
 
     function actions() public override {
 
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
-        address OLD_MCD_ESM = DssExecLib.getChangelogAddress(MCD_ESM);
+        address MCD_VAT      = DssExecLib.getChangelogAddress("MCD_VAT");
+        address MCD_VOW      = DssExecLib.getChangelogAddress("MCD_VOW");
+        address MCD_JOIN_DAI = DssExecLib.getChangelogAddress("MCD_JOIN_DAI");
+        address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+        address OLD_MCD_ESM  = DssExecLib.getChangelogAddress(MCD_ESM_NAME);
         address addr;
 
 
@@ -409,7 +421,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.deauthorize(addr, OLD_MCD_ESM);
         DssExecLib.authorize(addr, NEW_MCD_ESM);
 
-        DssExecLib.setChangelogAddress(MCD_ESM, NEW_MCD_ESM);
+        DssExecLib.setChangelogAddress(MCD_ESM_NAME, NEW_MCD_ESM);
         DssExecLib.setChangelogVersion("1.10.0");
 
         //////////////////////////////////////////////////////////
@@ -433,7 +445,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
         uint256 _sneId = 24;
         // Send first month payment minus accrued amount
-        DssExecLib.sendPaymentFromSurplusBuffer(SNE_001_WALLET, 42_917 - (VEST.accrued(_sneId) / WAD));
+        uint256 snePayment = sub(42_917 * WAD, VestAbstract(MCD_VEST_DAI).accrued(24));
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), snePayment * RAY);
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(SNE_001_WALLET, snePayment);
         // Cancel
         VEST.unrestrict(_sneId);
         VEST.vest(_sneId); // Pay unpaid stream amount
@@ -448,7 +462,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP46
         uint256 _sfId = 26;
         // Send first month payment minus accrued amount
-        DssExecLib.sendPaymentFromSurplusBuffer(SF_001_WALLET, 82_417 - (VEST.accrued(_sfId) / WAD));
+        uint256 sfPayment = sub(82_417 * WAD, VestAbstract(MCD_VEST_DAI).accrued(26));
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), sfPayment * RAY);
+        DaiJoinAbstract(MCD_JOIN_DAI).exit(SF_001_WALLET, sfPayment);
         // Cancel stream
         VEST.unrestrict(_sfId);
         VEST.vest(_sfId); // Pay unpaid stream amount
