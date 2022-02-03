@@ -437,7 +437,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
         uint256 _sneId = 24;
         // Send first month payment minus accrued amount
-        uint256 snePayment = sub(42_917 * WAD, VEST.accrued(24));
+        uint256 snePayment = sub(42_917 * WAD, VEST.accrued(_sneId));
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), snePayment * RAY);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(SNE_001_WALLET, snePayment);
         // Cancel
@@ -454,7 +454,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://mips.makerdao.com/mips/details/MIP40c3SP46
         uint256 _sfId = 26;
         // Send first month payment minus accrued amount
-        uint256 sfPayment = sub(82_417 * WAD, VEST.accrued(26));
+        uint256 sfPayment = sub(82_417 * WAD, VEST.accrued(_sfId));
         VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), sfPayment * RAY);
         DaiJoinAbstract(MCD_JOIN_DAI).exit(SF_001_WALLET, sfPayment);
         // Cancel stream
