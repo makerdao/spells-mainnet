@@ -75,8 +75,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant SF_001_WALLET          = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
     address constant SNE_001_WALLET         = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
 
-    uint256 constant MAR_01_2022            = 1646110800;
-    uint256 constant JUL_31_2022            = 1659243600;
+    uint256 constant MAR_01_2022            = 1646092800;
+    uint256 constant JUL_31_2022            = 1659225600;
 
     // Math
     uint256 constant MILLION = 10**6;

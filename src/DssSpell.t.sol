@@ -25,8 +25,8 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant amountJustinCase   =    889;
     uint256 constant amountGfxLabs      =    641;
 
-    uint256 constant MAR_01_2022        = 1646110800;
-    uint256 constant JUL_31_2022        = 1659243600;
+    uint256 constant MAR_01_2022        = 1646092800;
+    uint256 constant JUL_31_2022        = 1659225600;
 
     function testDelegatePayments() public {
         uint256 prevSin              = vat.sin(address(vow));
@@ -97,18 +97,18 @@ contract DssSpellTest is DssSpellTestBase {
 
         // // -----
         assertEq(vest.usr(28), wallets.addr("SNE_WALLET"));
-        assertEq(vest.bgn(28), MAR_01_2022);
-        assertEq(vest.clf(28), MAR_01_2022);
-        assertEq(vest.fin(28), MAR_01_2022 + 152 days); // (31+30+31+30+31)
+        assertEq(vest.bgn(28), MAR_01_2022, "bgn");
+        assertEq(vest.clf(28), MAR_01_2022, "clf");
+        assertEq(vest.fin(28), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
         assertEq(vest.mgr(28), address(0));
         assertEq(vest.res(28), 1);
         assertEq(vest.tot(28), 214_583 * WAD);
         assertEq(vest.rxd(28), 0);
         // // -----
         assertEq(vest.usr(29), wallets.addr("SF_WALLET"));
-        assertEq(vest.bgn(29), MAR_01_2022);
-        assertEq(vest.clf(29), MAR_01_2022);
-        assertEq(vest.fin(29), MAR_01_2022 + 152 days); // (31+30+31+30+31)
+        assertEq(vest.bgn(29), MAR_01_2022, "bgn");
+        assertEq(vest.clf(29), MAR_01_2022, "clf");
+        assertEq(vest.fin(29), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
         assertEq(vest.mgr(29), address(0));
         assertEq(vest.res(29), 1);
         assertEq(vest.tot(29), 412_805 * WAD);
