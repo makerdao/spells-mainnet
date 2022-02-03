@@ -1,4 +1,4 @@
-all             :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4' \
+all             :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$(shell cat DssExecLib.address)' \
                     DAPP_BUILD_OPTIMIZE=0 DAPP_BUILD_OPTIMIZE_RUNS=200 \
                     dapp --use solc:0.6.12 build
 clean           :; dapp clean

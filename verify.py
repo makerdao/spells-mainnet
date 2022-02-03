@@ -200,19 +200,23 @@ if 'addNewCollateral' not in remove_comments(code):
 
 def get_library_info():
     try:
-        makefile = open('./Makefile').read()
-        libraries_flags = re.findall('DAPP_LIBRARIES=\'(.*)\'', makefile)
-        if len(libraries_flags) == 0:
-            raise ValueError('No library flags found in Makefile')
-        libraries_flag = libraries_flags[0].strip().split(' ')
-        if len(libraries_flag) > 1:
-            exit('Only one library supported.')
-        library_flag = libraries_flag[0]
-        library_components = library_flag.split(':')
-        if len(library_components) != 3:
-            raise ValueError('Malformed library flag: ', library_components)
-        library_name = library_components[1]
-        library_address = library_components[2]
+
+        # makefile = open('./Makefile').read()
+        # libraries_flags = re.findall('DAPP_LIBRARIES=\'(.*)\'', makefile)
+        # if len(libraries_flags) == 0:
+        #     raise ValueError('No library flags found in Makefile')
+        # libraries_flag = libraries_flags[0].strip().split(' ')
+        # if len(libraries_flag) > 1:
+        #     print(libraries_flag)
+        #     exit('Only one library supported.')
+        # library_flag = libraries_flag[0]
+        # library_components = library_flag.split(':')
+        # if len(library_components) != 3:
+        #     raise ValueError('Malformed library flag: ', library_components)
+        # library_name = library_components[1]
+        # library_address = library_components[2]
+        library_name = "DssExecLib"
+        library_address = open('./DssExecLib.address').read()
         return library_name, library_address
     except FileNotFoundError:
         raise ValueError('No Makefile found')
