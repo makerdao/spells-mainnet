@@ -464,7 +464,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         VEST.yank(_sfId);
         // Stream payments for months 2-6
         VEST.restrict(
-            VEST.create(SF_001_WALLET,      412_805 * WAD, MAR_01_2022, JUL_31_2022 - MAR_01_2022,            0, address(0))
+            VEST.create(SF_001_WALLET,      412_085 * WAD, MAR_01_2022, JUL_31_2022 - MAR_01_2022,            0, address(0))
         );
         // Total of payments = 494_502
 

@@ -105,7 +105,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(29), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
         assertEq(vest.mgr(29), address(0));
         assertEq(vest.res(29), 1);
-        assertEq(vest.tot(29), 412_805 * WAD);
+        assertEq(vest.tot(29), 412_085 * WAD);
         assertEq(vest.rxd(29), 0);
 
 
@@ -126,7 +126,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 vestedSNE = vest.accrued(28);
         assertEq(vestedSNE, 214583 * WAD);
         uint256 vestedSF = vest.accrued(29);
-        assertEq(vestedSF, 412805 * WAD);
+        assertEq(vestedSF, 412085 * WAD);
 
         vest.vest(28);
         vest.vest(29);
@@ -179,7 +179,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(29), MAR_01_2022 + 152 days, "fin"); // (31+30+31+30+31)
         assertEq(vest.mgr(29), address(0));
         assertEq(vest.res(29), 1);
-        assertEq(vest.tot(29), 412_805 * WAD);
+        assertEq(vest.tot(29), 412_085 * WAD);
         assertEq(vest.rxd(29), 0);
 
 
@@ -200,7 +200,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 vestedSNE = vest.accrued(28);
         assertEq(vestedSNE, 214583 * WAD);
         uint256 vestedSF = vest.accrued(29);
-        assertEq(vestedSF, 412805 * WAD);
+        assertEq(vestedSF, 412085 * WAD);
 
         vest.vest(28);
         vest.vest(29);
