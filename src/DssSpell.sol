@@ -22,6 +22,15 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
+interface VestLike {
+    function accrued(uint256) external view returns (uint256);
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function vest(uint256) external;
+    function yank(uint256) external;
+    function unrestrict(uint256) external;
+    function restrict(uint256) external;
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -61,6 +70,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+
+    VestLike immutable VEST                 = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    address constant SF_001_WALLET          = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+    address constant SNE_001_WALLET         = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+
+    uint256 constant MAR_01_2022            = 1646110800;
+    uint256 constant JUL_31_2022            = 1659243600;
 
     // Math
     uint256 constant MILLION = 10**6;
@@ -408,6 +424,41 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET,      3_795);
         DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,        889);
         DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,           641);
+
+
+        // Repair Dai Streams
+        // http://TODO
+
+        // MIP40c3-SP47: Core Unit Budget (SNE-001) - Phase II StarkNet Fast Withdrawal and Wormhole
+        // https://mips.makerdao.com/mips/details/MIP40c3SP47
+        uint256 _sneId = 24;
+        // Send first month payment minus accrued amount
+        DssExecLib.sendPaymentFromSurplusBuffer(SNE_001_WALLET, 42_917 - (VEST.accrued(_sneId) / WAD));
+        // Cancel
+        VEST.unrestrict(_sneId);
+        VEST.vest(_sneId); // Pay unpaid stream amount
+        VEST.yank(_sneId);
+        // Stream payments for months 2-6
+        VEST.restrict(
+            VEST.create(SNE_001_WALLET,     214_583 * WAD, MAR_01_2022, JUL_31_2022 - MAR_01_2022,            0, address(0))
+        );
+        // Total of payments = 257_500
+
+        // MIP40c3-SP46: Adding Strategic Finance Core Unit Budget (SF-001)
+        // https://mips.makerdao.com/mips/details/MIP40c3SP46
+        uint256 _sfId = 26;
+        // Send first month payment minus accrued amount
+        DssExecLib.sendPaymentFromSurplusBuffer(SF_001_WALLET, 82_417 - (VEST.accrued(_sfId) / WAD));
+        // Cancel stream
+        VEST.unrestrict(_sfId);
+        VEST.vest(_sfId); // Pay unpaid stream amount
+        VEST.yank(_sfId);
+        // Stream payments for months 2-6
+        VEST.restrict(
+            VEST.create(SF_001_WALLET,      412_805 * WAD, MAR_01_2022, JUL_31_2022 - MAR_01_2022,            0, address(0))
+        );
+        // Total of payments = 494_502
+
     }
 }
 

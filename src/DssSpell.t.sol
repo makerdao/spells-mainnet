@@ -25,6 +25,9 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant amountJustinCase   =    889;
     uint256 constant amountGfxLabs      =    641;
 
+    uint256 constant MAR_01_2022        = 1646110800;
+    uint256 constant JUL_31_2022        = 1659243600;
+
     function testDelegatePayments() public {
         uint256 prevSin              = vat.sin(address(vow));
         uint256 prevDaiFlipFlop      = dai.balanceOf(FLIPFLOPFLAP);
@@ -61,6 +64,82 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,  amountAcreInvest   * WAD);
         assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,  amountJustinCase   * WAD);
         assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,     amountGfxLabs      * WAD);
+    }
+
+    function testPayouts() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        address sne = wallets.addr("SNE_WALLET");
+        address sf = wallets.addr("SF_WALLET");
+
+        uint256 snebal = dai.balanceOf(sne);
+        uint256 sfbal = dai.balanceOf(sf);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq((dai.balanceOf(sne) - snebal) / WAD * WAD, 42917 * WAD);
+        assertEq((dai.balanceOf(sf) - sfbal) / WAD * WAD, 82417 * WAD);
+    }
+
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        uint streams = vest.ids();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.ids(), streams + 2);
+
+        // // -----
+        assertEq(vest.usr(28), wallets.addr("SNE_WALLET"));
+        assertEq(vest.bgn(28), MAR_01_2022);
+        assertEq(vest.clf(28), MAR_01_2022);
+        assertEq(vest.fin(28), MAR_01_2022 + 152 days); // (31+30+31+30+31)
+        assertEq(vest.mgr(28), address(0));
+        assertEq(vest.res(28), 1);
+        assertEq(vest.tot(28), 214_583 * WAD);
+        assertEq(vest.rxd(28), 0);
+        // // -----
+        assertEq(vest.usr(29), wallets.addr("SF_WALLET"));
+        assertEq(vest.bgn(29), MAR_01_2022);
+        assertEq(vest.clf(29), MAR_01_2022);
+        assertEq(vest.fin(29), MAR_01_2022 + 152 days); // (31+30+31+30+31)
+        assertEq(vest.mgr(29), address(0));
+        assertEq(vest.res(29), 1);
+        assertEq(vest.tot(29), 412_805 * WAD);
+        assertEq(vest.rxd(29), 0);
+
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vest),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vest.unrestrict(28);
+        vest.unrestrict(29);
+        // //
+
+        hevm.warp(JUL_31_2022);
+        uint256 prevBalanceSNE  = dai.balanceOf(wallets.addr("SNE_WALLET"));
+        uint256 prevBalanceSF  = dai.balanceOf(wallets.addr("SF_WALLET"));
+
+        uint256 vestedSNE = vest.accrued(28);
+        assertEq(vestedSNE, 214583000000000000000000);
+        uint256 vestedSF = vest.accrued(29);
+        assertEq(vestedSF, 412805000000000000000000);
+
+        vest.vest(28);
+        vest.vest(29);
+
+        assertEq(dai.balanceOf(wallets.addr("SNE_WALLET")), prevBalanceSNE + vestedSNE);
+        assertEq(dai.balanceOf(wallets.addr("SF_WALLET")), prevBalanceSF + vestedSF);
+
     }
 
     function testSpellIsCast_GENERAL() public {
