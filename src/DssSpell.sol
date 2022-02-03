@@ -430,8 +430,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,           641);
 
 
+        //////////////////////////////////////////////////////////
         // Repair Dai Streams
-        // http://TODO
+        // https://forum.makerdao.com/t/correction-to-last-weeks-executive/13022
 
         // MIP40c3-SP47: Core Unit Budget (SNE-001) - Phase II StarkNet Fast Withdrawal and Wormhole
         // https://mips.makerdao.com/mips/details/MIP40c3SP47
