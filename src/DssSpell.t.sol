@@ -162,7 +162,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
         assertEq(vest.ids(), streams + 2);
-
+        assertEq(vest.fin(24), block.timestamp);
+        assertEq(vest.fin(26), block.timestamp);
+        assertEq(vest.tot(24), vest.accrued(24));
+        assertEq(vest.tot(26), vest.accrued(26));
         // // -----
         assertEq(vest.usr(28), wallets.addr("SNE_WALLET"));
         assertEq(vest.bgn(28), MAR_01_2022, "bgn");
