@@ -141,8 +141,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         /// DIRECT-AAVEV2-DAI (Aave D3M) Target Borrow Rate Decrease
 
         // Decrease the DIRECT-AAVEV2-DAI Target Borrow Rate from 3.75% to 3.5%.
-        DssExecLib.setValue(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), "bar", 3.5 * 10**27 / 100);
-
+        DssExecLib.setD3MTargetInterestRate(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), 350); // 3.5%
 
         /// Maximum Debt Ceiling Changes + GUNIV3DAIUSDC2-A Target Available Debt Increase
 
