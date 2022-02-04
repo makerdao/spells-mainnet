@@ -29,7 +29,6 @@ echo "Using DssExecLib at: $DSS_EXEC_LIB"
 export DAPP_LIBRARIES=" lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$DSS_EXEC_LIB"
 export DAPP_LINK_TEST_LIBRARIES=0
 
-
 if [[ -z "$MATCH" ]]; then
   dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" -v
 else
