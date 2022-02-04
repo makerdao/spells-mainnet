@@ -20,15 +20,13 @@ if [[ -z "$OPTIMIZER" ]]; then
   OPTIMIZER=1
 fi
 
-# 2022-01-28 Disabled optimizer on due to engineering costs
-# export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
-# export DAPP_BUILD_OPTIMIZE_RUNS=1
+export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
+export DAPP_BUILD_OPTIMIZE_RUNS=1
 
 DSS_EXEC_LIB=$(< DssExecLib.address)
 echo "Using DssExecLib at: $DSS_EXEC_LIB"
 export DAPP_LIBRARIES=" lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$DSS_EXEC_LIB"
 export DAPP_LINK_TEST_LIBRARIES=0
-
 
 if [[ -z "$MATCH" ]]; then
   dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" -v
