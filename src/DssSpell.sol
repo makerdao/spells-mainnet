@@ -67,6 +67,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
     VestAbstract immutable VEST             = VestAbstract(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    address immutable      MCD_VAT          = DssExecLib.getChangelogAddress("MCD_VAT");
+    address immutable      MCD_VOW          = DssExecLib.getChangelogAddress("MCD_VOW");
+    address immutable      MCD_JOIN_DAI     = DssExecLib.getChangelogAddress("MCD_JOIN_DAI");
+    address immutable      OLD_MCD_ESM      = DssExecLib.getChangelogAddress(MCD_ESM_NAME);
+
     address constant SF_001_WALLET          = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
     address constant SNE_001_WALLET         = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
 
@@ -87,11 +92,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
-        address MCD_VAT      = DssExecLib.getChangelogAddress("MCD_VAT");
-        address MCD_VOW      = DssExecLib.getChangelogAddress("MCD_VOW");
-        address MCD_JOIN_DAI = DssExecLib.getChangelogAddress("MCD_JOIN_DAI");
-        address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-        address OLD_MCD_ESM  = DssExecLib.getChangelogAddress(MCD_ESM_NAME);
         address addr;
 
 
