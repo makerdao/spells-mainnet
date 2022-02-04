@@ -23,6 +23,7 @@ import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
 import "lib/dss-interfaces/src/dss/VatAbstract.sol";
 import "lib/dss-interfaces/src/dss/VestAbstract.sol";
+import "lib/dss-interfaces/src/dss/ESMAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
@@ -157,7 +158,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Set the ESM threshold to 100k MKR
         // https://vote.makerdao.com/polling/QmQSVmrh?network=mainnet#poll-detail
 
-        DssExecLib.setValue(NEW_MCD_ESM, "min", 100_000 * WAD);
+        require(ESMAbstract(NEW_MCD_ESM).min() == 100_000 * WAD, "DssSpellAction/error-esm-min");
+        require(ESMAbstract(NEW_MCD_ESM).end() == DssExecLib.getChangelogAddress("MCD_END"), "DssSpellAction/error-esm-end");
+        require(ESMAbstract(NEW_MCD_ESM).gem() == DssExecLib.getChangelogAddress("MCD_GOV"), "DssSpellAction/error-esm-gov");
+        require(ESMAbstract(NEW_MCD_ESM).proxy() == address(this), "DssSpellAction/error-esm-proxy");
 
         // MCD_END
         addr = DssExecLib.getChangelogAddress("MCD_END");
