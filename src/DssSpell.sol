@@ -162,260 +162,64 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         require(ESMAbstract(NEW_MCD_ESM).gem() == DssExecLib.getChangelogAddress("MCD_GOV"), "DssSpellAction/error-esm-gov");
         require(ESMAbstract(NEW_MCD_ESM).proxy() == address(this), "DssSpellAction/error-esm-proxy");
 
-        // MCD_END
-        addr = DssExecLib.getChangelogAddress("MCD_END");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
+        bytes32[] memory keys = new bytes32[](51);
+        keys[0] = bytes32("MCD_END");
+        keys[1] = bytes32("MCD_CLIP_ETH_A");
+        keys[2] = bytes32("MCD_CLIP_ETH_B");
+        keys[3] = bytes32("MCD_CLIP_ETH_C");
+        keys[4] = bytes32("MCD_CLIP_BAT_A");
+        keys[5] = bytes32("MCD_CLIP_USDC_A");
+        keys[6] = bytes32("MCD_CLIP_USDC_B");
+        keys[7] = bytes32("MCD_CLIP_TUSD_A");
+        keys[8] = bytes32("MCD_CLIP_WBTC_A");
+        keys[9] = bytes32("MCD_CLIP_ZRX_A");
+        keys[10] = bytes32("MCD_CLIP_KNC_A");
+        keys[11] = bytes32("MCD_CLIP_MANA_A");
+        keys[12] = bytes32("MCD_CLIP_USDT_A");
+        keys[13] = bytes32("MCD_CLIP_PAXUSD_A");
+        keys[14] = bytes32("MCD_CLIP_COMP_A");
+        keys[15] = bytes32("MCD_CLIP_LRC_A");
+        keys[16] = bytes32("MCD_CLIP_LINK_A");
+        keys[17] = bytes32("MCD_CLIP_BAL_A");
+        keys[18] = bytes32("MCD_CLIP_YFI_A");
+        keys[19] = bytes32("MCD_CLIP_GUSD_A");
+        keys[20] = bytes32("MCD_CLIP_UNI_A");
+        keys[21] = bytes32("MCD_CLIP_RENBTC_A");
+        keys[22] = bytes32("MCD_CLIP_AAVE_A");
+        keys[23] = bytes32("MCD_CLIP_PSM_USDC_A");
+        keys[24] = bytes32("MCD_CLIP_MATIC_A");
+        keys[25] = bytes32("MCD_CLIP_UNIV2DAIETH_A");
+        keys[26] = bytes32("MCD_CLIP_UNIV2WBTCETH_A");
+        keys[27] = bytes32("MCD_CLIP_UNIV2USDCETH_A");
+        keys[28] = bytes32("MCD_CLIP_UNIV2DAIUSDC_A");
+        keys[29] = bytes32("MCD_CLIP_UNIV2ETHUSDT_A");
+        keys[30] = bytes32("MCD_CLIP_UNIV2LINKETH_A");
+        keys[31] = bytes32("MCD_CLIP_UNIV2UNIETH_A");
+        keys[32] = bytes32("MCD_CLIP_UNIV2WBTCDAI_A");
+        keys[33] = bytes32("MCD_CLIP_UNIV2AAVEETH_A");
+        keys[34] = bytes32("MCD_CLIP_UNIV2DAIUSDT_A");
+        keys[35] = bytes32("MCD_CLIP_PSM_PAX_A");
+        keys[36] = bytes32("MCD_CLIP_GUNIV3DAIUSDC1_A");
+        keys[37] = bytes32("MCD_CLIP_WSTETH_A");
+        keys[38] = bytes32("MCD_CLIP_WBTC_B");
+        keys[39] = bytes32("MCD_CLIP_WBTC_C");
+        keys[40] = bytes32("MCD_CLIP_PSM_GUSD_A");
+        keys[41] = bytes32("MCD_CLIP_GUNIV3DAIUSDC2_A");
+        keys[42] = bytes32("MCD_VAT");
+        keys[43] = bytes32("MCD_CLIP_DIRECT_AAVEV2_DAI");
+        keys[44] = bytes32("OPTIMISM_DAI_BRIDGE");
+        keys[45] = bytes32("OPTIMISM_ESCROW");
+        keys[46] = bytes32("OPTIMISM_GOV_RELAY");
+        keys[47] = bytes32("ARBITRUM_DAI_BRIDGE");
+        keys[48] = bytes32("ARBITRUM_ESCROW");
+        keys[49] = bytes32("ARBITRUM_GOV_RELAY");
+        keys[50] = bytes32("MCD_JOIN_DIRECT_AAVEV2_DAI");
 
-        // MCD_CLIP_ETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_ETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_ETH_B
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_ETH_B");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_ETH_C
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_ETH_C");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_BAT_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_BAT_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_USDC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_USDC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_USDC_B
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_USDC_B");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_TUSD_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_TUSD_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_WBTC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_WBTC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_ZRX_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_ZRX_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_KNC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_KNC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_MANA_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_MANA_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_USDT_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_USDT_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_PAXUSD_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_PAXUSD_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_COMP_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_COMP_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_LRC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_LRC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_LINK_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_LINK_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_BAL_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_BAL_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_YFI_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_YFI_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_GUSD_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_GUSD_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNI_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNI_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_RENBTC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_RENBTC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_AAVE_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_AAVE_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_PSM_USDC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_PSM_USDC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_MATIC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_MATIC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2DAIETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2DAIETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2WBTCETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2WBTCETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2USDCETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2USDCETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2DAIUSDC_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2DAIUSDC_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2ETHUSDT_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2ETHUSDT_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2LINKETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2LINKETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2UNIETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2UNIETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2WBTCDAI_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2WBTCDAI_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2AAVEETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2AAVEETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_UNIV2DAIUSDT_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_UNIV2DAIUSDT_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_PSM_PAX_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_PSM_PAX_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_GUNIV3DAIUSDC1_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC1_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_WSTETH_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_WSTETH_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_WBTC_B
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_WBTC_B");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_WBTC_C
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_WBTC_C");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_PSM_GUSD_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_PSM_GUSD_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_GUNIV3DAIUSDC2_A
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_GUNIV3DAIUSDC2_A");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_VAT
-        addr = DssExecLib.getChangelogAddress("MCD_VAT");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_CLIP_DIRECT_AAVEV2_DAI
-        addr = DssExecLib.getChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // OPTIMISM_DAI_BRIDGE
-        addr = DssExecLib.getChangelogAddress("OPTIMISM_DAI_BRIDGE");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // OPTIMISM_ESCROW
-        addr = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // OPTIMISM_GOV_RELAY
-        addr = DssExecLib.getChangelogAddress("OPTIMISM_GOV_RELAY");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // ARBITRUM_DAI_BRIDGE
-        addr = DssExecLib.getChangelogAddress("ARBITRUM_DAI_BRIDGE");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // ARBITRUM_ESCROW
-        addr = DssExecLib.getChangelogAddress("ARBITRUM_ESCROW");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // ARBITRUM_GOV_RELAY
-        addr = DssExecLib.getChangelogAddress("ARBITRUM_GOV_RELAY");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
-
-        // MCD_JOIN_DIRECT_AAVEV2_DAI
-        addr = DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
-        DssExecLib.deauthorize(addr, OLD_MCD_ESM);
-        DssExecLib.authorize(addr, NEW_MCD_ESM);
+        for (uint256 i = 0; i < keys.length; i++) {
+            addr = DssExecLib.getChangelogAddress(keys[i]);
+            DssExecLib.deauthorize(addr, OLD_MCD_ESM);
+            DssExecLib.authorize(addr, NEW_MCD_ESM);
+        }
 
         DssExecLib.setChangelogAddress(MCD_ESM_NAME, NEW_MCD_ESM);
         DssExecLib.setChangelogVersion("1.10.0");
