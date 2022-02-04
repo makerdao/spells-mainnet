@@ -229,6 +229,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             flap_tau:              72 hours,                // in seconds
             cat_box:               20 * MILLION,            // In whole Dai units
             dog_Hole:              100 * MILLION,           // In whole Dai units
+            esm_min:               100 * THOUSAND,          // In whole MKR units
             pause_authority:       address(chief),          // Pause authority
             osm_mom_authority:     address(chief),          // OsmMom authority
             flipper_mom_authority: address(chief),          // FlipperMom authority
@@ -394,6 +395,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             uint256 normalizedHole = values.dog_Hole * RAD;
             assertEq(dog.Hole(), normalizedHole, "TestError/dog-Hole");
             assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
+        }
+
+        // ESM min in WAD
+        {
+            uint256 normalizedMin = values.esm_min * WAD;
+            assertEq(esm.min(), normalizedMin, "TestError/esm-min");
+            assertTrue(esm.min() > WAD && esm.min() < 200 * THOUSAND * WAD, "TestError/esm-min-range");
         }
 
         // check Pause authority

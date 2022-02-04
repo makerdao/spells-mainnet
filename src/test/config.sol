@@ -33,6 +33,7 @@ contract Config {
         uint256 flap_tau;
         uint256 cat_box;
         uint256 dog_Hole;
+        uint256 esm_min;
         address pause_authority;
         address osm_mom_authority;
         address flipper_mom_authority;
