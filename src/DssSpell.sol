@@ -163,16 +163,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         require(ESMAbstract(NEW_MCD_ESM).proxy() == address(this), "DssSpellAction/error-esm-proxy");
 
         bytes32[] memory keys = new bytes32[](51);
-        keys[0] = bytes32("MCD_END");
-        keys[1] = bytes32("MCD_CLIP_ETH_A");
-        keys[2] = bytes32("MCD_CLIP_ETH_B");
-        keys[3] = bytes32("MCD_CLIP_ETH_C");
-        keys[4] = bytes32("MCD_CLIP_BAT_A");
-        keys[5] = bytes32("MCD_CLIP_USDC_A");
-        keys[6] = bytes32("MCD_CLIP_USDC_B");
-        keys[7] = bytes32("MCD_CLIP_TUSD_A");
-        keys[8] = bytes32("MCD_CLIP_WBTC_A");
-        keys[9] = bytes32("MCD_CLIP_ZRX_A");
+        keys[0]  = bytes32("MCD_END");
+        keys[1]  = bytes32("MCD_CLIP_ETH_A");
+        keys[2]  = bytes32("MCD_CLIP_ETH_B");
+        keys[3]  = bytes32("MCD_CLIP_ETH_C");
+        keys[4]  = bytes32("MCD_CLIP_BAT_A");
+        keys[5]  = bytes32("MCD_CLIP_USDC_A");
+        keys[6]  = bytes32("MCD_CLIP_USDC_B");
+        keys[7]  = bytes32("MCD_CLIP_TUSD_A");
+        keys[8]  = bytes32("MCD_CLIP_WBTC_A");
+        keys[9]  = bytes32("MCD_CLIP_ZRX_A");
         keys[10] = bytes32("MCD_CLIP_KNC_A");
         keys[11] = bytes32("MCD_CLIP_MANA_A");
         keys[12] = bytes32("MCD_CLIP_USDT_A");
