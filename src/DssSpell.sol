@@ -443,7 +443,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         uint256 _sneId = 24;
         // Send first month payment minus accrued amount
         uint256 snePayment = sub(42_917 * WAD, VEST.accrued(_sneId));
-        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), snePayment * RAY);
+        VatAbstract(MCD_VAT).suck(MCD_VOW, address(this), snePayment * RAY);  // WAD * RAY == RAD
         DaiJoinAbstract(MCD_JOIN_DAI).exit(SNE_001_WALLET, snePayment);
         // Cancel
         VEST.unrestrict(_sneId);
