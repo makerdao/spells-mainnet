@@ -16,7 +16,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
-
+// Enable ABIEncoderV2 when onboarding collateral
+//pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
