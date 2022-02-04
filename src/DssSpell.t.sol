@@ -80,7 +80,7 @@ contract DssSpellTest is DssSpellTestBase {
     function testVestDAI() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
-        uint streams = vest.ids();
+        uint256 streams = vest.ids();
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
