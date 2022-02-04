@@ -20,10 +20,10 @@ pragma solidity 0.6.12;
 //pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "lib/dss-interfaces/src/dss/DaiJoinAbstract.sol";
-import "lib/dss-interfaces/src/dss/VatAbstract.sol";
-import "lib/dss-interfaces/src/dss/VestAbstract.sol";
-import "lib/dss-interfaces/src/dss/ESMAbstract.sol";
+import "dss-interfaces/dss/DaiJoinAbstract.sol";
+import "dss-interfaces/dss/VatAbstract.sol";
+import "dss-interfaces/dss/VestAbstract.sol";
+import "dss-interfaces/dss/ESMAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
