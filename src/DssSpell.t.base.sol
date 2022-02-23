@@ -36,17 +36,6 @@ interface DirectDepositLike is GemJoinAbstract {
 }
 
 contract DssSpellTestBase is Config, DSTest, DSMath {
-
-    struct SpellValues {
-        address deployed_spell;
-        uint256 deployed_spell_created;
-        address previous_spell;
-        bool    office_hours_enabled;
-        uint256 expiration_threshold;
-    }
-
-    SpellValues  spellValues;
-
     Hevm hevm;
 
     Rates          rates = new Rates();
@@ -94,9 +83,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     // uint256 constant WAD        = 10 ** 18; // provided by ds-math
     // uint256 constant RAY        = 10 ** 27; // provided by ds-math
     uint256 constant RAD        = 10 ** 45;
-
-    uint256 constant monthly_expiration = 4 days;
-    uint256 constant weekly_expiration = 30 days;
 
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
@@ -196,48 +182,12 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
-        //
-        // Test for spell-specific parameters
-        //
-        spellValues = SpellValues({
-            deployed_spell:                 address(0xC45c1419DA490880b4cf4e840e14D62827969B3f),        // populate with deployed spell if deployed
-            deployed_spell_created:         1644002846,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
-            expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
-        });
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
         castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
 
-        //
-        // Test for all system configuration changes
-        //
-        afterSpell = SystemValues({
-            line_offset:           500 * MILLION,           // Offset between the global line against the sum of local lines
-            pot_dsr:               1,                       // In basis points
-            pause_delay:           48 hours,                // In seconds
-            vow_wait:              156 hours,               // In seconds
-            vow_dump:              250,                     // In whole Dai units
-            vow_sump:              50 * THOUSAND,           // In whole Dai units
-            vow_bump:              30 * THOUSAND,           // In whole Dai units
-            vow_hump_min:          250 * MILLION,           // In whole Dai units
-            vow_hump_max:          250 * MILLION,           // In whole Dai units
-            flap_beg:              400,                     // in basis points
-            flap_ttl:              30 minutes,              // in seconds
-            flap_tau:              72 hours,                // in seconds
-            cat_box:               20 * MILLION,            // In whole Dai units
-            dog_Hole:              100 * MILLION,           // In whole Dai units
-            esm_min:               100 * THOUSAND,          // In whole MKR units
-            pause_authority:       address(chief),          // Pause authority
-            osm_mom_authority:     address(chief),          // OsmMom authority
-            flipper_mom_authority: address(chief),          // FlipperMom authority
-            clipper_mom_authority: address(chief),          // ClipperMom authority
-            ilk_count:             48                       // Num expected in system
-        });
-
-        setCollateralValues();
+        setValues(address(chief));
     }
 
     function scheduleWaitAndCastFailDay() public {
