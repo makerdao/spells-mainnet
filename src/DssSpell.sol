@@ -41,6 +41,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.setIlkAutoLineDebtCeiling("PSM-GUSD-A", 60 * MILLION);
 
         // Pay retroactive delegate compensation to MakerMan
+        // https://vote.makerdao.com/polling/QmR2DX4L
         DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET, 8_245);
     }
 }
