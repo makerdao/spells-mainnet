@@ -31,9 +31,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-02-25 MakerDAO Executive Spell | Hash: 0x29cc4d6453529846a34d9de91c0d19005bcf4f8d2526f26f1cd03b4be8ef4052";
 
-    uint256 constant public MILLION = 10**6;
+    uint256 constant MILLION = 10**6;
 
-    address constant public MAKERMAN_WALLET = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant MAKERMAN_WALLET = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
 
     // Turn office hours off
     function officeHours() public override returns (bool) {
