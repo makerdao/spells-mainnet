@@ -37,6 +37,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     function actions() public override {
         // Increase PSM-GUSD-A max debt ceiling from 10M to 60M
+        // https://vote.makerdao.com/polling/QmWPYU9c
         DssExecLib.setIlkAutoLineDebtCeiling("PSM-GUSD-A", 60 * MILLION);
 
         // Pay retroactive delegate compensation to MakerMan
