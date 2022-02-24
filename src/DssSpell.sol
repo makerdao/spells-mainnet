@@ -35,6 +35,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     address constant public MAKERMAN_WALLET = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
 
+    // Turn office hours off
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     function actions() public override {
         // Increase PSM-GUSD-A max debt ceiling from 10M to 60M
         // https://vote.makerdao.com/polling/QmWPYU9c
