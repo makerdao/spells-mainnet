@@ -22,9 +22,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
@@ -216,9 +214,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_OSMs() private { // make public to use
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track OSM authorizations here
@@ -226,9 +222,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_Medianizers() private { // make public to use
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track Median authorizations here
