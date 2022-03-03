@@ -185,12 +185,11 @@ contract DssSpellTest is DssSpellTestBase {
         vestDai.unrestrict(8);
         // //
 
-        uint256 amt = vestDai.unpaid(8);
         vestDai.vest(8);
 
         assertTrue(!vestDai.valid(8));
 
-        assertEqApprox(vestDai.rxd(8), CLAIMED_AMOUNT + amt, 40_000 * WAD); // claimable delta on cast time (estimate)
+        assertEqApprox(vestDai.rxd(8), CLAIMED_AMOUNT, 30_000 * WAD); // claimable delta on cast time (estimate)
     }
 
     function testSpellIsCast_GENERAL() public {
