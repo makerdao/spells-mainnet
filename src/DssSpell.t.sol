@@ -89,6 +89,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant APR_01_2022            = 1648771200; // 2022-04-01
     function testDaiStreams() public {
         uint256 streams = vestDai.ids();
+        assertEq(streams, 29);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -98,7 +99,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestDai.ids(), streams + 3);
 
 
-        vestDai.valid(30); // check for valid contract
+        assertTrue(vestDai.valid(30)); // check for valid contract
         checkDaiVest({
             _index:      30,                          // id
             _wallet:     wallets.addr("RISK_WALLET"), // usr
@@ -110,7 +111,7 @@ contract DssSpellTest is DssSpellTestBase {
             _reward:     2_760_000 * WAD,             // tot
             _claimed:    0                            // rxd
         });
-        vestDai.valid(31); // check for valid contract
+        assertTrue(vestDai.valid(31)); // check for valid contract
         checkDaiVest({
             _index:      31,                          // id
             _wallet:     wallets.addr("CES_WALLET"),  // usr
@@ -122,7 +123,7 @@ contract DssSpellTest is DssSpellTestBase {
             _reward:     2_780_562 * WAD,             // tot
             _claimed:    0                            // rxd
         });
-        vestDai.valid(32); // check for valid contract
+        assertTrue(vestDai.valid(32)); // check for valid contract
         checkDaiVest({
             _index:      32,                          // id
             _wallet:     wallets.addr("IS_WALLET"),   // usr
@@ -141,12 +142,11 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant SEP_01_2021    = 1630454400;
     uint256 constant SEP_01_2022    = 1661990400;
     uint256 constant VEST_AMOUNT    = 2_184_000 * WAD;
-    uint256 constant CLAIMED_AMOUNT =   910_000 * WAD;
+    uint256 constant CLAIMED_AMOUNT = 1_092_000 * WAD;
 
     function testYankedDaiStreams() public {
 
-        vestDai.valid(8); // check for valid contract
-
+        assertTrue(vestDai.valid(8)); // check for valid contract
         checkDaiVest({
             _index:      8,                  // id
             _wallet:     RISK_OLD_WALLET,    // usr
@@ -163,6 +163,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        assertTrue(vestDai.valid(8)); // check for valid contract
         checkDaiVest({
             _index:      8,                  // id
             _wallet:     RISK_OLD_WALLET,    // usr
@@ -174,6 +175,22 @@ contract DssSpellTest is DssSpellTestBase {
             _reward:     vestDai.accrued(8), // tot
             _claimed:    CLAIMED_AMOUNT      // rxd
         });
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        hevm.store(
+            address(vestDai),
+            keccak256(abi.encode(address(this), uint256(1))),
+            bytes32(uint256(1))
+        );
+        vestDai.unrestrict(8);
+        // //
+
+        uint256 amt = vestDai.unpaid(8);
+        vestDai.vest(8);
+
+        assertTrue(!vestDai.valid(8));
+
+        assertEqApprox(vestDai.rxd(8), CLAIMED_AMOUNT + amt, 40_000 * WAD); // claimable delta on cast time (estimate)
     }
 
     function testSpellIsCast_GENERAL() public {
