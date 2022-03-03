@@ -10,3 +10,4 @@ deploy          :; make && dapp create DssSpell | xargs ./verify.py DssSpell
 estimate        :; ./estimate-deploy-gas.sh
 flatten         :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
 archive-spell   :; ./archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
+wards           :; ./wards.sh $(target)
