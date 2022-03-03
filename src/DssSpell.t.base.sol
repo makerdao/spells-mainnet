@@ -929,11 +929,25 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(token.balanceOf(address(join)), 0);
     }
 
-    function checkDaiVest(uint256 _index, address _wallet, uint256 _start, uint256 _end, uint256 _amount) public {
-        assertEq(vestDai.usr(_index), _wallet);
-        assertEq(vestDai.bgn(_index), _start);
-        assertEq(vestDai.fin(_index), _end);
-        assertEq(vestDai.tot(_index), _amount * WAD);
+    function checkDaiVest(
+        uint256 _index,
+        address _wallet,
+        uint256 _start,
+        uint256 _cliff,
+        uint256 _end,
+        address _manager,
+        uint256 _restricted,
+        uint256 _reward,
+        uint256 _claimed
+        ) public {
+        assertEq(vestDai.usr(_index), _wallet,     "usr");
+        assertEq(vestDai.bgn(_index), _start,      "bgn");
+        assertEq(vestDai.clf(_index), _cliff,      "clf");
+        assertEq(vestDai.fin(_index), _end,        "fin");
+        assertEq(vestDai.mgr(_index), _manager,    "mgr");
+        assertEq(vestDai.res(_index), _restricted, "res");
+        assertEq(vestDai.tot(_index), _reward,     "tot");
+        assertEq(vestDai.rxd(_index), _claimed,    "rxd");
     }
 
     function getMat(bytes32 _ilk) internal view returns (uint256 mat) {

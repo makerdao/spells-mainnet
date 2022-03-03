@@ -98,7 +98,7 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x50968E9d628FdD0Eb29C7742dC84233babaD534e),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1645737440,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
@@ -1457,8 +1457,8 @@ contract Config {
         });
         afterSpell.collaterals["WSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      200 * MILLION,
-            aL_gap:       20 * MILLION,
+            aL_line:      300 * MILLION,
+            aL_gap:       30 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
@@ -1487,8 +1487,8 @@ contract Config {
         });
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      220 * MILLION,
-            aL_gap:       50 * MILLION,
+            aL_line:      300 * MILLION,
+            aL_gap:       65 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         0,

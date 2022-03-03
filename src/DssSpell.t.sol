@@ -7,17 +7,57 @@ import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    address immutable MAKERMAN   = wallets.addr("MAKERMAN");
+    // Recognized Delegates Wallets
+    address immutable FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
+    address immutable FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
+    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
+    address immutable MAKERMAN       = wallets.addr("MAKERMAN");
+    address immutable ACREINVEST     = wallets.addr("ACREINVEST");
+    address immutable MONETSUPPLY    = wallets.addr("MONETSUPPLY");
+    address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
+    address immutable GFXLABS        = wallets.addr("GFXLABS");
 
-    uint256 constant amountMakerMan     = 8_245;
+    // Core Units Wallets
+    address immutable CES_WALLET     = wallets.addr("CES_WALLET");
+    address immutable IS_WALLET      = wallets.addr("IS_WALLET");
+
+    // Recognized Delegates Payout
+    uint256 constant amountFlipFlopFlap  = 12_000;
+    uint256 constant amountFeedBlack     = 12_000;
+    uint256 constant amountUltraSchuppi  = 12_000;
+    uint256 constant amountMakerMan      =  8_512;
+    uint256 constant amountAcreInvest    =  6_494;
+    uint256 constant amountMonetSupply   =  5_072;
+    uint256 constant amountJustinCase    =    927;
+    uint256 constant amountGfxLabs       =    660;
+
+    // Core Units Budget Transfers
+    uint256 constant amountCES     = 259_184;
+    uint256 constant amountIS      = 138_000;
 
     function testPayments() public {
+
         uint256 prevSin              = vat.sin(address(vow));
+
+        // Recognized Delegates
+        uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
+        uint256 prevDaiFeedBlack     = dai.balanceOf(FEEDBLACKLOOPS);
+        uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
         uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
+        uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
+        uint256 prevDaiMonetSupply   = dai.balanceOf(MONETSUPPLY);
+        uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
+        uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
 
-        uint256 amountTotal = amountMakerMan;
+        // Core Units
+        uint256 prevDaiCES           = dai.balanceOf(CES_WALLET);
+        uint256 prevDaiIS            = dai.balanceOf(IS_WALLET);
 
-        assertEq(amountTotal, 8_245);
+        uint256 amountTotal = amountFlipFlopFlap + amountFeedBlack + amountUltraSchuppi
+        + amountMakerMan + amountAcreInvest + amountMonetSupply  + amountJustinCase
+        + amountGfxLabs + amountCES + amountIS;
+
+        assertEq(amountTotal, 57_665 + 259_184 + 138_000);
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
@@ -28,7 +68,112 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         assertEq(vat.sin(address(vow))         - prevSin,            amountTotal        * RAD);
-        assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,    amountMakerMan     * WAD);
+
+        // Recognized Delegates
+        assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
+        assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
+        assertEq(dai.balanceOf(ULTRASCHUPPI)   - prevDaiUltraSchuppi, amountUltraSchuppi * WAD);
+        assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,     amountMakerMan     * WAD);
+        assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,   amountAcreInvest   * WAD);
+        assertEq(dai.balanceOf(MONETSUPPLY)    - prevDaiMonetSupply,  amountMonetSupply  * WAD);
+        assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,   amountJustinCase   * WAD);
+        assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,      amountGfxLabs      * WAD);
+
+        // Core Units
+        assertEq(dai.balanceOf(CES_WALLET)     - prevDaiCES,         amountCES          * WAD);
+        assertEq(dai.balanceOf(IS_WALLET)      - prevDaiIS,          amountIS           * WAD);
+    }
+
+
+    uint256 constant MAR_01_2022            = 1646092800; // 2022-03-01
+    uint256 constant APR_01_2022            = 1648771200; // 2022-04-01
+    function testDaiStreams() public {
+        uint256 streams = vestDai.ids();
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vestDai.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vestDai.ids(), streams + 3);
+
+
+        vestDai.valid(30); // check for valid contract
+        checkDaiVest({
+            _index:      30,                          // id
+            _wallet:     wallets.addr("RISK_WALLET"), // usr
+            _start:      MAR_01_2022,                 // bgn
+            _cliff:      MAR_01_2022,                 // clf
+            _end:        MAR_01_2022 + 364 days,      // fin
+            _manager:    address(0),                  // mgr
+            _restricted: 1,                           // res
+            _reward:     2_760_000 * WAD,             // tot
+            _claimed:    0                            // rxd
+        });
+        vestDai.valid(31); // check for valid contract
+        checkDaiVest({
+            _index:      31,                          // id
+            _wallet:     wallets.addr("CES_WALLET"),  // usr
+            _start:      APR_01_2022,                 // bgn
+            _cliff:      APR_01_2022,                 // clf
+            _end:        APR_01_2022 + 364 days,      // fin
+            _manager:    address(0),                  // mgr
+            _restricted: 1,                           // res
+            _reward:     2_780_562 * WAD,             // tot
+            _claimed:    0                            // rxd
+        });
+        vestDai.valid(32); // check for valid contract
+        checkDaiVest({
+            _index:      32,                          // id
+            _wallet:     wallets.addr("IS_WALLET"),   // usr
+            _start:      MAR_01_2022,                 // bgn
+            _cliff:      MAR_01_2022,                 // clf
+            _end:        MAR_01_2022 + 275 days,      // fin
+            _manager:    address(0),                  // mgr
+            _restricted: 1,                           // res
+            _reward:     207_000 * WAD,               // tot
+            _claimed:    0                            // rxd
+        });
+    }
+
+    // https://github.com/makerdao/spells-mainnet/tree/master/archive/2021-09-03-DssSpell
+    address immutable RISK_OLD_WALLET = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
+    uint256 constant SEP_01_2021    = 1630454400;
+    uint256 constant SEP_01_2022    = 1661990400;
+    uint256 constant VEST_AMOUNT    = 2_184_000 * WAD;
+    uint256 constant CLAIMED_AMOUNT =   910_000 * WAD;
+
+    function testYankedDaiStreams() public {
+
+        vestDai.valid(8); // check for valid contract
+
+        checkDaiVest({
+            _index:      8,                  // id
+            _wallet:     RISK_OLD_WALLET,    // usr
+            _start:      SEP_01_2021,        // bgn
+            _cliff:      SEP_01_2021,        // clf
+            _end:        SEP_01_2022,        // fin
+            _manager:    address(0),         // mgr
+            _restricted: 1,                  // res
+            _reward:     VEST_AMOUNT,        // tot
+            _claimed:    CLAIMED_AMOUNT      // rxd
+        });
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        checkDaiVest({
+            _index:      8,                  // id
+            _wallet:     RISK_OLD_WALLET,    // usr
+            _start:      SEP_01_2021,        // bgn
+            _cliff:      SEP_01_2021,        // clf
+            _end:        block.timestamp,    // fin
+            _manager:    address(0),         // mgr
+            _restricted: 1,                  // res
+            _reward:     vestDai.accrued(8), // tot
+            _claimed:    CLAIMED_AMOUNT      // rxd
+        });
     }
 
     function testSpellIsCast_GENERAL() public {
@@ -61,18 +206,52 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 3.5 * 10**27 / 100);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(join.bar(), 2.85 * 10**27 / 100);
+    }
+
     function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
+        checkIlkIntegration(
+            "TOKEN-X",
+            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+            addr.addr("PIP_TOKEN"),
+            true,
+            true,
+            false
+        );
     }
 
-    function testLerps() private { // make public to use
+    function testLerpSurplusBuffer() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+
+        // Insert new SB lerp tests here
+
+        LerpAbstract lerp = LerpAbstract(lerpFactory.lerps("NAME"));
+
+        uint256 duration = 210 days;
+        hevm.warp(block.timestamp + duration / 2);
+        assertEq(vow.hump(), 60 * MILLION * RAD);
+        lerp.tick();
+        assertEq(vow.hump(), 75 * MILLION * RAD);
+        hevm.warp(block.timestamp + duration / 2);
+        lerp.tick();
+        assertEq(vow.hump(), 90 * MILLION * RAD);
+        assertTrue(lerp.done());
     }
 
     function testNewChainlogValues() private { // make public to use
@@ -81,8 +260,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_ESM"), addr.addr("MCD_ESM"));
-        assertEq(chainLog.version(), "1.10.0");
+        assertEq(chainLog.getAddress("MCD_JOIN_TOKEN_X"), addr.addr("MCD_JOIN_TOKEN_X"));
+        assertEq(chainLog.getAddress("MCD_CLIP_TOKEN_X"), addr.addr("MCD_CLIP_TOKEN_X"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TOKEN_X"), addr.addr("MCD_CLIP_CALC_TOKEN_X"));
+        assertEq(chainLog.version(), "X.X.X");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -91,6 +272,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
+        assertEq(reg.pos("TOKEN-X"), 48);
+        assertEq(reg.join("TOKEN-X"), addr.addr("MCD_JOIN_TOKEN_X"));
+        assertEq(reg.gem("TOKEN-X"), addr.addr("TOKEN"));
+        assertEq(reg.dec("TOKEN-X"), DSTokenAbstract(addr.addr("TOKEN")).decimals());
+        assertEq(reg.class("TOKEN-X"), 1);
+        assertEq(reg.pip("TOKEN-X"), addr.addr("PIP_TOKEN"));
+        assertEq(reg.xlip("TOKEN-X"), addr.addr("MCD_CLIP_TOKEN_X"));
+        assertEq(reg.name("TOKEN-X"), "NAME");
+        assertEq(reg.symbol("TOKEN-X"), "SYMBOL");
     }
 
     function testFailWrongDay() public {
@@ -213,11 +403,16 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function test_OSMs() private { // make public to use
+        address READER_ADDR = address(0);
+
+        // Track OSM authorizations here
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER_ADDR), 0);
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Track OSM authorizations here
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER_ADDR), 1);
     }
 
     function test_Medianizers() private { // make public to use
@@ -226,6 +421,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Track Median authorizations here
+        address SET_TOKEN    = address(0);
+        address TOKENUSD_MED = OsmAbstract(addr.addr("PIP_TOKEN")).src();
+        assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
     function test_auth() private { // make public to use
