@@ -28,9 +28,9 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20Vote%20-%20February%2025%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6fa5724ffd5801bbcf37802205ed4f54092c6147/governance/votes/Executive%20vote%20-%20March%204%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-03-04 MakerDAO Executive Spell | Hash: TODO";
+        "2022-03-04 MakerDAO Executive Spell | Hash: 0x9cf9cccb89d57a94d3b5cb95a5e5df67cdcfaf5310ff0481c194d5cc4a2f3fa2";
 
     // Recognized Delegates DAI Transfers
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
