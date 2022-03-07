@@ -343,6 +343,7 @@ contract Addresses {
         addr["MCD_JOIN_GUNIV3DAIUSDC2_A"]       = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
         addr["MCD_CLIP_GUNIV3DAIUSDC2_A"]       = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
         addr["MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"]  = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
+        addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
     }
 }
 

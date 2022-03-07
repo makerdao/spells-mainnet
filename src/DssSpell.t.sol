@@ -35,7 +35,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant amountCES     = 259_184;
     uint256 constant amountIS      = 138_000;
 
-    function testPayments() public {
+    function testPayments() private { // make public to use
 
         uint256 prevSin              = vat.sin(address(vow));
 
@@ -87,7 +87,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     uint256 constant MAR_01_2022            = 1646092800; // 2022-03-01
     uint256 constant APR_01_2022            = 1648771200; // 2022-04-01
-    function testDaiStreams() public {
+    function testDaiStreams() private { // make public to use
         uint256 streams = vestDai.ids();
         assertEq(streams, 29);
 
@@ -137,61 +137,6 @@ contract DssSpellTest is DssSpellTestBase {
         });
     }
 
-    // https://github.com/makerdao/spells-mainnet/tree/master/archive/2021-09-03-DssSpell
-    address immutable RISK_OLD_WALLET = 0xd98ef20520048a35EdA9A202137847A62120d2d9;
-    uint256 constant SEP_01_2021    = 1630454400;
-    uint256 constant SEP_01_2022    = 1661990400;
-    uint256 constant VEST_AMOUNT    = 2_184_000 * WAD;
-    uint256 constant CLAIMED_AMOUNT = 1_092_000 * WAD;
-
-    function testYankedDaiStreams() public {
-
-        assertTrue(vestDai.valid(8)); // check for valid contract
-        checkDaiVest({
-            _index:      8,                  // id
-            _wallet:     RISK_OLD_WALLET,    // usr
-            _start:      SEP_01_2021,        // bgn
-            _cliff:      SEP_01_2021,        // clf
-            _end:        SEP_01_2022,        // fin
-            _manager:    address(0),         // mgr
-            _restricted: 1,                  // res
-            _reward:     VEST_AMOUNT,        // tot
-            _claimed:    CLAIMED_AMOUNT      // rxd
-        });
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertTrue(vestDai.valid(8)); // check for valid contract
-        checkDaiVest({
-            _index:      8,                  // id
-            _wallet:     RISK_OLD_WALLET,    // usr
-            _start:      SEP_01_2021,        // bgn
-            _cliff:      SEP_01_2021,        // clf
-            _end:        block.timestamp,    // fin
-            _manager:    address(0),         // mgr
-            _restricted: 1,                  // res
-            _reward:     vestDai.accrued(8), // tot
-            _claimed:    CLAIMED_AMOUNT      // rxd
-        });
-
-        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        hevm.store(
-            address(vestDai),
-            keccak256(abi.encode(address(this), uint256(1))),
-            bytes32(uint256(1))
-        );
-        vestDai.unrestrict(8);
-        // //
-
-        vestDai.vest(8);
-
-        assertTrue(!vestDai.valid(8));
-
-        assertEqApprox(vestDai.rxd(8), CLAIMED_AMOUNT, 30_000 * WAD); // claimable delta on cast time (estimate)
-    }
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -222,7 +167,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testAAVEDirectBarChange() public {
+    function testAAVEDirectBarChange() private { // make public to use
         DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
         assertEq(join.bar(), 3.5 * 10**27 / 100);
 
@@ -270,16 +215,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_TOKEN_X"), addr.addr("MCD_JOIN_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_TOKEN_X"), addr.addr("MCD_CLIP_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TOKEN_X"), addr.addr("MCD_CLIP_CALC_TOKEN_X"));
-        assertEq(chainLog.version(), "X.X.X");
+        assertEq(chainLog.getAddress("FLASH_KILLER"), addr.addr("FLASH_KILLER"));
+        assertEq(chainLog.version(), "1.10.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -496,4 +439,30 @@ contract DssSpellTest is DssSpellTestBase {
         }
         assertEq(expectedHash, actualHash);
     }
+
+    function test_flashKiller() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH"));
+        address killer = addr.addr("FLASH_KILLER");
+
+        assertEq(flash.wards(killer), 1);
+
+        // Emulate Global Settlement
+        hevm.store(
+            address(end),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1)));
+        end.cage();
+
+        assertTrue(flash.max() > 0);
+        FlashKillerLike(killer).kill();
+        assertEq(flash.max(), 0);
+    }
+}
+
+interface FlashKillerLike {
+    function kill() external;
 }
