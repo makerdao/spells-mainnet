@@ -54,16 +54,15 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_TOKEN_X"), addr.addr("MCD_JOIN_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_TOKEN_X"), addr.addr("MCD_CLIP_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TOKEN_X"), addr.addr("MCD_CLIP_CALC_TOKEN_X"));
-        assertEq(chainLog.version(), "X.X.X");
+        assertEq(chainLog.getAddress("MCD_FLAP"), addr.addr("MCD_FLAP"));
+
+        assertEq(chainLog.version(), "1.10.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -280,4 +279,43 @@ contract DssSpellTest is DssSpellTestBase {
         }
         assertEq(expectedHash, actualHash);
     }
+
+    function setFlaps() internal {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        // Force creation of 1B surplus
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(address(vow), uint256(5))))),
+            bytes32(uint256(1_000_000_000 * RAD))
+        );
+        assertEq(vat.dai(address(vow)), 1_000_000_000 * RAD);
+        vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
+    }
+
+    function test_new_flapper() public {
+        setFlaps();
+
+        assertEq(vow.flapper(), addr.addr("MCD_FLAP"));
+        assertEq(address(flap), addr.addr("MCD_FLAP"));
+
+        assertEq(flap.fill(), 0);
+        vow.flap();
+        assertEq(flap.fill(), 30_000 * RAD);
+        vow.flap();
+        assertEq(flap.fill(), 60_000 * RAD);
+        vow.flap();
+        assertEq(flap.fill(), 90_000 * RAD);
+        vow.flap();
+        assertEq(flap.fill(), 120_000 * RAD);
+        vow.flap();
+        assertEq(flap.fill(), 150_000 * RAD);
+    }
+
+    function testFail_new_flapper_exeed_limit() public {
+        test_new_flapper();
+        vow.flap();
+    }
+
 }

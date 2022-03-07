@@ -35,6 +35,11 @@ interface DirectDepositLike is GemJoinAbstract {
     function king() external view returns (address);
 }
 
+interface FlapLike is FlapAbstract {
+    function fill() external view returns (uint256);
+    function lid() external view returns (uint256);
+}
+
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
@@ -61,7 +66,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-    FlapAbstract            flap = FlapAbstract(       addr.addr("MCD_FLAP"));
+    FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
 
     OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
@@ -381,6 +386,10 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(flap.tau(), values.flap_tau, "TestError/flap-tau");
         assertTrue(flap.tau() > 0 && flap.tau() < 2678400, "TestError/flap-tau-range"); // gt 0 && lt 1 month
         assertTrue(flap.tau() >= flap.ttl(), "TestError/flap-tau-ttl");
+        // Check flap lid and sanity checks
+        uint256 normalizedLid = values.flap_lid * RAD;
+        assertEq(flap.lid(), normalizedLid, "TestError/flap-lid");
+        assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
     }
 
     function checkCollateralValues(SystemValues storage values) internal {

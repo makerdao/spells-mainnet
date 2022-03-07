@@ -20,7 +20,8 @@ pragma solidity 0.6.12;
 //pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VestAbstract.sol";
+import "dss-interfaces/dss/FlapAbstract.sol";
+import "dss-interfaces/dss/ChainlogAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
@@ -32,8 +33,28 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-03-11 MakerDAO Executive Spell | Hash: TODO";
 
+    // Flap
+    address constant MCD_FLAP = 0xa4f79bC4a5612bdDA35904FDF55Fc4Cb53D1BFf6;
+
+    // Math
+    uint256 constant RAD = 10**45;
+
     function actions() public override {
-        
+        // Replace Flapper with rate limit one
+        // https://vote.makerdao.com/polling/Qmdd4Pg7
+        address MCD_VOW = DssExecLib.vow();
+        address MCD_FLAP_OLD = DssExecLib.flap();
+        DssExecLib.setValue(MCD_FLAP, "beg", FlapAbstract(MCD_FLAP_OLD).beg());
+        DssExecLib.setValue(MCD_FLAP, "ttl", FlapAbstract(MCD_FLAP_OLD).ttl());
+        DssExecLib.setValue(MCD_FLAP, "tau", FlapAbstract(MCD_FLAP_OLD).tau());
+        DssExecLib.setValue(MCD_FLAP, "lid", 150_000 * RAD);
+        DssExecLib.deauthorize(MCD_FLAP_OLD, MCD_VOW);
+        DssExecLib.authorize(MCD_FLAP, MCD_VOW);
+        DssExecLib.setContract(MCD_VOW, "flapper", MCD_FLAP);
+
+        // Changelog updates
+        DssExecLib.setChangelogAddress("MCD_FLAP", MCD_FLAP);
+        DssExecLib.setChangelogVersion("1.10.1");
     }
 }
 

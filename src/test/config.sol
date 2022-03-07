@@ -40,6 +40,7 @@ contract Config {
         uint256 flap_beg;
         uint256 flap_ttl;
         uint256 flap_tau;
+        uint256 flap_lid;
         uint256 cat_box;
         uint256 dog_Hole;
         uint256 esm_min;
@@ -121,6 +122,7 @@ contract Config {
             flap_beg:              400,                     // in basis points
             flap_ttl:              30 minutes,              // in seconds
             flap_tau:              72 hours,                // in seconds
+            flap_lid:              150 * THOUSAND,          // in whole Dai units
             cat_box:               20 * MILLION,            // In whole Dai units
             dog_Hole:              100 * MILLION,           // In whole Dai units
             esm_min:               100 * THOUSAND,          // In whole MKR units
