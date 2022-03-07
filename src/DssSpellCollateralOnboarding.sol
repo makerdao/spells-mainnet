@@ -34,57 +34,75 @@ contract DssSpellCollateralOnboardingAction {
 
     // --- Math ---
 
+    // --- PRE-REQUISITE GENERAL DEPLOYS ---
+    address constant CDP_REGISTRY              = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
+    address constant PROXY_ACTIONS_CROPPER     = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
+    address constant PROXY_ACTIONS_END_CROPPER = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
+    address constant CROPPER                   = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
+
     // --- DEPLOYED COLLATERAL ADDRESSES ---
+    address constant ETHSTETH                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
+    address constant PIP_ETHSTETH              = 0x100db6699D58467a1099a193F43c5C1203a9edDA;
+    address constant MCD_JOIN_ETHSTETH_A       = 0x036A451114E3835AbEF163A67163B6B376cF2480;
+    address constant MCD_CLIP_ETHSTETH_A       = 0x2Ae099CE87c1A1291953373F660bdEbbdc1928E9;
+    address constant MCD_CLIP_CALC_ETHSTETH_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add ______________ as a new Vault Type
-        //  Poll Link:
+        //  Add CRVV1ETHSTETH-A as a new Vault Type
+        //  Poll Link: https://vote.makerdao.com/polling/Qmek9vzo?network=mainnet#poll-detail
 
-        // DssExecLib.addNewCollateral(
-        //     CollateralOpts({
-        //         ilk:                   ,
-        //         gem:                   ,
-        //         join:                  ,
-        //         clip:                  ,
-        //         calc:                  ,
-        //         pip:                   ,
-        //         isLiquidatable:        ,
-        //         isOSM:                 ,
-        //         whitelistOSM:          ,
-        //         ilkDebtCeiling:        ,
-        //         minVaultAmount:        ,
-        //         maxLiquidationAmount:  ,
-        //         liquidationPenalty:    ,
-        //         ilkStabilityFee:       ,
-        //         startingPriceFactor:   ,
-        //         breakerTolerance:      ,
-        //         auctionDuration:       ,
-        //         permittedDrop:         ,
-        //         liquidationRatio:      ,
-        //         kprFlatReward:         ,
-        //         kprPctReward:
-        //     })
-        // );
-
-        // DssExecLib.setStairstepExponentialDecrease(
-        //     CALC_ADDR,
-        //     DURATION,
-        //     PCT_BPS
-        // );
-
-        // DssExecLib.setIlkAutoLineParameters(
-        //     ILK,
-        //     AMOUNT,
-        //     GAP,
-        //     TTL
-        // );
+        DssExecLib.addNewCollateral(
+            CollateralOpts({
+                ilk:                   "CRVV1ETHSTETH-A",
+                gem:                   ETHSTETH,
+                join:                  MCD_JOIN_ETHSTETH_A,
+                clip:                  MCD_CLIP_ETHSTETH_A,
+                calc:                  MCD_CLIP_CALC_ETHSTETH_A,
+                pip:                   PIP_ETHSTETH,
+                isLiquidatable:        true,
+                isOSM:                 true,
+                whitelistOSM:          true,
+                ilkDebtCeiling:        3 * MILLION,
+                minVaultAmount:        15 * THOUSAND,
+                maxLiquidationAmount:  3 * MILLION,
+                liquidationPenalty:    1300,
+                ilkStabilityFee:       FOUR_POINT_FIVE_PCT,
+                startingPriceFactor:   13000,
+                breakerTolerance:      5000,
+                auctionDuration:       140 minutes,
+                permittedDrop:         4000,
+                liquidationRatio:      15500,
+                kprFlatReward:         300,
+                kprPctReward:          10
+            })
+        );
+        DssExecLib.setStairstepExponentialDecrease(
+            MCD_CLIP_CALC_ETHSTETH_A,
+            90 seconds,
+            9900
+        );
+        DssExecLib.setIlkAutoLineParameters(
+            "CRVV1ETHSTETH-A",
+            5 * MILLION,
+            3 * MILLION,
+            8 hours
+        );
+        DssExecLib.authorize(MCD_JOIN_ETHSTETH_A, CROPPER);
 
         // ChainLog Updates
-        // Add the new flip and join to the Chainlog
-        // address constant CHAINLOG        = DssExecLib.LOG();
-        // ChainlogAbstract(CHAINLOG).setAddress("<join-name>", <join-address>);
-        // ChainlogAbstract(CHAINLOG).setAddress("<clip-name>", <clip-address>);
-        // ChainlogAbstract(CHAINLOG).setVersion("<new-version>");
+        // Add the new clip and join to the Chainlog
+        address constant CHAINLOG = DssExecLib.LOG();
+
+        ChainlogAbstract(CHAINLOG).setAddress("CDP_REGISTRY", CDP_REGISTRY);
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_CROPPER", CROPPER);
+        ChainlogAbstract(CHAINLOG).setAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
+        ChainlogAbstract(CHAINLOG).setAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
+        
+        ChainlogAbstract(CHAINLOG).setAddress("CRVV1ETHSTETH", ETHSTETH);
+        ChainlogAbstract(CHAINLOG).setAddress("PIP_CRVV1ETHSTETH", PIP_ETHSTETH);
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_CRVV1ETHSTETH_A", MCD_JOIN_ETHSTETH_A);
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_CLIP_CRVV1ETHSTETH_A", MCD_CLIP_ETHSTETH_A);
+        ChainlogAbstract(CHAINLOG).setAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A", MCD_CLIP_CALC_ETHSTETH_A);
     }
 }

@@ -40,6 +40,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant RAD = 10**45;
 
     function actions() public override {
+        onboardNewCollaterals();
+
         // Replace Flapper with rate limit one
         // https://vote.makerdao.com/polling/Qmdd4Pg7
         address MCD_VOW = DssExecLib.vow();
