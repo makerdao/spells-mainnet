@@ -90,7 +90,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.getAddress("MCD_CLIP_CRVV1ETHSTETH_A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
         assertEq(chainLog.getAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A"), addr.addr("MCD_CLIP_CALC_CRVV1ETHSTETH_A"));
 
-        assertEq(chainLog.version(), "1.10.1");
+        assertEq(chainLog.version(), "1.11.0");
     }
 
     function testNewIlkRegistryValues() public { // make public to use

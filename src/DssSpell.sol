@@ -64,7 +64,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         // Changelog updates
         DssExecLib.setChangelogAddress("MCD_FLAP", MCD_FLAP);
-        DssExecLib.setChangelogVersion("1.10.1");
+        DssExecLib.setChangelogVersion("1.11.0");
     }
 }
 
