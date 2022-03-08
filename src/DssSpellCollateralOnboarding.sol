@@ -19,6 +19,10 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExecLib.sol";
 
+interface CurveLPOracleLike {
+    function orbs(uint256) external view returns (address);
+}
+
 contract DssSpellCollateralOnboardingAction {
 
     // --- Rates ---
@@ -64,7 +68,7 @@ contract DssSpellCollateralOnboardingAction {
                 pip:                   PIP_ETHSTETH,
                 isLiquidatable:        true,
                 isOSM:                 true,
-                whitelistOSM:          true,
+                whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
                 ilkDebtCeiling:        3 * MILLION,
                 minVaultAmount:        15 * THOUSAND,
                 maxLiquidationAmount:  3 * MILLION,
@@ -90,7 +94,13 @@ contract DssSpellCollateralOnboardingAction {
             3 * MILLION,
             8 hours
         );
+
+        // Extra for crop-join - need to authorize the join adapter with the cropper
         DssExecLib.authorize(MCD_JOIN_ETHSTETH_A, CROPPER);
+
+        // Whitelist OSM - normally handled in addNewCollateral, but Curve LP Oracle format is not supported yet
+        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);
+        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
 
         // ChainLog Updates
         // Add the new clip and join to the Chainlog
