@@ -70,6 +70,7 @@ contract Addresses {
         addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
         addr["CDP_REGISTRY"]                    = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
         addr["MCD_CROPPER"]                     = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
+        addr["MCD_CROPPER_IMP"]                 = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
         addr["ETH"]                             = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                         = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                  = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;

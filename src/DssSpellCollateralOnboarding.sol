@@ -46,6 +46,7 @@ contract DssSpellCollateralOnboardingAction {
     address constant PROXY_ACTIONS_CROPPER     = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
     address constant PROXY_ACTIONS_END_CROPPER = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
     address constant CROPPER                   = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
+    address constant CROPPER_IMP               = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address constant ETHSTETH                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
@@ -113,6 +114,7 @@ contract DssSpellCollateralOnboardingAction {
         // Add the new clip and join to the Chainlog
         DssExecLib.setChangelogAddress("CDP_REGISTRY", CDP_REGISTRY);
         DssExecLib.setChangelogAddress("MCD_CROPPER", CROPPER);
+        DssExecLib.setChangelogAddress("MCD_CROPPER_IMP", CROPPER_IMP);
         DssExecLib.setChangelogAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
         DssExecLib.setChangelogAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
         
