@@ -49,10 +49,14 @@ contract DssSpellCollateralOnboardingAction {
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address constant ETHSTETH                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
-    address constant PIP_ETHSTETH              = 0x100db6699D58467a1099a193F43c5C1203a9edDA;
+    address constant PIP_ETHSTETH              = 0x2b465de3e69a2EC00158F0E3B4614e3582430ab2;
     address constant MCD_JOIN_ETHSTETH_A       = 0x036A451114E3835AbEF163A67163B6B376cF2480;
     address constant MCD_CLIP_ETHSTETH_A       = 0x2Ae099CE87c1A1291953373F660bdEbbdc1928E9;
     address constant MCD_CLIP_CALC_ETHSTETH_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
+
+    // --- Other addresses ---
+    address constant STETH_PRICE               = 0x911D7A8F87282C4111f621e2D100Aa751Bab1260;
+    address constant WSTETH_MEDIAN             = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
@@ -97,6 +101,9 @@ contract DssSpellCollateralOnboardingAction {
 
         // Extra for crop-join - need to authorize the join adapter with the cropper
         DssExecLib.authorize(MCD_JOIN_ETHSTETH_A, CROPPER);
+
+        // Need to whitelist the stETH Medianizer with the wstETH Medianizer
+        DssExecLib.addReaderToWhitelistCall(WSTETH_MEDIAN, STETH_PRICE);
 
         // Whitelist OSM - normally handled in addNewCollateral, but Curve LP Oracle format is not supported yet
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);

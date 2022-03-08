@@ -610,27 +610,56 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
+        // Scan the storage for the balance storage slot
         for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                address(token),
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                address(token),
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
+            // Solidity-style storage layout for maps
+            {
+                bytes32 prevValue = hevm.load(
+                    address(token),
+                    keccak256(abi.encode(address(this), uint256(i)))
+                );
+
                 hevm.store(
                     address(token),
                     keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
+                    bytes32(amount)
                 );
+                if (token.balanceOf(address(this)) == amount) {
+                    // Found it
+                    return;
+                } else {
+                    // Keep going after restoring the original value
+                    hevm.store(
+                        address(token),
+                        keccak256(abi.encode(address(this), uint256(i))),
+                        prevValue
+                    );
+                }
+            }
+
+            // Vyper-style storage layout for maps
+            {
+                bytes32 prevValue = hevm.load(
+                    address(token),
+                    keccak256(abi.encode(uint256(i), address(this)))
+                );
+
+                hevm.store(
+                    address(token),
+                    keccak256(abi.encode(uint256(i), address(this))),
+                    bytes32(amount)
+                );
+                if (token.balanceOf(address(this)) == amount) {
+                    // Found it
+                    return;
+                } else {
+                    // Keep going after restoring the original value
+                    hevm.store(
+                        address(token),
+                        keccak256(abi.encode(uint256(i), address(this))),
+                        prevValue
+                    );
+                }
             }
         }
 
@@ -969,7 +998,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         spotter.poke(_ilk);
 
         // Check medianizer sources
-        assertEq(pip.src(), address(token));
         assertEq(pip.orbs(0), _medianizer1);
         assertEq(pip.orbs(1), _medianizer2);
 

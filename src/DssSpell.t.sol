@@ -49,7 +49,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")),
             CurveLPOsmLike(addr.addr("PIP_CRVV1ETHSTETH")),
             0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85,     // ETH Medianizer
-            0xd27188da9A0FB3b8e785ccD43df99138449a594f,     // stETH Medianizer (proxy to wstETH medianizer)
+            0x911D7A8F87282C4111f621e2D100Aa751Bab1260,     // stETH Medianizer (proxy to wstETH medianizer)
             true,
             true,
             true
@@ -84,7 +84,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("CRVV1ETHSTETH-A"), 49);
+        assertEq(reg.pos("CRVV1ETHSTETH-A"), 48);
         assertEq(reg.join("CRVV1ETHSTETH-A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
         assertEq(reg.gem("CRVV1ETHSTETH-A"), addr.addr("CRVV1ETHSTETH"));
         assertEq(reg.dec("CRVV1ETHSTETH-A"), DSTokenAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
