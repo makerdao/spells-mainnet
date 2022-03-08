@@ -47,6 +47,10 @@ interface CropperLike {
     function frob(bytes32 ilk, address u, address v, address w, int256 dink, int256 dart) external;
 }
 
+interface CropJoinLike {
+    function bonus() external view returns (address);
+}
+
 interface CurveLPOsmLike is LPOsmAbstract {
     function orbs(uint256) external view returns (address);
 }
@@ -981,7 +985,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
     function checkCropCRVLPIntegration(
         bytes32 _ilk,
-        GemJoinAbstract join,
+        CropJoinLike join,
         ClipAbstract clip,
         CurveLPOsmLike pip,
         address _medianizer1,
@@ -1027,6 +1031,11 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
 
+        // Check that we got rewards from the time increment above
+        assertEq(DSTokenAbstract(bonus).balanceOf(address(this)), 0);
+        cropper.join(address(join), address(this), 0);
+        assertGt(DSTokenAbstract(bonus).balanceOf(address(this)), 0);
+
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
@@ -1055,8 +1064,11 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
+            // Kick off the liquidation
             dog.bark(_ilk, cropper.getOrCreateProxy(address(this)), address(this));
             assertEq(clip.kicks(), 1);
+
+            // TODO: Complete the liquidation
         }
 
         // Dump all dai for next run

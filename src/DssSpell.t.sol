@@ -45,7 +45,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new collateral tests here
         checkCropCRVLPIntegration(
             "CRVV1ETHSTETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")),
+            CropJoinLike(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")),
             CurveLPOsmLike(addr.addr("PIP_CRVV1ETHSTETH")),
             0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85,     // ETH Medianizer
