@@ -32,6 +32,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-03-11 MakerDAO Executive Spell | Hash: TODO";
 
+    // Immunefi Payouts
+    address constant WALLET1 = 0x3C32F2ca11D92a7093d1F237161C1fB692F6a8eA;
+    address constant WALLET2 = 0x2BC5fFc5De1a83a9e4cDDfA138bAEd516D70414b;
+
     // Flap
     address constant MCD_FLAP = 0xa4f79bC4a5612bdDA35904FDF55Fc4Cb53D1BFf6;
 
@@ -40,6 +44,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     function actions() public override {
         onboardNewCollaterals();
+
+        // Immunefi Payouts
+        // https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-5565/13545
+        DssExecLib.sendPaymentFromSurplusBuffer(WALLET1, 2_500);
+        DssExecLib.sendPaymentFromSurplusBuffer(WALLET2, 250);
 
         // Replace Flapper with rate limit one
         // https://vote.makerdao.com/polling/Qmdd4Pg7

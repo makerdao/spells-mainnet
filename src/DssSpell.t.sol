@@ -37,6 +37,20 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
+    address constant WALLET1 = 0x3C32F2ca11D92a7093d1F237161C1fB692F6a8eA;
+    address constant WALLET2 = 0x2BC5fFc5De1a83a9e4cDDfA138bAEd516D70414b;
+    function testPayments() public {
+        uint256 prev1 = dai.balanceOf(WALLET1);
+        uint256 prev2 = dai.balanceOf(WALLET2);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(dai.balanceOf(WALLET1) - prev1, 2_500 * WAD);
+        assertEq(dai.balanceOf(WALLET2) - prev2, 250 * WAD);
+    }
+
     function testCollateralIntegrations() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
