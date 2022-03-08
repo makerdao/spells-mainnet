@@ -199,12 +199,12 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     function setUp() public {
         hevm = Hevm(address(CHEAT_CODE));
 
+        setValues(address(chief));
+
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
         castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
-
-        setValues(address(chief));
     }
 
     function scheduleWaitAndCastFailDay() public {
