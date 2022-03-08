@@ -1017,11 +1017,11 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         giveTokens(token, amount);
 
         assertEq(token.balanceOf(address(this)), amount);
-        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
         token.approve(address(cropper), amount);
         cropper.join(address(join), address(this), amount);
         assertEq(token.balanceOf(address(this)), 0);
-        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
 
         // Tick the fees forward so that art != dai in wad units
         hevm.warp(block.timestamp + 1);
@@ -1031,25 +1031,26 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
         cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
-        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
         assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
+        vat.hope(address(cropper));      // Need to grant the cropper permission to remove dai
         cropper.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
-        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
         assertEq(vat.dai(address(this)), 0);
 
         // Withdraw from adapter
         cropper.exit(address(join), address(this), amount);
         assertEq(token.balanceOf(address(this)), amount);
-        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
 
         // Generate new DAI to force a liquidation
         token.approve(address(cropper), amount);
         cropper.join(address(join), address(this), amount);
         // dart max amount of DAI
         (,,uint256 spot,,) = vat.ilks(_ilk);
-        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
