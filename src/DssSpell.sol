@@ -23,7 +23,7 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface FlashLike {
+interface FlashKillerLike {
     function vat() external view returns (address);
     function flash() external view returns (address);
 }
@@ -43,9 +43,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     }
 
     function actions() public override {
-        require(FlashLike(FLASH_KILLER).vat() == DssExecLib.vat(), "DssSpell/non-matching-vat");
+        require(FlashKillerLike(FLASH_KILLER).vat() == DssExecLib.vat(), "DssSpell/non-matching-vat");
         address flash = DssExecLib.getChangelogAddress("MCD_FLASH");
-        require(FlashLike(FLASH_KILLER).flash() == flash, "DssSpell/non-matching-flash");
+        require(FlashKillerLike(FLASH_KILLER).flash() == flash, "DssSpell/non-matching-flash");
         DssExecLib.authorize(flash, FLASH_KILLER);
         DssExecLib.setChangelogAddress("FLASH_KILLER", FLASH_KILLER);
         DssExecLib.setChangelogVersion("1.10.1");
