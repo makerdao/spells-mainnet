@@ -31,8 +31,11 @@ contract DssSpellCollateralOnboardingAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmTRiQ3GqjCiRhh1ojzKzgScmSsiwQPLyjhgYSxZASQekj
     //
+    uint256 constant THREE_POINT_FIVE_PCT = 1000000001090862085746321732;
 
     // --- Math ---
+    uint256 constant THOUSAND   = 10 ** 3;
+    uint256 constant MILLION    = 10 ** 6;
 
     // --- PRE-REQUISITE GENERAL DEPLOYS ---
     address constant CDP_REGISTRY              = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
@@ -51,7 +54,6 @@ contract DssSpellCollateralOnboardingAction {
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add CRVV1ETHSTETH-A as a new Vault Type
         //  Poll Link: https://vote.makerdao.com/polling/Qmek9vzo?network=mainnet#poll-detail
-
         DssExecLib.addNewCollateral(
             CollateralOpts({
                 ilk:                   "CRVV1ETHSTETH-A",
@@ -67,7 +69,7 @@ contract DssSpellCollateralOnboardingAction {
                 minVaultAmount:        15 * THOUSAND,
                 maxLiquidationAmount:  3 * MILLION,
                 liquidationPenalty:    1300,
-                ilkStabilityFee:       FOUR_POINT_FIVE_PCT,
+                ilkStabilityFee:       THREE_POINT_FIVE_PCT,
                 startingPriceFactor:   13000,
                 breakerTolerance:      5000,
                 auctionDuration:       140 minutes,
@@ -84,7 +86,7 @@ contract DssSpellCollateralOnboardingAction {
         );
         DssExecLib.setIlkAutoLineParameters(
             "CRVV1ETHSTETH-A",
-            5 * MILLION,
+            3 * MILLION,
             3 * MILLION,
             8 hours
         );
@@ -92,17 +94,15 @@ contract DssSpellCollateralOnboardingAction {
 
         // ChainLog Updates
         // Add the new clip and join to the Chainlog
-        address constant CHAINLOG = DssExecLib.LOG();
-
-        ChainlogAbstract(CHAINLOG).setAddress("CDP_REGISTRY", CDP_REGISTRY);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_CROPPER", CROPPER);
-        ChainlogAbstract(CHAINLOG).setAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
-        ChainlogAbstract(CHAINLOG).setAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
+        DssExecLib.setChangelogAddress("CDP_REGISTRY", CDP_REGISTRY);
+        DssExecLib.setChangelogAddress("CROPPER", CROPPER);
+        DssExecLib.setChangelogAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
+        DssExecLib.setChangelogAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
         
-        ChainlogAbstract(CHAINLOG).setAddress("CRVV1ETHSTETH", ETHSTETH);
-        ChainlogAbstract(CHAINLOG).setAddress("PIP_CRVV1ETHSTETH", PIP_ETHSTETH);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_JOIN_CRVV1ETHSTETH_A", MCD_JOIN_ETHSTETH_A);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_CLIP_CRVV1ETHSTETH_A", MCD_CLIP_ETHSTETH_A);
-        ChainlogAbstract(CHAINLOG).setAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A", MCD_CLIP_CALC_ETHSTETH_A);
+        DssExecLib.setChangelogAddress("CRVV1ETHSTETH", ETHSTETH);
+        DssExecLib.setChangelogAddress("PIP_CRVV1ETHSTETH", PIP_ETHSTETH);
+        DssExecLib.setChangelogAddress("MCD_JOIN_CRVV1ETHSTETH_A", MCD_JOIN_ETHSTETH_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A", MCD_CLIP_ETHSTETH_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A", MCD_CLIP_CALC_ETHSTETH_A);
     }
 }
