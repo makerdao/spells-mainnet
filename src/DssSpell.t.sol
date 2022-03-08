@@ -65,7 +65,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.getAddress("MCD_FLAP"), addr.addr("MCD_FLAP"));
 
         assertEq(chainLog.getAddress("CDP_REGISTRY"), addr.addr("CDP_REGISTRY"));
-        assertEq(chainLog.getAddress("CROPPER"), addr.addr("CROPPER"));
+        assertEq(chainLog.getAddress("MCD_CROPPER"), addr.addr("MCD_CROPPER"));
         assertEq(chainLog.getAddress("PROXY_ACTIONS_CROPPER"), addr.addr("PROXY_ACTIONS_CROPPER"));
         assertEq(chainLog.getAddress("PROXY_ACTIONS_END_CROPPER"), addr.addr("PROXY_ACTIONS_END_CROPPER"));
 

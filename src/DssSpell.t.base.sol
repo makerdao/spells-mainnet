@@ -48,6 +48,8 @@ interface CropperLike {
 }
 
 interface CropJoinLike {
+    function wards(address) external view returns (uint256);
+    function gem() external view returns (address);
     function bonus() external view returns (address);
 }
 
@@ -82,7 +84,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
-    CropperLike          cropper = CropperLike(        addr.addr("CROPPER"));
+    CropperLike          cropper = CropperLike(        addr.addr("MCD_CROPPER"));
 
     OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
@@ -994,8 +996,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         bool _isMedian2,
         bool _checkLiquidations
     ) public {
-        DSTokenAbstract token = DSTokenAbstract(join.gem());
-
         pip.poke();
         hevm.warp(block.timestamp + 3601);
         pip.poke();
@@ -1018,13 +1018,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
         uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
-        giveTokens(token, amount);
+        giveTokens(DSTokenAbstract(join.gem()), amount);
 
-        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-        token.approve(address(cropper), amount);
+        DSTokenAbstract(join.gem()).approve(address(cropper), amount);
         cropper.join(address(join), address(this), amount);
-        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), 0);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
 
         // Tick the fees forward so that art != dai in wad units
@@ -1032,9 +1032,9 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         jug.drip(_ilk);
 
         // Check that we got rewards from the time increment above
-        assertEq(DSTokenAbstract(bonus).balanceOf(address(this)), 0);
+        assertEq(DSTokenAbstract(join.bonus()).balanceOf(address(this)), 0);
         cropper.join(address(join), address(this), 0);
-        assertGt(DSTokenAbstract(bonus).balanceOf(address(this)), 0);
+        assertGt(DSTokenAbstract(join.bonus()).balanceOf(address(this)), 0);
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
@@ -1051,15 +1051,17 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Withdraw from adapter
         cropper.exit(address(join), address(this), amount);
-        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
 
         // Generate new DAI to force a liquidation
-        token.approve(address(cropper), amount);
+        DSTokenAbstract(join.gem()).approve(address(cropper), amount);
         cropper.join(address(join), address(this), amount);
         // dart max amount of DAI
-        (,,uint256 spot,,) = vat.ilks(_ilk);
-        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        {   // Stack too deep
+            (,,uint256 spot,,) = vat.ilks(_ilk);
+            cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        }
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
@@ -1068,7 +1070,18 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             dog.bark(_ilk, cropper.getOrCreateProxy(address(this)), address(this));
             assertEq(clip.kicks(), 1);
 
-            // TODO: Complete the liquidation
+            // Complete the liquidation
+            vat.hope(address(clip));
+            (, uint256 tab,,,,) = clip.sales(1);
+            hevm.store(
+                address(vat),
+                keccak256(abi.encode(address(this), uint256(5))),
+                bytes32(tab)
+            );
+            assertEq(vat.dai(address(this)), tab);
+            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
+            clip.take(1, type(uint256).max, type(uint256).max, address(this), "");
+            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
         }
 
         // Dump all dai for next run

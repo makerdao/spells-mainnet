@@ -112,7 +112,7 @@ contract DssSpellCollateralOnboardingAction {
         // ChainLog Updates
         // Add the new clip and join to the Chainlog
         DssExecLib.setChangelogAddress("CDP_REGISTRY", CDP_REGISTRY);
-        DssExecLib.setChangelogAddress("CROPPER", CROPPER);
+        DssExecLib.setChangelogAddress("MCD_CROPPER", CROPPER);
         DssExecLib.setChangelogAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
         DssExecLib.setChangelogAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
         
