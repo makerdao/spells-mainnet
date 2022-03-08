@@ -130,7 +130,7 @@ contract Config {
             osm_mom_authority:     chief,                   // OsmMom authority
             flipper_mom_authority: chief,                   // FlipperMom authority
             clipper_mom_authority: chief,                   // ClipperMom authority
-            ilk_count:             48                       // Num expected in system
+            ilk_count:             49                       // Num expected in system
         });
 
         //
@@ -1575,6 +1575,36 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
+            lerp:         false
+        });
+        afterSpell.collaterals["CRVV1ETHSTETH-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      3 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         15 * THOUSAND,
+            pct:          350,
+            mat:          15500,
+            liqType:      "clip",
+            liqOn:        true,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     3 * MILLION,
+            clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
+            calc_tau:     0,
+            calc_step:    90,
+            calc_cut:     9900,
             lerp:         false
         });
     }

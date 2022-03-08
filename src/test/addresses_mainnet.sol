@@ -66,6 +66,10 @@ contract Addresses {
         addr["MCD_VEST_DAI"]                    = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
         addr["MCD_VEST_MKR"]                    = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+        addr["PROXY_ACTIONS_CROPPER"]           = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
+        addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
+        addr["CDP_REGISTRY"]                    = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
+        addr["CROPPER"]                         = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
         addr["ETH"]                             = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                         = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                  = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
@@ -343,6 +347,11 @@ contract Addresses {
         addr["MCD_JOIN_GUNIV3DAIUSDC2_A"]       = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
         addr["MCD_CLIP_GUNIV3DAIUSDC2_A"]       = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
         addr["MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"]  = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
+        addr["CRVV1ETHSTETH"]                   = 0x06325440D014e39736583c165C2963BA99fAf14E;
+        addr["PIP_CRVV1ETHSTETH"]               = 0x100db6699D58467a1099a193F43c5C1203a9edDA;
+        addr["MCD_JOIN_CRVV1ETHSTETH_A"]        = 0x036A451114E3835AbEF163A67163B6B376cF2480;
+        addr["MCD_CLIP_CRVV1ETHSTETH_A"]        = 0x2Ae099CE87c1A1291953373F660bdEbbdc1928E9;
+        addr["MCD_CLIP_CALC_CRVV1ETHSTETH_A"]   = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
     }
 }
 

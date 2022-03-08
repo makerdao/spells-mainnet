@@ -37,20 +37,22 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testCollateralIntegrations() private { // make public to use
+    function testCollateralIntegrations() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
-            "TOKEN-X",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-            addr.addr("PIP_TOKEN"),
+        checkCropCRVLPIntegration(
+            "CRVV1ETHSTETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")),
+            CurveLPOsmLike(addr.addr("PIP_CRVV1ETHSTETH")),
+            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85,     // ETH Medianizer
+            0xd27188da9A0FB3b8e785ccD43df99138449a594f,     // stETH Medianizer (proxy to wstETH medianizer)
             true,
             true,
-            false
+            true
         );
     }
 
@@ -62,24 +64,35 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new chainlog values tests here
         assertEq(chainLog.getAddress("MCD_FLAP"), addr.addr("MCD_FLAP"));
 
+        assertEq(chainLog.getAddress("CDP_REGISTRY"), addr.addr("CDP_REGISTRY"));
+        assertEq(chainLog.getAddress("CROPPER"), addr.addr("CROPPER"));
+        assertEq(chainLog.getAddress("PROXY_ACTIONS_CROPPER"), addr.addr("PROXY_ACTIONS_CROPPER"));
+        assertEq(chainLog.getAddress("PROXY_ACTIONS_END_CROPPER"), addr.addr("PROXY_ACTIONS_END_CROPPER"));
+
+        assertEq(chainLog.getAddress("CRVV1ETHSTETH"), addr.addr("CRVV1ETHSTETH"));
+        assertEq(chainLog.getAddress("PIP_CRVV1ETHSTETH"), addr.addr("PIP_CRVV1ETHSTETH"));
+        assertEq(chainLog.getAddress("MCD_JOIN_CRVV1ETHSTETH_A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CRVV1ETHSTETH_A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A"), addr.addr("MCD_CLIP_CALC_CRVV1ETHSTETH_A"));
+
         assertEq(chainLog.version(), "1.10.1");
     }
 
-    function testNewIlkRegistryValues() private { // make public to use
+    function testNewIlkRegistryValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("TOKEN-X"), 48);
-        assertEq(reg.join("TOKEN-X"), addr.addr("MCD_JOIN_TOKEN_X"));
-        assertEq(reg.gem("TOKEN-X"), addr.addr("TOKEN"));
-        assertEq(reg.dec("TOKEN-X"), DSTokenAbstract(addr.addr("TOKEN")).decimals());
-        assertEq(reg.class("TOKEN-X"), 1);
-        assertEq(reg.pip("TOKEN-X"), addr.addr("PIP_TOKEN"));
-        assertEq(reg.xlip("TOKEN-X"), addr.addr("MCD_CLIP_TOKEN_X"));
-        assertEq(reg.name("TOKEN-X"), "NAME");
-        assertEq(reg.symbol("TOKEN-X"), "SYMBOL");
+        assertEq(reg.pos("CRVV1ETHSTETH-A"), 49);
+        assertEq(reg.join("CRVV1ETHSTETH-A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
+        assertEq(reg.gem("CRVV1ETHSTETH-A"), addr.addr("CRVV1ETHSTETH"));
+        assertEq(reg.dec("CRVV1ETHSTETH-A"), DSTokenAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
+        assertEq(reg.class("CRVV1ETHSTETH-A"), 1);
+        assertEq(reg.pip("CRVV1ETHSTETH-A"), addr.addr("PIP_CRVV1ETHSTETH"));
+        assertEq(reg.xlip("CRVV1ETHSTETH-A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
+        assertEq(reg.name("CRVV1ETHSTETH-A"), "Curve.fi ETH/stETH");
+        assertEq(reg.symbol("CRVV1ETHSTETH-A"), "steCRV");
     }
 
     function testFailWrongDay() public {

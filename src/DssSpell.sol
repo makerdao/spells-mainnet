@@ -17,7 +17,7 @@
 
 pragma solidity 0.6.12;
 // Enable ABIEncoderV2 when onboarding collateral
-//pragma experimental ABIEncoderV2;
+pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/FlapAbstract.sol";

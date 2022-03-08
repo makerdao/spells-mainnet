@@ -40,6 +40,17 @@ interface FlapLike is FlapAbstract {
     function lid() external view returns (uint256);
 }
 
+interface CropperLike {
+    function getOrCreateProxy(address usr) external returns (address urp);
+    function join(address crop, address usr, uint256 val) external;
+    function exit(address crop, address usr, uint256 val) external;
+    function frob(bytes32 ilk, address u, address v, address w, int256 dink, int256 dart) external;
+}
+
+interface CurveLPOsmLike is LPOsmAbstract {
+    function orbs(uint256) external view returns (address);
+}
+
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
@@ -67,6 +78,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
+    CropperLike          cropper = CropperLike(        addr.addr("CROPPER"));
 
     OsmMomAbstract           osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract      flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
@@ -936,6 +948,90 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertLe(ink, 1);
         assertLe(art, 1);
         assertEq(token.balanceOf(address(join)), 0);
+    }
+
+    function checkCropCRVLPIntegration(
+        bytes32 _ilk,
+        GemJoinAbstract join,
+        ClipAbstract clip,
+        CurveLPOsmLike pip,
+        address _medianizer1,
+        address _medianizer2,
+        bool _isMedian1,
+        bool _isMedian2,
+        bool _checkLiquidations
+    ) public {
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
+
+        pip.poke();
+        hevm.warp(block.timestamp + 3601);
+        pip.poke();
+        spotter.poke(_ilk);
+
+        // Check medianizer sources
+        assertEq(pip.src(), address(token));
+        assertEq(pip.orbs(0), _medianizer1);
+        assertEq(pip.orbs(1), _medianizer2);
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(pip.wards(address(osmMom)), 1);
+        assertEq(pip.bud(address(spotter)), 1);
+        assertEq(pip.bud(address(end)), 1);
+        if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
+        if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
+
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        dust /= RAY;
+        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
+        giveTokens(token, amount);
+
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        token.approve(address(cropper), amount);
+        cropper.join(address(join), address(this), amount);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(vat.gem(_ilk, address(this)), amount);
+
+        // Tick the fees forward so that art != dai in wad units
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+
+        // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
+        assertEq(vat.dai(address(this)), 0);
+        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), 0);
+        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
+
+        // Payback DAI, withdraw collateral
+        cropper.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        assertEq(vat.gem(_ilk, address(this)), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        cropper.exit(address(join), address(this), amount);
+        assertEq(token.balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, address(this)), 0);
+
+        // Generate new DAI to force a liquidation
+        token.approve(address(cropper), amount);
+        cropper.join(address(join), address(this), amount);
+        // dart max amount of DAI
+        (,,uint256 spot,,) = vat.ilks(_ilk);
+        vat.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+        hevm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+        assertEq(clip.kicks(), 0);
+        if (_checkLiquidations) {
+            dog.bark(_ilk, cropper.getOrCreateProxy(address(this)), address(this));
+            assertEq(clip.kicks(), 1);
+        }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
     function checkDaiVest(
