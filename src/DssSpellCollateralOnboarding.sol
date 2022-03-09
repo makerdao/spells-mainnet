@@ -75,7 +75,7 @@ contract DssSpellCollateralOnboardingAction {
                 isOSM:                 true,
                 whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
                 ilkDebtCeiling:        3 * MILLION,
-                minVaultAmount:        15 * THOUSAND,
+                minVaultAmount:        25 * THOUSAND,
                 maxLiquidationAmount:  3 * MILLION,
                 liquidationPenalty:    1300,
                 ilkStabilityFee:       THREE_POINT_FIVE_PCT,

@@ -1583,7 +1583,7 @@ contract Config {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         15 * THOUSAND,
+            dust:         25 * THOUSAND,
             pct:          350,
             mat:          15500,
             liqType:      "clip",
