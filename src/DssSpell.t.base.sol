@@ -57,6 +57,13 @@ interface CurveLPOsmLike is LPOsmAbstract {
     function orbs(uint256) external view returns (address);
 }
 
+interface LidoLike {
+    function balanceOf(address account) external view returns (uint256);
+    function earned(address account) external view returns (uint256);
+    function getReward() external;
+    function userRewardPerTokenPaid(address) external view returns (uint256);
+}
+
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
@@ -1028,7 +1035,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
 
         // Tick the fees forward so that art != dai in wad units
-        hevm.warp(block.timestamp + 60);
+        hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
 
         // Check that we got rewards from the time increment above
