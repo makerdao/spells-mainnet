@@ -461,6 +461,16 @@ contract DssSpellTest is DssSpellTestBase {
         FlashKillerLike(killer).kill();
         assertEq(flash.max(), 0);
     }
+
+    function testFail_flashKiller() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        address killer = addr.addr("FLASH_KILLER");
+
+        FlashKillerLike(killer).kill();
+    }
 }
 
 interface FlashKillerLike {
