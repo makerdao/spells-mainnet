@@ -31,9 +31,9 @@ interface FlashKillerLike {
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget  -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/032b4a2fe74e46bded6beeb59d10d37393509798/governance/votes/Executive%20vote%20-%20March%209%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-03-09 MakerDAO Executive Spell | Hash: ";
+        "2022-03-09 MakerDAO Executive Spell | Hash: 0x3dbd4673376e8b89c755ceaa85560b7f1df3818b5dee0a92858014ad9acd1ea2";
 
     address constant FLASH_KILLER = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
 
