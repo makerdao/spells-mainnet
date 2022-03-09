@@ -51,8 +51,8 @@ contract DssSpellCollateralOnboardingAction {
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address constant ETHSTETH                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
     address constant PIP_ETHSTETH              = 0x2b465de3e69a2EC00158F0E3B4614e3582430ab2;
-    address constant MCD_JOIN_ETHSTETH_A       = 0x036A451114E3835AbEF163A67163B6B376cF2480;
-    address constant MCD_CLIP_ETHSTETH_A       = 0x2Ae099CE87c1A1291953373F660bdEbbdc1928E9;
+    address constant MCD_JOIN_ETHSTETH_A       = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
+    address constant MCD_CLIP_ETHSTETH_A       = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
     address constant MCD_CLIP_CALC_ETHSTETH_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
 
     // --- Other addresses ---

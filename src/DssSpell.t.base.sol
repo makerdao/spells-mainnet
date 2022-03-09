@@ -1028,7 +1028,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
 
         // Tick the fees forward so that art != dai in wad units
-        hevm.warp(block.timestamp + 1);
+        hevm.warp(block.timestamp + 60);
         jug.drip(_ilk);
 
         // Check that we got rewards from the time increment above
