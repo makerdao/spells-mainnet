@@ -57,13 +57,6 @@ interface CurveLPOsmLike is LPOsmAbstract {
     function orbs(uint256) external view returns (address);
 }
 
-interface LidoLike {
-    function balanceOf(address account) external view returns (uint256);
-    function earned(address account) external view returns (uint256);
-    function getReward() external;
-    function userRewardPerTokenPaid(address) external view returns (uint256);
-}
-
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
