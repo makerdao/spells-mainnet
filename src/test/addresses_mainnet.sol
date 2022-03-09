@@ -26,6 +26,7 @@ contract Addresses {
         addr["MULTICALL"]                       = 0x5e227AD1969Ea493B43F840cfF78d08a6fc17796;
         addr["FAUCET"]                          = 0x0000000000000000000000000000000000000000;
         addr["MCD_DEPLOY"]                      = 0xbaa65281c2FA2baAcb2cb550BA051525A480D3F4;
+        addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
         addr["FLIP_FAB"]                        = 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b;
         addr["CLIP_FAB"]                        = 0x0716F25fBaAae9b63803917b6125c10c313dF663;
         addr["CALC_FAB"]                        = 0xE1820A2780193d74939CcA104087CADd6c1aA13A;
@@ -66,6 +67,8 @@ contract Addresses {
         addr["MCD_VEST_DAI"]                    = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
         addr["MCD_VEST_MKR"]                    = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
+        addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
+        addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
         addr["ETH"]                             = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                         = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                  = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
@@ -300,8 +303,6 @@ contract Addresses {
         addr["RWA002_A_URN"]                    = 0x225B3da5BE762Ee52B182157E67BeA0b31968163;
         addr["RWA002_A_INPUT_CONDUIT"]          = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
         addr["RWA002_A_OUTPUT_CONDUIT"]         = 0x2474F297214E5d96Ba4C81986A9F0e5C260f445D;
-        addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
-        addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["RWA003"]                          = 0x07F0A80aD7AeB7BfB7f139EA71B3C8f7E17156B9;
         addr["MCD_JOIN_RWA003_A"]               = 0x1Fe789BBac5b141bdD795A3Bc5E12Af29dDB4b86;
         addr["RWA003_A_URN"]                    = 0x7bF825718e7C388c3be16CFe9982539A7455540F;
@@ -343,7 +344,6 @@ contract Addresses {
         addr["MCD_JOIN_GUNIV3DAIUSDC2_A"]       = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
         addr["MCD_CLIP_GUNIV3DAIUSDC2_A"]       = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
         addr["MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"]  = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
-        addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
     }
 }
 
