@@ -1009,6 +1009,11 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
         assertEq(clip.wards(address(end)), 1);
+        assertEq(vat.wards(address(clip)), 1);
+        assertEq(dog.wards(address(clip)), 1);
+        assertEq(clip.wards(address(dog)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(esm)), 1);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
