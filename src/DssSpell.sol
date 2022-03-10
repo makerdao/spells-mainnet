@@ -27,9 +27,9 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6fa5724ffd5801bbcf37802205ed4f54092c6147/governance/votes/Executive%20vote%20-%20March%204%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/19e338132d799741f42f07a130efb9692654897f/governance/votes/Executive%20Vote%20-%20March%2011%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-03-11 MakerDAO Executive Spell | Hash: TODO";
+        "2022-03-11 MakerDAO Executive Spell | Hash: 0x4eaeba62293ee8c19ccb1dfc7d9e97b5764b7e62fefebc1049f2e8f984d0836f";
 
     // Immunefi Payouts
     address constant WALLET1 = 0x3C32F2ca11D92a7093d1F237161C1fB692F6a8eA;
