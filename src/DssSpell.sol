@@ -24,7 +24,6 @@ import "dss-interfaces/dss/FlapAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions

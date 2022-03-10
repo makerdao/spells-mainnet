@@ -41,7 +41,7 @@ contract Addresses {
         addr["MCD_DOG"]                         = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
         addr["MCD_VOW"]                         = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
         addr["MCD_JOIN_DAI"]                    = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
-        addr["MCD_FLAP"]                        = 0xa4f79bC4a5612bdDA35904FDF55Fc4Cb53D1BFf6;
+        addr["MCD_FLAP"]                        = 0xC4269cC7acDEdC3794b221aA4D9205F564e27f0d;
         addr["MCD_FLOP"]                        = 0xA41B6EF151E06da0e34B009B86E828308986736D;
         addr["MCD_PAUSE"]                       = 0xbE286431454714F511008713973d3B053A2d38f3;
         addr["MCD_PAUSE_PROXY"]                 = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
@@ -69,11 +69,6 @@ contract Addresses {
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
         addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
-        addr["PROXY_ACTIONS_CROPPER"]           = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
-        addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
-        addr["CDP_REGISTRY"]                    = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
-        addr["MCD_CROPPER"]                     = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
-        addr["MCD_CROPPER_IMP"]                 = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
         addr["ETH"]                             = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                         = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                  = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
@@ -349,11 +344,6 @@ contract Addresses {
         addr["MCD_JOIN_GUNIV3DAIUSDC2_A"]       = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
         addr["MCD_CLIP_GUNIV3DAIUSDC2_A"]       = 0xB55da3d3100C4eBF9De755b6DdC24BF209f6cc06;
         addr["MCD_CLIP_CALC_GUNIV3DAIUSDC2_A"]  = 0xef051Ca2A2d809ba47ee0FC8caaEd06E3D832225;
-        addr["CRVV1ETHSTETH"]                   = 0x06325440D014e39736583c165C2963BA99fAf14E;
-        addr["PIP_CRVV1ETHSTETH"]               = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
-        addr["MCD_JOIN_CRVV1ETHSTETH_A"]        = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
-        addr["MCD_CLIP_CRVV1ETHSTETH_A"]        = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
-        addr["MCD_CLIP_CALC_CRVV1ETHSTETH_A"]   = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
     }
 }
 
