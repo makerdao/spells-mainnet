@@ -229,28 +229,30 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function test_OSMs() private { // make public to use
-        address READER_ADDR = address(0);
+    function test_OSMs() public { // make public to use
+        address READER_ADDR = address(spotter);
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER_ADDR), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_CRVV1ETHSTETH")).bud(READER_ADDR), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER_ADDR), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_CRVV1ETHSTETH")).bud(READER_ADDR), 1);
     }
 
-    function test_Medianizers() private { // make public to use
+    function test_Medianizers() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track Median authorizations here
-        address SET_TOKEN    = address(0);
-        address TOKENUSD_MED = OsmAbstract(addr.addr("PIP_TOKEN")).src();
-        assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
+        address SET_TOKEN    = addr.addr("PIP_CRVV1ETHSTETH");
+        address ETHUSD_MED   = CurveLPOsmLike(SET_TOKEN).orbs(0);
+        address STETHUSD_MED = CurveLPOsmLike(SET_TOKEN).orbs(1);
+        assertEq(MedianAbstract(ETHUSD_MED).bud(SET_TOKEN), 1);
+        assertEq(MedianAbstract(STETHUSD_MED).bud(SET_TOKEN), 1);
     }
 
     function test_auth() public { // make public to use
