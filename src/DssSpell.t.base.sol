@@ -1005,6 +1005,17 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(pip.orbs(0), _medianizer1);
         assertEq(pip.orbs(1), _medianizer2);
 
+        // Contracts set
+        {
+            (address _clip,,,) = dog.ilks(_ilk);
+            assertEq(_clip, address(clip));
+        }
+        assertEq(clip.ilk(), _ilk);
+        assertEq(clip.vat(), address(vat));
+        assertEq(clip.vow(), address(vow));
+        assertEq(clip.dog(), address(dog));
+        assertEq(clip.spotter(), address(spotter));
+
         // Authorization
         assertEq(join.wards(pauseProxy), 1);
         assertEq(vat.wards(address(join)), 1);
@@ -1012,10 +1023,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(dog.wards(address(clip)), 1);
         assertEq(clip.wards(address(dog)), 1);
         assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
         assertEq(clip.wards(address(esm)), 1);
         assertEq(pip.wards(address(osmMom)), 1);
         assertEq(pip.bud(address(spotter)), 1);
         assertEq(pip.bud(address(end)), 1);
+        assertEq(pip.bud(address(clip)), 1);
+        assertEq(pip.bud(address(clipMom)), 1);
         if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
         if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
 
