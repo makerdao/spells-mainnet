@@ -40,6 +40,11 @@ contract DssSpellTest is DssSpellTestBase {
     address constant WALLET1 = 0x3C32F2ca11D92a7093d1F237161C1fB692F6a8eA;
     address constant WALLET2 = 0x2BC5fFc5De1a83a9e4cDDfA138bAEd516D70414b;
     function testPayments() public {
+        uint256 prevSin = vat.sin(address(vow));
+
+        uint256 amt1 = 2_500 * WAD;
+        uint256 amt2 = 250 * WAD;
+
         uint256 prev1 = dai.balanceOf(WALLET1);
         uint256 prev2 = dai.balanceOf(WALLET2);
 
@@ -47,8 +52,10 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(dai.balanceOf(WALLET1) - prev1, 2_500 * WAD);
-        assertEq(dai.balanceOf(WALLET2) - prev2, 250 * WAD);
+        assertEq(vat.sin(address(vow)) - prevSin, (amt1 + amt2) * RAY);
+
+        assertEq(dai.balanceOf(WALLET1) - prev1, amt1);
+        assertEq(dai.balanceOf(WALLET2) - prev2, amt2);
     }
 
     function testCollateralIntegrations() public { // make public to use
@@ -253,6 +260,7 @@ contract DssSpellTest is DssSpellTestBase {
         address STETHUSD_MED = CurveLPOsmLike(SET_TOKEN).orbs(1);
         assertEq(MedianAbstract(ETHUSD_MED).bud(SET_TOKEN), 1);
         assertEq(MedianAbstract(STETHUSD_MED).bud(SET_TOKEN), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WSTETH")).src()).bud(STETHUSD_MED), 1);
     }
 
     function test_auth() public { // make public to use
