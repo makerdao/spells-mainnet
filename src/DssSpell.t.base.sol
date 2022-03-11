@@ -1034,8 +1034,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
-        dust /= RAY;
-        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
+        uint256 amount = 2 * dust / (getUNIV2LPPrice(address(pip)) * 1e9);
         giveTokens(DSTokenAbstract(join.gem()), amount);
 
         assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
@@ -1058,13 +1057,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
-        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(mul(RAY, dust), rate)));
+        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(dust, rate)));
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-        assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
+        assertTrue(vat.dai(address(this)) >= dust && vat.dai(address(this)) <= dust + RAY);
 
         // Payback DAI, withdraw collateral
         vat.hope(address(cropper));      // Need to grant the cropper permission to remove dai
-        cropper.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(mul(RAY, dust), rate)));
+        cropper.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(dust, rate)));
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
         assertEq(vat.dai(address(this)), 0);
 
