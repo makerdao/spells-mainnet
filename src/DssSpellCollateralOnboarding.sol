@@ -111,7 +111,6 @@ contract DssSpellCollateralOnboardingAction {
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
 
         // ChainLog Updates
-        // Add the new clip and join to the Chainlog
         DssExecLib.setChangelogAddress("CDP_REGISTRY", CDP_REGISTRY);
         DssExecLib.setChangelogAddress("MCD_CROPPER", CROPPER);
         DssExecLib.setChangelogAddress("MCD_CROPPER_IMP", CROPPER_IMP);
