@@ -11,4 +11,6 @@ deploy          :; make && dapp create DssSpell | xargs ./scripts/verify.py DssS
 deploy-stamp    :; ./scripts/get-created-timestamp.sh
 flatten         :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
 archive-spell   :; ./scripts/archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
+feed            :; ./scripts/check-oracle-feed.sh $(pip)
+feed-lp         :; ./scripts/check-oracle-feed-lp.sh $(pip)
 wards           :; ./scripts/wards.sh $(target)
