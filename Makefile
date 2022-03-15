@@ -3,8 +3,8 @@ all             :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecL
                     dapp --use solc:0.6.12 build
 clean           :; dapp clean
                     # Usage example: make test match=SpellIsCast
-test            :; ./scripts/test-dssspell.sh match="$(match)" optimizer="$(optimizer)"
-test-dev        :; ./scripts/test-dssspell.sh match="$(match)" optimizer="0"
+test            :; ./scripts/test-dssspell.sh match="$(match)" optimizer="$(optimizer)" block="$(block)"
+test-dev        :; ./scripts/test-dssspell.sh match="$(match)" optimizer="0" block="$(block)"
 test-forge      :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 estimate        :; ./scripts/estimate-deploy-gas.sh
 deploy          :; make && dapp create DssSpell | xargs ./scripts/verify.py DssSpell

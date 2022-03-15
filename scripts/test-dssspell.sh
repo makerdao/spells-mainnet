@@ -10,6 +10,7 @@ do
 
     case "$KEY" in
             match)      MATCH="$VALUE" ;;
+            block)      BLOCK="$VALUE" ;;
             optimizer)  OPTIMIZER="$VALUE" ;;
             *)
     esac
@@ -29,8 +30,12 @@ echo "Using DssExecLib at: $DSS_EXEC_LIB"
 export DAPP_LIBRARIES=" lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$DSS_EXEC_LIB"
 export DAPP_LINK_TEST_LIBRARIES=0
 
-if [[ -z "$MATCH" ]]; then
+if [[ -z "$MATCH" && -z "$BLOCK" ]]; then
   dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" -v
-else
+elif [[ -z "$BLOCK" ]]; then
   dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" --match "$MATCH" -vv
+elif [[ -z "$MATCH" ]]; then
+  dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" --rpc-block "$BLOCK" -vv
+else
+  dapp --use solc:0.6.12 test --rpc-url="$ETH_RPC_URL" --match "$MATCH" --rpc-block "$BLOCK" -vv
 fi
