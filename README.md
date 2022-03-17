@@ -36,7 +36,7 @@ $ make test
 
 ### Test (Forge without Optimizations)
 
-#### Prerequisites
+#### Prerequisites
 1. [Install](https://www.rust-lang.org/tools/install) Rust.
 2. [Install](https://github.com/gakonst/foundry#forge) Forge.
 
