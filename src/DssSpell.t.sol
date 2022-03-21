@@ -39,7 +39,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     address constant WALLET1 = 0x3C32F2ca11D92a7093d1F237161C1fB692F6a8eA;
     address constant WALLET2 = 0x2BC5fFc5De1a83a9e4cDDfA138bAEd516D70414b;
-    function testPayments() public {
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         uint256 amt1 = 2_500 * WAD;
@@ -58,7 +58,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(WALLET2) - prev2, amt2);
     }
 
-    function testCollateralIntegrations() public { // make public to use
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -77,7 +77,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -100,7 +100,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.version(), "1.11.0");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -236,7 +236,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function test_OSMs() public { // make public to use
+    function test_OSMs() private { // make public to use
         address READER_ADDR = address(spotter);
 
         // Track OSM authorizations here
@@ -249,7 +249,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_CRVV1ETHSTETH")).bud(READER_ADDR), 1);
     }
 
-    function test_Medianizers() public { // make public to use
+    function test_Medianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -317,43 +317,4 @@ contract DssSpellTest is DssSpellTestBase {
         }
         assertEq(expectedHash, actualHash);
     }
-
-    function setFlaps() internal {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        // Force creation of 1B surplus
-        hevm.store(
-            address(vat),
-            bytes32(uint256(keccak256(abi.encode(address(vow), uint256(5))))),
-            bytes32(uint256(1_000_000_000 * RAD))
-        );
-        assertEq(vat.dai(address(vow)), 1_000_000_000 * RAD);
-        vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
-    }
-
-    function test_new_flapper() public {
-        setFlaps();
-
-        assertEq(vow.flapper(), addr.addr("MCD_FLAP"));
-        assertEq(address(flap), addr.addr("MCD_FLAP"));
-
-        assertEq(flap.fill(), 0);
-        vow.flap();
-        assertEq(flap.fill(), 30_000 * RAD);
-        vow.flap();
-        assertEq(flap.fill(), 60_000 * RAD);
-        vow.flap();
-        assertEq(flap.fill(), 90_000 * RAD);
-        vow.flap();
-        assertEq(flap.fill(), 120_000 * RAD);
-        vow.flap();
-        assertEq(flap.fill(), 150_000 * RAD);
-    }
-
-    function testFail_new_flapper_exeed_limit() public {
-        test_new_flapper();
-        vow.flap();
-    }
-
 }
