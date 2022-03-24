@@ -31,7 +31,7 @@ contract DssSpellCollateralOnboardingAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmTRiQ3GqjCiRhh1ojzKzgScmSsiwQPLyjhgYSxZASQekj
     //
-    uint256 constant NUMBER_PCT = 1000000004090862085746321732;
+    uint256 constant NUMBER_PCT = 1000000001234567890123456789;
 
     // --- Math ---
     uint256 constant THOUSAND   = 10 ** 3;
@@ -48,52 +48,52 @@ contract DssSpellCollateralOnboardingAction {
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add CRVV1ETHSTETH-A as a new Vault Type
         //  Poll Link: https://vote.makerdao.com/polling/Qmek9vzo?network=mainnet#poll-detail
-        DssExecLib.addNewCollateral(
-            CollateralOpts({
-                ilk:                   "XXX-A",
-                gem:                   XXX,
-                join:                  MCD_JOIN_XXX_A,
-                clip:                  MCD_CLIP_XXX_A,
-                calc:                  MCD_CLIP_CALC_XXX_A,
-                pip:                   PIP_XXX,
-                isLiquidatable:        true,
-                isOSM:                 true,
-                whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
-                ilkDebtCeiling:        3 * MILLION,
-                minVaultAmount:        25 * THOUSAND,
-                maxLiquidationAmount:  3 * MILLION,
-                liquidationPenalty:    1300,
-                ilkStabilityFee:       NUMBER_PCT,
-                startingPriceFactor:   13000,
-                breakerTolerance:      5000,
-                auctionDuration:       140 minutes,
-                permittedDrop:         4000,
-                liquidationRatio:      15500,
-                kprFlatReward:         300,
-                kprPctReward:          10
-            })
-        );
-        DssExecLib.setStairstepExponentialDecrease(
-            MCD_CLIP_CALC_XXX_A,
-            90 seconds,
-            9900
-        );
-        DssExecLib.setIlkAutoLineParameters(
-            "XXX-A",
-            3 * MILLION,
-            3 * MILLION,
-            8 hours
-        );
+        // DssExecLib.addNewCollateral(
+        //     CollateralOpts({
+        //         ilk:                   "XXX-A",
+        //         gem:                   XXX,
+        //         join:                  MCD_JOIN_XXX_A,
+        //         clip:                  MCD_CLIP_XXX_A,
+        //         calc:                  MCD_CLIP_CALC_XXX_A,
+        //         pip:                   PIP_XXX,
+        //         isLiquidatable:        true,
+        //         isOSM:                 true,
+        //         whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
+        //         ilkDebtCeiling:        3 * MILLION,
+        //         minVaultAmount:        25 * THOUSAND,
+        //         maxLiquidationAmount:  3 * MILLION,
+        //         liquidationPenalty:    1300,
+        //         ilkStabilityFee:       NUMBER_PCT,
+        //         startingPriceFactor:   13000,
+        //         breakerTolerance:      5000,
+        //         auctionDuration:       140 minutes,
+        //         permittedDrop:         4000,
+        //         liquidationRatio:      15500,
+        //         kprFlatReward:         300,
+        //         kprPctReward:          10
+        //     })
+        // );
+        // DssExecLib.setStairstepExponentialDecrease(
+        //     MCD_CLIP_CALC_XXX_A,
+        //     90 seconds,
+        //     9900
+        // );
+        // DssExecLib.setIlkAutoLineParameters(
+        //     "XXX-A",
+        //     3 * MILLION,
+        //     3 * MILLION,
+        //     8 hours
+        // );
 
         // Whitelist OSM - normally handled in addNewCollateral, but Curve LP Oracle format is not supported yet
         // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);
         // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
 
         // ChainLog Updates
-        DssExecLib.setChangelogAddress("XXX", XXX);
-        DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
-        DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
+        // DssExecLib.setChangelogAddress("XXX", XXX);
+        // DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
+        // DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
     }
 }
