@@ -11,11 +11,12 @@ interface Gem6Like {
 
 interface GemJoin6Like {
     function implementations(address) external view returns (uint256);
+    function join(address, uint256) external;
 }
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function testTUSDImplementation() public {
+    function test_TUSDImplementation() public {
         address TUSD = addr.addr("TUSD");
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
         address prevImpl = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
@@ -31,6 +32,27 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(prevImpl), 0);
         assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 1);
+    }
+
+    function joinTUSD() internal {
+        address TUSD = addr.addr("TUSD");
+        address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
+
+        uint256 amount = 86 * THOUSAND * WAD;
+        giveTokens(DSTokenAbstract(TUSD), amount);
+        DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
+        GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
+    }
+
+    function testFail_joinTUSDBefore() public {
+        joinTUSD();
+    }
+
+    function test_joinTUSDAfter() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
+        joinTUSD();
     }
 
     function testSpellIsCast_GENERAL() public {
