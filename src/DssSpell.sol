@@ -30,6 +30,10 @@ interface GemJoin6Like {
     ) external;
 }
 
+interface AuthLike {
+    function rely(address) external;
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -52,6 +56,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         address MCD_JOIN_TUSD_A = DssExecLib.getChangelogAddress("MCD_JOIN_TUSD_A");
         GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_PREV_IMPL, 0);
         GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_NEXT_IMPL, 1);
+
+        // Authorize ESM on DssFlash
+        // https://forum.makerdao.com/t/proposed-security-fix-to-be-added-in-the-march-25th-2022-executive-spell
+        address MCD_FLASH = DssExecLib.getChangelogAddress("MCD_FLASH");
+        address MCD_ESM = DssExecLib.esm();
+        AuthLike(MCD_FLASH).rely(MCD_ESM);
     }
 }
 

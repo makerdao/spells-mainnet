@@ -14,6 +14,10 @@ interface GemJoin6Like {
     function join(address, uint256) external;
 }
 
+interface AuthLike {
+    function wards(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
 
     function test_TUSDImplementation() public {
@@ -53,6 +57,19 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
         joinTUSD();
+    }
+
+    function test_ESMFlashAuth() public {
+        address MCD_FLASH = addr.addr("MCD_FLASH");
+        address MCD_ESM = addr.addr("MCD_ESM");
+
+        assertEq(AuthLike(MCD_FLASH).wards(MCD_ESM), 0);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
+
+        assertEq(AuthLike(MCD_FLASH).wards(MCD_ESM), 1);
     }
 
     function testSpellIsCast_GENERAL() public {
