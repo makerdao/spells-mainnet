@@ -38,11 +38,11 @@ contract DssSpellCollateralOnboardingAction {
     uint256 constant MILLION    = 10 ** 6;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address constant XXX                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
-    address constant PIP_XXX              = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
-    address constant MCD_JOIN_XXX_A       = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
-    address constant MCD_CLIP_XXX_A       = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
-    address constant MCD_CLIP_CALC_XXX_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
+    // address constant XXX                  = 0x0000000000000000000000000000000000000000;
+    // address constant PIP_XXX              = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_JOIN_XXX_A       = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_CLIP_XXX_A       = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_CLIP_CALC_XXX_A  = 0x0000000000000000000000000000000000000000;
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
