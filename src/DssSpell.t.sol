@@ -12,6 +12,7 @@ interface Gem6Like {
 interface GemJoin6Like {
     function implementations(address) external view returns (uint256);
     function join(address, uint256) external;
+    function exit(address, uint256) external;
 }
 
 interface AuthLike {
@@ -38,25 +39,29 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 1);
     }
 
-    function joinTUSD() internal {
+    function joinAndExitTUSD() internal {
         address TUSD = addr.addr("TUSD");
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
+        address ali = 0x6C64CeAF2338cE509A612cf244FFb121e0ff172c;
 
         uint256 amount = 86 * THOUSAND * WAD;
         giveTokens(DSTokenAbstract(TUSD), amount);
         DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
         GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
+        assertEq(DSTokenAbstract(TUSD).balanceOf(ali), 0);
+        GemJoin6Like(MCD_JOIN_TUSD_A).exit(ali, amount);
+        assertEq(DSTokenAbstract(TUSD).balanceOf(ali), amount);
     }
 
-    function testFail_joinTUSDBefore() public {
-        joinTUSD();
+    function testFail_joinAndExitTUSDBefore() public {
+        joinAndExitTUSD();
     }
 
-    function test_joinTUSDAfter() public {
+    function test_joinAndExitTUSDAfter() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
-        joinTUSD();
+        joinAndExitTUSD();
     }
 
     function test_ESMFlashAuth() public {
