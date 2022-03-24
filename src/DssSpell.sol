@@ -40,6 +40,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address public constant TUSD_PREV_IMPL = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
     address public constant TUSD_NEXT_IMPL = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
 
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     function actions() public override {
         // onboardNewCollaterals();
 
