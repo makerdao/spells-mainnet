@@ -19,10 +19,6 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExecLib.sol";
 
-interface CurveLPOracleLike {
-    function orbs(uint256) external view returns (address);
-}
-
 contract DssSpellCollateralOnboardingAction {
 
     // --- Rates ---
@@ -35,29 +31,18 @@ contract DssSpellCollateralOnboardingAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmTRiQ3GqjCiRhh1ojzKzgScmSsiwQPLyjhgYSxZASQekj
     //
-    uint256 constant THREE_POINT_FIVE_PCT = 1000000001090862085746321732;
+    uint256 constant NUMBER_PCT = 1000000004090862085746321732;
 
     // --- Math ---
     uint256 constant THOUSAND   = 10 ** 3;
     uint256 constant MILLION    = 10 ** 6;
 
-    // --- PRE-REQUISITE GENERAL DEPLOYS ---
-    address constant CDP_REGISTRY              = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
-    address constant PROXY_ACTIONS_CROPPER     = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
-    address constant PROXY_ACTIONS_END_CROPPER = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
-    address constant CROPPER                   = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
-    address constant CROPPER_IMP               = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
-
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address constant ETHSTETH                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
-    address constant PIP_ETHSTETH              = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
-    address constant MCD_JOIN_ETHSTETH_A       = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
-    address constant MCD_CLIP_ETHSTETH_A       = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
-    address constant MCD_CLIP_CALC_ETHSTETH_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
-
-    // --- Other addresses ---
-    address constant STETH_PRICE               = 0x911D7A8F87282C4111f621e2D100Aa751Bab1260;
-    address constant WSTETH_MEDIAN             = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
+    address constant XXX                  = 0x06325440D014e39736583c165C2963BA99fAf14E;
+    address constant PIP_XXX              = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
+    address constant MCD_JOIN_XXX_A       = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
+    address constant MCD_CLIP_XXX_A       = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
+    address constant MCD_CLIP_CALC_XXX_A  = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
@@ -65,12 +50,12 @@ contract DssSpellCollateralOnboardingAction {
         //  Poll Link: https://vote.makerdao.com/polling/Qmek9vzo?network=mainnet#poll-detail
         DssExecLib.addNewCollateral(
             CollateralOpts({
-                ilk:                   "CRVV1ETHSTETH-A",
-                gem:                   ETHSTETH,
-                join:                  MCD_JOIN_ETHSTETH_A,
-                clip:                  MCD_CLIP_ETHSTETH_A,
-                calc:                  MCD_CLIP_CALC_ETHSTETH_A,
-                pip:                   PIP_ETHSTETH,
+                ilk:                   "XXX-A",
+                gem:                   XXX,
+                join:                  MCD_JOIN_XXX_A,
+                clip:                  MCD_CLIP_XXX_A,
+                calc:                  MCD_CLIP_CALC_XXX_A,
+                pip:                   PIP_XXX,
                 isLiquidatable:        true,
                 isOSM:                 true,
                 whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
@@ -78,7 +63,7 @@ contract DssSpellCollateralOnboardingAction {
                 minVaultAmount:        25 * THOUSAND,
                 maxLiquidationAmount:  3 * MILLION,
                 liquidationPenalty:    1300,
-                ilkStabilityFee:       THREE_POINT_FIVE_PCT,
+                ilkStabilityFee:       NUMBER_PCT,
                 startingPriceFactor:   13000,
                 breakerTolerance:      5000,
                 auctionDuration:       140 minutes,
@@ -89,38 +74,26 @@ contract DssSpellCollateralOnboardingAction {
             })
         );
         DssExecLib.setStairstepExponentialDecrease(
-            MCD_CLIP_CALC_ETHSTETH_A,
+            MCD_CLIP_CALC_XXX_A,
             90 seconds,
             9900
         );
         DssExecLib.setIlkAutoLineParameters(
-            "CRVV1ETHSTETH-A",
+            "XXX-A",
             3 * MILLION,
             3 * MILLION,
             8 hours
         );
 
-        // Extra for crop-join - need to authorize the join adapter with the cropper
-        DssExecLib.authorize(MCD_JOIN_ETHSTETH_A, CROPPER);
-
-        // Need to whitelist the stETH Medianizer with the wstETH Medianizer
-        DssExecLib.addReaderToWhitelistCall(WSTETH_MEDIAN, STETH_PRICE);
-
         // Whitelist OSM - normally handled in addNewCollateral, but Curve LP Oracle format is not supported yet
-        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);
-        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
+        // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);
+        // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
 
         // ChainLog Updates
-        DssExecLib.setChangelogAddress("CDP_REGISTRY", CDP_REGISTRY);
-        DssExecLib.setChangelogAddress("MCD_CROPPER", CROPPER);
-        DssExecLib.setChangelogAddress("MCD_CROPPER_IMP", CROPPER_IMP);
-        DssExecLib.setChangelogAddress("PROXY_ACTIONS_CROPPER", PROXY_ACTIONS_CROPPER);
-        DssExecLib.setChangelogAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
-        
-        DssExecLib.setChangelogAddress("CRVV1ETHSTETH", ETHSTETH);
-        DssExecLib.setChangelogAddress("PIP_CRVV1ETHSTETH", PIP_ETHSTETH);
-        DssExecLib.setChangelogAddress("MCD_JOIN_CRVV1ETHSTETH_A", MCD_JOIN_ETHSTETH_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A", MCD_CLIP_ETHSTETH_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_CRVV1ETHSTETH_A", MCD_CLIP_CALC_ETHSTETH_A);
+        DssExecLib.setChangelogAddress("XXX", XXX);
+        DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
+        DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
     }
 }
