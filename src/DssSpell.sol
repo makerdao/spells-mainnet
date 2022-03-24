@@ -23,10 +23,6 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface Gem6Like {
-    function implementation() external returns (address);
-}
-
 interface GemJoin6Like {
     function setImplementation(
         address implementation,
@@ -41,14 +37,15 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-03-25 MakerDAO Executive Spell | Hash: TODO";
 
+    address public constant TUSD_IMPLEMENTATION = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
+
     function actions() public override {
         // onboardNewCollaterals();
 
         // update TUSD implementation
-        address TUSD = DssExecLib.getChangelogAddress("TUSD");
+        // TODO link
         address MCD_JOIN_TUSD_A = DssExecLib.getChangelogAddress("MCD_JOIN_TUSD_A");
-        address implementation = Gem6Like(TUSD).implementation(); 
-        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(implementation, 1);
+        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPLEMENTATION, 1);
     }
 }
 

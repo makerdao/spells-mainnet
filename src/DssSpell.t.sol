@@ -5,10 +5,6 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
-interface Gem6Like {
-    function implementation() external view returns (address);
-}
-
 interface GemJoin6Like {
     function implementations(address) external view returns (uint256);
 }
@@ -16,9 +12,8 @@ interface GemJoin6Like {
 contract DssSpellTest is DssSpellTestBase {
 
     function testTUSDImplementation() public {
-        address TUSD = addr.addr("TUSD");
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
-        address implementation = Gem6Like(TUSD).implementation();
+        address implementation = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
         assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(implementation), 0);
 
         vote(address(spell));
