@@ -37,15 +37,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-03-25 MakerDAO Executive Spell | Hash: TODO";
 
-    address public constant TUSD_IMPLEMENTATION = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
+    address public constant TUSD_PREV_IMPL = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
+    address public constant TUSD_NEXT_IMPL = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
 
     function actions() public override {
         // onboardNewCollaterals();
 
-        // update TUSD implementation
-        // TODO link
+        // Update TUSD implementation
+        // https://forum.makerdao.com/t/2022-03-25-adding-support-for-the-new-tusd-implementation-address/14189
         address MCD_JOIN_TUSD_A = DssExecLib.getChangelogAddress("MCD_JOIN_TUSD_A");
-        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_IMPLEMENTATION, 1);
+        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_PREV_IMPL, 0);
+        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_NEXT_IMPL, 1);
     }
 }
 

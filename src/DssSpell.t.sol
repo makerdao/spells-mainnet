@@ -13,14 +13,17 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testTUSDImplementation() public {
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
-        address implementation = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(implementation), 0);
+        address prevImpl = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
+        address nextImpl = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
+        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(prevImpl), 1);
+        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
 
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(implementation), 1);
+        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(prevImpl), 0);
+        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 1);
     }
 
     function testSpellIsCast_GENERAL() public {
