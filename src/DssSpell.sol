@@ -61,7 +61,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://forum.makerdao.com/t/proposed-security-fix-to-be-added-in-the-march-25th-2022-executive-spell
         address MCD_FLASH = DssExecLib.getChangelogAddress("MCD_FLASH");
         address MCD_ESM = DssExecLib.esm();
-        AuthLike(MCD_FLASH).rely(MCD_ESM);
+        DssExecLib.authorize(MCD_FLASH, MCD_ESM);
     }
 }
 
