@@ -42,17 +42,16 @@ contract DssSpellTest is DssSpellTestBase {
     function joinAndExitTUSD() internal {
         address TUSD = addr.addr("TUSD");
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
-        address ali = 0x6C64CeAF2338cE509A612cf244FFb121e0ff172c;
 
         uint256 amount = 86 * THOUSAND * WAD;
         giveTokens(DSTokenAbstract(TUSD), amount);
         DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
         GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
         assertEq(vat.gem("TUSD-A", address(this)), amount);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(ali), 0);
-        GemJoin6Like(MCD_JOIN_TUSD_A).exit(ali, amount);
+        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), 0);
+        GemJoin6Like(MCD_JOIN_TUSD_A).exit(address(this), amount);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(ali), amount);
+        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), amount);
     }
 
     function testFail_joinAndExitTUSDBefore() public {
