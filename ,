@@ -1052,7 +1052,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
         cropper.join(address(join), address(this), 0);
         // NOTE: LDO rewards are shutting off on Friday so this will fail (bad timing), but they plan to extend
-        //assertGt(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
+        //assertGt(DSTokenAbstract(join.bonus()).balanceOf(address(this)), 0);
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
@@ -1069,12 +1069,12 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Withdraw from adapter
         cropper.exit(address(join), address(this), amount);
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
 
         if (_checkLiquidations) {
             // Generate new DAI to force a liquidation
-            GemAbstract(join.gem()).approve(address(cropper), amount);
+            DSTokenAbstract(join.gem()).approve(address(cropper), amount);
             cropper.join(address(join), address(this), amount);
             // dart max amount of DAI
             {   // Stack too deep

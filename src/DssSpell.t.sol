@@ -44,14 +44,14 @@ contract DssSpellTest is DssSpellTestBase {
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
 
         uint256 amount = 86 * THOUSAND * WAD;
-        giveTokens(DSTokenAbstract(TUSD), amount);
-        DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
+        giveTokens(GemAbstract(TUSD), amount);
+        GemAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
         GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
         assertEq(vat.gem("TUSD-A", address(this)), amount);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), 0);
+        assertEq(GemAbstract(TUSD).balanceOf(address(this)), 0);
         GemJoin6Like(MCD_JOIN_TUSD_A).exit(address(this), amount);
         assertEq(vat.gem("TUSD-A", address(this)), 0);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), amount);
+        assertEq(GemAbstract(TUSD).balanceOf(address(this)), amount);
     }
 
     function testFail_joinAndExitTUSDBefore() public {
@@ -164,7 +164,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.pos("XXX-A"), 48);
         assertEq(reg.join("XXX-A"), addr.addr("MCD_JOIN_XXX_A"));
         assertEq(reg.gem("XXX-A"), addr.addr("XXX"));
-        assertEq(reg.dec("XXX-A"), DSTokenAbstract(addr.addr("XXX")).decimals());
+        assertEq(reg.dec("XXX-A"), GemAbstract(addr.addr("XXX")).decimals());
         assertEq(reg.class("XXX-A"), 1);
         assertEq(reg.pip("XXX-A"), addr.addr("PIP_XXX"));
         assertEq(reg.xlip("XXX-A"), addr.addr("MCD_CLIP_XXX_A"));
