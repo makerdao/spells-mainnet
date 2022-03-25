@@ -30,10 +30,6 @@ interface GemJoin6Like {
     ) external;
 }
 
-interface AuthLike {
-    function rely(address) external;
-}
-
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
