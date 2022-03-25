@@ -254,7 +254,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
     function vote(address spell_) internal {
         if (chief.hat() != spell_) {
-            giveTokens(gov, 999999999999 ether);
+            giveTokens(GemAbstract(address(gov)), 999999999999 ether);
             gov.approve(address(chief), uint256(-1));
             chief.lock(999999999999 ether);
 
