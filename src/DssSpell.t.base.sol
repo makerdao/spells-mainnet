@@ -254,7 +254,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
     function vote(address spell_) internal {
         if (chief.hat() != spell_) {
-            giveTokens(GemAbstract(address(gov)), 999999999999 ether);
+            giveTokens(gov, 999999999999 ether);
             gov.approve(address(chief), uint256(-1));
             chief.lock(999999999999 ether);
 
@@ -612,7 +612,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         return price;
     }
 
-    function giveTokens(GemAbstract token, uint256 amount) internal {
+    function giveTokens(DSTokenAbstract token, uint256 amount) internal {
         // Edge case - balance is already set for some reason
         if (token.balanceOf(address(this)) == amount) return;
 
@@ -716,7 +716,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         bool _checkLiquidations,
         bool _transferFee
     ) public {
-        GemAbstract token = GemAbstract(join.gem());
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
 
         if (_isOSM) OsmAbstract(pip).poke();
         hevm.warp(block.timestamp + 3601);
@@ -812,7 +812,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         bool _isMedian2,
         bool _checkLiquidations
     ) public {
-        GemAbstract token = GemAbstract(join.gem());
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
 
         pip.poke();
         hevm.warp(block.timestamp + 3601);
@@ -894,7 +894,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         uint256 tin,
         uint256 tout
     ) public {
-        GemAbstract token = GemAbstract(join.gem());
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
 
         assertTrue(pip != address(0));
 
@@ -942,7 +942,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         uint256 bar,
         uint256 tau
     ) public {
-        GemAbstract token = GemAbstract(join.gem());
+        DSTokenAbstract token = DSTokenAbstract(join.gem());
         assertTrue(pip != address(0));
 
         spotter.poke(_ilk);
@@ -1035,13 +1035,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         uint256 amount = 2 * dust / (getUNIV2LPPrice(address(pip)) * 1e9);
-        giveTokens(GemAbstract(join.gem()), amount);
+        giveTokens(DSTokenAbstract(join.gem()), amount);
 
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-        GemAbstract(join.gem()).approve(address(cropper), amount);
+        DSTokenAbstract(join.gem()).approve(address(cropper), amount);
         cropper.join(address(join), address(this), amount);
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), 0);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), 0);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
 
         // Tick the fees forward so that art != dai in wad units
@@ -1049,10 +1049,10 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         jug.drip(_ilk);
 
         // Check that we got rewards from the time increment above
-        assertEq(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
+        assertEq(DSTokenAbstract(join.bonus()).balanceOf(address(this)), 0);
         cropper.join(address(join), address(this), 0);
         // NOTE: LDO rewards are shutting off on Friday so this will fail (bad timing), but they plan to extend
-        //assertGt(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
+        //assertGt(DSTokenAbstract(join.bonus()).balanceOf(address(this)), 0);
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
@@ -1069,12 +1069,12 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Withdraw from adapter
         cropper.exit(address(join), address(this), amount);
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
+        assertEq(DSTokenAbstract(join.gem()).balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
 
         if (_checkLiquidations) {
             // Generate new DAI to force a liquidation
-            GemAbstract(join.gem()).approve(address(cropper), amount);
+            DSTokenAbstract(join.gem()).approve(address(cropper), amount);
             cropper.join(address(join), address(this), amount);
             // dart max amount of DAI
             {   // Stack too deep
