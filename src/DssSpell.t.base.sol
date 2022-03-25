@@ -79,7 +79,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     SpotAbstract         spotter = SpotAbstract(       addr.addr("MCD_SPOT"));
     DaiAbstract              dai = DaiAbstract(        addr.addr("MCD_DAI"));
     DaiJoinAbstract      daiJoin = DaiJoinAbstract(    addr.addr("MCD_JOIN_DAI"));
-    GemAbstract              gov = GemAbstract(        addr.addr("MCD_GOV"));
+    DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
