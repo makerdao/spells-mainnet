@@ -33,9 +33,9 @@ interface GemJoin6Like {
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20Vote%20-%20March%2025%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/821b3cd2d736be97bedb7583dcbff49edeb53e1f/governance/votes/Executive%20vote%20-%20March%2025%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-03-25 MakerDAO Executive Spell | Hash: TODO";
+        "2022-03-25 MakerDAO Executive Spell | Hash: 0xde56d1553299f5d1dc2fdeb7ca352d82ac2ca011b9afbaa0709fe42338871d29";
 
     address public constant TUSD_PREV_IMPL = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
     address public constant TUSD_NEXT_IMPL = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
