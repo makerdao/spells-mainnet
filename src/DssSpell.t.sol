@@ -44,7 +44,7 @@ contract DssSpellTest is DssSpellTestBase {
         address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
 
         uint256 amount = 86 * THOUSAND * WAD;
-        giveTokens(DSTokenAbstract(TUSD), amount);
+        giveTokens(TUSD, amount);
         DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
         GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
         assertEq(vat.gem("TUSD-A", address(this)), amount);
