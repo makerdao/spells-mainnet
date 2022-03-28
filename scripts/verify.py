@@ -63,18 +63,12 @@ compiler_version = 'v' + metadata['compiler']['version']
 evm_version = metadata['settings']['evmVersion']
 optimizer_enabled = metadata['settings']['optimizer']['enabled']
 optimizer_runs = metadata['settings']['optimizer']['runs']
-
-# waiting for ehterscan apis license fix (missing n. 13 in license range)
-# https://docs.etherscan.io/tutorials/verifying-contracts-programmatically#4-configuring-source-code-parameters
-#license_name = metadata['sources'][contract_path]['license']
-#license_numbers = {
-#    'GPL-3.0-or-later': 5,
-#    'AGPL-3.0-or-later': 13
-#}
-#license_number = license_numbers[license_name]
-
-# temporary fix (enforcing GPLv3 for the spells)
-license_number = 5
+license_name = metadata['sources'][contract_path]['license']
+license_numbers = {
+    'GPL-3.0-or-later': 5,
+    'AGPL-3.0-or-later': 13
+}
+license_number = license_numbers[license_name]
 
 module = 'contract'
 action = 'verifysourcecode'
