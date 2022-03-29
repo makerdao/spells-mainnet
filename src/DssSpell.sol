@@ -20,6 +20,7 @@ pragma solidity 0.6.12;
 // pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/VestAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
@@ -35,10 +36,38 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/821b3cd2d736be97bedb7583dcbff49edeb53e1f/governance/votes/Executive%20vote%20-%20March%2025%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-03-25 MakerDAO Executive Spell | Hash: 0xde56d1553299f5d1dc2fdeb7ca352d82ac2ca011b9afbaa0709fe42338871d29";
+        "2022-04-01 MakerDAO Executive Spell | Hash: <TODO>";
 
-    address public constant TUSD_PREV_IMPL = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
-    address public constant TUSD_NEXT_IMPL = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
+    uint256 constant WAD = 10**18;
+
+    VestAbstract constant MCD_VEST_DAI = VestAbstract(0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71);
+    VestAbstract constant MCD_VEST_MKR = VestAbstract(0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd);
+
+    // Gov Dai Transfer, Stream and MKR vesting (41.20 MKR)
+    address constant GOV_WALLET_1      = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    // Gov MKR vesting (73.70 MKR) and MKR Transfer (60 MKR)
+    address constant GOV_WALLET_2      = 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b;
+    // Gov MKR vesting (52.74 MKR)
+    address constant GOV_WALLET_3      = 0xbfDD0E744723192f7880493b66501253C34e1241;
+    // Immunifi Core Unit
+    address constant ISCU_WALLET       = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+    // Real World Finance Core Unit
+    address constant RWF_WALLET        = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
+    // Gelato Keeper Network Contract for Dai Stream
+    address constant GELATO_WALLET     = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
+
+    // Start Dates - Start of Day (00:00:00 GMT)
+    uint256 constant FEB_08_2022 = 1644278400;
+    uint256 constant MAR_01_2022 = 1646092800;
+    uint256 constant APR_01_2022 = 1648771200;
+
+    // End Dates - End of Day (11:59:59 GMT)
+    uint256 constant ONE_YEAR = 365 days;
+    uint256 constant TWO_YEARS = ONE_YEAR * 2;
+    // 2022-03-01 to 2022-08-01
+    uint256 constant FIVE_MONTHS = 153 days;
+    // 2022-04-01 to 2022-12-31
+    uint256 constant EIGHT_MONTHS = 274 days;
 
     function officeHours() public override returns (bool) {
         return false;
@@ -47,17 +76,40 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     function actions() public override {
         // onboardNewCollaterals();
 
-        // Update TUSD implementation
-        // https://forum.makerdao.com/t/2022-03-25-adding-support-for-the-new-tusd-implementation-address/14189
-        address MCD_JOIN_TUSD_A = DssExecLib.getChangelogAddress("MCD_JOIN_TUSD_A");
-        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_PREV_IMPL, 0);
-        GemJoin6Like(MCD_JOIN_TUSD_A).setImplementation(TUSD_NEXT_IMPL, 1);
+        // Core Unit DAI Budget Transfers
+        // GOV-001 - 30,000 DAI - 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://forum.makerdao.com/t/mip40c3-sp59-govalpha-budget-2022-23/13144
+        DssExecLib.sendPaymentFromSurplusBuffer(GOV_WALLET_1,  30_000);
+        // IS-001 - 348,452.30 DAI - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
+        // RWF-001 - 2,055,000 DAI - 0x96d7b01Cc25B141520C717fa369844d34FF116ec https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
 
-        // Authorize ESM on DssFlash
-        // https://forum.makerdao.com/t/proposed-security-fix-to-be-added-in-the-march-25th-2022-executive-spell
-        address MCD_FLASH = DssExecLib.getChangelogAddress("MCD_FLASH");
-        address MCD_ESM = DssExecLib.esm();
-        DssExecLib.authorize(MCD_FLASH, MCD_ESM);
+        // Core Unit DAI Budget Streams
+        // GOV-001 | 2022-04-01 to 2023-04-01 | 1,079,793 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://forum.makerdao.com/t/mip40c3-sp59-govalpha-budget-2022-23/13144
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(GOV_WALLET_1, 1_079_793 * WAD, APR_01_2022, ONE_YEAR, 0, address(0))
+        );
+        // IS-001 | 2022-03-01 to 2022-08-01 | 700,356.90 DAI | 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
+        // RWF-001 | 2022-04-01 to 2022-12-31 | 6,165,000 DAI | 0x96d7b01Cc25B141520C717fa369844d34FF116ec https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
+        // Remove/Revoke Stream #27 (RWF-001) on DssVestSuckable https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
+        MCD_VEST_DAI.yank(27);
+
+        // Core Unit MKR Vesting Streams (sourced from treasury)
+        // GOV-001 | 2022-02-08 to 2023-02-08 | 73.70 MKR | 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        // GOV-001 | 2022-02-08 to 2023-02-08 | 52.74 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        // GOV-001 | 2022-02-08 to 2023-02-08 | 41.20 MKR | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+
+        // Core Unit MKR Transfer (sourced from treasury)
+        // GOV-001 - 60 MKR - 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+
+        // Gelato Keeper Network DAI Budget Stream
+        // https://mips.makerdao.com/mips/details/MIP63c4SP3
+        // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
+        // Amount: 1,000 DAI/day
+        // Start Date: Apr 1, 2022
+        // End Date: +730 days
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(GELATO_WALLET, 730_000 * WAD, APR_01_2022, TWO_YEARS, 0, address(0))
+        );
+
     }
 }
 
