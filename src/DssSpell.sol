@@ -91,7 +91,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // GOV-001 - 30,000 DAI - 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://forum.makerdao.com/t/mip40c3-sp59-govalpha-budget-2022-23/13144
         DssExecLib.sendPaymentFromSurplusBuffer(GOV_WALLET_1,  30_000);
         // IS-001 - 348,452.30 DAI - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
-        DssExecLib.sendPaymentFromSurplusBuffer(ISCU_WALLET,  348_452.30);
+        // Rounded up from 348,452.30 to 348,453
+        DssExecLib.sendPaymentFromSurplusBuffer(ISCU_WALLET,  348_453);
         // RWF-001 - 2,055,000 DAI - 0x96d7b01Cc25B141520C717fa369844d34FF116ec https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
         DssExecLib.sendPaymentFromSurplusBuffer(RWF_WALLET,  2_055_000);
 
