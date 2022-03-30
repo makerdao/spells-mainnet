@@ -164,7 +164,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.pos("XXX-A"), 48);
         assertEq(reg.join("XXX-A"), addr.addr("MCD_JOIN_XXX_A"));
         assertEq(reg.gem("XXX-A"), addr.addr("XXX"));
-        assertEq(reg.dec("XXX-A"), DSTokenAbstract(addr.addr("XXX")).decimals());
+        assertEq(reg.dec("XXX-A"), GemAbstract(addr.addr("XXX")).decimals());
         assertEq(reg.class("XXX-A"), 1);
         assertEq(reg.pip("XXX-A"), addr.addr("PIP_XXX"));
         assertEq(reg.xlip("XXX-A"), addr.addr("MCD_CLIP_XXX_A"));
