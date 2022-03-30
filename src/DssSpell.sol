@@ -144,6 +144,23 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Remove/Revoke Stream #27 (RWF-001) on DssVestSuckable https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
         MCD_VEST_DAI.yank(27);
 
+        // Gelato Keeper Network DAI Budget Stream
+        // https://mips.makerdao.com/mips/details/MIP63c4SP3
+        // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
+        // Amount: 1,000 DAI/day
+        // Start Date: Apr 1, 2022
+        // End Date: +731 days (2024 is a leap year)
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                GELATO_WALLET,
+                730_000 * WAD,
+                APR_01_2022,
+                TWO_YEARS,
+                0,
+                address(0)
+            )
+        );
+
         // Core Unit MKR Vesting Streams (sourced from treasury)
         // GOV-001 | 2022-02-08 to 2023-02-08 | Cliff: 2023-02-08 (1 year) | 73.70 MKR | 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
         MCD_VEST_MKR_TREASURY.restrict(
@@ -182,24 +199,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Core Unit MKR Transfer (sourced from treasury)
         // GOV-001 - 60 MKR - 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
         GemLike(DssExecLib.getChangelogAddress("MCD_GOV")).transfer(GOV_WALLET_2, 60 * WAD);
-
-        // Gelato Keeper Network DAI Budget Stream
-        // https://mips.makerdao.com/mips/details/MIP63c4SP3
-        // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
-        // Amount: 1,000 DAI/day
-        // Start Date: Apr 1, 2022
-        // End Date: +731 days (2024 is a leap year)
-        MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(
-                GELATO_WALLET,
-                730_000 * WAD,
-                APR_01_2022,
-                TWO_YEARS,
-                0,
-                address(0)
-            )
-        );
-
     }
 }
 

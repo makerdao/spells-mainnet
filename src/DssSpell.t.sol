@@ -21,61 +21,160 @@ interface AuthLike {
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function test_TUSDImplementation() public {
-        address TUSD = addr.addr("TUSD");
-        address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
-        address prevImpl = 0xffc40F39806F1400d8278BfD33823705b5a4c196;
-        address nextImpl = 0xd8D59c59Ab40B880b54C969920E8d9172182Ad7b;
-        address actualImpl = Gem6Like(TUSD).implementation();
-        assertEq(nextImpl, actualImpl);
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(prevImpl), 1);
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 0);
+    // Custom Addresses
+    address constant GOV_WALLET_1      = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address constant GOV_WALLET_2      = 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b;
+    address constant GOV_WALLET_3      = 0xbfDD0E744723192f7880493b66501253C34e1241;
+
+    // Start Dates - Start of Day (00:00:00 GMT)
+    uint256 constant FEB_08_2022 = 1644278400;
+    uint256 constant MAR_01_2022 = 1646092800;
+    uint256 constant APR_01_2022 = 1648771200;
+
+    function testOneTimePaymentDistributions() public {
+        uint256 prevSin         = vat.sin(address(vow));
+        uint256 prevDaiGov1     = dai.balanceOf(GOV_WALLET_1);
+        uint256 prevDaiIs       = dai.balanceOf(wallets.addr("IS_WALLET"));
+        uint256 prevDaiRwf      = dai.balanceOf(wallets.addr("RWF_WALLET"));
+
+        uint256 amountDaiGov1 = 30_000;
+        uint256 amountDaiIs   = 348_453;
+        uint256 amountDaiRwf  = 2_055_000;
+        uint256 amountTotal   = amountDaiGov1 + amountDaiIs + amountDaiRwf;
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
+
+        assertEq(
+            vat.sin(address(vow)) - prevSin,
+            ( amountDaiGov1
+            + amountDaiIs
+            + amountDaiRwf
+            ) * RAD
+        );
+        assertEq(vat.sin(address(vow)) - prevSin, amountTotal * RAD);
+        assertEq(dai.balanceOf(GOV_WALLET_1) - prevDaiGov1, amountDaiGov1 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("IS_WALLET")) - prevDaiIs, amountDaiIs * WAD);
+        assertEq(dai.balanceOf(wallets.addr("RWF_WALLET")) - prevDaiRwf, amountDaiRwf * WAD);
+    }
+
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.ids(), 32);
+
+        assertTrue(vest.valid(27));
+        assertEq(vest.fin(27), 1672444800);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
+        assertTrue(spell.done());
 
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(prevImpl), 0);
-        assertEq(GemJoin6Like(MCD_JOIN_TUSD_A).implementations(nextImpl), 1);
+        assertEq(vest.ids(), 36);
+
+        // // ----- Gov Wallet
+        assertEq(vest.usr(33), GOV_WALLET_1);
+        assertEq(vest.bgn(33), APR_01_2022);
+        assertEq(vest.clf(33), APR_01_2022);
+        assertEq(vest.fin(33), APR_01_2022 + 365 days);
+        assertEq(vest.mgr(33), address(0));
+        assertEq(vest.res(33), 1);
+        assertEq(vest.tot(33), 1_079_793 * WAD);
+        assertEq(vest.rxd(33), 0);
+        // // ----- ISCU
+        assertEq(vest.usr(34), wallets.addr("IS_WALLET"));
+        assertEq(vest.bgn(34), MAR_01_2022);
+        assertEq(vest.clf(34), MAR_01_2022);
+        assertEq(vest.fin(34), MAR_01_2022 + 153 days);
+        assertEq(vest.mgr(34), address(0));
+        assertEq(vest.res(34), 1);
+        assertEq(vest.tot(34), 7_003_569 * 10**17); // 700_356.9 * 10 * WAD / 10
+        assertEq(vest.rxd(34), 0);
+        // // ----- RWF New
+        assertEq(vest.usr(35), wallets.addr("RWF_WALLET"));
+        assertEq(vest.bgn(35), APR_01_2022);
+        assertEq(vest.clf(35), APR_01_2022);
+        assertEq(vest.fin(35), APR_01_2022 + 274 days);
+        assertEq(vest.mgr(35), address(0));
+        assertEq(vest.res(35), 1);
+        assertEq(vest.tot(35), 6_165_000 * WAD);
+        assertEq(vest.rxd(35), 0);
+        // // ----- RWF Old
+        assertEq(vest.usr(27), wallets.addr("RWF_WALLET"));
+        assertEq(vest.fin(27), block.timestamp);
+        assertEq(vest.tot(27), vest.accrued(27));
+        // // ----- Gelato
+        assertEq(vest.usr(36), addr.addr("GELATO_VEST_STREAMING"));
+        assertEq(vest.bgn(36), APR_01_2022);
+        assertEq(vest.clf(36), APR_01_2022);
+        assertEq(vest.fin(36), APR_01_2022 + 731 days);
+        assertEq(vest.mgr(36), address(0));
+        assertEq(vest.res(36), 1);
+        assertEq(vest.tot(36), 730_000 * WAD);
+        assertEq(vest.rxd(36), 0);
     }
 
-    function joinAndExitTUSD() internal {
-        address TUSD = addr.addr("TUSD");
-        address MCD_JOIN_TUSD_A = addr.addr("MCD_JOIN_TUSD_A");
+    function testOneTimeMkrDistributions() public {
+        uint256 prevMkrPP   = gov.balanceOf(pauseProxy);
+        uint256 prevMkrGov2 = gov.balanceOf(GOV_WALLET_2);
 
-        uint256 amount = 86 * THOUSAND * WAD;
-        giveTokens(TUSD, amount);
-        DSTokenAbstract(TUSD).approve(MCD_JOIN_TUSD_A, amount);
-        GemJoin6Like(MCD_JOIN_TUSD_A).join(address(this), amount);
-        assertEq(vat.gem("TUSD-A", address(this)), amount);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), 0);
-        GemJoin6Like(MCD_JOIN_TUSD_A).exit(address(this), amount);
-        assertEq(vat.gem("TUSD-A", address(this)), 0);
-        assertEq(DSTokenAbstract(TUSD).balanceOf(address(this)), amount);
+        uint256 amountMkrGov2 =  60;
+
+        vote(address(spell));
+        spell.schedule();
+        hevm.warp(spell.nextCastTime());
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(gov.balanceOf(pauseProxy),  prevMkrPP   - (amountMkrGov2   * WAD));
+        assertEq(gov.balanceOf(GOV_WALLET_2), prevMkrGov2 + (amountMkrGov2 * WAD));
     }
 
-    function testFail_joinAndExitTUSDBefore() public {
-        joinAndExitTUSD();
-    }
+    function testVestMKR() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
-    function test_joinAndExitTUSDAfter() public {
+        assertEq(vest.ids(), 19);
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
-        joinAndExitTUSD();
-    }
+        assertTrue(spell.done());
 
-    function test_ESMFlashAuth() public {
-        address MCD_FLASH = addr.addr("MCD_FLASH");
-        address MCD_ESM = addr.addr("MCD_ESM");
+        assertEq(vest.ids(), 22);
 
-        assertEq(AuthLike(MCD_FLASH).wards(MCD_ESM), 0);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
-
-        assertEq(AuthLike(MCD_FLASH).wards(MCD_ESM), 1);
+        // ----- Gov Wallet 2
+        assertEq(vest.usr(20), GOV_WALLET_2);
+        assertEq(vest.bgn(20), FEB_08_2022);
+        assertEq(vest.clf(20), FEB_08_2022 + 365 days);
+        assertEq(vest.fin(20), FEB_08_2022 + 365 days);
+        assertEq(vest.mgr(20), address(0));
+        assertEq(vest.res(20), 1);
+        assertEq(vest.tot(20), 737 * 10**17); // 73.70 * 10 * WAD / 10
+        assertEq(vest.rxd(20), 0);
+        // ----- Gov Wallet 3
+        assertEq(vest.usr(21), GOV_WALLET_3);
+        assertEq(vest.bgn(21), FEB_08_2022);
+        assertEq(vest.clf(21), FEB_08_2022 + 365 days);
+        assertEq(vest.fin(21), FEB_08_2022 + 365 days);
+        assertEq(vest.mgr(21), address(0));
+        assertEq(vest.res(21), 1);
+        assertEq(vest.tot(21), 5274 * 10**16); // 52.74 * 100 * WAD / 100
+        assertEq(vest.rxd(21), 0);
+        // -----
+        assertEq(vest.usr(22), GOV_WALLET_1);
+        assertEq(vest.bgn(22), FEB_08_2022);
+        assertEq(vest.clf(22), FEB_08_2022 + 365 days);
+        assertEq(vest.fin(22), FEB_08_2022 + 365 days);
+        assertEq(vest.mgr(22), address(0));
+        assertEq(vest.res(22), 1);
+        assertEq(vest.tot(22), 412 * 10**17); // 41.20 * 10 * WAD / 10
+        assertEq(vest.rxd(22), 0);
     }
 
     function testSpellIsCast_GENERAL() public {
