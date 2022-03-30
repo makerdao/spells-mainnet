@@ -20,15 +20,17 @@ pragma solidity 0.6.12;
 // pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VestAbstract.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface GemJoin6Like {
-    function setImplementation(
-        address implementation,
-        uint256 permitted
-    ) external;
+interface DssVestLike {
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function restrict(uint256) external;
+    function yank(uint256) external;
+}
+
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
 }
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
@@ -40,8 +42,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     uint256 constant WAD = 10**18;
 
-    VestAbstract constant MCD_VEST_DAI = VestAbstract(0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71);
-    VestAbstract constant MCD_VEST_MKR = VestAbstract(0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd);
+    DssVestLike constant MCD_VEST_DAI = DssVestLike(0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71);
+    DssVestLike constant MCD_VEST_MKR_TREASURY = DssVestLike(0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd);
+
 
     // Gov Dai Transfer, Stream and MKR vesting (41.20 MKR)
     address constant GOV_WALLET_1      = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
@@ -63,11 +66,19 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // End Dates - End of Day (11:59:59 GMT)
     uint256 constant ONE_YEAR = 365 days;
-    uint256 constant TWO_YEARS = ONE_YEAR * 2;
+    // Two years including Feb 2024 which has a leap day
+    uint256 constant TWO_YEARS = ONE_YEAR * 2 + 1 days;
     // 2022-03-01 to 2022-08-01
     uint256 constant FIVE_MONTHS = 153 days;
     // 2022-04-01 to 2022-12-31
     uint256 constant EIGHT_MONTHS = 274 days;
+
+    // Amounts with decimals
+    uint256 constant ISCU_DAI_STREAM_AMOUNT = 700_356.9 * 10 * WAD / 10;
+    uint256 constant GOV_2_MKR = 73.70 * 10 * WAD / 10;
+    uint256 constant GOV_3_MKR = 52.74 * 100 * WAD / 100;
+    uint256 constant GOV_1_MKR = 41.20 * 10 * WAD / 10;
+
 
     function officeHours() public override returns (bool) {
         return false;
@@ -80,34 +91,112 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // GOV-001 - 30,000 DAI - 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://forum.makerdao.com/t/mip40c3-sp59-govalpha-budget-2022-23/13144
         DssExecLib.sendPaymentFromSurplusBuffer(GOV_WALLET_1,  30_000);
         // IS-001 - 348,452.30 DAI - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
+        DssExecLib.sendPaymentFromSurplusBuffer(ISCU_WALLET,  348_452.30);
         // RWF-001 - 2,055,000 DAI - 0x96d7b01Cc25B141520C717fa369844d34FF116ec https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
+        DssExecLib.sendPaymentFromSurplusBuffer(RWF_WALLET,  2_055_000);
+
+        // VEST.restrict( Only recipient can request funds
+        //     VEST.create(
+        //         Recipient of vest,
+        //         Total token amount of vest over period,
+        //         Start timestamp of vest,
+        //         Duration of the vesting period (in seconds),
+        //         Length of cliff period (in seconds),
+        //         Manager address
+        //     )
+        // );
 
         // Core Unit DAI Budget Streams
         // GOV-001 | 2022-04-01 to 2023-04-01 | 1,079,793 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://forum.makerdao.com/t/mip40c3-sp59-govalpha-budget-2022-23/13144
         MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(GOV_WALLET_1, 1_079_793 * WAD, APR_01_2022, ONE_YEAR, 0, address(0))
+            MCD_VEST_DAI.create(
+                GOV_WALLET_1,
+                1_079_793 * WAD,
+                APR_01_2022,
+                ONE_YEAR,
+                0,
+                address(0)
+            )
         );
         // IS-001 | 2022-03-01 to 2022-08-01 | 700,356.90 DAI | 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                ISCU_WALLET,
+                ISCU_DAI_STREAM_AMOUNT,
+                MAR_01_2022,
+                FIVE_MONTHS,
+                0,
+                address(0)
+            )
+        );
         // RWF-001 | 2022-04-01 to 2022-12-31 | 6,165,000 DAI | 0x96d7b01Cc25B141520C717fa369844d34FF116ec https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                RWF_WALLET,
+                6_165_000 * WAD,
+                APR_01_2022,
+                EIGHT_MONTHS,
+                0,
+                address(0)
+            )
+        );
         // Remove/Revoke Stream #27 (RWF-001) on DssVestSuckable https://mips.makerdao.com/mips/details/MIP40c3SP61#transactions
         MCD_VEST_DAI.yank(27);
 
         // Core Unit MKR Vesting Streams (sourced from treasury)
-        // GOV-001 | 2022-02-08 to 2023-02-08 | 73.70 MKR | 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
-        // GOV-001 | 2022-02-08 to 2023-02-08 | 52.74 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
-        // GOV-001 | 2022-02-08 to 2023-02-08 | 41.20 MKR | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        // GOV-001 | 2022-02-08 to 2023-02-08 | Cliff: 2023-02-08 (1 year) | 73.70 MKR | 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        MCD_VEST_MKR_TREASURY.restrict(
+            MCD_VEST_MKR_TREASURY.create(
+                GOV_WALLET_2,
+                GOV_2_MKR,
+                FEB_08_2022,
+                ONE_YEAR,
+                ONE_YEAR,
+                address(0)
+            )
+        );
+        // GOV-001 | 2022-02-08 to 2023-02-08 | Cliff: 2023-02-08 (1 year) | 52.74 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        MCD_VEST_MKR_TREASURY.restrict(
+            MCD_VEST_MKR_TREASURY.create(
+                GOV_WALLET_3,
+                GOV_3_MKR,
+                FEB_08_2022,
+                ONE_YEAR,
+                ONE_YEAR,
+                address(0)
+            )
+        );
+        // GOV-001 | 2022-02-08 to 2023-02-08 | Cliff: 2023-02-08 (1 year) | 41.20 MKR | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73 https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        MCD_VEST_MKR_TREASURY.restrict(
+            MCD_VEST_MKR_TREASURY.create(
+                GOV_WALLET_1,
+                GOV_1_MKR,
+                FEB_08_2022,
+                ONE_YEAR,
+                ONE_YEAR,
+                address(0)
+            )
+        );
 
         // Core Unit MKR Transfer (sourced from treasury)
         // GOV-001 - 60 MKR - 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
+        GemLike(DssExecLib.getChangelogAddress("MCD_GOV")).transfer(GOV_WALLET_2, 60 * WAD);
 
         // Gelato Keeper Network DAI Budget Stream
         // https://mips.makerdao.com/mips/details/MIP63c4SP3
         // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
         // Amount: 1,000 DAI/day
         // Start Date: Apr 1, 2022
-        // End Date: +730 days
+        // End Date: +731 days (2024 is a leap year)
         MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(GELATO_WALLET, 730_000 * WAD, APR_01_2022, TWO_YEARS, 0, address(0))
+            MCD_VEST_DAI.create(
+                GELATO_WALLET,
+                730_000 * WAD,
+                APR_01_2022,
+                TWO_YEARS,
+                0,
+                address(0)
+            )
         );
 
     }
