@@ -59,17 +59,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Gelato Keeper Network Contract for Dai Stream
     address constant GELATO_WALLET     = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
 
-    // Start Dates - Start of Day (00:00:00 GMT)
+    // Start Dates - Start of Day
     uint256 constant FEB_08_2022 = 1644278400;
     uint256 constant MAR_01_2022 = 1646092800;
     uint256 constant APR_01_2022 = 1648771200;
 
-    // End Dates - End of Day (11:59:59 GMT)
+    // End Dates - End of Day
     uint256 constant ONE_YEAR = 365 days;
-    // Two years including Feb 2024 which has a leap day
-    uint256 constant TWO_YEARS = ONE_YEAR * 2 + 1 days;
     // 2022-03-01 to 2022-08-01
     uint256 constant FIVE_MONTHS = 153 days;
+    // 2022-04-01 to 2022-10-01
+    uint256 constant SIX_MONTHS = 183 days;
     // 2022-04-01 to 2022-12-31
     uint256 constant EIGHT_MONTHS = 274 days;
 
@@ -149,13 +149,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
         // Amount: 1,000 DAI/day
         // Start Date: Apr 1, 2022
-        // End Date: +731 days (2024 is a leap year)
+        // End Date: Oct 1, 2022
         MCD_VEST_DAI.restrict(
             MCD_VEST_DAI.create(
                 GELATO_WALLET,
-                730_000 * WAD,
+                183_000 * WAD,
                 APR_01_2022,
-                TWO_YEARS,
+                SIX_MONTHS,
                 0,
                 address(0)
             )
