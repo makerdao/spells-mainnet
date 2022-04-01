@@ -116,7 +116,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 APR_01_2022,
                 ONE_YEAR,
                 0,
-                GOV_WALLET_1
+                address(0)
             )
         );
         // IS-001 | 2022-03-01 to 2022-08-01 | 700,356.90 DAI | 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4 https://github.com/makerdao/mips/pull/463/files
