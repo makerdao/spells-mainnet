@@ -42,8 +42,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     uint256 constant WAD = 10**18;
 
-    DssVestLike constant MCD_VEST_DAI = DssVestLike(0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71);
-    DssVestLike constant MCD_VEST_MKR_TREASURY = DssVestLike(0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd);
+    DssVestLike immutable MCD_VEST_DAI = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
 
     // Gov Dai Transfer, Stream and MKR vesting (41.20 MKR)
