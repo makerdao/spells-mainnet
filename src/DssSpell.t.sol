@@ -45,10 +45,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
-        assertTrue(spell.done());
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
 
         assertEq(vat.can(address(pauseProxy), address(daiJoin)), 1);
 
@@ -129,9 +127,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amountMkrGov2 =  60;
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(pauseProxy),  prevMkrPP   - (amountMkrGov2   * WAD));
@@ -169,7 +165,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.tot(21), 5274 * 10**16);        // 52.74 * 100 * WAD / 100
         assertEq(vest.tot(21), 52740000000000000000); // 52.74 * 100 * WAD / 100
         assertEq(vest.rxd(21), 0);
-        // -----
+        // ----- Gov Wallet 1
         assertEq(vest.usr(22), GOV_WALLET_1);
         assertEq(vest.bgn(22), FEB_08_2022);
         assertEq(vest.clf(22), FEB_08_2022 + 365 days);

@@ -52,7 +52,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant GOV_WALLET_2      = 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b;
     // Gov MKR vesting (52.74 MKR)
     address constant GOV_WALLET_3      = 0xbfDD0E744723192f7880493b66501253C34e1241;
-    // Immunifi Core Unit
+    // Immunefi Core Unit
     address constant ISCU_WALLET       = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
     // Real World Finance Core Unit
     address constant RWF_WALLET        = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
@@ -198,7 +198,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         // Core Unit MKR Transfer (sourced from treasury)
         // GOV-001 - 60 MKR - 0xC818Ae5f27B76b4902468C6B02Fd7a089F12c07b https://mips.makerdao.com/mips/details/MIP40c3SP60#list-of-budget-breakdowns
-        GemLike(DssExecLib.getChangelogAddress("MCD_GOV")).transfer(GOV_WALLET_2, 60 * WAD);
+        GemLike(DssExecLib.mkr()).transfer(GOV_WALLET_2, 60 * WAD);
     }
 }
 
