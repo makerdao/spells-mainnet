@@ -71,7 +71,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // 2022-04-01 to 2022-10-01
     uint256 constant SIX_MONTHS = 183 days;
     // 2022-04-01 to 2022-12-31
-    uint256 constant EIGHT_MONTHS = 274 days;
+    uint256 constant NINE_MONTHS = 274 days;
 
     // Amounts with decimals
     uint256 constant ISCU_DAI_STREAM_AMOUNT = 700_356.9 * 10 * WAD / 10;
@@ -136,7 +136,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 RWF_WALLET,
                 6_165_000 * WAD,
                 APR_01_2022,
-                EIGHT_MONTHS,
+                NINE_MONTHS,
                 0,
                 RWF_WALLET
             )

@@ -95,7 +95,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(34), MAR_01_2022 + 153 days);
         assertEq(vest.mgr(34), wallets.addr("IS_WALLET"));
         assertEq(vest.res(34), 1);
-        assertEq(vest.tot(34), 7_003_569 * 10**17); // 700_356.9 * 10 * WAD / 10
+        assertEq(vest.tot(34), 7_003_569 * 10**17);       // 700_356.9 * 10 * WAD / 10
+        assertEq(vest.tot(34), 700356900000000000000000); // 700_356.9 * 10 * WAD / 10
         assertEq(vest.rxd(34), 0);
         // // ----- RWF New
         assertEq(vest.usr(35), wallets.addr("RWF_WALLET"));
@@ -155,7 +156,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(20), FEB_08_2022 + 365 days);
         assertEq(vest.mgr(20), address(0));
         assertEq(vest.res(20), 1);
-        assertEq(vest.tot(20), 737 * 10**17); // 73.70 * 10 * WAD / 10
+        assertEq(vest.tot(20), 737 * 10**17);         // 73.70 * 10 * WAD / 10
+        assertEq(vest.tot(20), 73700000000000000000); // 73.70 * 10 * WAD / 10
         assertEq(vest.rxd(20), 0);
         // ----- Gov Wallet 3
         assertEq(vest.usr(21), GOV_WALLET_3);
@@ -164,7 +166,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(21), FEB_08_2022 + 365 days);
         assertEq(vest.mgr(21), address(0));
         assertEq(vest.res(21), 1);
-        assertEq(vest.tot(21), 5274 * 10**16); // 52.74 * 100 * WAD / 100
+        assertEq(vest.tot(21), 5274 * 10**16);        // 52.74 * 100 * WAD / 100
+        assertEq(vest.tot(21), 52740000000000000000); // 52.74 * 100 * WAD / 100
         assertEq(vest.rxd(21), 0);
         // -----
         assertEq(vest.usr(22), GOV_WALLET_1);
@@ -173,7 +176,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(22), FEB_08_2022 + 365 days);
         assertEq(vest.mgr(22), address(0));
         assertEq(vest.res(22), 1);
-        assertEq(vest.tot(22), 412 * 10**17); // 41.20 * 10 * WAD / 10
+        assertEq(vest.tot(22), 412 * 10**17);         // 41.20 * 10 * WAD / 10
+        assertEq(vest.tot(22), 41200000000000000000); // 41.20 * 10 * WAD / 10
         assertEq(vest.rxd(22), 0);
     }
 
