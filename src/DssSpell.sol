@@ -66,11 +66,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // End Dates - End of Day
     uint256 constant ONE_YEAR = 365 days;
-    // 2022-03-01 to 2022-08-01
+    // 2022-03-01 to 2022-08-01 00:00:00 UTC
     uint256 constant FIVE_MONTHS = 153 days;
-    // 2022-04-01 to 2022-10-01
+    // 2022-04-01 to 2022-09-30 23:59:59 UTC
     uint256 constant SIX_MONTHS = 183 days;
-    // 2022-04-01 to 2022-12-31
+    // 2022-04-01 to 2022-12-31 00:00:00 UTC
     uint256 constant NINE_MONTHS = 274 days;
 
     // Amounts with decimals
@@ -149,7 +149,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Address: 0x926c21602fec84d6d0fa6450b40edba595b5c6e4
         // Amount: 1,000 DAI/day
         // Start Date: Apr 1, 2022
-        // End Date: Oct 1, 2022
+        // End Date: Sep 30, 2022 23:59:59 UTC
         MCD_VEST_DAI.restrict(
             MCD_VEST_DAI.create(
                 GELATO_WALLET,

@@ -84,7 +84,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(33), APR_01_2022);
         assertEq(vest.clf(33), APR_01_2022);
         assertEq(vest.fin(33), APR_01_2022 + 365 days);
-        assertEq(vest.mgr(33), GOV_WALLET_1);
+        assertEq(vest.mgr(33), address(0));
         assertEq(vest.res(33), 1);
         assertEq(vest.tot(33), 1_079_793 * WAD);
         assertEq(vest.rxd(33), 0);
@@ -93,7 +93,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(34), MAR_01_2022);
         assertEq(vest.clf(34), MAR_01_2022);
         assertEq(vest.fin(34), MAR_01_2022 + 153 days);
-        assertEq(vest.mgr(34), wallets.addr("IS_WALLET"));
+        assertEq(vest.mgr(34), address(0));
         assertEq(vest.res(34), 1);
         assertEq(vest.tot(34), 7_003_569 * 10**17);       // 700_356.9 * 10 * WAD / 10
         assertEq(vest.tot(34), 700356900000000000000000); // 700_356.9 * 10 * WAD / 10
@@ -103,7 +103,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(35), APR_01_2022);
         assertEq(vest.clf(35), APR_01_2022);
         assertEq(vest.fin(35), APR_01_2022 + 274 days);
-        assertEq(vest.mgr(35), wallets.addr("RWF_WALLET"));
+        assertEq(vest.mgr(35), address(0));
         assertEq(vest.res(35), 1);
         assertEq(vest.tot(35), 6_165_000 * WAD);
         assertEq(vest.rxd(35), 0);
@@ -116,7 +116,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(36), APR_01_2022);
         assertEq(vest.clf(36), APR_01_2022);
         assertEq(vest.fin(36), APR_01_2022 + 183 days);
-        assertEq(vest.mgr(36), addr.addr("GELATO_VEST_STREAMING"));
+        assertEq(vest.mgr(36), address(0));
         assertEq(vest.res(36), 1);
         assertEq(vest.tot(36), 183_000 * WAD);
         assertEq(vest.rxd(36), 0);
