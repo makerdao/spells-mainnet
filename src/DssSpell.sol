@@ -36,9 +36,9 @@ interface GemLike {
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/821b3cd2d736be97bedb7583dcbff49edeb53e1f/governance/votes/Executive%20vote%20-%20March%2025%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a7095d5b92ee825bef28b6f5d22baec50718d438/governance/votes/Executive%20vote%20-%20April%201%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-04-01 MakerDAO Executive Spell | Hash: <TODO>";
+        "2022-04-01 MakerDAO Executive Spell | Hash: 0x4ac0f251ca491bf27799ebe04452ad4a6f48f2c5c8a09a5c2880a984c2f26178";
 
     uint256 constant WAD = 10**18;
 
