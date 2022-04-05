@@ -40,6 +40,7 @@ contract Wallets {
         addr["SF_WALLET"]                    = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["SNE_WALLET"]                   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
         addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+        addr["GELATO_VEST_STREAMING"]        = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
 
         // Recognized Delegates
         addr["ACREINVEST"]                   = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
