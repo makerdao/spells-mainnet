@@ -21,6 +21,17 @@ interface AuthLike {
 
 contract DssSpellTest is DssSpellTestBase {
 
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 2.85 * 10**27 / 100);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(join.bar(), 3.5 * 10**27 / 100);
+    }
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");

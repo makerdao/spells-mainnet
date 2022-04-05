@@ -40,6 +40,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     string public constant override description =
         "2022-04-08 MakerDAO Executive Spell | Hash: TODO";
 
+    // Math
+    uint256 constant internal MILLION  = 10 ** 6;
+    uint256 constant internal BILLION  = 10 ** 9;
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -64,7 +68,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     function actions() public override {
         // onboardNewCollaterals();
 
-        // Rates Proposal - April 08, 2022
+        // ------------------------- Rates Updates -----------------------------
         // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
 
         // Decrease the WSTETH-A Stability Fee from 2.5% to 2.25%
@@ -84,6 +88,28 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         // Decrease the GUNIV3DAIUSDC2-A Stability Fee from 0.25% to 0.05%
         DssExecLib.setIlkStabilityFee("GUNIV3DAIUSDC2-A", ZERO_ZERO_FIVE_PCT_RATE, true);
+
+        // ---------------------- Debt Ceiling Updates -------------------------
+
+        // TODO: link Risk's forums post
+        // Increase the CRVV1ETHSTETH-A Maximum Debt Ceiling from 3 million DAI to 5 million DAI.
+        DssExecLib.setIlkAutoLineDebtCeiling("CRVV1ETHSTETH-A", 5 * MILLION);
+
+        // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
+        // Increase the GUNIV3DAIUSDC2-A Maximum Debt Ceiling from 750 million DAI to 1 billion DAI.
+        DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC2-A", 1 * BILLION);
+
+        // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
+        // Increase the GUNIV3DAIUSDC1-A Maximum Debt Ceiling from 100 million DAI to 750 million DAI.
+        // Increase the GUNIV3DAIUSDC1-A gap from 10 million to 50 million
+        // Leave the GUNIV3DAIUSDC1-A ttl the same
+        DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 750 * MILLION, 50 * MILLION, 8 hours);
+
+        // ---------------------- Target Borrow Rates -------------------------
+        // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail 
+
+        // Increase the DIRECT-AAVEV2-DAI target borrow rate from 2.85% to 3.5%
+        DssExecLib.setD3MTargetInterestRate(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), 350); // 3.5%
     }
 }
 

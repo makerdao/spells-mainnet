@@ -31,11 +31,12 @@ contract DssSpellCollateralOnboardingAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmTRiQ3GqjCiRhh1ojzKzgScmSsiwQPLyjhgYSxZASQekj
     //
-    uint256 constant NUMBER_PCT = 1000000001234567890123456789;
+    // uint256 constant NUMBER_PCT = 1000000001234567890123456789;
 
     // --- Math ---
-    uint256 constant THOUSAND   = 10 ** 3;
-    uint256 constant MILLION    = 10 ** 6;
+    // uint256 constant THOUSAND   = 10 ** 3;
+    // uint256 constant MILLION    = 10 ** 6;
+    // uint256 constant BILLION    = 10 ** 9;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     // address constant XXX                  = 0x0000000000000000000000000000000000000000;
