@@ -61,6 +61,20 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant THREE_TWO_FIVE_PCT_RATE = 1000000001014175731521720677;
     uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
+    // Recognized Delegates DAI Transfers
+    address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET    = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
+    address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address constant MONETSUPPLY_WALLET     = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
+    address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address constant DOO_WALLET             = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+
+    // ETH Amsterdam Event SPF
+    address constant ETH_AMSTERDAM_WALLET   = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
+
     // Turn office hours off
     function officeHours() public override returns (bool) {
         return false;
@@ -116,6 +130,24 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         // Increase the DIRECT-AAVEV2-DAI target borrow rate from 2.85% to 3.5%
         DssExecLib.setD3MTargetInterestRate(DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI"), 350); // 3.5%
+
+        // --------------------------- DAI payouts -----------------------------
+        // Recognized Delegate Compensation Distribution (Payout: 77,183 DAI)
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-march-2022/14427
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET,  12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET,    12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET,        10_761);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET,      9_295);
+        DssExecLib.sendPaymentFromSurplusBuffer(MONETSUPPLY_WALLET,      7_598);
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,      6_640);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,         6_606);
+        DssExecLib.sendPaymentFromSurplusBuffer(DOO_WALLET,                283);
+
+        // ETH Amsterdam Event SPF
+        // https://mips.makerdao.com/mips/details/MIP55c3SP3#sentence-summary
+        // https://forum.makerdao.com/t/mip55c3-sp3-ethamsterdam-event-spf/13781/74?u=patrick_j
+        DssExecLib.sendPaymentFromSurplusBuffer(ETH_AMSTERDAM_WALLET, 50_000);
     }
 }
 
