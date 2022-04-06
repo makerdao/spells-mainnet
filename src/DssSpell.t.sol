@@ -269,11 +269,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
     }
 
-    function test_auth() private { // make public to use
+    function test_auth() public {
         checkAuth(false);
     }
 
-    function test_auth_in_sources() private { // make public to use
+    function test_auth_in_sources() public {
         checkAuth(true);
     }
 
