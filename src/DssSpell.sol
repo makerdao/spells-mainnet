@@ -61,6 +61,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     uint256 constant THREE_TWO_FIVE_PCT_RATE = 1000000001014175731521720677;
     uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
+    // Turn office hours off
     function officeHours() public override returns (bool) {
         return false;
     }
@@ -69,6 +70,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
+
 
         // ------------------------- Rates Updates -----------------------------
         // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
@@ -91,6 +93,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Decrease the GUNIV3DAIUSDC2-A Stability Fee from 0.25% to 0.05%
         DssExecLib.setIlkStabilityFee("GUNIV3DAIUSDC2-A", ZERO_ZERO_FIVE_PCT_RATE, true);
 
+
         // ---------------------- Debt Ceiling Updates -------------------------
 
         // https://forum.makerdao.com/t/immediate-short-term-parameter-changes-proposal-for-crvv1ethsteth-a-dc-and-gap-increase/14476
@@ -98,16 +101,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.setIlkAutoLineDebtCeiling("CRVV1ETHSTETH-A", 5 * MILLION);
 
         // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
-        // Increase the GUNIV3DAIUSDC2-A Maximum Debt Ceiling from 750 million DAI to 1 billion DAI.
-        DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC2-A", 1 * BILLION);
-
-        // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
         // Increase the GUNIV3DAIUSDC1-A Maximum Debt Ceiling from 100 million DAI to 750 million DAI.
         // Increase the GUNIV3DAIUSDC1-A gap from 10 million to 50 million
         // Leave the GUNIV3DAIUSDC1-A ttl the same
         DssExecLib.setIlkAutoLineParameters("GUNIV3DAIUSDC1-A", 750 * MILLION, 50 * MILLION, 8 hours);
 
-        // ---------------------- Target Borrow Rates -------------------------
+        // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail
+        // Increase the GUNIV3DAIUSDC2-A Maximum Debt Ceiling from 750 million DAI to 1 billion DAI.
+        DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC2-A", 1 * BILLION);
+
+
+        // ----------------------- Target Borrow Rates -------------------------
         // https://vote.makerdao.com/polling/QmdS8mCx#poll-detail 
 
         // Increase the DIRECT-AAVEV2-DAI target borrow rate from 2.85% to 3.5%
