@@ -110,7 +110,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(27), block.timestamp);
         assertEq(vest.tot(27), vest.accrued(27));
         // // ----- Gelato
-        assertEq(vest.usr(36), addr.addr("GELATO_VEST_STREAMING"));
+        assertEq(vest.usr(36), wallets.addr("GELATO_VEST_STREAMING"));
         assertEq(vest.bgn(36), APR_01_2022);
         assertEq(vest.clf(36), APR_01_2022);
         assertEq(vest.fin(36), APR_01_2022 + 183 days);

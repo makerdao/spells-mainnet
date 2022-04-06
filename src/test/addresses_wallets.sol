@@ -51,5 +51,8 @@ contract Wallets {
         addr["MAKERMAN"]                     = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
         addr["ULTRASCHUPPI"]                 = 0x89C5d54C979f682F40b73a9FC39F338C88B434c6;
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
+
+        // MIP-63 Keeper Network
+        addr["GELATO_VEST_STREAMING"]        = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
     }
 }
