@@ -8,7 +8,7 @@ test-dev           :; ./scripts/test-dssspell.sh match="$(match)" optimizer="0" 
 test-forge         :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 estimate           :; ./scripts/estimate-deploy-gas.sh
 deploy             :; make && dapp create DssSpell | xargs ./scripts/verify.py DssSpell
-deploy-stamp       :; ./scripts/get-created-timestamp.sh
+deploy-stamp       :; ./scripts/get-created-timestamp.sh tx=$(tx)
 flatten            :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
 archive-spell      :; ./scripts/archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
 diff-archive-spell :; ./scripts/diff-archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
