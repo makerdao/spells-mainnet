@@ -49,15 +49,15 @@ contract DssSpellTest is DssSpellTestBase {
     // ETH Amsterdam Event SPF payout
     uint256 constant amountEthAmsterdam  = 50_000;
 
-    function testAAVEDirectBarChange() public {
-        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(join.bar(), 2.85 * 10**27 / 100);
+    function testAAVEDirectBarChange() private {
+        // DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        // assertEq(join.bar(), 2.85 * 10**27 / 100);
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(join.bar(), 3.5 * 10**27 / 100);
+        // assertEq(join.bar(), 3.5 * 10**27 / 100);
     }
 
     function testSpellIsCast_GENERAL() public {
@@ -90,46 +90,46 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() public {
-        uint256 prevSin = vat.sin(address(vow));
+    function testPayments() private {
+        // uint256 prevSin = vat.sin(address(vow));
 
-        // Recognized Delegates
-        uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
-        uint256 prevDaiFeedBlack     = dai.balanceOf(FEEDBLACKLOOPS);
-        uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
-        uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
-        uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
-        uint256 prevDaiMonetSupply   = dai.balanceOf(MONETSUPPLY);
-        uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
-        uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
-        uint256 prevDaiDoo           = dai.balanceOf(DOO);
+        // // Recognized Delegates
+        // uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
+        // uint256 prevDaiFeedBlack     = dai.balanceOf(FEEDBLACKLOOPS);
+        // uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
+        // uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
+        // uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
+        // uint256 prevDaiMonetSupply   = dai.balanceOf(MONETSUPPLY);
+        // uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
+        // uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
+        // uint256 prevDaiDoo           = dai.balanceOf(DOO);
 
-        // ETH Amsterdam Event SPF
-        uint256 prevDaiEthAmsterdam  = dai.balanceOf(ETH_AMSTERDAM);
+        // // ETH Amsterdam Event SPF
+        // uint256 prevDaiEthAmsterdam  = dai.balanceOf(ETH_AMSTERDAM);
 
-        uint256 amount = amountFlipFlopFlap + amountFeedBlack + amountUltraSchuppi
-        + amountMakerMan + amountAcreInvest + amountMonetSupply  + amountJustinCase
-        + amountGfxLabs + amountDoo + amountEthAmsterdam;
+        // uint256 amount = amountFlipFlopFlap + amountFeedBlack + amountUltraSchuppi
+        // + amountMakerMan + amountAcreInvest + amountMonetSupply  + amountJustinCase
+        // + amountGfxLabs + amountDoo + amountEthAmsterdam;
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
+        // assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
 
-        // Recognized Delegates
-        assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
-        assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
-        assertEq(dai.balanceOf(ULTRASCHUPPI)   - prevDaiUltraSchuppi, amountUltraSchuppi * WAD);
-        assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,     amountMakerMan     * WAD);
-        assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,   amountAcreInvest   * WAD);
-        assertEq(dai.balanceOf(MONETSUPPLY)    - prevDaiMonetSupply,  amountMonetSupply  * WAD);
-        assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,   amountJustinCase   * WAD);
-        assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,      amountGfxLabs      * WAD);
-        assertEq(dai.balanceOf(DOO)            - prevDaiDoo,          amountDoo          * WAD);
+        // // Recognized Delegates
+        // assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
+        // assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
+        // assertEq(dai.balanceOf(ULTRASCHUPPI)   - prevDaiUltraSchuppi, amountUltraSchuppi * WAD);
+        // assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,     amountMakerMan     * WAD);
+        // assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,   amountAcreInvest   * WAD);
+        // assertEq(dai.balanceOf(MONETSUPPLY)    - prevDaiMonetSupply,  amountMonetSupply  * WAD);
+        // assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,   amountJustinCase   * WAD);
+        // assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,      amountGfxLabs      * WAD);
+        // assertEq(dai.balanceOf(DOO)            - prevDaiDoo,          amountDoo          * WAD);
 
-        // ETH Amsterdam Event SPF
-        assertEq(dai.balanceOf(ETH_AMSTERDAM)  - prevDaiEthAmsterdam, amountEthAmsterdam * WAD);
+        // // ETH Amsterdam Event SPF
+        // assertEq(dai.balanceOf(ETH_AMSTERDAM)  - prevDaiEthAmsterdam, amountEthAmsterdam * WAD);
     }
 
     function testCollateralIntegrations() private { // make public to use
