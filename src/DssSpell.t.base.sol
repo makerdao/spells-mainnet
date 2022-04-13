@@ -536,7 +536,11 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertEq(uint256(clip.buf()), normalizedTestBuf, concat("TestError/clip-buf-", ilk));
                 assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY, concat("TestError/clip-buf-range-", ilk)); // gte 0% and lte 100%
                 assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail, concat("TestError/clip-tail-", ilk));
-                assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours, concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt 10 hours
+                if (ilk == "TUSD-A") { // long tail liquidation
+                    assertTrue(clip.tail() >= 1200 && clip.tail() < 365 days, concat("TestError/TUSD-clip-tail-range-", ilk)); // gt eq 20 minutes and lt 10 hours
+                } else {
+                    assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours, concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt 10 hours
+                } // gt eq 20 minutes and lt 10 hours
                 uint256 normalizedTestCusp = (values.collaterals[ilk].clip_cusp)  * 10**23;
                 assertEq(uint256(clip.cusp()), normalizedTestCusp, concat("TestError/clip-cusp-", ilk));
                 assertTrue(clip.cusp() >= RAY / 10 && clip.cusp() < RAY, concat("TestError/clip-cusp-range-", ilk)); // gte 10% and lt 100%
