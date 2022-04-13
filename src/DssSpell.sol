@@ -29,10 +29,6 @@ interface DssVestLike {
     function yank(uint256) external;
 }
 
-interface GemLike {
-    function transfer(address, uint256) external returns (bool);
-}
-
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
