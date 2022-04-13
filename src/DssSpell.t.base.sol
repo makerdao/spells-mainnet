@@ -1139,8 +1139,41 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(vestDai.rxd(_index), _claimed,    "rxd");
     }
 
-    function getMat(bytes32 _ilk) internal view returns (uint256 mat) {
+    function getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
         (, mat) = spotter.ilks(_ilk);
+    }
+
+    function getIlkDuty(bytes32 _ilk) internal view returns (uint256 duty) {
+        (duty,)  = jug.ilks(_ilk);
+    }
+
+    function setIlkMat(bytes32 ilk, uint256 amount) internal {
+        hevm.store(
+            address(spotter),
+            bytes32(uint256(keccak256(abi.encode(ilk, uint256(1)))) + 1),
+            bytes32(amount)
+        );
+        assertEq(getIlkMat(ilk), amount, concat("TestError/setIlkMat-", ilk));
+    }
+
+    function setIlkRate(bytes32 ilk, uint256 amount) internal {
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(ilk, uint256(2)))) + 1),
+            bytes32(amount)
+        );
+        (,uint256 rate,,,) = vat.ilks(ilk);
+        assertEq(rate, amount, concat("TestError/setIlkRate-", ilk));
+    }
+
+    function setIlkLine(bytes32 ilk, uint256 amount) internal {
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(ilk, uint256(2)))) + 3),
+            bytes32(amount)
+        );
+        (,,,uint256 line,) = vat.ilks(ilk);
+        assertEq(line, amount, concat("TestError/setIlkLine-", ilk));
     }
 
     function checkIlkLerpOffboarding(bytes32 _ilk, bytes32 _lerp, uint256 _startMat, uint256 _endMat) public {
@@ -1151,13 +1184,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(_lerp));
 
         hevm.warp(block.timestamp + lerp.duration() / 2);
-        assertEq(getMat(_ilk), _startMat * RAY / 100);
+        assertEq(getIlkMat(_ilk), _startMat * RAY / 100);
         lerp.tick();
-        assertEqApprox(getMat(_ilk), ((_startMat + _endMat) / 2) * RAY / 100, RAY / 100);
+        assertEqApprox(getIlkMat(_ilk), ((_startMat + _endMat) / 2) * RAY / 100, RAY / 100);
 
         hevm.warp(block.timestamp + lerp.duration());
         lerp.tick();
-        assertEq(getMat(_ilk), _endMat * RAY / 100);
+        assertEq(getIlkMat(_ilk), _endMat * RAY / 100);
     }
 
     function checkIlkLerpIncreaseMatOffboarding(bytes32 _ilk, bytes32 _oldLerp, bytes32 _newLerp, uint256 _newEndMat) public {
@@ -1170,19 +1203,19 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         uint256 t = (block.timestamp - oldLerp.startTime()) * WAD / oldLerp.duration();
         uint256 tickMat = oldLerp.end() * t / WAD + oldLerp.start() - oldLerp.start() * t / WAD;
-        assertEq(getMat(_ilk), tickMat);
+        assertEq(getIlkMat(_ilk), tickMat);
         assertEq(spotter.wards(address(oldLerp)), 0);
 
         LerpAbstract newLerp = LerpAbstract(lerpFactory.lerps(_newLerp));
 
         hevm.warp(block.timestamp + newLerp.duration() / 2);
-        assertEq(getMat(_ilk), tickMat);
+        assertEq(getIlkMat(_ilk), tickMat);
         newLerp.tick();
-        assertEqApprox(getMat(_ilk), (tickMat + _newEndMat * RAY / 100) / 2, RAY / 100);
+        assertEqApprox(getIlkMat(_ilk), (tickMat + _newEndMat * RAY / 100) / 2, RAY / 100);
 
         hevm.warp(block.timestamp + newLerp.duration());
         newLerp.tick();
-        assertEq(getMat(_ilk), _newEndMat * RAY / 100);
+        assertEq(getIlkMat(_ilk), _newEndMat * RAY / 100);
     }
 
     function getExtcodesize(address target) public view returns (uint256 exsize) {
