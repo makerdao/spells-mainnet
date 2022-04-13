@@ -735,18 +735,22 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         spotter.poke(_ilk);
 
         // Authorization
-        assertEq(join.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(join)), 1);
-        assertEq(clip.wards(address(end)), 1);
-        assertEq(clip.wards(address(clipMom)), 1);
+        assertEq(join.wards(pauseProxy), 1, concat("TestError/checkIlkIntegration-pauseProxy-not-auth-on-join-", _ilk));
+        assertEq(vat.wards(address(join)), 1, concat("TestError/checkIlkIntegration-join-not-auth-on-vat-", _ilk));
+        assertEq(vat.wards(address(clip)), 1, concat("TestError/checkIlkIntegration-clip-not-auth-on-vat-", _ilk));
+        assertEq(dog.wards(address(clip)), 1, concat("TestError/checkIlkIntegration-clip-not-auth-on-dog-", _ilk));
+        assertEq(clip.wards(address(dog)), 1, concat("TestError/checkIlkIntegration-dog-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(end)), 1, concat("TestError/checkIlkIntegration-end-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(clipMom)), 1, concat("TestError/checkIlkIntegration-clipMom-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(esm)), 1, concat("TestError/checkIlkIntegration-esm-not-auth-on-clip-", _ilk));
         if (_isOSM) {
-            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1);
-            assertEq(OsmAbstract(pip).bud(address(spotter)), 1);
-            assertEq(OsmAbstract(pip).bud(address(clip)), 1);
-            assertEq(OsmAbstract(pip).bud(address(clipMom)), 1);
-            assertEq(OsmAbstract(pip).bud(address(end)), 1);
-            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1);
-            assertEq(OsmMomAbstract(osmMom).osms(_ilk), pip);
+            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1, concat("TestError/checkIlkIntegration-osmMom-not-auth-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(spotter)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(clip)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(clipMom)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(end)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1, concat("TestError/checkIlkIntegration-pip-not-bud-on-osm-", _ilk));
+            assertEq(OsmMomAbstract(osmMom).osms(_ilk), pip, concat("TestError/checkIlkIntegration-pip-not-bud-on-osmMom-", _ilk));
         }
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
@@ -771,9 +775,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         jug.drip(_ilk);
 
         // Deposit collateral, generate DAI
-        (,uint256 rate,,,) = vat.ilks(_ilk);
+        (,uint256 rate,,uint256 line,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
+        // Set max line to ensure we can create a new position
+        setIlkLine(_ilk, uint256(-1));
         vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(divup(mul(RAY, dust), rate)));
+        // Revert ilk line to proceed with testing
+        setIlkLine(_ilk, line);
         assertEq(vat.gem(_ilk, address(this)), 0);
         assertTrue(vat.dai(address(this)) >= dust * RAY);
         assertTrue(vat.dai(address(this)) <= (dust + 1) * RAY);
@@ -799,11 +807,21 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         }
         // dart max amount of DAI
         (,,uint256 spot,,) = vat.ilks(_ilk);
+        // Set max line to ensure we can draw dai
+        setIlkLine(_ilk, uint256(-1));
         vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(mul(amount18, spot) / rate));
+        // Revert ilk line to proceed with testing
+        setIlkLine(_ilk, line);
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
+            if (getIlkDuty(_ilk) == rates.rates(0)) {
+                // Rates wont accrue if 0, raise the mat to make the vault unsafe
+                setIlkMat(_ilk, 100000 * RAY);
+                hevm.warp(block.timestamp + 10 days);
+                spotter.poke(_ilk);
+            }
             dog.bark(_ilk, address(this), address(this));
             assertEq(clip.kicks(), 1);
         }
