@@ -550,7 +550,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertTrue(clip.chip() < 1 * WAD / 100, concat("TestError/clip-chip-range-", ilk)); // lt 1%
                 uint256 normalizedTestTip = values.collaterals[ilk].clip_tip * RAD;
                 assertEq(uint256(clip.tip()), normalizedTestTip, concat("TestError/clip-tip-", ilk));
-                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 300 * RAD, concat("TestError/clip-tip-range-", ilk));
+                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 500 * RAD, concat("TestError/clip-tip-range-", ilk));
 
                 assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom, concat("TestError/clip-clipperMom-auth-", ilk));
 
