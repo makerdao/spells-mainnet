@@ -54,9 +54,12 @@ contract Wallets {
         addr["DOO"]                          = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
 
         // MIP-63 Keeper Network
-        addr["GELATO_VEST_STREAMING"]        = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
+        addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
 
         // ETH Amsterdam Event SPF
         addr["ETH_AMSTERDAM"]                = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
+
+        // Ambassador Program Pilot Multisig
+        addr["AMBASSADOR_WALLET"]            = 0xF411d823a48D18B32e608274Df16a9957fE33E45;
     }
 }
