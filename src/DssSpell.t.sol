@@ -132,20 +132,30 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(dai.balanceOf(ETH_AMSTERDAM)  - prevDaiEthAmsterdam, amountEthAmsterdam * WAD);
     }
 
-    function testCollateralIntegrations() private { // make public to use
+    function testCollateralIntegrations() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
+        // checkIlkIntegration(
+        //     "TOKEN-X",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+        //     addr.addr("PIP_TOKEN"),
+        //     true,
+        //     true,
+        //     false
+        // );
+
         checkIlkIntegration(
-            "TOKEN-X",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-            addr.addr("PIP_TOKEN"),
-            true,
-            true,
-            false
+             "TUSD-A",
+             GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
+             ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
+             addr.addr("PIP_TUSD"),
+             true,
+             true,
+             false
         );
     }
 
@@ -373,5 +383,52 @@ contract DssSpellTest is DssSpellTestBase {
             actualHash := keccak256(ptr, size)
         }
         assertEq(expectedHash, actualHash);
+    }
+
+    // Validate addresses in test harness match chainlog
+    function test_chainlog_values() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        for(uint256 i = 0; i < chainLog.count(); i++) {
+            (bytes32 _key, address _val) = chainLog.get(i);
+            assertEq(_val, addr.addr(_key), concat("TestError/chainlog-addr-mismatch-", _key));
+        }
+    }
+
+    // Ensure version is updated if chainlog changes
+    function test_chainlog_version_bump() public {
+
+        uint256                   _count = chainLog.count();
+        string    memory        _version = chainLog.version();
+        address[] memory _chainlog_addrs = new address[](_count);
+
+        for(uint256 i = 0; i < _count; i++) {
+            (, address _val) = chainLog.get(i);
+            _chainlog_addrs[i] = _val;
+        }
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        if (_count != chainLog.count()) {
+            if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+                emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
+                fail();
+            }
+        }
+
+        for(uint256 i = 0; i < _count; i++) {
+            (, address _val) = chainLog.get(i);
+            // If the address arrays don't match it's due to a change in the changelog. Fail if the version is not updated.
+            if (_chainlog_addrs[i] != _val) {
+                if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+                    emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-address-change-", _version));
+                    fail();
+                }
+            }
+        }
     }
 }
