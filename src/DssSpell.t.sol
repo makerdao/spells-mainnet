@@ -153,7 +153,7 @@ contract DssSpellTest is DssSpellTestBase {
              GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
              ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
              addr.addr("PIP_TUSD"),
-             true,
+             false,
              true,
              false
         );
