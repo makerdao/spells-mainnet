@@ -22,15 +22,39 @@ interface AuthLike {
 contract DssSpellTest is DssSpellTestBase {
 
 
-    function testAAVEDirectBarChange() private {
-        // DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        // assertEq(join.bar(), 2.85 * 10**27 / 100);
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        uint256 APR_01_2022 = 1648771200;
 
-        // assertEq(join.bar(), 3.5 * 10**27 / 100);
+        assertEq(vest.ids(), 36);
+
+        assertTrue(vest.valid(36));
+        assertEq(vest.fin(36), 1664582400);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Gelato Offboarding
+        assertEq(vest.usr(36), 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4);
+        assertEq(vest.bgn(36), APR_01_2022);
+        assertEq(vest.clf(36), APR_01_2022);
+        assertEq(vest.fin(36), block.timestamp); // ensure stream is cancelled
+        assertEq(vest.mgr(36), address(0));
+        assertEq(vest.res(36), 1);
+
+        assertEq(vest.ids(), 37);
+
+        // // ----- Gov Wallet
+        assertEq(vest.usr(37), wallets.addr("GELATO_VEST_STREAMING"));
+        assertEq(vest.bgn(37), APR_01_2022);
+        assertEq(vest.clf(37), APR_01_2022);
+        assertEq(vest.fin(37), APR_01_2022 + 183 days);
+        assertEq(vest.mgr(37), address(0));
+        assertEq(vest.res(37), 1);
+        assertEq(vest.tot(37), 183_000 * WAD);
+        assertEq(vest.rxd(37), 0);
     }
 
     function testSpellIsCast_GENERAL() public {
