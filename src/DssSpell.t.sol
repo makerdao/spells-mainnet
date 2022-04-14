@@ -159,15 +159,17 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
+        // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
+        // assertEq(chainLog.version(), "1.X.X");
 
-        assertEq(chainLog.version(), "1.X.X");
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TUSD_A"), addr.addr("MCD_CLIP_CALC_TUSD_A"));
+        assertEq(chainLog.version(), "1.11.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
