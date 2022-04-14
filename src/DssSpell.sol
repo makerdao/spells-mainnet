@@ -79,11 +79,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://vote.makerdao.com/polling/QmPpQ49p#poll-detail
         DssExecLib.sendPaymentFromSurplusBuffer(AMBASSADOR_WALLET, 25_000);
 
-
-        // -------- CRVV1ETHSTETH-A System Parameters ----------
-        // https://vote.makerdao.com/polling/QmeTfgKP#poll-detail
-        DssExecLib.setIlkAutoLineParameters("CRVV1ETHSTETH-A", 50 * MILLION, 10 * MILLION, 8 hours);
-
         // ---- Replace Gelato Keeper Top Up Contract Stream ---
         // https://forum.makerdao.com/t/update-to-the-gelato-keeper-network-top-up-contract/14524
         // Yank existing stream
