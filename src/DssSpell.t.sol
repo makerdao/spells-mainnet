@@ -422,7 +422,7 @@ contract DssSpellTest is DssSpellTestBase {
             }
         }
 
-        for(uint256 i = 0; i < _count; i++) {
+        for(uint256 i = 0; i < chainLog.count(); i++) {
             (, address _val) = chainLog.get(i);
             // If the address arrays don't match it's due to a change in the changelog. Fail if the version is not updated.
             if (_chainlog_addrs[i] != _val) {
