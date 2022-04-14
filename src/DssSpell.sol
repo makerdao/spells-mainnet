@@ -110,6 +110,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         address _clip = DssExecLib.getChangelogAddress("MCD_CLIP_TUSD_A");
         //
         // Enable liquidations for TUSD-A
+        // Note: ClipperMom cannot circuit-break on a DS-Value but we're adding
+        //       the rely for consistency with other collaterals and in case the PIP
+        //       changes to an OSM.
         DssExecLib.authorize(_clip, DssExecLib.clipperMom());
         DssExecLib.setValue(_clip, "stopped", 0);
         // Use Abacus/LinearDecrease
@@ -131,7 +134,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.setKeeperIncentivePercent(_ilk, 0);
         // Set Flat Kick Incentive (tip) to 500
         DssExecLib.setKeeperIncentiveFlatRate(_ilk, 500);
-
+        // Update spotter price
+        DssExecLib.updateCollateralPrice(_ilk);
         // Update calc in changelog
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_TUSD_A", MCD_CLIP_CALC_TUSD_A);
 
