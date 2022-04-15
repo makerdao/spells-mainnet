@@ -26,6 +26,9 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         uint256 APR_01_2022 = 1648771200;
+        uint256 APR_15_2022 = 1649980800;
+
+        address OLD_GELATO_STREAM_ADDRESS = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
 
         assertEq(vest.ids(), 36);
 
@@ -37,7 +40,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Gelato Offboarding
-        assertEq(vest.usr(36), 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4);
+        assertEq(vest.usr(36), OLD_GELATO_STREAM_ADDRESS);
         assertEq(vest.bgn(36), APR_01_2022);
         assertEq(vest.clf(36), APR_01_2022);
         assertEq(vest.fin(36), block.timestamp); // ensure stream is cancelled
@@ -48,9 +51,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         // // ----- Gov Wallet
         assertEq(vest.usr(37), wallets.addr("GELATO_VEST_STREAMING"));
-        assertEq(vest.bgn(37), APR_01_2022);
-        assertEq(vest.clf(37), APR_01_2022);
-        assertEq(vest.fin(37), APR_01_2022 + 183 days);
+        assertEq(vest.bgn(37), APR_15_2022);
+        assertEq(vest.clf(37), APR_15_2022);
+        assertEq(vest.fin(37), APR_15_2022 + 183 days);
         assertEq(vest.mgr(37), address(0));
         assertEq(vest.res(37), 1);
         assertEq(vest.tot(37), 183_000 * WAD);

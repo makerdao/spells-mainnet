@@ -48,8 +48,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant internal    GELATO_WALLET_OLD = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
     address constant internal    GELATO_WALLET_NEW = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
 
-    uint256 constant APR_01_2022 = 1648771200;
-    // 2022-04-01 to 2022-09-30 23:59:59 UTC
+    uint256 constant APR_15_2022 = 1649980800;
+    // 2022-04-01 to 2022-10-15 00:00:00 UTC
     uint256 constant SIX_MONTHS = 183 days;
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -86,13 +86,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Replace stream
         // Address: 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62
         // Amount: 1,000 DAI/day
-        // Start Date: Apr 1, 2022
-        // End Date: Sep 30, 2022 23:59:59 UTC
+        // Start Date: Apr 15, 2022
+        // End Date: Oct 14, 2022 23:59:59 UTC
         MCD_VEST_DAI.restrict(
             MCD_VEST_DAI.create(
                 GELATO_WALLET_NEW,
                 183_000 * WAD,
-                APR_01_2022,
+                APR_15_2022,
                 SIX_MONTHS,
                 0,
                 address(0)
