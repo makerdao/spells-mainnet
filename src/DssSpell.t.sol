@@ -224,6 +224,74 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(totalGas <= 10 * MILLION);
     }
 
+    // The specific date doesn't matter that much since function is checking for difference between warps
+    function test_nextCastTime() public {
+        hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        vote(address(spell));
+        spell.schedule();
+
+        uint256 monday_1400_UTC = 1606744800; // Nov 30, 2020
+        uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
+
+        // Day tests
+        hevm.warp(monday_1400_UTC);                                    // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);               // Monday,   14:00 UTC
+
+        if (spell.officeHours()) {
+            hevm.warp(monday_1400_UTC - 1 days);                       // Sunday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_1400_UTC - 2 days);                       // Saturday, 14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_1400_UTC - 3 days);                       // Friday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days);  // Able to cast
+
+            hevm.warp(monday_2100_UTC);                                // Monday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC + 1 days);  // Tuesday,  14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 1 days);                       // Sunday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 2 days);                       // Saturday, 21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            hevm.warp(monday_2100_UTC - 3 days);                       // Friday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            // Time tests
+            uint256 castTime;
+
+            for(uint256 i = 0; i < 5; i++) {
+                castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
+                hevm.warp(castTime - 1 seconds); // 13:59:59 UTC
+                assertEq(spell.nextCastTime(), castTime);
+
+                hevm.warp(castTime + 7 hours + 1 seconds); // 21:00:01 UTC
+                if (i < 4) {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + (i + 1) * 1 days); // Next day at 14:00 UTC
+                } else {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + 7 days); // Next monday at 14:00 UTC (friday case)
+                }
+            }
+        }
+    }
+
+    function testFail_notScheduled() public view {
+        spell.nextCastTime();
+    }
+
+    function test_use_eta() public {
+        hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        vote(address(spell));
+        spell.schedule();
+
+        uint256 castTime = spell.nextCastTime();
+        assertEq(castTime, spell.eta());
+    }
+
     function test_OSMs() private { // make public to use
         address READER_ADDR = address(spotter);
 
@@ -254,5 +322,99 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_auth_in_sources() public {
         checkAuth(true);
+    }
+
+    // Verifies that the bytecode of the action of the spell used for testing
+    // matches what we'd expect.
+    //
+    // Not a complete replacement for Etherscan verification, unfortunately.
+    // This is because the DssSpell bytecode is non-deterministic because it
+    // deploys the action in its constructor and incorporates the action
+    // address as an immutable variable--but the action address depends on the
+    // address of the DssSpell which depends on the address+nonce of the
+    // deploying address. If we had a way to simulate a contract creation by
+    // an arbitrary address+nonce, we could verify the bytecode of the DssSpell
+    // instead.
+    //
+    // Vacuous until the deployed_spell value is non-zero.
+    function test_bytecode_matches() public {
+        address expectedAction = (new DssSpell()).action();
+        address actualAction   = spell.action();
+        uint256 expectedBytecodeSize;
+        uint256 actualBytecodeSize;
+        assembly {
+            expectedBytecodeSize := extcodesize(expectedAction)
+            actualBytecodeSize   := extcodesize(actualAction)
+        }
+
+        uint256 metadataLength = getBytecodeMetadataLength(expectedAction);
+        assertTrue(metadataLength <= expectedBytecodeSize);
+        expectedBytecodeSize -= metadataLength;
+
+        metadataLength = getBytecodeMetadataLength(actualAction);
+        assertTrue(metadataLength <= actualBytecodeSize);
+        actualBytecodeSize -= metadataLength;
+
+        assertEq(actualBytecodeSize, expectedBytecodeSize);
+        uint256 size = actualBytecodeSize;
+        uint256 expectedHash;
+        uint256 actualHash;
+        assembly {
+            let ptr := mload(0x40)
+
+            extcodecopy(expectedAction, ptr, 0, size)
+            expectedHash := keccak256(ptr, size)
+
+            extcodecopy(actualAction, ptr, 0, size)
+            actualHash := keccak256(ptr, size)
+        }
+        assertEq(expectedHash, actualHash);
+    }
+
+    // Validate addresses in test harness match chainlog
+    function test_chainlog_values() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        for(uint256 i = 0; i < chainLog.count(); i++) {
+            (bytes32 _key, address _val) = chainLog.get(i);
+            assertEq(_val, addr.addr(_key), concat("TestError/chainlog-addr-mismatch-", _key));
+        }
+    }
+
+    // Ensure version is updated if chainlog changes
+    function test_chainlog_version_bump() public {
+
+        uint256                   _count = chainLog.count();
+        string    memory        _version = chainLog.version();
+        address[] memory _chainlog_addrs = new address[](_count);
+
+        for(uint256 i = 0; i < _count; i++) {
+            (, address _val) = chainLog.get(i);
+            _chainlog_addrs[i] = _val;
+        }
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        if (_count != chainLog.count()) {
+            if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+                emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
+                fail();
+            }
+        }
+
+        for(uint256 i = 0; i < chainLog.count(); i++) {
+            (, address _val) = chainLog.get(i);
+            // If the address arrays don't match it's due to a change in the changelog. Fail if the version is not updated.
+            if (_chainlog_addrs[i] != _val) {
+                if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+                    emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-address-change-", _version));
+                    fail();
+                }
+            }
+        }
     }
 }
