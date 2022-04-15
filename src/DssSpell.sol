@@ -49,7 +49,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant internal    GELATO_WALLET_NEW = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
 
     uint256 constant APR_15_2022 = 1649980800;
-    // 2022-04-01 to 2022-10-15 00:00:00 UTC
+    // 2022-04-15 to 2022-10-15 00:00:00 UTC
     uint256 constant SIX_MONTHS = 183 days;
 
     // Many of the settings that change weekly rely on the rate accumulator
