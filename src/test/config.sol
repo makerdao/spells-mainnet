@@ -429,7 +429,7 @@ contract Config {
             clip_tail:    120 hours,
             clip_cusp:    9800,
             clip_chip:    0,
-            clip_tip:     500,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 9500,
             calc_tau:     250 days,
