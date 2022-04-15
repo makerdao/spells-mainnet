@@ -129,7 +129,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Set Proportional Kick Incentive (chip) to 0
         DssExecLib.setKeeperIncentivePercent(_ilk, 0);
         // Set Flat Kick Incentive (tip) to 500
-        // NOTE: PECU rejected the incentive update to 500. Details will be provided in the forum.
+        // NOTE: PECU rejected the incentive update to 500.
+        //       https://forum.makerdao.com/t/tusd-offloading-flat-kick-incentive-change/14645
         DssExecLib.setKeeperIncentiveFlatRate(_ilk, 0);
         // Update spotter price
         DssExecLib.updateCollateralPrice(_ilk);
