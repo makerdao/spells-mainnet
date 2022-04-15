@@ -60,6 +60,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.rxd(37), 0);
     }
 
+    function testIsWorking_TUSD_A_clip() public {
+        checkIlkClipper(
+            "TUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
+            addr.addr("MCD_CLIP_CALC_TUSD_A"),
+            (addr.addr("PIP_TUSD")),
+            1000_000 * WAD
+        );
+    }
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");

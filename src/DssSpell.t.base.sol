@@ -830,6 +830,116 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
+function checkIlkClipper(
+        bytes32 ilk,
+        GemJoinAbstract join,
+        ClipAbstract clipper,
+        address calc,
+        address pip,
+        uint256 ilkAmt
+    ) internal {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Contracts set
+        assertEq(dog.vat(), address(vat));
+        assertEq(dog.vow(), address(vow));
+        {
+        (address clip,,,) = dog.ilks(ilk);
+        assertEq(clip, address(clipper));
+        }
+        assertEq(clipper.ilk(), ilk);
+        assertEq(clipper.vat(), address(vat));
+        assertEq(clipper.vow(), address(vow));
+        assertEq(clipper.dog(), address(dog));
+        assertEq(clipper.spotter(), address(spotter));
+        assertEq(clipper.calc(), calc);
+
+        // Authorization
+        assertEq(vat.wards(address(clipper))    , 1);
+        assertEq(dog.wards(address(clipper))    , 1);
+        assertEq(clipper.wards(address(dog))    , 1);
+        assertEq(clipper.wards(address(end))    , 1);
+        assertEq(clipper.wards(address(clipMom)), 1);
+        assertEq(clipper.wards(address(esm)), 1);
+
+        // Force max Hole
+        hevm.store(
+            address(dog),
+            bytes32(uint256(4)),
+            bytes32(uint256(-1))
+        );
+
+        // ----------------------- Check Clipper works and bids can be made -----------------------
+
+        {
+        GemAbstract token = GemAbstract(join.gem());
+        uint256 tknAmt =  ilkAmt / 10 ** (18 - join.dec());
+        giveTokens(address(token), tknAmt);
+        assertEq(token.balanceOf(address(this)), tknAmt);
+
+        // Join to adapter
+        assertEq(vat.gem(ilk, address(this)), 0);
+        assertEq(token.allowance(address(this), address(join)), 0);
+        token.approve(address(join), tknAmt);
+        join.join(address(this), tknAmt);
+        assertEq(token.balanceOf(address(this)), 0);
+        assertEq(vat.gem(ilk, address(this)), ilkAmt);
+        }
+
+        {
+        // Generate new DAI to force a liquidation
+        uint256 rate;
+        int256 art;
+        uint256 spot;
+        uint256 line;
+        (,rate, spot, line,) = vat.ilks(ilk);
+        art = int256(mul(ilkAmt, spot) / rate);
+
+        // dart max amount of DAI
+        setIlkLine(ilk, uint256(-1));
+        vat.frob(ilk, address(this), address(this), address(this), int256(ilkAmt), art);
+        setIlkLine(ilk, line);
+        setIlkMat(ilk, 100000 * RAY);
+        hevm.warp(block.timestamp + 10 days);
+        spotter.poke(ilk);
+        assertEq(clipper.kicks(), 0);
+        dog.bark(ilk, address(this), address(this));
+        assertEq(clipper.kicks(), 1);
+
+        (, rate,,,) = vat.ilks(ilk);
+        uint256 debt = mul(mul(rate, uint256(art)), dog.chop(ilk)) / WAD;
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(debt)
+        );
+        assertEq(vat.dai(address(this)), debt);
+        assertEq(vat.gem(ilk, address(this)), 0);
+
+        hevm.warp(block.timestamp + 20 minutes);
+        (, uint256 tab, uint256 lot, address usr,, uint256 top) = clipper.sales(1);
+
+        assertEq(usr, address(this));
+        assertEq(tab, debt);
+        assertEq(lot, ilkAmt);
+        assertTrue(mul(lot, top) > tab); // There is enough collateral to cover the debt at current price
+
+        vat.hope(address(clipper));
+        clipper.take(1, lot, top, address(this), bytes(""));
+        }
+
+        {
+        (, uint256 tab, uint256 lot, address usr,,) = clipper.sales(1);
+        assertEq(usr, address(0));
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+        assertEq(vat.dai(address(this)), 0);
+        assertEq(vat.gem(ilk, address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
+        }
+     }
+
     function checkUNILPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
