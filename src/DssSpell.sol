@@ -124,6 +124,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.setLinearDecrease(MCD_CLIP_CALC_TUSD_A, 21_600_000);
         // Set Max Auction Duration (tail) to 432,000 seconds (5 days, implies minimum price of 0.98)
         DssExecLib.setAuctionTimeBeforeReset(_ilk, 432_000);
+        // Inferred by risk. Enforcing here with approval https://discord.com/channels/893112320329396265/897483518316265553/963575806653767720
         DssExecLib.setAuctionPermittedDrop(_ilk, 9800);
         // Set Proportional Kick Incentive (chip) to 0
         DssExecLib.setKeeperIncentivePercent(_ilk, 0);
