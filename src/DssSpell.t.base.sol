@@ -838,6 +838,7 @@ function checkIlkClipper(
         address pip,
         uint256 ilkAmt
     ) internal {
+        pip; // Unused
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
