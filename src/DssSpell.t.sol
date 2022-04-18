@@ -5,71 +5,7 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
-interface Gem6Like {
-    function implementation() external view returns (address);
-}
-
-interface GemJoin6Like {
-    function implementations(address) external view returns (uint256);
-    function join(address, uint256) external;
-    function exit(address, uint256) external;
-}
-
-interface AuthLike {
-    function wards(address) external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
-
-
-    function testVestDAI() public {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-
-        uint256 APR_01_2022 = 1648771200;
-        uint256 APR_15_2022 = 1649980800;
-
-        address OLD_GELATO_STREAM_ADDRESS = 0x926c21602FeC84d6d0fA6450b40Edba595B5c6e4;
-
-        assertEq(vest.ids(), 36);
-
-        assertTrue(vest.valid(36));
-        assertEq(vest.fin(36), 1664582400);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Gelato Offboarding
-        assertEq(vest.usr(36), OLD_GELATO_STREAM_ADDRESS);
-        assertEq(vest.bgn(36), APR_01_2022);
-        assertEq(vest.clf(36), APR_01_2022);
-        assertEq(vest.fin(36), block.timestamp); // ensure stream is cancelled
-        assertEq(vest.mgr(36), address(0));
-        assertEq(vest.res(36), 1);
-
-        assertEq(vest.ids(), 37);
-
-        // // ----- Gov Wallet
-        assertEq(vest.usr(37), wallets.addr("GELATO_VEST_STREAMING"));
-        assertEq(vest.bgn(37), APR_15_2022);
-        assertEq(vest.clf(37), APR_15_2022);
-        assertEq(vest.fin(37), APR_15_2022 + 183 days);
-        assertEq(vest.mgr(37), address(0));
-        assertEq(vest.res(37), 1);
-        assertEq(vest.tot(37), 183_000 * WAD);
-        assertEq(vest.rxd(37), 0);
-    }
-
-    function testIsWorking_TUSD_A_clip() public {
-        checkIlkClipper(
-            "TUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
-            addr.addr("MCD_CLIP_CALC_TUSD_A"),
-            (addr.addr("PIP_TUSD")),
-            1000_000 * WAD
-        );
-    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -101,19 +37,19 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() public {
-        uint256 amountGrowthCU = 474683;
-        uint256 amountAmbassadorWallet = 25000;
+    function testPayments() private { // make public to use
+        uint256 amountCU = 0;
+        uint256 amountWallet = 0;
 
         uint256 prevSin = vat.sin(address(vow));
 
         // Core Units
-        uint256 prevDaiGrowthCU = dai.balanceOf(wallets.addr("GRO_WALLET"));
+        uint256 prevDaiCU = dai.balanceOf(wallets.addr("CU_WALLET"));
 
         // Ambassador Program
-        uint256 prevDaiAmbassadorWallet = dai.balanceOf(wallets.addr("AMBASSADOR_WALLET"));
+        uint256 prevDaiWallet = dai.balanceOf(wallets.addr("XXX_WALLET"));
 
-        uint256 amount = amountGrowthCU + amountAmbassadorWallet;
+        uint256 amount = amountCU + amountWallet;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -121,50 +57,55 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
 
-        // // Recognized Delegates
-        assertEq(dai.balanceOf(wallets.addr("GRO_WALLET")) - prevDaiGrowthCU, amountGrowthCU * WAD);
-        assertEq(dai.balanceOf(wallets.addr("AMBASSADOR_WALLET")) - prevDaiAmbassadorWallet, amountAmbassadorWallet * WAD);
+        // Wallets
+        assertEq(dai.balanceOf(wallets.addr("CU_WALLET")) - prevDaiCU, amountCU * WAD);
+        assertEq(dai.balanceOf(wallets.addr("AMBASSADOR_WALLET")) - prevDaiWallet, amountWallet * WAD);
 
     }
 
-    function testCollateralIntegrations() public { // make public to use
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        // checkIlkIntegration(
-        //     "TOKEN-X",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-        //     addr.addr("PIP_TOKEN"),
-        //     true,
-        //     true,
-        //     false
-        // );
-
         checkIlkIntegration(
-             "TUSD-A",
-             GemJoinAbstract(addr.addr("MCD_JOIN_TUSD_A")),
-             ClipAbstract(addr.addr("MCD_CLIP_TUSD_A")),
-             addr.addr("PIP_TUSD"),
-             false,
-             true,
-             false
+            "TOKEN-X",
+            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+            addr.addr("PIP_TOKEN"),
+            true,
+            true,
+            false
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testIlkClipper() private { // make public to use
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Insert new ilk clipper tests here
+        checkIlkClipper(
+            "TOKEN-X",
+            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+            addr.addr("MCD_CLIP_CALC_TOKEN_X"),
+            OsmAbstract(addr.addr("PIP_TOKEN")),
+            20_000 * WAD
+        );
+    }
+
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
-        // assertEq(chainLog.version(), "1.X.X");
-
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TUSD_A"), addr.addr("MCD_CLIP_CALC_TUSD_A"));
-        assertEq(chainLog.version(), "1.11.1");
+        assertEq(chainLog.getAddress("MCD_JOIN_TOKEN_X"), addr.addr("MCD_JOIN_TOKEN_X"));
+        assertEq(chainLog.getAddress("MCD_CLIP_TOKEN_X"), addr.addr("MCD_CLIP_TOKEN_X"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TOKEN_X"), addr.addr("MCD_CLIP_CALC_TOKEN_X"));
+        assertEq(chainLog.version(), "X.X.X");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -303,7 +244,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function test_OSMs() private { // make public to use
+    function testOSMs() private { // make public to use
         address READER_ADDR = address(spotter);
 
         // Track OSM authorizations here
@@ -316,7 +257,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_XXX")).bud(READER_ADDR), 1);
     }
 
-    function test_Medianizers() private { // make public to use
+    function testMedianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());

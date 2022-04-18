@@ -47,8 +47,9 @@ contract DssSpellCollateralOnboardingAction {
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add CRVV1ETHSTETH-A as a new Vault Type
-        //  Poll Link: https://vote.makerdao.com/polling/Qmek9vzo?network=mainnet#poll-detail
+        //  Add ______________ as a new Vault Type
+        //  Poll Link:
+
         // DssExecLib.addNewCollateral(
         //     CollateralOpts({
         //         ilk:                   "XXX-A",
@@ -57,38 +58,36 @@ contract DssSpellCollateralOnboardingAction {
         //         clip:                  MCD_CLIP_XXX_A,
         //         calc:                  MCD_CLIP_CALC_XXX_A,
         //         pip:                   PIP_XXX,
-        //         isLiquidatable:        true,
-        //         isOSM:                 true,
-        //         whitelistOSM:          false,           // We need to whitelist OSM, but Curve Oracle orbs() function is not supported
-        //         ilkDebtCeiling:        3 * MILLION,
-        //         minVaultAmount:        25 * THOUSAND,
-        //         maxLiquidationAmount:  3 * MILLION,
-        //         liquidationPenalty:    1300,
-        //         ilkStabilityFee:       NUMBER_PCT,
-        //         startingPriceFactor:   13000,
-        //         breakerTolerance:      5000,
-        //         auctionDuration:       140 minutes,
-        //         permittedDrop:         4000,
-        //         liquidationRatio:      15500,
-        //         kprFlatReward:         300,
-        //         kprPctReward:          10
+        //         isLiquidatable:        BOOL,
+        //         isOSM:                 BOOL,
+        //         whitelistOSM:          BOOL,
+        //         ilkDebtCeiling:        line,
+        //         minVaultAmount:        dust,
+        //         maxLiquidationAmount:  hole,
+        //         liquidationPenalty:    chop,
+        //         ilkStabilityFee:       duty,
+        //         startingPriceFactor:   buf,
+        //         breakerTolerance:      tolerance,
+        //         auctionDuration:       tail,
+        //         permittedDrop:         cusp,
+        //         liquidationRatio:      mat,
+        //         kprFlatReward:         tip,
+        //         kprPctReward:          chip
         //     })
         // );
+
         // DssExecLib.setStairstepExponentialDecrease(
-        //     MCD_CLIP_CALC_XXX_A,
-        //     90 seconds,
-        //     9900
-        // );
-        // DssExecLib.setIlkAutoLineParameters(
-        //     "XXX-A",
-        //     3 * MILLION,
-        //     3 * MILLION,
-        //     8 hours
+        //     CALC_ADDR,
+        //     DURATION,
+        //     PCT_BPS
         // );
 
-        // Whitelist OSM - normally handled in addNewCollateral, but Curve LP Oracle format is not supported yet
-        // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(0), PIP_ETHSTETH);
-        // DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_ETHSTETH).orbs(1), PIP_ETHSTETH);
+        // DssExecLib.setIlkAutoLineParameters(
+        //     "XXX-A",
+        //     AMOUNT,
+        //     GAP,
+        //     TTL
+        // );
 
         // ChainLog Updates
         // DssExecLib.setChangelogAddress("XXX", XXX);

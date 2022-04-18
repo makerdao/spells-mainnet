@@ -835,13 +835,9 @@ function checkIlkClipper(
         GemJoinAbstract join,
         ClipAbstract clipper,
         address calc,
-        address pip,
+        OsmAbstract pip,
         uint256 ilkAmt
     ) internal {
-        pip; // Unused
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
 
         // Contracts set
         assertEq(dog.vat(), address(vat));
@@ -864,6 +860,13 @@ function checkIlkClipper(
         assertEq(clipper.wards(address(end))    , 1);
         assertEq(clipper.wards(address(clipMom)), 1);
         assertEq(clipper.wards(address(esm)), 1);
+
+        try pip.bud(address(clipMom)) returns (uint256 bud) {
+            assertEq(bud, 1);
+        } catch {}
+        try pip.bud(address(clipper)) returns (uint256 bud) {
+            assertEq(bud, 1);
+        } catch {}
 
         // Force max Hole
         hevm.store(
