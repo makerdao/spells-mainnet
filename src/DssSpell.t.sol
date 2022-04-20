@@ -244,17 +244,31 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function testOSMs() private { // make public to use
-        address READER_ADDR = address(spotter);
+    function testOSMs() public { // make public to use
+        address OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_XXX")).bud(READER_ADDR), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_XXX")).bud(READER_ADDR), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
     }
 
     function testMedianizers() private { // make public to use

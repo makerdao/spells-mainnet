@@ -45,11 +45,23 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // --- Rates ---
     //uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
+    address constant internal OASIS_APP_OSM_READER     = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
+
+        // --------------------------------- Oasis.app OSM Whitelist ---------------------------------------
+        // https://vote.makerdao.com/polling/QmZykRSM
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_ETH"),    OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WSTETH"), OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WBTC"),   OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_RENBTC"), OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_YFI"),    OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_UNI"),    OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_LINK"),   OASIS_APP_OSM_READER);
+        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_MANA"),   OASIS_APP_OSM_READER);
     }
 }
 
