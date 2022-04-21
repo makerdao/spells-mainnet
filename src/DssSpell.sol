@@ -23,6 +23,14 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
+interface CurveLPOracleLike {
+    function orbs(uint256) external view returns (address);
+}
+
+interface IlkRegistryLike {
+    function update(bytes32) external;
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -47,6 +55,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     address constant internal OASIS_APP_OSM_READER     = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
+    address constant internal PIP_CRVV1ETHSTETH = 0xEa508F82728927454bd3ce853171b0e2705880D4;
+
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
@@ -62,6 +72,65 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_UNI"),    OASIS_APP_OSM_READER);
         DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_LINK"),   OASIS_APP_OSM_READER);
         DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_MANA"),   OASIS_APP_OSM_READER);
+
+        // --------------------------------- Replace CRVV1ETHSTETH-A PIP -----------------------------------
+        bytes32 _ilk  = "CRVV1ETHSTETH-A";
+
+        address  PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
+        address  MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
+
+        address OSM_MOM = DssExecLib.osmMom();
+        address MCD_SPOT = DssExecLib.spotter();
+        address CLIPPER_MOM = DssExecLib.clipperMom();
+        address MCD_END = DssExecLib.end();
+
+        // ---- Revoke OsmMom to access to the Old PIP
+        DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
+
+        // ---- Remove Old CRVV1ETHSTETH-A PIP Whitelistings
+        DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), PIP_CRVV1ETHSTETH_OLD);
+        DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), PIP_CRVV1ETHSTETH_OLD);
+
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_SPOT);
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_CLIP_CRVV1ETHSTETH_A);
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, CLIPPER_MOM);
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_END);
+
+        // ---- Replace CRVV1ETHSTETH-A PIP ----
+
+        // Set the token PIP in the Spotter
+        DssExecLib.setContract(MCD_SPOT, _ilk, "pip", PIP_CRVV1ETHSTETH);
+
+        // Allow OsmMom to access to the OSM
+        DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
+
+        // Whitelist OSM
+        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0), PIP_CRVV1ETHSTETH);
+        DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1), PIP_CRVV1ETHSTETH);
+
+        // Whitelist Spotter to read the OSM data
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, DssExecLib.spotter());
+
+        // Whitelist Clipper on OSM
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
+
+        // Allow the clippermom to access the feed
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, CLIPPER_MOM);
+
+        // Whitelist End to read the OSM data
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_END);
+
+        // Set OSM in the OsmMom for the ilk
+        DssExecLib.allowOSMFreeze(PIP_CRVV1ETHSTETH, _ilk);
+
+        // Update pip in the ilk registry
+        IlkRegistryLike(DssExecLib.reg()).update(_ilk);
+
+        // Update pip in changelog
+        DssExecLib.setChangelogAddress("PIP_CRVV1ETHSTETH", PIP_CRVV1ETHSTETH);
+
+        // Update chaingelog version
+        DssExecLib.setChangelogVersion("1.11.2");
     }
 }
 

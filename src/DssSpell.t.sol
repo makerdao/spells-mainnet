@@ -63,20 +63,22 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
-    function testCollateralIntegrations() private { // make public to use
+    function testCollateralIntegrations() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkIlkIntegration(
-            "TOKEN-X",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-            addr.addr("PIP_TOKEN"),
+        checkCropCRVLPIntegration(
+            "CRVV1ETHSTETH-A",
+            CropJoinLike(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")),
+            CurveLPOsmLike(addr.addr("PIP_CRVV1ETHSTETH")),
+            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85,     // ETH Medianizer
+            0x911D7A8F87282C4111f621e2D100Aa751Bab1260,     // stETH Medianizer (proxy to wstETH medianizer)
             true,
             true,
-            false
+            true
         );
     }
 
@@ -96,33 +98,34 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_TOKEN_X"), addr.addr("MCD_JOIN_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_TOKEN_X"), addr.addr("MCD_CLIP_TOKEN_X"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_TOKEN_X"), addr.addr("MCD_CLIP_CALC_TOKEN_X"));
-        assertEq(chainLog.version(), "X.X.X");
+        // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
+        // assertEq(chainLog.version(), "1.X.X");
+
+        assertEq(chainLog.getAddress("PIP_CRVV1ETHSTETH"), addr.addr("PIP_CRVV1ETHSTETH"));
+        assertEq(chainLog.version(), "1.11.2");
     }
 
-    function testNewIlkRegistryValues() private { // make public to use
+    function testNewIlkRegistryValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("XXX-A"), 48);
-        assertEq(reg.join("XXX-A"), addr.addr("MCD_JOIN_XXX_A"));
-        assertEq(reg.gem("XXX-A"), addr.addr("XXX"));
-        assertEq(reg.dec("XXX-A"), GemAbstract(addr.addr("XXX")).decimals());
-        assertEq(reg.class("XXX-A"), 1);
-        assertEq(reg.pip("XXX-A"), addr.addr("PIP_XXX"));
-        assertEq(reg.xlip("XXX-A"), addr.addr("MCD_CLIP_XXX_A"));
-        assertEq(reg.name("XXX-A"), "xxx xxx xxx");
-        assertEq(reg.symbol("XXX-A"), "xxx");
+        assertEq(reg.pos("CRVV1ETHSTETH-A"), 48);
+        assertEq(reg.join("CRVV1ETHSTETH-A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
+        assertEq(reg.gem("CRVV1ETHSTETH-A"), addr.addr("CRVV1ETHSTETH"));
+        assertEq(reg.dec("CRVV1ETHSTETH-A"), DSTokenAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
+        assertEq(reg.class("CRVV1ETHSTETH-A"), 1);
+        assertEq(reg.pip("CRVV1ETHSTETH-A"), addr.addr("PIP_CRVV1ETHSTETH"));
+        assertEq(reg.xlip("CRVV1ETHSTETH-A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
+        assertEq(reg.name("CRVV1ETHSTETH-A"), "Curve.fi ETH/stETH");
+        assertEq(reg.symbol("CRVV1ETHSTETH-A"), "steCRV");
     }
 
     function testFailWrongDay() public {
@@ -271,15 +274,51 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
     }
 
-    function testMedianizers() private { // make public to use
+    function testRemoveOldOSM() public { // make public to use
+        address PIP_CRVV1ETHSTETH_OLD = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
+
+        // Wards
+        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 1);
+
+        // Buds
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
+
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 1);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 1);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 1);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 1);
+
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Wards
+        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 0);
+
+        // Buds
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
+
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 0);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 0);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 0);
+        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
+    }
+
+    function test_Medianizers() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track Median authorizations here
-        address PIP     = addr.addr("PIP_XXX");
-        address MEDIAN  = OsmAbstract(PIP).src();
-        assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
+        address SET_TOKEN    = addr.addr("PIP_CRVV1ETHSTETH");
+        address ETHUSD_MED   = CurveLPOsmLike(SET_TOKEN).orbs(0);
+        address STETHUSD_MED = CurveLPOsmLike(SET_TOKEN).orbs(1);
+        assertEq(MedianAbstract(ETHUSD_MED).bud(SET_TOKEN), 1);
+        assertEq(MedianAbstract(STETHUSD_MED).bud(SET_TOKEN), 1);
+        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WSTETH")).src()).bud(STETHUSD_MED), 1);
     }
 
     function test_auth() public {
