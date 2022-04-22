@@ -29,7 +29,7 @@ interface CurveLPOracleLike {
     function wat() external view returns (bytes32);
     function ncoins() external view returns (uint256);
     function orbs(uint256) external view returns (address);
-    function nonReentrant() external view returns (bool);
+    function nonreentrant() external view returns (bool);
 }
 
 interface IlkRegistryLike {
@@ -84,14 +84,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         address PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
         address MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
 
+        address PIP_CRVV1ETHSTETH_ORBS_0 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0);
+        address PIP_CRVV1ETHSTETH_ORBS_1 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1);
+
         // OSM Sanity Checks
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).pool() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).pool(), "DssSpell/pip-wrong-pool");
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).src() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).src(), "DssSpell/pip-wrong-src");
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).wat() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).wat(), "DssSpell/pip-wrong-wat");
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).ncoins() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).ncoins(), "DssSpell/pip-wrong-ncoins");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).nonReentrant(), "DssSpell/pip-reentrant");
+        require(PIP_CRVV1ETHSTETH_ORBS_0 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
+        require(PIP_CRVV1ETHSTETH_ORBS_1 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).nonreentrant(), "DssSpell/pip-reentrant");
 
         address OSM_MOM = DssExecLib.osmMom();
         address MCD_SPOT = DssExecLib.spotter();
@@ -102,8 +105,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
 
         // Remove Old CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.removeReaderFromWhitelist(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), PIP_CRVV1ETHSTETH_OLD);
-        DssExecLib.removeReaderFromWhitelist(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), PIP_CRVV1ETHSTETH_OLD);
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH_OLD);
+        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH_OLD);
 
         DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_SPOT);
         DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_CLIP_CRVV1ETHSTETH_A);
@@ -119,8 +122,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
 
         // Add New CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.addReaderToWhitelist(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0), PIP_CRVV1ETHSTETH);
-        DssExecLib.addReaderToWhitelist(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1), PIP_CRVV1ETHSTETH);
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH);
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH);
 
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_SPOT);
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
