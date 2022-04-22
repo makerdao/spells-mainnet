@@ -96,10 +96,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         address CLIPPER_MOM = DssExecLib.clipperMom();
         address MCD_END = DssExecLib.end();
 
-        // ---- Revoke OsmMom to access to the Old PIP
+        // Revoke OsmMom to access the Old OSM
         DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
 
-        // ---- Remove Old CRVV1ETHSTETH-A PIP Whitelistings
+        // Remove Old CRVV1ETHSTETH-A PIP Whitelistings
         DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), PIP_CRVV1ETHSTETH_OLD);
         DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), PIP_CRVV1ETHSTETH_OLD);
 
@@ -113,23 +113,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Set the token PIP in the Spotter
         DssExecLib.setContract(MCD_SPOT, _ilk, "pip", PIP_CRVV1ETHSTETH);
 
-        // Allow OsmMom to access to the OSM
+        // Allow OsmMom to access the New OSM
         DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
 
-        // Whitelist OSM
+        // Add New CRVV1ETHSTETH-A PIP Whitelistings
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0), PIP_CRVV1ETHSTETH);
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1), PIP_CRVV1ETHSTETH);
 
-        // Whitelist Spotter to read the OSM data
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_SPOT);
-
-        // Whitelist Clipper on OSM
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
-
-        // Allow the clippermom to access the feed
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, CLIPPER_MOM);
-
-        // Whitelist End to read the OSM data
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_END);
 
         // Set OSM in the OsmMom for the ilk
