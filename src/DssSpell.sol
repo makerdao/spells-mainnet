@@ -24,6 +24,10 @@ import "dss-exec-lib/DssAction.sol";
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
 interface CurveLPOracleLike {
+    function pool() external view returns (address);
+    function src() external view returns (address);
+    function wat() external view returns (bytes32);
+    function ncoins() external view returns (uint256);
     function orbs(uint256) external view returns (address);
 }
 
@@ -78,6 +82,14 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         address PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
         address MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
+
+        // OSM Sanity Checks
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).pool() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).pool(), "DssSpell/pip-wrong-pool");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).src() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).src(), "DssSpell/pip-wrong-src");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).wat() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).wat(), "DssSpell/pip-wrong-wat");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).ncoins() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).ncoins(), "DssSpell/pip-wrong-ncoins");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
 
         address OSM_MOM = DssExecLib.osmMom();
         address MCD_SPOT = DssExecLib.spotter();
