@@ -39,9 +39,9 @@ interface IlkRegistryLike {
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20April%2015%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6b4cedd333d710702f50b0e679b005286773b6d3/governance/votes/Executive%20vote%20-%20April%2022%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-04-22 MakerDAO Executive Spell | Hash: TODO";
+        "2022-04-22 MakerDAO Executive Spell | Hash: 0xe5e05856de3897fcc39b076c48452bd853ee5261f193100270f672e6c5870d53";
 
     // Math
 
