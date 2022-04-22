@@ -275,7 +275,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testRemoveOldOSM() public { // make public to use
-        address PIP_CRVV1ETHSTETH_OLD = 0x0A7DA4e31582a2fB4FD4067943e88f127F70ab39;
+        address PIP_CRVV1ETHSTETH_OLD = chainLog.getAddress("PIP_CRVV1ETHSTETH");
 
         // Wards
         assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 1);
