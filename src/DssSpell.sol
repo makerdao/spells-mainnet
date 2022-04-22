@@ -99,7 +99,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Revoke OsmMom to access the Old OSM
         DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
 
-        // Remove Old CRVV1ETHSTETH-A PIP Whitelistings
+        // Remove Old CRVV1ETHSTETH-A OSM Whitelistings
         DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), PIP_CRVV1ETHSTETH_OLD);
         DssExecLib.removeReaderFromWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), PIP_CRVV1ETHSTETH_OLD);
 
@@ -116,7 +116,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Allow OsmMom to access the New OSM
         DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
 
-        // Add New CRVV1ETHSTETH-A PIP Whitelistings
+        // Add New CRVV1ETHSTETH-A OSM Whitelistings
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0), PIP_CRVV1ETHSTETH);
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1), PIP_CRVV1ETHSTETH);
 
