@@ -29,6 +29,7 @@ interface CurveLPOracleLike {
     function wat() external view returns (bytes32);
     function ncoins() external view returns (uint256);
     function orbs(uint256) external view returns (address);
+    function nonReentrant() external view returns (bool);
 }
 
 interface IlkRegistryLike {
@@ -90,6 +91,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).ncoins() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).ncoins(), "DssSpell/pip-wrong-ncoins");
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
         require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1) == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
+        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).nonReentrant(), "DssSpell/pip-reentrant");
 
         address OSM_MOM = DssExecLib.osmMom();
         address MCD_SPOT = DssExecLib.spotter();

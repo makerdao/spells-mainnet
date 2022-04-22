@@ -307,18 +307,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
     }
 
-    function testMedianizers() public { // make public to use
+    function test_Medianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track Median authorizations here
-        address SET_TOKEN    = addr.addr("PIP_CRVV1ETHSTETH");
-        address ETHUSD_MED   = CurveLPOsmLike(SET_TOKEN).orbs(0);
-        address STETHUSD_MED = CurveLPOsmLike(SET_TOKEN).orbs(1);
-        assertEq(MedianAbstract(ETHUSD_MED).bud(SET_TOKEN), 1);
-        assertEq(MedianAbstract(STETHUSD_MED).bud(SET_TOKEN), 1);
-        assertEq(MedianAbstract(OsmAbstract(addr.addr("PIP_WSTETH")).src()).bud(STETHUSD_MED), 1);
+        address PIP     = addr.addr("PIP_XXX");
+        address MEDIAN  = OsmAbstract(PIP).src();
+        assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
     }
 
     function test_auth() public {
