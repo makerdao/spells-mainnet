@@ -307,7 +307,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
     }
 
-    function test_Medianizers() public { // make public to use
+    function testMedianizers() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
