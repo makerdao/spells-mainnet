@@ -53,7 +53,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // --- Rates ---
     //uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
-    address constant internal OASIS_APP_OSM_READER     = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
+    address constant internal OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
     address constant internal PIP_CRVV1ETHSTETH = 0xEa508F82728927454bd3ce853171b0e2705880D4;
 
@@ -76,8 +76,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // --------------------------------- Replace CRVV1ETHSTETH-A PIP -----------------------------------
         bytes32 _ilk  = "CRVV1ETHSTETH-A";
 
-        address  PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
-        address  MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
+        address PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
+        address MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
 
         address OSM_MOM = DssExecLib.osmMom();
         address MCD_SPOT = DssExecLib.spotter();
