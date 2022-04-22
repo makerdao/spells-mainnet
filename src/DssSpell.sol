@@ -109,7 +109,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.addReaderToWhitelistCall(CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1), PIP_CRVV1ETHSTETH);
 
         // Whitelist Spotter to read the OSM data
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, DssExecLib.spotter());
+        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_SPOT);
 
         // Whitelist Clipper on OSM
         DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
