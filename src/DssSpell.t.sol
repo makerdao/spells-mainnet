@@ -120,7 +120,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.pos("CRVV1ETHSTETH-A"), 48);
         assertEq(reg.join("CRVV1ETHSTETH-A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
         assertEq(reg.gem("CRVV1ETHSTETH-A"), addr.addr("CRVV1ETHSTETH"));
-        assertEq(reg.dec("CRVV1ETHSTETH-A"), DSTokenAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
+        assertEq(reg.dec("CRVV1ETHSTETH-A"), GemAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
         assertEq(reg.class("CRVV1ETHSTETH-A"), 1);
         assertEq(reg.pip("CRVV1ETHSTETH-A"), addr.addr("PIP_CRVV1ETHSTETH"));
         assertEq(reg.xlip("CRVV1ETHSTETH-A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
@@ -307,7 +307,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
     }
 
-    function test_Medianizers() private { // make public to use
+    function testMedianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());

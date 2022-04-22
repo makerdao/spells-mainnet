@@ -861,10 +861,16 @@ function checkIlkClipper(
         assertEq(clipper.wards(address(clipMom)), 1);
         assertEq(clipper.wards(address(esm)), 1);
 
-        try pip.bud(address(clipMom)) returns (uint256 bud) {
+        try pip.bud(address(spotter)) returns (uint256 bud) {
             assertEq(bud, 1);
         } catch {}
         try pip.bud(address(clipper)) returns (uint256 bud) {
+            assertEq(bud, 1);
+        } catch {}
+        try pip.bud(address(clipMom)) returns (uint256 bud) {
+            assertEq(bud, 1);
+        } catch {}
+        try pip.bud(address(end)) returns (uint256 bud) {
             assertEq(bud, 1);
         } catch {}
 
