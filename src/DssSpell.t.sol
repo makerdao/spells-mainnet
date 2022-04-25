@@ -405,7 +405,7 @@ contract DssSpellTest is DssSpellTestBase {
             // Chainlog version has been updated. Short circuit the test here.
             return;
         } else {
-            // Fail if the version is not updated and the chainlog count has not changed
+            // Fail if the version is not updated and the chainlog count has changed
             if (_count != chainLog.count()) {
                 emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
                 fail();
