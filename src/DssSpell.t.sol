@@ -410,7 +410,7 @@ contract DssSpellTest is DssSpellTestBase {
             // Fail if the chainlog is the same size but local keys don't match the chainlog.
             for(uint256 i = 0; i < chainLog.count(); i++) {
                 (, address _val) = chainLog.get(i);
-                if (address(_chainlog_addrs[i]) != address(_val)) {
+                if (_chainlog_addrs[i] != _val) {
                     emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-address-change-", _version));
                     fail();
                 }
