@@ -401,10 +401,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        if (keccak256(abi.encodePacked(_version)) != keccak256(abi.encodePacked(chainLog.version()))) {
-            // Chainlog version has been updated. Short circuit the test here.
-            return;
-        } else {
+        if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
             // Fail if the version is not updated and the chainlog count has changed
             if (_count != chainLog.count()) {
                 emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
