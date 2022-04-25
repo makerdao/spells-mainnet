@@ -405,6 +405,9 @@ contract DssSpellTest is DssSpellTestBase {
             if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
                 emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
                 fail();
+            } else {
+                // Chainlog size changed and version is updated, so test passes.
+                return;
             }
         }
 
