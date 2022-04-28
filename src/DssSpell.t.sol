@@ -401,20 +401,20 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        if (_count != chainLog.count()) {
-            if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+        if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+            // Fail if the version is not updated and the chainlog count has changed
+            if (_count != chainLog.count()) {
                 emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-count-change-", _version));
                 fail();
+                return;
             }
-        }
-
-        for(uint256 i = 0; i < chainLog.count(); i++) {
-            (, address _val) = chainLog.get(i);
-            // If the address arrays don't match it's due to a change in the changelog. Fail if the version is not updated.
-            if (_chainlog_addrs[i] != _val) {
-                if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+            // Fail if the chainlog is the same size but local keys don't match the chainlog.
+            for(uint256 i = 0; i < _count; i++) {
+                (, address _val) = chainLog.get(i);
+                if (_chainlog_addrs[i] != _val) {
                     emit log_named_string("Error", concat("TestError/chainlog-version-not-updated-address-change-", _version));
                     fail();
+                    return;
                 }
             }
         }
