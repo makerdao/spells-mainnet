@@ -433,8 +433,6 @@ contract DssSpellTest is DssSpellTestBase {
 
     uint256 constant MAY_01_2022 = 1651363200;
     uint256 constant JUL_01_2022 = 1656633600;
-    uint256 constant JAN_01_2023 = 1672531200;
-    uint256 constant MAY_01_2023 = 1682899200;
 
     function testVestDAI() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
@@ -452,7 +450,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(1), wallets.addr("PE_WALLET"));
         assertEq(vest.bgn(1), MAY_01_2022);
         assertEq(vest.clf(1), MAY_01_2022);
-        assertEq(vest.fin(1), MAY_01_2023);
+        assertEq(vest.fin(1), MAY_01_2022 + 365 days);
         assertEq(vest.mgr(1), address(0));
         assertEq(vest.res(1), 1);
         assertEq(vest.tot(1), 7_590_000 * WAD);
@@ -461,7 +459,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(2), wallets.addr("COM_WALLET"));
         assertEq(vest.bgn(2), JUL_01_2022);
         assertEq(vest.clf(2), JUL_01_2022);
-        assertEq(vest.fin(2), JAN_01_2023);
+        assertEq(vest.fin(2), JUL_01_2022 + 184 days);
         assertEq(vest.mgr(2), address(0));
         assertEq(vest.res(2), 1);
         assertEq(vest.tot(2), 336_672 * WAD);
@@ -470,7 +468,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(3), wallets.addr("DIN_WALLET"));
         assertEq(vest.bgn(3), MAY_01_2022);
         assertEq(vest.clf(3), MAY_01_2022);
-        assertEq(vest.fin(3), MAY_01_2023);
+        assertEq(vest.fin(3), MAY_01_2022 + 365 days);
         assertEq(vest.mgr(3), address(0));
         assertEq(vest.res(3), 1);
         assertEq(vest.tot(3), 1_083_000 * WAD);
@@ -479,7 +477,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(4), wallets.addr("EVENTS_WALLET"));
         assertEq(vest.bgn(4), MAY_01_2022);
         assertEq(vest.clf(4), MAY_01_2022);
-        assertEq(vest.fin(4), MAY_01_2023);
+        assertEq(vest.fin(4), MAY_01_2022 + 365 days);
         assertEq(vest.mgr(4), address(0));
         assertEq(vest.res(4), 1);
         assertEq(vest.tot(4), 748_458 * WAD);
@@ -489,7 +487,7 @@ contract DssSpellTest is DssSpellTestBase {
         giveAuth(address(vest), address(this));
         vest.unrestrict(1);
 
-        hevm.warp(MAY_01_2023);
+        hevm.warp(MAY_01_2022 + 365 days);
         uint256 prevBalance = dai.balanceOf(wallets.addr("PE_WALLET"));
         assertTrue(tryVest(address(vest), 1));
         assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
@@ -507,7 +505,7 @@ contract DssSpellTest is DssSpellTestBase {
         giveAuth(address(vest), address(this));
         vest.unrestrict(1);
 
-        hevm.warp(MAY_01_2023);
+        hevm.warp(MAY_01_2022 + 365 days);
 
         giveTokens(address(gov), 999999999999 ether);
         gov.approve(address(esm), type(uint256).max);
