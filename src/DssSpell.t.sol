@@ -37,33 +37,39 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() private { // make public to use
-        uint256 amountCU = 0;
-        uint256 amountWallet = 0;
+    function testPayments() public { // make public to use
+        uint256 amountPE     = 800_000;
+        uint256 amountCOMEF  = 46_836;
+        uint256 amountCOM    = 26_390;
+        uint256 amountEVENTS = 149_692;
+        uint256 amountSH     = 35_000;
 
         uint256 prevSin = vat.sin(address(vow));
 
         // Core Units
-        uint256 prevDaiCU = dai.balanceOf(wallets.addr("CU_WALLET"));
+        uint256 prevDaiPE     = dai.balanceOf(wallets.addr("PE_WALLET"));
+        uint256 prevDaiCOMEF  = dai.balanceOf(wallets.addr("COM_EF_WALLET"));
+        uint256 prevDaiCOM    = dai.balanceOf(wallets.addr("COM_WALLET"));
+        uint256 prevDaiEVENTS = dai.balanceOf(wallets.addr("EVENTS_WALLET"));
+        uint256 prevDaiSH     = dai.balanceOf(wallets.addr("SH_WALLET"));
 
-        // Ambassador Program
-        uint256 prevDaiWallet = dai.balanceOf(wallets.addr("XXX_WALLET"));
-
-        uint256 amount = amountCU + amountWallet;
+        uint256 amount = amountPE + amountCOMEF + amountCOM + amountEVENTS + amountSH;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
+        assertEq(vat.sin(address(vow)), prevSin + amount * RAD);
 
         // Wallets
-        assertEq(dai.balanceOf(wallets.addr("CU_WALLET")) - prevDaiCU, amountCU * WAD);
-        assertEq(dai.balanceOf(wallets.addr("AMBASSADOR_WALLET")) - prevDaiWallet, amountWallet * WAD);
-
+        assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevDaiPE + amountPE * WAD);
+        assertEq(dai.balanceOf(wallets.addr("COM_EF_WALLET")), prevDaiCOMEF + amountCOMEF * WAD);
+        assertEq(dai.balanceOf(wallets.addr("COM_WALLET")), prevDaiCOM + amountCOM * WAD);
+        assertEq(dai.balanceOf(wallets.addr("EVENTS_WALLET")), prevDaiEVENTS + amountEVENTS * WAD);
+        assertEq(dai.balanceOf(wallets.addr("SH_WALLET")), prevDaiSH + amountSH * WAD);
     }
 
-    function testCollateralIntegrations() public { // make public to use
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -107,11 +113,12 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
         // assertEq(chainLog.version(), "1.X.X");
 
-        assertEq(chainLog.getAddress("PIP_CRVV1ETHSTETH"), addr.addr("PIP_CRVV1ETHSTETH"));
-        assertEq(chainLog.version(), "1.11.2");
+        assertEq(chainLog.getAddress("MCD_VEST_DAI"), addr.addr("MCD_VEST_DAI"));
+        assertEq(chainLog.getAddress("MCD_VEST_DAI_LEGACY"), addr.addr("MCD_VEST_DAI_LEGACY"));
+        assertEq(chainLog.version(), "1.11.3");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -247,7 +254,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function testOSMs() public { // make public to use
+    function testOSMs() private { // make public to use
         address OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
         // Track OSM authorizations here
@@ -274,7 +281,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
     }
 
-    function testRemoveOldOSM() public { // make public to use
+    function testRemoveOldOSM() private { // make public to use
         address PIP_CRVV1ETHSTETH_OLD = chainLog.getAddress("PIP_CRVV1ETHSTETH");
 
         // Wards
@@ -418,5 +425,101 @@ contract DssSpellTest is DssSpellTestBase {
                 }
             }
         }
+    }
+
+    function tryVest(address vest, uint256 id) internal returns (bool ok) {
+        (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
+    }
+
+    uint256 constant MAY_01_2022 = 1651363200;
+    uint256 constant JUL_01_2022 = 1656633600;
+    uint256 constant JAN_01_2023 = 1672531200;
+    uint256 constant MAY_01_2023 = 1682899200;
+
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        assertEq(vest.ids(), 0);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.ids(), 4);
+
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+
+        assertEq(vest.usr(1), wallets.addr("PE_WALLET"));
+        assertEq(vest.bgn(1), MAY_01_2022);
+        assertEq(vest.clf(1), MAY_01_2022);
+        assertEq(vest.fin(1), MAY_01_2023);
+        assertEq(vest.mgr(1), address(0));
+        assertEq(vest.res(1), 1);
+        assertEq(vest.tot(1), 7_590_000 * WAD);
+        assertEq(vest.rxd(1), 0);
+
+        assertEq(vest.usr(2), wallets.addr("COM_WALLET"));
+        assertEq(vest.bgn(2), JUL_01_2022);
+        assertEq(vest.clf(2), JUL_01_2022);
+        assertEq(vest.fin(2), JAN_01_2023);
+        assertEq(vest.mgr(2), address(0));
+        assertEq(vest.res(2), 1);
+        assertEq(vest.tot(2), 336_672 * WAD);
+        assertEq(vest.rxd(2), 0);
+
+        assertEq(vest.usr(3), wallets.addr("DIN_WALLET"));
+        assertEq(vest.bgn(3), MAY_01_2022);
+        assertEq(vest.clf(3), MAY_01_2022);
+        assertEq(vest.fin(3), MAY_01_2023);
+        assertEq(vest.mgr(3), address(0));
+        assertEq(vest.res(3), 1);
+        assertEq(vest.tot(3), 1_083_000 * WAD);
+        assertEq(vest.rxd(3), 0);
+
+        assertEq(vest.usr(4), wallets.addr("EVENTS_WALLET"));
+        assertEq(vest.bgn(4), MAY_01_2022);
+        assertEq(vest.clf(4), MAY_01_2022);
+        assertEq(vest.fin(4), MAY_01_2023);
+        assertEq(vest.mgr(4), address(0));
+        assertEq(vest.res(4), 1);
+        assertEq(vest.tot(4), 748_458 * WAD);
+        assertEq(vest.rxd(4), 0);
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        giveAuth(address(vest), address(this));
+        vest.unrestrict(1);
+
+        hevm.warp(MAY_01_2023);
+        uint256 prevBalance = dai.balanceOf(wallets.addr("PE_WALLET"));
+        assertTrue(tryVest(address(vest), 1));
+        assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
+    }
+
+    function testVestDAIFails() public {
+        VestAbstract vest  = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        VestAbstract vestL = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        giveAuth(address(vest), address(this));
+        vest.unrestrict(1);
+
+        hevm.warp(MAY_01_2023);
+
+        giveTokens(address(gov), 999999999999 ether);
+        gov.approve(address(esm), type(uint256).max);
+        esm.join(999999999999 ether);
+        assertEq(vat.live(), 1);
+        esm.fire();
+        assertEq(vat.live(), 0);
+
+        assertTrue(!tryVest(address(vest), 1));
+
+        assertEq(vestL.wards(address(pauseProxy)), 1);
+        esm.denyProxy(address(vestL));
+        assertEq(vestL.wards(address(pauseProxy)), 0);
     }
 }

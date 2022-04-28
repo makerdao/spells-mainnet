@@ -23,27 +23,38 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface CurveLPOracleLike {
-    function pool() external view returns (address);
-    function src() external view returns (address);
-    function wat() external view returns (bytes32);
-    function ncoins() external view returns (uint256);
-    function orbs(uint256) external view returns (address);
-    function nonreentrant() external view returns (bool);
-}
-
-interface IlkRegistryLike {
-    function update(bytes32) external;
+interface DssVestLike {
+    function cap() external view returns (uint256);
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function file(bytes32, uint256) external;
+    function rely(address) external;
+    function restrict(uint256) external;
 }
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6b4cedd333d710702f50b0e679b005286773b6d3/governance/votes/Executive%20vote%20-%20April%2022%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/Executive%20vote%20-%20April%2029%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-04-22 MakerDAO Executive Spell | Hash: 0xe5e05856de3897fcc39b076c48452bd853ee5261f193100270f672e6c5870d53";
+        "2022-04-29 MakerDAO Executive Spell | Hash: ";
+
+    address constant MCD_VEST_DAI = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
+
+    address constant COM_WALLET     = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
+    address constant COM_EF_WALLET  = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
+    address constant EVENTS_WALLET  = 0x3D274fbAc29C92D2F624483495C0113B44dBE7d2;
+    address constant DIN_WALLET     = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
+    address constant PE_WALLET      = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
+    address constant SH_WALLET      = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
+
+    uint256 constant MAY_01_2022 = 1651363200;
+    uint256 constant JUL_01_2022 = 1656633600;
+    uint256 constant JAN_01_2023 = 1672531200;
+    uint256 constant MAY_01_2023 = 1682899200;
 
     // Math
+
+    uint256 constant WAD = 10 ** 18;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -58,89 +69,42 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // --- Rates ---
     //uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
-    address constant internal OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
-
-    address constant internal PIP_CRVV1ETHSTETH = 0xEa508F82728927454bd3ce853171b0e2705880D4;
-
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
-        // --------------------------------- Oasis.app OSM Whitelist ---------------------------------------
-        // https://vote.makerdao.com/polling/QmZykRSM
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_ETH"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WSTETH"), OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WBTC"),   OASIS_APP_OSM_READER);
-        //DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_RENBTC"), OASIS_APP_OSM_READER); Same address as WBTC OSM
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_YFI"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_UNI"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_LINK"),   OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_MANA"),   OASIS_APP_OSM_READER);
+        // Add new MCD_VEST_DAI
+        address MCD_VEST_DAI_LEGACY = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+        DssVestLike(MCD_VEST_DAI_LEGACY).rely(DssExecLib.getChangelogAddress("MCD_ESM"));
 
-        // --------------------------------- Replace CRVV1ETHSTETH-A PIP -----------------------------------
-        bytes32 _ilk  = "CRVV1ETHSTETH-A";
+        DssExecLib.authorize(DssExecLib.vat(), MCD_VEST_DAI);
+        DssVestLike(MCD_VEST_DAI).file("cap", DssVestLike(MCD_VEST_DAI_LEGACY).cap());
 
-        address PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
-        address MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
+        DssExecLib.setChangelogAddress("MCD_VEST_DAI", MCD_VEST_DAI);
+        DssExecLib.setChangelogAddress("MCD_VEST_DAI_LEGACY", MCD_VEST_DAI_LEGACY);
+        DssExecLib.setChangelogVersion("1.11.3");
 
-        address PIP_CRVV1ETHSTETH_ORBS_0 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0);
-        address PIP_CRVV1ETHSTETH_ORBS_1 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1);
+        // Stream payments
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(PE_WALLET,   7_590_000 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
+        );
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(COM_WALLET,    336_672 * WAD, JUL_01_2022, JAN_01_2023 - JUL_01_2022, 0, address(0))
+        );
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(DIN_WALLET,  1_083_000 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
+        );
+        DssVestLike(MCD_VEST_DAI).restrict(
+            DssVestLike(MCD_VEST_DAI).create(EVENTS_WALLET, 748_458 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
+        );
 
-        // OSM Sanity Checks
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).pool() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).pool(), "DssSpell/pip-wrong-pool");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).src() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).src(), "DssSpell/pip-wrong-src");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).wat() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).wat(), "DssSpell/pip-wrong-wat");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).ncoins() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).ncoins(), "DssSpell/pip-wrong-ncoins");
-        require(PIP_CRVV1ETHSTETH_ORBS_0 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
-        require(PIP_CRVV1ETHSTETH_ORBS_1 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).nonreentrant(), "DssSpell/pip-reentrant");
-
-        address OSM_MOM = DssExecLib.osmMom();
-        address MCD_SPOT = DssExecLib.spotter();
-        address CLIPPER_MOM = DssExecLib.clipperMom();
-        address MCD_END = DssExecLib.end();
-
-        // Revoke OsmMom to access the Old OSM
-        DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
-
-        // Remove Old CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH_OLD);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH_OLD);
-
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_SPOT);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_CLIP_CRVV1ETHSTETH_A);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, CLIPPER_MOM);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_END);
-
-        // ---- Replace CRVV1ETHSTETH-A PIP ----
-
-        // Set the token PIP in the Spotter
-        DssExecLib.setContract(MCD_SPOT, _ilk, "pip", PIP_CRVV1ETHSTETH);
-
-        // Allow OsmMom to access the New OSM
-        DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
-
-        // Add New CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH);
-
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_SPOT);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, CLIPPER_MOM);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_END);
-
-        // Set OSM in the OsmMom for the ilk
-        DssExecLib.allowOSMFreeze(PIP_CRVV1ETHSTETH, _ilk);
-
-        // Update pip in the ilk registry
-        IlkRegistryLike(DssExecLib.reg()).update(_ilk);
-
-        // Update pip in changelog
-        DssExecLib.setChangelogAddress("PIP_CRVV1ETHSTETH", PIP_CRVV1ETHSTETH);
-
-        // Update chaingelog version
-        DssExecLib.setChangelogVersion("1.11.2");
+        // Unique payments
+        DssExecLib.sendPaymentFromSurplusBuffer(PE_WALLET, 800_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_EF_WALLET, 46_836);
+        DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 26_390);
+        DssExecLib.sendPaymentFromSurplusBuffer(EVENTS_WALLET, 149_692);
+        DssExecLib.sendPaymentFromSurplusBuffer(SH_WALLET, 35_000);
     }
 }
 

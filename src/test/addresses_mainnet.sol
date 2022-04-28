@@ -65,7 +65,8 @@ contract Addresses {
         addr["DIRECT_MOM"]                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
-        addr["MCD_VEST_DAI"]                    = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
+        addr["MCD_VEST_DAI"]                    = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
+        addr["MCD_VEST_DAI_LEGACY"]             = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
         addr["MCD_VEST_MKR"]                    = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
         addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
