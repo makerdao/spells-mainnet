@@ -25,7 +25,10 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 
 interface DssVestLike {
     function cap() external view returns (uint256);
+    function chainlog() external view returns (address);
+    function daiJoin() external view returns (address);
     function ids() external view returns (uint256);
+    function vat() external view returns (address);
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
     function file(bytes32, uint256) external;
     function rely(address) external;
@@ -75,15 +78,21 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
-        // Rely ESM in MCD_VEST_DAI_LEGACY
+        // Verify new vesting contract was correctly deployed
         address MCD_VEST_DAI_LEGACY = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+        require(DssVestLike(MCD_VEST_DAI).ids() == 0, "DssSpell/non-empty-vesting-contract");
+        require(DssVestLike(MCD_VEST_DAI).chainlog() == DssVestLike(MCD_VEST_DAI_LEGACY).chainlog(), "DssSpell/non-matching-chainlog");
+        require(DssVestLike(MCD_VEST_DAI).vat() == DssVestLike(MCD_VEST_DAI_LEGACY).vat(), "DssSpell/non-matching-vat");
+        require(DssVestLike(MCD_VEST_DAI).daiJoin() == DssVestLike(MCD_VEST_DAI_LEGACY).daiJoin(), "DssSpell/non-matching-daiJoin");
+
+        // Rely ESM in old vesting contract
         DssVestLike(MCD_VEST_DAI_LEGACY).rely(DssExecLib.getChangelogAddress("MCD_ESM"));
 
-        // Add new MCD_VEST_DAI
-        require(DssVestLike(MCD_VEST_DAI).ids() == 0, "DssSpell/non-empty-vesting-contract");
+        // Set up new vesting contract
         DssExecLib.authorize(DssExecLib.vat(), MCD_VEST_DAI);
         DssVestLike(MCD_VEST_DAI).file("cap", DssVestLike(MCD_VEST_DAI_LEGACY).cap());
 
+        // Replace vesting in the chainlog and bump version
         DssExecLib.setChangelogAddress("MCD_VEST_DAI", MCD_VEST_DAI);
         DssExecLib.setChangelogAddress("MCD_VEST_DAI_LEGACY", MCD_VEST_DAI_LEGACY);
         DssExecLib.setChangelogVersion("1.12.0");
