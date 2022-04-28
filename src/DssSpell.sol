@@ -17,7 +17,7 @@
 
 pragma solidity 0.6.12;
 // Enable ABIEncoderV2 when onboarding collateral
-// pragma experimental ABIEncoderV2;
+pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
@@ -41,7 +41,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6b4cedd333d710702f50b0e679b005286773b6d3/governance/votes/Executive%20vote%20-%20April%2022%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-04-22 MakerDAO Executive Spell | Hash: 0xe5e05856de3897fcc39b076c48452bd853ee5261f193100270f672e6c5870d53";
+        // TODO: update this
+        "2022-XX-YY MakerDAO Executive Spell | Hash: 0x0000000000000000000000000000000000000000000000000000000000000000";
 
     // Math
 
@@ -56,91 +57,19 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     //
 
     // --- Rates ---
-    //uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
+    // uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
 
-    address constant internal OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
-
-    address constant internal PIP_CRVV1ETHSTETH = 0xEa508F82728927454bd3ce853171b0e2705880D4;
+    // Turn office hours off
+    function officeHours() public override returns (bool) {
+        return false;
+    }
 
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
-        // onboardNewCollaterals();
+        onboardNewCollaterals();
 
-        // --------------------------------- Oasis.app OSM Whitelist ---------------------------------------
-        // https://vote.makerdao.com/polling/QmZykRSM
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_ETH"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WSTETH"), OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_WBTC"),   OASIS_APP_OSM_READER);
-        //DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_RENBTC"), OASIS_APP_OSM_READER); Same address as WBTC OSM
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_YFI"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_UNI"),    OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_LINK"),   OASIS_APP_OSM_READER);
-        DssExecLib.addReaderToWhitelist(DssExecLib.getChangelogAddress("PIP_MANA"),   OASIS_APP_OSM_READER);
-
-        // --------------------------------- Replace CRVV1ETHSTETH-A PIP -----------------------------------
-        bytes32 _ilk  = "CRVV1ETHSTETH-A";
-
-        address PIP_CRVV1ETHSTETH_OLD = DssExecLib.getChangelogAddress("PIP_CRVV1ETHSTETH");
-        address MCD_CLIP_CRVV1ETHSTETH_A = DssExecLib.getChangelogAddress("MCD_CLIP_CRVV1ETHSTETH_A");
-
-        address PIP_CRVV1ETHSTETH_ORBS_0 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(0);
-        address PIP_CRVV1ETHSTETH_ORBS_1 = CurveLPOracleLike(PIP_CRVV1ETHSTETH).orbs(1);
-
-        // OSM Sanity Checks
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).pool() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).pool(), "DssSpell/pip-wrong-pool");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).src() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).src(), "DssSpell/pip-wrong-src");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).wat() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).wat(), "DssSpell/pip-wrong-wat");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).ncoins() == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).ncoins(), "DssSpell/pip-wrong-ncoins");
-        require(PIP_CRVV1ETHSTETH_ORBS_0 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(0), "DssSpell/pip-wrong-orbs0");
-        require(PIP_CRVV1ETHSTETH_ORBS_1 == CurveLPOracleLike(PIP_CRVV1ETHSTETH_OLD).orbs(1), "DssSpell/pip-wrong-orbs1");
-        require(CurveLPOracleLike(PIP_CRVV1ETHSTETH).nonreentrant(), "DssSpell/pip-reentrant");
-
-        address OSM_MOM = DssExecLib.osmMom();
-        address MCD_SPOT = DssExecLib.spotter();
-        address CLIPPER_MOM = DssExecLib.clipperMom();
-        address MCD_END = DssExecLib.end();
-
-        // Revoke OsmMom to access the Old OSM
-        DssExecLib.deauthorize(PIP_CRVV1ETHSTETH_OLD, OSM_MOM);
-
-        // Remove Old CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH_OLD);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH_OLD);
-
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_SPOT);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_CLIP_CRVV1ETHSTETH_A);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, CLIPPER_MOM);
-        DssExecLib.removeReaderFromWhitelist(PIP_CRVV1ETHSTETH_OLD, MCD_END);
-
-        // ---- Replace CRVV1ETHSTETH-A PIP ----
-
-        // Set the token PIP in the Spotter
-        DssExecLib.setContract(MCD_SPOT, _ilk, "pip", PIP_CRVV1ETHSTETH);
-
-        // Allow OsmMom to access the New OSM
-        DssExecLib.authorize(PIP_CRVV1ETHSTETH, OSM_MOM);
-
-        // Add New CRVV1ETHSTETH-A OSM Whitelistings
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_0, PIP_CRVV1ETHSTETH);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH_ORBS_1, PIP_CRVV1ETHSTETH);
-
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_SPOT);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_CLIP_CRVV1ETHSTETH_A);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, CLIPPER_MOM);
-        DssExecLib.addReaderToWhitelist(PIP_CRVV1ETHSTETH, MCD_END);
-
-        // Set OSM in the OsmMom for the ilk
-        DssExecLib.allowOSMFreeze(PIP_CRVV1ETHSTETH, _ilk);
-
-        // Update pip in the ilk registry
-        IlkRegistryLike(DssExecLib.reg()).update(_ilk);
-
-        // Update pip in changelog
-        DssExecLib.setChangelogAddress("PIP_CRVV1ETHSTETH", PIP_CRVV1ETHSTETH);
-
-        // Update chaingelog version
-        DssExecLib.setChangelogVersion("1.11.2");
+        DssExecLib.setChangelogVersion("1.11.3");
     }
 }
 
