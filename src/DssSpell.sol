@@ -86,7 +86,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         DssExecLib.setChangelogAddress("MCD_VEST_DAI", MCD_VEST_DAI);
         DssExecLib.setChangelogAddress("MCD_VEST_DAI_LEGACY", MCD_VEST_DAI_LEGACY);
-        DssExecLib.setChangelogVersion("1.11.3");
+        DssExecLib.setChangelogVersion("1.12.0");
 
         // Stream payments
         DssVestLike(MCD_VEST_DAI).restrict(
