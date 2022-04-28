@@ -25,6 +25,7 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 
 interface DssVestLike {
     function cap() external view returns (uint256);
+    function ids() external view returns (uint256);
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
     function file(bytes32, uint256) external;
     function rely(address) external;
@@ -74,10 +75,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
 
-        // Add new MCD_VEST_DAI
+        // Rely ESM in MCD_VEST_DAI_LEGACY
         address MCD_VEST_DAI_LEGACY = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
         DssVestLike(MCD_VEST_DAI_LEGACY).rely(DssExecLib.getChangelogAddress("MCD_ESM"));
 
+        // Add new MCD_VEST_DAI
+        require(DssVestLike(MCD_VEST_DAI).ids() == 0, "DssSpell/non-empty-vesting-contract");
         DssExecLib.authorize(DssExecLib.vat(), MCD_VEST_DAI);
         DssVestLike(MCD_VEST_DAI).file("cap", DssVestLike(MCD_VEST_DAI_LEGACY).cap());
 
