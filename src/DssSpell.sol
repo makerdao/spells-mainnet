@@ -61,7 +61,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Turn office hours off
     function officeHours() public override returns (bool) {
-        return false;
+        return true;
     }
 
     function actions() public override {

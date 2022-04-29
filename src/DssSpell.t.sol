@@ -244,7 +244,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function testOSMs() public { // make public to use
+    function testOSMs() private { // make public to use
         address OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
 
         // Track OSM authorizations here
@@ -271,7 +271,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
     }
 
-    function testRemoveOldOSM() public { // make public to use
+    function testRemoveOldOSM() private { // make public to use
         address PIP_CRVV1ETHSTETH_OLD = chainLog.getAddress("PIP_CRVV1ETHSTETH");
 
         // Wards
