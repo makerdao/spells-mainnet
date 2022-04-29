@@ -105,7 +105,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chainLog.getAddress("MCD_JOIN_WSTETH_B"), addr.addr("MCD_JOIN_WSTETH_B"));
         assertEq(chainLog.getAddress("MCD_CLIP_WSTETH_B"), addr.addr("MCD_CLIP_WSTETH_B"));
         assertEq(chainLog.getAddress("MCD_CLIP_CALC_WSTETH_B"), addr.addr("MCD_CLIP_CALC_WSTETH_B"));
-        assertEq(chainLog.version(), "1.11.2");
+        assertEq(chainLog.version(), "1.11.3");
     }
 
     function testNewIlkRegistryValues() public { // make public to use
