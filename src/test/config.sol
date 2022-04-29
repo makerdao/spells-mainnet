@@ -99,8 +99,8 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x530708D653D540B3FcE6dF02da95588834aD39f2),        // populate with deployed spell if deployed
-            deployed_spell_created:         1650657072,        // use get-created-timestamp.sh if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
+            deployed_spell_created:         0,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
@@ -130,7 +130,7 @@ contract Config {
             osm_mom_authority:     chief,                   // OsmMom authority
             flipper_mom_authority: chief,                   // FlipperMom authority
             clipper_mom_authority: chief,                   // ClipperMom authority
-            ilk_count:             49                       // Num expected in system
+            ilk_count:             50                       // Num expected in system
         });
 
         //
@@ -1596,6 +1596,36 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     3 * MILLION,
             clip_buf:     13000,
+            clip_tail:    140 minutes,
+            clip_cusp:    4000,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  1,
+            cm_tolerance: 5000,
+            calc_tau:     0,
+            calc_step:    90,
+            calc_cut:     9900,
+            lerp:         false
+        });
+        afterSpell.collaterals["WSTETH-B"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      150 * MILLION,
+            aL_gap:       15 * MILLION,
+            aL_ttl:       8 hours,
+            line:         0,
+            dust:         5 * THOUSAND,
+            pct:          75,
+            mat:          18500,
+            liqType:      "clip",
+            liqOn:        true,
+            chop:         1300,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     10 * MILLION,
+            clip_buf:     12000,
             clip_tail:    140 minutes,
             clip_cusp:    4000,
             clip_chip:    10,
