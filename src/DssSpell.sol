@@ -76,47 +76,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
-        // onboardNewCollaterals();
-
-        // Verify new vesting contract was correctly deployed
-        address MCD_VEST_DAI_LEGACY = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-        require(DssVestLike(MCD_VEST_DAI).ids() == 0, "DssSpell/non-empty-vesting-contract");
-        require(DssVestLike(MCD_VEST_DAI).chainlog() == DssVestLike(MCD_VEST_DAI_LEGACY).chainlog(), "DssSpell/non-matching-chainlog");
-        require(DssVestLike(MCD_VEST_DAI).vat() == DssVestLike(MCD_VEST_DAI_LEGACY).vat(), "DssSpell/non-matching-vat");
-        require(DssVestLike(MCD_VEST_DAI).daiJoin() == DssVestLike(MCD_VEST_DAI_LEGACY).daiJoin(), "DssSpell/non-matching-daiJoin");
-
-        // Rely ESM in old vesting contract
-        DssVestLike(MCD_VEST_DAI_LEGACY).rely(DssExecLib.getChangelogAddress("MCD_ESM"));
-
-        // Set up new vesting contract
-        DssExecLib.authorize(DssExecLib.vat(), MCD_VEST_DAI);
-        DssVestLike(MCD_VEST_DAI).file("cap", DssVestLike(MCD_VEST_DAI_LEGACY).cap());
-
-        // Replace vesting in the chainlog and bump version
-        DssExecLib.setChangelogAddress("MCD_VEST_DAI", MCD_VEST_DAI);
-        DssExecLib.setChangelogAddress("MCD_VEST_DAI_LEGACY", MCD_VEST_DAI_LEGACY);
-        DssExecLib.setChangelogVersion("1.12.0");
-
-        // Stream payments
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(PE_WALLET,   7_590_000 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
-        );
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(COM_WALLET,    336_672 * WAD, JUL_01_2022, JAN_01_2023 - JUL_01_2022, 0, address(0))
-        );
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(DIN_WALLET,  1_083_000 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
-        );
-        DssVestLike(MCD_VEST_DAI).restrict(
-            DssVestLike(MCD_VEST_DAI).create(EVENTS_WALLET, 748_458 * WAD, MAY_01_2022, MAY_01_2023 - MAY_01_2022, 0, address(0))
-        );
-
-        // Unique payments
-        DssExecLib.sendPaymentFromSurplusBuffer(PE_WALLET, 800_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(COM_EF_WALLET, 46_836);
-        DssExecLib.sendPaymentFromSurplusBuffer(COM_WALLET, 26_390);
-        DssExecLib.sendPaymentFromSurplusBuffer(EVENTS_WALLET, 149_692);
-        DssExecLib.sendPaymentFromSurplusBuffer(SH_WALLET, 35_000);
+        onboardNewCollaterals();
     }
 }
 

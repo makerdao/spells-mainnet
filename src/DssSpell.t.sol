@@ -37,7 +37,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() public { // make public to use
+    function testPayments() private { // make public to use
         uint256 amountPE     = 800_000;
         uint256 amountCOMEF  = 46_836;
         uint256 amountCOM    = 26_390;
@@ -104,7 +104,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -434,7 +434,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant MAY_01_2022 = 1651363200;
     uint256 constant JUL_01_2022 = 1656633600;
 
-    function testVestDAI() public {
+    function testVestDAI() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         assertEq(vest.ids(), 0);
@@ -493,7 +493,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
     }
 
-    function testVestDAIFails() public {
+    function testVestDAIFails() private {
         VestAbstract vest  = VestAbstract(addr.addr("MCD_VEST_DAI"));
         VestAbstract vestL = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
