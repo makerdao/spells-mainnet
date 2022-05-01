@@ -59,7 +59,7 @@ contract DssSpellCollateralOnboardingAction {
             isLiquidatable:        true,
             isOSM:                 true,
             whitelistOSM:          false,
-            ilkDebtCeiling:        0,
+            ilkDebtCeiling:        15 * MILLION,
             minVaultAmount:        5000,
             maxLiquidationAmount:  10 * MILLION,
             liquidationPenalty:    1300,                     // 13% penalty fee
