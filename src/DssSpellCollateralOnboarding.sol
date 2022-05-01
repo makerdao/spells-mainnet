@@ -33,7 +33,7 @@ contract DssSpellCollateralOnboardingAction {
     //
 
     // --- Math ---
-    uint256 constant MILLION = 10**6;
+    uint256 constant MILLION = 10 ** 6;
 
     uint256 constant ZERO_SEVEN_FIVE_PCT_RATE = 1000000000236936036262880196;
 
