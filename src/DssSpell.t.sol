@@ -69,22 +69,20 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(wallets.addr("SH_WALLET")), prevDaiSH + amountSH * WAD);
     }
 
-    function testCollateralIntegrations() private { // make public to use
+    function testCollateralIntegrations() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
-        checkCropCRVLPIntegration(
-            "CRVV1ETHSTETH-A",
-            CropJoinLike(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")),
-            CurveLPOsmLike(addr.addr("PIP_CRVV1ETHSTETH")),
-            0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85,     // ETH Medianizer
-            0x911D7A8F87282C4111f621e2D100Aa751Bab1260,     // stETH Medianizer (proxy to wstETH medianizer)
-            true,
-            true,
-            true
+        checkIlkIntegration(
+             "WSTETH-B",
+             GemJoinAbstract(addr.addr("MCD_JOIN_WSTETH_B")),
+             ClipAbstract(addr.addr("MCD_CLIP_WSTETH_B")),
+             addr.addr("PIP_WSTETH"),
+             true,
+             true,
+             false
         );
     }
 
@@ -104,35 +102,33 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
-        // assertEq(chainLog.version(), "1.X.X");
-
-        assertEq(chainLog.getAddress("MCD_VEST_DAI"), addr.addr("MCD_VEST_DAI"));
-        assertEq(chainLog.getAddress("MCD_VEST_DAI_LEGACY"), addr.addr("MCD_VEST_DAI_LEGACY"));
-        assertEq(chainLog.version(), "1.12.0");
+        assertEq(chainLog.getAddress("MCD_JOIN_WSTETH_B"), addr.addr("MCD_JOIN_WSTETH_B"));
+        assertEq(chainLog.getAddress("MCD_CLIP_WSTETH_B"), addr.addr("MCD_CLIP_WSTETH_B"));
+        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WSTETH_B"), addr.addr("MCD_CLIP_CALC_WSTETH_B"));
+        assertEq(chainLog.version(), "1.12.1");
     }
 
-    function testNewIlkRegistryValues() private { // make public to use
+    function testNewIlkRegistryValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("CRVV1ETHSTETH-A"), 48);
-        assertEq(reg.join("CRVV1ETHSTETH-A"), addr.addr("MCD_JOIN_CRVV1ETHSTETH_A"));
-        assertEq(reg.gem("CRVV1ETHSTETH-A"), addr.addr("CRVV1ETHSTETH"));
-        assertEq(reg.dec("CRVV1ETHSTETH-A"), GemAbstract(addr.addr("CRVV1ETHSTETH")).decimals());
-        assertEq(reg.class("CRVV1ETHSTETH-A"), 1);
-        assertEq(reg.pip("CRVV1ETHSTETH-A"), addr.addr("PIP_CRVV1ETHSTETH"));
-        assertEq(reg.xlip("CRVV1ETHSTETH-A"), addr.addr("MCD_CLIP_CRVV1ETHSTETH_A"));
-        assertEq(reg.name("CRVV1ETHSTETH-A"), "Curve.fi ETH/stETH");
-        assertEq(reg.symbol("CRVV1ETHSTETH-A"), "steCRV");
+        assertEq(reg.pos("WSTETH-B"), 49);
+        assertEq(reg.join("WSTETH-B"), addr.addr("MCD_JOIN_WSTETH_B"));
+        assertEq(reg.gem("WSTETH-B"), addr.addr("WSTETH"));
+        assertEq(reg.dec("WSTETH-B"), GemAbstract(addr.addr("WSTETH")).decimals());
+        assertEq(reg.class("WSTETH-B"), 1);
+        assertEq(reg.pip("WSTETH-B"), addr.addr("PIP_WSTETH"));
+        assertEq(reg.xlip("WSTETH-B"), addr.addr("MCD_CLIP_WSTETH_B"));
+        //assertEq(reg.name("TOKEN-X"), "NAME"); // Token Name Not Present (DSToken, ONLY ON GOERLI)
+        assertEq(reg.symbol("WSTETH-B"), "wstETH");
     }
 
     function testFailWrongDay() public {
