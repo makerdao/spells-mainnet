@@ -127,7 +127,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.class("WSTETH-B"), 1);
         assertEq(reg.pip("WSTETH-B"), addr.addr("PIP_WSTETH"));
         assertEq(reg.xlip("WSTETH-B"), addr.addr("MCD_CLIP_WSTETH_B"));
-        //assertEq(reg.name("TOKEN-X"), "NAME"); // Token Name Not Present (DSToken, ONLY ON GOERLI)
+        assertEq(reg.name("WSTETH-B"), "Wrapped liquid staked Ether 2.0");
         assertEq(reg.symbol("WSTETH-B"), "wstETH");
     }
 
