@@ -7,6 +7,30 @@ import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
+    // Recognized Delegates Wallets
+    address immutable FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
+    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
+    address immutable FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
+    address immutable MAKERMAN       = wallets.addr("MAKERMAN");
+    address immutable ACREINVEST     = wallets.addr("ACREINVEST");
+    address immutable MONETSUPPLY    = wallets.addr("MONETSUPPLY");
+    address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
+    address immutable GFXLABS        = wallets.addr("GFXLABS");
+    address immutable DOO            = wallets.addr("DOO");
+    address immutable FLIPSIDE       = wallets.addr("FLIPSIDE");
+
+    // Recognized Delegates Payout
+    uint256 constant amountFlipFlopFlap  = 12_000;
+    uint256 constant amountUltraSchuppi  = 12_000;
+    uint256 constant amountFeedBlack     = 12_000;
+    uint256 constant amountMakerMan      = 10_929;
+    uint256 constant amountAcreInvest    =  9_347;
+    uint256 constant amountMonetSupply   =  8_626;
+    uint256 constant amountJustinCase    =  7_522;
+    uint256 constant amountGfxLabs       =  6_607;
+    uint256 constant amountDoo           =    351;
+    uint256 constant amountFlipside      =    265;
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -37,36 +61,42 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() private { // make public to use
-        uint256 amountPE     = 800_000;
-        uint256 amountCOMEF  = 46_836;
-        uint256 amountCOM    = 26_390;
-        uint256 amountEVENTS = 149_692;
-        uint256 amountSH     = 35_000;
-
+    function testPayments() public { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
-        // Core Units
-        uint256 prevDaiPE     = dai.balanceOf(wallets.addr("PE_WALLET"));
-        uint256 prevDaiCOMEF  = dai.balanceOf(wallets.addr("COM_EF_WALLET"));
-        uint256 prevDaiCOM    = dai.balanceOf(wallets.addr("COM_WALLET"));
-        uint256 prevDaiEVENTS = dai.balanceOf(wallets.addr("EVENTS_WALLET"));
-        uint256 prevDaiSH     = dai.balanceOf(wallets.addr("SH_WALLET"));
+        // Recognized Delegates
+        uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
+        uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
+        uint256 prevDaiFeedBlack     = dai.balanceOf(FEEDBLACKLOOPS);
+        uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
+        uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
+        uint256 prevDaiMonetSupply   = dai.balanceOf(MONETSUPPLY);
+        uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
+        uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
+        uint256 prevDaiDoo           = dai.balanceOf(DOO);
+        uint256 prevDaiFlipside      = dai.balanceOf(FLIPSIDE);
 
-        uint256 amount = amountPE + amountCOMEF + amountCOM + amountEVENTS + amountSH;
+        uint256 amount = amountFlipFlopFlap + amountUltraSchuppi + amountFeedBlack
+        + amountMakerMan + amountAcreInvest + amountMonetSupply  + amountJustinCase
+        + amountGfxLabs + amountDoo + amountFlipside;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)), prevSin + amount * RAD);
+        assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
 
-        // Wallets
-        assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevDaiPE + amountPE * WAD);
-        assertEq(dai.balanceOf(wallets.addr("COM_EF_WALLET")), prevDaiCOMEF + amountCOMEF * WAD);
-        assertEq(dai.balanceOf(wallets.addr("COM_WALLET")), prevDaiCOM + amountCOM * WAD);
-        assertEq(dai.balanceOf(wallets.addr("EVENTS_WALLET")), prevDaiEVENTS + amountEVENTS * WAD);
-        assertEq(dai.balanceOf(wallets.addr("SH_WALLET")), prevDaiSH + amountSH * WAD);
+        // Recognized Delegates
+        assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
+        assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
+        assertEq(dai.balanceOf(ULTRASCHUPPI)   - prevDaiUltraSchuppi, amountUltraSchuppi * WAD);
+        assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,     amountMakerMan     * WAD);
+        assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,   amountAcreInvest   * WAD);
+        assertEq(dai.balanceOf(MONETSUPPLY)    - prevDaiMonetSupply,  amountMonetSupply  * WAD);
+        assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,   amountJustinCase   * WAD);
+        assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,      amountGfxLabs      * WAD);
+        assertEq(dai.balanceOf(DOO)            - prevDaiDoo,          amountDoo          * WAD);
+        assertEq(dai.balanceOf(FLIPSIDE)       - prevDaiFlipside,     amountFlipside     * WAD);
     }
 
     function testCollateralIntegrations() public { // make public to use
