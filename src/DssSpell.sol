@@ -16,6 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+
 // Enable ABIEncoderV2 when onboarding collateral
 pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
@@ -43,13 +44,22 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
     //
 
-    // --- Rates ---
-    // uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
+    uint256 constant TWO_TWO_FIVE_PCT_RATE = 1000000000705562181084137268;
+    uint256 constant FOUR_PCT_RATE         = 1000000001243680656318820312;
 
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         onboardNewCollaterals();
+
+        // MOMC Proposal
+        // https://vote.makerdao.com/polling/QmTmehbz#poll-detail
+
+        //Lower the WBTC-A Stability Fee from 3.25% to 2.25%.
+        DssExecLib.setIlkStabilityFee("WBTC-A", TWO_TWO_FIVE_PCT_RATE, true);
+
+        //Lower the WBTC-B Stability Fee from 4.5% to 4.0%.
+        DssExecLib.setIlkStabilityFee("WBTC-B", FOUR_PCT_RATE, true);
 
         DssExecLib.setChangelogVersion("1.12.1");
     }
