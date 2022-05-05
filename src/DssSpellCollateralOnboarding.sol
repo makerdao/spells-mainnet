@@ -63,7 +63,7 @@ contract DssSpellCollateralOnboardingAction {
             minVaultAmount:        5000,
             maxLiquidationAmount:  10 * MILLION,
             liquidationPenalty:    1300,                     // 13% penalty fee
-            ilkStabilityFee:       ZERO_SEVEN_FIVE_PCT_RATE, //0.75% stability fee
+            ilkStabilityFee:       ZERO_SEVEN_FIVE_PCT_RATE, // 0.75% stability fee
             startingPriceFactor:   12000,                    // Auction price begins at 120% of oracle
             breakerTolerance:      5000,                     // Allows for a 50% hourly price drop before disabling liquidations
             auctionDuration:       140 minutes,
