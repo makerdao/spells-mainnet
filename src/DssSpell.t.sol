@@ -518,32 +518,4 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(tryVest(address(vest), 1));
         assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
     }
-
-    function testVestDAIFails() private {
-        VestAbstract vest  = VestAbstract(addr.addr("MCD_VEST_DAI"));
-        VestAbstract vestL = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        giveAuth(address(vest), address(this));
-        vest.unrestrict(1);
-
-        hevm.warp(MAY_01_2022 + 365 days);
-
-        giveTokens(address(gov), 999999999999 ether);
-        gov.approve(address(esm), type(uint256).max);
-        esm.join(999999999999 ether);
-        assertEq(vat.live(), 1);
-        esm.fire();
-        assertEq(vat.live(), 0);
-
-        assertTrue(!tryVest(address(vest), 1));
-
-        assertEq(vestL.wards(address(pauseProxy)), 1);
-        esm.denyProxy(address(vestL));
-        assertEq(vestL.wards(address(pauseProxy)), 0);
-    }
 }
