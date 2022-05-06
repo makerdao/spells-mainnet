@@ -38,8 +38,6 @@ contract DssSpellCollateralOnboardingAction {
     uint256 constant ZERO_SEVEN_FIVE_PCT_RATE = 1000000000236936036262880196;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address constant WSTETH                 = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-    address constant PIP_WSTETH             = 0xFe7a2aC0B945f12089aEEB6eCebf4F384D9f043F;
     address constant MCD_JOIN_WSTETH_B      = 0x248cCBf4864221fC0E840F29BB042ad5bFC89B5c;
     address constant MCD_CLIP_WSTETH_B      = 0x3ea60191b7d5990a3544B6Ef79983fD67e85494A;
     address constant MCD_CLIP_CALC_WSTETH_B = 0x95098b29F579dbEb5c198Db6F30E28F7f3955Fbb;
@@ -48,6 +46,9 @@ contract DssSpellCollateralOnboardingAction {
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add WSTETH-B as a new Vault Type
         //  Poll Link: https://vote.makerdao.com/polling/QmaE5doB#poll-detail
+
+        address WSTETH     = DssExecLib.getChangelogAddress("WSTETH");
+        address PIP_WSTETH = DssExecLib.getChangelogAddress("PIP_WSTETH");
 
         DssExecLib.addNewCollateral(CollateralOpts({
             ilk:                   "WSTETH-B",
