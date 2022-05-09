@@ -101,7 +101,7 @@ contract Config {
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         0,                 // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0xD8E6fBb43354dd6637561208eF5Db1a62e6408DC),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
