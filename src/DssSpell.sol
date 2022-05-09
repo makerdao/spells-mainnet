@@ -27,10 +27,11 @@ import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboardi
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6b4cedd333d710702f50b0e679b005286773b6d3/governance/votes/Executive%20vote%20-%20April%2022%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/8044c921dc954e321ae6e229052af4a5204778ba/governance/votes/Executive%20vote%20-%20May%2011%2C%202022.md -q -O - 2>/dev/null)"
+
     string public constant override description =
         // TODO: update this
-        "2022-XX-YY MakerDAO Executive Spell | Hash: 0x0000000000000000000000000000000000000000000000000000000000000000";
+        "2022-05-11 MakerDAO Executive Spell | Hash: 0x1c715f41675838e51cce3a7435df43fc67defa27634b40b9baa3c0280715c820";
 
     // Math
 
