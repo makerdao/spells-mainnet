@@ -15,3 +15,4 @@ diff-archive-spell :; ./scripts/diff-archive-dssspell.sh "$(if $(date),$(date),$
 feed               :; ./scripts/check-oracle-feed.sh $(pip)
 feed-lp            :; ./scripts/check-oracle-feed-lp.sh $(pip)
 wards              :; ./scripts/wards.sh $(target)
+time               :; ./scripts/time.sh date="$(date)" stamp="$(stamp)"
