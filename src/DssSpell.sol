@@ -63,7 +63,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address immutable ILK_REGISTRY     = DssExecLib.reg();
     address immutable MCD_END_OLD      = DssExecLib.end();
     address immutable MCD_FLASH_LEGACY = DssExecLib.getChangelogAddress("MCD_FLASH");
-    address immutable MCD_GOV          = DssExecLib.getChangelogAddress("MCD_GOV");
+    address immutable MCD_GOV          = DssExecLib.mkr();
 
     address immutable SES_WALLET = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
