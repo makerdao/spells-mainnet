@@ -7,30 +7,6 @@ import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    // Recognized Delegates Wallets
-    address immutable FLIPFLOPFLAP   = wallets.addr("FLIPFLOPFLAP");
-    address immutable ULTRASCHUPPI   = wallets.addr("ULTRASCHUPPI");
-    address immutable FEEDBLACKLOOPS = wallets.addr("FEEDBLACKLOOPS");
-    address immutable MAKERMAN       = wallets.addr("MAKERMAN");
-    address immutable ACREINVEST     = wallets.addr("ACREINVEST");
-    address immutable MONETSUPPLY    = wallets.addr("MONETSUPPLY");
-    address immutable JUSTINCASE     = wallets.addr("JUSTINCASE");
-    address immutable GFXLABS        = wallets.addr("GFXLABS");
-    address immutable DOO            = wallets.addr("DOO");
-    address immutable FLIPSIDE       = wallets.addr("FLIPSIDE");
-
-    // Recognized Delegates Payout
-    uint256 constant amountFlipFlopFlap  = 12_000;
-    uint256 constant amountUltraSchuppi  = 12_000;
-    uint256 constant amountFeedBlack     = 12_000;
-    uint256 constant amountMakerMan      = 10_929;
-    uint256 constant amountAcreInvest    =  9_347;
-    uint256 constant amountMonetSupply   =  8_626;
-    uint256 constant amountJustinCase    =  7_522;
-    uint256 constant amountGfxLabs       =  6_607;
-    uint256 constant amountDoo           =    351;
-    uint256 constant amountFlipside      =    265;
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -61,45 +37,27 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() public { // make public to use
-        uint256 prevSin = vat.sin(address(vow));
+    function testPayments() private { // make public to use
+        // uint256 prevSin = vat.sin(address(vow));
 
-        // Recognized Delegates
-        uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
-        uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
-        uint256 prevDaiFeedBlack     = dai.balanceOf(FEEDBLACKLOOPS);
-        uint256 prevDaiMakerMan      = dai.balanceOf(MAKERMAN);
-        uint256 prevDaiAcreInvest    = dai.balanceOf(ACREINVEST);
-        uint256 prevDaiMonetSupply   = dai.balanceOf(MONETSUPPLY);
-        uint256 prevDaiJustinCase    = dai.balanceOf(JUSTINCASE);
-        uint256 prevDaiGfxLabs       = dai.balanceOf(GFXLABS);
-        uint256 prevDaiDoo           = dai.balanceOf(DOO);
-        uint256 prevDaiFlipside      = dai.balanceOf(FLIPSIDE);
+        // // Recognized Delegates
+        // uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
+        // uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
 
-        uint256 amount = amountFlipFlopFlap + amountUltraSchuppi + amountFeedBlack
-        + amountMakerMan + amountAcreInvest + amountMonetSupply  + amountJustinCase
-        + amountGfxLabs + amountDoo + amountFlipside;
+        // uint256 amount = amountFlipFlopFlap + amountUltraSchuppi;
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
+        // assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
 
-        // Recognized Delegates
-        assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
-        assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
-        assertEq(dai.balanceOf(ULTRASCHUPPI)   - prevDaiUltraSchuppi, amountUltraSchuppi * WAD);
-        assertEq(dai.balanceOf(MAKERMAN)       - prevDaiMakerMan,     amountMakerMan     * WAD);
-        assertEq(dai.balanceOf(ACREINVEST)     - prevDaiAcreInvest,   amountAcreInvest   * WAD);
-        assertEq(dai.balanceOf(MONETSUPPLY)    - prevDaiMonetSupply,  amountMonetSupply  * WAD);
-        assertEq(dai.balanceOf(JUSTINCASE)     - prevDaiJustinCase,   amountJustinCase   * WAD);
-        assertEq(dai.balanceOf(GFXLABS)        - prevDaiGfxLabs,      amountGfxLabs      * WAD);
-        assertEq(dai.balanceOf(DOO)            - prevDaiDoo,          amountDoo          * WAD);
-        assertEq(dai.balanceOf(FLIPSIDE)       - prevDaiFlipside,     amountFlipside     * WAD);
+        // // Recognized Delegates
+        // assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
+        // assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
     }
 
-    function testCollateralIntegrations() public { // make public to use
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -138,13 +96,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_WSTETH_B"), addr.addr("MCD_JOIN_WSTETH_B"));
-        assertEq(chainLog.getAddress("MCD_CLIP_WSTETH_B"), addr.addr("MCD_CLIP_WSTETH_B"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WSTETH_B"), addr.addr("MCD_CLIP_CALC_WSTETH_B"));
-        assertEq(chainLog.version(), "1.12.1");
+        assertEq(chainLog.getAddress("MCD_END"), addr.addr("MCD_END"));
+        assertEq(chainLog.getAddress("MCD_CURE"), addr.addr("MCD_CURE"));
+        assertEq(chainLog.getAddress("MCD_FLASH"), addr.addr("MCD_FLASH"));
+        assertEq(chainLog.getAddress("MCD_FLASH_LEGACY"), addr.addr("MCD_FLASH_LEGACY"));
+        assertEq(chainLog.version(), "1.13.0");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -518,4 +477,326 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(tryVest(address(vest), 1));
         assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
     }
+
+    function testNewEndAuthorities() public {
+        address endOld = chainLog.getAddress("MCD_END");
+        assertEq(vat.wards(endOld), 1);
+        assertEq(cat.wards(endOld), 1);
+        assertEq(dog.wards(endOld), 1);
+        assertEq(vow.wards(endOld), 1);
+        assertEq(pot.wards(endOld), 1);
+        assertEq(spotter.wards(endOld), 1);
+
+        assertEq(EndAbstract(endOld).wards(address(esm)), 1);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Contracts set
+        assertEq(end.vat(), address(vat));
+        assertEq(end.cat(), address(cat));
+        assertEq(end.dog(), address(dog));
+        assertEq(end.vow(), address(vow));
+        assertEq(end.pot(), address(pot));
+        assertEq(end.spot(), address(spotter));
+        assertEq(EndNewAbstract(address(end)).cure(), address(cure));
+
+        // Check end.wait
+        assertEq(end.wait(), EndAbstract(endOld).wait());
+
+        assertEq(esm.end(), address(end));
+
+        // Check flippers/clippers authorities and osms whitelisting
+        bytes32[] memory ilks = reg.list();
+        for (uint256 i = 0; i < ilks.length; i++) {
+            if (reg.class(ilks[i]) < 3) {
+                FlipAbstract xlip = FlipAbstract(reg.xlip(ilks[i]));
+                assertEq(xlip.wards(address(end)), 1);
+                assertEq(xlip.wards(endOld), 0);
+
+                OsmAbstract osm = OsmAbstract(reg.pip(ilks[i]));
+                try osm.bud(address(123)) { // Check is an OSM or Median
+                    assertEq(osm.bud(address(end)), 1);
+                    assertEq(osm.bud(endOld), 0);
+                } catch {}
+            }
+        }
+
+        assertEq(vat.wards(endOld), 0);
+        assertEq(cat.wards(endOld), 0);
+        assertEq(dog.wards(endOld), 0);
+        assertEq(vow.wards(endOld), 0);
+        assertEq(pot.wards(endOld), 0);
+        assertEq(spotter.wards(endOld), 0);
+        assertEq(CureAbstract(cure).wards(endOld), 0);
+
+        assertEq(EndAbstract(endOld).wards(address(esm)), 0);
+
+        assertEq(vat.wards(address(end)), 1);
+        assertEq(cat.wards(address(end)), 1);
+        assertEq(dog.wards(address(end)), 1);
+        assertEq(vow.wards(address(end)), 1);
+        assertEq(pot.wards(address(end)), 1);
+        assertEq(spotter.wards(address(end)), 1);
+        assertEq(CureAbstract(cure).wards(address(end)), 1);
+
+        assertEq(end.wards(address(esm)), 1);
+    }
+
+    function testNewEndFunctionality() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        GemAbstract ETH = GemAbstract(addr.addr("ETH"));
+        GemJoinAbstract joinETHA = GemJoinAbstract(addr.addr("MCD_JOIN_ETH_A"));
+        ClipAbstract clipETHA = ClipAbstract(addr.addr("MCD_CLIP_ETH_A"));
+
+        GemAbstract YFI = GemAbstract(addr.addr("YFI"));
+        GemJoinAbstract joinYFIA = GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A"));
+        ClipAbstract clipYFIA = ClipAbstract(addr.addr("MCD_CLIP_YFI_A"));
+
+        GemAbstract LINK = GemAbstract(addr.addr("LINK"));
+        GemJoinAbstract joinLINKA = GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A"));
+        ClipAbstract clipLINKA = ClipAbstract(addr.addr("MCD_CLIP_LINK_A"));
+
+        uint256 ilkAmt = 10000 * WAD;
+
+        giveTokens(address(ETH), ilkAmt);
+        giveTokens(address(YFI), ilkAmt);
+        giveTokens(address(LINK), ilkAmt);
+
+        ETH.approve(address(joinETHA), ilkAmt);
+        joinETHA.join(address(this), ilkAmt);
+        YFI.approve(address(joinYFIA), ilkAmt);
+        joinYFIA.join(address(this), ilkAmt);
+        LINK.approve(address(joinLINKA), ilkAmt);
+        joinLINKA.join(address(this), ilkAmt);
+
+        // Don't worry about debt ceilings
+        hevm.store(
+            address(vat),
+            bytes32(uint256(9)),
+            bytes32(type(uint256).max)
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("ETH-A"), uint256(2)))) + 3),
+            bytes32(type(uint256).max)
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("YFI-A"), uint256(2)))) + 3),
+            bytes32(type(uint256).max)
+        );
+        hevm.store(
+            address(vat),
+            bytes32(uint256(keccak256(abi.encode(bytes32("LINK-A"), uint256(2)))) + 3),
+            bytes32(type(uint256).max)
+        );
+        //
+
+        (,uint256 rate, uint256 spot,,) = vat.ilks("ETH-A");
+        vat.frob("ETH-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
+        (, rate, spot,,) = vat.ilks("YFI-A");
+        vat.frob("YFI-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
+        (, rate, spot,,) = vat.ilks("LINK-A");
+        vat.frob("LINK-A", address(this), address(this), address(this), int256(ilkAmt), int256(mul(ilkAmt, spot) / rate));
+
+        hevm.warp(block.timestamp + 1);
+        jug.drip("ETH-A");
+        jug.drip("YFI-A");
+        jug.drip("LINK-A");
+
+        uint256 auctionIdETHA = clipETHA.kicks() + 1;
+        uint256 auctionIdYFIA = clipYFIA.kicks() + 1;
+        uint256 auctionIdLINKA = clipLINKA.kicks() + 1;
+
+        dog.bark("ETH-A", address(this), address(this));
+        dog.bark("YFI-A", address(this), address(this));
+        dog.bark("LINK-A", address(this), address(this));
+
+        assertEq(clipETHA.kicks(), auctionIdETHA);
+        assertEq(clipYFIA.kicks(), auctionIdYFIA);
+        assertEq(clipLINKA.kicks(), auctionIdLINKA);
+
+        hevm.store(
+            address(end),
+            keccak256(abi.encode(address(this), uint256(0))),
+            bytes32(uint256(1))
+        );
+        assertEq(end.wards(address(this)), 1);
+
+        end.cage();
+        end.cage("ETH-A");
+        end.cage("YFI-A");
+        end.cage("LINK-A");
+
+        (,,, address usr,,) = clipETHA.sales(auctionIdETHA);
+        assertTrue(usr != address(0));
+        (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
+        assertTrue(usr != address(0));
+        (,,, usr,,) = clipLINKA.sales(auctionIdLINKA);
+        assertTrue(usr != address(0));
+
+        end.snip("ETH-A", auctionIdETHA);
+        end.snip("YFI-A", auctionIdYFIA);
+        end.snip("LINK-A", auctionIdLINKA);
+
+        (,,, usr,,) = clipETHA.sales(auctionIdETHA);
+        assertTrue(usr == address(0));
+        (,,, usr,,) = clipYFIA.sales(auctionIdYFIA);
+        assertTrue(usr == address(0));
+        (,,, usr,,) = clipLINKA.sales(auctionIdLINKA);
+        assertTrue(usr == address(0));
+
+        end.skim("ETH-A", address(this));
+        end.skim("YFI-A", address(this));
+        end.skim("LINK-A", address(this));
+
+        end.free("ETH-A");
+        end.free("YFI-A");
+        end.free("LINK-A");
+
+        hevm.warp(block.timestamp + end.wait());
+
+        vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
+
+        // Removing the surplus to allow continuing the execution.
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
+
+        end.thaw();
+
+        end.flow("ETH-A");
+        end.flow("YFI-A");
+        end.flow("LINK-A");
+
+        vat.hope(address(end));
+
+        uint256 daiToRedeem = vat.dai(address(this)) / RAY;
+        assertTrue(daiToRedeem > 0);
+
+        end.pack(daiToRedeem);
+
+        // Make sure amount of collateral in the End doesn't limit process (as otherwise we need to skim vaults)
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("ETH-A"), uint256(4))))),
+            bytes32(bytes32(type(uint256).max))
+        );
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("YFI-A"), uint256(4))))),
+            bytes32(bytes32(type(uint256).max))
+        );
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(end), keccak256(abi.encode(bytes32("LINK-A"), uint256(4))))),
+            bytes32(bytes32(type(uint256).max))
+        );
+
+        end.cash("ETH-A", daiToRedeem);
+        end.cash("YFI-A", daiToRedeem);
+        end.cash("LINK-A", daiToRedeem);
+    }
+
+    function testFlashLegacy() public {
+        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
+        assertEq(flash.max(), 500_000_000 * WAD);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 vowDai = vat.dai(address(vow));
+
+        uint256 amount = 1 * MILLION;
+        assertEq(flash.toll(), 0);
+        assertEq(flash.flashFee(address(dai), amount * WAD), 0);
+        assertEq(flash.max(), 250_000_000 * WAD);
+        assertEq(flash.flashFee(address(dai), amount * WAD), 0); // 0 DAI fee on a 1M loan (on any actually)
+        flash.flashLoan(address(this), address(dai), amount * WAD, "");
+        flash.vatDaiFlashLoan(address(this), amount * RAD, "");
+        assertEq(vat.sin(address(flash)), 0);
+        assertEq(vat.dai(address(flash)), 0);
+        flash.accrue();
+        assertEq(vat.dai(address(flash)), 0);
+        assertEq(vat.dai(address(vow)), vowDai);
+    }
+
+    function testFlash() public {
+        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH"));
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 amount = 1 * MILLION;
+        assertEq(flash.flashFee(address(dai), amount * WAD), 0);
+        assertEq(flash.max(), 250_000_000 * WAD);
+        assertEq(flash.flashFee(address(dai), amount * WAD), 0); // 0 DAI fee on a 1M loan (on any actually)
+        flash.flashLoan(address(this), address(dai), amount * WAD, "");
+        flash.vatDaiFlashLoan(address(this), amount * RAD, "");
+        assertEq(vat.sin(address(flash)), 0);
+        assertEq(vat.dai(address(flash)), 0);
+    }
+
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(token, address(dai));
+        assertEq(amount, 1 * MILLION * WAD);
+        assertEq(fee, 0);
+
+        dai.approve(msg.sender, amount);
+
+        return keccak256("ERC3156FlashBorrower.onFlashLoan");
+    }
+
+    function onVatDaiFlashLoan(
+        address initiator,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(amount, 1 * MILLION * RAD);
+        assertEq(fee, 0);
+
+        vat.move(address(this), msg.sender, amount);
+
+        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
+    }
+
+    function testMKRPayment() public {
+        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrSES = gov.balanceOf(wallets.addr("SES_WALLET"));
+
+        uint256 amount = 541.47 ether;
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - amount);
+        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amount);
+    }
+}
+
+interface EndNewAbstract is EndAbstract {
+    function cure() external view returns (address);
+}
+
+interface CureAbstract {
+    function wards(address) external view returns (uint256);
 }

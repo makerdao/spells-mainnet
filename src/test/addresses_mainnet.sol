@@ -50,7 +50,8 @@ contract Addresses {
         addr["MCD_DAI"]                         = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
         addr["MCD_SPOT"]                        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
         addr["MCD_POT"]                         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-        addr["MCD_END"]                         = 0xBB856d1742fD182a90239D7AE85706C2FE4e5922;
+        addr["MCD_END"]                         = 0x0e2e8F1D1326A4B9633D96222Ce399c708B19c28;
+        addr["MCD_CURE"]                        = 0x0085c9feAb2335447E1F4DC9bf3593a8e28bdfc7;
         addr["MCD_ESM"]                         = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
         addr["PROXY_ACTIONS"]                   = 0x82ecD135Dce65Fbc6DbdD0e4237E0AF93FFD5038;
         addr["PROXY_ACTIONS_END"]               = 0x7AfF9FC9faD225e3c88cDA06BC56d8Aca774bC57;
@@ -69,7 +70,8 @@ contract Addresses {
         addr["MCD_VEST_DAI_LEGACY"]             = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
         addr["MCD_VEST_MKR"]                    = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
-        addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
+        addr["MCD_FLASH"]                       = 0x60744434d6339a6B27d73d9Eda62b6F66a0a04FA;
+        addr["MCD_FLASH_LEGACY"]                = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
         addr["PROXY_ACTIONS_CROPPER"]           = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
         addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;

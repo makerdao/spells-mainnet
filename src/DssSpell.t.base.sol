@@ -82,6 +82,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
+    address                 cure =                     addr.addr("MCD_CURE");
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
     CropperLike          cropper = CropperLike(        addr.addr("MCD_CROPPER"));
@@ -504,6 +505,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, concat("TestError/flip-flipperMom-auth-", ilk));
 
                 assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, concat("TestError/flip-liqOn-", ilk));
+                assertEq(flip.wards(address(end)), 1, concat("TestError/flip-end-auth-", ilk));
                 assertEq(flip.wards(address(pauseProxy)), 1, concat("TestError/flip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
             }
@@ -562,6 +564,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                     assertTrue(clip.stopped() > 0, concat("TestError/clip-liqOn-", ilk));
                 }
 
+                assertEq(clip.wards(address(end)), 1, concat("TestError/clip-end-auth-", ilk));
                 assertEq(clip.wards(address(pauseProxy)), 1, concat("TestError/clip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
                 {
