@@ -40,11 +40,10 @@ contract DssSpellTest is DssSpellTestBase {
     function testPayments() private { // make public to use
         // uint256 prevSin = vat.sin(address(vow));
 
-        // // Recognized Delegates
-        // uint256 prevDaiFlipFlopFlap  = dai.balanceOf(FLIPFLOPFLAP);
-        // uint256 prevDaiUltraSchuppi  = dai.balanceOf(ULTRASCHUPPI);
+        // uint256 prevDaiWALLET0  = dai.balanceOf(<WALLET0>);
+        // uint256 prevDaiWALLET1  = dai.balanceOf(<WALLET1>);
 
-        // uint256 amount = amountFlipFlopFlap + amountUltraSchuppi;
+        // uint256 amount = prevDaiWALLET0 + prevDaiWALLET1;
 
         // vote(address(spell));
         // scheduleWaitAndCast(address(spell));
@@ -52,9 +51,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
 
-        // // Recognized Delegates
-        // assertEq(dai.balanceOf(FLIPFLOPFLAP)   - prevDaiFlipFlopFlap, amountFlipFlopFlap * WAD);
-        // assertEq(dai.balanceOf(FEEDBLACKLOOPS) - prevDaiFeedBlack,    amountFeedBlack    * WAD);
+        // assertEq(dai.balanceOf(WALLET0) - prevDaiWALLET0, amountWALLET0 * WAD);
+        // assertEq(dai.balanceOf(WALLET1) - prevDaiWALLET1, amountWALLET1 * WAD);
     }
 
     function testCollateralIntegrations() private { // make public to use
@@ -64,10 +62,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert new collateral tests here
         checkIlkIntegration(
-             "WSTETH-B",
-             GemJoinAbstract(addr.addr("MCD_JOIN_WSTETH_B")),
-             ClipAbstract(addr.addr("MCD_CLIP_WSTETH_B")),
-             addr.addr("PIP_WSTETH"),
+             "TOKEN-X",
+             GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+             ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+             addr.addr("PIP_TOKEN"),
              true,
              true,
              false
@@ -109,15 +107,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("WSTETH-B"), 49);
-        assertEq(reg.join("WSTETH-B"), addr.addr("MCD_JOIN_WSTETH_B"));
-        assertEq(reg.gem("WSTETH-B"), addr.addr("WSTETH"));
-        assertEq(reg.dec("WSTETH-B"), GemAbstract(addr.addr("WSTETH")).decimals());
-        assertEq(reg.class("WSTETH-B"), 1);
-        assertEq(reg.pip("WSTETH-B"), addr.addr("PIP_WSTETH"));
-        assertEq(reg.xlip("WSTETH-B"), addr.addr("MCD_CLIP_WSTETH_B"));
-        assertEq(reg.name("WSTETH-B"), "Wrapped liquid staked Ether 2.0");
-        assertEq(reg.symbol("WSTETH-B"), "wstETH");
+        assertEq(reg.pos("TOKEN-X"), 49);
+        assertEq(reg.join("TOKEN-X"), addr.addr("MCD_JOIN_TOKEN_X"));
+        assertEq(reg.gem("TOKEN-X"), addr.addr("TOKEN"));
+        assertEq(reg.dec("TOKEN-X"), GemAbstract(addr.addr("TOKEN")).decimals());
+        assertEq(reg.class("TOKEN-X"), 1);
+        assertEq(reg.pip("TOKEN-X"), addr.addr("PIP_TOKEN"));
+        assertEq(reg.xlip("TOKEN-X"), addr.addr("MCD_CLIP_TOKEN_X"));
+        assertEq(reg.name("TOKEN-X"), "");
+        assertEq(reg.symbol("TOKEN-X"), "TOKEN");
     }
 
     function testFailWrongDay() public {
@@ -240,46 +238,32 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testOSMs() private { // make public to use
-        address OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
+        address READER = address(0);
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
     function testRemoveOldOSM() private { // make public to use
-        address PIP_CRVV1ETHSTETH_OLD = chainLog.getAddress("PIP_CRVV1ETHSTETH");
+        address PIP_TOKEN_OLD = chainLog.getAddress("PIP_TOKEN");
 
         // Wards
-        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 1);
+        assertEq(WardsAbstract(PIP_TOKEN_OLD).wards(addr.addr("OSM_MOM")), 1);
 
         // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(0)).bud(PIP_TOKEN_OLD), 1);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(1)).bud(PIP_TOKEN_OLD), 1);
 
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 1);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_SPOT")), 1);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_CLIP_TOKEN_X")), 1);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("CLIPPER_MOM")), 1);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_END")), 1);
 
 
         vote(address(spell));
@@ -287,16 +271,16 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Wards
-        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 0);
+        assertEq(WardsAbstract(PIP_TOKEN_OLD).wards(addr.addr("OSM_MOM")), 0);
 
         // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(0)).bud(PIP_TOKEN_OLD), 0);
+        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(1)).bud(PIP_TOKEN_OLD), 0);
 
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_SPOT")), 0);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_CLIP_TOKEN_X")), 0);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("CLIPPER_MOM")), 0);
+        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_END")), 0);
     }
 
     function testMedianizers() private { // make public to use
@@ -416,9 +400,6 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    uint256 constant MAY_01_2022 = 1651363200;
-    uint256 constant JUL_01_2022 = 1656633600;
-
     function testVestDAI() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
@@ -432,50 +413,23 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertEq(vest.usr(1), wallets.addr("PE_WALLET"));
-        assertEq(vest.bgn(1), MAY_01_2022);
-        assertEq(vest.clf(1), MAY_01_2022);
-        assertEq(vest.fin(1), MAY_01_2022 + 365 days);
+        assertEq(vest.usr(1), wallets.addr("WALLET"));
+        assertEq(vest.bgn(1), 100);
+        assertEq(vest.clf(1), 100);
+        assertEq(vest.fin(1), 100 + 365 days);
         assertEq(vest.mgr(1), address(0));
         assertEq(vest.res(1), 1);
-        assertEq(vest.tot(1), 7_590_000 * WAD);
+        assertEq(vest.tot(1), 1 * WAD);
         assertEq(vest.rxd(1), 0);
-
-        assertEq(vest.usr(2), wallets.addr("COM_WALLET"));
-        assertEq(vest.bgn(2), JUL_01_2022);
-        assertEq(vest.clf(2), JUL_01_2022);
-        assertEq(vest.fin(2), JUL_01_2022 + 184 days);
-        assertEq(vest.mgr(2), address(0));
-        assertEq(vest.res(2), 1);
-        assertEq(vest.tot(2), 336_672 * WAD);
-        assertEq(vest.rxd(2), 0);
-
-        assertEq(vest.usr(3), wallets.addr("DIN_WALLET"));
-        assertEq(vest.bgn(3), MAY_01_2022);
-        assertEq(vest.clf(3), MAY_01_2022);
-        assertEq(vest.fin(3), MAY_01_2022 + 365 days);
-        assertEq(vest.mgr(3), address(0));
-        assertEq(vest.res(3), 1);
-        assertEq(vest.tot(3), 1_083_000 * WAD);
-        assertEq(vest.rxd(3), 0);
-
-        assertEq(vest.usr(4), wallets.addr("EVENTS_WALLET"));
-        assertEq(vest.bgn(4), MAY_01_2022);
-        assertEq(vest.clf(4), MAY_01_2022);
-        assertEq(vest.fin(4), MAY_01_2022 + 365 days);
-        assertEq(vest.mgr(4), address(0));
-        assertEq(vest.res(4), 1);
-        assertEq(vest.tot(4), 748_458 * WAD);
-        assertEq(vest.rxd(4), 0);
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
         vest.unrestrict(1);
 
-        hevm.warp(MAY_01_2022 + 365 days);
-        uint256 prevBalance = dai.balanceOf(wallets.addr("PE_WALLET"));
+        hevm.warp(100 + 365 days);
+        uint256 prevBalance = dai.balanceOf(wallets.addr("WALLET"));
         assertTrue(tryVest(address(vest), 1));
-        assertEq(dai.balanceOf(wallets.addr("PE_WALLET")), prevBalance + 7_590_000 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("WALLET")), prevBalance + 1 * WAD);
     }
 
     function testNewEndAuthorities() public {
