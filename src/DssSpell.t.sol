@@ -250,39 +250,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testRemoveOldOSM() private { // make public to use
-        address PIP_TOKEN_OLD = chainLog.getAddress("PIP_TOKEN");
-
-        // Wards
-        assertEq(WardsAbstract(PIP_TOKEN_OLD).wards(addr.addr("OSM_MOM")), 1);
-
-        // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(0)).bud(PIP_TOKEN_OLD), 1);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(1)).bud(PIP_TOKEN_OLD), 1);
-
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_SPOT")), 1);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_CLIP_TOKEN_X")), 1);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("CLIPPER_MOM")), 1);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_END")), 1);
-
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Wards
-        assertEq(WardsAbstract(PIP_TOKEN_OLD).wards(addr.addr("OSM_MOM")), 0);
-
-        // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(0)).bud(PIP_TOKEN_OLD), 0);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_TOKEN_OLD).orbs(1)).bud(PIP_TOKEN_OLD), 0);
-
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_SPOT")), 0);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_CLIP_TOKEN_X")), 0);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("CLIPPER_MOM")), 0);
-        assertEq(OsmAbstract(PIP_TOKEN_OLD).bud(addr.addr("MCD_END")), 0);
-    }
-
     function testMedianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
