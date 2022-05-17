@@ -32,10 +32,10 @@ import "dss-interfaces/dapp/DSTokenAbstract.sol";
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5405e49fd10dbbe07e9df65b08555e420aaec841/governance/votes/Executive%20vote%20-%20May%2018%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/bc2e40681e771c76d5f1fc48bad0131b0e18c7b6/governance/votes/Executive%20vote%20-%20May%2018%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-05-18 MakerDAO Executive Spell | Hash: 0x528ea78790c8edcd9397ac2c9e42cbf52d12e20b2fc7a48e6702a8248dfb1ba9";
+        "2022-05-18 MakerDAO Executive Spell | Hash: 0x7e92cd8a072a9130a349416ca0512edb1d87ef320abda8d7870c8c3d6fa7df29";
 
     // Math
 
