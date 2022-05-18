@@ -49,6 +49,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
     //
 
+    // Turn office hours off
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     address immutable MCD_ESM = DssExecLib.esm();
     address immutable MCD_GOV = DssExecLib.mkr();
 
