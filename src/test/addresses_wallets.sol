@@ -43,6 +43,7 @@ contract Wallets {
         addr["SH_WALLET"]                    = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
         addr["SNE_WALLET"]                   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
         addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+        addr["SIDESTREAM_WALLET"]            = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
 
         // Recognized Delegates
         addr["ACREINVEST"]                   = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;

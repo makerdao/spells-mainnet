@@ -397,16 +397,21 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testMKRPayment() public {
-        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        // uint256 prevMkrSES = gov.balanceOf(wallets.addr("SES_WALLET"));
+        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrSAS = gov.balanceOf(wallets.addr("SIDESTREAM_WALLET"));
+        uint256 prevMkrDUX = gov.balanceOf(wallets.addr("DUX_WALLET"));
 
-        // uint256 amount = 541.47 ether;
+        uint256 amountSAS = 243.7953 ether;
+        uint256 amountDUX = 355.86   ether;
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        uint256 total = amountSAS + amountDUX;
 
-        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - amount);
-        // assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amount);
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(gov.balanceOf(address(pauseProxy)),               prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("SIDESTREAM_WALLET")), prevMkrSAS + amountSAS);
+        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrSAS + amountDUX);
     }
 }
