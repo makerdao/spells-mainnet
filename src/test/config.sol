@@ -102,7 +102,7 @@ contract Config {
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         0,                 // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
 
@@ -122,7 +122,7 @@ contract Config {
             flap_beg:              400,                     // in basis points
             flap_ttl:              30 minutes,              // in seconds
             flap_tau:              72 hours,                // in seconds
-            flap_lid:              150 * THOUSAND,          // in whole Dai units
+            flap_lid:              30 * THOUSAND,           // in whole Dai units
             cat_box:               20 * MILLION,            // In whole Dai units
             dog_Hole:              100 * MILLION,           // In whole Dai units
             esm_min:               100 * THOUSAND,          // In whole MKR units

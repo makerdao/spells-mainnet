@@ -38,6 +38,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         "2022-05-25 MakerDAO Executive Spell | Hash: <TODO>";
 
     // Math
+    uint256 constant RAD = 10 ** 45;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -54,11 +55,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         return false;
     }
 
-    address immutable MCD_ESM = DssExecLib.esm();
-    address immutable MCD_GOV = DssExecLib.mkr();
+    address immutable MCD_FLAP = DssExecLib.flap();
+    address immutable MCD_ESM  = DssExecLib.esm();
+    address immutable MCD_GOV  = DssExecLib.mkr();
 
-    address immutable DUX_WALLET =        ;
-    address immutable SIDESTREAM_WALLET = ;
+    // address immutable DUX_WALLET =        ;
+    // address immutable SIDESTREAM_WALLET = ;
 
     function actions() public override {
         // ---------------------------------------------------------------------
@@ -66,6 +68,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // onboardNewCollaterals();
 
         // ---------------------------- Lid for Flap ---------------------------
+        DssExecLib.setValue(MCD_FLAP, "lid", 30_000 * RAD);
 
         // ------------------------------ ESM Min ------------------------------
 
