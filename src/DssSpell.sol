@@ -60,8 +60,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address immutable MCD_ESM  = DssExecLib.esm();
     address immutable MCD_GOV  = DssExecLib.mkr();
 
-    address immutable DUX_WALLET =        0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
     address immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+    address immutable DUX_WALLET =        0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
     function actions() public override {
         // ---------------------------------------------------------------------
@@ -75,8 +75,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         DssExecLib.setValue(MCD_ESM, "min", 150_000 * WAD);
 
         // ---------------------------- Transfer MKR ---------------------------
-        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET,        355.86   ether);
         DSTokenAbstract(MCD_GOV).transfer(SIDESTREAM_WALLET, 243.7953 ether);
+        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET,        355.86   ether);
 
     }
 }

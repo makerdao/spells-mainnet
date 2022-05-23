@@ -412,6 +412,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(gov.balanceOf(address(pauseProxy)),               prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("SIDESTREAM_WALLET")), prevMkrSAS + amountSAS);
-        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrSAS + amountDUX);
+        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrDUX + amountDUX);
     }
 }
