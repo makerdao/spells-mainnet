@@ -28,11 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Foundry
+    - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
         run: forge install
 
-      - name: Run Forge tests
+    - name: Run Forge tests
         run: forge test -v --force --fork-url ${{ secrets.ETH_RPC_URL }}
