@@ -69,12 +69,15 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // onboardNewCollaterals();
 
         // ---------------------------- Lid for Flap ---------------------------
+        // https://vote.makerdao.com/polling/QmREdTJK
         DssExecLib.setValue(MCD_FLAP, "lid", 30_000 * RAD);
 
         // ------------------------------ ESM Min ------------------------------
+        // https://vote.makerdao.com/polling/QmQgab4a
         DssExecLib.setValue(MCD_ESM, "min", 150_000 * WAD);
 
         // ---------------------------- Transfer MKR ---------------------------
+        // https://vote.makerdao.com/polling/QmPnAkS4
         DSTokenAbstract(MCD_GOV).transfer(SIDESTREAM_WALLET, 243.7953 ether);
 
         // Original Proposal: https://forum.makerdao.com/t/mip40c3-sp27-development-ux-core-unit-mkr-budget-dux-001/9777
