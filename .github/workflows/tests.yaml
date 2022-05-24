@@ -1,8 +1,7 @@
 on: [push, pull_request]
 
 env:
-  ETH_RPC_URL: secrets.ETH_RPC_URL
-  BLOCK_NUMBER: 14793834 # Block when the last spell was cast
+  BLOCK: 14793834 # Block when the last spell was cast
 
 jobs:
   dapp:
@@ -26,7 +25,7 @@ jobs:
         extraPullNames: dapp
 
     - name: Run Dapp tests
-      run: nix-shell --pure --argstr url "$ETH_RPC_URL" --run 'dapp test -v --rpc --rpc-block "$BLOCK"'
+      run: nix-shell --pure --argstr url ${{ secrets.ETH_RPC_URL }} --run 'dapp test -v --rpc --rpc-block ${{ env.BLOCK }}'
   forge:
     runs-on: ubuntu-latest
     steps:
@@ -41,4 +40,4 @@ jobs:
         run: forge install
 
       - name: Run Forge tests
-        run: forge test -v --force --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK"
+        run: forge test -v --force --fork-url ${{ secrets.ETH_RPC_URL }} --fork-block-number ${{ env.BLOCK }}
