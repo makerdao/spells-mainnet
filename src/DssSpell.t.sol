@@ -401,7 +401,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrSAS = gov.balanceOf(wallets.addr("SIDESTREAM_WALLET"));
         uint256 prevMkrDUX = gov.balanceOf(wallets.addr("DUX_WALLET"));
 
-        uint256 amountSAS = 243.7953 ether;
+        uint256 amountSAS =  243795300000000000000;
         uint256 amountDUX = 355.86   ether;
 
         uint256 total = amountSAS + amountDUX;
