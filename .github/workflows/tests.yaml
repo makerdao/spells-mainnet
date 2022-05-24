@@ -1,7 +1,7 @@
 on: [push, pull_request]
 
 jobs:
-  tests_dapp:
+  dapp:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository and submodules
@@ -23,16 +23,18 @@ jobs:
 
     - name: Run Dapp tests
       run: nix-shell --pure --argstr url ${{ secrets.ETH_RPC_URL }} --run 'dapp test -v --rpc'
-  tests_forge:
+  forge:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-    - name: Install Foundry
+      - name: Define Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+
+      - name: Install Foundry
         run: forge install
 
-    - name: Run Forge tests
+      - name: Run Forge tests
         run: forge test -v --force --fork-url ${{ secrets.ETH_RPC_URL }}
