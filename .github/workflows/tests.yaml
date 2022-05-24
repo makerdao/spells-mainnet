@@ -1,7 +1,7 @@
 on: [push, pull_request]
 
 jobs:
-  tests-dapp:
+  tests_dapp:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository and submodules
@@ -23,7 +23,7 @@ jobs:
 
     - name: Run Dapp tests
       run: nix-shell --pure --argstr url ${{ secrets.ETH_RPC_URL }} --run 'dapp test -v --rpc'
-  tests-forge:
+  tests_forge:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
