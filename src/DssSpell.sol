@@ -76,7 +76,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
         // ---------------------------- Transfer MKR ---------------------------
         DSTokenAbstract(MCD_GOV).transfer(SIDESTREAM_WALLET, 243.7953 ether);
-        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET,        355.86   ether);
+
+        // Original Proposal: https://forum.makerdao.com/t/mip40c3-sp27-development-ux-core-unit-mkr-budget-dux-001/9777
+        // Adjusted Amounts in Monthly Report:
+        // Apr 2022: https://github.com/makerdao-dux/transparency-reporting/blob/main/Monthy%20Budget%20Statements/2022-04.md#3-mkr-vesting-overview
+        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET, 355.86 ether);
 
     }
 }
