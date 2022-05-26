@@ -32,12 +32,13 @@ fi
 
 echo -e "Network: $(seth chain)"
 list=$(seth call "$CHANGELOG" 'list()(bytes32[])')
-for key in $(echo -e "$list" | sed "s/,/ /g")
+IFS=","
+for key in $list
 do
-    contractName=$(seth --to-ascii "$key" | sed 's/\x0/ /g')
+    contractName=$(seth --to-ascii "$key" | tr -d '\0')
     contract=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
     [[ $(seth call "$target" 'wards(address)(uint256)' "$contract" 2>/dev/null) == "1" ]] && echo "$1 -> $contractName"
-    [[ $(seth call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "${contractName// } -> $1"
+    [[ $(seth call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$contractName -> $1"
     src=$(seth call "$contract" 'src()(address)' 2>/dev/null) || continue
-    [[ $(seth call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$src (source of ${contractName// }) -> $1"
+    [[ $(seth call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$src (source of $contractName) -> $1"
 done
