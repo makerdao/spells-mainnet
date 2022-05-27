@@ -24,18 +24,13 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-import "dss-interfaces/dss/EndAbstract.sol";
-import "dss-interfaces/dss/IlkRegistryAbstract.sol";
-import "dss-interfaces/dss/FlashAbstract.sol";
-import "dss-interfaces/dapp/DSTokenAbstract.sol";
-
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/45d2525f0b3f57a3e102fbd7034d1d912dea921a/governance/votes/Executive%20vote%20-%20May%2025%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Exe....md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-05-25 MakerDAO Executive Spell | Hash: 0x308785a5c5d12cf03a48ce076a72b12ac887590da1b84ef68e4272a2d026ed9c";
+        "2022-06-08 MakerDAO Executive Spell | Hash: 0xTODO";
 
     // Math
     uint256 constant WAD = 10 ** 18;
@@ -56,34 +51,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         return false;
     }
 
-    address immutable MCD_FLAP = DssExecLib.flap();
-    address immutable MCD_ESM  = DssExecLib.esm();
-    address immutable MCD_GOV  = DssExecLib.mkr();
-
-    address immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
-    address immutable DUX_WALLET =        0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
-
-        // ---------------------------- Lid for Flap ---------------------------
-        // https://vote.makerdao.com/polling/QmREdTJK
-        DssExecLib.setValue(MCD_FLAP, "lid", 30_000 * RAD);
-
-        // ------------------------------ ESM Min ------------------------------
-        // https://vote.makerdao.com/polling/QmQgab4a
-        DssExecLib.setValue(MCD_ESM, "min", 150_000 * WAD);
-
-        // ---------------------------- Transfer MKR ---------------------------
-        // https://vote.makerdao.com/polling/QmPnAkS4
-        DSTokenAbstract(MCD_GOV).transfer(SIDESTREAM_WALLET, 243.7953 ether);
-
-        // Original Proposal: https://forum.makerdao.com/t/mip40c3-sp27-development-ux-core-unit-mkr-budget-dux-001/9777
-        // Adjusted Amounts in Monthly Report:
-        // Apr 2022: https://github.com/makerdao-dux/transparency-reporting/blob/main/Monthy%20Budget%20Statements/2022-04.md#3-mkr-vesting-overview
-        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET, 355.86 ether);
 
     }
 }

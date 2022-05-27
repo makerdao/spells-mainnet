@@ -365,7 +365,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testVestDAI() private {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        /* VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         assertEq(vest.ids(), 0);
 
@@ -393,10 +393,11 @@ contract DssSpellTest is DssSpellTestBase {
         hevm.warp(100 + 365 days);
         uint256 prevBalance = dai.balanceOf(wallets.addr("WALLET"));
         assertTrue(tryVest(address(vest), 1));
-        assertEq(dai.balanceOf(wallets.addr("WALLET")), prevBalance + 1 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("WALLET")), prevBalance + 1 * WAD); */
     }
 
-    function testMKRPayment() public {
+    function testMKRPayment() private {
+        /*
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrSAS = gov.balanceOf(wallets.addr("SIDESTREAM_WALLET"));
         uint256 prevMkrDUX = gov.balanceOf(wallets.addr("DUX_WALLET"));
@@ -413,5 +414,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)),               prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("SIDESTREAM_WALLET")), prevMkrSAS + amountSAS);
         assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrDUX + amountDUX);
+        */
     }
 }
