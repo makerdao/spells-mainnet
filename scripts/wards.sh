@@ -3,7 +3,18 @@ set -e
 
 [[ "$ETH_RPC_URL" ]] || { echo "Please set a ETH_RPC_URL"; exit 1; }
 
-[[ "$1" ]] || { echo "Please specify the Target Address or ChainLog Key (ASCII) to inspect"; exit 1; }
+[[ "$1" ]] || { echo "Please specify the Target Address (e.g. target=0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B) or ChainLog Key (e.g. target=MCD_VAT) to inspect"; exit 1; }
+
+for ARGUMENT in "$@"
+do
+    KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
+    VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
+
+    case "$KEY" in
+            target)      TARGET="$VALUE" ;;
+            *)           TARGET="$KEY"   ;;
+    esac
+done
 
 ### Override maxFeePerGas to avoid spikes
 baseFee=$(seth basefee)
@@ -12,22 +23,22 @@ baseFee=$(seth basefee)
 
 CHANGELOG=0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F
 
-if [[ "$1" =~ 0x* ]]; then
-    target=$1
+if [[ "$TARGET" =~ 0x* ]]; then
+    target=$TARGET
 else
-    KEY=$(seth --to-bytes32 "$(seth --from-ascii "$1")")
-    target=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$KEY")
+    key=$(seth --to-bytes32 "$(seth --from-ascii "$TARGET")")
+    target=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
 fi
 
 echo -e "Network: $(seth chain)"
 list=$(seth call "$CHANGELOG" 'list()(bytes32[])')
-for key in $(echo -e "$list" | sed "s/,/ /g")
+IFS=","
+for key in $list
 do
-    contractName=$(seth --to-ascii "$key" | sed 's/\x0/ /g')
+    contractName=$(seth --to-ascii "$key" | tr -d '\0')
     contract=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
-    wards=$(seth call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) || continue
-    [[ "$wards" == "1" ]] && echo "$contractName"
+    [[ $(seth call "$target" 'wards(address)(uint256)' "$contract" 2>/dev/null) == "1" ]] && echo "$1 -> $contractName"
+    [[ $(seth call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$contractName -> $1"
     src=$(seth call "$contract" 'src()(address)' 2>/dev/null) || continue
-    srcWards=$(seth call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) || continue
-    [[ "$srcWards" == "1" ]] && echo -e "source of $contractName\n$src"
+    [[ $(seth call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$src (source of $contractName) -> $1"
 done
