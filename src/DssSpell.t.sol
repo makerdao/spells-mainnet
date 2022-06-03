@@ -365,36 +365,82 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() private {
-        /* VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+    function testVestDAI() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        address SH_MULTISIG = wallets.addr("SH_MULTISIG");
 
-        assertEq(vest.ids(), 0);
+        // Wed 01 Jun 2022 12:00:00 AM UTC
+        uint256 JUN_01_2022 = 1654041600;
+        // Wed 15 Mar 2023 12:00:00 AM UTC
+        uint256 MAR_15_2023 = 1678838400;
+
+        assertEq(vest.ids(), 4);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 4);
+        assertEq(vest.ids(), 5);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertEq(vest.usr(1), wallets.addr("WALLET"));
-        assertEq(vest.bgn(1), 100);
-        assertEq(vest.clf(1), 100);
-        assertEq(vest.fin(1), 100 + 365 days);
-        assertEq(vest.mgr(1), address(0));
-        assertEq(vest.res(1), 1);
-        assertEq(vest.tot(1), 1 * WAD);
-        assertEq(vest.rxd(1), 0);
+        assertEq(vest.usr(5), SH_MULTISIG);
+        assertEq(vest.bgn(5), JUN_01_2022);
+        assertEq(vest.clf(5), JUN_01_2022);
+        assertEq(vest.fin(5), MAR_15_2023);
+        assertEq(vest.mgr(5), address(0));
+        assertEq(vest.res(5), 1);
+        assertEq(vest.tot(5), 540000 * WAD);
+        assertEq(vest.rxd(5), 0);
+
+        hevm.warp(JUN_01_2022 + 365 days);
+        uint256 prevBalance = dai.balanceOf(SH_MULTISIG);
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
-        vest.unrestrict(1);
+        vest.unrestrict(5);
 
-        hevm.warp(100 + 365 days);
-        uint256 prevBalance = dai.balanceOf(wallets.addr("WALLET"));
-        assertTrue(tryVest(address(vest), 1));
-        assertEq(dai.balanceOf(wallets.addr("WALLET")), prevBalance + 1 * WAD); */
+        assertTrue(tryVest(address(vest), 5));
+        assertEq(dai.balanceOf(SH_MULTISIG), prevBalance + 540000 * WAD);
+    }
+
+    function testVestMKR() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        assertEq(vest.ids(), 22);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.cap(), 1_100 * WAD / 365 days);
+        assertEq(vest.ids(), 23);
+
+        // Wed 01 Jun 2022 12:00:00 AM UTC
+        uint256 JUN_01_2022 = 1654041600;
+        // Wed 23 Nov 2022 12:00:00 AM UTC
+        uint256 NOV_23_2022 = 1669161600;
+        address SH_WALLET = wallets.addr("SH_WALLET");
+
+        // -----
+        assertEq(vest.usr(23), SH_WALLET);
+        assertEq(vest.bgn(23), JUN_01_2022);
+        assertEq(vest.clf(23), NOV_23_2022);
+        assertEq(vest.fin(23), JUN_01_2022 + 4 * 365 days);
+        assertEq(vest.mgr(23), wallets.addr("SH_MULTISIG"));
+        assertEq(vest.res(23), 1);
+        assertEq(vest.tot(23), 250 * 10**18);
+        assertEq(vest.rxd(23), 0);
+
+
+        uint256 prevBalance = gov.balanceOf(SH_WALLET);
+        hevm.warp(JUN_01_2022 + 365 days);
+
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        giveAuth(address(vest), address(this));
+        vest.unrestrict(23);
+
+        vest.vest(23);
+        assertEq(gov.balanceOf(SH_WALLET), prevBalance + 250 * WAD / 4);
     }
 
     function testMKRPayment() private {
