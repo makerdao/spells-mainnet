@@ -59,6 +59,7 @@ contract Wallets {
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["DOO"]                          = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
         addr["FLIPSIDE"]                     = 0x62a43123FE71f9764f26554b3F5017627996816a;
+        addr["PENNBLOCKCHAIN"]               = 0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
