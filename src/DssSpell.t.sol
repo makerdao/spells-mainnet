@@ -73,22 +73,50 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() private { // make public to use
-        // uint256 prevSin = vat.sin(address(vow));
+    struct Payee {
+        address addr;
+        uint256 amount;
+        uint256 prevAmount;
+    }
 
-        // uint256 prevDaiWALLET0  = dai.balanceOf(<WALLET0>);
-        // uint256 prevDaiWALLET1  = dai.balanceOf(<WALLET1>);
+    function testPayments() public { // make public to use
+        uint256 prevSin = vat.sin(address(vow));
 
-        // uint256 amount = prevDaiWALLET0 + prevDaiWALLET1;
+        Payee[12] memory payees = [
+            Payee(wallets.addr("SH_MULTISIG"),230_000,0),
+            Payee(wallets.addr("FLIPFLOPFLAP"),12_000,0),
+            Payee(wallets.addr("ULTRASCHUPPI"),12_000,0),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),12_000,0),
+            Payee(wallets.addr("MAKERMAN"),11_025,0),
+            Payee(wallets.addr("ACREINVEST"),9372,0),
+            Payee(wallets.addr("MONETSUPPLY"),6275,0),
+            Payee(wallets.addr("JUSTINCASE"),7626,0),
+            Payee(wallets.addr("GFXLABS"),6607,0),
+            Payee(wallets.addr("DOO"),622,0),
+            Payee(wallets.addr("FLIPSIDE"),270,0),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),265,0)
+        ];
+        uint256 prevBalance;
+        uint256 totAmount;
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        for (uint256 i = 0; i < payees.length; i++) {
+            totAmount += payees[i].amount;
+            payees[i].prevAmount = dai.balanceOf(payees[i].addr);
+            prevBalance += payees[i].prevAmount;
+        }
 
-        // assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-        // assertEq(dai.balanceOf(WALLET0) - prevDaiWALLET0, amountWALLET0 * WAD);
-        // assertEq(dai.balanceOf(WALLET1) - prevDaiWALLET1, amountWALLET1 * WAD);
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
+
+        for (uint256 i = 0; i < payees.length; i++) {
+            assertEq(
+                dai.balanceOf(payees[i].addr) - payees[i].prevAmount,
+                payees[i].amount * WAD
+            );
+        }
     }
 
     function testCollateralIntegrations() private { // make public to use
