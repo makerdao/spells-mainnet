@@ -36,6 +36,10 @@ interface DssVestLike {
     function restrict(uint256) external;
 }
 
+interface StarknetLike {
+    function setCeiling(uint256) external;
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Provides a descriptive tag for bot consumption
@@ -49,10 +53,23 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     DssVestLike immutable MCD_VEST_DAI          = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
-    address constant SH_MULTISIG = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
-    address constant SH_WALLET   = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
+    address constant STARKNET_DAI_BRIDGE    = 0x659a00c33263d9254Fed382dE81349426C795BB6;
+    address constant STARKNET_ESCROW_MOM    = 0xc238E3D63DfD677Fa0FA9985576f0945C581A266;
 
-    address constant FLIP_FLOP_FLAP_WALLET    = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant SH_MULTISIG            = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
+    address constant SH_WALLET              = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
+
+    address constant FLIPFLOPFLAP_WALLET    = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant SCHUPPI_WALLET         = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address constant FEEDBLACKLOOPS_WALLET  = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant ACREINVEST_WALLET      = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address constant MONETSUPPLY_WALLET     = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
+    address constant JUSTINCASE_WALLET      = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant GFXLABS_WALLET         = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address constant DOO_WALLET             = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address constant FLIPSIDECRYPTO_WALLET  = 0x62a43123FE71f9764f26554b3F5017627996816a;
+    address constant PENNBLOCKCHAIN_WALLET  = 0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b;
 
     // Wed 01 Jun 2022 12:00:00 AM UTC
     uint256 constant JUN_01_2022 = 1654041600;
@@ -204,36 +221,42 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         //    https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-may-2022/15536
         //
         //    Flip Flop Flap Delegate LLC - 12000 DAI - 0x688d508f3a6B0a377e266405A1583B3316f9A2B3
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET, 12_000);
         //    schuppi - 12000 DAI - 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(SCHUPPI_WALLET, 12_000);
         //    Feedblack Loops LLC - 12000 DAI - 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS_WALLET, 12_000);
         //    MakerMan - 11025 DAI - 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET, 11025);
         //    ACREInvest - 9372 DAI - 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST_WALLET, 9372);
         //    monetsupply - 6275 DAI - 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(MONETSUPPLY_WALLET, 6275);
         //    JustinCase - 7626 DAI - 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTINCASE_WALLET, 7626);
         //    GFX Labs - 6607 DAI - 0xa6e8772af29b29B9202a073f8E36f447689BEef6
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS_WALLET, 6607);
         //    Doo - 622 DAI - 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(DOO_WALLET, 622);
         //    Flipside Crypto - 270 DAI - 0x62a43123FE71f9764f26554b3F5017627996816a
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDECRYPTO_WALLET, 270);
         //    Penn Blockchain - 265 DAI - 0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b
-        // MAINNET ONLY
+        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN_WALLET, 265);
 
 
         // Starknet Bridge Changes
         // https://forum.makerdao.com/t/details-about-spells-to-be-included-in-june-8th-2022-executive-vote/15532
         //
         //    Increase Starknet Bridge Limit from 100,000 DAI to 200,000 DAI
-        // MAINNET ONLY
+        StarknetLike(STARKNET_DAI_BRIDGE).setCeiling(200_000 * WAD);
         //    Give DSChief control over L1EscrowMom
-        // MAINNET ONLY
+        DssExecLib.setAuthority(STARKNET_ESCROW_MOM, DssExecLib.getChangelogAddress("MCD_ADM"));
+
+
+        // Changelog
+        DssExecLib.setChangelogAddress("STARKNET_DAI_BRIDGE", STARKNET_DAI_BRIDGE);
+        DssExecLib.setChangelogAddress("STARKNET_ESCROW_MOM", STARKNET_ESCROW_MOM);
+        DssExecLib.setChangelogVersion("1.13.1");
     }
 }
 

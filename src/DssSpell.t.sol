@@ -6,7 +6,42 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
+interface StarknetLike {
+    function ceiling() external returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
+
+    function testStarknetUpdates() public {
+
+        // Test before spell
+        assertEq(
+            StarknetLike(addr.addr("STARKNET_DAI_BRIDGE")).ceiling(),
+            100_000 * WAD
+        );
+
+        // authority is currently unset
+        assertEq(
+            DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
+            address(0)
+        );
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Ensure Dai bridge value changed
+        assertEq(
+            StarknetLike(addr.addr("STARKNET_DAI_BRIDGE")).ceiling(),
+            200_000 * WAD
+        );
+
+        // Ensure authority is set to DSChief
+        assertEq(
+            DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
+            addr.addr("MCD_ADM")
+        );
+    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -89,14 +124,15 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("CONTRACT_KEY"), addr.addr("CONTRACT_KEY"));
-        assertEq(chainLog.version(), "X.XX.X");
+        assertEq(chainLog.getAddress("STARKNET_DAI_BRIDGE"), addr.addr("STARKNET_DAI_BRIDGE"));
+        assertEq(chainLog.getAddress("STARKNET_ESCROW_MOM"), addr.addr("STARKNET_ESCROW_MOM"));
+        assertEq(chainLog.version(), "1.13.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
