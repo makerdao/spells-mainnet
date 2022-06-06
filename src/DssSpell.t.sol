@@ -14,6 +14,8 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testStarknetUpdates() public {
 
+        address OLD_ESM = 0x29CfBd381043D00a98fD9904a431015Fef07af2f;
+
         // Test before spell
         assertEq(
             StarknetLike(addr.addr("STARKNET_DAI_BRIDGE")).ceiling(),
@@ -25,6 +27,14 @@ contract DssSpellTest is DssSpellTestBase {
             DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
             address(0)
         );
+
+        // Validate ESM wards correctly set
+        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(addr.addr("MCD_ESM")), 1);
+        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(addr.addr("MCD_ESM")), 1);
+        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(addr.addr("MCD_ESM")), 1);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -41,6 +51,14 @@ contract DssSpellTest is DssSpellTestBase {
             DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
             addr.addr("MCD_ADM")
         );
+
+        // Validate ESM wards correctly set
+        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(OLD_ESM), 0);
+        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(addr.addr("MCD_ESM")), 1);
+        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(addr.addr("MCD_ESM")), 1);
+        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(addr.addr("MCD_ESM")), 1);
     }
 
     function testSpellIsCast_GENERAL() public {
