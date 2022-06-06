@@ -76,10 +76,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Wed 01 Jun 2022 12:00:00 AM UTC
     uint256 constant JUN_01_2022 = 1654041600;
-    // Wed 23 Nov 2022 12:00:00 AM UTC
-    uint256 constant NOV_23_2022 = 1669161600;
     // Wed 15 Mar 2023 12:00:00 AM UTC
     uint256 constant MAR_15_2023 = 1678838400;
+    // Thu 23 Nov 2023 12:00:00 AM UTC
+    uint256 constant NOV_23_2023 = 1700697600;
 
 
     // Math
@@ -143,7 +143,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 250 * WAD,
                 JUN_01_2022,
                 4 * 365 days,
-                NOV_23_2022 - JUN_01_2022,
+                NOV_23_2023 - JUN_01_2022,
                 SH_MULTISIG
             )
         );

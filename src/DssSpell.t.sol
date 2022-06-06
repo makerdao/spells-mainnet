@@ -508,14 +508,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Wed 01 Jun 2022 12:00:00 AM UTC
         uint256 JUN_01_2022 = 1654041600;
-        // Wed 23 Nov 2022 12:00:00 AM UTC
-        uint256 NOV_23_2022 = 1669161600;
+        // Thu 23 Nov 2023 12:00:00 AM UTC
+        uint256 NOV_23_2023 = 1700697600;
         address SH_WALLET = wallets.addr("SH_WALLET");
 
         // -----
         assertEq(vest.usr(23), SH_WALLET);
         assertEq(vest.bgn(23), JUN_01_2022);
-        assertEq(vest.clf(23), NOV_23_2022);
+        assertEq(vest.clf(23), NOV_23_2023);
         assertEq(vest.fin(23), JUN_01_2022 + 4 * 365 days);
         assertEq(vest.mgr(23), wallets.addr("SH_MULTISIG"));
         assertEq(vest.res(23), 1);
@@ -524,14 +524,16 @@ contract DssSpellTest is DssSpellTestBase {
 
 
         uint256 prevBalance = gov.balanceOf(SH_WALLET);
-        hevm.warp(JUN_01_2022 + 365 days);
+        // 20220608 exec: Warp 2 years since cliff here is 18 months
+        hevm.warp(JUN_01_2022 + 2 * 365 days);
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
         vest.unrestrict(23);
 
         vest.vest(23);
-        assertEq(gov.balanceOf(SH_WALLET), prevBalance + 250 * WAD / 4);
+        // 20220608 exec: Ensure 2 years vest accumulated
+        assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
     function testMKRPayment() private {
