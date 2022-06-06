@@ -1389,8 +1389,8 @@ function checkIlkClipper(
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
                 emit log("Error: Bad Auth");
-                emit log_named_address(" Deployer Address: ", deployers.addr(i));
-                emit log_named_string( "Affected Contract: ", contractName);
+                emit log_named_address("   Deployer Address", deployers.addr(i));
+                emit log_named_string("  Affected Contract", contractName);
                 fail();
             }
         }
