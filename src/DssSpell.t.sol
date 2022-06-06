@@ -104,18 +104,18 @@ contract DssSpellTest is DssSpellTestBase {
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[12] memory payees = [
-            Payee(wallets.addr("SH_MULTISIG"),230_000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),12_000),
-            Payee(wallets.addr("ULTRASCHUPPI"),12_000),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),12_000),
-            Payee(wallets.addr("MAKERMAN"),11_025),
-            Payee(wallets.addr("ACREINVEST"),9372),
-            Payee(wallets.addr("MONETSUPPLY"),6275),
-            Payee(wallets.addr("JUSTINCASE"),7626),
-            Payee(wallets.addr("GFXLABS"),6607),
-            Payee(wallets.addr("DOO"),622),
-            Payee(wallets.addr("FLIPSIDE"),270),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),265)
+            Payee(wallets.addr("SH_MULTISIG"),    230_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),    12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),    12_000),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),  12_000),
+            Payee(wallets.addr("MAKERMAN"),        11_025),
+            Payee(wallets.addr("ACREINVEST"),        9372),
+            Payee(wallets.addr("MONETSUPPLY"),       6275),
+            Payee(wallets.addr("JUSTINCASE"),        7626),
+            Payee(wallets.addr("GFXLABS"),           6607),
+            Payee(wallets.addr("DOO"),                622),
+            Payee(wallets.addr("FLIPSIDE"),           270),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     265)
         ];
 
         uint256 prevBalance;
