@@ -53,8 +53,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     DssVestLike immutable MCD_VEST_DAI          = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
-    address constant STARKNET_DAI_BRIDGE    = 0x659a00c33263d9254Fed382dE81349426C795BB6;
     address constant STARKNET_ESCROW_MOM    = 0xc238E3D63DfD677Fa0FA9985576f0945C581A266;
+    address constant STARKNET_ESCROW        = 0x0437465dfb5B79726e35F08559B0cBea55bb585C;
+    address constant STARKNET_DAI_BRIDGE    = 0x659a00c33263d9254Fed382dE81349426C795BB6;
+    address constant STARKNET_GOV_RELAY     = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
 
     address constant SH_MULTISIG            = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
     address constant SH_WALLET              = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
@@ -71,13 +73,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     address constant FLIPSIDECRYPTO_WALLET  = 0x62a43123FE71f9764f26554b3F5017627996816a;
     address constant PENNBLOCKCHAIN_WALLET  = 0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b;
 
+
     // Wed 01 Jun 2022 12:00:00 AM UTC
     uint256 constant JUN_01_2022 = 1654041600;
     // Wed 23 Nov 2022 12:00:00 AM UTC
     uint256 constant NOV_23_2022 = 1669161600;
     // Wed 15 Mar 2023 12:00:00 AM UTC
     uint256 constant MAR_15_2023 = 1678838400;
-
 
 
     // Math
@@ -254,8 +256,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
 
         // Changelog
-        DssExecLib.setChangelogAddress("STARKNET_DAI_BRIDGE", STARKNET_DAI_BRIDGE);
         DssExecLib.setChangelogAddress("STARKNET_ESCROW_MOM", STARKNET_ESCROW_MOM);
+        DssExecLib.setChangelogAddress("STARKNET_ESCROW", STARKNET_ESCROW);
+        DssExecLib.setChangelogAddress("STARKNET_DAI_BRIDGE", STARKNET_DAI_BRIDGE);
+        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY", STARKNET_GOV_RELAY);
         DssExecLib.setChangelogVersion("1.13.1");
     }
 }

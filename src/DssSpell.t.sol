@@ -158,9 +158,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("STARKNET_DAI_BRIDGE"), addr.addr("STARKNET_DAI_BRIDGE"));
-        assertEq(chainLog.getAddress("STARKNET_ESCROW_MOM"), addr.addr("STARKNET_ESCROW_MOM"));
-        assertEq(chainLog.version(), "1.13.1");
+        // checkChainlogKey("CONTRACT_KEY");
+        // checkChainlogVersion("X.XX.X");
+        checkChainlogKey("STARKNET_ESCROW_MOM");
+        checkChainlogKey("STARKNET_ESCROW");
+        checkChainlogKey("STARKNET_DAI_BRIDGE");
+        checkChainlogKey("STARKNET_GOV_RELAY");
+        checkChainlogVersion("1.13.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
