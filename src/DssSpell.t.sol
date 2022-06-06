@@ -94,7 +94,6 @@ contract DssSpellTest is DssSpellTestBase {
     struct Payee {
         address addr;
         uint256 amount;
-        uint256 prevAmount;
     }
 
     function testPayments() public { // make public to use
@@ -103,29 +102,30 @@ contract DssSpellTest is DssSpellTestBase {
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
-        //    the prevAmount can be zero as it is set in the next loop
-        // Create the array with the number of payees
+        // Initialize the array with the number of payees
         Payee[12] memory payees = [
-            Payee(wallets.addr("SH_MULTISIG"),230_000,0),
-            Payee(wallets.addr("FLIPFLOPFLAP"),12_000,0),
-            Payee(wallets.addr("ULTRASCHUPPI"),12_000,0),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),12_000,0),
-            Payee(wallets.addr("MAKERMAN"),11_025,0),
-            Payee(wallets.addr("ACREINVEST"),9372,0),
-            Payee(wallets.addr("MONETSUPPLY"),6275,0),
-            Payee(wallets.addr("JUSTINCASE"),7626,0),
-            Payee(wallets.addr("GFXLABS"),6607,0),
-            Payee(wallets.addr("DOO"),622,0),
-            Payee(wallets.addr("FLIPSIDE"),270,0),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),265,0)
+            Payee(wallets.addr("SH_MULTISIG"),230_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),12_000),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),12_000),
+            Payee(wallets.addr("MAKERMAN"),11_025),
+            Payee(wallets.addr("ACREINVEST"),9372),
+            Payee(wallets.addr("MONETSUPPLY"),6275),
+            Payee(wallets.addr("JUSTINCASE"),7626),
+            Payee(wallets.addr("GFXLABS"),6607),
+            Payee(wallets.addr("DOO"),622),
+            Payee(wallets.addr("FLIPSIDE"),270),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),265)
         ];
+
         uint256 prevBalance;
         uint256 totAmount;
+        uint256[] memory prevAmounts = new uint256[](payees.length);
 
         for (uint256 i = 0; i < payees.length; i++) {
             totAmount += payees[i].amount;
-            payees[i].prevAmount = dai.balanceOf(payees[i].addr);
-            prevBalance += payees[i].prevAmount;
+            prevAmounts[i] = dai.balanceOf(payees[i].addr);
+            prevBalance += prevAmounts[i];
         }
 
         vote(address(spell));
@@ -136,7 +136,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
-                dai.balanceOf(payees[i].addr) - payees[i].prevAmount,
+                dai.balanceOf(payees[i].addr) - prevAmounts[i],
                 payees[i].amount * WAD
             );
         }
