@@ -100,6 +100,11 @@ contract DssSpellTest is DssSpellTestBase {
     function testPayments() public { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
+        // For each payment, create a Payee object with
+        //    the Payee address,
+        //    the amount to be paid in whole Dai units
+        //    the prevAmount can be zero as it is set in the next loop
+        // Create the array with the number of payees
         Payee[12] memory payees = [
             Payee(wallets.addr("SH_MULTISIG"),230_000,0),
             Payee(wallets.addr("FLIPFLOPFLAP"),12_000,0),
