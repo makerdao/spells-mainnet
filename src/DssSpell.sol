@@ -144,7 +144,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
                 JUN_01_2022,
                 4 * 365 days,
                 NOV_23_2023 - JUN_01_2022,
-                SH_MULTISIG
+                SH_WALLET
             )
         );
 

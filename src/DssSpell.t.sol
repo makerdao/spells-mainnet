@@ -517,7 +517,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(23), JUN_01_2022);
         assertEq(vest.clf(23), NOV_23_2023);
         assertEq(vest.fin(23), JUN_01_2022 + 4 * 365 days);
-        assertEq(vest.mgr(23), wallets.addr("SH_MULTISIG"));
+        assertEq(vest.mgr(23), wallets.addr("SH_WALLET"));
         assertEq(vest.res(23), 1);
         assertEq(vest.tot(23), 250 * 10**18);
         assertEq(vest.rxd(23), 0);
