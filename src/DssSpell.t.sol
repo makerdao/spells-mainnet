@@ -536,6 +536,16 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        assertEq(join.bar(), 3.5 * 10**27 / 100);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(join.bar(), 2.75 * 10**27 / 100);
+    }    
     function testMKRPayment() private {
         /*
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
