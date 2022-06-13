@@ -12,55 +12,6 @@ interface StarknetLike {
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function testStarknetUpdates() public {
-
-        address OLD_ESM = 0x29CfBd381043D00a98fD9904a431015Fef07af2f;
-
-        // Test before spell
-        assertEq(
-            StarknetLike(addr.addr("STARKNET_DAI_BRIDGE")).ceiling(),
-            100_000 * WAD
-        );
-
-        // authority is currently unset
-        assertEq(
-            DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
-            address(0)
-        );
-
-        // Validate ESM wards correctly set
-        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(addr.addr("MCD_ESM")), 1);
-        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(addr.addr("MCD_ESM")), 1);
-        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(addr.addr("MCD_ESM")), 1);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Ensure Dai bridge value changed
-        assertEq(
-            StarknetLike(addr.addr("STARKNET_DAI_BRIDGE")).ceiling(),
-            200_000 * WAD
-        );
-
-        // Ensure authority is set to DSChief
-        assertEq(
-            DSAuthAbstract(addr.addr("STARKNET_ESCROW_MOM")).authority(),
-            addr.addr("MCD_ADM")
-        );
-
-        // Validate ESM wards correctly set
-        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(OLD_ESM), 0);
-        assertEq(WardsAbstract(addr.addr("STARKNET_ESCROW")).wards(addr.addr("MCD_ESM")), 1);
-        assertEq(WardsAbstract(addr.addr("STARKNET_DAI_BRIDGE")).wards(addr.addr("MCD_ESM")), 1);
-        assertEq(WardsAbstract(addr.addr("STARKNET_GOV_RELAY")).wards(addr.addr("MCD_ESM")), 1);
-    }
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -96,7 +47,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to use
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -175,7 +126,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -183,11 +134,6 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new chainlog values tests here
         // checkChainlogKey("CONTRACT_KEY");
         // checkChainlogVersion("X.XX.X");
-        checkChainlogKey("STARKNET_ESCROW_MOM");
-        checkChainlogKey("STARKNET_ESCROW");
-        checkChainlogKey("STARKNET_DAI_BRIDGE");
-        checkChainlogKey("STARKNET_GOV_RELAY");
-        checkChainlogVersion("1.13.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -456,7 +402,7 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() public {
+    function testVestDAI() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         address SH_MULTISIG = wallets.addr("SH_MULTISIG");
 
@@ -495,7 +441,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(SH_MULTISIG), prevBalance + 540000 * WAD);
     }
 
-    function testVestMKR() public {
+    function testVestMKR() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 22);
 
@@ -536,16 +482,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testAAVEDirectBarChange() public {
-        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        assertEq(join.bar(), 3.5 * 10**27 / 100);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(join.bar(), 2.75 * 10**27 / 100);
-    }    
     function testMKRPayment() private {
         /*
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
