@@ -6,10 +6,6 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
-interface StarknetLike {
-    function ceiling() external returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
