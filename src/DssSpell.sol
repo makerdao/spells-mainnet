@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Copyright (C) 2021-2022 Dai Foundation
@@ -16,35 +17,43 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+
 // Enable ABIEncoderV2 when onboarding collateral
-pragma experimental ABIEncoderV2;
+// pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
-interface CurveLPOracleLike {
-    function pool() external view returns (address);
-    function src() external view returns (address);
-    function wat() external view returns (bytes32);
-    function ncoins() external view returns (uint256);
-    function orbs(uint256) external view returns (address);
-    function nonreentrant() external view returns (bool);
-}
-
-interface IlkRegistryLike {
-    function update(bytes32) external;
-}
 
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
+
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/6b4cedd333d710702f50b0e679b005286773b6d3/governance/votes/Executive%20vote%20-%20April%2022%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/428d97b75ec8bdb4f2b87e69dcc917ad750b8c76/governance/votes/Executive%20vote%20-%20June%208%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        // TODO: update this
-        "2022-XX-YY MakerDAO Executive Spell | Hash: 0x0000000000000000000000000000000000000000000000000000000000000000";
+        "TODO";
 
     // Math
+    uint256 constant RAY  = 10 ** 27;
+
+    // --- Offboarding: Current Liquidation Ratio ---
+    uint256 constant CURRENT_UNI_A_MAT              =  165 * RAY / 100;
+    uint256 constant CURRENT_UNIV2DAIETH_A_MAT      =  120 * RAY / 100;
+    uint256 constant CURRENT_UNIV2WBTCETH_A_MAT     =  145 * RAY / 100;
+    uint256 constant CURRENT_UNIV2UNIETH_A_MAT      =  160 * RAY / 100;
+    uint256 constant CURRENT_UNIV2WBTCDAI_A_MAT     =  120 * RAY / 100;
+
+    // --- Offboarding: Target Liquidation Ratio ---
+    uint256 constant TARGET_UNI_A_MAT               = 900 * RAY / 100;
+    uint256 constant TARGET_UNIV2DAIETH_A_MAT       = 3100 * RAY / 100;
+    uint256 constant TARGET_UNIV2WBTCETH_A_MAT      = 5300 * RAY / 100;
+    uint256 constant TARGET_UNIV2UNIETH_A_MAT       = 700 * RAY / 100;
+    uint256 constant TARGET_UNIV2WBTCDAI_A_MAT      = 1000 * RAY / 100;
+
+    function _sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "sub-underflow");
+    }
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -56,20 +65,104 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
     //
 
-    // --- Rates ---
-    // uint256 constant FOUR_FIVE_PCT_RATE      = 1000000001395766281313196627;
-
     // Turn office hours off
     function officeHours() public override returns (bool) {
-        return true;
+        return false;
     }
 
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
-        onboardNewCollaterals();
+        // onboardNewCollaterals();
 
-        DssExecLib.setChangelogVersion("1.11.3");
+
+        // Offboard UNI-A
+        // https://vote.makerdao.com/polling/QmSfLS6V#poll-detail
+        // https://forum.makerdao.com/t/signal-request-offboard-uni-univ2daieth-univ2wbtceth-univ2unieth-and-univ2wbtcdai/15160
+
+        DssExecLib.setIlkLiquidationPenalty("UNI-A", 0);
+        DssExecLib.setKeeperIncentiveFlatRate("UNI-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNI-A Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNI-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNI_A_MAT,
+            _end:       TARGET_UNI_A_MAT,
+            _duration:  30 days
+        });
+
+        // Offboard UNIV2DAIETH-A
+        // https://vote.makerdao.com/polling/QmQUozNn#poll-detail
+        // https://forum.makerdao.com/t/signal-request-offboard-uni-univ2daieth-univ2wbtceth-univ2unieth-and-univ2wbtcdai/15160
+
+        DssExecLib.setIlkLiquidationPenalty("UNIV2DAIETH-A", 0);
+        DssExecLib.setKeeperIncentiveFlatRate("UNIV2DAIETH-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2DAIETH-A Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2DAIETH-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2DAIETH_A_MAT,
+            _end:       TARGET_UNIV2DAIETH_A_MAT,
+            _duration:  30 days
+        });
+
+        // Offboard UNIV2WBTCETH-A
+        // https://vote.makerdao.com/polling/QmY3YsDB#poll-detail
+        // https://forum.makerdao.com/t/signal-request-offboard-uni-univ2daieth-univ2wbtceth-univ2unieth-and-univ2wbtcdai/15160
+
+        DssExecLib.setIlkLiquidationPenalty("UNIV2WBTCETH-A", 0);
+        DssExecLib.setKeeperIncentiveFlatRate("UNIV2WBTCETH-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2WBTCETH-A Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2WBTCETH-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2WBTCETH_A_MAT,
+            _end:       TARGET_UNIV2WBTCETH_A_MAT,
+            _duration:  30 days
+        });
+
+        // Offboard UNIV2UNIETH-A
+        // https://vote.makerdao.com/polling/QmUeYVa2#poll-detail
+        // https://forum.makerdao.com/t/signal-request-offboard-uni-univ2daieth-univ2wbtceth-univ2unieth-and-univ2wbtcdai/15160
+
+        DssExecLib.setIlkLiquidationPenalty("UNIV2UNIETH-A", 0);
+        DssExecLib.setKeeperIncentiveFlatRate("UNIV2UNIETH-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2UNIETH-A Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2UNIETH-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2UNIETH_A_MAT,
+            _end:       TARGET_UNIV2UNIETH_A_MAT,
+            _duration:  30 days
+        });
+
+        // Offboard UNIV2WBTCDAI-A
+        // https://vote.makerdao.com/polling/QmZHNkip#poll-detail
+        // https://forum.makerdao.com/t/signal-request-offboard-uni-univ2daieth-univ2wbtceth-univ2unieth-and-univ2wbtcdai/15160
+
+        DssExecLib.setIlkLiquidationPenalty("UNIV2WBTCDAI-A", 0);
+        DssExecLib.setKeeperIncentiveFlatRate("UNIV2WBTCDAI-A", 0);
+        DssExecLib.linearInterpolation({
+            _name:      "UNIV2WBTCDAI-A Offboarding",
+            _target:    DssExecLib.spotter(),
+            _ilk:       "UNIV2WBTCDAI-A",
+            _what:      "mat",
+            _startTime: block.timestamp,
+            _start:     CURRENT_UNIV2WBTCDAI_A_MAT,
+            _end:       TARGET_UNIV2WBTCDAI_A_MAT,
+            _duration:  30 days
+        });
+
+
+        DssExecLib.setChangelogVersion("1.14.0");
     }
 }
 

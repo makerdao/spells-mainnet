@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 pragma solidity 0.6.12;
@@ -5,7 +6,31 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
+interface StarknetLike {
+    function ceiling() external returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
+
+    function testUNIALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNI-A", "UNI-A Offboarding", 165, 900);
+    }
+
+    function testUNIV2DAIETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2DAIETH-A", "UNIV2DAIETH-A Offboarding", 120, 3100);
+    }
+
+    function testUNIV2WBTCETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2WBTCETH-A", "UNIV2WBTCETH-A Offboarding", 145, 5300);
+    }
+
+    function testUNIV2UNIETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2UNIETH-A", "UNIV2UNIETH-A Offboarding", 160, 700);
+    }
+
+    function testUNIV2WBTCDAIALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2WBTCDAI-A", "UNIV2WBTCDAI-A Offboarding", 120, 1000);
+    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
@@ -37,43 +62,23 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testPayments() private { // make public to use
-        uint256 amountCU = 0;
-        uint256 amountWallet = 0;
-
-        uint256 prevSin = vat.sin(address(vow));
-
-        // Core Units
-        uint256 prevDaiCU = dai.balanceOf(wallets.addr("CU_WALLET"));
-
-        // Ambassador Program
-        uint256 prevDaiWallet = dai.balanceOf(wallets.addr("XXX_WALLET"));
-
-        uint256 amount = amountCU + amountWallet;
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vat.sin(address(vow)) - prevSin, amount * RAD);
-
-        // Wallets
-        assertEq(dai.balanceOf(wallets.addr("CU_WALLET")) - prevDaiCU, amountCU * WAD);
-        assertEq(dai.balanceOf(wallets.addr("AMBASSADOR_WALLET")) - prevDaiWallet, amountWallet * WAD);
-
+    struct Payee {
+        address addr;
+        uint256 amount;
     }
 
-    function testCollateralIntegrations() public { // make public to use
+
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new collateral tests here
         checkIlkIntegration(
-             "WSTETH-B",
-             GemJoinAbstract(addr.addr("MCD_JOIN_WSTETH_B")),
-             ClipAbstract(addr.addr("MCD_CLIP_WSTETH_B")),
-             addr.addr("PIP_WSTETH"),
+             "TOKEN-X",
+             GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+             ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+             addr.addr("PIP_TOKEN"),
              true,
              true,
              false
@@ -102,27 +107,27 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("MCD_JOIN_WSTETH_B"), addr.addr("MCD_JOIN_WSTETH_B"));
-        assertEq(chainLog.getAddress("MCD_CLIP_WSTETH_B"), addr.addr("MCD_CLIP_WSTETH_B"));
-        assertEq(chainLog.getAddress("MCD_CLIP_CALC_WSTETH_B"), addr.addr("MCD_CLIP_CALC_WSTETH_B"));
-        assertEq(chainLog.version(), "1.11.3");
+        // assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
+        // assertEq(chainLog.version(), "1.X.X");
+
+        assertEq(chainLog.version(), "1.14.0");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("WSTETH-B"), 49);
-        assertEq(reg.join("WSTETH-B"), addr.addr("MCD_JOIN_WSTETH_B"));
-        assertEq(reg.gem("WSTETH-B"), addr.addr("WSTETH"));
-        assertEq(reg.dec("WSTETH-B"), GemAbstract(addr.addr("WSTETH")).decimals());
-        assertEq(reg.class("WSTETH-B"), 1);
-        assertEq(reg.pip("WSTETH-B"), addr.addr("PIP_WSTETH"));
-        assertEq(reg.xlip("WSTETH-B"), addr.addr("MCD_CLIP_WSTETH_B"));
-        //assertEq(reg.name("TOKEN-X"), "NAME"); // Token Name Not Present (DSToken, ONLY ON GOERLI)
-        assertEq(reg.symbol("WSTETH-B"), "wstETH");
+        assertEq(reg.pos("TOKEN-X"), 49);
+        assertEq(reg.join("TOKEN-X"), addr.addr("MCD_JOIN_TOKEN_X"));
+        assertEq(reg.gem("TOKEN-X"), addr.addr("TOKEN"));
+        assertEq(reg.dec("TOKEN-X"), GemAbstract(addr.addr("TOKEN")).decimals());
+        assertEq(reg.class("TOKEN-X"), 1);
+        assertEq(reg.pip("TOKEN-X"), addr.addr("PIP_TOKEN"));
+        assertEq(reg.xlip("TOKEN-X"), addr.addr("MCD_CLIP_TOKEN_X"));
+        assertEq(reg.name("TOKEN-X"), "");
+        assertEq(reg.symbol("TOKEN-X"), "TOKEN");
     }
 
     function testFailWrongDay() public {
@@ -245,63 +250,16 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testOSMs() private { // make public to use
-        address OASIS_APP_OSM_READER = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
+        address READER = address(0);
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 0);
-        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_ETH")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_WSTETH")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_WBTC")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_RENBTC")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_YFI")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_UNI")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_LINK")).bud(OASIS_APP_OSM_READER), 1);
-        assertEq(OsmAbstract(addr.addr("PIP_MANA")).bud(OASIS_APP_OSM_READER), 1);
-    }
-
-    function testRemoveOldOSM() private { // make public to use
-        address PIP_CRVV1ETHSTETH_OLD = chainLog.getAddress("PIP_CRVV1ETHSTETH");
-
-        // Wards
-        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 1);
-
-        // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 1);
-
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 1);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 1);
-
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Wards
-        assertEq(WardsAbstract(PIP_CRVV1ETHSTETH_OLD).wards(addr.addr("OSM_MOM")), 0);
-
-        // Buds
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(0)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
-        assertEq(MedianAbstract(CurveLPOsmLike(PIP_CRVV1ETHSTETH_OLD).orbs(1)).bud(PIP_CRVV1ETHSTETH_OLD), 0);
-
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_SPOT")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_CLIP_CRVV1ETHSTETH_A")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("CLIPPER_MOM")), 0);
-        assertEq(OsmAbstract(PIP_CRVV1ETHSTETH_OLD).bud(addr.addr("MCD_END")), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
     function testMedianizers() private { // make public to use
@@ -415,5 +373,9 @@ contract DssSpellTest is DssSpellTestBase {
                 }
             }
         }
+    }
+
+    function tryVest(address vest, uint256 id) internal returns (bool ok) {
+        (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 }

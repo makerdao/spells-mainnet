@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 pragma solidity 0.6.12;
@@ -82,6 +83,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
+    address                 cure =                     addr.addr("MCD_CURE");
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
     CropperLike          cropper = CropperLike(        addr.addr("MCD_CROPPER"));
@@ -110,7 +112,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
-    event Log(string message, address deployer, string contractName);
 
     // not provided in DSMath
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
@@ -504,6 +505,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, concat("TestError/flip-flipperMom-auth-", ilk));
 
                 assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, concat("TestError/flip-liqOn-", ilk));
+                assertEq(flip.wards(address(end)), 1, concat("TestError/flip-end-auth-", ilk));
                 assertEq(flip.wards(address(pauseProxy)), 1, concat("TestError/flip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
             }
@@ -562,6 +564,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                     assertTrue(clip.stopped() > 0, concat("TestError/clip-liqOn-", ilk));
                 }
 
+                // assertEq(clip.wards(address(end)), 1, concat("TestError/clip-end-auth-", ilk));
                 assertEq(clip.wards(address(pauseProxy)), 1, concat("TestError/clip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
                 {
@@ -1385,7 +1388,9 @@ function checkIlkClipper(
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                emit Log("Bad auth", deployers.addr(i), contractName);
+                emit log("Error: Bad Auth");
+                emit log_named_address("   Deployer Address", deployers.addr(i));
+                emit log_named_string("  Affected Contract", contractName);
                 fail();
             }
         }
@@ -1416,5 +1421,13 @@ function checkIlkClipper(
             if (onlySource) checkSource(_addr, contractName);
             else checkWards(_addr, contractName);
         }
+    }
+
+    function checkChainlogKey(bytes32 key) internal {
+        assertEq(chainLog.getAddress(key), addr.addr(key), concat("TestError/Chainlog-key-mismatch-", key));
+    }
+
+    function checkChainlogVersion(string memory key) internal {
+        assertEq(chainLog.version(), key, concat("TestError/Chainlog-version-mismatch-", key));
     }
 }

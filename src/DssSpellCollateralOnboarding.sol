@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Copyright (C) 2021-2022 Dai Foundation
@@ -29,57 +30,71 @@ contract DssSpellCollateralOnboardingAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmTRiQ3GqjCiRhh1ojzKzgScmSsiwQPLyjhgYSxZASQekj
+    //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
     //
+    // uint256 constant NUMBER_PCT = 1000000001234567890123456789;
 
     // --- Math ---
-    uint256 constant MILLION = 10**6;
-
-    uint256 constant ZERO_SEVEN_FIVE_PCT_RATE = 1000000000236936036262880196;
+    // uint256 constant THOUSAND   = 10 ** 3;
+    // uint256 constant MILLION    = 10 ** 6;
+    // uint256 constant BILLION    = 10 ** 9;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address constant WSTETH                 = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-    address constant PIP_WSTETH             = 0xFe7a2aC0B945f12089aEEB6eCebf4F384D9f043F;
-    address constant MCD_JOIN_WSTETH_B      = 0x248cCBf4864221fC0E840F29BB042ad5bFC89B5c;
-    address constant MCD_CLIP_WSTETH_B      = 0x3ea60191b7d5990a3544B6Ef79983fD67e85494A;
-    address constant MCD_CLIP_CALC_WSTETH_B = 0x95098b29F579dbEb5c198Db6F30E28F7f3955Fbb;
+    // address constant XXX                  = 0x0000000000000000000000000000000000000000;
+    // address constant PIP_XXX              = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_JOIN_XXX_A       = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_CLIP_XXX_A       = 0x0000000000000000000000000000000000000000;
+    // address constant MCD_CLIP_CALC_XXX_A  = 0x0000000000000000000000000000000000000000;
 
     function onboardNewCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add WSTETH-B as a new Vault Type
-        //  Poll Link: https://vote.makerdao.com/polling/QmaE5doB#poll-detail
+        //  Add ______________ as a new Vault Type
+        //  Poll Link:
 
-        DssExecLib.addNewCollateral(CollateralOpts({
-            ilk:                   "WSTETH-B",
-            gem:                   WSTETH,
-            join:                  MCD_JOIN_WSTETH_B,
-            clip:                  MCD_CLIP_WSTETH_B,
-            calc:                  MCD_CLIP_CALC_WSTETH_B,
-            pip:                   PIP_WSTETH,
-            isLiquidatable:        true,
-            isOSM:                 true,
-            whitelistOSM:          false,
-            ilkDebtCeiling:        0,
-            minVaultAmount:        5000,
-            maxLiquidationAmount:  10 * MILLION,
-            liquidationPenalty:    1300,                     // 13% penalty fee
-            ilkStabilityFee:       ZERO_SEVEN_FIVE_PCT_RATE, //0.75% stability fee
-            startingPriceFactor:   12000,                    // Auction price begins at 120% of oracle
-            breakerTolerance:      5000,                     // Allows for a 50% hourly price drop before disabling liquidations
-            auctionDuration:       140 minutes,
-            permittedDrop:         4000,                     // 40% price drop before reset
-            liquidationRatio:      18500,                    // 185% collateralization
-            kprFlatReward:         300,                      // 300 Dai
-            kprPctReward:          10                        // chip 0.1%
-        }));
+        // DssExecLib.addNewCollateral(
+        //     CollateralOpts({
+        //         ilk:                   "XXX-A",
+        //         gem:                   XXX,
+        //         join:                  MCD_JOIN_XXX_A,
+        //         clip:                  MCD_CLIP_XXX_A,
+        //         calc:                  MCD_CLIP_CALC_XXX_A,
+        //         pip:                   PIP_XXX,
+        //         isLiquidatable:        BOOL,
+        //         isOSM:                 BOOL,
+        //         whitelistOSM:          BOOL,
+        //         ilkDebtCeiling:        line,
+        //         minVaultAmount:        dust,
+        //         maxLiquidationAmount:  hole,
+        //         liquidationPenalty:    chop,
+        //         ilkStabilityFee:       duty,
+        //         startingPriceFactor:   buf,
+        //         breakerTolerance:      tolerance,
+        //         auctionDuration:       tail,
+        //         permittedDrop:         cusp,
+        //         liquidationRatio:      mat,
+        //         kprFlatReward:         tip,
+        //         kprPctReward:          chip
+        //     })
+        // );
 
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_WSTETH_B, 90 seconds, 9900);
-        DssExecLib.setIlkAutoLineParameters("WSTETH-B", 150 * MILLION, 15 * MILLION, 8 hours);
+        // DssExecLib.setStairstepExponentialDecrease(
+        //     CALC_ADDR,
+        //     DURATION,
+        //     PCT_BPS
+        // );
+
+        // DssExecLib.setIlkAutoLineParameters(
+        //     "XXX-A",
+        //     AMOUNT,
+        //     GAP,
+        //     TTL
+        // );
 
         // ChainLog Updates
-        // Add the new join, clip, and abacus to the Chainlog
-        DssExecLib.setChangelogAddress("MCD_JOIN_WSTETH_B",      MCD_JOIN_WSTETH_B);
-        DssExecLib.setChangelogAddress("MCD_CLIP_WSTETH_B",      MCD_CLIP_WSTETH_B);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_WSTETH_B", MCD_CLIP_CALC_WSTETH_B);
+        // DssExecLib.setChangelogAddress("XXX", XXX);
+        // DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
+        // DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
     }
 }

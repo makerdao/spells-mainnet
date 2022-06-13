@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Copyright (C) 2021-2022 Dai Foundation
@@ -50,7 +51,8 @@ contract Addresses {
         addr["MCD_DAI"]                         = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
         addr["MCD_SPOT"]                        = 0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3;
         addr["MCD_POT"]                         = 0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7;
-        addr["MCD_END"]                         = 0xBB856d1742fD182a90239D7AE85706C2FE4e5922;
+        addr["MCD_END"]                         = 0x0e2e8F1D1326A4B9633D96222Ce399c708B19c28;
+        addr["MCD_CURE"]                        = 0x0085c9feAb2335447E1F4DC9bf3593a8e28bdfc7;
         addr["MCD_ESM"]                         = 0x09e05fF6142F2f9de8B6B65855A1d56B6cfE4c58;
         addr["PROXY_ACTIONS"]                   = 0x82ecD135Dce65Fbc6DbdD0e4237E0AF93FFD5038;
         addr["PROXY_ACTIONS_END"]               = 0x7AfF9FC9faD225e3c88cDA06BC56d8Aca774bC57;
@@ -65,10 +67,12 @@ contract Addresses {
         addr["DIRECT_MOM"]                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
-        addr["MCD_VEST_DAI"]                    = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
+        addr["MCD_VEST_DAI"]                    = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
+        addr["MCD_VEST_DAI_LEGACY"]             = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
         addr["MCD_VEST_MKR"]                    = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]           = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
-        addr["MCD_FLASH"]                       = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
+        addr["MCD_FLASH"]                       = 0x60744434d6339a6B27d73d9Eda62b6F66a0a04FA;
+        addr["MCD_FLASH_LEGACY"]                = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
         addr["PROXY_ACTIONS_CROPPER"]           = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
         addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
@@ -347,6 +351,10 @@ contract Addresses {
         addr["ARBITRUM_DAI_BRIDGE"]             = 0xD3B5b60020504bc3489D6949d545893982BA3011;
         addr["ARBITRUM_ESCROW"]                 = 0xA10c7CE4b876998858b1a9E12b10092229539400;
         addr["ARBITRUM_GOV_RELAY"]              = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
+        addr["STARKNET_ESCROW_MOM"]             = 0xc238E3D63DfD677Fa0FA9985576f0945C581A266;
+        addr["STARKNET_ESCROW"]                 = 0x0437465dfb5B79726e35F08559B0cBea55bb585C;
+        addr["STARKNET_DAI_BRIDGE"]             = 0x659a00c33263d9254Fed382dE81349426C795BB6;
+        addr["STARKNET_GOV_RELAY"]              = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
         addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
         addr["PIP_ADAI"]                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
         addr["MCD_JOIN_DIRECT_AAVEV2_DAI"]      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
