@@ -89,7 +89,7 @@ interface StarknetCoreLike {
 }
 
 interface DaiLike {
-    function allowance(address, address) public view returns (uint256)
+    function allowance(address, address) public view returns (uint256);
 }
 
 contract StarknetTests is DssSpellTestBase, ConfigStarknet {
