@@ -88,6 +88,10 @@ interface StarknetCoreLike {
     function stateRoot() external returns (uint256);
 }
 
+interface DaiLike {
+    function allowance(address, address) public view returns (uint256)
+}
+
 contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
     function testStarknet() public {
@@ -117,6 +121,12 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         StarknetEscrowLike escrow = StarknetEscrowLike(addr.addr("STARKNET_ESCROW"));
 
         assertEq(escrow.wards(addr.addr("MCD_PAUSE_PROXY")), 1);
+        assertEq(escrow.wards(addr.addr("MCD_ESM")), 1);
+        assertEq(escrow.wards(addr.addr("STARKNET_ESCROW_MOM")), 1);
+
+        DaiLike dai = DaiLike(addr.addr("MCD_DAI"));
+
+        assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), uint256(-1));
     }
 
     function checkStarknetDaiBridge() public {
@@ -129,12 +139,14 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(daiBridge.dai(), addr.addr("MCD_DAI"));
         assertEq(daiBridge.starkNet(), addr.addr("STARKNET_CORE"));
         assertEq(daiBridge.wards(addr.addr("MCD_PAUSE_PROXY")), 1);
+        assertEq(daiBridge.wards(addr.addr("MCD_ESM")), 1);
     }
 
     function checkStarknetGovRelay() public {
         StarknetGovRelayLike govRelay = StarknetGovRelayLike(addr.addr("STARKNET_GOV_RELAY"));
 
         assertEq(govRelay.wards(addr.addr("MCD_PAUSE_PROXY")), 1);
+        assertEq(govRelay.wards(addr.addr("MCD_ESM")), 1);
         assertEq(govRelay.starkNet(), addr.addr("STARKNET_CORE"));
     }
 
