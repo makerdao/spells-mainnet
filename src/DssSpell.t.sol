@@ -6,10 +6,6 @@ pragma solidity 0.6.12;
 import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
-interface StarknetLike {
-    function ceiling() external returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -480,6 +476,28 @@ contract DssSpellTest is DssSpellTestBase {
         vest.vest(23);
         // 20220608 exec: Ensure 2 years vest accumulated
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
+    }
+
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        DSTokenAbstract adai = DSTokenAbstract(join.adai());
+
+        assertEq(join.bar(), 2.75 * 10**27 / 100);
+
+        vote(address(spell));
+        DssSpell(spell).schedule();
+
+        // bar should now be 0
+        assertEq(join.bar(), 0);
+
+        // this should unwind the position
+        assertTrue(adai.balanceOf(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")) > 0);
+        join.exec();
+        assertEq(adai.balanceOf(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")), 0);
+
+        hevm.warp(DssSpell(spell).nextCastTime());
+        DssSpell(spell).cast();
+        assertTrue(spell.done());
     }
 
     function testMKRPayment() private {

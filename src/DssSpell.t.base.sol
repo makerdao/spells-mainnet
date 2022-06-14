@@ -34,6 +34,7 @@ interface DirectDepositLike is GemJoinAbstract {
     function tau() external view returns (uint256);
     function bar() external view returns (uint256);
     function king() external view returns (address);
+    function adai() external view returns (address);
 }
 
 interface FlapLike is FlapAbstract {
