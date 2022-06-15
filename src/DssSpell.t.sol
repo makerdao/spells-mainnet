@@ -12,6 +12,26 @@ interface StarknetLike {
 
 contract DssSpellTest is DssSpellTestBase {
 
+    function testUNIALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNI-A", "UNI-A Offboarding", 165, 900);
+    }
+
+    function testUNIV2DAIETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2DAIETH-A", "UNIV2DAIETH-A Offboarding", 120, 3100);
+    }
+
+    function testUNIV2WBTCETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2WBTCETH-A", "UNIV2WBTCETH-A Offboarding", 145, 5300);
+    }
+
+    function testUNIV2UNIETHALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2UNIETH-A", "UNIV2UNIETH-A Offboarding", 160, 700);
+    }
+
+    function testUNIV2WBTCDAIALerpOffboardings() public {
+        checkIlkLerpOffboarding("UNIV2WBTCDAI-A", "UNIV2WBTCDAI-A Offboarding", 120, 1000);
+    }
+
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
