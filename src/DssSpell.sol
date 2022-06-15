@@ -23,8 +23,6 @@ pragma solidity 0.6.12;
 // import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
-
 interface PauseAbstract {
     function delay() external view returns (uint256);
     function plot(address, bytes32, bytes calldata, uint256) external;
@@ -105,7 +103,7 @@ contract DssExec {
     }
 }
 
-contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
+contract DssSpellAction is DssAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -129,9 +127,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     }
 
     function actions() public override {
-        // ---------------------------------------------------------------------
-        // Includes changes from the DssSpellCollateralOnboardingAction
-        // onboardNewCollaterals();
+        // NOOP
     }
 }
 
