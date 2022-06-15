@@ -132,8 +132,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
-
-        // DEBATE: we could just add the MKR distributions for next week here.
     }
 }
 
