@@ -478,22 +478,46 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayment() public {
+    function testAAVEDirectBarChange() public {
+        DirectDepositLike join = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        DSTokenAbstract adai = DSTokenAbstract(join.adai());
+
+        assertEq(join.bar(), 2.75 * 10**27 / 100);
+
+        vote(address(spell));
+        DssSpell(spell).schedule();
+
+        // bar should now be 0
+        assertEq(join.bar(), 0);
+
+        // this should unwind the position
+        assertTrue(adai.balanceOf(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")) > 0);
+        join.exec();
+        assertEq(adai.balanceOf(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI")), 0);
+
+        hevm.warp(DssSpell(spell).nextCastTime());
+        DssSpell(spell).cast();
+        assertTrue(spell.done());
+    }
+
+    function testMKRPayment() private {
+        /*
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrDECO = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrRWF = gov.balanceOf(wallets.addr("RWF_WALLET"));
+        uint256 prevMkrSAS = gov.balanceOf(wallets.addr("SIDESTREAM_WALLET"));
+        uint256 prevMkrDUX = gov.balanceOf(wallets.addr("DUX_WALLET"));
 
-        uint256 amountDECO = 500 * WAD;
-        uint256 amountRWF  = 80 * WAD;
+        uint256 amountSAS = 243795300000000000000;
+        uint256 amountDUX = 355860000000000000000;
 
-        uint256 total = amountDECO + amountRWF;
+        uint256 total = amountSAS + amountDUX;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDECO + amountDECO);
-        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF + amountRWF);
+        assertEq(gov.balanceOf(address(pauseProxy)),               prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("SIDESTREAM_WALLET")), prevMkrSAS + amountSAS);
+        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrDUX + amountDUX);
+        */
     }
 }

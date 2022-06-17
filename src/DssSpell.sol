@@ -25,13 +25,23 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
 
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/428d97b75ec8bdb4f2b87e69dcc917ad750b8c76/governance/votes/Executive%20vote%20-%20June%208%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-06-15 MakerDAO Executive Spell | Hash: 0x0";
+        "2022-06-22 MakerDAO Executive Spell | Hash: 0x0";
+
+    // Math
+    uint256 constant WAD = 10**18;
+
+    address public constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address public constant RWF_WALLET  = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -47,6 +57,14 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralOnboardingAction
         // onboardNewCollaterals();
+
+        // transfer 500 MKR from treasury to DECO wallet
+        // https://vote.makerdao.com/polling/QmPPvUhN#vote-breakdown
+        GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 500 * WAD);
+
+        // transfer 80 MKR from treasury to RWF wallet
+        // https://vote.makerdao.com/polling/QmYNiuNE#vote-breakdown
+        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 80 * WAD);
     }
 }
 
