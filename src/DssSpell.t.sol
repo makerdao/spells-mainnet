@@ -478,24 +478,22 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayment() private {
-        /*
+    function testMKRPayment() public {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrSAS = gov.balanceOf(wallets.addr("SIDESTREAM_WALLET"));
-        uint256 prevMkrDUX = gov.balanceOf(wallets.addr("DUX_WALLET"));
+        uint256 prevMkrDECO = gov.balanceOf(wallets.addr("DECO_WALLET"));
+        uint256 prevMkrRWF = gov.balanceOf(wallets.addr("RWF_WALLET"));
 
-        uint256 amountSAS = 243795300000000000000;
-        uint256 amountDUX = 355860000000000000000;
+        uint256 amountDECO = 500 * WAD;
+        uint256 amountRWF  = 80 * WAD;
 
-        uint256 total = amountSAS + amountDUX;
+        uint256 total = amountDECO + amountRWF;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)),               prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("SIDESTREAM_WALLET")), prevMkrSAS + amountSAS);
-        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")),        prevMkrDUX + amountDUX);
-        */
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDECO + amountDECO);
+        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF + amountRWF);
     }
 }

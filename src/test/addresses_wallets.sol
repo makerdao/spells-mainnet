@@ -28,6 +28,7 @@ contract Wallets {
         addr["CES_WALLET"]                   = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
         addr["COM_WALLET"]                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
         addr["COM_EF_WALLET"]                = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
+        addr["DECO_WALLET"]                  = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
         addr["DIN_WALLET"]                   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
         addr["DUX_WALLET"]                   = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
         addr["EVENTS_WALLET"]                = 0x3D274fbAc29C92D2F624483495C0113B44dBE7d2;
