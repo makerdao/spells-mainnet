@@ -33,7 +33,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/428d97b75ec8bdb4f2b87e69dcc917ad750b8c76/governance/votes/Executive%20vote%20-%20June%208%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
     string public constant override description =
         "2022-06-22 MakerDAO Executive Spell | Hash: 0x0";
 
