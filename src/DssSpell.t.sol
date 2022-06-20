@@ -484,7 +484,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrRWF = gov.balanceOf(wallets.addr("RWF_WALLET"));
 
         uint256 amountDECO = 500 * WAD;
-        uint256 amountRWF  = 80 * WAD;
+        uint256 amountRWF  = 152 * WAD;
 
         uint256 total = amountDECO + amountRWF;
 

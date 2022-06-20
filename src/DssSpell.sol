@@ -67,9 +67,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
         // https://vote.makerdao.com/polling/QmPPvUhN#vote-breakdown
         GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 500 * WAD);
 
-        // transfer 80 MKR from treasury to RWF wallet
+        // transfer 152 MKR from treasury to RWF wallet
         // https://vote.makerdao.com/polling/QmYNiuNE#vote-breakdown
-        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 80 * WAD);
+        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 152 * WAD);
     }
 }
 
