@@ -26,6 +26,7 @@ interface DssExecSpellLike {
     function eta() external view returns (uint256);
     function cast() external;
     function nextCastTime() external returns (uint256);
+    function adai() external view returns (address);
 }
 
 interface DirectDepositLike is GemJoinAbstract {
