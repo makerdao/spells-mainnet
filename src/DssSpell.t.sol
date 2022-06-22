@@ -12,23 +12,23 @@ interface StarknetLike {
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function testUNIALerpOffboardings() public {
+    function testUNIALerpOffboarding() public {
         checkIlkLerpOffboarding("UNI-A", "UNI-A Offboarding", 165, 900);
     }
 
-    function testUNIV2DAIETHALerpOffboardings() public {
+    function testUNIV2DAIETHALerpOffboarding() public {
         checkIlkLerpOffboarding("UNIV2DAIETH-A", "UNIV2DAIETH-A Offboarding", 120, 3100);
     }
 
-    function testUNIV2WBTCETHALerpOffboardings() public {
+    function testUNIV2WBTCETHALerpOffboarding() public {
         checkIlkLerpOffboarding("UNIV2WBTCETH-A", "UNIV2WBTCETH-A Offboarding", 145, 5300);
     }
 
-    function testUNIV2UNIETHALerpOffboardings() public {
+    function testUNIV2UNIETHALerpOffboarding() public {
         checkIlkLerpOffboarding("UNIV2UNIETH-A", "UNIV2UNIETH-A Offboarding", 160, 700);
     }
 
-    function testUNIV2WBTCDAIALerpOffboardings() public {
+    function testUNIV2WBTCDAIALerpOffboarding() public {
         checkIlkLerpOffboarding("UNIV2WBTCDAI-A", "UNIV2WBTCDAI-A Offboarding", 120, 1000);
     }
 
