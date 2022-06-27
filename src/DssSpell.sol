@@ -1,7 +1,5 @@
-// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2021 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//
-// Copyright (C) 2021-2022 Dai Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -33,15 +31,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/4c3f35adedac225ca819bad39ac805cd9c804a70/governance/votes/Executive%20vote%20-%20June%2022%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20June%2029%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-06-22 MakerDAO Executive Spell | Hash: 0xd573c8fc38d6938bcb067408389583c68a531ab63b8e37f2fcea9e516bf7f1b9";
+        "2022-06-29 MakerDAO Executive Spell | Hash: TODO";
 
     // Math
     uint256 constant WAD = 10**18;
-
-    address public constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-    address public constant RWF_WALLET  = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -53,23 +48,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
     //
 
-    // Turn office hours off
     function officeHours() public override returns (bool) {
-        return false;
+        return true;
     }
 
     function actions() public override {
-        // ---------------------------------------------------------------------
-        // Includes changes from the DssSpellCollateralOnboardingAction
-        // onboardNewCollaterals();
-
-        // transfer 500 MKR from treasury to DECO wallet
-        // https://vote.makerdao.com/polling/QmPPvUhN#vote-breakdown
-        GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 500 * WAD);
-
-        // transfer 152 MKR from treasury to RWF wallet
-        // https://vote.makerdao.com/polling/QmYNiuNE#vote-breakdown
-        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 152 * WAD);
     }
 }
 

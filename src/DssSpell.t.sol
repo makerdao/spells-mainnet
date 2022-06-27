@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2021 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 pragma solidity 0.6.12;
@@ -478,7 +478,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayment() public {
+    function testMKRPayment() private {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrDECO = gov.balanceOf(wallets.addr("DECO_WALLET"));
         uint256 prevMkrRWF = gov.balanceOf(wallets.addr("RWF_WALLET"));
