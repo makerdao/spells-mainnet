@@ -39,6 +39,7 @@ contract Wallets {
         addr["ORA_GAS_EMERGENCY"]            = 0x1A5B692029b157df517b7d21a32c8490b8692b0f;
         addr["PE_WALLET"]                    = 0xe2c16c308b843eD02B09156388Cb240cEd58C01c;
         addr["RISK_WALLET"]                  = 0xb386Bc4e8bAE87c3F67ae94Da36F385C100a370a;
+        addr["RISK_WALLET_VEST"]             = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
         addr["RWF_WALLET"]                   = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
         addr["SES_WALLET"]                   = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
         addr["SF_WALLET"]                    = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;

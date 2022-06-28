@@ -507,22 +507,19 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayment() private {
+    function testMKRPayments() public {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrDECO = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrRWF = gov.balanceOf(wallets.addr("RWF_WALLET"));
+        uint256 prevMkrRisk = gov.balanceOf(wallets.addr("RISK_WALLET"));
 
-        uint256 amountDECO = 500 * WAD;
-        uint256 amountRWF  = 152 * WAD;
+        uint256 amountRisk  = 175 * WAD;
 
-        uint256 total = amountDECO + amountRWF;
+        uint256 total = amountRisk;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDECO + amountDECO);
-        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF + amountRWF);
+        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
     }
 }

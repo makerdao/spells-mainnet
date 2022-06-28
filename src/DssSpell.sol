@@ -35,6 +35,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     string public constant override description =
         "2022-06-29 MakerDAO Executive Spell | Hash: 0xb2521ac39ef97ccbb20120431edefa51eb424149ed4a9f7d2840a92920a23420";
 
+    address constant RISK_WALLET_VEST = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+
     // Math
     uint256 constant WAD = 10**18;
 
@@ -53,6 +55,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     }
 
     function actions() public override {
+        // Risk Core Unit MKR Vesting Transfer
+        // https://github.com/makerdao/community/blob/9e4a28dd9961cc802f37493fb9176674fd746dff/governance/votes/Executive%20vote%20-%20June%2029%2C%202022.md#rick-core-unit-mkr-vesting-transfer
+        GemLike(DssExecLib.mkr()).transfer(RISK_WALLET_VEST, 175 * WAD);
+
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
         // onboardCollaterals();
