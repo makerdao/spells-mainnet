@@ -509,7 +509,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testMKRPayments() public {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrRisk = gov.balanceOf(wallets.addr("RISK_WALLET"));
+        uint256 prevMkrRisk = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
 
         uint256 amountRisk  = 175 * WAD;
 
