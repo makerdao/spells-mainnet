@@ -67,7 +67,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // Housekeeping - add Starknet core contract to Chainlog
         // Contract address taken from https://github.com/starknet-community-libs/starknet-addresses
         DssExecLib.setChangelogAddress("STARKNET_CORE", 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4);
-        DssExecLib.setChangelogVersion("1.13.3");
+        DssExecLib.setChangelogVersion("1.13.2");
 
     }
 }

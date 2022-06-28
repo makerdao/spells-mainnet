@@ -353,6 +353,7 @@ contract Addresses {
         addr["STARKNET_ESCROW"]                 = 0x0437465dfb5B79726e35F08559B0cBea55bb585C;
         addr["STARKNET_DAI_BRIDGE"]             = 0x659a00c33263d9254Fed382dE81349426C795BB6;
         addr["STARKNET_GOV_RELAY"]              = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
+        addr["STARKNET_CORE"]                   = 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4;
         addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
         addr["PIP_ADAI"]                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
         addr["MCD_JOIN_DIRECT_AAVEV2_DAI"]      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
@@ -368,6 +369,5 @@ contract Addresses {
         addr["MCD_JOIN_CRVV1ETHSTETH_A"]        = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
         addr["MCD_CLIP_CRVV1ETHSTETH_A"]        = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
         addr["MCD_CLIP_CALC_CRVV1ETHSTETH_A"]   = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
-        addr["STARKNET_CORE"]                   = 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4;
     }
 }
