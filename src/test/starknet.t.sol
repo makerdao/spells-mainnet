@@ -34,7 +34,7 @@ contract ConfigStarknet {
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
             dai_bridge_isOpen:         1,        // 1 open, 0 closed
             dai_bridge_ceiling:        200_000,  // Whole Dai Units
-            dai_bridge_maxDeposit:     5         // Whole Dai Units
+            dai_bridge_maxDeposit:     50        // Whole Dai Units
         });
     }
 }
@@ -67,6 +67,7 @@ interface StarknetGovRelayLike {
 
 interface StarknetCoreLike {
     function implementation() external returns (address);
+    function isNotFinalized() external returns (bool);
 }
 
 interface DaiLike {
@@ -137,6 +138,11 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
     function checkStarknetCore() public {
         StarknetCoreLike core = StarknetCoreLike(addr.addr("STARKNET_CORE"));
 
-        assertEq(core.implementation(), starknetValues.core_implementation, "StarknetTest/core-implementation");
+        // Starknet Core is currently out of scope.
+        // It is updating frequently and the implementation is not ready to be
+        //    brought into our simulation tests yet.
+        //assertEq(core.implementation(), starknetValues.core_implementation, "StarknetTest/core-implementation");
+
+        assertTrue(core.isNotFinalized());
     }
 }
