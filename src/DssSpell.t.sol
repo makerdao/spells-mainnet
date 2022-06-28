@@ -1,5 +1,18 @@
 // SPDX-FileCopyrightText: © 2021 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
 
@@ -7,6 +20,22 @@ import "./DssSpell.t.base.sol";
 import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
+
+    function testUNIALerpOffboarding() public {
+        checkIlkLerpOffboarding("UNI-A", "UNI-A Offboarding", 165, 1_300);
+    }
+
+    function testUNIV2DAIETHALerpOffboarding() public {
+        checkIlkLerpOffboarding("UNIV2DAIETH-A", "UNIV2DAIETH-A Offboarding", 120, 2_000);
+    }
+
+    function testUNIV2WBTCETHALerpOffboarding() public {
+        checkIlkLerpOffboarding("UNIV2WBTCETH-A", "UNIV2WBTCETH-A Offboarding", 145, 2_400);
+    }
+
+    function testUNIV2WBTCDAIALerpOffboarding() public {
+        checkIlkLerpOffboarding("UNIV2WBTCDAI-A", "UNIV2WBTCDAI-A Offboarding", 120, 800);
+    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();

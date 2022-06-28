@@ -21,13 +21,13 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import { DssSpellCollateralOnboardingAction } from "./DssSpellCollateralOnboarding.sol";
+import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
 }
 
-contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
+contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -53,6 +53,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralOnboardingAction {
     }
 
     function actions() public override {
+        // ---------------------------------------------------------------------
+        // Includes changes from the DssSpellCollateralAction
+        // onboardCollaterals();
+        offboardCollaterals();
+
+        // Housekeeping - add Starknet core contract to Chainlog
+        // Contract address taken from https://github.com/starknet-community-libs/starknet-addresses
+        DssExecLib.setChangelogAddress("STARKNET_CORE", 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4);
+        DssExecLib.setChangelogVersion("1.13.3");
+
     }
 }
 

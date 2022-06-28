@@ -1,7 +1,5 @@
-// SPDX-FileCopyrightText: © 2021-2022 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2021 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//
-// Copyright (C) 2021-2022 Dai Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -370,5 +368,6 @@ contract Addresses {
         addr["MCD_JOIN_CRVV1ETHSTETH_A"]        = 0x82D8bfDB61404C796385f251654F6d7e92092b5D;
         addr["MCD_CLIP_CRVV1ETHSTETH_A"]        = 0x1926862F899410BfC19FeFb8A3C69C7Aed22463a;
         addr["MCD_CLIP_CALC_CRVV1ETHSTETH_A"]   = 0x8a4780acABadcae1a297b2eAe5DeEbd7d50DEeB8;
+        addr["STARKNET_CORE"]                   = 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4;
     }
 }
