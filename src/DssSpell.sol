@@ -61,7 +61,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
-        // onboardCollaterals();
+        // onboardNewCollaterals();
         offboardCollaterals();
 
         // Housekeeping - add Starknet core contract to Chainlog
