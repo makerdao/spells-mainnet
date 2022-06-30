@@ -21,22 +21,6 @@ import "dss-interfaces/Interfaces.sol";
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function testUNIALerpOffboarding() public {
-        checkIlkLerpOffboarding("UNI-A", "UNI-A Offboarding", 165, 1_300);
-    }
-
-    function testUNIV2DAIETHALerpOffboarding() public {
-        checkIlkLerpOffboarding("UNIV2DAIETH-A", "UNIV2DAIETH-A Offboarding", 120, 2_000);
-    }
-
-    function testUNIV2WBTCETHALerpOffboarding() public {
-        checkIlkLerpOffboarding("UNIV2WBTCETH-A", "UNIV2WBTCETH-A Offboarding", 145, 2_400);
-    }
-
-    function testUNIV2WBTCDAIALerpOffboarding() public {
-        checkIlkLerpOffboarding("UNIV2WBTCDAI-A", "UNIV2WBTCDAI-A Offboarding", 120, 800);
-    }
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -151,7 +135,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -160,8 +144,6 @@ contract DssSpellTest is DssSpellTestBase {
         // checkChainlogKey("CONTRACT_KEY");
         // checkChainlogVersion("X.XX.X");
 
-        checkChainlogKey("STARKNET_CORE");
-        checkChainlogVersion("1.13.2");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -510,7 +492,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayments() public {
+    function testMKRPayments() private {
+
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrRisk = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
 
