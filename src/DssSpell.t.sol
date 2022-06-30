@@ -56,15 +56,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make public to use
+    function testPayments() public { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[12] memory payees = [
-            Payee(wallets.addr("SH_MULTISIG"),    230_000),
+        Payee[1] memory payees = [ // TODO: add delegates data once in the sheet
+            Payee(wallets.addr("GRO_WALLET"),    648_133) /* ,
             Payee(wallets.addr("FLIPFLOPFLAP"),    12_000),
             Payee(wallets.addr("ULTRASCHUPPI"),    12_000),
             Payee(wallets.addr("FEEDBLACKLOOPS"),  12_000),
@@ -75,7 +75,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("GFXLABS"),           6607),
             Payee(wallets.addr("DOO"),                622),
             Payee(wallets.addr("FLIPSIDE"),           270),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),     265)
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     265) */
         ];
 
         uint256 prevBalance;
@@ -412,43 +412,83 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() private {
+    function testVestDAI() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-        address SH_MULTISIG = wallets.addr("SH_MULTISIG");
 
-        // Wed 01 Jun 2022 12:00:00 AM UTC
-        uint256 JUN_01_2022 = 1654041600;
-        // Wed 15 Mar 2023 12:00:00 AM UTC
-        uint256 MAR_15_2023 = 1678838400;
+        address SF_WALLET              = wallets.addr("SF_WALLET");
+        address GRO_WALLET             = wallets.addr("GRO_WALLET");
+        address KEEP3R_VEST_STREAMING = wallets.addr("KEEP3R_VEST_STREAMING");
 
-        assertEq(vest.ids(), 4);
+        // Friday, 1 July 2022 00:00:00
+        uint256 JUL_01_2022 = 1656633600;
+        // Tuesday, 31 January 2023 00:00:00
+        uint256 JAN_31_2023 = 1675123200;
+        // Friday, 30 June 2023 00:00:00
+        uint256 JUN_30_2023 = 1688083200;
+        // Saturday, 1 July 2023 00:00:00
+        uint256 JUL_01_2023 = 1688169600;
+
+        assertEq(vest.ids(), 5);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 5);
+        assertEq(vest.ids(), 8);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertEq(vest.usr(5), SH_MULTISIG);
-        assertEq(vest.bgn(5), JUN_01_2022);
-        assertEq(vest.clf(5), JUN_01_2022);
-        assertEq(vest.fin(5), MAR_15_2023);
-        assertEq(vest.mgr(5), address(0));
-        assertEq(vest.res(5), 1);
-        assertEq(vest.tot(5), 540000 * WAD);
-        assertEq(vest.rxd(5), 0);
+        assertEq(vest.usr(6), SF_WALLET);
+        assertEq(vest.bgn(6), JUL_01_2022);
+        assertEq(vest.clf(6), JUL_01_2022);
+        assertEq(vest.fin(6), JUL_01_2023);
+        assertEq(vest.fin(6), JUL_01_2022 + 365 days);
+        assertEq(vest.mgr(6), address(0));
+        assertEq(vest.res(6), 1);
+        assertEq(vest.tot(6), 989004 * WAD);
+        assertEq(vest.rxd(6), 0);
 
-        hevm.warp(JUN_01_2022 + 365 days);
-        uint256 prevBalance = dai.balanceOf(SH_MULTISIG);
+        assertEq(vest.usr(7), GRO_WALLET);
+        assertEq(vest.bgn(7), JUL_01_2022);
+        assertEq(vest.clf(7), JUL_01_2022);
+        assertEq(vest.fin(7), JUN_30_2023);
+        assertEq(vest.fin(7), JUL_01_2022 + 364 days);
+        assertEq(vest.mgr(7), address(0));
+        assertEq(vest.res(7), 1);
+        assertEq(vest.tot(7), 2913994 * WAD);
+        assertEq(vest.rxd(7), 0);
+
+        assertEq(vest.usr(8), KEEP3R_VEST_STREAMING);
+        assertEq(vest.bgn(8), JUL_01_2022);
+        assertEq(vest.clf(8), JUL_01_2022);
+        assertEq(vest.fin(8), JAN_31_2023);
+        assertEq(vest.fin(8), JUL_01_2022 + 214 days);
+        assertEq(vest.mgr(8), address(0));
+        assertEq(vest.res(8), 1);
+        assertEq(vest.tot(8), 215000 * WAD);
+        assertEq(vest.rxd(8), 0);
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
-        vest.unrestrict(5);
+        vest.unrestrict(6);
+        vest.unrestrict(7);
+        vest.unrestrict(8);
 
-        assertTrue(tryVest(address(vest), 5));
-        assertEq(dai.balanceOf(SH_MULTISIG), prevBalance + 540000 * WAD);
+        uint256 prevBalance;
+        hevm.warp(JUL_01_2022 + 365 days);
+        prevBalance = dai.balanceOf(SF_WALLET);
+        assertTrue(tryVest(address(vest), 6));
+        assertEq(dai.balanceOf(SF_WALLET), prevBalance + 989004 * WAD);
+
+        hevm.warp(JUL_01_2022 + 364 days);
+        prevBalance = dai.balanceOf(GRO_WALLET);
+        assertTrue(tryVest(address(vest), 7));
+        assertEq(dai.balanceOf(GRO_WALLET), prevBalance + 2913994 * WAD);
+
+        hevm.warp(JUL_01_2022 + 214 days);
+        prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);
+        assertTrue(tryVest(address(vest), 8));
+        assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
 
     function testVestMKR() private {
