@@ -63,19 +63,22 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [ // TODO: add delegates data once in the sheet
-            Payee(wallets.addr("GRO_WALLET"),    648_133) /* ,
-            Payee(wallets.addr("FLIPFLOPFLAP"),    12_000),
-            Payee(wallets.addr("ULTRASCHUPPI"),    12_000),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),  12_000),
-            Payee(wallets.addr("MAKERMAN"),        11_025),
-            Payee(wallets.addr("ACREINVEST"),        9372),
-            Payee(wallets.addr("MONETSUPPLY"),       6275),
-            Payee(wallets.addr("JUSTINCASE"),        7626),
-            Payee(wallets.addr("GFXLABS"),           6607),
-            Payee(wallets.addr("DOO"),                622),
-            Payee(wallets.addr("FLIPSIDE"),           270),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),     265) */
+        Payee[15] memory payees = [
+            Payee(wallets.addr("GRO_WALLET"),       648_133),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),    11_573),
+            Payee(wallets.addr("FLIPFLOPFLAP"),      11_528),
+            Payee(wallets.addr("ULTRASCHUPPI"),      11_292),
+            Payee(wallets.addr("MAKERMAN"),           9_366),
+            Payee(wallets.addr("ACREINVEST"),         8_813),
+            Payee(wallets.addr("JUSTINCASE"),         8_158),
+            Payee(wallets.addr("GFXLABS"),            6_679),
+            Payee(wallets.addr("DOO"),                5_075),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     3_795),
+            Payee(wallets.addr("FLIPSIDE"),           3_186),
+            Payee(wallets.addr("CHRISBLEC"),          2_739),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 2_150),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),   704),
+            Payee(wallets.addr("GOVERNANCEHOUSE"),      127)
         ];
 
         uint256 prevBalance;
