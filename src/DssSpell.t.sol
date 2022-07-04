@@ -458,7 +458,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(7), JUL_01_2022 + 364 days);
         assertEq(vest.mgr(7), address(0));
         assertEq(vest.res(7), 1);
-        assertEq(vest.tot(7), 2913994 * WAD);
+        assertEq(vest.tot(7), 2913995 * WAD);
         assertEq(vest.rxd(7), 0);
 
         assertEq(vest.usr(8), KEEP3R_VEST_STREAMING);
@@ -486,7 +486,7 @@ contract DssSpellTest is DssSpellTestBase {
         hevm.warp(JUL_01_2022 + 364 days);
         prevBalance = dai.balanceOf(GRO_WALLET);
         assertTrue(tryVest(address(vest), 7));
-        assertEq(dai.balanceOf(GRO_WALLET), prevBalance + 2913994 * WAD);
+        assertEq(dai.balanceOf(GRO_WALLET), prevBalance + 2913995 * WAD);
 
         hevm.warp(JUL_01_2022 + 214 days);
         prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);

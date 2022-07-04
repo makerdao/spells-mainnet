@@ -107,7 +107,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         MCD_VEST_DAI.restrict(
             MCD_VEST_DAI.create(
                 GRO_001_WALLET,
-                2_913_994 * WAD,
+                2_913_995 * WAD,
                 JUL_01_2022,
                 JUN_30_2023 - JUL_01_2022,
                 0,
@@ -117,7 +117,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // Core Unit Budget Transfer
         // GRO-001 - 648,133.59 DAI - 0x7800C137A645c07132886539217ce192b9F0528e
-        DssExecLib.sendPaymentFromSurplusBuffer(GRO_001_WALLET, 648_133);
+        DssExecLib.sendPaymentFromSurplusBuffer(GRO_001_WALLET, 648_134);
 
         // Keep3r Network Stream
         // Keep3r Network | 2022-07-01 to 2023-01-31 | 215,000 DAI | 0xc6A048550C9553F8Ac20fbdeB06f114c27ECcabb
