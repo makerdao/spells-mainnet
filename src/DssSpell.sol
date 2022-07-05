@@ -32,9 +32,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/TODO -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3f4ec88e5bd6220123e931110784d3b6fee63829/governance/votes/Executive%20vote%20-%20July%2006,%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-07-06 MakerDAO Executive Spell | Hash: TODO";
+        "2022-07-06 MakerDAO Executive Spell | Hash: 0xbfd59d586d0af2a9d9ea835d09e6b8d2c01b30f5c2ac607592662075f23e72bb";
 
     DssVestLike immutable MCD_VEST_DAI = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
 
