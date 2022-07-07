@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-#!/usr/bin/env bash
+set -e
+
+[[ "$ETH_RPC_URL" ]] || { echo "Please set a ETH_RPC_URL"; exit 1; }
+
+[[ "$1" =~ 0x* ]] || { echo "Please specify the transaction to inspect (e.g. tx=0x<txhash>)"; exit 1; }
 
 for ARGUMENT in "$@"
 do
