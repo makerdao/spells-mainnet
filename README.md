@@ -3,6 +3,7 @@
 
 Staging repo for MakerDAO weekly executive spells.
 
+## Instructions
 
 ### Getting Started
 
@@ -11,18 +12,12 @@ $ git clone git@github.com:makerdao/spells-mainnet.git
 $ dapp update
 ```
 
-### Build
-
-```bash
-$ make
-```
-
 ### Adding Collaterals to the System
 
 If the weekly executive needs to onboard a new collateral:
 
 1. Update the `onboardNewCollaterals()` function in `DssSpellCollateral.sol`
-2. Update the values in `src/tests/config.sol`
+2. Update the values in `src/test/config.sol`
 3. Add `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
 ### Removing Collaterals from the System
@@ -32,6 +27,12 @@ If the weekly executive needs to offboard collaterals:
 1. Update the `offboardCollaterals()` function in `DssSpellCollateral.sol`
 2. Update the values in `src/test/config.sol`
 3. Add `offboardCollaterals();` in the `actions()` function in `DssSpellAction`
+
+### Build
+
+```bash
+$ make
+```
 
 ### Test (DappTools without Optimizations)
 
@@ -101,4 +102,4 @@ The process of verifying code on etherscan is a little bit more involved because
    2. Comment out `DssExecLib.addNewCollateral` method.
 3. Go to etherscan and verify source.
    1. Add library: `DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4`
-   2. Ensure optimizer is on and optimize runs = 1
+   2. Ensure optimizer is off and optimize runs = 200
