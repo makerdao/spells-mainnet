@@ -21,6 +21,9 @@ done
 [[ -z "$OPTIMIZER" ]] && OPTIMIZER=0             # Default to running with optimize=0
 [[ -z "$OPTIMIZER_RUNS" ]] && OPTIMIZER_RUNS=200 # Default to running with optimizer-runs=200
 
+export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
+export DAPP_BUILD_OPTIMIZE_RUNS="$OPTIMIZER_RUNS"
+
 DSS_EXEC_LIB=$(< DssExecLib.address)
 echo "Using DssExecLib at: $DSS_EXEC_LIB"
 export DAPP_LIBRARIES=" lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$DSS_EXEC_LIB"
