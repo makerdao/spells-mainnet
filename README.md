@@ -25,6 +25,14 @@ If the weekly executive needs to onboard a new collateral:
 2. Update the values in `src/tests/config.sol`
 3. Add `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
+### Removing Collaterals from the System
+
+If the weekly executive needs to offboard collaterals:
+
+1. Update the `offboardCollaterals()` function in `DssSpellCollateral.sol`
+2. Update the values in `src/test/config.sol`
+3. Add `offboardCollaterals();` in the `actions()` function in `DssSpellAction`
+
 ### Test (DappTools without Optimizations)
 
 Set `ETH_RPC_URL` to a Mainnet node.
