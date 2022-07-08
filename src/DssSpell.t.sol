@@ -56,7 +56,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to use
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -415,7 +415,7 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() public {
+    function testVestDAI() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         address SF_WALLET              = wallets.addr("SF_WALLET");

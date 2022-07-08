@@ -98,9 +98,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xC17f2C69aE2E66FD87367E3260412EEfF637F70E),        // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1657043538,        // use get-created-timestamp.sh if deployed
-            previous_spell:                 address(0xD67A415a55A11C128a04fEd4B9C94cF61A633e7f),        // supply if there is a need to test prior to its cast() function being called on-chain.
+            previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,             // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
@@ -263,7 +263,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          100,
+            pct:          0,
             mat:          10100,
             liqType:      "clip",
             liqOn:        false,
@@ -563,7 +563,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          100,
+            pct:          0,
             mat:          10100,
             liqType:      "clip",
             liqOn:        false,
@@ -648,7 +648,7 @@ contract Config {
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
+            aL_line:      25 * MILLION,
             aL_gap:       7 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -708,7 +708,7 @@ contract Config {
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
+            aL_line:      25 * MILLION,
             aL_gap:       7 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -978,12 +978,12 @@ contract Config {
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      250 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_line:      300 * MILLION,
+            aL_gap:       20 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          0,
+            pct:          1,
             mat:          10200,
             liqType:      "clip",
             liqOn:        false,
@@ -1368,8 +1368,8 @@ contract Config {
         });
         afterSpell.collaterals["MATIC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      35 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_line:      20 * MILLION,
+            aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
@@ -1433,7 +1433,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          0,
+            pct:          1,
             mat:          10200,
             liqType:      "clip",
             liqOn:        false,
@@ -1458,12 +1458,12 @@ contract Config {
         });
         afterSpell.collaterals["WSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      200 * MILLION,
+            aL_line:      150 * MILLION,
             aL_gap:       30 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          225,
+            pct:          250,
             mat:          16000,
             liqType:      "clip",
             liqOn:        true,
@@ -1488,7 +1488,7 @@ contract Config {
         });
         afterSpell.collaterals["WSTETH-B"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      150 * MILLION,
+            aL_line:      100 * MILLION,
             aL_gap:       30 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
