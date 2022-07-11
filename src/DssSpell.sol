@@ -40,7 +40,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
     //
     // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmPgPVrVxDCGyNR5rGp9JC5AUxppLzUAqvncRJDcxQnX1u
+    //    https://ipfs.io/ipfs/QmX2QMoM1SZq2XMoTbMak8pZP86Y2icpgPAKDjQg4r4YHn
     //
     uint256 constant ZERO_PCT_RATE     = 1000000000000000000000000000;
     uint256 constant ONE_BPS_RATE      = 1000000000003170820659990704;
