@@ -9,21 +9,20 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
 
     case "$KEY" in
-            match)      MATCH="$VALUE" ;;
-            block)      BLOCK="$VALUE" ;;
-            optimizer)  OPTIMIZER="$VALUE" ;;
+            match)           MATCH="$VALUE" ;;
+            block)           BLOCK="$VALUE" ;;
+            optimizer)       OPTIMIZER="$VALUE" ;;
+            optimizer-runs)  OPTIMIZER_RUNS="$VALUE" ;;
             *)
     esac
 done
 
-if [[ -z "$OPTIMIZER" ]]; then
-  # Default to running with optimize=1
-  OPTIMIZER=1
-fi
-
 # 2022-01-28 Disabled optimizer on due to engineering costs
-# export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
-# export DAPP_BUILD_OPTIMIZE_RUNS=1
+[[ -z "$OPTIMIZER" ]] && OPTIMIZER=0             # Default to running with optimize=0
+[[ -z "$OPTIMIZER_RUNS" ]] && OPTIMIZER_RUNS=200 # Default to running with optimizer-runs=200
+
+export DAPP_BUILD_OPTIMIZE="$OPTIMIZER"
+export DAPP_BUILD_OPTIMIZE_RUNS="$OPTIMIZER_RUNS"
 
 DSS_EXEC_LIB=$(< DssExecLib.address)
 echo "Using DssExecLib at: $DSS_EXEC_LIB"

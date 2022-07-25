@@ -3,33 +3,42 @@
 
 Staging repo for MakerDAO weekly executive spells.
 
+## Instructions
 
 ### Getting Started
 
-```
+```bash
 $ git clone git@github.com:makerdao/spells-mainnet.git
 $ dapp update
-```
-
-### Build
-
-```
-$ make
 ```
 
 ### Adding Collaterals to the System
 
 If the weekly executive needs to onboard a new collateral:
 
-1. Update the `onboardNewCollaterals()` function in `DssSpellCollateralOnboarding.sol`.
-2. Update the values in `src/tests/collaterals.sol`
-3. uncomment the `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
+1. Update the `onboardNewCollaterals()` function in `DssSpellCollateral.sol`
+2. Update the values in `src/test/config.sol`
+3. Add `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
-### Test (DappTools with Optimizations)
+### Removing Collaterals from the System
+
+If the weekly executive needs to offboard collaterals:
+
+1. Update the `offboardCollaterals()` function in `DssSpellCollateral.sol`
+2. Update the values in `src/test/config.sol`
+3. Add `offboardCollaterals();` in the `actions()` function in `DssSpellAction`
+
+### Build
+
+```bash
+$ make
+```
+
+### Test (DappTools without Optimizations)
 
 Set `ETH_RPC_URL` to a Mainnet node.
 
-```
+```bash
 $ export ETH_RPC_URL=<Mainnet URL>
 $ make test
 ```
@@ -43,7 +52,7 @@ $ make test
 #### Operation
 Set `ETH_RPC_URL` to a Mainnet node.
 
-```
+```bash
 $ export ETH_RPC_URL=<Mainnet URL>
 $ make test-forge
 ```
@@ -52,7 +61,7 @@ $ make test-forge
 
 Set `ETH_RPC_URL` to a Mainnet node and ensure `ETH_GAS` is set to a high enough number to deploy the contract.
 
-```
+```bash
 $ export ETH_RPC_URL=<Mainnet URL>
 $ export ETH_GAS=5000000
 $ export ETH_GAS_PRICE=$(seth --to-wei 100 "gwei")
@@ -62,7 +71,7 @@ $ make deploy
 A few helpful tips to estimate gas.  You can use the following to get a
 gas estimate for the deploy.
 
-```
+```bash
 make all
 make estimate
 ```
@@ -70,7 +79,7 @@ make estimate
 Once you have that, add another million gas as a buffer against
 out-of-gas errors.  Set ETH_GAS to this value.
 
-```
+```bash
 export ETH_GAS="$((<value from previous step> + 0))"
 export ETH_GAS=$(bc <<< "$ETH_GAS + 1000000")
 ```
@@ -79,7 +88,7 @@ You should also check current gas prices on your favorite site
 (e.g. https://ethgasstation.info/) and put that gwei value in the
 ETH_GAS_PRICE line.
 
-```
+```bash
 export ETH_GAS_PRICE=$(seth --to-wei 420 "gwei")
 ```
 
@@ -93,4 +102,4 @@ The process of verifying code on etherscan is a little bit more involved because
    2. Comment out `DssExecLib.addNewCollateral` method.
 3. Go to etherscan and verify source.
    1. Add library: `DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4`
-   2. Ensure optimizer is on and optimize runs = 1
+   2. Ensure optimizer is off and optimize runs = 200

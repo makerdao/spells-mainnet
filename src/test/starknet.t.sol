@@ -16,7 +16,6 @@
 pragma solidity 0.6.12;
 
 import "../DssSpell.t.base.sol";
-import "dss-interfaces/Interfaces.sol";
 
 contract ConfigStarknet {
 
