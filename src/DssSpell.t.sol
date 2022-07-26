@@ -179,6 +179,14 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogKey("RWA008_A_INPUT_CONDUIT");
         checkChainlogKey("PIP_RWA008");
 
+        // RWA009
+        checkChainlogKey("RWA009_A_JAR");
+        checkChainlogKey("RWA009");
+        checkChainlogKey("MCD_JOIN_RWA009_A");
+        checkChainlogKey("RWA009_A_URN");
+        checkChainlogKey("RWA009_A_OUTPUT_CONDUIT");
+        checkChainlogKey("PIP_RWA009");
+
         // RWA TOKEN FAB
         checkChainlogKey("RWA_TOKEN_FAB");
 
@@ -201,6 +209,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.pip("RWA008-A"),    pipRwa008);
         assertEq(reg.name("RWA008-A"),   "RWA008-A: SG Forge OFH");
         assertEq(reg.symbol("RWA008-A"), "RWA008");
+
+        // RWA009
+        (, address pipRwa009,,) = oracle.ilks("RWA009-A");
+
+        assertEq(reg.pos("RWA009-A"),    51);
+        assertEq(reg.join("RWA009-A"),   addr.addr("MCD_JOIN_RWA009_A"));
+        assertEq(reg.gem("RWA009-A"),    addr.addr("RWA009"));
+        assertEq(reg.dec("RWA009-A"),    GemAbstract(addr.addr("RWA009")).decimals());
+        assertEq(reg.class("RWA009-A"),  3);
+        assertEq(reg.pip("RWA009-A"),    pipRwa009);
+        assertEq(reg.name("RWA009-A"),   "RWA009-A: H. V. Bank");
+        assertEq(reg.symbol("RWA009-A"), GemAbstract(addr.addr("RWA009")).symbol());
     }
 
     function testFailWrongDay() public {
@@ -600,6 +620,11 @@ contract DssSpellTest is DssSpellTestBase {
     RwaInputConduitLike  rwaconduitin_008    = RwaInputConduitLike(addr.addr("RWA008_A_INPUT_CONDUIT"));
     RwaOutputConduitLike rwaconduitout_008   = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
 
+    DSTokenAbstract      rwagem_009          = DSTokenAbstract(addr.addr("RWA009"));
+    GemJoinAbstract      rwajoin_009         = GemJoinAbstract(addr.addr("MCD_JOIN_RWA009_A"));
+    RwaUrnLike           rwaurn_009          = RwaUrnLike(addr.addr("RWA009_A_URN"));
+    address              RWA009_GENESIS_ADDRESS = addr.addr("RWA009_A_OUTPUT_CONDUIT");
+
     function testRWA008_INTEGRATION_BUMP() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -880,5 +905,216 @@ contract DssSpellTest is DssSpellTestBase {
         rwajoin_008.exit(address(this), vat.gem("RWA008-A", address(this)));
         assertEq(vat.gem("RWA008-A", address(this)), 0, "RWA008: wrong vat gem after exit");
         assertGt(rwagem_008.balanceOf(address(this)), 0, "RWA008: wrong gem balance after exit");
+    }
+
+    function testRWA009_INTEGRATION_BUMP() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        giveAuth(address(oracle), address(this));
+
+        (, address pip, , ) = oracle.ilks("RWA009-A");
+
+        assertEq(DSValueAbstract(pip).read(), bytes32(100 * MILLION * WAD), "RWA009: Bad initial PIP value");
+
+        oracle.bump("RWA009-A", 110 * MILLION * WAD);
+
+        assertEq(DSValueAbstract(pip).read(), bytes32(110 * MILLION * WAD), "RWA009: Bad PIP value after bump()");
+    }
+
+    function testRWA009_INTEGRATION_TELL() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        giveAuth(address(vat), address(this));
+        giveAuth(address(oracle), address(this));
+
+        (, , , uint48 tocPre) = oracle.ilks("RWA009-A");
+        assertEq(uint256(tocPre), 0, "RWA009: `toc` is not 0 before tell()");
+        assertTrue(oracle.good("RWA009-A"), "RWA009: Oracle not good before tell()");
+
+        vat.file("RWA009-A", "line", 0);
+        oracle.tell("RWA009-A");
+
+        (, , , uint48 tocPost) = oracle.ilks("RWA009-A");
+        assertGt(uint256(tocPost), 0, "RWA009: `toc` is not set after tell()");
+        assertTrue(!oracle.good("RWA009-A"), "RWA009: Oracle still good after tell()");
+    }
+
+    function testRWA009_INTEGRATION_TELL_CURE_GOOD() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        giveAuth(address(vat), address(this));
+        giveAuth(address(oracle), address(this));
+
+        vat.file("RWA009-A", "line", 0);
+        oracle.tell("RWA009-A");
+
+        assertTrue(!oracle.good("RWA009-A"), "RWA009: Oracle still good after tell()");
+
+        oracle.cure("RWA009-A");
+
+        assertTrue(oracle.good("RWA009-A"), "RWA009: Oracle not good after cure()");
+        (, , , uint48 toc) = oracle.ilks("RWA009-A");
+        assertEq(uint256(toc), 0, "RWA009: `toc` not zero after cure()");
+    }
+
+    function testFailRWA009_INTEGRATION_CURE_BEFORE_TELL() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        giveAuth(address(oracle), address(this));
+
+        oracle.cure("RWA009-A");
+    }
+
+    function testRWA009_INTEGRATION_TELL_CULL() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        giveAuth(address(vat), address(this));
+        giveAuth(address(oracle), address(this));
+
+        assertTrue(oracle.good("RWA009-A"));
+
+        vat.file("RWA009-A", "line", 0);
+        oracle.tell("RWA009-A");
+
+        assertTrue(!oracle.good("RWA009-A"), "RWA009: Oracle still good after tell()");
+
+        oracle.cull("RWA009-A", addr.addr("RWA009_A_URN"));
+
+        assertTrue(!oracle.good("RWA009-A"), "RWA009: Oracle still good after cull()");
+        (, address pip, , ) = oracle.ilks("RWA009-A");
+        assertEq(DSValueAbstract(pip).read(), bytes32(0), "RWA009: Oracle PIP value not set to zero after cull()");
+    }
+
+    function testRWA009_PAUSE_PROXY_OWNS_RWA009_TOKEN_BEFORE_SPELL() public {
+        assertEq(rwagem_009.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 1 * WAD);
+    }
+
+    function testRWA009_SPELL_OPERATOR_LOCK_DRAW_WIPE_FREE() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 25_000_000 * WAD;
+
+        // setting address(this) as operator
+        hevm.store(address(rwaurn_009), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwaurn_009.can(address(this)), 1);
+
+        // Check if spell lock 1 * WAD of RWA009
+        assertEq(rwagem_009.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA009: gem not transfered from the pause proxy");
+        assertEq(rwagem_009.balanceOf(address(rwajoin_009)), 1 * WAD, "RWA009: gem not locked into the urn");
+
+        // Check if spell draw 25mm DAI to GENESIS
+        assertEq(dai.balanceOf(address(RWA009_GENESIS_ADDRESS)), drawAmount, "RWA009: Dai drawn was not send to the recipient");
+
+        (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaurn_009));
+        assertEq(art, drawAmount, "RWA009: bad `art` after spell"); // DAI drawn == art as rate should always be 1 RAY
+        assertEq(ink, 1 * WAD, "RWA009: bad `ink` after spell"); // Whole unit of collateral is locked
+
+        hevm.warp(block.timestamp + 10 days);
+        jug.drip("RWA009-A");
+
+        (, uint256 rate,,,) = vat.ilks("RWA009-A");
+        assertEq(rate, RAY, 'RWA009: bad `rate`'); // rate keeps being 1 RAY
+
+        // as we have SF 0 we need to pay exectly the same amount of DAI we have drawn
+        uint256 daiToPay = drawAmount;
+
+        // transfer DAI to the URN
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(this), uint256(5))),
+            bytes32(daiToPay * RAY)
+        ); // Forcing extra dai balance for addres(this) on the Vat
+        vat.hope(address(daiJoin));
+        daiJoin.exit(address(this), daiToPay);
+        dai.transfer(address(rwaurn_009), daiToPay);
+        assertEq(dai.balanceOf(address(rwaurn_009)), daiToPay, "Balance of the URN doesnt match");
+
+        // repay debt and free our collateral
+        rwaurn_009.wipe(daiToPay);
+        rwaurn_009.free(1 * WAD);
+
+        // check if MCD_PAUSE_PROXY have RWA009 Tokens
+        assertEq(rwagem_009.balanceOf(address(this)), 1 * WAD, "RWA009: gem not sent back to the caller");
+
+        // check if we have 0 collateral and outstanding debt in the VAT
+        (ink, art) = vat.urns("RWA009-A", address(rwaurn_009));
+        assertEq(ink, 0, "RWA009: bad `ink` after free()");
+        assertEq(art, 0, "RWA009: bad `art` after wipe()");
+    }
+
+    function testRWA009_OPERATOR_LOCK_DRAW_CAGE() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 25_000_000 * WAD;
+
+        // setting address(this) as operator
+        hevm.store(address(rwaurn_009), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwaurn_009.can(address(this)), 1, "RWA009: address(this) not operator");
+
+        // Check if spell lock 1 * WAD of RWA009
+        assertEq(rwagem_009.balanceOf(address(rwajoin_009)), 1 * WAD, "RWA009: wrong gem balance in join");
+
+        // Check if spell draw 25mm DAI to GENESIS
+        assertEq(dai.balanceOf(address(RWA009_GENESIS_ADDRESS)), drawAmount, "RWA009: wrong dai balance in output conduit");
+
+        (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaurn_009));
+        assertEq(ink, 1 * WAD, "RWA009: wrong ink in urn"); // Whole unit of collateral is locked
+        assertEq(art, drawAmount, "RWA009: wrong art in urn"); // DAI drawn == art as rate should always be 1 RAY
+
+        giveAuth(address(end), address(this));
+        end.cage();
+        end.cage("RWA009-A");
+
+        end.skim("RWA009-A", address(rwaurn_009));
+
+        (ink, art) = vat.urns("RWA009-A", address(rwaurn_009));
+        uint256 skimmedInk = 25_000_000 * WAD / 100_000_000;
+        assertEq(ink, 1 * WAD - skimmedInk, "RWA009: wrong ink in urn after skim");
+        assertEq(art, 0, "RWA009: wrong art in urn after skim");
+
+        hevm.warp(block.timestamp + end.wait());
+
+        vow.heal(min(vat.dai(address(vow)), sub(sub(vat.sin(address(vow)), vow.Sin()), vow.Ash())));
+
+        // Removing the surplus to allow continuing the execution.
+        hevm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
+
+        end.thaw();
+
+        end.flow("RWA009-A");
+
+        giveTokens(address(dai), 1_000_000 * WAD);
+        dai.approve(address(daiJoin), 1_000_000 * WAD);
+        daiJoin.join(address(this), 1_000_000 * WAD);
+
+        vat.hope(address(end));
+        end.pack(1_000_000 * WAD);
+
+        assertEq(vat.gem("RWA009-A", address(this)), 0, "RWA009: wrong vat gem");
+        assertEq(rwagem_009.balanceOf(address(this)), 0, "RWA009: wrong gem balance");
+        end.cash("RWA009-A", 1_000_000 * WAD);
+        assertGt(vat.gem("RWA009-A", address(this)), 0, "RWA009: wrong vat gem after cash");
+        assertEq(rwagem_009.balanceOf(address(this)), 0, "RWA009: wrong gem balance after cash");
+        rwajoin_009.exit(address(this), vat.gem("RWA009-A", address(this)));
+        assertEq(vat.gem("RWA009-A", address(this)), 0, "RWA009: wrong vat gem after exit");
+        assertGt(rwagem_009.balanceOf(address(this)), 0, "RWA009: wrong gem balance after exit");
     }
 }
