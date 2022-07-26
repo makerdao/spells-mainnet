@@ -23,10 +23,6 @@ import "lib/dss-interfaces/src/dss/IlkRegistryAbstract.sol";
 import "lib/dss-interfaces/src/dapp/DSTokenAbstract.sol";
 import "./CentrifugeCollateralValues.sol";
 
-interface Initializable {
-    function init(bytes32) external;
-}
-
 interface Hopeable {
     function hope(address) external;
 }

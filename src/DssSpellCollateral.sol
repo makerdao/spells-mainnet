@@ -19,15 +19,10 @@ pragma solidity 0.6.12;
 // pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExecLib.sol";
-import "dss-interfaces/dapp/DSTokenAbstract.sol";
 import "dss-interfaces/dss/ChainlogAbstract.sol";
 import "dss-interfaces/dss/GemJoinAbstract.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
-
-interface Initializeable {
-    function init(bytes32) external;
-}
 
 interface RwaLiquidationLike {
     function ilks(bytes32) external returns (string memory, address, uint48, uint48);
@@ -73,10 +68,10 @@ contract DssSpellCollateralAction {
 
     // -- RWA008 MIP21 components --
     address constant RWA008                    = 0xb9737098b50d7c536b6416dAeB32879444F59fCA;
-    address constant MCD_JOIN_RWA008_A         = 0xF4D4184413d97C8C8a4f0437AbEa711bc5991a7e;
-    address constant RWA008_A_URN              = 0x593f2A49A7aA5e0c333edB4e3abB10654F68069c;
+    address constant MCD_JOIN_RWA008_A         = 0x56eDD5067d89D4E65Bf956c49eAF054e6Ff0b262;
+    address constant RWA008_A_URN              = 0x495215cabc630830071F80263a908E8826a66121;
     address constant RWA008_A_URN_CLOSE_HELPER = 0xCfc4043675EE82EEAe63C90D6eb3aB2dcf833431;
-    address constant RWA008_A_INPUT_CONDUIT    = 0x7032546Ba3F6E8866334556a354e67B905aA4470;
+    address constant RWA008_A_INPUT_CONDUIT    = 0xa397a23dDA051186F202C67148c90683c413383C;
     address constant RWA008_A_OUTPUT_CONDUIT   = 0x21CF5Ad1311788D762f9035829f81B9f54610F0C;
     // SocGen's wallet
     address constant RWA008_A_OPERATOR         = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
@@ -115,7 +110,7 @@ contract DssSpellCollateralAction {
     ) internal {
         // RWA008-A collateral deploy
         bytes32 ilk      = "RWA008-A";
-        uint256 decimals = DSTokenAbstract(RWA008).decimals();
+        uint256 decimals = GemAbstract(RWA008).decimals();
 
         // Sanity checks
         require(GemJoinAbstract(MCD_JOIN_RWA008_A).vat() == MCD_VAT,  "join-vat-not-match");
