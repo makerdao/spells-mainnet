@@ -302,6 +302,7 @@ contract Addresses {
         addr["MCD_CLIP_CALC_UNIV2DAIUSDT_A"]    = 0x4E88cE740F6bEa31C2b14134F6C5eB2a63104fcF;
         addr["PIP_UNIV2DAIUSDT"]                = 0x9A1CD705dc7ac64B50777BcEcA3529E58B1292F1;
         addr["MIP21_LIQUIDATION_ORACLE"]        = 0x88f88Bb9E66241B73B84f3A6E197FbBa487b1E30;
+        addr["RWA_TOKEN_FAB"]                   = 0x16c299c3fB950Cdea730cA6C456aDcE44CbeD350;
         addr["RWA001"]                          = 0x10b2aA5D77Aa6484886d8e244f0686aB319a270d;
         addr["PIP_RWA001"]                      = 0x76A9f30B45F4ebFD60Ce8a1c6e963b1605f7cB6d;
         addr["MCD_JOIN_RWA001_A"]               = 0x476b81c12Dc71EDfad1F64B9E07CaA60F4b156E2;
@@ -338,6 +339,21 @@ contract Addresses {
         addr["RWA006_A_URN"]                    = 0x0C185bf5388DdfDB288F4D875265d456D18FD9Cb;
         addr["RWA006_A_INPUT_CONDUIT"]          = 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3;
         addr["RWA006_A_OUTPUT_CONDUIT"]         = 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3;
+
+        addr["RWA008"]                          = 0x7907FB7f6aa0ebe363BC6966c4132849b7B560F8;
+        addr["PIP_RWA008"]                      = 0x2623dE50D8A6FdC2f0D583327142210b8b464bfd;
+        addr["MCD_JOIN_RWA008_A"]               = 0x8EeE937787DFD6A82ED1F1d11d9db7e2dC3a5884;
+        addr["RWA008_A_URN"]                    = 0x7b7061164858B69cFc3B0a3B8b630C9279c20de5;
+        addr["RWA008_A_INPUT_CONDUIT"]          = 0xC5b09E985B396C1D3883030404DDE06aef71e972;
+        addr["RWA008_A_OUTPUT_CONDUIT"]         = 0x2d2962fbDF6d5d9567387e33901BF83866431e09;
+
+        addr["RWA009"]                          = 0x518351716C4Ec0531B426b174ed79FfBcc9A4242;
+        addr["PIP_RWA009"]                      = 0xdc7D370A089797Fe9556A2b0400496eBb3a61E44;
+        addr["MCD_JOIN_RWA009_A"]               = 0xAe20C8f0e9dc566bDf5E5628fc2EA0E66fd60437;
+        addr["RWA009_A_URN"]                    = 0xDE70058B9C22012e7E4c53aC3F117864cE8C59CA;
+        addr["RWA009_A_JAR"]                    = 0xB67c844C8b2B78125978dEcf33A48d0175486322;
+        addr["RWA009_A_OUTPUT_CONDUIT"]         = 0x508D982e13263Fc8e1b5A4E6bf59b335202e36b4;
+
         addr["GUNIV3DAIUSDC1"]                  = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
         addr["PIP_GUNIV3DAIUSDC1"]              = 0x7F6d78CC0040c87943a0e0c140De3F77a273bd58;
         addr["MCD_JOIN_GUNIV3DAIUSDC1_A"]       = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
