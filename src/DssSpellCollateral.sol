@@ -64,7 +64,6 @@ contract DssSpellCollateralAction {
     //    https://ipfs.io/ipfs/QmX2QMoM1SZq2XMoTbMak8pZP86Y2icpgPAKDjQg4r4YHn
     //
 
-    uint256 constant ZERO_PCT_RATE           = 1000000000000000000000000000;
     uint256 constant ZERO_ZERO_FIVE_PCT_RATE = 1000000000015850933588756013;
 
     // --- Math ---
@@ -104,29 +103,6 @@ contract DssSpellCollateralAction {
     uint256 constant RWA008_A_MAT              = 100_00; // 100% in basis-points
     uint256 constant RWA008_A_RATE             = ZERO_ZERO_FIVE_PCT_RATE;
     // -- RWA008 end --
-
-    // -- RWA009 MIP21 components --
-    address constant RWA009                  = 0x8b9734bbaA628bFC0c9f323ba08Ed184e5b88Da2;
-    address constant MCD_JOIN_RWA009_A       = 0x9A4193CD0fC71f61c7f4E7Ee90075720fF26B99E;
-    address constant RWA009_A_URN            = 0xbDCa96eBfb24a694544aB53eDc4Ad2B721D781B1;
-    address constant RWA009_A_JAR            = 0x6C6d4Be2223B5d202263515351034861dD9aFdb6;
-    // Goerli: CES Goerli Multisig / Mainnet: Genesis
-    address constant RWA009_A_OUTPUT_CONDUIT = 0x508D982e13263Fc8e1b5A4E6bf59b335202e36b4;
-
-    // MIP21_LIQUIDATION_ORACLE params
-    string  constant RWA009_DOC              = "QmZG31b6iLGGCLGD7ZUn8EDkE9kANPVMcHzEYkvyNWCZpG";
-    uint256 constant RWA009_A_INITIAL_PRICE  = 100_000_000 * WAD; // No DssExecLib helper, so WAD is required
-    uint48  constant RWA009_A_TAU            = 0;
-
-    // Ilk registry params
-    uint256 constant RWA009_REG_CLASS_RWA    = 3;
-
-    // Remaining params
-    uint256 constant RWA009_A_LINE           = 100_000_000;
-    uint256 constant RWA009_A_MAT            = 100_00; // 100% in basis-points
-    uint256 constant RWA009_A_RATE           = ZERO_PCT_RATE;
-
-    // -- RWA009 END --
 
     function onboardRwa008(
         ChainlogAbstract CHANGELOG,
@@ -218,85 +194,6 @@ contract DssSpellCollateralAction {
         );
     }
 
-    function onboardRwa009(
-        ChainlogAbstract CHANGELOG,
-        IlkRegistryAbstract REGISTRY,
-        address MIP21_LIQUIDATION_ORACLE,
-        address MCD_VAT,
-        address MCD_JUG,
-        address MCD_SPOT,
-        address MCD_JOIN_DAI
-    ) internal {
-        // RWA009-A collateral deploy
-        bytes32 ilk      = "RWA009-A";
-        uint256 decimals = DSTokenAbstract(RWA009).decimals();
-
-        // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_RWA009_A).vat() == MCD_VAT,  "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA009_A).ilk() == ilk,      "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA009_A).gem() == RWA009,   "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA009_A).dec() == decimals, "join-dec-not-match");
-
-        require(RwaUrnLike(RWA009_A_URN).vat() == MCD_VAT,               "urn-vat-not-match");
-        require(RwaUrnLike(RWA009_A_URN).jug() == MCD_JUG,               "urn-jug-not-match");
-        require(RwaUrnLike(RWA009_A_URN).daiJoin() == MCD_JOIN_DAI,      "urn-daijoin-not-match");
-        require(RwaUrnLike(RWA009_A_URN).gemJoin() == MCD_JOIN_RWA009_A, "urn-gemjoin-not-match");
-
-        // Init the RwaLiquidationOracle
-        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA009_A_INITIAL_PRICE, RWA009_DOC, RWA009_A_TAU);
-        (, address pip, , ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
-
-        // Set price feed for RWA009
-        DssExecLib.setContract(MCD_SPOT, ilk, "pip", pip);
-
-        // Init RWA009 in Vat
-        Initializable(MCD_VAT).init(ilk);
-        // Init RWA009 in Jug
-        Initializable(MCD_JUG).init(ilk);
-
-        // Allow RWA009 Join to modify Vat registry
-        DssExecLib.authorize(MCD_VAT, MCD_JOIN_RWA009_A);
-
-        // 100m debt ceiling
-        DssExecLib.increaseIlkDebtCeiling(ilk, RWA009_A_LINE, /* _global = */ true);
-
-        // Set the stability fee
-        DssExecLib.setIlkStabilityFee(ilk, RWA009_A_RATE, /* _doDrip = */ false);
-
-        // Set collateralization ratio
-        DssExecLib.setIlkLiquidationRatio(ilk, RWA009_A_MAT);
-
-        // Poke the spotter to pull in a price
-        DssExecLib.updateCollateralPrice(ilk);
-
-        // Give the urn permissions on the join adapter
-        DssExecLib.authorize(MCD_JOIN_RWA009_A, RWA009_A_URN);
-
-        // MCD_PAUSE_PROXY permission on URN
-        RwaUrnLike(RWA009_A_URN).hope(address(this));
-
-        // Add RWA009 contract to the changelog
-        CHANGELOG.setAddress("RWA009",                  RWA009);
-        CHANGELOG.setAddress("PIP_RWA009",              pip);
-        CHANGELOG.setAddress("MCD_JOIN_RWA009_A",       MCD_JOIN_RWA009_A);
-        CHANGELOG.setAddress("RWA009_A_URN",            RWA009_A_URN);
-        CHANGELOG.setAddress("RWA009_A_JAR",            RWA009_A_JAR);
-        CHANGELOG.setAddress("RWA009_A_OUTPUT_CONDUIT", RWA009_A_OUTPUT_CONDUIT);
-
-        // Add RWA009 to ILK REGISTRY
-        REGISTRY.put(
-            ilk,
-            MCD_JOIN_RWA009_A,
-            RWA009,
-            decimals,
-            RWA009_REG_CLASS_RWA,
-            pip,
-            address(0),
-            "RWA009-A: H. V. Bank",
-            GemAbstract(RWA009).symbol()
-        );
-    }
-
     function onboardNewCollaterals() internal {
         ChainlogAbstract CHANGELOG       = ChainlogAbstract(DssExecLib.LOG);
         IlkRegistryAbstract REGISTRY     = IlkRegistryAbstract(DssExecLib.reg());
@@ -310,9 +207,6 @@ contract DssSpellCollateralAction {
 
         // Onboard SocGen: https://vote.makerdao.com/polling/QmajCtnG
         onboardRwa008(CHANGELOG, REGISTRY, MIP21_LIQUIDATION_ORACLE, MCD_VAT, MCD_JUG, MCD_SPOT, MCD_JOIN_DAI);
-
-        // Onboard HvB: https://vote.makerdao.com/polling/QmQMDasC
-        onboardRwa009(CHANGELOG, REGISTRY, MIP21_LIQUIDATION_ORACLE, MCD_VAT, MCD_JUG, MCD_SPOT, MCD_JOIN_DAI);
     }
 
     function offboardCollaterals() internal {}

@@ -345,12 +345,6 @@ contract Addresses {
         addr["RWA008_A_URN"]                    = 0x593f2A49A7aA5e0c333edB4e3abB10654F68069c;
         addr["RWA008_A_INPUT_CONDUIT"]          = 0x7032546Ba3F6E8866334556a354e67B905aA4470;
         addr["RWA008_A_OUTPUT_CONDUIT"]         = 0x21CF5Ad1311788D762f9035829f81B9f54610F0C;
-        addr["RWA009"]                          = 0x8b9734bbaA628bFC0c9f323ba08Ed184e5b88Da2;
-        addr["PIP_RWA009"]                      = 0xdc7D370A089797Fe9556A2b0400496eBb3a61E44;
-        addr["MCD_JOIN_RWA009_A"]               = 0x9A4193CD0fC71f61c7f4E7Ee90075720fF26B99E;
-        addr["RWA009_A_URN"]                    = 0xbDCa96eBfb24a694544aB53eDc4Ad2B721D781B1;
-        addr["RWA009_A_JAR"]                    = 0x6C6d4Be2223B5d202263515351034861dD9aFdb6;
-        addr["RWA009_A_OUTPUT_CONDUIT"]         = 0x508D982e13263Fc8e1b5A4E6bf59b335202e36b4;
         addr["GUNIV3DAIUSDC1"]                  = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
         addr["PIP_GUNIV3DAIUSDC1"]              = 0x7F6d78CC0040c87943a0e0c140De3F77a273bd58;
         addr["MCD_JOIN_GUNIV3DAIUSDC1_A"]       = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;

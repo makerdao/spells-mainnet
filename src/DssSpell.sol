@@ -41,8 +41,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     address constant RWA_TOKEN_FAB = 0x2B3a4c18705e99bC29b22222dA7E10b643658552;
 
-    uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
-
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -64,21 +62,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         onboardNewCollaterals();
         // offboardCollaterals();
 
-        drawFromRWA009Urn();
-
         // Add RWA_TOKEN_FAB to changelog
         DssExecLib.setChangelogAddress("RWA_TOKEN_FAB", RWA_TOKEN_FAB);
 
         DssExecLib.setChangelogVersion("1.13.3");
-    }
-
-    function drawFromRWA009Urn() internal {
-        // lock RWA009 Token in the URN
-        DSTokenAbstract(RWA009).approve(RWA009_A_URN, 1 * WAD);
-        RwaUrnLike(RWA009_A_URN).lock(1 * WAD);
-
-        // draw DAI to genesis address
-        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
     }
 }
 
