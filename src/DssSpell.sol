@@ -54,7 +54,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //
 
     function officeHours() public override returns (bool) {
-        return false;
+        return true;
     }
 
     function actions() public override {
