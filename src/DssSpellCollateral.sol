@@ -73,12 +73,12 @@ contract DssSpellCollateralAction {
     uint256 public constant RAD = 10**45;
 
     // -- RWA008 MIP21 components --
-    address constant RWA008                    = 0x7907FB7f6aa0ebe363BC6966c4132849b7B560F8;
-    address constant MCD_JOIN_RWA008_A         = 0x8EeE937787DFD6A82ED1F1d11d9db7e2dC3a5884;
-    address constant RWA008_A_URN              = 0x7b7061164858B69cFc3B0a3B8b630C9279c20de5;
-    address constant RWA008_A_URN_CLOSE_HELPER = 0xDCd1D2879A309785b4E40b6Fb3FbE36D315bC597;
-    address constant RWA008_A_INPUT_CONDUIT    = 0xC5b09E985B396C1D3883030404DDE06aef71e972;
-    address constant RWA008_A_OUTPUT_CONDUIT   = 0x2d2962fbDF6d5d9567387e33901BF83866431e09;
+    address constant RWA008                    = 0xb9737098b50d7c536b6416dAeB32879444F59fCA;
+    address constant MCD_JOIN_RWA008_A         = 0xF4D4184413d97C8C8a4f0437AbEa711bc5991a7e;
+    address constant RWA008_A_URN              = 0x593f2A49A7aA5e0c333edB4e3abB10654F68069c;
+    address constant RWA008_A_URN_CLOSE_HELPER = 0xCfc4043675EE82EEAe63C90D6eb3aB2dcf833431;
+    address constant RWA008_A_INPUT_CONDUIT    = 0x7032546Ba3F6E8866334556a354e67B905aA4470;
+    address constant RWA008_A_OUTPUT_CONDUIT   = 0x21CF5Ad1311788D762f9035829f81B9f54610F0C;
     // SocGen's wallet
     address constant RWA008_A_OPERATOR         = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
     // DIIS Group wallet
@@ -106,10 +106,10 @@ contract DssSpellCollateralAction {
     // -- RWA008 end --
 
     // -- RWA009 MIP21 components --
-    address constant RWA009                  = 0x518351716C4Ec0531B426b174ed79FfBcc9A4242;
-    address constant MCD_JOIN_RWA009_A       = 0xAe20C8f0e9dc566bDf5E5628fc2EA0E66fd60437;
-    address constant RWA009_A_URN            = 0xDE70058B9C22012e7E4c53aC3F117864cE8C59CA;
-    address constant RWA009_A_JAR            = 0xB67c844C8b2B78125978dEcf33A48d0175486322;
+    address constant RWA009                  = 0x8b9734bbaA628bFC0c9f323ba08Ed184e5b88Da2;
+    address constant MCD_JOIN_RWA009_A       = 0x9A4193CD0fC71f61c7f4E7Ee90075720fF26B99E;
+    address constant RWA009_A_URN            = 0xbDCa96eBfb24a694544aB53eDc4Ad2B721D781B1;
+    address constant RWA009_A_JAR            = 0x6C6d4Be2223B5d202263515351034861dD9aFdb6;
     // Goerli: CES Goerli Multisig / Mainnet: Genesis
     address constant RWA009_A_OUTPUT_CONDUIT = 0x508D982e13263Fc8e1b5A4E6bf59b335202e36b4;
 

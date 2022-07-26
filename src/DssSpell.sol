@@ -39,7 +39,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     string public constant override description =
         "2022-07-27 MakerDAO Executive Spell | Hash: 0x0000000000000000000000000000000000000000000000000000000000000000";
 
-    address constant RWA_TOKEN_FAB = 0x16c299c3fB950Cdea730cA6C456aDcE44CbeD350;
+    address constant RWA_TOKEN_FAB = 0x2B3a4c18705e99bC29b22222dA7E10b643658552;
 
     uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
