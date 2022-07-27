@@ -25,7 +25,6 @@ import "dss-interfaces/dapp/DSTokenAbstract.sol";
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface RwaUrnLike {
-    function hope(address) external;
     function lock(uint256) external;
     function draw(uint256) external;
 }

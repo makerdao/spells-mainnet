@@ -36,7 +36,6 @@ interface RwaUrnLike {
     function daiJoin() external view returns(address);
     function outputConduit() external view returns(address);
     function hope(address) external;
-    function lock(uint256) external;
 }
 
 interface RwaOutputConduitLike {
