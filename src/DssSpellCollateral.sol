@@ -191,16 +191,9 @@ contract DssSpellCollateralAction {
         RwaUrnLike(RWA008_A_URN).hope(RWA008_A_URN_CLOSE_HELPER);
         RwaUrnLike(RWA008_A_URN).hope(RWA008_A_OPERATOR);
 
-        // Set up output conduit
-        RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).hope(RWA008_A_OPERATOR);
-
         // Whitelist DIIS Group in the conduits
         RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).mate(RWA008_A_MATE);
         RwaInputConduitLike(RWA008_A_INPUT_CONDUIT)  .mate(RWA008_A_MATE);
-
-        // Whitelist Socgen in the conduits as a fallback for DIIS Group
-        RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).mate(RWA008_A_OPERATOR);
-        RwaInputConduitLike(RWA008_A_INPUT_CONDUIT)  .mate(RWA008_A_OPERATOR);
 
         // Add RWA008 contract to the changelog
         CHANGELOG.setAddress("RWA008",                  RWA008);
