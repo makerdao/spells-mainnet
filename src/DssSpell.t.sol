@@ -613,20 +613,20 @@ contract DssSpellTest is DssSpellTestBase {
     //             RWA tests              //
     ////////////////////////////////////////
 
-    RwaLiquidationLike internal oracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    RwaLiquidationLike oracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
-    address internal RWA008_A_OPERATOR              = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
-    address internal RWA008_A_MATE                  = 0xb9444802F0831A3EB9f90E24EFe5FfA20138d684;
-    GemAbstract internal rwagem_008                 = GemAbstract(addr.addr("RWA008"));
-    GemJoinAbstract internal rwajoin_008            = GemJoinAbstract(addr.addr("MCD_JOIN_RWA008_A"));
-    RwaUrnLike internal rwaurn_008                  = RwaUrnLike(addr.addr("RWA008_A_URN"));
-    RwaInputConduitLike internal rwaconduitin_008   = RwaInputConduitLike(addr.addr("RWA008_A_INPUT_CONDUIT"));
-    RwaOutputConduitLike internal rwaconduitout_008 = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
+    address RWA008_A_OPERATOR              = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
+    address RWA008_A_MATE                  = 0xb9444802F0831A3EB9f90E24EFe5FfA20138d684;
+    GemAbstract rwagem_008                 = GemAbstract(addr.addr("RWA008"));
+    GemJoinAbstract rwajoin_008            = GemJoinAbstract(addr.addr("MCD_JOIN_RWA008_A"));
+    RwaUrnLike rwaurn_008                  = RwaUrnLike(addr.addr("RWA008_A_URN"));
+    RwaInputConduitLike rwaconduitin_008   = RwaInputConduitLike(addr.addr("RWA008_A_INPUT_CONDUIT"));
+    RwaOutputConduitLike rwaconduitout_008 = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
 
-    GemAbstract internal rwagem_009         = GemAbstract(addr.addr("RWA009"));
-    GemJoinAbstract internal rwajoin_009    = GemJoinAbstract(addr.addr("MCD_JOIN_RWA009_A"));
-    RwaUrnLike internal rwaurn_009          = RwaUrnLike(addr.addr("RWA009_A_URN"));
-    address internal RWA009_GENESIS_ADDRESS = addr.addr("RWA009_A_OUTPUT_CONDUIT");
+    GemAbstract rwagem_009         = GemAbstract(addr.addr("RWA009"));
+    GemJoinAbstract rwajoin_009    = GemJoinAbstract(addr.addr("MCD_JOIN_RWA009_A"));
+    RwaUrnLike rwaurn_009          = RwaUrnLike(addr.addr("RWA009_A_URN"));
+    address RWA009_GENESIS_ADDRESS = addr.addr("RWA009_A_OUTPUT_CONDUIT");
 
     function testRWA008_OPERATOR_OWNS_RWA008_TOKEN_BEFORE_SPELL() public {
         assertEq(rwagem_008.balanceOf(RWA008_A_OPERATOR), 1 * WAD);
@@ -640,12 +640,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwaurn_008.can(RWA008_A_OPERATOR), 1, "RWA008: bad urn.can(operator)");
         assertEq(rwaurn_008.can(RWA008_A_MATE),     0, "RWA008: bad urn.can(mate)");
 
-        assertEq(rwaconduitin_008.may(RWA008_A_OPERATOR), 0, "RWA008: bad inputConduit.may(operator)");
+        assertEq(rwaconduitin_008.may(RWA008_A_OPERATOR), 1, "RWA008: bad inputConduit.may(operator)");
         assertEq(rwaconduitin_008.may(RWA008_A_MATE),     1, "RWA008: bad inputConduit.may(mate)");
 
+        // We are not hope-ing the operator wallet in this spell because SocGen could not verify their addess in time.
         assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 0, "RWA008: bad outputConduit.can(operator)");
         assertEq(rwaconduitout_008.can(RWA008_A_MATE),     0, "RWA008: bad outputConduit.can(mate)");
-        assertEq(rwaconduitout_008.may(RWA008_A_OPERATOR), 0, "RWA008: bad outputConduit.may(operator)");
+        assertEq(rwaconduitout_008.may(RWA008_A_OPERATOR), 1, "RWA008: bad outputConduit.may(operator)");
         assertEq(rwaconduitout_008.may(RWA008_A_MATE),     1, "RWA008: bad outputConduit.may(mate)");
     }
 
