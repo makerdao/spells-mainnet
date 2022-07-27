@@ -34,16 +34,20 @@ interface RwaUrnLike {
     function jug() external view returns(address);
     function gemJoin() external view returns(address);
     function daiJoin() external view returns(address);
+    function outputConduit() external view returns(address);
     function hope(address) external;
     function lock(uint256) external;
 }
 
 interface RwaOutputConduitLike {
+    function dai() external view returns(address);
     function hope(address) external;
     function mate(address) external;
 }
 
 interface RwaInputConduitLike {
+    function dai() external view returns(address);
+    function to() external view returns(address);
     function mate(address usr) external;
 }
 
@@ -130,7 +134,8 @@ contract DssSpellCollateralAction {
         address MCD_VAT,
         address MCD_JUG,
         address MCD_SPOT,
-        address MCD_JOIN_DAI
+        address MCD_JOIN_DAI,
+        address MCD_DAI
     ) internal {
         // RWA008-A collateral deploy
         bytes32 ilk      = "RWA008-A";
@@ -142,10 +147,16 @@ contract DssSpellCollateralAction {
         require(GemJoinAbstract(MCD_JOIN_RWA008_A).gem() == RWA008,   "join-gem-not-match");
         require(GemJoinAbstract(MCD_JOIN_RWA008_A).dec() == decimals, "join-dec-not-match");
 
-        require(RwaUrnLike(RWA008_A_URN).vat() == MCD_VAT,               "urn-vat-not-match");
-        require(RwaUrnLike(RWA008_A_URN).jug() == MCD_JUG,               "urn-jug-not-match");
-        require(RwaUrnLike(RWA008_A_URN).daiJoin() == MCD_JOIN_DAI,      "urn-daijoin-not-match");
-        require(RwaUrnLike(RWA008_A_URN).gemJoin() == MCD_JOIN_RWA008_A, "urn-gemjoin-not-match");
+        require(RwaUrnLike(RWA008_A_URN).vat()           == MCD_VAT,                 "urn-vat-not-match");
+        require(RwaUrnLike(RWA008_A_URN).jug()           == MCD_JUG,                 "urn-jug-not-match");
+        require(RwaUrnLike(RWA008_A_URN).daiJoin()       == MCD_JOIN_DAI,            "urn-daijoin-not-match");
+        require(RwaUrnLike(RWA008_A_URN).gemJoin()       == MCD_JOIN_RWA008_A,       "urn-gemjoin-not-match");
+        require(RwaUrnLike(RWA008_A_URN).outputConduit() == RWA008_A_OUTPUT_CONDUIT, "urn-outputconduit-not-match");
+
+        require(RwaInputConduitLike(RWA008_A_INPUT_CONDUIT).dai() == MCD_DAI,      "inputconduit-dai-not-match");
+        require(RwaInputConduitLike(RWA008_A_INPUT_CONDUIT).to()  == RWA008_A_URN, "inputconduit-to-not-match");
+
+        require(RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).dai() == MCD_DAI, "outputconduit-dai-not-match");
 
         // Init the RwaLiquidationOracle
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA008_A_INITIAL_PRICE, RWA008_DOC, RWA008_A_TAU);
@@ -232,10 +243,11 @@ contract DssSpellCollateralAction {
         require(GemJoinAbstract(MCD_JOIN_RWA009_A).gem() == RWA009,   "join-gem-not-match");
         require(GemJoinAbstract(MCD_JOIN_RWA009_A).dec() == decimals, "join-dec-not-match");
 
-        require(RwaUrnLike(RWA009_A_URN).vat() == MCD_VAT,               "urn-vat-not-match");
-        require(RwaUrnLike(RWA009_A_URN).jug() == MCD_JUG,               "urn-jug-not-match");
-        require(RwaUrnLike(RWA009_A_URN).daiJoin() == MCD_JOIN_DAI,      "urn-daijoin-not-match");
-        require(RwaUrnLike(RWA009_A_URN).gemJoin() == MCD_JOIN_RWA009_A, "urn-gemjoin-not-match");
+        require(RwaUrnLike(RWA009_A_URN).vat()           == MCD_VAT,                 "urn-vat-not-match");
+        require(RwaUrnLike(RWA009_A_URN).jug()           == MCD_JUG,                 "urn-jug-not-match");
+        require(RwaUrnLike(RWA009_A_URN).daiJoin()       == MCD_JOIN_DAI,            "urn-daijoin-not-match");
+        require(RwaUrnLike(RWA009_A_URN).gemJoin()       == MCD_JOIN_RWA009_A,       "urn-gemjoin-not-match");
+        require(RwaUrnLike(RWA009_A_URN).outputConduit() == RWA009_A_OUTPUT_CONDUIT, "urn-outputconduit-not-match");
 
         // Init the RwaLiquidationOracle
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA009_A_INITIAL_PRICE, RWA009_DOC, RWA009_A_TAU);
@@ -297,6 +309,7 @@ contract DssSpellCollateralAction {
         IlkRegistryAbstract REGISTRY     = IlkRegistryAbstract(DssExecLib.reg());
         address MIP21_LIQUIDATION_ORACLE = CHANGELOG.getAddress("MIP21_LIQUIDATION_ORACLE");
         address MCD_VAT                  = DssExecLib.vat();
+        address MCD_DAI                  = DssExecLib.dai();
         address MCD_JUG                  = DssExecLib.jug();
         address MCD_SPOT                 = DssExecLib.spotter();
         address MCD_JOIN_DAI             = DssExecLib.daiJoin();
@@ -304,7 +317,7 @@ contract DssSpellCollateralAction {
         // --------------------------- RWA Collateral onboarding ---------------------------
 
         // Onboard SocGen: https://vote.makerdao.com/polling/QmajCtnG
-        onboardRwa008(CHANGELOG, REGISTRY, MIP21_LIQUIDATION_ORACLE, MCD_VAT, MCD_JUG, MCD_SPOT, MCD_JOIN_DAI);
+        onboardRwa008(CHANGELOG, REGISTRY, MIP21_LIQUIDATION_ORACLE, MCD_VAT, MCD_JUG, MCD_SPOT, MCD_JOIN_DAI, MCD_DAI);
 
         // Onboard HvB: https://vote.makerdao.com/polling/QmQMDasC
         onboardRwa009(CHANGELOG, REGISTRY, MIP21_LIQUIDATION_ORACLE, MCD_VAT, MCD_JUG, MCD_SPOT, MCD_JOIN_DAI);
