@@ -33,7 +33,7 @@ contract Deployers {
             0x1f42e41A34B71606FcC60b4e624243b365D99745,  // Oracles
             0x075da589886BA445d7c7e81c472059dE7AE65250,  // Used for Optimism & Arbitrum bridge contracts
             0x7f06941997C7778E7B734fE55f7353f554B06d7d,  // Starknet
-            0xb27B6fa77D7FBf3C1BD34B0f7DA59b39D3DB0f7e
+            0xb27B6fa77D7FBf3C1BD34B0f7DA59b39D3DB0f7e   // CES
         ];
     }
 

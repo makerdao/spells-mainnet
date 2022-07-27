@@ -20,9 +20,12 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dapp/DSTokenAbstract.sol";
 
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
+
+interface ERC20Like {
+    function approve(address, uint256) external returns (bool);
+}
 
 interface RwaUrnLike {
     function lock(uint256) external;
@@ -73,7 +76,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     function drawFromRWA009Urn() internal {
         // lock RWA009 Token in the URN
-        DSTokenAbstract(RWA009).approve(RWA009_A_URN, 1 * WAD);
+        ERC20Like(RWA009).approve(RWA009_A_URN, 1 * WAD);
         RwaUrnLike(RWA009_A_URN).lock(1 * WAD);
 
         // draw DAI to genesis address
