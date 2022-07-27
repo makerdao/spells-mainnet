@@ -204,11 +204,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.pos("RWA008-A"),    50);
         assertEq(reg.join("RWA008-A"),   addr.addr("MCD_JOIN_RWA008_A"));
         assertEq(reg.gem("RWA008-A"),    addr.addr("RWA008"));
-        assertEq(reg.dec("RWA008-A"),    DSTokenAbstract(addr.addr("RWA008")).decimals());
+        assertEq(reg.dec("RWA008-A"),    GemAbstract(addr.addr("RWA008")).decimals());
         assertEq(reg.class("RWA008-A"),  3);
         assertEq(reg.pip("RWA008-A"),    pipRwa008);
         assertEq(reg.name("RWA008-A"),   "RWA008-A: SG Forge OFH");
-        assertEq(reg.symbol("RWA008-A"), "RWA008");
+        assertEq(reg.symbol("RWA008-A"), GemAbstract(addr.addr("RWA008")).symbol());
 
         // RWA009
         (, address pipRwa009,,) = oracle.ilks("RWA009-A");
@@ -609,21 +609,23 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
     }
 
-    // RWA tests
+    ////////////////////////////////////////
+    //             RWA tests              //
+    ////////////////////////////////////////
 
-    RwaLiquidationLike oracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    RwaLiquidationLike internal oracle = RwaLiquidationLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
-    address              rwaOperator_008     = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
-    DSTokenAbstract      rwagem_008          = DSTokenAbstract(addr.addr("RWA008"));
-    GemJoinAbstract      rwajoin_008         = GemJoinAbstract(addr.addr("MCD_JOIN_RWA008_A"));
-    RwaUrnLike           rwaurn_008          = RwaUrnLike(addr.addr("RWA008_A_URN"));
-    RwaInputConduitLike  rwaconduitin_008    = RwaInputConduitLike(addr.addr("RWA008_A_INPUT_CONDUIT"));
-    RwaOutputConduitLike rwaconduitout_008   = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
+    address rwaOperator_008                = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
+    GemAbstract rwagem_008                 = GemAbstract(addr.addr("RWA008"));
+    GemJoinAbstract rwajoin_008            = GemJoinAbstract(addr.addr("MCD_JOIN_RWA008_A"));
+    RwaUrnLike rwaurn_008                  = RwaUrnLike(addr.addr("RWA008_A_URN"));
+    RwaInputConduitLike rwaconduitin_008   = RwaInputConduitLike(addr.addr("RWA008_A_INPUT_CONDUIT"));
+    RwaOutputConduitLike rwaconduitout_008 = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
 
-    DSTokenAbstract      rwagem_009          = DSTokenAbstract(addr.addr("RWA009"));
-    GemJoinAbstract      rwajoin_009         = GemJoinAbstract(addr.addr("MCD_JOIN_RWA009_A"));
-    RwaUrnLike           rwaurn_009          = RwaUrnLike(addr.addr("RWA009_A_URN"));
-    address              RWA009_GENESIS_ADDRESS = addr.addr("RWA009_A_OUTPUT_CONDUIT");
+    GemAbstract rwagem_009         = GemAbstract(addr.addr("RWA009"));
+    GemJoinAbstract rwajoin_009    = GemJoinAbstract(addr.addr("MCD_JOIN_RWA009_A"));
+    RwaUrnLike rwaurn_009          = RwaUrnLike(addr.addr("RWA009_A_URN"));
+    address RWA009_GENESIS_ADDRESS = addr.addr("RWA009_A_OUTPUT_CONDUIT");
 
     function testRWA008_INTEGRATION_BUMP() public {
         vote(address(spell));
