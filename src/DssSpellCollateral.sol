@@ -112,7 +112,7 @@ contract DssSpellCollateralAction {
     address constant RWA009_A_OUTPUT_CONDUIT = 0x508D982e13263Fc8e1b5A4E6bf59b335202e36b4;
 
     // MIP21_LIQUIDATION_ORACLE params
-    string  constant RWA009_DOC              = "QmZG31b6iLGGCLGD7ZUn8EDkE9kANPVMcHzEYkvyNWCZpG";
+    string  constant RWA009_DOC              = "QmRe77P2JsvQWygVr9ZAMs4SHnjUQXz6uawdSboAaj2ryF";
     uint256 constant RWA009_A_INITIAL_PRICE  = 100_000_000 * WAD; // No DssExecLib helper, so WAD is required
     uint48  constant RWA009_A_TAU            = 0;
 
