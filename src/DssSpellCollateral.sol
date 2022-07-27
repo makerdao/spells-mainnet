@@ -191,9 +191,26 @@ contract DssSpellCollateralAction {
         RwaUrnLike(RWA008_A_URN).hope(RWA008_A_URN_CLOSE_HELPER);
         RwaUrnLike(RWA008_A_URN).hope(RWA008_A_OPERATOR);
 
+        // Set up output conduit
+        //
+        // We are not hope-ing the operator wallet in this spell because SocGen could not verify their addess in time.
+        //
+        // There is a potential front-running attack:
+        //   1. The operator choses a legit `to` address with `pick()`
+        //   2. The mate calls `push()` on the output conduit
+        //   3. The operator front-runs the `push()` transaction and `pick()`s a fraudulent address.
+        //
+        // Once SocGen verifies the ownership of the address, it will be hope-d in the output conduit.
+        //
+        // RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).hope(RWA008_A_OPERATOR);
+
         // Whitelist DIIS Group in the conduits
         RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).mate(RWA008_A_MATE);
         RwaInputConduitLike(RWA008_A_INPUT_CONDUIT)  .mate(RWA008_A_MATE);
+
+        // Whitelist Socgen in the conduits as a fallback for DIIS Group
+        RwaOutputConduitLike(RWA008_A_OUTPUT_CONDUIT).mate(RWA008_A_OPERATOR);
+        RwaInputConduitLike(RWA008_A_INPUT_CONDUIT)  .mate(RWA008_A_OPERATOR);
 
         // Add RWA008 contract to the changelog
         CHANGELOG.setAddress("RWA008",                  RWA008);

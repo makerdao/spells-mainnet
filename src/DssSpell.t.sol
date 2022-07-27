@@ -643,14 +643,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwaconduitin_008.may(RWA008_A_OPERATOR), 0, "RWA008: bad inputConduit.may(operator)");
         assertEq(rwaconduitin_008.may(RWA008_A_MATE),     1, "RWA008: bad inputConduit.may(mate)");
 
-        // We are not hope-ing the operator wallet in this spell because SocGen could not verify their addess in time.
-        //
-        // There is a potential front-running attack:
-        //   1. The operator choses a legit `to` address with `pick()`
-        //   2. The mate calls `push()` on the output conduit
-        //   3. The operator front-runs the `push()` transaction and `pick()`s a fraudulent address.
-        //
-        // Once SocGen verifies the ownership of the address, it will be hope-d in the output conduit.
         assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 0, "RWA008: bad outputConduit.can(operator)");
         assertEq(rwaconduitout_008.can(RWA008_A_MATE),     0, "RWA008: bad outputConduit.can(mate)");
         assertEq(rwaconduitout_008.may(RWA008_A_OPERATOR), 0, "RWA008: bad outputConduit.may(operator)");
