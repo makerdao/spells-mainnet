@@ -33,8 +33,6 @@ interface RwaUrnLike {
 }
 
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
-
-    // TODO: update with the content of the executive vote.
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20July%2029%2C%202022.md -q -O - 2>/dev/null)"
