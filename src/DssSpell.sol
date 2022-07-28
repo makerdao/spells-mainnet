@@ -35,7 +35,7 @@ interface RwaUrnLike {
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20July%2029%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/969f04cfec25e56791fbe4503bcbe2df7a58df1e/governance/votes/Executive%20vote%20-%20July%2029%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2022-07-29 MakerDAO Executive Spell | Hash: 0x18850080b101bb43125dd2bec32e5e7196586c5614bb9a0f05f9bbe392901d64";
 
