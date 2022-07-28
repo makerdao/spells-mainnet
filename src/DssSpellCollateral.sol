@@ -90,6 +90,8 @@ contract DssSpellCollateralAction {
      *   - 2.9 years: Duration of the Loan
      *
      *     bc -l <<< 'scale=18; (30000000 * e( l(1.0005) * 2.9 ))'
+     *
+     * There is no DssExecLib helper, so WAD precision is used.
      */
     uint256 constant RWA008_A_INITIAL_PRICE    = 30_043_520_665599336150000000;
     uint48  constant RWA008_A_TAU              = 0;
@@ -113,7 +115,8 @@ contract DssSpellCollateralAction {
 
     // MIP21_LIQUIDATION_ORACLE params
     string  constant RWA009_DOC              = "QmRe77P2JsvQWygVr9ZAMs4SHnjUQXz6uawdSboAaj2ryF";
-    uint256 constant RWA009_A_INITIAL_PRICE  = 100_000_000 * WAD; // No DssExecLib helper, so WAD is required
+    // There is no DssExecLib helper, so WAD precision is used.
+    uint256 constant RWA009_A_INITIAL_PRICE  = 100_000_000 * WAD;
     uint48  constant RWA009_A_TAU            = 0;
 
     // Ilk registry params

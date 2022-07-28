@@ -37,9 +37,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // TODO: update with the content of the executive vote.
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0000000000000000000000000000000000000000/governance/votes/ExecutiveXXX.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20July%2029%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-07-27 MakerDAO Executive Spell | Hash: 0x0000000000000000000000000000000000000000000000000000000000000000";
+        "2022-07-27 MakerDAO Executive Spell | Hash: 0x3306da286ebc0e0a4f47e9cc9c831c3af02256d6c2f3aac95deff08b47b3d743";
 
     address constant RWA_TOKEN_FAB = 0x2B3a4c18705e99bC29b22222dA7E10b643658552;
 
