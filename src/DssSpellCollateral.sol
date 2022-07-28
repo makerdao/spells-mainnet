@@ -60,7 +60,6 @@ contract DssSpellCollateralAction {
     //
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmX2QMoM1SZq2XMoTbMak8pZP86Y2icpgPAKDjQg4r4YHn
-    //
 
     uint256 constant ZERO_PCT_RATE           = 1000000000000000000000000000;
     uint256 constant ZERO_ZERO_FIVE_PCT_RATE = 1000000000015850933588756013;
