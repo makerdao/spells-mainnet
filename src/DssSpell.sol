@@ -32,6 +32,22 @@ interface RwaUrnLike {
     function draw(uint256) external;
 }
 
+interface PauseAbstract {
+    function delay() external view returns (uint256);
+    function plot(address, bytes32, bytes calldata, uint256) external;
+    function exec(address, bytes32, bytes calldata, uint256) external returns (bytes memory);
+}
+
+interface Changelog {
+    function getAddress(bytes32) external view returns (address);
+}
+
+interface SpellAction {
+    function officeHours() external view returns (bool);
+    function description() external view returns (string memory);
+    function nextCastTime(uint256) external view returns (uint256);
+}
+
 interface DssExecLike {
     function done() external view returns (bool);
 }
@@ -46,8 +62,6 @@ contract DssExec {
     address       immutable public action;
     uint256       immutable public expiration;
     PauseAbstract immutable public pause;
-
-    address constant public PREVIOUS_SPELL = 0x67A45c2163798d47c32Fc2bcD5Dc0ABc6dCDFe78;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -86,8 +100,7 @@ contract DssExec {
         pause.plot(action, tag, sig, eta);
     }
 
-    function cast() public {
-        require(DssExecLike(PREVIOUS_SPELL).done(), "DssExec/previous-spell-not-cast");
+    function cast() public virtual {
         require(!done, "spell-already-cast");
         done = true;
         pause.exec(action, tag, sig, eta);
@@ -138,5 +151,15 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 }
 
 contract DssSpell is DssExec {
+
+    address constant public PREVIOUS_SPELL = 0x67A45c2163798d47c32Fc2bcD5Dc0ABc6dCDFe78;
+
     constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) public {}
+
+    function cast() public override {
+        require(DssExecLike(PREVIOUS_SPELL).done(), "DssExec/previous-spell-not-cast");
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
 }
