@@ -84,8 +84,8 @@ contract DssSpellAction is DssAction {
             VestLike(MCD_VEST_DAI).create({
                 usr: 0x37b375e3D418fbECba6b283e704F840AB32f3b3C,
                 tot: 215_000 * WAD,
-                bgn: 1656633600,
-                tau: 18489600,
+                bgn: JUL_01_2022,
+                tau: FEB_01_2023 - JUL_01_2022,
                 eta: 0,
                 mgr: address(0) // 0x45fEEBbd5Cf86dF61be8F81025E22Ae07a07cB23
             })
