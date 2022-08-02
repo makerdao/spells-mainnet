@@ -49,6 +49,8 @@ contract DssSpellAction is DssAction {
 
     uint256 public constant WAD                = 10**18;
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
+    uint256 public constant JUL_01_2022        = 1656633600;
+    uint256 public constant JAN_31_2023        = 1675123200;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -85,7 +87,7 @@ contract DssSpellAction is DssAction {
                 usr: 0x37b375e3D418fbECba6b283e704F840AB32f3b3C,
                 tot: 215_000 * WAD,
                 bgn: JUL_01_2022,
-                tau: FEB_01_2023 - JUL_01_2022,
+                tau: JAN_31_2023 - JUL_01_2022,
                 eta: 0,
                 mgr: address(0) // 0x45fEEBbd5Cf86dF61be8F81025E22Ae07a07cB23
             })
