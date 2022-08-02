@@ -35,11 +35,9 @@ interface RwaUrnLike {
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/969f04cfec25e56791fbe4503bcbe2df7a58df1e/governance/votes/Executive%20vote%20-%20July%2029%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%203%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-07-29 MakerDAO Executive Spell | Hash: 0x18850080b101bb43125dd2bec32e5e7196586c5614bb9a0f05f9bbe392901d64";
-
-    address constant RWA_TOKEN_FAB = 0x2B3a4c18705e99bC29b22222dA7E10b643658552;
+        "2022-08-03 MakerDAO Executive Spell | Hash: TODO";
 
     uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
@@ -54,22 +52,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //
 
     function officeHours() public override returns (bool) {
-        return true;
+        return false;
     }
 
     function actions() public override {
 
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
-        onboardNewCollaterals();
+        // onboardNewCollaterals();
         // offboardCollaterals();
 
         drawFromRWA009Urn();
-
-        // Add RWA_TOKEN_FAB to changelog
-        DssExecLib.setChangelogAddress("RWA_TOKEN_FAB", RWA_TOKEN_FAB);
-
-        DssExecLib.setChangelogVersion("1.13.3");
     }
 
     function drawFromRWA009Urn() internal {
