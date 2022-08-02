@@ -439,8 +439,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Friday, 1 July 2022 00:00:00
         uint256 JUL_01_2022 = 1656633600;
-        // Tuesday, 31 January 2023 00:00:00
-        uint256 JAN_31_2023 = 1675123200;
+        // Wednesday, 1 February 2023 00:00:00
+        uint256 FEB_01_2023 = 1675209600;
 
         assertEq(vest.ids(), 8);
 
@@ -455,8 +455,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(9), KEEP3R_VEST_STREAMING);
         assertEq(vest.bgn(9), JUL_01_2022);
         assertEq(vest.clf(9), JUL_01_2022);
-        assertEq(vest.fin(9), JAN_31_2023);
-        assertEq(vest.fin(9), JUL_01_2022 + 214 days);
+        assertEq(vest.fin(9), FEB_01_2023);
+        assertEq(vest.fin(9), JUL_01_2022 + 215 days);
         assertEq(vest.mgr(9), address(0));
         assertEq(vest.res(9), 1);
         assertEq(vest.tot(9), 215000 * WAD);
@@ -467,7 +467,7 @@ contract DssSpellTest is DssSpellTestBase {
         vest.unrestrict(9);
 
         uint256 prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);
-        hevm.warp(JUL_01_2022 + 214 days);
+        hevm.warp(JUL_01_2022 + 215 days);
         assertTrue(tryVest(address(vest), 9));
         assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
