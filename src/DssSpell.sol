@@ -23,10 +23,6 @@ import "dss-exec-lib/DssAction.sol";
 
 // import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
-interface VatLike {
-    function ilks(bytes32) external view returns (uint256, uint256, uint256, uint256, uint256);
-}
-
 interface RwaUrnLike {
     function draw(uint256) external;
 }
@@ -39,8 +35,6 @@ contract DssSpellAction is DssAction {
         "2022-08-03 MakerDAO Executive Spell | Hash: TODO";
 
     uint256 public constant WAD                = 10**18;
-    address public constant MCD_VAT            = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
-    bytes32 public constant RWA009_ILK         = "RWA009-A";
     address public constant RWA009_A_URN       = 0x1818EE501cd28e01E058E7C283E178E9e04a1e79;
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
@@ -67,10 +61,7 @@ contract DssSpellAction is DssAction {
 
 
         // Huntingdon Valley (HVBank) Vault Drawdown
-        (, uint256 rate,,,) = VatLike(MCD_VAT).ilks(RWA009_ILK);
-        if (rate != 0) {
-            RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
-        }
+        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
     }
 
 }
