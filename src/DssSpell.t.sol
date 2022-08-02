@@ -18,36 +18,28 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory, address, uint48 toc, uint48 tau);
-    function bump(bytes32 ilk, uint256 val) external;
-    function tell(bytes32) external;
-    function cure(bytes32) external;
-    function cull(bytes32, address) external;
-    function good(bytes32) external view returns (bool);
-}
-
-interface RwaUrnLike {
-    function can(address) external view returns (uint256);
-    function lock(uint256) external;
-    function draw(uint256) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
-}
-
-interface RwaOutputConduitLike {
-    function can(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function pick(address) external;
-    function push() external;
-}
-
-interface RwaInputConduitLike {
-    function may(address) external view returns (uint256);
-    function push() external;
+interface ERC20Like {
+    function balanceOf(address) external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
+
+    function test_RWA009Draw() public {
+
+        address dai         = addr.addr("MCD_DAI");
+        address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
+        uint256 prevBalance = ERC20Like(dai).balanceOf(conduit);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
+
+        uint256 nextBalance = ERC20Like(dai).balanceOf(conduit);
+        uint256 drawAmount  = 25_000_000 * WAD;
+        log_named_uint("prev balance", prevBalance);
+        log_named_uint("next balance", nextBalance);
+        assertEq(nextBalance, prevBalance + drawAmount);
+    }
 
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();

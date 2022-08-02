@@ -21,25 +21,28 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
+// import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
-interface ERC20Like {
-    function approve(address, uint256) external returns (bool);
+interface VatLike {
+    function ilks(bytes32) external view returns (uint256, uint256, uint256, uint256, uint256);
 }
 
 interface RwaUrnLike {
-    function lock(uint256) external;
     function draw(uint256) external;
 }
 
-contract DssSpellAction is DssAction, DssSpellCollateralAction {
+contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%203%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2022-08-03 MakerDAO Executive Spell | Hash: TODO";
 
-    uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
+    uint256 public constant WAD                = 10**18;
+    address public constant MCD_VAT            = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
+    bytes32 public constant RWA009_ILK         = "RWA009-A";
+    address public constant RWA009_A_URN       = 0x1818EE501cd28e01E058E7C283E178E9e04a1e79;
+    uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -62,17 +65,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
-        drawFromRWA009Urn();
+        (, uint256 rate,,,) = VatLike(MCD_VAT).ilks(RWA009_ILK);
+        if (rate != 0) {
+            RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
+        }
     }
 
-    function drawFromRWA009Urn() internal {
-        // lock RWA009 Token in the URN
-        ERC20Like(RWA009).approve(RWA009_A_URN, 1 * WAD);
-        RwaUrnLike(RWA009_A_URN).lock(1 * WAD);
-
-        // draw DAI to genesis address
-        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
-    }
 }
 
 contract DssSpell is DssExec {
