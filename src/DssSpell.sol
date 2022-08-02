@@ -65,6 +65,8 @@ contract DssSpellAction is DssAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
+
+        // Huntingdon Valley (HVBank) Vault Drawdown
         (, uint256 rate,,,) = VatLike(MCD_VAT).ilks(RWA009_ILK);
         if (rate != 0) {
             RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
