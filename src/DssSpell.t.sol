@@ -451,82 +451,43 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() private {
+    function testVestDAI() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
-        address SF_WALLET              = wallets.addr("SF_WALLET");
-        address GRO_WALLET             = wallets.addr("GRO_WALLET");
         address KEEP3R_VEST_STREAMING = wallets.addr("KEEP3R_VEST_STREAMING");
 
         // Friday, 1 July 2022 00:00:00
         uint256 JUL_01_2022 = 1656633600;
         // Tuesday, 31 January 2023 00:00:00
         uint256 JAN_31_2023 = 1675123200;
-        // Friday, 30 June 2023 00:00:00
-        uint256 JUN_30_2023 = 1688083200;
-        // Saturday, 1 July 2023 00:00:00
-        uint256 JUL_01_2023 = 1688169600;
 
-        assertEq(vest.ids(), 5);
+        assertEq(vest.ids(), 8);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 8);
+        assertEq(vest.ids(), 9);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertEq(vest.usr(6), SF_WALLET);
-        assertEq(vest.bgn(6), JUL_01_2022);
-        assertEq(vest.clf(6), JUL_01_2022);
-        assertEq(vest.fin(6), JUL_01_2023);
-        assertEq(vest.fin(6), JUL_01_2022 + 365 days);
-        assertEq(vest.mgr(6), address(0));
-        assertEq(vest.res(6), 1);
-        assertEq(vest.tot(6), 989004 * WAD);
-        assertEq(vest.rxd(6), 0);
-
-        assertEq(vest.usr(7), GRO_WALLET);
-        assertEq(vest.bgn(7), JUL_01_2022);
-        assertEq(vest.clf(7), JUL_01_2022);
-        assertEq(vest.fin(7), JUN_30_2023);
-        assertEq(vest.fin(7), JUL_01_2022 + 364 days);
-        assertEq(vest.mgr(7), address(0));
-        assertEq(vest.res(7), 1);
-        assertEq(vest.tot(7), 2913995 * WAD);
-        assertEq(vest.rxd(7), 0);
-
-        assertEq(vest.usr(8), KEEP3R_VEST_STREAMING);
-        assertEq(vest.bgn(8), JUL_01_2022);
-        assertEq(vest.clf(8), JUL_01_2022);
-        assertEq(vest.fin(8), JAN_31_2023);
-        assertEq(vest.fin(8), JUL_01_2022 + 214 days);
-        assertEq(vest.mgr(8), address(0));
-        assertEq(vest.res(8), 1);
-        assertEq(vest.tot(8), 215000 * WAD);
-        assertEq(vest.rxd(8), 0);
+        assertEq(vest.usr(9), KEEP3R_VEST_STREAMING);
+        assertEq(vest.bgn(9), JUL_01_2022);
+        assertEq(vest.clf(9), JUL_01_2022);
+        assertEq(vest.fin(9), JAN_31_2023);
+        assertEq(vest.fin(9), JUL_01_2022 + 214 days);
+        assertEq(vest.mgr(9), address(0));
+        assertEq(vest.res(9), 1);
+        assertEq(vest.tot(9), 215000 * WAD);
+        assertEq(vest.rxd(9), 0);
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
-        vest.unrestrict(6);
-        vest.unrestrict(7);
-        vest.unrestrict(8);
+        vest.unrestrict(9);
 
-        uint256 prevBalance;
-        hevm.warp(JUL_01_2022 + 365 days);
-        prevBalance = dai.balanceOf(SF_WALLET);
-        assertTrue(tryVest(address(vest), 6));
-        assertEq(dai.balanceOf(SF_WALLET), prevBalance + 989004 * WAD);
-
-        hevm.warp(JUL_01_2022 + 364 days);
-        prevBalance = dai.balanceOf(GRO_WALLET);
-        assertTrue(tryVest(address(vest), 7));
-        assertEq(dai.balanceOf(GRO_WALLET), prevBalance + 2913995 * WAD);
-
+        uint256 prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);
         hevm.warp(JUL_01_2022 + 214 days);
-        prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);
-        assertTrue(tryVest(address(vest), 8));
+        assertTrue(tryVest(address(vest), 9));
         assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
 

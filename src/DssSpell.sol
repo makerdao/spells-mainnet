@@ -27,6 +27,19 @@ interface RwaUrnLike {
     function draw(uint256) external;
 }
 
+interface VestLike {
+    function yank(uint256) external;
+    function restrict(uint256) external;
+    function create(
+        address usr,
+        uint256 tot,
+        uint256 bgn,
+        uint256 tau,
+        uint256 eta,
+        address mgr
+    ) external returns (uint256);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -37,6 +50,7 @@ contract DssSpellAction is DssAction {
     uint256 public constant WAD                = 10**18;
     address public constant RWA009_A_URN       = 0x1818EE501cd28e01E058E7C283E178E9e04a1e79;
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
+    address public constant MCD_VEST_DAI       = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -62,6 +76,20 @@ contract DssSpellAction is DssAction {
 
         // Huntingdon Valley (HVBank) Vault Drawdown
         RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
+
+
+        // Keep3r Network Stream Re-Deployment
+        VestLike(MCD_VEST_DAI).yank(8);
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create({
+                usr: 0x37b375e3D418fbECba6b283e704F840AB32f3b3C,
+                tot: 215_000 * WAD,
+                bgn: 1656633600,
+                tau: 18489600,
+                eta: 0,
+                mgr: address(0)
+            })
+        );
     }
 
 }
