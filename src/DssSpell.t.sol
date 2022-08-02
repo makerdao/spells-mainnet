@@ -36,8 +36,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 nextBalance = ERC20Like(dai).balanceOf(conduit);
         uint256 drawAmount  = 25_000_000 * WAD;
-        log_named_uint("prev balance", prevBalance);
-        log_named_uint("next balance", nextBalance);
         assertEq(nextBalance, prevBalance + drawAmount);
     }
 
