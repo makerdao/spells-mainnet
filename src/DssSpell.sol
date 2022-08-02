@@ -48,9 +48,7 @@ contract DssSpellAction is DssAction {
         "2022-08-03 MakerDAO Executive Spell | Hash: TODO";
 
     uint256 public constant WAD                = 10**18;
-    address public constant RWA009_A_URN       = 0x1818EE501cd28e01E058E7C283E178E9e04a1e79;
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
-    address public constant MCD_VEST_DAI       = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -73,6 +71,8 @@ contract DssSpellAction is DssAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
+        address RWA009_A_URN = DssExecLib.getChangelogAddress("RWA009_A_URN");
+        address MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
 
         // Huntingdon Valley (HVBank) Vault Drawdown
         RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
@@ -87,7 +87,7 @@ contract DssSpellAction is DssAction {
                 bgn: 1656633600,
                 tau: 18489600,
                 eta: 0,
-                mgr: address(0)
+                mgr: address(0) // 0x45fEEBbd5Cf86dF61be8F81025E22Ae07a07cB23
             })
         );
     }

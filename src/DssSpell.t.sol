@@ -24,21 +24,6 @@ interface ERC20Like {
 
 contract DssSpellTest is DssSpellTestBase {
 
-    function test_RWA009Draw() public {
-
-        address dai         = addr.addr("MCD_DAI");
-        address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
-        uint256 prevBalance = ERC20Like(dai).balanceOf(conduit);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
-
-        uint256 nextBalance = ERC20Like(dai).balanceOf(conduit);
-        uint256 drawAmount  = 25_000_000 * WAD;
-        assertEq(nextBalance, prevBalance + drawAmount);
-    }
-
     function testSpellIsCast_GENERAL() public {
         string memory description = new DssSpell().description();
         assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
@@ -547,6 +532,21 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
+    }
+
+    function test_RWA009Draw() public {
+
+        address dai         = addr.addr("MCD_DAI");
+        address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
+        uint256 prevBalance = ERC20Like(dai).balanceOf(conduit);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "DssSpellTest/spell-not-done");
+
+        uint256 nextBalance = ERC20Like(dai).balanceOf(conduit);
+        uint256 drawAmount  = 25_000_000 * WAD;
+        assertEq(nextBalance, prevBalance + drawAmount);
     }
 
 }
