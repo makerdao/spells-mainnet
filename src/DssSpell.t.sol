@@ -18,10 +18,6 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface ERC20Like {
-    function balanceOf(address) external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -536,15 +532,14 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_RWA009Draw() public {
 
-        address dai         = addr.addr("MCD_DAI");
         address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
-        uint256 prevBalance = ERC20Like(dai).balanceOf(conduit);
+        uint256 prevBalance = dai.balanceOf(conduit);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
 
-        uint256 nextBalance = ERC20Like(dai).balanceOf(conduit);
+        uint256 nextBalance = dai.balanceOf(conduit);
         uint256 drawAmount  = 25_000_000 * WAD;
         assertEq(nextBalance, prevBalance + drawAmount);
     }
