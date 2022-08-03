@@ -89,7 +89,7 @@ contract DssSpellAction is DssAction {
                 bgn: JUL_01_2022,
                 tau: FEB_01_2023 - JUL_01_2022,
                 eta: 0,
-                mgr: address(0) // 0x45fEEBbd5Cf86dF61be8F81025E22Ae07a07cB23
+                mgr: address(0)
             })
         );
     }
