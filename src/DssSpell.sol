@@ -43,9 +43,9 @@ interface VestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20August%203%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/585e2e732a5a13125a2df34245f75f0f95839c8e/governance/votes/Executive%20Vote%20-%20August%203%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-08-03 MakerDAO Executive Spell | Hash: TODO";
+        "2022-08-03 MakerDAO Executive Spell | Hash: 0x732b6178deb82f7df569adac9f94cc5aefb34966200a035e7585722ec01f1a8a";
 
     uint256 public constant WAD                = 10**18;
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
