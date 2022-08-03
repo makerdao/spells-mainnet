@@ -472,6 +472,23 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
 
+    function testYankDAI() public { // make private if not in use
+
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        address KEEP3R_VEST_STREAMING_LEGACY = wallets.addr("KEEP3R_VEST_STREAMING_LEGACY");
+        // Tuesday, 31 January 2023 00:00:00
+        uint256 JAN_31_2023 = 1675123200;
+
+        assertEq(vest.usr(8), KEEP3R_VEST_STREAMING_LEGACY);
+        assertEq(vest.fin(8), JAN_31_2023);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vest.fin(8), block.timestamp);
+    }
+
     function testVestMKR() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 22);
