@@ -126,7 +126,7 @@ contract DssSpellAction is DssAction {
         // ----------------------- Activate SocGen Vault -----------------------
         // NOTE: ignore in goerli
         // call hope() on RWA008_A_OUTPUT_CONDUIT
-        // https://discord.com/channels/893112320329396265/897483518316265553/1005127577515597905
+        // https://forum.makerdao.com/t/socgen-forge-ofh-granting-final-permission-after-the-onboarding/17033
         address RWA008_A_OPERATOR       = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
         address RWA008_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress("RWA008_A_OUTPUT_CONDUIT");
         HopeLike(RWA008_A_OUTPUT_CONDUIT).hope(RWA008_A_OPERATOR);
