@@ -59,29 +59,28 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make public to use
+    function testPayments() public { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[15] memory payees = [
-            Payee(wallets.addr("GRO_WALLET"),       648_134),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),    11_573),
-            Payee(wallets.addr("FLIPFLOPFLAP"),      11_528),
-            Payee(wallets.addr("ULTRASCHUPPI"),      11_292),
-            Payee(wallets.addr("MAKERMAN"),           9_366),
-            Payee(wallets.addr("ACREINVEST"),         8_813),
-            Payee(wallets.addr("JUSTINCASE"),         8_158),
-            Payee(wallets.addr("GFXLABS"),            6_679),
-            Payee(wallets.addr("DOO"),                5_075),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),     3_795),
-            Payee(wallets.addr("FLIPSIDE"),           3_186),
-            Payee(wallets.addr("CHRISBLEC"),          2_739),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 2_150),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"),   704),
-            Payee(wallets.addr("GOVERNANCEHOUSE"),      127)
+        Payee[12] memory payees = [
+            // Payee(wallets.addr("FLIPFLOPFLAP"),      12_000),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),    12_000),
+            Payee(wallets.addr("JUSTINCASE"),        12_000),
+            Payee(wallets.addr("DOO"),               12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),      11_918),
+            Payee(wallets.addr("FLIPSIDE"),          11_387),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     9_438),
+            Payee(wallets.addr("CHRISBLEC"),          9_174),
+            Payee(wallets.addr("GFXLABS"),            8_512),
+            // Payee(wallets.addr("MAKERMAN"),           6_912),
+            Payee(wallets.addr("ACREINVEST"),         6_628),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"), 4_029),
+            Payee(wallets.addr("LLAMA"),              3_797),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 2_013)
         ];
 
         uint256 prevBalance;

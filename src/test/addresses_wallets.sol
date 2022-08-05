@@ -59,11 +59,11 @@ contract Wallets {
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["DOO"]                          = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
         addr["FLIPSIDE"]                     = 0x62a43123FE71f9764f26554b3F5017627996816a;
-        addr["PENNBLOCKCHAIN"]               = 0x070341aA5Ed571f0FB2c4a5641409B1A46b4961b;
+        addr["PENNBLOCKCHAIN"]               = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
         addr["CHRISBLEC"]                    = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
         addr["BLOCKCHAINCOLUMBIA"]           = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
         addr["MHONKASALOTEEMULAU"]           = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
-        addr["GOVERNANCEHOUSE"]              = 0x82cD339Fa7d6f22242B31d5f7ea37c1B721dB9C3;
+        addr["LLAMA"]                        = 0x82cD339Fa7d6f22242B31d5f7ea37c1B721dB9C3;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
