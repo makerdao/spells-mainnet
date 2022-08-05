@@ -576,7 +576,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 1, "RWA008: bad outputConduit.can(operator)");
+        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 1, "RWA008: [post-spell] bad outputConduit.can(operator)");
     }
 
 }
