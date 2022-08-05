@@ -543,6 +543,13 @@ contract DssSpellTest is DssSpellTestBase {
         address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
         uint256 prevBalance = dai.balanceOf(conduit);
 
+        address rwaUrn009 = addr.addr("RWA009_A_URN");
+        (uint256 pink, uint256 part) = vat.urns("RWA009-A", address(rwaUrn009));
+
+        assertEq(prevBalance, 25_000_000 * WAD, "RWA009/bad-recipient-balance-before-spell");
+        assertEq(pink, 1 * WAD,                 "RWA009/bad-art-before-spell");
+        assertEq(part, 25_000_000 * WAD,        "RWA009/bad-ink-before-spell");
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
@@ -550,6 +557,10 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 nextBalance = dai.balanceOf(conduit);
         uint256 drawAmount  = 25_000_000 * WAD;
         assertEq(nextBalance, prevBalance + drawAmount);
+
+        (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaUrn009));
+        assertEq(art, part + drawAmount, "RWA009/bad-art-after-spell"); // DAI drawn == art as rate should always be 1 RAY
+        assertEq(ink, pink,              "RWA009/bad-ink-after-spell"); // Whole unit of collateral is locked. should not change
     }
 
 }
