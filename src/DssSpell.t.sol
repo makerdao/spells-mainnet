@@ -142,26 +142,17 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // RWA008
-        checkChainlogKey("RWA008");
-        checkChainlogKey("MCD_JOIN_RWA008_A");
-        checkChainlogKey("RWA008_A_URN");
-        checkChainlogKey("RWA008_A_OUTPUT_CONDUIT");
-        checkChainlogKey("RWA008_A_INPUT_CONDUIT");
-        checkChainlogKey("PIP_RWA008");
-
-        // RWA009
-        checkChainlogKey("RWA009_A_JAR");
-        checkChainlogKey("RWA009");
-        checkChainlogKey("MCD_JOIN_RWA009_A");
-        checkChainlogKey("RWA009_A_URN");
-        checkChainlogKey("RWA009_A_OUTPUT_CONDUIT");
-        checkChainlogKey("PIP_RWA009");
+        // checkChainlogKey("RWA009_A_JAR");
+        // checkChainlogKey("RWA009");
+        // checkChainlogKey("MCD_JOIN_RWA009_A");
+        // checkChainlogKey("RWA009_A_URN");
+        // checkChainlogKey("RWA009_A_OUTPUT_CONDUIT");
+        // checkChainlogKey("PIP_RWA009");
 
         // RWA TOKEN FAB
-        checkChainlogKey("RWA_TOKEN_FAB");
+        // checkChainlogKey("RWA_TOKEN_FAB");
 
-        checkChainlogVersion("1.13.3");
+        // checkChainlogVersion("1.13.3");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -432,7 +423,7 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() public {
+    function testVestDAI() private {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         address KEEP3R_VEST_STREAMING = wallets.addr("KEEP3R_VEST_STREAMING");
@@ -472,7 +463,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
 
-    function testYankDAI() public { // make private if not in use
+    function testYankDAI() private { // make private if not in use
 
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         address KEEP3R_VEST_STREAMING_LEGACY = wallets.addr("KEEP3R_VEST_STREAMING_LEGACY");
