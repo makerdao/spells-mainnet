@@ -570,7 +570,7 @@ contract DssSpellTest is DssSpellTestBase {
         // SocGen's wallet
         address RWA008_A_OPERATOR = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
         RwaOutputConduitLike rwaconduitout_008 = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
-        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 0, "RWA008: bad outputConduit.can(operator)");
+        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 0, "RWA008: [pre-spell] bad outputConduit.can(operator)");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
