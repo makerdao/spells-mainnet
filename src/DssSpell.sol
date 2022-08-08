@@ -136,8 +136,8 @@ contract DssSpellAction is DssAction {
         // Recognized Delegate Compensation - July 2022
         // https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-july-2022/16995
 
-        //                                Flip Flop Flap Delegate LLC  12000 DAI
-        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET, 12_000);
+        //                                Flip Flop Flap Delegate LLC     12000 DAI
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET,    12_000);
         //                                      Feedblack Loops LLC       12000 DAI
         DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET,   12_000);
         //                                      JustinCase                12000 DAI
