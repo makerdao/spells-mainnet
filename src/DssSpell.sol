@@ -44,7 +44,7 @@ contract DssSpellAction is DssAction {
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Recognized Delegates DAI Transfers
-    // address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
     address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
     address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
     address constant DOO_WALLET             = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
@@ -53,7 +53,7 @@ contract DssSpellAction is DssAction {
     address constant PENN_BLOCKCHAIN        = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
     address constant CHRIS_BLEC             = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
     address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
-    // address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
     address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address constant MHONKASALO_TEEMULAU    = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
     address constant LLAMA                  = 0x82cD339Fa7d6f22242B31d5f7ea37c1B721dB9C3;
@@ -137,7 +137,7 @@ contract DssSpellAction is DssAction {
         // https://forum.makerdao.com/t/recognized-delegate-compensation-breakdown-july-2022/16995
 
         //                                Flip Flop Flap Delegate LLC  12000 DAI
-        // DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET, 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET, 12_000);
         //                                      Feedblack Loops LLC       12000 DAI
         DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET,   12_000);
         //                                      JustinCase                12000 DAI
@@ -155,7 +155,7 @@ contract DssSpellAction is DssAction {
         //                                      GFX Labs                   8512 DAI
         DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,           8_512);
         //                                      MakerMan                   6912 DAI
-        // DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET,           6_912);
+        DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET,           6_912);
         //                                      ACREInvest                 6628 DAI
         DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET,        6_628);
         //                                      mhonkasalo & teemulau      4029 DAI

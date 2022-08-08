@@ -66,8 +66,8 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[12] memory payees = [
-            // Payee(wallets.addr("FLIPFLOPFLAP"),      12_000),
+        Payee[14] memory payees = [
+            Payee(wallets.addr("FLIPFLOPFLAP"),      12_000),
             Payee(wallets.addr("FEEDBLACKLOOPS"),    12_000),
             Payee(wallets.addr("JUSTINCASE"),        12_000),
             Payee(wallets.addr("DOO"),               12_000),
@@ -76,7 +76,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("PENNBLOCKCHAIN"),     9_438),
             Payee(wallets.addr("CHRISBLEC"),          9_174),
             Payee(wallets.addr("GFXLABS"),            8_512),
-            // Payee(wallets.addr("MAKERMAN"),           6_912),
+            Payee(wallets.addr("MAKERMAN"),           6_912),
             Payee(wallets.addr("ACREINVEST"),         6_628),
             Payee(wallets.addr("MHONKASALOTEEMULAU"), 4_029),
             Payee(wallets.addr("LLAMA"),              3_797),
@@ -549,9 +549,7 @@ contract DssSpellTest is DssSpellTestBase {
         address rwaUrn009 = addr.addr("RWA009_A_URN");
         (uint256 pink, uint256 part) = vat.urns("RWA009-A", address(rwaUrn009));
 
-        assertEq(prevBalance, 25_000_000 * WAD, "RWA009/bad-recipient-balance-before-spell");
         assertEq(pink, 1 * WAD,                 "RWA009/bad-art-before-spell");
-        assertEq(part, 25_000_000 * WAD,        "RWA009/bad-ink-before-spell");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
