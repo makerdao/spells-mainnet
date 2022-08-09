@@ -41,7 +41,6 @@ contract DssSpellAction is DssAction {
     uint256 public constant MILLION            = 10 **  6;
     uint256 public constant BILLION            = 10 **  9;
     uint256 public constant WAD                = 10 ** 18;
-    uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Recognized Delegates DAI Transfers
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
@@ -81,13 +80,6 @@ contract DssSpellAction is DssAction {
         // Includes changes from the DssSpellCollateralAction
         // onboardNewCollaterals();
         // offboardCollaterals();
-
-
-        // ----------------------------- RWA Draws -----------------------------
-        // https://vote.makerdao.com/polling/QmQMDasC#poll-detail
-        // Weekly Draw for HVB
-        address RWA009_A_URN = DssExecLib.getChangelogAddress("RWA009_A_URN");
-        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
 
         // --------------------------- Rates updates ---------------------------
         // https://vote.makerdao.com/polling/QmfMRfE4#poll-detail

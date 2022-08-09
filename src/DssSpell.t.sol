@@ -556,7 +556,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "DssSpellTest/spell-not-done");
 
         uint256 nextBalance = dai.balanceOf(conduit);
-        uint256 drawAmount  = 25_000_000 * WAD;
+        uint256 drawAmount  = 0 * WAD;
         assertEq(nextBalance, prevBalance + drawAmount);
 
         (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaUrn009));
