@@ -541,7 +541,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
     }
 
-    function test_RWA009Draw() public {
+    function test_RWA009NoDraw() public {
 
         address conduit     = addr.addr("RWA009_A_OUTPUT_CONDUIT");
         uint256 prevBalance = dai.balanceOf(conduit);

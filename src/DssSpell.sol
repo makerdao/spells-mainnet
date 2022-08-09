@@ -34,9 +34,9 @@ interface HopeLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c9635597359fdda294f689fc30e04c80afa8ecd9/governance/votes/Executive%20vote%20-%20August%2010%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/TODO.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-08-10 MakerDAO Executive Spell | Hash: 0x0e16e57649555259f4b68650c8ff8e08020431b3b5f008af6f6ae364e03c8e5d";
+        "2022-08-10 MakerDAO Executive Spell | Hash: ";
 
     uint256 public constant MILLION            = 10 **  6;
     uint256 public constant BILLION            = 10 **  9;
