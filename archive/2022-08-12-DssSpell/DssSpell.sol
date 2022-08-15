@@ -34,14 +34,13 @@ interface HopeLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c9635597359fdda294f689fc30e04c80afa8ecd9/governance/votes/Executive%20vote%20-%20August%2010%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0845cb91e15d928e636918e9b59da83f68e86a5f/governance/votes/Executive%20vote%20-%20August%2012%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-08-10 MakerDAO Executive Spell | Hash: 0x0e16e57649555259f4b68650c8ff8e08020431b3b5f008af6f6ae364e03c8e5d";
+        "2022-08-10 MakerDAO Executive Spell | Hash: 0xe8f7b317e95c89b79044775787087895c0b4b65486e4ad21246cfac10da2ea17";
 
     uint256 public constant MILLION            = 10 **  6;
     uint256 public constant BILLION            = 10 **  9;
     uint256 public constant WAD                = 10 ** 18;
-    uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Recognized Delegates DAI Transfers
     address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
@@ -75,19 +74,16 @@ contract DssSpellAction is DssAction {
     uint256 public constant TWO_TWO_FIVE_PCT_RATE     = 1000000000705562181084137268;
     uint256 public constant THREE_SEVEN_FIVE_PCT_RATE = 1000000001167363430498603315;
 
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     function actions() public override {
 
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
         // onboardNewCollaterals();
         // offboardCollaterals();
-
-
-        // ----------------------------- RWA Draws -----------------------------
-        // https://vote.makerdao.com/polling/QmQMDasC#poll-detail
-        // Weekly Draw for HVB
-        address RWA009_A_URN = DssExecLib.getChangelogAddress("RWA009_A_URN");
-        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
 
         // --------------------------- Rates updates ---------------------------
         // https://vote.makerdao.com/polling/QmfMRfE4#poll-detail
