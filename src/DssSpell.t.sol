@@ -59,7 +59,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to use
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -540,18 +540,4 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
     }
-
-    function testRWA008_MIP21_UPDATED_PERMISSIONS() public {
-        // SocGen's wallet
-        address RWA008_A_OPERATOR = 0x03f1A14A5b31e2f1751b6db368451dFCEA5A0439;
-        RwaOutputConduitLike rwaconduitout_008 = RwaOutputConduitLike(addr.addr("RWA008_A_OUTPUT_CONDUIT"));
-        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 0, "RWA008: [pre-spell] bad outputConduit.can(operator)");
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(rwaconduitout_008.can(RWA008_A_OPERATOR), 1, "RWA008: [post-spell] bad outputConduit.can(operator)");
-    }
-
 }
