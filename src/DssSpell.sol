@@ -23,6 +23,10 @@ import "dss-exec-lib/DssAction.sol";
 
 // import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
+interface RwaUrnLike {
+    function draw(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -33,6 +37,8 @@ contract DssSpellAction is DssAction {
     uint256 public constant MILLION = 10 **  6;
     uint256 public constant BILLION = 10 **  9;
     uint256 public constant WAD     = 10 ** 18;
+
+    uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -45,18 +51,19 @@ contract DssSpellAction is DssAction {
     //
     // --- Rates ---
 
-    function officeHours() public override returns (bool) {
-        return false;
-    }
-
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
         // onboardNewCollaterals();
         // offboardCollaterals();
 
+        // ----------------------------- RWA Draws -----------------------------
+        // https://vote.makerdao.com/polling/QmQMDasC#poll-detail
+        // Weekly Draw for HVB
+        address RWA009_A_URN = DssExecLib.getChangelogAddress("RWA009_A_URN");
+        // Draw again for Aug 24th Exec Draw
+        RwaUrnLike(RWA009_A_URN).draw(RWA009_DRAW_AMOUNT);
     }
-
 }
 
 contract DssSpell is DssExec {
