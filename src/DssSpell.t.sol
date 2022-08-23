@@ -543,7 +543,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRWA009_SPELL_DRAW() public {
         address rwaUrn009       = addr.addr("RWA009_A_URN");
-        address rwaUrn009Output = addr.addr("RWA009_A_OUTPUT_CONDUIT"); // for goerli, we use the pause proxy
+        address rwaUrn009Output = addr.addr("RWA009_A_OUTPUT_CONDUIT"); 
 
         (uint256 pink, uint256 part) = vat.urns("RWA009-A", address(rwaUrn009));
         uint256 prevBalance = dai.balanceOf(address(rwaUrn009Output));
@@ -556,8 +556,8 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check if spell draw 25mm DAI to Output Conduit (Pause Proxy)
-        assertEq(dai.balanceOf(address(rwaUrn009Output)), prevBalance + drawAmount, "RWA009/dai-drawn-was-not-send-to-the-recipient");
+        // Check if spell draw 25mm DAI to Output Conduit
+        assertEq(dai.balanceOf(address(rwaUrn009Output)), prevBalance + drawAmount, "RWA009/dai-drawn-was-not-sent-to-the-recipient");
 
         (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaUrn009));
         assertEq(art, part + drawAmount, "RWA009/bad-art-after-spell"); // DAI drawn == art as rate should always be 1 RAY
