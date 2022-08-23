@@ -34,7 +34,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2022-08-24 MakerDAO Executive Spell | Hash: 0x47527eb9c08846cf35e779272c00c60f86ce6a5a745b46772ba5747d22e893e2";
 
-    uint256 public constant WAD     = 10 ** 18;
+    uint256 public constant WAD = 10**18;
 
     uint256 public constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
