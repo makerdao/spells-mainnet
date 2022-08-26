@@ -539,7 +539,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-lerp-", ilk));
             } else {
                 assertEq(mat, normalizedTestMat, concat("TestError/vat-mat-", ilk));
-                assertTrue(mat >= RAY && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr eq 100% and lt 1000%
+                assertTrue(mat >= 0 && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr gt 0% and lt 1000%
             }
             }
 

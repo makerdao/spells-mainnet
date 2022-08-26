@@ -110,7 +110,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell = SystemValues({
-            line_offset:           502 * MILLION,           // Offset between the global line against the sum of local lines
+            line_offset:           500 * MILLION,           // Offset between the global line against the sum of local lines
             pot_dsr:               1,                       // In basis points
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds
@@ -130,7 +130,7 @@ contract Config {
             osm_mom_authority:     chief,                   // OsmMom authority
             flipper_mom_authority: chief,                   // FlipperMom authority
             clipper_mom_authority: chief,                   // ClipperMom authority
-            ilk_count:             52                       // Num expected in system
+            ilk_count:             53                       // Num expected in system
         });
 
         //
@@ -1696,6 +1696,36 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
+            lerp:         false
+        });
+        afterSpell.collaterals["TELEPORT-FW-A"] = CollateralValues({
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
+            line:         2_000_000,
+            dust:         0,
+            pct:          0,
+            mat:          0,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            cat_dunk:     0,
+            flip_beg:     0,
+            flip_ttl:     0,
+            flip_tau:     0,
+            flipper_mom:  0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
             lerp:         false
         });
     }

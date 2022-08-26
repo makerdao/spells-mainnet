@@ -164,22 +164,21 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogVersion("1.14.0");
     }
 
-    function testNewIlkRegistryValues() private { // make public to use
+    function testNewIlkRegistryValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // RWA008 example
-        // (, address pipRwa008,,) = oracle.ilks("RWA008-A");
-
-        // assertEq(reg.pos("RWA008-A"),    50);
-        // assertEq(reg.join("RWA008-A"),   addr.addr("MCD_JOIN_RWA008_A"));
-        // assertEq(reg.gem("RWA008-A"),    addr.addr("RWA008"));
-        // assertEq(reg.dec("RWA008-A"),    GemAbstract(addr.addr("RWA008")).decimals());
-        // assertEq(reg.class("RWA008-A"),  3);
-        // assertEq(reg.pip("RWA008-A"),    pipRwa008);
-        // assertEq(reg.name("RWA008-A"),   "RWA008-A: SG Forge OFH");
-        // assertEq(reg.symbol("RWA008-A"), GemAbstract(addr.addr("RWA008")).symbol());
+        // Insert new ilk registry values tests here
+        assertEq(reg.pos("TELEPORT-FW-A"), 52);
+        assertEq(reg.join("TELEPORT-FW-A"), addr.addr("MCD_JOIN_TELEPORT_FW_A"));
+        assertEq(reg.gem("TELEPORT-FW-A"), addr.addr("MCD_DAI"));
+        assertEq(reg.dec("TELEPORT-FW-A"), GemAbstract(addr.addr("MCD_DAI")).decimals());
+        assertEq(reg.class("TELEPORT-FW-A"), 4);
+        assertEq(reg.pip("TELEPORT-FW-A"), address(0));
+        assertEq(reg.xlip("TELEPORT-FW-A"), address(0));
+        assertEq(reg.name("TELEPORT-FW-A"), "Dai Stablecoin");
+        assertEq(reg.symbol("TELEPORT-FW-A"), "DAI");
 
     }
 

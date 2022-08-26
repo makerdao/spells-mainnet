@@ -25,6 +25,8 @@ import "dss-exec-lib/DssAction.sol";
 
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { JugAbstract } from "dss-interfaces/dss/JugAbstract.sol";
+import { IlkRegistryAbstract } from "dss-interfaces/dss/IlkRegistryAbstract.sol";
+import { DaiAbstract } from "dss-interfaces/dss/DaiAbstract.sol";
 
 interface RwaUrnLike {
     function draw(uint256) external;
@@ -116,8 +118,15 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmahjYA2#poll-detail
         // https://forum.makerdao.com/t/layer-2-roadmap-history-and-future/17310#phase-1-l2-l1-fast-withdrawals-5
 
+        // Setup new ilk
+        VatAbstract vat = VatAbstract(DssExecLib.vat());
+        JugAbstract jug = JugAbstract(DssExecLib.jug());
+        CureLike cure = CureLike(DssExecLib.getChangelogAddress("MCD_CURE"));
+        address dai = DssExecLib.dai();
+        IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(DssExecLib.getChangelogAddress("ILK_REGISTRY"));
+
         // Run sanity checks
-        require(TeleportJoinLike(TELEPORT_JOIN).vat() == DssExecLib.vat());
+        require(TeleportJoinLike(TELEPORT_JOIN).vat() == address(vat));
         require(TeleportJoinLike(TELEPORT_JOIN).vow() == DssExecLib.vow());
         require(TeleportJoinLike(TELEPORT_JOIN).daiJoin() ==  DssExecLib.daiJoin());
         require(TeleportJoinLike(TELEPORT_JOIN).ilk() == ILK);
@@ -125,13 +134,7 @@ contract DssSpellAction is DssAction {
         require(TeleportOracleAuthLike(ORACLE_AUTH).teleportJoin() == TELEPORT_JOIN);
         require(TeleportRouterLike(ROUTER).gateways(DOMAIN_ETH) == TELEPORT_JOIN);
         require(TeleportRouterLike(ROUTER).domains(TELEPORT_JOIN) == DOMAIN_ETH);
-        require(TeleportRouterLike(ROUTER).dai() == DssExecLib.dai());
-
-        // Setup new ilk
-        VatAbstract vat = VatAbstract(DssExecLib.vat());
-        JugAbstract jug = JugAbstract(DssExecLib.jug());
-        CureLike cure = CureLike(DssExecLib.getChangelogAddress("MCD_CURE"));
-        address dai = DssExecLib.dai();
+        require(TeleportRouterLike(ROUTER).dai() == dai);
 
         vat.init(ILK);
         jug.init(ILK);
@@ -191,6 +194,19 @@ contract DssSpellAction is DssAction {
         // Authorize TeleportGateways to use the escrows
         EscrowLike(ESCROW_OPT).approve(dai, TELEPORT_GATEWAY_OPT, type(uint256).max);
         EscrowLike(ESCROW_ARB).approve(dai, TELEPORT_GATEWAY_ARB, type(uint256).max);
+
+        // Add to ilk registry
+        ilkRegistry.put(
+            ILK,
+            TELEPORT_JOIN,
+            dai,
+            DaiAbstract(dai).decimals(),
+            4,
+            address(0),
+            address(0),
+            DaiAbstract(dai).name(),
+            DaiAbstract(dai).symbol()
+        );
 
         // Configure Chainlog
         DssExecLib.setChangelogAddress("MCD_JOIN_TELEPORT_FW_A", TELEPORT_JOIN);
