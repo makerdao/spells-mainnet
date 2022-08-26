@@ -37,15 +37,24 @@ interface CureLike {
 interface TeleportJoinLike {
     function file(bytes32,bytes32,address) external;
     function file(bytes32,bytes32,uint256) external;
+    function vow() external view returns (address);
+    function vat() external view returns (address);
+    function daiJoin() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function domain() external view returns (bytes32);
 }
 
 interface TeleportRouterLike {
     function file(bytes32,bytes32,address) external;
+    function gateways(bytes32) external view returns (address);
+    function domains(address) external view returns (bytes32);
+    function dai() external view returns (address);
 }
 
 interface TeleportOracleAuthLike {
     function file(bytes32,uint256) external;
     function addSigners(address[] calldata) external;
+    function teleportJoin() external view returns (address);
 }
 
 interface EscrowLike {
@@ -106,6 +115,17 @@ contract DssSpellAction is DssAction {
         // ------------------ Setup Teleport Fast Withdrawals -----------------
         // https://vote.makerdao.com/polling/QmahjYA2#poll-detail
         // https://forum.makerdao.com/t/layer-2-roadmap-history-and-future/17310#phase-1-l2-l1-fast-withdrawals-5
+
+        // Run sanity checks
+        require(TeleportJoinLike(TELEPORT_JOIN).vat() == DssExecLib.vat());
+        require(TeleportJoinLike(TELEPORT_JOIN).vow() == DssExecLib.vow());
+        require(TeleportJoinLike(TELEPORT_JOIN).daiJoin() ==  DssExecLib.daiJoin());
+        require(TeleportJoinLike(TELEPORT_JOIN).ilk() == ILK);
+        require(TeleportJoinLike(TELEPORT_JOIN).domain() == DOMAIN_ETH);
+        require(TeleportOracleAuthLike(ORACLE_AUTH).teleportJoin() == TELEPORT_JOIN);
+        require(TeleportRouterLike(ROUTER).gateways(DOMAIN_ETH) == TELEPORT_JOIN);
+        require(TeleportRouterLike(ROUTER).domains(TELEPORT_JOIN) == DOMAIN_ETH);
+        require(TeleportRouterLike(ROUTER).dai() == DssExecLib.dai());
 
         // Setup new ilk
         VatAbstract vat = VatAbstract(DssExecLib.vat());

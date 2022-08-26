@@ -590,6 +590,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(join.wards(address(router)), 1);
         assertEq(join.vow(), address(vow));
         assertEq(join.daiJoin(), address(daiJoin));
+        assertEq(join.vat(), address(vat));
         assertEq(join.ilk(), ilk);
         assertEq(join.domain(), domain);
 
