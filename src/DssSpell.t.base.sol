@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "ds-math/math.sol";
 import "ds-test/test.sol";
@@ -28,10 +29,24 @@ import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
 
+struct TeleportGUID {
+    bytes32 sourceDomain;
+    bytes32 targetDomain;
+    bytes32 receiver;
+    bytes32 operator;
+    uint128 amount;
+    uint80 nonce;
+    uint48 timestamp;
+}
+
 interface Hevm {
     function warp(uint256) external;
     function store(address,bytes32,bytes32) external;
     function load(address,bytes32) external view returns (bytes32);
+    function addr(uint) external returns (address);
+    function sign(uint, bytes32) external returns (uint8, bytes32, bytes32);
+    function startPrank(address) external;
+    function stopPrank() external;
 }
 
 interface DssExecSpellLike {
@@ -70,6 +85,50 @@ interface CropJoinLike {
 
 interface CurveLPOsmLike is LPOsmAbstract {
     function orbs(uint256) external view returns (address);
+}
+
+interface TeleportJoinLike {
+    function wards(address) external view returns (uint256);
+    function fees(bytes32) external view returns (address);
+    function line(bytes32) external view returns (uint256);
+    function debt(bytes32) external view returns (int256);
+    function vow() external view returns (address);
+    function vat() external view returns (address);
+    function daiJoin() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function domain() external view returns (bytes32);
+}
+
+interface TeleportFeeLike {
+    function fee() external view returns (uint256);
+    function ttl() external view returns (uint256);
+}
+
+interface TeleportOracleAuthLike {
+    function signers(address) external view returns (uint256);
+    function teleportJoin() external view returns (address);
+    function threshold() external view returns (uint256);
+    function addSigners(address[] calldata) external;
+    function getSignHash(TeleportGUID calldata) external pure returns (bytes32);
+    function requestMint(
+        TeleportGUID calldata,
+        bytes calldata,
+        uint256,
+        uint256
+    ) external returns (uint256, uint256);
+}
+
+interface TeleportRouterLike {
+    function file(bytes32, bytes32, address) external;
+    function gateways(bytes32) external view returns (address);
+    function domains(address) external view returns (bytes32);
+    function dai() external view returns (address);
+    function requestMint(
+        TeleportGUID calldata,
+        uint256,
+        uint256
+    ) external returns (uint256, uint256);
+    function settle(bytes32, uint256) external;
 }
 
 contract DssSpellTestBase is Config, DSTest, DSMath {
@@ -1271,6 +1330,109 @@ function checkIlkClipper(
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function getSignatures(bytes32 signHash) internal returns (bytes memory signatures, address[] memory signers) {
+        // seeds chosen s.t. corresponding addresses are in ascending order
+        uint8[30] memory seeds = [8,10,6,2,9,15,14,20,7,29,24,13,12,25,16,26,21,22,0,18,17,27,3,28,23,19,4,5,1,11];
+        uint256 numSigners = seeds.length;
+        signers = new address[](numSigners);
+        for(uint256 i; i < numSigners; i++) {
+            uint256 sk = uint256(keccak256(abi.encode(seeds[i])));
+            signers[i] = hevm.addr(sk);
+            (uint8 v, bytes32 r, bytes32 s) = hevm.sign(sk, signHash);
+            signatures = abi.encodePacked(signatures, r, s, v);
+        }
+        assertEq(signatures.length, numSigners * 65);
+    }
+
+    function addressToBytes32(address addr) internal pure returns (bytes32) {
+        return bytes32(uint256(uint160(addr)));
+    }
+
+    function oracleAuthRequestMint(
+        bytes32 sourceDomain,
+        bytes32 targetDomain,
+        uint256 toMint,
+        uint256 expectedFee
+    ) internal {
+        TeleportOracleAuthLike oracleAuth = TeleportOracleAuthLike(addr.addr("MCD_ORACLE_AUTH_TELEPORT_FW_A"));
+        giveAuth(address(oracleAuth), address(this));
+        (bytes memory signatures, address[] memory signers) = getSignatures(oracleAuth.getSignHash(TeleportGUID({
+            sourceDomain: sourceDomain,
+            targetDomain: targetDomain,
+            receiver: bytes32(uint256(uint160(address(this)))),
+            operator: bytes32(0),
+            amount: uint128(toMint),
+            nonce: 1,
+            timestamp: uint48(block.timestamp)
+        })));
+        oracleAuth.addSigners(signers);
+        oracleAuth.requestMint(TeleportGUID({
+            sourceDomain: sourceDomain,
+            targetDomain: targetDomain,
+            receiver: bytes32(uint256(uint160(address(this)))),
+            operator: bytes32(0),
+            amount: uint128(toMint),
+            nonce: 1,
+            timestamp: uint48(block.timestamp)
+        }), signatures, expectedFee, 0);
+    }
+
+    // NOTE: Only executable by forge
+    function checkTeleportFWIntegration(
+        bytes32 sourceDomain,
+        bytes32 targetDomain,
+        uint256 line,
+        address gateway,
+        address fee,
+        address escrow,
+        uint256 toMint,
+        uint256 expectedFee,
+        uint256 expectedTtl
+    ) public {
+        TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
+        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
+
+        // Sanity checks
+        assertEq(join.line(sourceDomain), line);
+        assertEq(join.fees(sourceDomain), address(fee));
+        assertEq(dai.allowance(escrow, gateway), type(uint256).max);
+        assertEq(dai.allowance(gateway, address(router)), type(uint256).max);
+        assertEq(TeleportFeeLike(fee).fee(), expectedFee);
+        assertEq(TeleportFeeLike(fee).ttl(), expectedTtl);
+
+        {
+            // NOTE: We are calling the router directly because the bridge code is minimal and unique to each domain
+            hevm.startPrank(gateway);
+            router.requestMint(TeleportGUID({
+                sourceDomain: sourceDomain,
+                targetDomain: targetDomain,
+                receiver: bytes32(uint256(uint160(address(this)))),
+                operator: bytes32(0),
+                amount: uint128(toMint),
+                nonce: 0,
+                timestamp: uint48(block.timestamp - TeleportFeeLike(fee).ttl())
+            }), 0, 0);
+            hevm.stopPrank();
+            assertEq(dai.balanceOf(address(this)), toMint);
+            assertEq(join.debt(sourceDomain), int256(toMint));
+        }
+
+        // Check oracle auth mint -- add custom signatures to test
+        {
+            oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
+            assertEq(dai.balanceOf(address(this)), toMint * 2 - toMint * expectedFee / WAD);
+            assertEq(join.debt(sourceDomain), int256(toMint * 2));
+        }
+
+        // Check settle
+        dai.transfer(gateway, toMint * 2 - toMint * expectedFee / WAD);
+        hevm.startPrank(gateway);
+        router.settle(targetDomain, toMint * 2 - toMint * expectedFee / WAD);
+        hevm.stopPrank();
+        assertEq(dai.balanceOf(gateway), 0);
+        assertEq(join.debt(sourceDomain), int256(WAD / 100));
     }
 
     function checkDaiVest(

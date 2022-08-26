@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 contract Config {
 
@@ -98,7 +99,7 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xB18a078AAFD872fe06A2BA8c5A7CC068D6bD79a9), // populate with deployed spell if deployed
+            deployed_spell:                 address(0),        // populate with deployed spell if deployed
             deployed_spell_created:         1661290827,        // use get-created-timestamp.sh if deployed
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
@@ -109,7 +110,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell = SystemValues({
-            line_offset:           500 * MILLION,           // Offset between the global line against the sum of local lines
+            line_offset:           502 * MILLION,           // Offset between the global line against the sum of local lines
             pot_dsr:               1,                       // In basis points
             pause_delay:           48 hours,                // In seconds
             vow_wait:              156 hours,               // In seconds

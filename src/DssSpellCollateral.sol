@@ -16,7 +16,7 @@
 
 pragma solidity 0.6.12;
 // Enable ABIEncoderV2 when onboarding collateral through `DssExecLib.addNewCollateral()`
-// pragma experimental ABIEncoderV2;
+pragma experimental ABIEncoderV2;
 
 contract DssSpellCollateralAction {
     // --- Rates ---
