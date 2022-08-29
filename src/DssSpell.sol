@@ -16,7 +16,7 @@
 
 pragma solidity 0.6.12;
 // Enable ABIEncoderV2 when onboarding collateral through `DssExecLib.addNewCollateral()`
-pragma experimental ABIEncoderV2;
+// pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
@@ -48,6 +48,7 @@ interface TeleportJoinLike {
 }
 
 interface TeleportRouterLike {
+    function rely(address) external;
     function file(bytes32,bytes32,address) external;
     function gateways(bytes32) external view returns (address);
     function domains(address) external view returns (bytes32);
@@ -55,6 +56,7 @@ interface TeleportRouterLike {
 }
 
 interface TeleportOracleAuthLike {
+    function rely(address) external;
     function file(bytes32,uint256) external;
     function addSigners(address[] calldata) external;
     function teleportJoin() external view returns (address);
@@ -193,7 +195,7 @@ contract DssSpellAction is DssAction {
 
         // Configure TeleportRouter
         TeleportRouterLike(ROUTER).rely(esm);
-        
+
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ETH, TELEPORT_JOIN);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_OPT, TELEPORT_GATEWAY_OPT);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ARB, TELEPORT_GATEWAY_ARB);

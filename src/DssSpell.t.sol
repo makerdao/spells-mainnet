@@ -626,29 +626,35 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(CureLike(cure).srcs(CureLike(cure).tCount() - 1), address(join));
 
+        OptimismTeleportBridgeLike optimismBridge = OptimismTeleportBridgeLike(addr.addr("OPTIMISM_TELEPORT_BRIDGE"));
         checkTeleportFWIntegration(
             "OPT-MAIN-A",
             domain,
             1_000_000 * WAD,
-            addr.addr("OPTIMISM_TELEPORT_BRIDGE"),
+            address(optimismBridge),
             addr.addr("OPTIMISM_TELEPORT_FEE"),
             addr.addr("OPTIMISM_ESCROW"),
             100 * WAD,
             WAD / 10000,   // 1bps
             8 days
         );
+        assertEq(optimismBridge.l2TeleportGateway(), );
+        assertEq(optimismBridge.messenger(), 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1);
 
+        ArbitrumTeleportBridgeLike arbitrumBridge = ArbitrumTeleportBridgeLike(addr.addr("ARBITRUM_TELEPORT_BRIDGE"));
         checkTeleportFWIntegration(
             "ARB-ONE-A",
             domain,
             1_000_000 * WAD,
-            addr.addr("ARBITRUM_TELEPORT_BRIDGE"),
+            address(arbitrumBridge),
             addr.addr("ARBITRUM_TELEPORT_FEE"),
             addr.addr("ARBITRUM_ESCROW"),
             100 * WAD,
             WAD / 10000,   // 1bps
             8 days
         );
+        assertEq(arbitrumBridge.l2TeleportGateway(), );
+        assertEq(arbitrumBridge.inbox(), 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f);
     }
 
     function testCureTeleport() public {
