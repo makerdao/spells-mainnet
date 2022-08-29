@@ -122,6 +122,7 @@ interface TeleportRouterLike {
     function file(bytes32, bytes32, address) external;
     function gateways(bytes32) external view returns (address);
     function domains(address) external view returns (bytes32);
+    function numDomains() external view returns (uint256);
     function dai() external view returns (address);
     function requestMint(
         TeleportGUID calldata,
@@ -1403,6 +1404,8 @@ function checkIlkClipper(
         assertEq(dai.allowance(gateway, address(router)), type(uint256).max);
         assertEq(TeleportFeeLike(fee).fee(), expectedFee);
         assertEq(TeleportFeeLike(fee).ttl(), expectedTtl);
+        assertEq(router.gateways(sourceDomain), gateway);
+        assertEq(router.domains(gateway), sourceDomain);
 
         {
             // NOTE: We are calling the router directly because the bridge code is minimal and unique to each domain
