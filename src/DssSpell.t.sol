@@ -19,11 +19,6 @@ pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
-interface CureLike {
-    function tCount() external view returns (uint256);
-    function srcs(uint256) external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -650,6 +645,32 @@ contract DssSpellTest is DssSpellTestBase {
             100 * WAD,
             WAD / 10000,   // 1bps
             8 days
+        );
+    }
+
+    function testCureTeleport() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes23 domain = "ETH-MAIN-A";
+
+        checkCureLoadTeleport(
+            "OPT-MAIN-A",
+            domain,
+            1_000_000 * WAD,
+            TeleportFeeLike(addr.addr("OPTIMISM_TELEPORT_FEE")).fee(),
+            1_000_000 * RAD,
+            true
+        );
+
+        checkCureLoadTeleport(
+            "ARB-ONE-A",
+            domain,
+            1_000_000 * WAD,
+            TeleportFeeLike(addr.addr("ARBITRUM_TELEPORT_FEE")).fee(),
+            2_000_000 * RAD,
+            false
         );
     }
 }
