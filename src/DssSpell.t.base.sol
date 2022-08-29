@@ -1415,7 +1415,7 @@ function checkIlkClipper(
         uint256 toMint,
         uint256 expectedFee,
         uint256 expectedTtl
-    ) public {
+    ) internal {
         TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
         TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
 
@@ -1434,6 +1434,7 @@ function checkIlkClipper(
 
         {
             // NOTE: We are calling the router directly because the bridge code is minimal and unique to each domain
+            // This tests the slow path via the router
             hevm.startPrank(gateway);
             router.requestMint(TeleportGUID({
                 sourceDomain: sourceDomain,
@@ -1475,7 +1476,7 @@ function checkIlkClipper(
         uint256 expectedFee,
         uint256 expectedTell,
         bool cage
-    ) public {
+    ) internal {
         TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
 
         // Oracle auth mint -- add custom signatures to test
