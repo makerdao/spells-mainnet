@@ -62,8 +62,28 @@ interface TeleportOracleAuthLike {
     function teleportJoin() external view returns (address);
 }
 
+interface TeleportFeeLike {
+    function fee() external view returns (uint256);
+    function ttl() external view returns (uint256);
+}
+
 interface EscrowLike {
     function approve(address,address,uint256) external;
+}
+
+interface TeleportBridgeLike {
+    function l1Escrow() external view returns (address);
+    function l1TeleportRouter() external view returns (address);
+    function l1Token() external view returns (address);
+    function l2TeleportGateway() external view returns (address);
+}
+
+interface OptimismTeleportBridgeLike is TeleportBridgeLike {
+    function messenger() external view returns (address);
+}
+
+interface ArbitrumTeleportBridgeLike is TeleportBridgeLike {
+    function inbox() external view returns (address);
 }
 
 contract DssSpellAction is DssAction {
@@ -83,11 +103,15 @@ contract DssSpellAction is DssAction {
 
     bytes32 internal constant DOMAIN_OPT = "OPT-MAIN-A";
     address internal constant TELEPORT_GATEWAY_OPT = 0x3c27390F61058152552613a563aC0195aDc7f169;
+    address internal constant TELEPORT_L2_GATEWAY_OPT = ;
     address internal constant ESCROW_OPT = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+    address internal constant MESSENGER_OPT = ;
 
     bytes32 internal constant DOMAIN_ARB = "ARB-ONE-A";
     address internal constant TELEPORT_GATEWAY_ARB = 0x39Fb4f2c0658BCE77863288d12413B23C2c2D6df;
+    address internal constant TELEPORT_L2_GATEWAY_ARB = ;
     address internal constant ESCROW_ARB = 0xA10c7CE4b876998858b1a9E12b10092229539400;
+    address internal constant INBOX_ARB = ;
 
     uint256 internal constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
@@ -136,6 +160,18 @@ contract DssSpellAction is DssAction {
         require(TeleportJoinLike(TELEPORT_JOIN).domain() == DOMAIN_ETH);
         require(TeleportOracleAuthLike(ORACLE_AUTH).teleportJoin() == TELEPORT_JOIN);
         require(TeleportRouterLike(ROUTER).dai() == dai);
+        require(TeleportFeeLike(LINEAR_FEE).fee() == WAD / 10000);
+        require(TeleportFeeLike(LINEAR_FEE).ttl() == 8 days);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1Escrow() == ESCROW_OPT);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1TeleportRouter() == ROUTER);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1Token() == dai);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l2TeleportGateway() == TELEPORT_L2_GATEWAY_OPT);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).messenger() == MESSENGER_OPT);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1Escrow() == ESCROW_ARB);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1TeleportRouter() == ROUTER);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1Token() == dai);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l2TeleportGateway() == TELEPORT_L2_GATEWAY_ARB);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).inbox() == INBOX_ARB);
 
         vat.init(ILK);
         jug.init(ILK);
@@ -208,13 +244,13 @@ contract DssSpellAction is DssAction {
         ilkRegistry.put(
             ILK,
             TELEPORT_JOIN,
-            dai,
-            DaiAbstract(dai).decimals(),
+            address(0),
+            0,
             4,
             address(0),
             address(0),
-            DaiAbstract(dai).name(),
-            DaiAbstract(dai).symbol()
+            "",
+            ""
         );
 
         // Configure Chainlog

@@ -1375,10 +1375,6 @@ function checkIlkClipper(
         assertEq(signatures.length, numSigners * 65);
     }
 
-    function addressToBytes32(address addr) internal pure returns (bytes32) {
-        return bytes32(uint256(uint160(addr)));
-    }
-
     function oracleAuthRequestMint(
         bytes32 sourceDomain,
         bytes32 targetDomain,
@@ -1454,19 +1450,22 @@ function checkIlkClipper(
         }
 
         // Check oracle auth mint -- add custom signatures to test
+        uint256 _fee = toMint * expectedFee / WAD;
         {
+            uint256 prevDai = vat.dai(address(vow));
             oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
-            assertEq(dai.balanceOf(address(this)), toMint * 2 - toMint * expectedFee / WAD);
+            assertEq(dai.balanceOf(address(this)), toMint * 2 - _fee);
             assertEq(join.debt(sourceDomain), int256(toMint * 2));
+            assertEq(vat.dai(address(vow)) - prevDai, _fee * RAY);
         }
 
         // Check settle
-        dai.transfer(gateway, toMint * 2 - toMint * expectedFee / WAD);
+        dai.transfer(gateway, toMint * 2 - _fee);
         hevm.startPrank(gateway);
-        router.settle(targetDomain, toMint * 2 - toMint * expectedFee / WAD);
+        router.settle(targetDomain, toMint * 2 - _fee);
         hevm.stopPrank();
         assertEq(dai.balanceOf(gateway), 0);
-        assertEq(join.debt(sourceDomain), int256(fee));
+        assertEq(join.debt(sourceDomain), int256(_fee));
     }
 
     function checkCureLoadTeleport(

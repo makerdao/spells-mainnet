@@ -167,13 +167,13 @@ contract DssSpellTest is DssSpellTestBase {
         // Insert new ilk registry values tests here
         assertEq(reg.pos("TELEPORT-FW-A"), 52);
         assertEq(reg.join("TELEPORT-FW-A"), addr.addr("MCD_JOIN_TELEPORT_FW_A"));
-        assertEq(reg.gem("TELEPORT-FW-A"), addr.addr("MCD_DAI"));
-        assertEq(reg.dec("TELEPORT-FW-A"), GemAbstract(addr.addr("MCD_DAI")).decimals());
+        assertEq(reg.gem("TELEPORT-FW-A"), address(0));
+        assertEq(reg.dec("TELEPORT-FW-A"), 0);
         assertEq(reg.class("TELEPORT-FW-A"), 4);
         assertEq(reg.pip("TELEPORT-FW-A"), address(0));
         assertEq(reg.xlip("TELEPORT-FW-A"), address(0));
-        assertEq(reg.name("TELEPORT-FW-A"), "Dai Stablecoin");
-        assertEq(reg.symbol("TELEPORT-FW-A"), "DAI");
+        assertEq(reg.name("TELEPORT-FW-A"), "");
+        assertEq(reg.symbol("TELEPORT-FW-A"), "");
 
     }
 
