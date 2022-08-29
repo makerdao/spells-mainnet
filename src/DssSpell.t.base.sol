@@ -531,15 +531,17 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             }
 
             {
-            (,uint256 mat) = spotter.ilks(ilk);
+            (address pip, uint256 mat) = spotter.ilks(ilk);
             // Convert BP to system expected value
             uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
-            if (values.collaterals[ilk].lerp) {
-                assertTrue(mat <= normalizedTestMat, concat("TestError/vat-lerping-mat-", ilk));
-                assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-lerp-", ilk));
-            } else {
-                assertEq(mat, normalizedTestMat, concat("TestError/vat-mat-", ilk));
-                assertTrue(mat >= 0 && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr gt 0% and lt 1000%
+            if (pip != address(0)) {
+                if (values.collaterals[ilk].lerp) {
+                    assertTrue(mat <= normalizedTestMat, concat("TestError/vat-lerping-mat-", ilk));
+                    assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-lerp-", ilk));
+                } else {
+                    assertEq(mat, normalizedTestMat, concat("TestError/vat-mat-", ilk));
+                    assertTrue(mat >= RAY && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr gt 100% and lt 1000%
+                }
             }
             }
 
@@ -1432,7 +1434,7 @@ function checkIlkClipper(
         router.settle(targetDomain, toMint * 2 - toMint * expectedFee / WAD);
         hevm.stopPrank();
         assertEq(dai.balanceOf(gateway), 0);
-        assertEq(join.debt(sourceDomain), int256(WAD / 100));
+        assertEq(join.debt(sourceDomain), int256(fee));
     }
 
     function checkDaiVest(

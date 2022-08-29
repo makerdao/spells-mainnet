@@ -37,9 +37,10 @@ interface CureLike {
 }
 
 interface TeleportJoinLike {
+    function rely(address) external;
+    function file(bytes32,address) external;
     function file(bytes32,bytes32,address) external;
     function file(bytes32,bytes32,uint256) external;
-    function vow() external view returns (address);
     function vat() external view returns (address);
     function daiJoin() external view returns (address);
     function ilk() external view returns (bytes32);
@@ -75,18 +76,18 @@ contract DssSpellAction is DssAction {
     address internal constant ROUTER = 0x0E18ab2b7cAA7ae841bC2e0Dd819Af87A8bF8b75;
     address internal constant LINEAR_FEE = 0xE3AEA9052Aca6b8ec4CF160B5771716765f99aA5;
 
-    bytes32 constant internal ILK = "TELEPORT-FW-A";
-    bytes32 constant internal DOMAIN_ETH = "ETH-MAIN-A";
+    bytes32 internal constant ILK = "TELEPORT-FW-A";
+    bytes32 internal constant DOMAIN_ETH = "ETH-MAIN-A";
 
-    bytes32 constant internal DOMAIN_OPT = "OPT-MAIN-A";
+    bytes32 internal constant DOMAIN_OPT = "OPT-MAIN-A";
     address internal constant TELEPORT_GATEWAY_OPT = 0x3c27390F61058152552613a563aC0195aDc7f169;
     address internal constant ESCROW_OPT = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
 
-    bytes32 constant internal DOMAIN_ARB = "ARB-ONE-A";
+    bytes32 internal constant DOMAIN_ARB = "ARB-ONE-A";
     address internal constant TELEPORT_GATEWAY_ARB = 0x39Fb4f2c0658BCE77863288d12413B23C2c2D6df;
     address internal constant ESCROW_ARB = 0xA10c7CE4b876998858b1a9E12b10092229539400;
 
-    uint256 constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
+    uint256 internal constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -127,13 +128,10 @@ contract DssSpellAction is DssAction {
 
         // Run sanity checks
         require(TeleportJoinLike(TELEPORT_JOIN).vat() == address(vat));
-        require(TeleportJoinLike(TELEPORT_JOIN).vow() == DssExecLib.vow());
         require(TeleportJoinLike(TELEPORT_JOIN).daiJoin() ==  DssExecLib.daiJoin());
         require(TeleportJoinLike(TELEPORT_JOIN).ilk() == ILK);
         require(TeleportJoinLike(TELEPORT_JOIN).domain() == DOMAIN_ETH);
         require(TeleportOracleAuthLike(ORACLE_AUTH).teleportJoin() == TELEPORT_JOIN);
-        require(TeleportRouterLike(ROUTER).gateways(DOMAIN_ETH) == TELEPORT_JOIN);
-        require(TeleportRouterLike(ROUTER).domains(TELEPORT_JOIN) == DOMAIN_ETH);
         require(TeleportRouterLike(ROUTER).dai() == dai);
 
         vat.init(ILK);
@@ -148,7 +146,10 @@ contract DssSpellAction is DssAction {
         vat.rely(TELEPORT_JOIN);
 
         // Configure TeleportJoin
-        // Note: vow already set
+        TeleportJoinLike(TELEPORT_JOIN).rely(ORACLE_AUTH);
+        TeleportJoinLike(TELEPORT_JOIN).rely(ROUTER);
+
+        TeleportJoinLike(TELEPORT_JOIN).file("vow", DssExecLib.vow());
 
         TeleportJoinLike(TELEPORT_JOIN).file("fees", DOMAIN_OPT, LINEAR_FEE);
         TeleportJoinLike(TELEPORT_JOIN).file("line", DOMAIN_OPT, 1_000_000 * WAD);
@@ -187,7 +188,7 @@ contract DssSpellAction is DssAction {
         TeleportOracleAuthLike(ORACLE_AUTH).addSigners(oracles);
 
         // Configure TeleportRouter
-        // Note: ETH-MAIN-A route already defined
+        TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ETH, TELEPORT_JOIN);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_OPT, TELEPORT_GATEWAY_OPT);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ARB, TELEPORT_GATEWAY_ARB);
 
