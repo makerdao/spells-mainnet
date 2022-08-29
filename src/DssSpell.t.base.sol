@@ -114,6 +114,7 @@ interface TeleportFeeLike {
 }
 
 interface TeleportOracleAuthLike {
+    function wards(address) external view returns (uint256);
     function signers(address) external view returns (uint256);
     function teleportJoin() external view returns (address);
     function threshold() external view returns (uint256);
@@ -128,6 +129,7 @@ interface TeleportOracleAuthLike {
 }
 
 interface TeleportRouterLike {
+    function wards(address) external view returns (uint256);
     function file(bytes32, bytes32, address) external;
     function gateways(bytes32) external view returns (address);
     function domains(address) external view returns (bytes32);

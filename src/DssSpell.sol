@@ -125,6 +125,7 @@ contract DssSpellAction is DssAction {
         CureLike cure = CureLike(DssExecLib.getChangelogAddress("MCD_CURE"));
         address dai = DssExecLib.dai();
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(DssExecLib.getChangelogAddress("ILK_REGISTRY"));
+        address esm = DssExecLib.esm();
 
         // Run sanity checks
         require(TeleportJoinLike(TELEPORT_JOIN).vat() == address(vat));
@@ -148,6 +149,7 @@ contract DssSpellAction is DssAction {
         // Configure TeleportJoin
         TeleportJoinLike(TELEPORT_JOIN).rely(ORACLE_AUTH);
         TeleportJoinLike(TELEPORT_JOIN).rely(ROUTER);
+        TeleportJoinLike(TELEPORT_JOIN).rely(esm);
 
         TeleportJoinLike(TELEPORT_JOIN).file("vow", DssExecLib.vow());
 
@@ -158,6 +160,8 @@ contract DssSpellAction is DssAction {
         TeleportJoinLike(TELEPORT_JOIN).file("line", DOMAIN_ARB, 1_000_000 * WAD);
 
         // Configure TeleportOracleAuth
+        TeleportOracleAuthLike(ORACLE_AUTH).rely(esm);
+
         TeleportOracleAuthLike(ORACLE_AUTH).file("threshold", 13);
         address[] memory oracles = new address[](24);
         // All are oracle keys except the last
@@ -188,6 +192,8 @@ contract DssSpellAction is DssAction {
         TeleportOracleAuthLike(ORACLE_AUTH).addSigners(oracles);
 
         // Configure TeleportRouter
+        TeleportRouterLike(ROUTER).rely(esm);
+        
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ETH, TELEPORT_JOIN);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_OPT, TELEPORT_GATEWAY_OPT);
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ARB, TELEPORT_GATEWAY_ARB);
