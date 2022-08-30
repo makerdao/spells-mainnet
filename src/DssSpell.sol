@@ -93,25 +93,25 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2022-08-31 MakerDAO Executive Spell | Hash: ";
 
-    address internal constant TELEPORT_JOIN = 0xF4B72741D114a49706877366300b3053a03E7f25;
-    address internal constant ORACLE_AUTH = 0xFb7b4427Fb77ad4AC24519725153CDD2C92Fc4e0;
-    address internal constant ROUTER = 0x0E18ab2b7cAA7ae841bC2e0Dd819Af87A8bF8b75;
-    address internal constant LINEAR_FEE = 0xE3AEA9052Aca6b8ec4CF160B5771716765f99aA5;
+    address internal constant TELEPORT_JOIN = 0x41Ca7a7Aa2Be78Cf7CB80C0F4a9bdfBC96e81815;
+    address internal constant ORACLE_AUTH = 0x324a895625E7AE38Fc7A6ae91a71e7E937Caa7e6;
+    address internal constant ROUTER = 0xeEf8B35eD538b6Ef7DbA82236377aDE4204e5115;
+    address internal constant LINEAR_FEE = 0xA7C088AAD64512Eff242901E33a516f2381b8823;
 
     bytes32 internal constant ILK = "TELEPORT-FW-A";
     bytes32 internal constant DOMAIN_ETH = "ETH-MAIN-A";
 
     bytes32 internal constant DOMAIN_OPT = "OPT-MAIN-A";
-    address internal constant TELEPORT_GATEWAY_OPT = 0x3c27390F61058152552613a563aC0195aDc7f169;
-    address internal constant TELEPORT_L2_GATEWAY_OPT = ;
+    address internal constant TELEPORT_GATEWAY_OPT = 0x920347f49a9dbe50865EB6161C3B2774AC046A7F;
+    address internal constant TELEPORT_L2_GATEWAY_OPT = 0x18d2CF2296c5b29343755E6B7e37679818913f88;
     address internal constant ESCROW_OPT = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
-    address internal constant MESSENGER_OPT = ;
+    address internal constant MESSENGER_OPT = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
 
     bytes32 internal constant DOMAIN_ARB = "ARB-ONE-A";
-    address internal constant TELEPORT_GATEWAY_ARB = 0x39Fb4f2c0658BCE77863288d12413B23C2c2D6df;
-    address internal constant TELEPORT_L2_GATEWAY_ARB = ;
+    address internal constant TELEPORT_GATEWAY_ARB = 0x22218359E78bC34E532B653198894B639AC3ed72;
+    address internal constant TELEPORT_L2_GATEWAY_ARB = 0x5dBaf6F2bEDebd414F8d78d13499222347e59D5E;
     address internal constant ESCROW_ARB = 0xA10c7CE4b876998858b1a9E12b10092229539400;
-    address internal constant INBOX_ARB = ;
+    address internal constant INBOX_ARB = 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f;
 
     uint256 internal constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
 

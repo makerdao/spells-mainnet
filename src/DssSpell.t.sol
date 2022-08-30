@@ -638,7 +638,7 @@ contract DssSpellTest is DssSpellTestBase {
             WAD / 10000,   // 1bps
             8 days
         );
-        assertEq(optimismBridge.l2TeleportGateway(), );
+        assertEq(optimismBridge.l2TeleportGateway(), 0x18d2CF2296c5b29343755E6B7e37679818913f88);
         assertEq(optimismBridge.messenger(), 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1);
 
         ArbitrumTeleportBridgeLike arbitrumBridge = ArbitrumTeleportBridgeLike(addr.addr("ARBITRUM_TELEPORT_BRIDGE"));
@@ -653,7 +653,7 @@ contract DssSpellTest is DssSpellTestBase {
             WAD / 10000,   // 1bps
             8 days
         );
-        assertEq(arbitrumBridge.l2TeleportGateway(), );
+        assertEq(arbitrumBridge.l2TeleportGateway(), 0x5dBaf6F2bEDebd414F8d78d13499222347e59D5E);
         assertEq(arbitrumBridge.inbox(), 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f);
     }
 
