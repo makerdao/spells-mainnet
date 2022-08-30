@@ -202,7 +202,7 @@ contract DssSpellAction is DssAction {
 
         TeleportOracleAuthLike(ORACLE_AUTH).file("threshold", 13);
         address[] memory oracles = new address[](24);
-        // All are oracle keys except the last
+        // https://forum.makerdao.com/t/maker-teleport-oracle-launch-configuration/17471
         oracles[0] = 0xaC8519b3495d8A3E3E44c041521cF7aC3f8F63B3;
         oracles[1] = 0x4f95d9B4D842B2E2B1d1AC3f2Cf548B93Fd77c67;
         oracles[2] = 0xE6367a7Da2b20ecB94A25Ef06F3b551baB2682e6;

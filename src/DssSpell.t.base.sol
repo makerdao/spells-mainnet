@@ -54,7 +54,6 @@ interface DssExecSpellLike {
     function eta() external view returns (uint256);
     function cast() external;
     function nextCastTime() external returns (uint256);
-    function adai() external view returns (address);
 }
 
 interface DirectDepositLike is GemJoinAbstract {
@@ -183,7 +182,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     DSTokenAbstract          gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract              end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract              esm = ESMAbstract(        addr.addr("MCD_ESM"));
-    CureLike                cure = CureLike(          addr.addr("MCD_CURE"));
+    CureLike                cure = CureLike(           addr.addr("MCD_CURE"));
     IlkRegistryAbstract      reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
     FlapLike                flap = FlapLike(           addr.addr("MCD_FLAP"));
     CropperLike          cropper = CropperLike(        addr.addr("MCD_CROPPER"));
@@ -559,12 +558,12 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
             {
             (address pip, uint256 mat) = spotter.ilks(ilk);
-            // Convert BP to system expected value
-            uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
             if (pip != address(0)) {
-                if (values.collaterals[ilk].lerp) {
+                // Convert BP to system expected value
+                uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
+                if ( values.collaterals[ilk].lerp ) {
                     assertTrue(mat <= normalizedTestMat, concat("TestError/vat-lerping-mat-", ilk));
-                    assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-lerp-", ilk));
+                    assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-", ilk));  // cr gt 100% and lt 30000%
                 } else {
                     assertEq(mat, normalizedTestMat, concat("TestError/vat-mat-", ilk));
                     assertTrue(mat >= RAY && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr gt 100% and lt 1000%
