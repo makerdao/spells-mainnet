@@ -89,9 +89,9 @@ interface ArbitrumTeleportBridgeLike is TeleportBridgeLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/f00be45def634c9185f4561a8f1549f28e704d11/governance/votes/Executive%20vote%20-%20August%2024%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/7ec65311cebe0d79e349300e7681cfa13583a5bb/governance/votes/Executive%20vote%20-%20August%2031%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-08-31 MakerDAO Executive Spell | Hash: ";
+        "2022-08-31 MakerDAO Executive Spell | Hash: 0x63220529d84b7a0ab1758dfd9d14e30d37ce6bf3d3f22a17e76fc26aef76c9cb";
 
     address internal constant TELEPORT_JOIN = 0x41Ca7a7Aa2Be78Cf7CB80C0F4a9bdfBC96e81815;
     address internal constant ORACLE_AUTH = 0x324a895625E7AE38Fc7A6ae91a71e7E937Caa7e6;
