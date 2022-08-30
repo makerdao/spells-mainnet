@@ -104,13 +104,11 @@ contract DssSpellAction is DssAction {
     bytes32 internal constant DOMAIN_OPT = "OPT-MAIN-A";
     address internal constant TELEPORT_GATEWAY_OPT = 0x920347f49a9dbe50865EB6161C3B2774AC046A7F;
     address internal constant TELEPORT_L2_GATEWAY_OPT = 0x18d2CF2296c5b29343755E6B7e37679818913f88;
-    address internal constant ESCROW_OPT = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
     address internal constant MESSENGER_OPT = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
 
     bytes32 internal constant DOMAIN_ARB = "ARB-ONE-A";
     address internal constant TELEPORT_GATEWAY_ARB = 0x22218359E78bC34E532B653198894B639AC3ed72;
     address internal constant TELEPORT_L2_GATEWAY_ARB = 0x5dBaf6F2bEDebd414F8d78d13499222347e59D5E;
-    address internal constant ESCROW_ARB = 0xA10c7CE4b876998858b1a9E12b10092229539400;
     address internal constant INBOX_ARB = 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f;
 
     uint256 internal constant RWA009_DRAW_AMOUNT = 25_000_000 * WAD;
@@ -152,6 +150,8 @@ contract DssSpellAction is DssAction {
         address dai = DssExecLib.dai();
         IlkRegistryAbstract ilkRegistry = IlkRegistryAbstract(DssExecLib.reg());
         address esm = DssExecLib.esm();
+        address escrowOpt = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
+        address escrowArb = DssExecLib.getChangelogAddress("ARBITRUM_ESCROW");
 
         // Run sanity checks
         require(TeleportJoinLike(TELEPORT_JOIN).vat() == address(vat));
@@ -162,12 +162,12 @@ contract DssSpellAction is DssAction {
         require(TeleportRouterLike(ROUTER).dai() == dai);
         require(TeleportFeeLike(LINEAR_FEE).fee() == WAD / 10000);
         require(TeleportFeeLike(LINEAR_FEE).ttl() == 8 days);
-        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1Escrow() == ESCROW_OPT);
+        require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1Escrow() == escrowOpt);
         require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1TeleportRouter() == ROUTER);
         require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l1Token() == dai);
         require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).l2TeleportGateway() == TELEPORT_L2_GATEWAY_OPT);
         require(OptimismTeleportBridgeLike(TELEPORT_GATEWAY_OPT).messenger() == MESSENGER_OPT);
-        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1Escrow() == ESCROW_ARB);
+        require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1Escrow() == escrowArb);
         require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1TeleportRouter() == ROUTER);
         require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l1Token() == dai);
         require(ArbitrumTeleportBridgeLike(TELEPORT_GATEWAY_ARB).l2TeleportGateway() == TELEPORT_L2_GATEWAY_ARB);
@@ -237,8 +237,8 @@ contract DssSpellAction is DssAction {
         TeleportRouterLike(ROUTER).file("gateway", DOMAIN_ARB, TELEPORT_GATEWAY_ARB);
 
         // Authorize TeleportGateways to use the escrows
-        EscrowLike(ESCROW_OPT).approve(dai, TELEPORT_GATEWAY_OPT, type(uint256).max);
-        EscrowLike(ESCROW_ARB).approve(dai, TELEPORT_GATEWAY_ARB, type(uint256).max);
+        EscrowLike(escrowOpt).approve(dai, TELEPORT_GATEWAY_OPT, type(uint256).max);
+        EscrowLike(escrowArb).approve(dai, TELEPORT_GATEWAY_ARB, type(uint256).max);
 
         // Add to ilk registry
         ilkRegistry.put(
