@@ -143,7 +143,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         15 * THOUSAND,   // In whole Dai units
-            pct:          225,             // In basis points
+            pct:          150,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -173,7 +173,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         40 * THOUSAND,
-            pct:          375,
+            pct:          300,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -323,7 +323,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          225,
+            pct:          200,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -353,7 +353,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         30 * THOUSAND,
-            pct:          375,
+            pct:          350,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -503,7 +503,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          600,
+            pct:          450,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -803,7 +803,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          250,
+            pct:          225,
             mat:          16500,
             liqType:      "clip",
             liqOn:        true,
@@ -1524,7 +1524,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          225,
+            pct:          150,
             mat:          16000,
             liqType:      "clip",
             liqOn:        true,
@@ -1549,7 +1549,7 @@ contract Config {
         });
         afterSpell.collaterals["WSTETH-B"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      100 * MILLION,
+            aL_line:      200 * MILLION,
             aL_gap:       30 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
