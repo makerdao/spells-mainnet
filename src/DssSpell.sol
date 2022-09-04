@@ -23,6 +23,10 @@ import "dss-exec-lib/DssAction.sol";
 
 // import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -48,12 +52,30 @@ contract DssSpellAction is DssAction {
     uint256 internal constant THREE_FIVE_PCT_RATE   = 1000000001090862085746321732;
     uint256 internal constant FOUR_FIVE_PCT_RATE    = 1000000001395766281313196627;
 
+    address internal constant RWF_WALLET  = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
+    address internal constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address internal constant GRO_WALLET  = 0x7800C137A645c07132886539217ce192b9F0528e;
+
+    address constant FLIP_FLOP_FLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant JUSTIN_CASE_WALLET     = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant DOO_WALLET             = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address constant FEEDBLACK_LOOPS_WALLET = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant ULTRASCHUPPI_WALLET    = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address constant FLIPSIDE_CRYPTO_WALLET = 0x62a43123FE71f9764f26554b3F5017627996816a;
+    address constant PENN_BLOCKCHAIN        = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address constant GFX_LABS_WALLET        = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address constant CHRIS_BLEC             = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
+    address constant ACRE_INVEST_WALLET     = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address constant MHONKASALO_TEEMULAU    = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
+    address constant LLAMA                  = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address constant MAKERMAN_WALLET        = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
+    address constant BLOCKCHAIN_COLUMBIA    = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
+    address constant CODEKNIGHT             = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address constant FRONTIER_RESEARCH      = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+
     uint256 internal constant MILLION = 10**6;
 
-    uint256 internal constant WAD = 10**18; // TODO: is needed?
-    uint256 internal constant RAY = 10**27; // TODO: is needed?
-
-    // TODO: is office hours indeed on?
+    uint256 internal constant WAD = 10**18;
 
     function actions() public override {
         // ---------------------------------------------------------------------
@@ -62,10 +84,34 @@ contract DssSpellAction is DssAction {
         // offboardCollaterals();
 
         // ----------------------------- MKR Vesting -----------------------------
-        // NOTE: ignore in goerli
+        // RWF-001 - 38 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
+        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 38 * WAD);
+
+        // DECO-001 - 125 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
+        GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 125 * WAD);
+
+        // GRO-001 | 2022-07-01 to 2023-07-01 | 803 MKR | 0x7800C137A645c07132886539217ce192b9F0528e
+        GemLike(DssExecLib.mkr()).transfer(GRO_WALLET, 803 * WAD);
 
         // ------------------------ Delegate Compensation ------------------------
-        // NOTE: ignore in goerli
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-august-2022/17584
+
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIP_FLOP_FLAP_WALLET,  12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,     12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(DOO_WALLET,             12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACK_LOOPS_WALLET, 11_970);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET,    11_844);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE_CRYPTO_WALLET, 11_392);
+        DssExecLib.sendPaymentFromSurplusBuffer(PENN_BLOCKCHAIN,         9_773);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFX_LABS_WALLET,         8_512);
+        DssExecLib.sendPaymentFromSurplusBuffer(CHRIS_BLEC,              8_090);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACRE_INVEST_WALLET,      6_681);
+        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALO_TEEMULAU,     4_492);
+        DssExecLib.sendPaymentFromSurplusBuffer(LLAMA,                   3_797);
+        DssExecLib.sendPaymentFromSurplusBuffer(MAKERMAN_WALLET,         2_670);
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKCHAIN_COLUMBIA,     1_809);
+        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT,                208);
+        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIER_RESEARCH,         207);
 
         // ------------------ PPG - Maker Open Market Committee ------------------
         // https://vote.makerdao.com/polling/QmXHnn2u#poll-detail

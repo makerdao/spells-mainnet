@@ -56,28 +56,30 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make public to use
+    function testPayments() public { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[14] memory payees = [
+        Payee[16] memory payees = [
             Payee(wallets.addr("FLIPFLOPFLAP"),      12_000),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),    12_000),
             Payee(wallets.addr("JUSTINCASE"),        12_000),
             Payee(wallets.addr("DOO"),               12_000),
-            Payee(wallets.addr("ULTRASCHUPPI"),      11_918),
-            Payee(wallets.addr("FLIPSIDE"),          11_387),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),     9_438),
-            Payee(wallets.addr("CHRISBLEC"),          9_174),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),    11_970),
+            Payee(wallets.addr("ULTRASCHUPPI"),      11_844),
+            Payee(wallets.addr("FLIPSIDE"),          11_392),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     9_773),
             Payee(wallets.addr("GFXLABS"),            8_512),
-            Payee(wallets.addr("MAKERMAN"),           6_912),
-            Payee(wallets.addr("ACREINVEST"),         6_628),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"), 4_029),
+            Payee(wallets.addr("CHRISBLEC"),          8_090),
+            Payee(wallets.addr("ACREINVEST"),         6_681),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"), 4_492),
             Payee(wallets.addr("LLAMA"),              3_797),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 2_013)
+            Payee(wallets.addr("MAKERMAN"),           2_670),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 1_809),
+            Payee(wallets.addr("CODEKNIGHT"),           208),
+            Payee(wallets.addr("FRONTIER_RESEARCH"),    207)
         ];
 
         uint256 prevBalance;
@@ -510,20 +512,26 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
     }
 
-    function testMKRPayments() private {
+    function testMKRPayments() public {
 
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrRisk = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
+        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrRWF    = gov.balanceOf(wallets.addr("RWF_WALLET"));
+        uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
+        uint256 prevMkrGrowth = gov.balanceOf(wallets.addr("GRO_WALLET"));
 
-        uint256 amountRisk  = 175 * WAD;
+        uint256 amountRWF    =  38 * WAD;
+        uint256 amountDeco   = 125 * WAD;
+        uint256 amountGrowth = 803 * WAD;
 
-        uint256 total = amountRisk;
+        uint256 total = amountRWF + amountDeco + amountGrowth;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
+        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF    + amountRWF);
+        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
+        assertEq(gov.balanceOf(wallets.addr("GRO_WALLET")),  prevMkrGrowth + amountGrowth);
     }
 }

@@ -63,7 +63,9 @@ contract Wallets {
         addr["CHRISBLEC"]                    = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
         addr["BLOCKCHAINCOLUMBIA"]           = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
         addr["MHONKASALOTEEMULAU"]           = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
-        addr["LLAMA"]                        = 0x82cD339Fa7d6f22242B31d5f7ea37c1B721dB9C3;
+        addr["LLAMA"]                        = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+        addr["CODEKNIGHT"]                   = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+        addr["FRONTIER_RESEARCH"]            = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
