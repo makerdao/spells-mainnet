@@ -137,44 +137,30 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogValues() public { // make public to use
+    function testNewChainlogValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("MCD_JOIN_TELEPORT_FW_A");
-        checkChainlogKey("MCD_ORACLE_AUTH_TELEPORT_FW_A");
-        checkChainlogKey("MCD_ROUTER_TELEPORT_FW_A");
-        checkChainlogKey("OPTIMISM_TELEPORT_BRIDGE");
-        checkChainlogKey("OPTIMISM_TELEPORT_FEE");
-        checkChainlogKey("OPTIMISM_DAI_BRIDGE");
-        checkChainlogKey("OPTIMISM_ESCROW");
-        checkChainlogKey("OPTIMISM_GOV_RELAY");
-        checkChainlogKey("ARBITRUM_TELEPORT_BRIDGE");
-        checkChainlogKey("ARBITRUM_TELEPORT_FEE");
-        checkChainlogKey("ARBITRUM_DAI_BRIDGE");
-        checkChainlogKey("ARBITRUM_ESCROW");
-        checkChainlogKey("ARBITRUM_GOV_RELAY");
-
-        checkChainlogVersion("1.14.0");
+        // checkChainlogKey("MCD_JOIN_TELEPORT_FW_A");
+        // checkChainlogVersion("1.14.0");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        assertEq(reg.pos("TELEPORT-FW-A"), 52);
-        assertEq(reg.join("TELEPORT-FW-A"), addr.addr("MCD_JOIN_TELEPORT_FW_A"));
-        assertEq(reg.gem("TELEPORT-FW-A"), address(0));
-        assertEq(reg.dec("TELEPORT-FW-A"), 0);
-        assertEq(reg.class("TELEPORT-FW-A"), 4);
-        assertEq(reg.pip("TELEPORT-FW-A"), address(0));
-        assertEq(reg.xlip("TELEPORT-FW-A"), address(0));
-        assertEq(reg.name("TELEPORT-FW-A"), "");
-        assertEq(reg.symbol("TELEPORT-FW-A"), "");
-
+        // assertEq(reg.pos("TELEPORT-FW-A"), 52);
+        // assertEq(reg.join("TELEPORT-FW-A"), addr.addr("MCD_JOIN_TELEPORT_FW_A"));
+        // assertEq(reg.gem("TELEPORT-FW-A"), address(0));
+        // assertEq(reg.dec("TELEPORT-FW-A"), 0);
+        // assertEq(reg.class("TELEPORT-FW-A"), 4);
+        // assertEq(reg.pip("TELEPORT-FW-A"), address(0));
+        // assertEq(reg.xlip("TELEPORT-FW-A"), address(0));
+        // assertEq(reg.name("TELEPORT-FW-A"), "");
+        // assertEq(reg.symbol("TELEPORT-FW-A"), "");
     }
 
     function testFailWrongDay() public {
@@ -539,147 +525,5 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
-    }
-
-    function testRWA009_SPELL_DRAW() public {
-        address rwaUrn009       = addr.addr("RWA009_A_URN");
-        address rwaUrn009Output = addr.addr("RWA009_A_OUTPUT_CONDUIT"); 
-
-        (uint256 pink, uint256 part) = vat.urns("RWA009-A", address(rwaUrn009));
-        uint256 prevBalance = dai.balanceOf(address(rwaUrn009Output));
-
-        assertEq(pink, 1 * WAD, "RWA009/bad-ink-before-spell");
-
-        uint256 drawAmount = 25_000_000 * WAD;
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Check if spell draw 25mm DAI to Output Conduit
-        assertEq(dai.balanceOf(address(rwaUrn009Output)), prevBalance + drawAmount, "RWA009/dai-drawn-was-not-sent-to-the-recipient");
-
-        (uint256 ink, uint256 art) = vat.urns("RWA009-A", address(rwaUrn009));
-        assertEq(art, part + drawAmount, "RWA009/bad-art-after-spell"); // DAI drawn == art as rate should always be 1 RAY
-        assertEq(ink, pink,              "RWA009/bad-ink-after-spell"); // Whole unit of collateral is locked. should not change
-    }
-
-    // NOTE: Only executable by forge
-    function testTeleportFW() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
-        TeleportOracleAuthLike oracleAuth = TeleportOracleAuthLike(addr.addr("MCD_ORACLE_AUTH_TELEPORT_FW_A"));
-        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
-
-        bytes32 ilk = "TELEPORT-FW-A";
-        bytes23 domain = "ETH-MAIN-A";
-
-        // Sanity checks
-        assertEq(vat.wards(address(join)), 1);
-
-        assertEq(join.wards(address(oracleAuth)), 1);
-        assertEq(join.wards(address(router)), 1);
-        assertEq(join.wards(address(esm)), 1);
-        assertEq(join.vow(), address(vow));
-        assertEq(join.daiJoin(), address(daiJoin));
-        assertEq(join.vat(), address(vat));
-        assertEq(join.ilk(), ilk);
-        assertEq(join.domain(), domain);
-
-        assertEq(oracleAuth.signers(0xaC8519b3495d8A3E3E44c041521cF7aC3f8F63B3), 1);
-        assertEq(oracleAuth.signers(0x4f95d9B4D842B2E2B1d1AC3f2Cf548B93Fd77c67), 1);
-        assertEq(oracleAuth.signers(0xE6367a7Da2b20ecB94A25Ef06F3b551baB2682e6), 1);
-        assertEq(oracleAuth.signers(0xFbaF3a7eB4Ec2962bd1847687E56aAEE855F5D00), 1);
-        assertEq(oracleAuth.signers(0x16655369Eb59F3e1cAFBCfAC6D3Dd4001328f747), 1);
-        assertEq(oracleAuth.signers(0xC9508E9E3Ccf319F5333A5B8c825418ABeC688BA), 1);
-        assertEq(oracleAuth.signers(0xA8EB82456ed9bAE55841529888cDE9152468635A), 1);
-        assertEq(oracleAuth.signers(0x83e23C207a67a9f9cB680ce84869B91473403e7d), 1);
-        assertEq(oracleAuth.signers(0xDA1d2961Da837891f43235FddF66BAD26f41368b), 1);
-        assertEq(oracleAuth.signers(0x4b0E327C08e23dD08cb87Ec994915a5375619aa2), 1);
-        assertEq(oracleAuth.signers(0xfeEd00AA3F0845AFE52Df9ECFE372549B74C69D2), 1);
-        assertEq(oracleAuth.signers(0x8aFBD9c3D794eD8DF903b3468f4c4Ea85be953FB), 1);
-        assertEq(oracleAuth.signers(0x8de9c5F1AC1D4d02bbfC25fD178f5DAA4D5B26dC), 1);
-        assertEq(oracleAuth.signers(0xd94BBe83b4a68940839cD151478852d16B3eF891), 1);
-        assertEq(oracleAuth.signers(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
-        assertEq(oracleAuth.signers(0x75ef8432566A79C86BBF207A47df3963B8Cf0753), 1);
-        assertEq(oracleAuth.signers(0xD27Fa2361bC2CfB9A591fb289244C538E190684B), 1);
-        assertEq(oracleAuth.signers(0x60da93D9903cb7d3eD450D4F81D402f7C4F71dd9), 1);
-        assertEq(oracleAuth.signers(0x71eCFF5261bAA115dcB1D9335c88678324b8A987), 1);
-        assertEq(oracleAuth.signers(0x77EB6CF8d732fe4D92c427fCdd83142DB3B742f7), 1);
-        assertEq(oracleAuth.signers(0x8ff6a38A1CD6a42cAac45F08eB0c802253f68dfD), 1);
-        assertEq(oracleAuth.signers(0x130431b4560Cd1d74A990AE86C337a33171FF3c6), 1);
-        assertEq(oracleAuth.signers(0x3CB645a8f10Fb7B0721eaBaE958F77a878441Cb9), 1);
-        assertEq(oracleAuth.signers(0xd72BA9402E9f3Ff01959D6c841DDD13615FFff42), 1);
-
-        assertEq(oracleAuth.teleportJoin(), address(join));
-        assertEq(oracleAuth.threshold(), 13);
-        assertEq(oracleAuth.wards(address(esm)), 1);
-
-        assertEq(router.gateways(domain), address(join));
-        assertEq(router.domains(address(join)), domain);
-        assertEq(router.dai(), address(dai));
-        assertEq(router.numDomains(), 3);
-        assertEq(router.wards(address(esm)), 1);
-
-        assertEq(CureLike(cure).srcs(CureLike(cure).tCount() - 1), address(join));
-
-        OptimismTeleportBridgeLike optimismBridge = OptimismTeleportBridgeLike(addr.addr("OPTIMISM_TELEPORT_BRIDGE"));
-        checkTeleportFWIntegration(
-            "OPT-MAIN-A",
-            domain,
-            1_000_000 * WAD,
-            address(optimismBridge),
-            addr.addr("OPTIMISM_TELEPORT_FEE"),
-            addr.addr("OPTIMISM_ESCROW"),
-            100 * WAD,
-            WAD / 10000,   // 1bps
-            8 days
-        );
-        assertEq(optimismBridge.l2TeleportGateway(), 0x18d2CF2296c5b29343755E6B7e37679818913f88);
-        assertEq(optimismBridge.messenger(), 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1);
-
-        ArbitrumTeleportBridgeLike arbitrumBridge = ArbitrumTeleportBridgeLike(addr.addr("ARBITRUM_TELEPORT_BRIDGE"));
-        checkTeleportFWIntegration(
-            "ARB-ONE-A",
-            domain,
-            1_000_000 * WAD,
-            address(arbitrumBridge),
-            addr.addr("ARBITRUM_TELEPORT_FEE"),
-            addr.addr("ARBITRUM_ESCROW"),
-            100 * WAD,
-            WAD / 10000,   // 1bps
-            8 days
-        );
-        assertEq(arbitrumBridge.l2TeleportGateway(), 0x5dBaf6F2bEDebd414F8d78d13499222347e59D5E);
-        assertEq(arbitrumBridge.inbox(), 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f);
-    }
-
-    function testCureTeleport() public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        bytes23 domain = "ETH-MAIN-A";
-
-        checkCureLoadTeleport(
-            "OPT-MAIN-A",
-            domain,
-            1_000_000 * WAD,
-            TeleportFeeLike(addr.addr("OPTIMISM_TELEPORT_FEE")).fee(),
-            1_000_000 * RAD,
-            true
-        );
-
-        checkCureLoadTeleport(
-            "ARB-ONE-A",
-            domain,
-            1_000_000 * WAD,
-            TeleportFeeLike(addr.addr("ARBITRUM_TELEPORT_FEE")).fee(),
-            2_000_000 * RAD,
-            false
-        );
     }
 }
