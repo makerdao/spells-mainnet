@@ -73,8 +73,7 @@ contract DssSpellAction is DssAction {
         ////// Stability Fee Changes //////
 
         // Decrease the CRVV1ETHSTETH-A Stability Fee from 2.25% to 2.0%.
-        // NOTE: ignore in goerli
-        // DssExecLib.setIlkStabilityFee("CRVV1ETHSTETH-A", TWO_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("CRVV1ETHSTETH-A", TWO_PCT_RATE, true);
 
         // Decrease the MANA-A Stability Fee from 6% to 4.5%.
         DssExecLib.setIlkStabilityFee("MANA-A", FOUR_FIVE_PCT_RATE, true);
@@ -104,8 +103,7 @@ contract DssSpellAction is DssAction {
 
         // Increase the CRVV1ETHSTETH-A Maximum Debt Ceiling from 5 million DAI to 20 million DAI
         // Increase the CRVV1ETHSTETH-A Target Available Debt from 3 million DAI to 10 million DAI.
-        // NOTE: ignore in goerli
-        // DssExecLib.setIlkAutoLineParameters("CRVV1ETHSTETH-A", 20 * MILLION, 10 * MILLION, 8 hours);
+        DssExecLib.setIlkAutoLineParameters("CRVV1ETHSTETH-A", 20 * MILLION, 10 * MILLION, 8 hours);
     }
 }
 
