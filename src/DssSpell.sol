@@ -27,12 +27,28 @@ interface GemLike {
     function transfer(address, uint256) external returns (bool);
 }
 
+interface DssVestLike {
+    function create(
+        address _usr,
+        uint256 _tot,
+        uint256 _bgn,
+        uint256 _tau,
+        uint256 _eta,
+        address _mgr
+    ) external returns (uint256);
+    function restrict(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%TODO.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2022-09-07 MakerDAO Executive Spell | Hash: TODO";
+
+    DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+
+    uint256 internal constant JUL_01_2022 = 1656633600;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -83,15 +99,25 @@ contract DssSpellAction is DssAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
-        // ----------------------------- MKR Vesting -----------------------------
+        // ----------------------- MKR Vesting Transfers -----------------------
         // RWF-001 - 38 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
         GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 38 * WAD);
 
         // DECO-001 - 125 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
         GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 125 * WAD);
 
-        // GRO-001 | 2022-07-01 to 2023-07-01 | 803 MKR | 0x7800C137A645c07132886539217ce192b9F0528e
-        GemLike(DssExecLib.mkr()).transfer(GRO_WALLET, 803 * WAD);
+        // ------------------------ MKR Vesting Stream -------------------------
+        // GRO-001 | 2022-07-01 to 2023-07-01 | 803 MKR | 0x7800C137A645c07132886539217ce192b9F0528e Cliff Date = 2022-07-01
+        MCD_VEST_MKR_TREASURY.restrict(
+           MCD_VEST_MKR_TREASURY.create({
+                _usr: GRO_WALLET,
+                _tot: 803 * WAD,
+                _bgn: JUL_01_2022,
+                _tau: 365 days,
+                _eta: 0 days, // cliff is the start date
+                _mgr: address(0)
+            })
+        );
 
         // ------------------------ Delegate Compensation ------------------------
         // https://forum.makerdao.com/t/recognized-delegate-compensation-august-2022/17584

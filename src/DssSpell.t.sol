@@ -471,45 +471,55 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(8), block.timestamp);
     }
 
-    function testVestMKR() private {
+    function testVestMKR() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 22);
+        assertEq(vest.ids(), 23);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 23);
+        assertEq(vest.ids(), 24);
 
-        // Wed 01 Jun 2022 12:00:00 AM UTC
-        uint256 JUN_01_2022 = 1654041600;
-        // Thu 23 Nov 2023 12:00:00 AM UTC
-        uint256 NOV_23_2023 = 1700697600;
-        address SH_WALLET = wallets.addr("SH_WALLET");
+        // Friday,   1 July 2022 00:00:00 UTC
+        uint256 JUL_01_2022 = 1656633600;
+        // Saturday, 1 July 2023 00:00:00 UTC
+        uint256 JUL_01_2023 = 1688169600;
+
+        address GRO_WALLET = wallets.addr("GRO_WALLET");
 
         // -----
-        assertEq(vest.usr(23), SH_WALLET);
-        assertEq(vest.bgn(23), JUN_01_2022);
-        assertEq(vest.clf(23), NOV_23_2023);
-        assertEq(vest.fin(23), JUN_01_2022 + 4 * 365 days);
-        assertEq(vest.mgr(23), wallets.addr("SH_WALLET"));
-        assertEq(vest.res(23), 1);
-        assertEq(vest.tot(23), 250 * 10**18);
-        assertEq(vest.rxd(23), 0);
+        assertEq(vest.usr(24), GRO_WALLET);
+        assertEq(vest.bgn(24), JUL_01_2022);
+        assertEq(vest.clf(24), JUL_01_2022);
+        assertEq(vest.fin(24), JUL_01_2022 + 365 days);
+        assertEq(vest.fin(24), JUL_01_2023);
+        assertEq(vest.mgr(24), address(0));
+        assertEq(vest.res(24), 1);
+        assertEq(vest.tot(24), 803 * WAD);
+        assertEq(vest.rxd(24), 0);
 
+        uint256 prevBalance = gov.balanceOf(GRO_WALLET);
 
-        uint256 prevBalance = gov.balanceOf(SH_WALLET);
-        // 20220608 exec: Warp 2 years since cliff here is 18 months
-        hevm.warp(JUN_01_2022 + 2 * 365 days);
-
-        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        // Give admin powers to test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
-        vest.unrestrict(23);
+        vest.unrestrict(24);
 
-        vest.vest(23);
-        // 20220608 exec: Ensure 2 years vest accumulated
-        assertEq(gov.balanceOf(SH_WALLET), prevBalance + (250 * WAD / 4) * 2);
+        // 20220907 exec: Warp 1/2 year since cliff, ensure vest was accumulated
+        hevm.warp(JUL_01_2022 + 365 days / 2);
+        vest.vest(24);
+        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + (803 * WAD / 2));
+
+        // 20220907 exec: Warp to end and vest remaining
+        hevm.warp(JUL_01_2022 + 365 days);
+        vest.vest(24);
+        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
+
+        // 20220907 exec: Warp even further and make sure nothing else was accumulated
+        hevm.warp(JUL_01_2022 + 365 days + 10 days);
+        vest.vest(24);
+        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
     }
 
     function testMKRPayments() public {
@@ -517,13 +527,11 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrRWF    = gov.balanceOf(wallets.addr("RWF_WALLET"));
         uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrGrowth = gov.balanceOf(wallets.addr("GRO_WALLET"));
 
         uint256 amountRWF    =  38 * WAD;
         uint256 amountDeco   = 125 * WAD;
-        uint256 amountGrowth = 803 * WAD;
 
-        uint256 total = amountRWF + amountDeco + amountGrowth;
+        uint256 total = amountRWF + amountDeco;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -532,6 +540,5 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF    + amountRWF);
         assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
-        assertEq(gov.balanceOf(wallets.addr("GRO_WALLET")),  prevMkrGrowth + amountGrowth);
     }
 }
