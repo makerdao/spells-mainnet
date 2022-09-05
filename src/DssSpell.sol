@@ -179,6 +179,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("WSTETH-B", 200 * MILLION);
 
         // Increase the CRVV1ETHSTETH-A Maximum Debt Ceiling from 5 million DAI to 20 million DAI
+        // https://forum.makerdao.com/t/2022-09-07-executive-inclusion-update-crvv1ethsteth-a-maximum-debt-ceiling/17628
         // Increase the CRVV1ETHSTETH-A Target Available Debt from 3 million DAI to 10 million DAI.
         DssExecLib.setIlkAutoLineParameters("CRVV1ETHSTETH-A", 20 * MILLION, 10 * MILLION, 8 hours);
     }
