@@ -93,6 +93,11 @@ contract DssSpellAction is DssAction {
 
     uint256 internal constant WAD = 10**18;
 
+    // Turn office hours off
+    function officeHours() public override returns (bool) {
+        return false;
+    }
+
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
