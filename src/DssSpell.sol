@@ -42,7 +42,7 @@ interface DssVestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/7e054d5ba9b9cc7566cf93ba7e19309fb9f59ab5/governance/votes/Executive%20vote%20-%20September%207,%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/7e054d5ba9b9cc7566cf93ba7e19309fb9f59ab5/governance/votes/Executive%20vote%20-%20September%207%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
         "2022-09-07 MakerDAO Executive Spell | Hash: 0x2734d98cd923a8714496b77534dc3f7734f87a2eb5936da3e710e3f55530f930";
