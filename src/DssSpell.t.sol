@@ -475,9 +475,13 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 23);
 
+        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 803 * WAD);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
         assertEq(vest.ids(), 24);

@@ -25,6 +25,8 @@ import "dss-exec-lib/DssAction.sol";
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
+    function approve(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
 }
 
 interface DssVestLike {
@@ -94,6 +96,10 @@ contract DssSpellAction is DssAction {
 
     uint256 internal constant WAD = 10**18;
 
+    function _add(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x + y) >= x, "DssSpellAction/add-overflow");
+    }
+
     // Turn office hours off
     function officeHours() public override returns (bool) {
         return false;
@@ -105,15 +111,20 @@ contract DssSpellAction is DssAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
+        GemLike mkr = GemLike(DssExecLib.mkr());
+
         // ----------------------- MKR Vesting Transfers -----------------------
         // RWF-001 - 38 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
-        GemLike(DssExecLib.mkr()).transfer(RWF_WALLET, 38 * WAD);
+        mkr.transfer(RWF_WALLET, 38 * WAD);
 
         // DECO-001 - 125 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
-        GemLike(DssExecLib.mkr()).transfer(DECO_WALLET, 125 * WAD);
+        mkr.transfer(DECO_WALLET, 125 * WAD);
 
         // ------------------------ MKR Vesting Stream -------------------------
         // GRO-001 | 2022-07-01 to 2023-07-01 | 803 MKR | 0x7800C137A645c07132886539217ce192b9F0528e Cliff Date = 2022-07-01
+        uint256 prevAllowance = mkr.allowance(address(this), address(MCD_VEST_MKR_TREASURY));
+        mkr.approve(address(MCD_VEST_MKR_TREASURY), _add(prevAllowance, 803 * WAD));
+
         MCD_VEST_MKR_TREASURY.restrict(
            MCD_VEST_MKR_TREASURY.create({
                 _usr: GRO_WALLET,
