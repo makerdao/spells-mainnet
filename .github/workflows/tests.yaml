@@ -6,22 +6,17 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository and submodules
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
-    - name: Install nix 2.3.6
-      uses: cachix/install-nix-action@v13
-      with:
-        install_url: https://releases.nixos.org/nix/nix-2.3.6/install
-        nix_path: nixpkgs=channel:nixos-unstable
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
 
-    - name: Use maker and dapp cachix
-      uses: cachix/cachix-action@v10
-      with:
-        name: maker
-        extraPullNames: dapp
-
-    - name: Run tests
-      run: nix-shell --pure --argstr url ${{ secrets.ETH_RPC_URL }} --run 'dapp test -v --rpc'
+      - name: Run tests
+        run: make test-forge
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
