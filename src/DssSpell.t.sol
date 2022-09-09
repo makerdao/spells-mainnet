@@ -19,6 +19,10 @@ pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
+interface RwaLiquidationLike {
+    function ilks(bytes32) external returns (string memory, address, uint48, uint48);
+}
+
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -56,7 +60,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to use
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -111,16 +115,16 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new collateral tests here
-        checkIlkIntegration(
-             "TOKEN-X",
-             GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-             ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-             addr.addr("PIP_TOKEN"),
-             true,
-             true,
-             false
-        );
+        // // Insert new collateral tests here
+        // checkIlkIntegration(
+        //      "TOKEN-X",
+        //      GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+        //      ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+        //      addr.addr("PIP_TOKEN"),
+        //      true,
+        //      true,
+        //      false
+        // );
     }
 
     function testIlkClipper() private { // make public to use
@@ -128,15 +132,15 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new ilk clipper tests here
-        checkIlkClipper(
-            "TOKEN-X",
-            GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-            ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-            addr.addr("MCD_CLIP_CALC_TOKEN_X"),
-            OsmAbstract(addr.addr("PIP_TOKEN")),
-            20_000 * WAD
-        );
+        // // Insert new ilk clipper tests here
+        // checkIlkClipper(
+        //     "TOKEN-X",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+        //     addr.addr("MCD_CLIP_CALC_TOKEN_X"),
+        //     OsmAbstract(addr.addr("PIP_TOKEN")),
+        //     20_000 * WAD
+        // );
     }
 
     function testNewChainlogValues() private { // make public to use
@@ -302,10 +306,10 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Track Median authorizations here
-        address PIP     = addr.addr("PIP_XXX");
-        address MEDIAN  = OsmAbstract(PIP).src();
-        assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
+        // // Track Median authorizations here
+        // address PIP     = addr.addr("PIP_XXX");
+        // address MEDIAN  = OsmAbstract(PIP).src();
+        // assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
     }
 
     function test_auth() public {
@@ -414,7 +418,7 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() private {
+    function testVestDAI() private { // make public to use
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         address KEEP3R_VEST_STREAMING = wallets.addr("KEEP3R_VEST_STREAMING");
@@ -454,7 +458,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
     }
 
-    function testYankDAI() private { // make private if not in use
+    function testYankDAI() private { // make public to use
 
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         address KEEP3R_VEST_STREAMING_LEGACY = wallets.addr("KEEP3R_VEST_STREAMING_LEGACY");
@@ -471,7 +475,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(8), block.timestamp);
     }
 
-    function testVestMKR() public {
+    function testVestMKR() private { // make public to use
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 23);
 
@@ -526,8 +530,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
     }
 
-    function testMKRPayments() public {
-
+    function testMKRPayments() private { // make public to use
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrRWF    = gov.balanceOf(wallets.addr("RWF_WALLET"));
         uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
@@ -544,5 +547,50 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF    + amountRWF);
         assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
+    }
+
+    // fix GRO-001 MKR Vest
+    function testMKRVestFix() public {
+        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+
+        uint256 unpaid = vest.unpaid(2);
+        assertEq(unpaid, 63180000000000000000, "amount doesn't match expectation");
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        unpaid = vest.unpaid(2);
+        assertEq(unpaid, 0, "vest still has a balance");
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+    }
+
+    // RWA tests
+    string OLDDOC = "QmRe77P2JsvQWygVr9ZAMs4SHnjUQXz6uawdSboAaj2ryF";
+    string NEWDOC = "QmPH6gMsoqrGFN8ECGGbuaaR5KSD4mtnuiuNkHzHgryp48";
+
+    function testDocChange() public {
+        bytes32 ilk = "RWA009-A";
+        RwaLiquidationLike oracle = RwaLiquidationLike(
+            chainLog.getAddress("MIP21_LIQUIDATION_ORACLE")
+        );
+
+        (string memory docOld, address pipOld, uint48 tauOld, uint48 tocOld) =
+            oracle.ilks(ilk);
+
+        assertEq(docOld, OLDDOC, "bad old document");
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        (string memory docNew, address pipNew, uint48 tauNew, uint48 tocNew) =
+            oracle.ilks(ilk);
+
+        assertEq(docNew, NEWDOC,     "bad new document");
+        assertEq(pipOld, pipNew,     "pip is the same");
+        assertTrue(tauOld == tauNew, "tau is the same");
+        assertTrue(tocOld == tocNew, "toc is the same");
     }
 }
