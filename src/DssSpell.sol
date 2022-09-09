@@ -52,7 +52,7 @@ contract DssSpellAction is DssAction {
     // --- Rates ---
 
     // HVB (RWA009-A) legal update doc
-    string constant DOC = "QmPH6gMsoqrGFN8ECGGbuaaR5KSD4mtnuiuNkHzHgryp48";
+    string constant DOC = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
 
     // wallet addresses
     address internal constant WTF1_WALLET = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
@@ -72,7 +72,7 @@ contract DssSpellAction is DssAction {
         // offboardCollaterals();
 
         // ---------------------- CU DAI Vesting Streams -----------------------
-        // TODO
+        // https://vote.makerdao.com/polling/QmQJ9hYq#poll-detail
 
         // ---------------------- SPF Funding Transfers ------------------------
         // https://forum.makerdao.com/t/mip55c3-sp6-legal-domain-work-on-greenlit-collateral-bibta-special-purpose-fund/17166

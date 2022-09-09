@@ -568,7 +568,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // RWA tests
     string OLDDOC = "QmRe77P2JsvQWygVr9ZAMs4SHnjUQXz6uawdSboAaj2ryF";
-    string NEWDOC = "QmPH6gMsoqrGFN8ECGGbuaaR5KSD4mtnuiuNkHzHgryp48";
+    string NEWDOC = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
 
     function testDocChange() public {
         bytes32 ilk = "RWA009-A";
