@@ -8,13 +8,14 @@ jobs:
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+
+      - name: Install Dependencies
+        run: git submodule update --init --recursive
 
       - name: Run tests
         run: make test-forge
