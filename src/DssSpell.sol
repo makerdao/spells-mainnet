@@ -20,6 +20,7 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/VestAbstract.sol";
 
 // import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
@@ -55,9 +56,21 @@ contract DssSpellAction is DssAction {
     string constant DOC = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
 
     // wallet addresses
-    address internal constant WTF1_WALLET = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
-    address internal constant WTF2_WALLET = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
+    address internal constant DAIF_WALLET         = 0x34D8d61050Ef9D2B48Ab00e6dc8A8CA6581c5d63;
+    address internal constant DAIF_RESERVE_WALLET = 0x5F5c328732c9E52DfCb81067b8bA56459b33921f;
+    address internal constant ORA_WALLET          = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address internal constant BIBTA_WALLET        = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
+    address internal constant MIP65_WALLET        = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
 
+    // dates (times in GMT)
+    uint256 constant JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
+    uint256 constant OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM 
+    uint256 constant OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
+    uint256 constant JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
+    uint256 constant AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
+    uint256 constant DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
+
+    // math
     uint256 internal constant WAD = 10**18;
 
     // Turn office hours off
@@ -73,12 +86,67 @@ contract DssSpellAction is DssAction {
 
         // ---------------------- CU DAI Vesting Streams -----------------------
         // https://vote.makerdao.com/polling/QmQJ9hYq#poll-detail
+        VestAbstract VEST = VestAbstract(
+            DssExecLib.getChangelogAddress("MCD_VEST_DAI")
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP74
+        // DAIF-001 | 2022-10-01 to 2022-10-31 | 67,863 DAI
+        VEST.restrict(
+            VEST.create(
+                DAIF_WALLET,                                             // usr
+                67_863 * WAD,                                            // tot
+                OCT_01_2022,                                             // bgn
+                OCT_31_2022 - OCT_01_2022,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP74
+        // DAIF-001 | 2022-11-01 to 2023-08-31 | 329,192 DAI
+        VEST.restrict(
+            VEST.create(
+                DAIF_WALLET,                                             // usr
+                329_192 * WAD,                                           // tot
+                OCT_31_2022,                                             // bgn
+                AUG_31_2023 - OCT_31_2022,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP74
+        // DAIF-001 | 2022-10-01 to 2022-12-31 | 270,000 DAI
+        VEST.restrict(
+            VEST.create(
+                DAIF_RESERVE_WALLET,                                     // usr
+                270_000 * WAD,                                           // tot
+                OCT_01_2022,                                             // bgn
+                DEC_31_2022 - OCT_01_2022,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP75
+        // ORA-001 | 2022-07-01 to 2023-06-30 | 2,337,804 DAI
+        VEST.restrict(
+            VEST.create(
+                ORA_WALLET,                                              // usr
+                2_337_804 * WAD,                                         // tot
+                JUL_01_2022,                                             // bgn
+                JUN_30_2023 - JUL_01_2022,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
+        );
 
         // ---------------------- SPF Funding Transfers ------------------------
         // https://forum.makerdao.com/t/mip55c3-sp6-legal-domain-work-on-greenlit-collateral-bibta-special-purpose-fund/17166
         // https://vote.makerdao.com/polling/QmdaG8mo#vote-breakdown
-        DssExecLib.sendPaymentFromSurplusBuffer(WTF1_WALLET, 50_000);
-        DssExecLib.sendPaymentFromSurplusBuffer(WTF2_WALLET, 30_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(BIBTA_WALLET, 50_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(MIP65_WALLET, 30_000);
 
         // ------------------- GRO-001 MKR Stream Clean-up ---------------------
         // https://forum.makerdao.com/t/executive-inclusion-gro-001-mkr-vesting-stream-clean-up/17820

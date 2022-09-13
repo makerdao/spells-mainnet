@@ -26,6 +26,8 @@ contract Wallets {
         addr["CES_WALLET"]                   = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
         addr["COM_WALLET"]                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
         addr["COM_EF_WALLET"]                = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
+        addr["DAIF_WALLET"]                  = 0x34D8d61050Ef9D2B48Ab00e6dc8A8CA6581c5d63;
+        addr["DAIF_RESERVE_WALLET"]          = 0x5F5c328732c9E52DfCb81067b8bA56459b33921f;
         addr["DECO_WALLET"]                  = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
         addr["DIN_WALLET"]                   = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
         addr["DUX_WALLET"]                   = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
@@ -77,5 +79,9 @@ contract Wallets {
 
         // Ambassador Program Pilot Multisig
         addr["AMBASSADOR_WALLET"]            = 0xF411d823a48D18B32e608274Df16a9957fE33E45;
+
+        // Legal Domain Work
+        addr["BIBTA_WALLET"]                 = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
+        addr["MIP65_WALLET"]                 = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
     }
 }
