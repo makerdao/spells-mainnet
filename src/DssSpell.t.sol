@@ -614,6 +614,9 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
+        address usr = vest.usr(2);
+        assertEq(usr, pauseProxy, "usr of id 2 is pause proxy");
+
         uint256 unpaid = vest.unpaid(2);
         assertEq(unpaid, 63180000000000000000, "amount doesn't match expectation");
 
