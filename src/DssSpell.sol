@@ -88,14 +88,14 @@ contract DssSpellAction is DssAction {
 
         // ---------------------- CU DAI Vesting Streams -----------------------
         // https://vote.makerdao.com/polling/QmQJ9hYq#poll-detail
-        VestLike vest = VestLike(
+        VestLike daiVest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_DAI")
         );
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-10-01 to 2022-10-31 | 67,863 DAI
-        vest.restrict(
-            vest.create(
+        daiVest.restrict(
+            daiVest.create(
                 DAIF_WALLET,                                             // usr
                 67_863 * WAD,                                            // tot
                 OCT_01_2022,                                             // bgn
@@ -107,8 +107,8 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-11-01 to 2023-08-31 | 329,192 DAI
-        vest.restrict(
-            vest.create(
+        daiVest.restrict(
+            daiVest.create(
                 DAIF_WALLET,                                             // usr
                 329_192 * WAD,                                           // tot
                 NOV_01_2022,                                             // bgn
@@ -120,8 +120,8 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-10-01 to 2022-12-31 | 270,000 DAI
-        vest.restrict(
-            vest.create(
+        daiVest.restrict(
+            daiVest.create(
                 DAIF_RESERVE_WALLET,                                     // usr
                 270_000 * WAD,                                           // tot
                 OCT_01_2022,                                             // bgn
@@ -133,8 +133,8 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP75
         // ORA-001 | 2022-07-01 to 2023-06-30 | 2,337,804 DAI
-        vest.restrict(
-            vest.create(
+        daiVest.restrict(
+            daiVest.create(
                 ORA_WALLET,                                              // usr
                 2_337_804 * WAD,                                         // tot
                 JUL_01_2022,                                             // bgn
@@ -152,10 +152,10 @@ contract DssSpellAction is DssAction {
 
         // ------------------- GRO-001 MKR Stream Clean-up ---------------------
         // https://forum.makerdao.com/t/executive-inclusion-gro-001-mkr-vesting-stream-clean-up/17820
-        vest = VestLike(
+        VestLike mkrVest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
         );
-        vest.vest(2);
+        mkrVest.vest(2);
 
         // -------------------- Update HVB Legal Documents ---------------------
         // https://forum.makerdao.com/t/poll-inclusion-request-hvbank-legal-update/17547

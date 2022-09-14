@@ -426,7 +426,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertTrue(vest.valid(11)); // check for valid contract
+        assertTrue(vest.valid(10)); // check for valid contract
         checkDaiVest({
             _index:      10,                                             // id
             _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
