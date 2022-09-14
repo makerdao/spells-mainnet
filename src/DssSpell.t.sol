@@ -404,44 +404,111 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() private { // make public to use
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
-        address KEEP3R_VEST_STREAMING = wallets.addr("KEEP3R_VEST_STREAMING");
+        // All times in GMT
+        uint256 JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
+        uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
+        uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
+        uint256 NOV_01_2022 = 1667260800; // Tuesday,  November  1, 2022 12:00:00 AM
+        uint256 JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
+        uint256 AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
+        uint256 DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
 
-        // Friday, 1 July 2022 00:00:00
-        uint256 JUL_01_2022 = 1656633600;
-        // Wednesday, 1 February 2023 00:00:00
-        uint256 FEB_01_2023 = 1675209600;
-
-        assertEq(vest.ids(), 8);
+        assertEq(vest.ids(), 9);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 9);
+        assertEq(vest.ids(), 9 + 4);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertEq(vest.usr(9), KEEP3R_VEST_STREAMING);
-        assertEq(vest.bgn(9), JUL_01_2022);
-        assertEq(vest.clf(9), JUL_01_2022);
-        assertEq(vest.fin(9), FEB_01_2023);
-        assertEq(vest.fin(9), JUL_01_2022 + 215 days);
-        assertEq(vest.mgr(9), 0x45fEEBbd5Cf86dF61be8F81025E22Ae07a07cB23);
-        assertEq(vest.res(9), 1);
-        assertEq(vest.tot(9), 215000 * WAD);
-        assertEq(vest.rxd(9), 0);
+        assertTrue(vest.valid(11)); // check for valid contract
+        checkDaiVest({
+            _index:      10,                                             // id
+            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
+            _start:      OCT_01_2022,                                    // bgn
+            _cliff:      OCT_01_2022,                                    // clf
+            _end:        OCT_31_2022,                                    // fin
+            _days:       31 days,                                        // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     67_863 * WAD,                                   // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(11)); // check for valid contract
+        checkDaiVest({
+            _index:      11,                                             // id
+            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
+            _start:      NOV_01_2022,                                    // bgn
+            _cliff:      NOV_01_2022,                                    // clf
+            _end:        AUG_31_2023,                                    // fin
+            _days:       304 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     329_192 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(12)); // check for valid contract
+        checkDaiVest({
+            _index:      12,                                             // id
+            _wallet:     wallets.addr("DAIF_RESERVE_WALLET"),            // usr
+            _start:      OCT_01_2022,                                    // bgn
+            _cliff:      OCT_01_2022,                                    // clf
+            _end:        DEC_31_2022,                                    // fin
+            _days:       92 days,                                        // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     270_000 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(13)); // check for valid contract
+        checkDaiVest({
+            _index:      13,                                             // id
+            _wallet:     wallets.addr("ORA_WALLET"),                     // usr
+            _start:      JUL_01_2022,                                    // bgn
+            _cliff:      JUL_01_2022,                                    // clf
+            _end:        JUN_30_2023,                                    // fin
+            _days:       365 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     2_337_804 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
-        vest.unrestrict(9);
+        uint256 prevBalance;
 
-        uint256 prevBalance = dai.balanceOf(KEEP3R_VEST_STREAMING);
-        hevm.warp(JUL_01_2022 + 215 days);
-        assertTrue(tryVest(address(vest), 9));
-        assertEq(dai.balanceOf(KEEP3R_VEST_STREAMING), prevBalance + 215000 * WAD);
+        vest.unrestrict(10);
+        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
+        hevm.warp(OCT_01_2022 + 31 days);
+        assertTrue(tryVest(address(vest), 10));
+        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
+
+        vest.unrestrict(11);
+        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
+        hevm.warp(NOV_01_2022 + 304 days);
+        assertTrue(tryVest(address(vest), 11));
+        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 329_192 * WAD);
+
+        vest.unrestrict(12);
+        prevBalance = dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET"));
+        hevm.warp(OCT_01_2022 + 92 days);
+        assertTrue(tryVest(address(vest), 12));
+        assertEq(dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET")), prevBalance + 270_000 * WAD);
+
+        vest.unrestrict(13);
+        prevBalance = dai.balanceOf(wallets.addr("ORA_WALLET"));
+        hevm.warp(JUL_01_2022 + 365 days);
+        assertTrue(tryVest(address(vest), 13));
+        assertEq(dai.balanceOf(wallets.addr("ORA_WALLET")), prevBalance + 2_337_804 * WAD);
     }
 
     function testYankDAI() private { // make public to use
@@ -533,80 +600,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF    + amountRWF);
         assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
-    }
-
-    // All times in GMT
-    uint256 constant JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
-    uint256 constant OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM 
-    uint256 constant OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
-    uint256 constant JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
-    uint256 constant AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
-    uint256 constant DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
-
-    function testDaiStreams() public { // make private to disable
-        uint256 streams = vestDai.ids();
-        assertEq(streams, 9);
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vestDai.cap(), 1 * MILLION * WAD / 30 days);
-        assertEq(vestDai.ids(), streams + 4);
-
-        assertTrue(vestDai.valid(10)); // check for valid contract
-        checkDaiVest({
-            _index:      10,                                             // id
-            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-            _start:      OCT_01_2022,                                    // bgn
-            _cliff:      OCT_01_2022,                                    // clf
-            _end:        OCT_31_2022,                                    // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     67_863 * WAD,                                   // tot
-            _claimed:    0                                               // rxd
-        });
-
-        // NOTE: I just reused OCT_31_2022 here, as the real vest date is only
-        // 1 second later on November 1st.
-        assertTrue(vestDai.valid(11)); // check for valid contract
-        checkDaiVest({
-            _index:      11,                                             // id
-            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-            _start:      OCT_31_2022,                                    // bgn
-            _cliff:      OCT_31_2022,                                    // clf
-            _end:        AUG_31_2023,                                    // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     329_192 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-
-        assertTrue(vestDai.valid(12)); // check for valid contract
-        checkDaiVest({
-            _index:      12,                                             // id
-            _wallet:     wallets.addr("DAIF_RESERVE_WALLET"),            // usr
-            _start:      OCT_01_2022,                                    // bgn
-            _cliff:      OCT_01_2022,                                    // clf
-            _end:        DEC_31_2022,                                    // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     270_000 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-
-        assertTrue(vestDai.valid(13)); // check for valid contract
-        checkDaiVest({
-            _index:      13,                                             // id
-            _wallet:     wallets.addr("ORA_WALLET"),                     // usr
-            _start:      JUL_01_2022,                                    // bgn
-            _cliff:      JUL_01_2022,                                    // clf
-            _end:        JUN_30_2023,                                    // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     2_337_804 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
     }
 
     // fix GRO-001 MKR Vest

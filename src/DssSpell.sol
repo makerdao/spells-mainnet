@@ -20,11 +20,12 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VestAbstract.sol";
 
 // import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
-interface VestMKRLike {
+interface VestLike {
+    function restrict(uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
     function vest(uint256) external;
 }
 
@@ -36,10 +37,10 @@ interface RwaLiquidationLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/7e054d5ba9b9cc7566cf93ba7e19309fb9f59ab5/governance/votes/Executive%20vote%20-%20September%207%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a4eee9428aba7acf79d1b473db0fff7211405d62/governance/votes/Executive%20vote%20-%20September%2014%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-09-14 MakerDAO Executive Spell | Hash: 0x0";
+        "2022-09-14 MakerDAO Executive Spell | Hash: 0xe2f55ebabb2b0a86919f33226ad04586bd8fbc3298ecc4dd33d16aba25649c6b";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -64,8 +65,9 @@ contract DssSpellAction is DssAction {
 
     // dates (times in GMT)
     uint256 constant JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
-    uint256 constant OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM 
+    uint256 constant OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
     uint256 constant OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
+    uint256 constant NOV_01_2022 = 1667260800; // Tuesday,  November  1, 2022 12:00:00 AM
     uint256 constant JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
     uint256 constant AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
     uint256 constant DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
@@ -86,14 +88,14 @@ contract DssSpellAction is DssAction {
 
         // ---------------------- CU DAI Vesting Streams -----------------------
         // https://vote.makerdao.com/polling/QmQJ9hYq#poll-detail
-        VestAbstract VEST = VestAbstract(
+        VestLike vest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_DAI")
         );
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-10-01 to 2022-10-31 | 67,863 DAI
-        VEST.restrict(
-            VEST.create(
+        vest.restrict(
+            vest.create(
                 DAIF_WALLET,                                             // usr
                 67_863 * WAD,                                            // tot
                 OCT_01_2022,                                             // bgn
@@ -105,12 +107,12 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-11-01 to 2023-08-31 | 329,192 DAI
-        VEST.restrict(
-            VEST.create(
+        vest.restrict(
+            vest.create(
                 DAIF_WALLET,                                             // usr
                 329_192 * WAD,                                           // tot
-                OCT_31_2022,                                             // bgn
-                AUG_31_2023 - OCT_31_2022,                               // tau
+                NOV_01_2022,                                             // bgn
+                AUG_31_2023 - NOV_01_2022,                               // tau
                 0,                                                       // eta
                 address(0)                                               // mgr
             )
@@ -118,8 +120,8 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP74
         // DAIF-001 | 2022-10-01 to 2022-12-31 | 270,000 DAI
-        VEST.restrict(
-            VEST.create(
+        vest.restrict(
+            vest.create(
                 DAIF_RESERVE_WALLET,                                     // usr
                 270_000 * WAD,                                           // tot
                 OCT_01_2022,                                             // bgn
@@ -131,8 +133,8 @@ contract DssSpellAction is DssAction {
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP75
         // ORA-001 | 2022-07-01 to 2023-06-30 | 2,337,804 DAI
-        VEST.restrict(
-            VEST.create(
+        vest.restrict(
+            vest.create(
                 ORA_WALLET,                                              // usr
                 2_337_804 * WAD,                                         // tot
                 JUL_01_2022,                                             // bgn
@@ -150,7 +152,7 @@ contract DssSpellAction is DssAction {
 
         // ------------------- GRO-001 MKR Stream Clean-up ---------------------
         // https://forum.makerdao.com/t/executive-inclusion-gro-001-mkr-vesting-stream-clean-up/17820
-        VestMKRLike vest = VestMKRLike(
+        vest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
         );
         vest.vest(2);
