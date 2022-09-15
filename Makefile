@@ -6,7 +6,7 @@ clean              :; dapp clean
 test               :; ./scripts/test-dssspell.sh match="$(match)" optimizer="$(optimizer)" optimizer-runs="$(optimizer-runs)" block="$(block)"
 test-forge         :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 estimate           :; ./scripts/estimate-deploy-gas.sh
-deploy             :; make && dapp create DssSpell | xargs ./scripts/verify.py DssSpell
+deploy             :; ./scripts/deploy.sh
 deploy-stamp       :; ./scripts/get-created-timestamp.sh tx=$(tx)
 flatten            :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
 archive-spell      :; ./scripts/archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
