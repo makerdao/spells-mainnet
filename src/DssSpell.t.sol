@@ -60,7 +60,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make public to use
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -404,17 +404,12 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make public to use
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
-        uint256 JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
         uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
         uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
-        uint256 NOV_01_2022 = 1667260800; // Tuesday,  November  1, 2022 12:00:00 AM
-        uint256 JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
-        uint256 AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
-        uint256 DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
 
         assertEq(vest.ids(), 9);
 
@@ -440,48 +435,6 @@ contract DssSpellTest is DssSpellTestBase {
             _claimed:    0                                               // rxd
         });
 
-        assertTrue(vest.valid(11)); // check for valid contract
-        checkDaiVest({
-            _index:      11,                                             // id
-            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-            _start:      NOV_01_2022,                                    // bgn
-            _cliff:      NOV_01_2022,                                    // clf
-            _end:        AUG_31_2023,                                    // fin
-            _days:       304 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     329_192 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-
-        assertTrue(vest.valid(12)); // check for valid contract
-        checkDaiVest({
-            _index:      12,                                             // id
-            _wallet:     wallets.addr("DAIF_RESERVE_WALLET"),            // usr
-            _start:      OCT_01_2022,                                    // bgn
-            _cliff:      OCT_01_2022,                                    // clf
-            _end:        DEC_31_2022,                                    // fin
-            _days:       92 days,                                        // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     270_000 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-
-        assertTrue(vest.valid(13)); // check for valid contract
-        checkDaiVest({
-            _index:      13,                                             // id
-            _wallet:     wallets.addr("ORA_WALLET"),                     // usr
-            _start:      JUL_01_2022,                                    // bgn
-            _cliff:      JUL_01_2022,                                    // clf
-            _end:        JUN_30_2023,                                    // fin
-            _days:       365 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     2_337_804 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
-
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
         uint256 prevBalance;
@@ -491,24 +444,6 @@ contract DssSpellTest is DssSpellTestBase {
         hevm.warp(OCT_01_2022 + 31 days);
         assertTrue(tryVest(address(vest), 10));
         assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
-
-        vest.unrestrict(11);
-        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
-        hevm.warp(NOV_01_2022 + 304 days);
-        assertTrue(tryVest(address(vest), 11));
-        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 329_192 * WAD);
-
-        vest.unrestrict(12);
-        prevBalance = dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET"));
-        hevm.warp(OCT_01_2022 + 92 days);
-        assertTrue(tryVest(address(vest), 12));
-        assertEq(dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET")), prevBalance + 270_000 * WAD);
-
-        vest.unrestrict(13);
-        prevBalance = dai.balanceOf(wallets.addr("ORA_WALLET"));
-        hevm.warp(JUL_01_2022 + 365 days);
-        assertTrue(tryVest(address(vest), 13));
-        assertEq(dai.balanceOf(wallets.addr("ORA_WALLET")), prevBalance + 2_337_804 * WAD);
     }
 
     function testYankDAI() private { // make public to use
@@ -602,8 +537,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
     }
 
-    // fix GRO-001 MKR Vest
-    function testMKRVestFix() public {
+    function testMKRVestFix() private { // make public to use
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
@@ -623,10 +557,10 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // RWA tests
-    string OLDDOC = "QmRe77P2JsvQWygVr9ZAMs4SHnjUQXz6uawdSboAaj2ryF";
-    string NEWDOC = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
+    string OLDDOC = "";
+    string NEWDOC = "";
 
-    function testDocChange() public {
+    function testDocChange() private { // make public to use
         bytes32 ilk = "RWA009-A";
         RwaLiquidationLike oracle = RwaLiquidationLike(
             chainLog.getAddress("MIP21_LIQUIDATION_ORACLE")
