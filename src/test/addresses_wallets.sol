@@ -24,6 +24,7 @@ contract Wallets {
 
         // Core Units
         addr["CES_WALLET"]                   = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
+        addr["CES_OP_WALLET"]                = 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f;
         addr["COM_WALLET"]                   = 0x1eE3ECa7aEF17D1e74eD7C447CcBA61aC76aDbA9;
         addr["COM_EF_WALLET"]                = 0x99E1696A680c0D9f426Be20400E468089E7FDB0f;
         addr["DAIF_WALLET"]                  = 0x34D8d61050Ef9D2B48Ab00e6dc8A8CA6581c5d63;

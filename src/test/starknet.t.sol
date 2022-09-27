@@ -34,7 +34,7 @@ contract ConfigStarknet {
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
             dai_bridge_isOpen:         1,        // 1 open, 0 closed
             dai_bridge_ceiling:        200_000,  // Whole Dai Units
-            dai_bridge_maxDeposit:     50        // Whole Dai Units
+            dai_bridge_maxDeposit:     1000      // Whole Dai Units
         });
     }
 }

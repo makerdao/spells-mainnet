@@ -129,13 +129,13 @@ contract DssSpellTest is DssSpellTestBase {
         // );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // checkChainlogKey("MCD_JOIN_TELEPORT_FW_A");
-        // checkChainlogVersion("1.14.0");
+        checkChainlogKey("PROXY_ACTIONS_END_CROPPER");
+        checkChainlogVersion("1.14.1");
     }
 
     function testNewIlkRegistryValues() private { // make public to use
@@ -518,23 +518,23 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
     }
 
-    function testMKRPayments() private { // make public to use
-        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrRWF    = gov.balanceOf(wallets.addr("RWF_WALLET"));
-        uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
+    function testMKRPayments() public { // make private to disable
+        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
+        uint256 prevMkrCES   = gov.balanceOf(wallets.addr("CES_OP_WALLET"));
 
-        uint256 amountRWF    =  38 * WAD;
-        uint256 amountDeco   = 125 * WAD;
+        uint256 amountRWF    =  20.00 ether;
+        uint256 amountCES    = 966.49 ether;
 
-        uint256 total = amountRWF + amountDeco;
+        uint256 total = amountRWF + amountCES;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")),  prevMkrRWF    + amountRWF);
-        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco   + amountDeco);
+        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
+        assertEq(gov.balanceOf(wallets.addr("CES_OP_WALLET")), prevMkrCES + amountCES);
     }
 
     function testMKRVestFix() private { // make public to use
