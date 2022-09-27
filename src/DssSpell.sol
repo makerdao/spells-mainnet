@@ -34,10 +34,10 @@ interface StarknetLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a8d026060aa4d2967185106222c85cb8b35086ff/governance/votes/Executive%20Vote%20-%20September%2028%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0344515b4f9ef9de6e589b5b873f5bafcf274b38/governance/votes/Executive%20Vote%20-%20September%2028%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-09-28 MakerDAO Executive Spell | Hash: 0xc4f6926109fbd767231352e650f96c1770688479152eabcca024d86fbf940bda";
+        "2022-09-28 MakerDAO Executive Spell | Hash: 0x2ec09ea8a5fad89c49737c249313db441abebdefb9786c9503c4df5f74b3e983";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -50,8 +50,9 @@ contract DssSpellAction is DssAction {
     //
 
     // --- CUs ---
-    address internal constant RWF_WALLET    = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
-    address internal constant CES_OP_WALLET = 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f;
+    address internal constant RWF_WALLET       = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
+    address internal constant CES_OP_WALLET    = 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f;
+    address internal constant RISK_WALLET_VEST = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
 
     // --- Chainlog ---
     address internal constant PROXY_ACTIONS_END_CROPPER = 0x38f7C166B5B22906f04D8471E241151BA45d97Af;
@@ -80,6 +81,10 @@ contract DssSpellAction is DssAction {
         // CES-001 - 966.49 MKR - 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f
         // https://mips.makerdao.com/mips/details/MIP40c3SP30
         mkr.transfer(CES_OP_WALLET, 966.49 ether);
+
+        // RISK-001 175 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
+        // https://mips.makerdao.com/mips/details/MIP40c3SP25
+        mkr.transfer(RISK_WALLET_VEST, 175.00 ether);
         // ---------------------
 
         // Increase Starknet Bridge Deposit Limit from 50 DAI to 1000 DAI

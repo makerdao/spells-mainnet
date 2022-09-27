@@ -522,11 +522,13 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
         uint256 prevMkrCES   = gov.balanceOf(wallets.addr("CES_OP_WALLET"));
+        uint256 prevMkrRisk  = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
 
         uint256 amountRWF    =  20.00 ether;
         uint256 amountCES    = 966.49 ether;
+        uint256 amountRisk   = 175.00 ether;
 
-        uint256 total = amountRWF + amountCES;
+        uint256 total = amountRWF + amountCES + amountRisk;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -535,6 +537,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
         assertEq(gov.balanceOf(wallets.addr("CES_OP_WALLET")), prevMkrCES + amountCES);
+        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
     }
 
     function testMKRVestFix() private { // make public to use
