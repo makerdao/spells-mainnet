@@ -408,8 +408,13 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
+        uint256 JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
         uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
         uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
+        uint256 NOV_01_2022 = 1667260800; // Tuesday,  November  1, 2022 12:00:00 AM
+        uint256 JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
+        uint256 AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
+        uint256 DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
 
         assertEq(vest.ids(), 9);
 
@@ -435,6 +440,48 @@ contract DssSpellTest is DssSpellTestBase {
             _claimed:    0                                               // rxd
         });
 
+        assertTrue(vest.valid(11)); // check for valid contract
+        checkDaiVest({
+            _index:      11,                                             // id
+            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
+            _start:      NOV_01_2022,                                    // bgn
+            _cliff:      NOV_01_2022,                                    // clf
+            _end:        AUG_31_2023,                                    // fin
+            _days:       304 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     329_192 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(12)); // check for valid contract
+        checkDaiVest({
+            _index:      12,                                             // id
+            _wallet:     wallets.addr("DAIF_RESERVE_WALLET"),            // usr
+            _start:      OCT_01_2022,                                    // bgn
+            _cliff:      OCT_01_2022,                                    // clf
+            _end:        DEC_31_2022,                                    // fin
+            _days:       92 days,                                        // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     270_000 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(13)); // check for valid contract
+        checkDaiVest({
+            _index:      13,                                             // id
+            _wallet:     wallets.addr("ORA_WALLET"),                     // usr
+            _start:      JUL_01_2022,                                    // bgn
+            _cliff:      JUL_01_2022,                                    // clf
+            _end:        JUN_30_2023,                                    // fin
+            _days:       365 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     2_337_804 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         giveAuth(address(vest), address(this));
         uint256 prevBalance;
@@ -444,6 +491,24 @@ contract DssSpellTest is DssSpellTestBase {
         hevm.warp(OCT_01_2022 + 31 days);
         assertTrue(tryVest(address(vest), 10));
         assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
+
+        vest.unrestrict(11);
+        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
+        hevm.warp(NOV_01_2022 + 304 days);
+        assertTrue(tryVest(address(vest), 11));
+        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 329_192 * WAD);
+
+        vest.unrestrict(12);
+        prevBalance = dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET"));
+        hevm.warp(OCT_01_2022 + 92 days);
+        assertTrue(tryVest(address(vest), 12));
+        assertEq(dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET")), prevBalance + 270_000 * WAD);
+
+        vest.unrestrict(13);
+        prevBalance = dai.balanceOf(wallets.addr("ORA_WALLET"));
+        hevm.warp(JUL_01_2022 + 365 days);
+        assertTrue(tryVest(address(vest), 13));
+        assertEq(dai.balanceOf(wallets.addr("ORA_WALLET")), prevBalance + 2_337_804 * WAD);
     }
 
     function testYankDAI() private { // make public to use
