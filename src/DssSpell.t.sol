@@ -123,7 +123,7 @@ contract DssSpellTest is DssSpellTestBase {
         // );
     }
 
-    function testNewChainlogValues() private { // make public to use
+    function testNewChainlogValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -141,7 +141,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogVersion("1.14.1");
     }
 
-    function testNewIlkRegistryValues() private { // make public to use
+    function testNewIlkRegistryValues() public { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
