@@ -73,7 +73,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         GemLike(RWA007).approve(RWA007_A_URN, 1 * WAD);
         RwaUrnLike(RWA007_A_URN).lock(1 * WAD);
         
-        DssExecLib.setChangelogVersion("1.14.1");
+        DssExecLib.setChangelogVersion("1.14.2");
 
         // MIP65 Deployment - 1 million Pilot Transaction (RWA-007-A)
         // https://vote.makerdao.com/polling/QmXHM6us
