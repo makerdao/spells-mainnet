@@ -27,8 +27,9 @@ interface GemLike {
     function transfer(address, uint256) external returns (bool);
 }
 
-interface StarknetLike {
-    function setMaxDeposit(uint256) external;
+interface VestLike {
+    function restrict(uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
 }
 
 contract DssSpellAction is DssAction {
@@ -37,7 +38,7 @@ contract DssSpellAction is DssAction {
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0344515b4f9ef9de6e589b5b873f5bafcf274b38/governance/votes/Executive%20Vote%20-%20September%2028%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-09-28 MakerDAO Executive Spell | Hash: 0x2ec09ea8a5fad89c49737c249313db441abebdefb9786c9503c4df5f74b3e983";
+        "2022-10-05 MakerDAO Executive Spell | Hash: ";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -68,14 +69,38 @@ contract DssSpellAction is DssAction {
 
 
         // --- MKR Vests ---
-        
+        VestLike vest = VestLike(
+            DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP80
+        // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 62.51 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241
+        vest.restrict(
+            vest.create(
+                GOV_WALLET1,                                             // usr
+                62.51 ether,                                             // tot
+                AUG_01_2022,                                             // bgn
+                AUG_01_2023 - AUG_01_2022,                               // tau
+                365 days,                                                // eta
+                address(0)                                               // mgr
+            )
+        );
 
         // --- MKR Transfers ---
         GemLike mkr = GemLike(DssExecLib.mkr());
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP79
+        // SNE-001 - 270 MKR - 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
         mkr.transfer(STARKNET_WALLET, 270.00 ether);
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP17
+        // SES-001 - 227.64 MKR - 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
         mkr.transfer(SES_WALLET, 227.64 ether);
 
         // --- DAI Transfers ---
+
+        // https://mips.makerdao.com/mips/details/MIP55c3SP7
+        // Ambassadors  - 81,000.0 DAI - 0xF411d823a48D18B32e608274Df16a9957fE33E45
         DssExecLib.sendPaymentFromSurplusBuffer(AMBASSADOR_WALLET, 81_000);
     }
 }
