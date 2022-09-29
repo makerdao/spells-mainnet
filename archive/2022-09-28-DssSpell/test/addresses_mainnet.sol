@@ -339,16 +339,6 @@ contract Addresses {
         addr["RWA006_A_URN"]                    = 0x0C185bf5388DdfDB288F4D875265d456D18FD9Cb;
         addr["RWA006_A_INPUT_CONDUIT"]          = 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3;
         addr["RWA006_A_OUTPUT_CONDUIT"]         = 0x8Fe38D1E4293181273E2e323e4c16e0D1d4861e3;
-        addr["RWA007"]                          = 0x078fb926b041a816FaccEd3614Cf1E4bc3C723bD;
-        addr["PIP_RWA007"]                      = 0x7bb4BcA758c4006998a2769776D9E4E6D86e0Dab;
-        addr["MCD_JOIN_RWA007_A"]               = 0x476aaD14F42469989EFad0b7A31f07b795FF0621;
-        addr["RWA007_A_URN"]                    = 0x481bA2d2e86a1c41427893899B5B0cEae41c6726;
-        addr["RWA007_A_JAR"]                    = 0xef1B095F700BE471981aae025f92B03091c3AD47;
-        addr["RWA007_A_OUTPUT_CONDUIT"]         = 0x701C3a384c613157bf473152844f368F2d6EF191;
-        addr["RWA007_A_INPUT_CONDUIT_URN"]      = 0x58f5e979eF74b60a9e5F955553ab8e0e65ba89c9;
-        addr["RWA007_A_INPUT_CONDUIT_JAR"]      = 0xc8bb4e2B249703640e89265e2Ae7c9D5eA2aF742;
-        addr["RWA007_A_OPERATOR"]               = 0x94cfBF071f8be325A5821bFeAe00eEbE9CE7c279;
-        addr["RWA007_A_COINBASE_CUSTODY"]       = 0xC3acf3B96E46Aa35dBD2aA3BD12D23c11295E774;
         addr["RWA008"]                          = 0xb9737098b50d7c536b6416dAeB32879444F59fCA;
         addr["PIP_RWA008"]                      = 0x2623dE50D8A6FdC2f0D583327142210b8b464bfd;
         addr["MCD_JOIN_RWA008_A"]               = 0x56eDD5067d89D4E65Bf956c49eAF054e6Ff0b262;
