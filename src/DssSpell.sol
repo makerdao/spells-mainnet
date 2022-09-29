@@ -71,30 +71,15 @@ contract DssSpellAction is DssAction {
         // onboardNewCollaterals();
         // offboardCollaterals();
 
+        // MIP65 Deployment - 1 million Pilot Transaction (RWA-007-A)
+        // https://vote.makerdao.com/polling/QmXHM6us
+
+
+        // --- MKR Vests ---
+        
+
         // --- MKR Transfers ---
-        GemLike mkr = GemLike(DssExecLib.mkr());
 
-        // RWF-001 - 20 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
-        // https://mips.makerdao.com/mips/details/MIP40c3SP38
-        mkr.transfer(RWF_WALLET, 20.00 ether);
-
-        // CES-001 - 966.49 MKR - 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f
-        // https://mips.makerdao.com/mips/details/MIP40c3SP30
-        mkr.transfer(CES_OP_WALLET, 966.49 ether);
-
-        // RISK-001 175 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
-        // https://mips.makerdao.com/mips/details/MIP40c3SP25
-        mkr.transfer(RISK_WALLET_VEST, 175.00 ether);
-        // ---------------------
-
-        // Increase Starknet Bridge Deposit Limit from 50 DAI to 1000 DAI
-        // https://vote.makerdao.com/polling/QmbWkTvW
-        StarknetLike(DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE")).setMaxDeposit(1000 * WAD);
-
-        // --- Chainlog Update ---
-        // https://forum.makerdao.com/t/28th-september-executive-updating-the-proxy-actions-end-cropper-address/18057
-        DssExecLib.setChangelogAddress("PROXY_ACTIONS_END_CROPPER", PROXY_ACTIONS_END_CROPPER);
-        DssExecLib.setChangelogVersion("1.14.1");
     }
 }
 

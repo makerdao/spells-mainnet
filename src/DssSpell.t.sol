@@ -583,7 +583,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
     }
 
-    function testMKRPayments() public { // make private to disable
+    function testMKRPayments() private { // make public to use
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
         uint256 prevMkrCES   = gov.balanceOf(wallets.addr("CES_OP_WALLET"));
