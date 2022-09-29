@@ -49,21 +49,13 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
 
-    // --- CUs ---
-    address internal constant RWF_WALLET       = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
-    address internal constant CES_OP_WALLET    = 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f;
-    address internal constant RISK_WALLET_VEST = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
-
-    // --- Chainlog ---
-    address internal constant PROXY_ACTIONS_END_CROPPER = 0x38f7C166B5B22906f04D8471E241151BA45d97Af;
-
-    // --- Math ---
-    uint256 internal constant WAD = 10**18;
-
-    // Turn office hours off
-    function officeHours() public override returns (bool) {
-        return false;
-    }
+    // --- Wallets ---
+    address internal constant GOV_WALLET1       = 0xbfDD0E744723192f7880493b66501253C34e1241;
+    address internal constant GOV_WALLET2       = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
+    address internal constant GOV_WALLET3       = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address internal constant AMBASSADOR_WALLET = 0xF411d823a48D18B32e608274Df16a9957fE33E45;
+    address internal constant STARKNET_WALLET   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+    address internal constant SES_WALLET        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
     function actions() public override {
         // ---------------------------------------------------------------------
@@ -79,7 +71,12 @@ contract DssSpellAction is DssAction {
         
 
         // --- MKR Transfers ---
+        GemLike mkr = GemLike(DssExecLib.mkr());
+        mkr.transfer(STARKNET_WALLET, 270.00 ether);
+        mkr.transfer(SES_WALLET, 227.64 ether);
 
+        // --- DAI Transfers ---
+        DssExecLib.sendPaymentFromSurplusBuffer(AMBASSADOR_WALLET, 81_000);
     }
 }
 
