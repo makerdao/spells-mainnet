@@ -86,8 +86,8 @@ contract DssSpellCollateralAction {
 
     // MIP21_LIQUIDATION_ORACLE params
 
-    // https://gateway.pinata.cloud/ipfs/QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh
-    string  internal constant RWA007_DOC                     = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
+    // https://gateway.pinata.cloud/ipfs/QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY
+    string  internal constant RWA007_DOC                     = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
     // There is no DssExecLib helper, so WAD precision is used.
     uint256 internal constant RWA007_A_INITIAL_PRICE         = 250_000_000 * WAD;
     uint48  internal constant RWA007_A_TAU                   = 0;
