@@ -25,6 +25,7 @@ import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface GemLike {
     function approve(address, uint256) external returns (bool);
+    function transfer(address, uint256) external returns (bool);
 }
 
 interface RwaUrnLike {
@@ -33,13 +34,18 @@ interface RwaUrnLike {
     function transfer(address, uint256) external returns (bool);
 }
 
+interface VestLike {
+    function restrict(uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+}
+
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0344515b4f9ef9de6e589b5b873f5bafcf274b38/governance/votes/Executive%20Vote%20-%20September%2028%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-09-28 MakerDAO Executive Spell | Hash: 0x2ec09ea8a5fad89c49737c249313db441abebdefb9786c9503c4df5f74b3e983";
+        "2022-10-05 MakerDAO Executive Spell | Hash: ";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -51,18 +57,18 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
 
-    // --- CUs ---
-    address internal constant RWF_WALLET       = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
-    address internal constant CES_OP_WALLET    = 0xD740882B8616B50d0B317fDFf17Ec3f4f853F44f;
-    address internal constant RISK_WALLET_VEST = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+    uint256 constant RWA007_DRAW_AMOUNT = 1_000_000 * WAD;
 
-    // --- Chainlog ---
-    address internal constant PROXY_ACTIONS_END_CROPPER = 0x38f7C166B5B22906f04D8471E241151BA45d97Af;
+    uint256 constant AUG_01_2022 = 1659326400;
+    uint256 constant AUG_01_2023 = 1690862400;
 
-    // Turn office hours off
-    function officeHours() public override returns (bool) {
-        return true;
-    }
+    // --- Wallets ---
+    address internal constant GOV_WALLET1       = 0xbfDD0E744723192f7880493b66501253C34e1241;
+    address internal constant GOV_WALLET2       = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
+    address internal constant GOV_WALLET3       = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address internal constant AMBASSADOR_WALLET = 0xF411d823a48D18B32e608274Df16a9957fE33E45;
+    address internal constant STARKNET_WALLET   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
+    address internal constant SES_WALLET        = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
     function actions() public override {
         // ---------------------------------------------------------------------
@@ -72,17 +78,47 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // lock RWA007 Token in the URN
         GemLike(RWA007).approve(RWA007_A_URN, 1 * WAD);
         RwaUrnLike(RWA007_A_URN).lock(1 * WAD);
-        
-        DssExecLib.setChangelogVersion("1.14.2");
 
         // MIP65 Deployment - 1 million Pilot Transaction (RWA-007-A)
         // https://vote.makerdao.com/polling/QmXHM6us
-
+        RwaUrnLike(RWA007_A_URN).draw(RWA007_DRAW_AMOUNT);
 
         // --- MKR Vests ---
-        
+        VestLike vest = VestLike(
+            DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
+        );
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP80
+        // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 62.51 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241
+        vest.restrict(
+            vest.create(
+                GOV_WALLET1,                                             // usr
+                62.51 ether,                                             // tot
+                AUG_01_2022,                                             // bgn
+                AUG_01_2023 - AUG_01_2022,                               // tau
+                AUG_01_2023 - AUG_01_2022,                               // eta
+                address(0)                                               // mgr
+            )
+        );
 
         // --- MKR Transfers ---
+        GemLike mkr = GemLike(DssExecLib.mkr());
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP79
+        // SNE-001 - 270 MKR - 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
+        mkr.transfer(STARKNET_WALLET, 270.00 ether);
+
+        // https://mips.makerdao.com/mips/details/MIP40c3SP17
+        // SES-001 - 227.64 MKR - 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
+        mkr.transfer(SES_WALLET, 227.64 ether);
+
+        // --- DAI Transfers ---
+
+        // https://mips.makerdao.com/mips/details/MIP55c3SP7
+        // Ambassadors  - 81,000.0 DAI - 0xF411d823a48D18B32e608274Df16a9957fE33E45
+        DssExecLib.sendPaymentFromSurplusBuffer(AMBASSADOR_WALLET, 81_000);
+        
+        DssExecLib.setChangelogVersion("1.14.2");
     }
 }
 
