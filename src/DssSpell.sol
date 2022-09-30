@@ -31,8 +31,6 @@ interface GemLike {
 
 interface RwaUrnLike {
     function lock(uint256) external;
-    function draw(uint256) external;
-    function transfer(address, uint256) external returns (bool);
 }
 
 interface VestLike {
@@ -57,8 +55,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-
-    uint256 constant RWA007_DRAW_AMOUNT = 1_000_000 * WAD;
 
     uint256 constant AUG_01_2022 = 1659326400;
     uint256 constant AUG_01_2023 = 1690862400;
