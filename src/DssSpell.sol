@@ -89,14 +89,14 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         );
 
         // Increase allowance by new vesting delta
-        mkr.approve(address(vest), mkr.allowance(address(this), address(vest)) + 787.71 ether);
+        mkr.approve(address(vest), mkr.allowance(address(this), address(vest)) + 787.70 ether);
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP80
         // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 62.51 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241
         vest.restrict(
             vest.create(
                 GOV_WALLET1,                                             // usr
-                62.51 ether,                                             // tot
+                62.50 ether,                                             // tot
                 AUG_01_2022,                                             // bgn
                 AUG_01_2023 - AUG_01_2022,                               // tau
                 AUG_01_2023 - AUG_01_2022,                               // eta

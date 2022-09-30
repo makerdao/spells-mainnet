@@ -517,7 +517,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.71 ether);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.70 ether);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
         assertEq(vest.ids(), 28);
@@ -539,7 +539,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(25), AUG_01_2023);
         assertEq(vest.mgr(25), address(0));
         assertEq(vest.res(25), 1);
-        assertEq(vest.tot(25), 62.51 ether);
+        assertEq(vest.tot(25), 62.50 ether);
         assertEq(vest.rxd(25), 0);
 
         assertEq(vest.usr(26), GOV_WALLET2);
