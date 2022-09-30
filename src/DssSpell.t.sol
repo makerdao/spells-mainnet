@@ -29,6 +29,7 @@ interface RwaLiquidationLike {
 }
 
 interface RwaUrnLike {
+    function gemJoin() external view returns (GemAbstract);
     function can(address) external view returns (uint256);
     function lock(uint256) external;
     function draw(uint256) external;
@@ -943,5 +944,25 @@ contract DssSpellTest is DssSpellTestBase {
         rwajoin_007.exit(address(this), vat.gem("RWA007-A", address(this)));
         assertEq(vat.gem("RWA007-A", address(this)), 0, "RWA007: wrong vat gem after exit");
         assertGt(rwagem_007.balanceOf(address(this)), 0, "RWA007: wrong gem balance after exit");
+    }
+
+    function testRWA007_SPELL_LOCK() public {
+        (uint256 pink, uint256 part) = vat.urns("RWA007-A", address(rwaurn_007));
+        uint256 prevBalance = rwagem_007.balanceOf(address(rwaurn_007.gemJoin()));
+
+        assertEq(pink, 0, "RWA007/bad-ink-before-spell");
+
+        uint256 lockAmount = 1 * WAD;
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Check if spell lock whole unit of RWA007 Token to the Urn
+        assertEq(rwagem_007.balanceOf(address(rwaurn_007.gemJoin())), prevBalance + lockAmount, "RWA007/spell-do-not-lock-rwa007-token");
+        
+        (uint256 ink, uint256 art) = vat.urns("RWA007-A", address(rwaurn_007));
+        assertEq(art, 0, "RWA007/bad-art-after-spell");
+        assertEq(ink, lockAmount, "RWA007/bad-ink-after-spell"); // Whole unit of collateral is locked
     }
 }
