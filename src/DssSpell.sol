@@ -24,6 +24,7 @@ import "dss-exec-lib/DssAction.sol";
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface GemLike {
+    function allowance(address, address) external view returns (uint256);
     function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
 }
@@ -61,6 +62,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     uint256 constant AUG_01_2022 = 1659326400;
     uint256 constant AUG_01_2023 = 1690862400;
+    uint256 constant SEP_28_2022 = 1664337600;
+    uint256 constant SEP_28_2024 = 1727496000;
 
     // --- Wallets ---
     address internal constant GOV_WALLET1       = 0xbfDD0E744723192f7880493b66501253C34e1241;
@@ -84,9 +87,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         RwaUrnLike(RWA007_A_URN).draw(RWA007_DRAW_AMOUNT);
 
         // --- MKR Vests ---
+        GemLike mkr = GemLike(DssExecLib.mkr());
         VestLike vest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
         );
+
+        // Increase allowance by new vesting delta
+        mkr.approve(address(vest), mkr.allowance(address(this), address(vest)) + 787.71 ether);
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP80
         // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 62.51 MKR | 0xbfDD0E744723192f7880493b66501253C34e1241
@@ -101,8 +108,43 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
             )
         );
 
+        // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 32.69 MKR | 0xbb147E995c9f159b93Da683dCa7893d6157199B9
+        vest.restrict(
+            vest.create(
+                GOV_WALLET2,                                             // usr
+                32.69 ether,                                             // tot
+                AUG_01_2022,                                             // bgn
+                AUG_01_2023 - AUG_01_2022,                               // tau
+                AUG_01_2023 - AUG_01_2022,                               // eta
+                address(0)                                               // mgr
+            )
+        );
+
+        // GOV-001 | 2022-08-01 to 2023-08-01 | Cliff 2023-08-01 | 152.51 MKR | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
+        vest.restrict(
+            vest.create(
+                GOV_WALLET3,                                             // usr
+                152.51 ether,                                            // tot
+                AUG_01_2022,                                             // bgn
+                AUG_01_2023 - AUG_01_2022,                               // tau
+                AUG_01_2023 - AUG_01_2022,                               // eta
+                address(0)                                               // mgr
+            )
+        );
+
+        // SNE-001 | 2022-09-28 to 2024-09-28 | Cliff date = start = 2022-09-28 | 540 MKR | 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1
+        vest.restrict(
+            vest.create(
+                STARKNET_WALLET,                                         // usr
+                540.00 ether,                                            // tot
+                SEP_28_2022,                                             // bgn
+                SEP_28_2024 - SEP_28_2022,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
+        );
+
         // --- MKR Transfers ---
-        GemLike mkr = GemLike(DssExecLib.mkr());
 
         // https://mips.makerdao.com/mips/details/MIP40c3SP79
         // SNE-001 - 270 MKR - 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1

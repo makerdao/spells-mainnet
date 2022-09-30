@@ -95,16 +95,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make public to use
+    function testPayments() public {
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[2] memory payees = [
-            Payee(wallets.addr("BIBTA_WALLET"),      50_000),
-            Payee(wallets.addr("MIP65_WALLET"),      30_000)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("AMBASSADOR_WALLET"), 81_000)
         ];
 
         uint256 prevBalance;
@@ -508,7 +507,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(8), block.timestamp);
     }
 
-    function testVestMKR() private { // make public to use
+    function testVestMKR() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 23);
 
@@ -518,71 +517,76 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 803 * WAD);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.71 ether);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 24);
+        assertEq(vest.ids(), 28);
 
-        // Friday,   1 July 2022 00:00:00 UTC
-        uint256 JUL_01_2022 = 1656633600;
-        // Saturday, 1 July 2023 00:00:00 UTC
-        uint256 JUL_01_2023 = 1688169600;
+        uint256 AUG_01_2022 = 1659326400;
+        uint256 AUG_01_2023 = 1690862400;
+        uint256 SEP_28_2022 = 1664337600;
+        uint256 SEP_28_2024 = 1727496000;
 
-        address GRO_WALLET = wallets.addr("GRO_WALLET");
+        address GOV_WALLET1 = 0xbfDD0E744723192f7880493b66501253C34e1241;
+        address GOV_WALLET2 = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
+        address GOV_WALLET3 = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+        address SNE_WALLET = wallets.addr("SNE_WALLET");
 
         // -----
-        assertEq(vest.usr(24), GRO_WALLET);
-        assertEq(vest.bgn(24), JUL_01_2022);
-        assertEq(vest.clf(24), JUL_01_2022);
-        assertEq(vest.fin(24), JUL_01_2022 + 365 days);
-        assertEq(vest.fin(24), JUL_01_2023);
-        assertEq(vest.mgr(24), address(0));
-        assertEq(vest.res(24), 1);
-        assertEq(vest.tot(24), 803 * WAD);
-        assertEq(vest.rxd(24), 0);
+        assertEq(vest.usr(25), GOV_WALLET1);
+        assertEq(vest.bgn(25), AUG_01_2022);
+        assertEq(vest.clf(25), AUG_01_2023);
+        assertEq(vest.fin(25), AUG_01_2023);
+        assertEq(vest.mgr(25), address(0));
+        assertEq(vest.res(25), 1);
+        assertEq(vest.tot(25), 62.51 ether);
+        assertEq(vest.rxd(25), 0);
 
-        uint256 prevBalance = gov.balanceOf(GRO_WALLET);
+        assertEq(vest.usr(26), GOV_WALLET2);
+        assertEq(vest.bgn(26), AUG_01_2022);
+        assertEq(vest.clf(26), AUG_01_2023);
+        assertEq(vest.fin(26), AUG_01_2023);
+        assertEq(vest.mgr(26), address(0));
+        assertEq(vest.res(26), 1);
+        assertEq(vest.tot(26), 32.69 ether);
+        assertEq(vest.rxd(26), 0);
 
-        // Give admin powers to test contract address and make the vesting unrestricted for testing
-        giveAuth(address(vest), address(this));
-        vest.unrestrict(24);
+        assertEq(vest.usr(27), GOV_WALLET3);
+        assertEq(vest.bgn(27), AUG_01_2022);
+        assertEq(vest.clf(27), AUG_01_2023);
+        assertEq(vest.fin(27), AUG_01_2023);
+        assertEq(vest.mgr(27), address(0));
+        assertEq(vest.res(27), 1);
+        assertEq(vest.tot(27), 152.51 ether);
+        assertEq(vest.rxd(27), 0);
 
-        // 20220907 exec: Warp 1/2 year since cliff, ensure vest was accumulated
-        hevm.warp(JUL_01_2022 + 365 days / 2);
-        vest.vest(24);
-        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + (803 * WAD / 2));
-
-        // 20220907 exec: Warp to end and vest remaining
-        hevm.warp(JUL_01_2022 + 365 days);
-        vest.vest(24);
-        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
-
-        // 20220907 exec: Warp even further and make sure nothing else was accumulated
-        hevm.warp(JUL_01_2022 + 365 days + 10 days);
-        vest.vest(24);
-        assertEq(gov.balanceOf(GRO_WALLET), prevBalance + 803 * WAD);
+        assertEq(vest.usr(28), SNE_WALLET);
+        assertEq(vest.bgn(28), SEP_28_2022);
+        assertEq(vest.clf(28), SEP_28_2022);
+        assertEq(vest.fin(28), SEP_28_2024);
+        assertEq(vest.mgr(28), address(0));
+        assertEq(vest.res(28), 1);
+        assertEq(vest.tot(28), 540.00 ether);
+        assertEq(vest.rxd(28), 0);
     }
 
-    function testMKRPayments() private { // make public to use
+    function testMKRPayments() public {
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
-        uint256 prevMkrCES   = gov.balanceOf(wallets.addr("CES_OP_WALLET"));
-        uint256 prevMkrRisk  = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
+        uint256 prevMkrSNE   = gov.balanceOf(wallets.addr("SNE_WALLET"));
+        uint256 prevMkrSES   = gov.balanceOf(wallets.addr("SES_WALLET"));
 
-        uint256 amountRWF    =  20.00 ether;
-        uint256 amountCES    = 966.49 ether;
-        uint256 amountRisk   = 175.00 ether;
+        uint256 amountSNE    = 270.00 ether;
+        uint256 amountSES    = 227.64 ether;
 
-        uint256 total = amountRWF + amountCES + amountRisk;
+        uint256 total = amountSNE + amountSES;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
-        assertEq(gov.balanceOf(wallets.addr("CES_OP_WALLET")), prevMkrCES + amountCES);
-        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
+        assertEq(gov.balanceOf(wallets.addr("SNE_WALLET")), prevMkrSNE + amountSNE);
+        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
     }
 
     function testMKRVestFix() private { // make public to use
