@@ -21,9 +21,16 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-// import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
+import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface GemLike {
+    function approve(address, uint256) external returns (bool);
+    function transfer(address, uint256) external returns (bool);
+}
+
+interface RwaUrnLike {
+    function lock(uint256) external;
+    function draw(uint256) external;
     function transfer(address, uint256) external returns (bool);
 }
 
@@ -32,7 +39,7 @@ interface VestLike {
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
 }
 
-contract DssSpellAction is DssAction {
+contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0344515b4f9ef9de6e589b5b873f5bafcf274b38/governance/votes/Executive%20Vote%20-%20September%2028%2C%202022.md -q -O - 2>/dev/null)"
@@ -50,6 +57,11 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
 
+    uint256 constant RWA007_DRAW_AMOUNT = 1_000_000 * WAD;
+
+    uint256 constant AUG_01_2022 = 1659326400;
+    uint256 constant AUG_01_2023 = 1690862400;
+
     // --- Wallets ---
     address internal constant GOV_WALLET1       = 0xbfDD0E744723192f7880493b66501253C34e1241;
     address internal constant GOV_WALLET2       = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
@@ -61,12 +73,15 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------------------------------------------------------------------
         // Includes changes from the DssSpellCollateralAction
-        // onboardNewCollaterals();
-        // offboardCollaterals();
+        onboardNewCollaterals();
+
+        // lock RWA007 Token in the URN
+        GemLike(RWA007).approve(RWA007_A_URN, 1 * WAD);
+        RwaUrnLike(RWA007_A_URN).lock(1 * WAD);
 
         // MIP65 Deployment - 1 million Pilot Transaction (RWA-007-A)
         // https://vote.makerdao.com/polling/QmXHM6us
-
+        RwaUrnLike(RWA007_A_URN).draw(RWA007_DRAW_AMOUNT);
 
         // --- MKR Vests ---
         VestLike vest = VestLike(
@@ -81,7 +96,7 @@ contract DssSpellAction is DssAction {
                 62.51 ether,                                             // tot
                 AUG_01_2022,                                             // bgn
                 AUG_01_2023 - AUG_01_2022,                               // tau
-                365 days,                                                // eta
+                AUG_01_2023 - AUG_01_2022,                               // eta
                 address(0)                                               // mgr
             )
         );
@@ -102,6 +117,8 @@ contract DssSpellAction is DssAction {
         // https://mips.makerdao.com/mips/details/MIP55c3SP7
         // Ambassadors  - 81,000.0 DAI - 0xF411d823a48D18B32e608274Df16a9957fE33E45
         DssExecLib.sendPaymentFromSurplusBuffer(AMBASSADOR_WALLET, 81_000);
+        
+        DssExecLib.setChangelogVersion("1.14.2");
     }
 }
 
