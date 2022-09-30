@@ -509,7 +509,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testVestMKR() public {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 23);
+        assertEq(vest.ids(), 24);
 
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
@@ -778,12 +778,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwagem_007.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA007: gem not transfered from the pause proxy");
         assertEq(rwagem_007.balanceOf(address(rwajoin_007)), 1 * WAD, "RWA007: gem not locked into the urn");
 
-        // 0 DAI in Output Conduit
-        assertEq(dai.balanceOf(address(rwaconduitout_007)), 0, "RWA007: Dangling Dai in input conduit before draw()");
-
-        // Draw 1mm
-        rwaurn_007.draw(drawAmount);
-
         // 1mm DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwaconduitout_007)), drawAmount, "RWA007: Dai drawn was not send to the recipient");
 
@@ -862,12 +856,6 @@ contract DssSpellTest is DssSpellTestBase {
         // Check if spell lock 1 * WAD of RWA009
         assertEq(rwagem_007.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA007: gem not transfered from the pause proxy");
         assertEq(rwagem_007.balanceOf(address(rwajoin_007)), 1 * WAD, "RWA007: gem not locked into the urn");
-
-        // 0 DAI in Output Conduit
-        assertEq(dai.balanceOf(address(rwaconduitout_007)), 0, "RWA007: Dangling Dai in input conduit before draw()");
-
-        // Draw 1mm
-        rwaurn_007.draw(drawAmount);
 
         // 1mm DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwaconduitout_007)), drawAmount, "RWA007: Dai drawn was not send to the recipient");
@@ -960,7 +948,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check if spell draw 25mm DAI to Output Conduit (Pause Proxy)
+        // Check if spell draw 1mm DAI to Output Conduit (Pause Proxy)
         assertEq(dai.balanceOf(address(rwaUrn007Output)), prevBalance + drawAmount, "RWA007/dai-drawn-was-not-send-to-the-recipient");
 
         (uint256 ink, uint256 art) = vat.urns("RWA007-A", address(rwaUrn007));

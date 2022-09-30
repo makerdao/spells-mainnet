@@ -73,7 +73,7 @@ contract Addresses {
         addr["MCD_FLASH_LEGACY"]                = 0x1EB4CF3A948E7D72A198fe073cCb8C7a948cD853;
         addr["FLASH_KILLER"]                    = 0x07a4BaAEFA236A649880009B5a2B862097D9a1cD;
         addr["PROXY_ACTIONS_CROPPER"]           = 0xa2f69F8B9B341CFE9BfBb3aaB5fe116C89C95bAF;
-        addr["PROXY_ACTIONS_END_CROPPER"]       = 0x38f7C166B5B22906f04D8471E241151BA45d97Af;
+        addr["PROXY_ACTIONS_END_CROPPER"]       = 0xAa61752a5Abf86A527A09546F23FE8bCB8fAB2C4;
         addr["CDP_REGISTRY"]                    = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
         addr["MCD_CROPPER"]                     = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
         addr["MCD_CROPPER_IMP"]                 = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
