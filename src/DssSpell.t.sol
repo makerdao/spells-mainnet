@@ -849,6 +849,20 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(art, 0, "RWA007: bad `art` after wipe()");
     }
 
+    function testFailRWA007_DRAW_ABOVE_LINE() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 2_000_000 * WAD;
+
+        // setting address(this) as operator
+        hevm.store(address(rwaurn_007), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+
+        // Draw 2mm
+        rwaurn_007.draw(drawAmount);
+    }
+
     function testRWA007_OPERATOR_LOCK_DRAW_CAGE() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
