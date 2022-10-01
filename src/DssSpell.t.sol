@@ -860,6 +860,33 @@ contract DssSpellTest is DssSpellTestBase {
         rwaurn_007.draw(drawAmount);
     }
 
+    function testFailRWA007_PUSH_ABOVE_LINE() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 1_000_000 * WAD;
+
+        // setting address(this) as operator
+        hevm.store(address(rwaurn_007), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+
+        // Draw 1mm
+        rwaurn_007.draw(drawAmount);
+
+        // auth
+        giveAuth(address(rwaconduitout_007), address(this));
+
+        // pick address(this)
+        rwaconduitout_007.hope(address(this)); // allow this to call pick
+        rwaconduitout_007.kiss(address(this)); // allow this to be picked
+        rwaconduitout_007.pick(address(this));
+
+        // push above line
+        uint256 pushAmount = 2_000_000 * WAD;
+        rwaconduitout_007.mate(address(this)); // allow this to call push
+        rwaconduitout_007.push(pushAmount);    // fail
+    }
+
     function testRWA007_OPERATOR_LOCK_DRAW_CAGE() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
