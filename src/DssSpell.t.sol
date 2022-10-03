@@ -174,9 +174,9 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogKey("RWA007");
         checkChainlogKey("MCD_JOIN_RWA007_A");
         checkChainlogKey("RWA007_A_URN");
-        checkChainlogKey("RWA007_A_OUTPUT_CONDUIT");
         checkChainlogKey("RWA007_A_INPUT_CONDUIT_URN");
         checkChainlogKey("RWA007_A_INPUT_CONDUIT_JAR");
+        checkChainlogKey("RWA007_A_OUTPUT_CONDUIT");
         checkChainlogKey("PIP_RWA007");
 
         checkChainlogVersion("1.14.2");
