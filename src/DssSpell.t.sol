@@ -657,6 +657,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwaconduitout_007.can(RWA007_A_OPERATOR), 1, "OutputConduit/monetalis-not-operator");
         assertEq(rwaconduitout_007.may(pauseProxy), 1, "OutputConduit/pause-proxy-not-mate");
         assertEq(rwaconduitout_007.may(RWA007_A_OPERATOR), 1, "OutputConduit/monetalis-not-mate");
+        assertEq(rwaconduitout_007.quitTo(), address(rwaurn_007), "OutputConduit/quit-to-not-urn");
         
         assertEq(rwaconduitout_007.bud(RWA007_A_COINBASE_CUSTODY), 1, "OutputConduit/coinbase-custody-not-whitelisted-for-pick");
 
