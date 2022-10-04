@@ -189,7 +189,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // RWA007
-        (, address pipRwa007,,) = oracle.ilks("RWA007-A");
 
         assertEq(reg.pos("RWA007-A"),    53);
         assertEq(reg.join("RWA007-A"),   addr.addr("MCD_JOIN_RWA007_A"));
