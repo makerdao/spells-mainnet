@@ -19,7 +19,6 @@ pragma solidity 0.6.12;
 // pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExecLib.sol";
-import "dss-interfaces/dss/ChainlogAbstract.sol";
 import "dss-interfaces/dss/GemJoinAbstract.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
@@ -30,7 +29,6 @@ interface RwaLiquidationLike {
 }
 
 interface RwaUrnLike {
-    function wards(address) external view returns(uint256);
     function vat() external view returns(address);
     function jug() external view returns(address);
     function gemJoin() external view returns(address);
@@ -39,8 +37,13 @@ interface RwaUrnLike {
     function hope(address) external;
 }
 
+interface RwaJarLike {
+    function chainlog() external view returns(address);
+    function dai() external view returns(address);
+    function daiJoin() external view returns(address);
+}
+
 interface RwaOutputConduitLike {
-    function wards(address) external view returns(uint256);
     function dai() external view returns(address);
     function gem() external view returns(address);
     function psm() external view returns(address);
@@ -51,7 +54,6 @@ interface RwaOutputConduitLike {
 }
 
 interface RwaInputConduitLike {
-    function wards(address) external view returns(uint256);
     function dai() external view returns(address);
     function gem() external view returns(address);
     function psm() external view returns(address);
@@ -123,28 +125,34 @@ contract DssSpellCollateralAction {
         uint256 decimals = GemAbstract(RWA007).decimals();
 
         // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_RWA007_A).vat()                             == MCD_VAT,                 "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA007_A).ilk()                             == ilk,                     "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA007_A).gem()                             == RWA007,                  "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA007_A).dec()                             == decimals,                "join-dec-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA007_A).vat()                             == MCD_VAT,                                    "join-vat-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA007_A).ilk()                             == ilk,                                        "join-ilk-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA007_A).gem()                             == RWA007,                                     "join-gem-not-match");
+        require(GemJoinAbstract(MCD_JOIN_RWA007_A).dec()                             == decimals,                                   "join-dec-not-match");
 
-        require(RwaUrnLike(RWA007_A_URN).vat()                                       == MCD_VAT,                 "urn-vat-not-match");
-        require(RwaUrnLike(RWA007_A_URN).jug()                                       == MCD_JUG,                 "urn-jug-not-match");
-        require(RwaUrnLike(RWA007_A_URN).daiJoin()                                   == MCD_JOIN_DAI,            "urn-daijoin-not-match");
-        require(RwaUrnLike(RWA007_A_URN).gemJoin()                                   == MCD_JOIN_RWA007_A,       "urn-gemjoin-not-match");
-        require(RwaUrnLike(RWA007_A_URN).outputConduit()                             == RWA007_A_OUTPUT_CONDUIT, "urn-outputconduit-not-match");
-
-        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).dai()                  == DssExecLib.dai(),        "output-conduit-dai-not-match");
-        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).gem()                  == DssExecLib.getChangelogAddress("USDC"), "output-conduit-gem-not-match");
-        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).psm()                  == MCD_PSM_USDC_A,          "output-conduit-psm-not-match");
+        require(RwaUrnLike(RWA007_A_URN).vat()                                       == MCD_VAT,                                    "urn-vat-not-match");
+        require(RwaUrnLike(RWA007_A_URN).jug()                                       == MCD_JUG,                                    "urn-jug-not-match");
+        require(RwaUrnLike(RWA007_A_URN).daiJoin()                                   == MCD_JOIN_DAI,                               "urn-daijoin-not-match");
+        require(RwaUrnLike(RWA007_A_URN).gemJoin()                                   == MCD_JOIN_RWA007_A,                          "urn-gemjoin-not-match");
+        require(RwaUrnLike(RWA007_A_URN).outputConduit()                             == RWA007_A_OUTPUT_CONDUIT,                    "urn-outputconduit-not-match");
         
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).psm()                == MCD_PSM_USDC_A,          "input-conduit-urn-psm-not-match");
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).to()                 == RWA007_A_URN,            "input-conduit-urn-to-not-match");
+        require(RwaJarLike(RWA007_A_JAR).chainlog()                                  == DssExecLib.LOG,                             "jar-chainlog-not-match");
+        require(RwaJarLike(RWA007_A_JAR).dai()                                       == DssExecLib.dai(),                           "jar-dai-not-match");
+        require(RwaJarLike(RWA007_A_JAR).daiJoin()                                   == MCD_JOIN_DAI,                               "jar-daijoin-not-match");
 
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).dai()                == DssExecLib.dai(),        "input-conduit-urn-dai-not-match");
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).gem()                == DssExecLib.getChangelogAddress("USDC"),          "input-conduit-urn-gem-not-match");
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).psm()                == MCD_PSM_USDC_A,          "input-conduit-jar-psm-not-match");
-        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).to()                 == RWA007_A_JAR,            "input-conduit-har-to-not-match");
+        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).dai()                  == DssExecLib.dai(),                           "output-conduit-dai-not-match");
+        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).gem()                  == DssExecLib.getChangelogAddress("USDC"),     "output-conduit-gem-not-match");
+        require(RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).psm()                  == MCD_PSM_USDC_A,                             "output-conduit-psm-not-match");
+        
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).psm()                == MCD_PSM_USDC_A,                             "input-conduit-urn-psm-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).to()                 == RWA007_A_URN,                               "input-conduit-urn-to-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).dai()                == DssExecLib.dai(),                           "input-conduit-urn-dai-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).gem()                == DssExecLib.getChangelogAddress("USDC"),     "input-conduit-urn-gem-not-match");
+
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).psm()                == MCD_PSM_USDC_A,                             "input-conduit-jar-psm-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).to()                 == RWA007_A_JAR,                               "input-conduit-jar-to-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).dai()                == DssExecLib.dai(),                           "input-conduit-jar-dai-not-match");
+        require(RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).gem()                == DssExecLib.getChangelogAddress("USDC"),     "input-conduit-jar-gem-not-match");
 
 
         // Init the RwaLiquidationOracle
@@ -162,7 +170,7 @@ contract DssSpellCollateralAction {
         // Allow RWA007 Join to modify Vat registry
         DssExecLib.authorize(MCD_VAT, MCD_JOIN_RWA007_A);
 
-        // 100m debt ceiling
+        // 1m debt ceiling
         DssExecLib.increaseIlkDebtCeiling(ilk, RWA007_A_LINE, /* _global = */ true);
 
         // Set the stability fee
@@ -181,7 +189,7 @@ contract DssSpellCollateralAction {
         RwaUrnLike(RWA007_A_URN).hope(address(this));
         RwaUrnLike(RWA007_A_URN).hope(address(RWA007_A_OPERATOR));
 
-        // MCD_PAUSE_PROXY and Monetails permission on RWA007_A_OUTPUT_CONDUIT
+        // MCD_PAUSE_PROXY and Monetalis permission on RWA007_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).hope(address(this));
         RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).mate(address(this));
         RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).hope(RWA007_A_OPERATOR);
@@ -191,13 +199,13 @@ contract DssSpellCollateralAction {
         // Set "quitTo" address for RWA007_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA007_A_OUTPUT_CONDUIT).file("quitTo", RWA007_A_URN);
 
-        // MCD_PAUSE_PROXY and Monetails permission on RWA007_A_INPUT_CONDUIT_URN
+        // MCD_PAUSE_PROXY and Monetalis permission on RWA007_A_INPUT_CONDUIT_URN
         RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).mate(address(this));
         RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).mate(RWA007_A_OPERATOR);
         // Set "quitTo" address for RWA007_A_INPUT_CONDUIT_URN
         RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_URN).file("quitTo", RWA007_A_COINBASE_CUSTODY);
 
-        // MCD_PAUSE_PROXY and Monetails permission on RWA007_A_INPUT_CONDUIT_JAR
+        // MCD_PAUSE_PROXY and Monetalis permission on RWA007_A_INPUT_CONDUIT_JAR
         RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).mate(address(this));
         RwaInputConduitLike(RWA007_A_INPUT_CONDUIT_JAR).mate(RWA007_A_OPERATOR);
         // Set "quitTo" address for RWA007_A_INPUT_CONDUIT_JAR
