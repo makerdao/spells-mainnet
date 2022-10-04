@@ -582,7 +582,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amountSNE    = 270.00 ether;
         uint256 amountSES    = 227.64 ether;
 
-        uint256 total = amountSNE + amountSES;
+        uint256 total = 497.64 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
