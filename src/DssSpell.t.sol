@@ -522,10 +522,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
         assertEq(vest.ids(), 28);
 
-        uint256 AUG_01_2022 = 1659326400;
-        uint256 AUG_01_2023 = 1690862400;
-        uint256 SEP_28_2022 = 1664337600;
-        uint256 SEP_28_2024 = 1727496000;
+        uint256 AUG_01_2022 = 1659312000;
+        uint256 AUG_01_2023 = 1690848000;
+        uint256 SEP_28_2022 = 1664323200;
+        uint256 SEP_28_2024 = 1727481600;
 
         address GOV_WALLET1 = 0xbfDD0E744723192f7880493b66501253C34e1241;
         address GOV_WALLET2 = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;

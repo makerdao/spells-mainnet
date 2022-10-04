@@ -56,10 +56,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
 
-    uint256 constant AUG_01_2022 = 1659326400;
-    uint256 constant AUG_01_2023 = 1690862400;
-    uint256 constant SEP_28_2022 = 1664337600;
-    uint256 constant SEP_28_2024 = 1727496000;
+    uint256 constant AUG_01_2022 = 1659312000;
+    uint256 constant AUG_01_2023 = 1690848000;
+    uint256 constant SEP_28_2022 = 1664323200;
+    uint256 constant SEP_28_2024 = 1727481600;
 
     // --- Wallets ---
     address internal constant GOV_WALLET1       = 0xbfDD0E744723192f7880493b66501253C34e1241;
