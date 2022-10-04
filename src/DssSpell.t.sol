@@ -668,6 +668,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwaconduitinjar_007.may(pauseProxy), 1, "InputConduitJar/pause-proxy-not-mate");
         assertEq(rwaconduitinjar_007.may(RWA007_A_OPERATOR), 1, "InputConduitJar/monetalis-not-mate");
         assertEq(rwaconduitinjar_007.quitTo(), RWA007_A_COINBASE_CUSTODY, "InputConduitJar/quit-to-not-set");
+        		
+        assertEq(rwajoin_007.wards(address(rwaurn_007)), 1, "Join/ward-urn-not-set");	
+        assertEq(rwaurn_007.can(pauseProxy), 1, "Urn/pause-proxy-not-hoped");	
+        assertEq(rwaurn_007.can(RWA007_A_OPERATOR), 1, "Urn/operator-not-hoped");
     }
 
     function testRWA007_INTEGRATION_BUMP() public {
