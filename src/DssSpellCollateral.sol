@@ -72,8 +72,6 @@ contract DssSpellCollateralAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
 
-    uint256 internal constant ZERO_PCT_RATE                  = 1000000000000000000000000000;
-
     // --- Math ---
     uint256 internal constant WAD = 10**18;
 
@@ -102,7 +100,6 @@ contract DssSpellCollateralAction {
     // Remaining params
     uint256 internal constant RWA007_A_LINE                  = 1_000_000;
     uint256 internal constant RWA007_A_MAT                   = 100_00; // 100% in basis-points
-    uint256 internal constant RWA007_A_RATE                  = ZERO_PCT_RATE;
 
     // Monetalis operator address
     address internal constant RWA007_A_OPERATOR              = 0x94cfBF071f8be325A5821bFeAe00eEbE9CE7c279;
@@ -159,9 +156,6 @@ contract DssSpellCollateralAction {
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA007_A_INITIAL_PRICE, RWA007_DOC, RWA007_A_TAU);
         (, address pip, , ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
 
-        // Set price feed for RWA007
-        DssExecLib.setContract(MCD_SPOT, ilk, "pip", pip);
-
         // Init RWA007 in Vat
         Initializable(MCD_VAT).init(ilk);
         // Init RWA007 in Jug
@@ -173,8 +167,8 @@ contract DssSpellCollateralAction {
         // 1m debt ceiling
         DssExecLib.increaseIlkDebtCeiling(ilk, RWA007_A_LINE, /* _global = */ true);
 
-        // Set the stability fee
-        DssExecLib.setIlkStabilityFee(ilk, RWA007_A_RATE, /* _doDrip = */ false);
+        // Set price feed for RWA007
+        DssExecLib.setContract(MCD_SPOT, ilk, "pip", pip);
 
         // Set collateralization ratio
         DssExecLib.setIlkLiquidationRatio(ilk, RWA007_A_MAT);
