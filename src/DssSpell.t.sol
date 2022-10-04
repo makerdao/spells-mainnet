@@ -29,8 +29,8 @@ interface RwaLiquidationLike {
 }
 
 interface RwaUrnLike {
-    function gemJoin() external view returns (GemAbstract);
     function can(address) external view returns (uint256);
+    function gemJoin() external view returns (GemAbstract);
     function lock(uint256) external;
     function draw(uint256) external;
     function wipe(uint256) external;
