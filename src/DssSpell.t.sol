@@ -183,7 +183,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogVersion("1.14.2");
     }
 
-    function testNewIlkRegistryValues() public { // make public to use
+    function testNewIlkRegistryValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
