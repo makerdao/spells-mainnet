@@ -536,6 +536,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(25), GOV_WALLET1);
         assertEq(vest.bgn(25), AUG_01_2022);
         assertEq(vest.clf(25), AUG_01_2023);
+        assertEq(vest.fin(25), AUG_01_2022 + 365 days);
         assertEq(vest.fin(25), AUG_01_2023);
         assertEq(vest.mgr(25), address(0));
         assertEq(vest.res(25), 1);
@@ -545,6 +546,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(26), GOV_WALLET2);
         assertEq(vest.bgn(26), AUG_01_2022);
         assertEq(vest.clf(26), AUG_01_2023);
+        assertEq(vest.fin(26), AUG_01_2022 + 365 days);
         assertEq(vest.fin(26), AUG_01_2023);
         assertEq(vest.mgr(26), address(0));
         assertEq(vest.res(26), 1);
@@ -554,6 +556,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(27), GOV_WALLET3);
         assertEq(vest.bgn(27), AUG_01_2022);
         assertEq(vest.clf(27), AUG_01_2023);
+        assertEq(vest.fin(27), AUG_01_2022 + 365 days);
         assertEq(vest.fin(27), AUG_01_2023);
         assertEq(vest.mgr(27), address(0));
         assertEq(vest.res(27), 1);
@@ -563,6 +566,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.usr(28), SNE_WALLET);
         assertEq(vest.bgn(28), SEP_28_2022);
         assertEq(vest.clf(28), SEP_28_2022);
+        assertEq(vest.fin(28), SEP_28_2022 + 731 days);
         assertEq(vest.fin(28), SEP_28_2024);
         assertEq(vest.mgr(28), address(0));
         assertEq(vest.res(28), 1);
