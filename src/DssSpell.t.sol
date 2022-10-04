@@ -49,6 +49,7 @@ interface RwaOutputConduitLike {
     function kiss(address) external;
     function mate(address) external;
     function hope(address) external;
+    function can(address) external view returns (uint256);
 }
 
 interface RwaInputConduitLike {
