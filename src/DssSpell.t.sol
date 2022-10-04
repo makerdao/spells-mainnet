@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
@@ -38,7 +37,6 @@ interface RwaUrnLike {
 }
 
 interface RwaOutputConduitLike {
-    function can(address) external view returns (uint256);
     function may(address) external view returns (uint256);
     function gem() external view returns (GemAbstract);
     function bud(address) external view returns (uint256);
@@ -50,6 +48,7 @@ interface RwaOutputConduitLike {
     function mate(address) external;
     function hope(address) external;
     function can(address) external view returns (uint256);
+    function quitTo() external view returns (address);
 }
 
 interface RwaInputConduitLike {
