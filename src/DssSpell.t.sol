@@ -195,7 +195,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(reg.gem("RWA007-A"),    addr.addr("RWA007"));
         assertEq(reg.dec("RWA007-A"),    GemAbstract(addr.addr("RWA007")).decimals());
         assertEq(reg.class("RWA007-A"),  3);
-        assertEq(reg.pip("RWA007-A"),    pipRwa007);
+        assertEq(reg.pip("RWA007-A"),    addr.addr("PIP_RWA007"));
         assertEq(reg.name("RWA007-A"),   "RWA007-A: Monetalis Clydesdale");
         assertEq(reg.symbol("RWA007-A"), GemAbstract(addr.addr("RWA007")).symbol());
     }
