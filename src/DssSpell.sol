@@ -163,7 +163,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // ---------------------------------------------------------------------
         // Delegate Compensation - September 2022 
-
+        
 
         // ---------------------------------------------------------------------
     }
