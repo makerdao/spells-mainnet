@@ -583,7 +583,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testVestMKR() private { // make public to use
-        /* VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 24);
 
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
@@ -693,26 +693,26 @@ contract DssSpellTest is DssSpellTestBase {
 
         hevm.warp(SEP_28_2022 + 731 days + 10 days);
         vest.vest(28);
-        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether); */
+        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether); 
     }
 
     function testMKRPayments() private { // make public to use
-        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        // uint256 prevMkrSNE   = gov.balanceOf(wallets.addr("SNE_WALLET"));
-        // uint256 prevMkrSES   = gov.balanceOf(wallets.addr("SES_WALLET"));
+        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrSNE   = gov.balanceOf(wallets.addr("SNE_WALLET"));
+        uint256 prevMkrSES   = gov.balanceOf(wallets.addr("SES_WALLET"));
 
-        // uint256 amountSNE    = 270.00 ether;
-        // uint256 amountSES    = 227.64 ether;
+        uint256 amountSNE    = 270.00 ether;
+        uint256 amountSES    = 227.64 ether;
 
-        // uint256 total = 497.64 ether; */
+        uint256 total = 497.64 ether; 
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        // assertEq(gov.balanceOf(wallets.addr("SNE_WALLET")), prevMkrSNE + amountSNE);
-        // assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("SNE_WALLET")), prevMkrSNE + amountSNE);
+        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
     }
 
     function testMKRVestFix() private { // make public to use

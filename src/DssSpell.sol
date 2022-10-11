@@ -64,6 +64,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     address internal constant ONESTONE_WALLET            = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
     address internal constant PVI_WALLET                 = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
     
+
     function actions() public override {
         // Includes changes from the DssSpellCollateralAction
         // onboardNewCollaterals();
@@ -171,8 +172,6 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE_WALLET,               108);
         DssExecLib.sendPaymentFromSurplusBuffer(PVI_WALLET,                     53);
         
-
-
         // ---------------------------------------------------------------------
     }
 }
