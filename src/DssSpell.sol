@@ -23,28 +23,13 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
-interface GemLike {
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external returns (bool);
-    function transfer(address, uint256) external returns (bool);
-}
-
-interface RwaUrnLike {
-    function lock(uint256) external;
-}
-
-interface VestLike {
-    function restrict(uint256) external;
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-}
-
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/ef7c8c881c961e9b4b3cc9644619986a75ef83d7/governance/votes/Executive%20vote%20-%20October%205%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20October%2012%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-10-05 MakerDAO Executive Spell | Hash: 0xf791ea9d7a97cace07a1cd79de48ce9a41dc79f53a43465faad83a30292dfc81";
+        "2022-10-05 MakerDAO Executive Spell | Hash: 0x0b0d0065dba31f91f6552a87022959dc802e0d902402998cf4717bbdd42471ab";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -60,22 +45,24 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // --- Math ---
     uint256 internal constant MILLION = 10 ** 6;
     // --- Wallets ---
-    address internal constant JUSTIN_CASE_WALLET  = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
-    address internal constant DOO_WALLET  = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
-    address internal constant ULTRASCHUPPI_WALLET  = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
-    address internal constant FLIPFLOPFLAP_WALLET  = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address internal constant FLIPSIDE_WALLET  = 0x62a43123FE71f9764f26554b3F5017627996816a;
-    address internal constant FEEDBLACKLOOPS_WALLET  = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address internal constant PENNBLOCKCHAIN_WALLET  = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
-    address internal constant GFXLABS_WALLET  = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address internal constant JUSTIN_CASE_WALLET         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address internal constant DOO_WALLET                 = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address internal constant ULTRASCHUPPI_WALLET        = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address internal constant FLIPFLOPFLAP_WALLET        = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address internal constant FLIPSIDE_WALLET            = 0x62a43123FE71f9764f26554b3F5017627996816a;
+    address internal constant FEEDBLACKLOOPS_WALLET      = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address internal constant PENNBLOCKCHAIN_WALLET      = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address internal constant GFXLABS_WALLET             = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
     address internal constant MHONKASALOTEEMULAU_WALLET  = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
-    address internal constant CHRISBLEC_WALLET  = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
-    address internal constant ACREINVEST_WALLET  = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address internal constant CHRISBLEC_WALLET           = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
+    address internal constant ACREINVEST_WALLET          = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address internal constant BLOCKCHAINCOLUMBIA_WALLET  = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
-    address internal constant FRONTIERRESEARCH_WALLET  = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
-    address internal constant LLAMA_WALLET  = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
-    address internal constant CODEKNIGHT_WALLET  = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
-    
+    address internal constant FRONTIERRESEARCH_WALLET    = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address internal constant LBSBLOCKCHAIN_WALLET       = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
+    address internal constant LLAMA_WALLET               = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address internal constant CODEKNIGHT_WALLET          = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address internal constant ONESTONE_WALLET            = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
+    address internal constant PVI_WALLET                 = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
     
     function actions() public override {
         // Includes changes from the DssSpellCollateralAction
@@ -163,6 +150,27 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // ---------------------------------------------------------------------
         // Delegate Compensation - September 2022 
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-september-2022/18257
+
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,         12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(DOO_WALLET,                 12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET,        12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET,        11_633);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE_WALLET,            11_396);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS_WALLET,      10_696);
+        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN_WALLET,      10_322);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS_WALLET,              8_509);
+        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU_WALLET,   7_996);
+        DssExecLib.sendPaymentFromSurplusBuffer(CHRISBLEC_WALLET,            7_372);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST_WALLET,           6_681);
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKCHAINCOLUMBIA_WALLET,   3_506);
+        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIERRESEARCH_WALLET,     2_136);
+        DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN_WALLET,        1_974);
+        DssExecLib.sendPaymentFromSurplusBuffer(LLAMA_WALLET,                1_839);
+        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT_WALLET,             269);
+        DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE_WALLET,               108);
+        DssExecLib.sendPaymentFromSurplusBuffer(PVI_WALLET,                     53);
+        
 
 
         // ---------------------------------------------------------------------
