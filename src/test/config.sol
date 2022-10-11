@@ -123,7 +123,7 @@ contract Config {
             flap_tau:              72 hours,                // in seconds
             flap_lid:              30 * THOUSAND,           // in whole Dai units
             cat_box:               20 * MILLION,            // In whole Dai units
-            dog_Hole:              100 * MILLION,           // In whole Dai units
+            dog_Hole:              70 * MILLION,           // In whole Dai units
             esm_min:               150 * THOUSAND,          // In whole MKR units
             pause_authority:       chief,                   // Pause authority
             osm_mom_authority:     chief,                   // OsmMom authority
