@@ -103,7 +103,7 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[16] memory payees = [
+        Payee[18] memory payees = [
             Payee(wallets.addr("JUSTINCASE"),         12_000),
             Payee(wallets.addr("DOO"),                12_000),
             Payee(wallets.addr("ULTRASCHUPPI"),       12_000),
@@ -121,8 +121,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("LLAMA"),               1_839),
             Payee(wallets.addr("CODEKNIGHT"),            269),
             Payee(wallets.addr("ONESTONE"),              108),
-            Payee(wallets.addr("PVI"),                    53),
-            
+            Payee(wallets.addr("PVI"),                    53)
         ];
 
 
@@ -583,8 +582,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(8), block.timestamp);
     }
 
-    function testVestMKR() public {
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+    function testVestMKR() private { // make public to use
+        /* VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 24);
 
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
@@ -694,26 +693,26 @@ contract DssSpellTest is DssSpellTestBase {
 
         hevm.warp(SEP_28_2022 + 731 days + 10 days);
         vest.vest(28);
-        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
+        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether); */
     }
 
-    function testMKRPayments() public {
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrSNE   = gov.balanceOf(wallets.addr("SNE_WALLET"));
-        uint256 prevMkrSES   = gov.balanceOf(wallets.addr("SES_WALLET"));
+    function testMKRPayments() private { // make public to use
+        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        // uint256 prevMkrSNE   = gov.balanceOf(wallets.addr("SNE_WALLET"));
+        // uint256 prevMkrSES   = gov.balanceOf(wallets.addr("SES_WALLET"));
 
-        uint256 amountSNE    = 270.00 ether;
-        uint256 amountSES    = 227.64 ether;
+        // uint256 amountSNE    = 270.00 ether;
+        // uint256 amountSES    = 227.64 ether;
 
-        uint256 total = 497.64 ether;
+        // uint256 total = 497.64 ether; */
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("SNE_WALLET")), prevMkrSNE + amountSNE);
-        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(wallets.addr("SNE_WALLET")), prevMkrSNE + amountSNE);
+        // assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
     }
 
     function testMKRVestFix() private { // make public to use
