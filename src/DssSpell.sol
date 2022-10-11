@@ -72,7 +72,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     address internal constant CHRISBLEC_WALLET  = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
     address internal constant ACREINVEST_WALLET  = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
     address internal constant BLOCKCHAINCOLUMBIA_WALLET  = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
-    address internal constant FRONTIER_RESEARCH  = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address internal constant FRONTIERRESEARCH_WALLET  = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
     address internal constant LLAMA_WALLET  = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
     address internal constant CODEKNIGHT_WALLET  = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
     
@@ -163,7 +163,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // ---------------------------------------------------------------------
         // Delegate Compensation - September 2022 
-        
+
 
         // ---------------------------------------------------------------------
     }
