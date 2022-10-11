@@ -103,9 +103,28 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("AMBASSADOR_WALLET"), 81_000)
+        Payee[16] memory payees = [
+            Payee(wallets.addr("JUSTINCASE"),         12_000),
+            Payee(wallets.addr("DOO"),                12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),       12_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),       11_633),
+            Payee(wallets.addr("FLIPSIDE"),           11_396),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),     10_696),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),     10_322),
+            Payee(wallets.addr("GFXLABS"),             8_509),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),  7_996),
+            Payee(wallets.addr("CHRISBLEC"),           7_372),
+            Payee(wallets.addr("ACREINVEST"),          6_681),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),  3_506),
+            Payee(wallets.addr("FRONTIERRESEARCH"),    2_136),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),       1_974),
+            Payee(wallets.addr("LLAMA"),               1_839),
+            Payee(wallets.addr("CODEKNIGHT"),            269),
+            Payee(wallets.addr("ONESTONE"),              108),
+            Payee(wallets.addr("PVI"),                    53),
+            
         ];
+
 
         uint256 prevBalance;
         uint256 totAmount;
