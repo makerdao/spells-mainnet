@@ -67,7 +67,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     address internal constant LLAMA_WALLET               = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
     address internal constant CODEKNIGHT_WALLET          = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
     address internal constant ONESTONE_WALLET            = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
-    address internal constant PVI_WALLET                 = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
+    address internal constant PVL_WALLET                 = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
     
 
     function actions() public override {
@@ -175,7 +175,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         DssExecLib.sendPaymentFromSurplusBuffer(LLAMA_WALLET,                1_839);
         DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT_WALLET,             269);
         DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE_WALLET,               108);
-        DssExecLib.sendPaymentFromSurplusBuffer(PVI_WALLET,                     53);
+        DssExecLib.sendPaymentFromSurplusBuffer(PVL_WALLET,                     53);
         
         // ---------------------------------------------------------------------
     }

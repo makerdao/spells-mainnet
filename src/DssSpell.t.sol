@@ -121,7 +121,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("LLAMA"),               1_839),
             Payee(wallets.addr("CODEKNIGHT"),            269),
             Payee(wallets.addr("ONESTONE"),              108),
-            Payee(wallets.addr("PVI"),                    53)
+            Payee(wallets.addr("PVL"),                    53)
         ];
 
 
