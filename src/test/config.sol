@@ -155,7 +155,7 @@ contract Config {
             flipper_mom:  0,               // 1 if circuit breaker enabled
             dog_hole:     40 * MILLION,    // In whole Dai units
             clip_buf:     110_00,          // In basis points
-            clip_tail:    7200 seconds,    // In seconds
+            clip_tail:    7_200,            // In seconds, do not use the 'seconds' keyword
             clip_cusp:    45_00,           // In basis points
             clip_chip:    10,              // In basis points
             clip_tip:     250,             // In whole Dai units
@@ -185,7 +185,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     15 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    4800 seconds,
+            clip_tail:    4_800,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -215,7 +215,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     35 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    7200 seconds,
+            clip_tail:    7_200,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -335,7 +335,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     30 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    7200 seconds,
+            clip_tail:    7_200,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -365,7 +365,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     10 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    4800 seconds,
+            clip_tail:    4_800,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -395,7 +395,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     20 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    7200 seconds,
+            clip_tail:    7_200,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -1565,7 +1565,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     15 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    7200 seconds,
+            clip_tail:    7_200,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
@@ -1595,7 +1595,7 @@ contract Config {
             flipper_mom:  0,
             dog_hole:     10 * MILLION,
             clip_buf:     110_00,
-            clip_tail:    7200 seconds,
+            clip_tail:    7_200,
             clip_cusp:    45_00,
             clip_chip:    10,
             clip_tip:     250,
