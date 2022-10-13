@@ -26,7 +26,7 @@ import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20October%2012%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d4081516d55e1da0e45220ec475cc616d9957a7b/governance/votes/Executive%20vote%20-%20October%2012%2C%202022.md)"
 
     string public constant override description =
         "2022-10-12 MakerDAO Executive Spell | Hash: 0x0b0d0065dba31f91f6552a87022959dc802e0d902402998cf4717bbdd42471ab";
