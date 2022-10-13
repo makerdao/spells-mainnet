@@ -152,6 +152,11 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         DssExecLib.setIlkStabilityFee("CRVV1ETHSTETH-A" , ONE_FIVE_PCT_RATE , true); 
         
         // YFI-A DC IAM line change (25M --> 10M)
+        /*  
+            Note that dss-auto-line does not automatically reduce this value
+            It will need to be called permissionlessly by a keeper after spell
+            deployment to take effect and reduce the ceiling.
+        */
         DssExecLib.setIlkAutoLineDebtCeiling("YFI-A" , 10 * MILLION);
 
         // ---------------------------------------------------------------------
