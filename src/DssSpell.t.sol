@@ -693,7 +693,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         hevm.warp(SEP_28_2022 + 731 days + 10 days);
         vest.vest(28);
-        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether); 
+        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
     function testMKRPayments() private { // make public to use
@@ -704,7 +704,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amountSNE    = 270.00 ether;
         uint256 amountSES    = 227.64 ether;
 
-        uint256 total = 497.64 ether; 
+        uint256 total = 497.64 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));

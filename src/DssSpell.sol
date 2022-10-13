@@ -29,7 +29,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20October%2012%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-10-05 MakerDAO Executive Spell | Hash: 0x0b0d0065dba31f91f6552a87022959dc802e0d902402998cf4717bbdd42471ab";
+        "2022-10-12 MakerDAO Executive Spell | Hash: 0x0b0d0065dba31f91f6552a87022959dc802e0d902402998cf4717bbdd42471ab";
 
     // Turn office hours off
     function officeHours() public override returns (bool) {
@@ -105,14 +105,14 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         DssExecLib.setAuctionPermittedDrop("WSTETH-B" , 45_00);
         
         // tail changes (Max auction duration)
-        DssExecLib.setAuctionTimeBeforeReset("ETH-A"    , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("ETH-C"    , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("WBTC-A"   , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("WBTC-C"   , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("WSTETH-A" , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("WSTETH-B" , 7200 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("ETH-B"    , 4800 seconds);
-        DssExecLib.setAuctionTimeBeforeReset("WBTC-B"   , 4800 seconds);
+        DssExecLib.setAuctionTimeBeforeReset("ETH-A"    , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("ETH-C"    , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("WBTC-A"   , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("WBTC-C"   , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("WSTETH-A" , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("WSTETH-B" , 7200);
+        DssExecLib.setAuctionTimeBeforeReset("ETH-B"    , 4800);
+        DssExecLib.setAuctionTimeBeforeReset("WBTC-B"   , 4800);
         
         // ilk hole changes (Max concurrent liquidation amount for an ilk)
         DssExecLib.setIlkMaxLiquidationAmount("ETH-A"    , 40 * MILLION);
