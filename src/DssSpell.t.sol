@@ -18,46 +18,6 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory, address, uint48 toc, uint48 tau);
-    function bump(bytes32 ilk, uint256 val) external;
-    function tell(bytes32) external;
-    function cure(bytes32) external;
-    function cull(bytes32, address) external;
-    function good(bytes32) external view returns (bool);
-}
-
-interface RwaUrnLike {
-    function can(address) external view returns (uint256);
-    function gemJoin() external view returns (GemAbstract);
-    function lock(uint256) external;
-    function draw(uint256) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
-}
-
-interface RwaOutputConduitLike {
-    function may(address) external view returns (uint256);
-    function gem() external view returns (GemAbstract);
-    function bud(address) external view returns (uint256);
-    function pick(address) external;
-    function push() external;
-    function push(uint256) external;
-    function quit() external;
-    function kiss(address) external;
-    function mate(address) external;
-    function hope(address) external;
-    function can(address) external view returns (uint256);
-    function quitTo() external view returns (address);
-}
-
-interface RwaInputConduitLike {
-    function wards(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function quitTo() external view returns (address);
-    function mate(address) external;
-    function push() external;
-}
 
 contract DssSpellTest is DssSpellTestBase {
 
@@ -97,39 +57,39 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testPayments() private { // make public to enable
-        uint256 prevSin = vat.sin(address(vow));
+        // uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("<WALLET>"),         00_000)
-        ];
+        // Payee[1] memory payees = [
+        //     Payee(wallets.addr("<WALLET>"),         XX_XXX)
+        // ];
 
 
-        uint256 prevBalance;
-        uint256 totAmount;
-        uint256[] memory prevAmounts = new uint256[](payees.length);
+        // uint256 prevBalance;
+        // uint256 totAmount;
+        // uint256[] memory prevAmounts = new uint256[](payees.length);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            totAmount += payees[i].amount;
-            prevAmounts[i] = dai.balanceOf(payees[i].addr);
-            prevBalance += prevAmounts[i];
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     totAmount += payees[i].amount;
+        //     prevAmounts[i] = dai.balanceOf(payees[i].addr);
+        //     prevBalance += prevAmounts[i];
+        // }
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
+        // assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(
-                dai.balanceOf(payees[i].addr) - prevAmounts[i],
-                payees[i].amount * WAD
-            );
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     assertEq(
+        //         dai.balanceOf(payees[i].addr) - prevAmounts[i],
+        //         payees[i].amount * WAD
+        //     );
+        // }
     }
 
     function testCollateralIntegrations() private { // make public to use
