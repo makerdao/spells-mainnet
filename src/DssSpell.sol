@@ -26,10 +26,10 @@ import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash:cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/<TODO>/governance/votes/<TODO>.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/57700b7c1eab15c213e5c92cd9ebf5de9df44f24/governance/votes/Executive%20vote%20-%20October%2019%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-10-19 MakerDAO Executive Spell | Hash: <TODO>";
+        "2022-10-19 MakerDAO Executive Spell | Hash: 0x300ef27d3eee7338f3619ea697a6e9f1c85e14f6547342c8f4a40d05f26ccd1f";
 
     // Turn office hours off
     function officeHours() public override returns (bool) {
@@ -48,13 +48,25 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // --- Rates ---
 
     // --- Math ---
-    // uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD = 10 ** 18;
 
     function actions() public override {
         // Includes changes from the DssSpellCollateralAction
         // onboardNewCollaterals();
         // updateCollaterals();
         // offboardCollaterals();
+
+        // ---------------------------------------------------------------------
+        // Vote: https://vote.makerdao.com/polling/QmYffkvR#poll-detail
+        // Forum: https://forum.makerdao.com/t/signal-request-change-psm-gusd-a-parameters/18142
+        address MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+        DssExecLib.setIlkAutoLineParameters({
+            _ilk:    "PSM-GUSD-A",
+            _amount: 500 * MILLION,
+            _gap:    50 * MILLION,
+            _ttl:    24 hours
+        });
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 20 * WAD / 100_00);
     }
 }
 

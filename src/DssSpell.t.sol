@@ -18,6 +18,9 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
+interface DssPsmLike {
+    function tout() external view returns (uint256);
+}
 
 contract DssSpellTest is DssSpellTestBase {
 
@@ -49,6 +52,17 @@ contract DssSpellTest is DssSpellTestBase {
         checkSystemValues(afterSpell);
 
         checkCollateralValues(afterSpell);
+    }
+
+    function testSpellIsCast_PSM_GUSD_A_tout() public {
+        DssPsmLike psmPSMGUSD = DssPsmLike(addr.addr("MCD_PSM_GUSD_A"));
+        assertEq(psmPSMGUSD.tout(), 0);
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(psmPSMGUSD.tout(), 2000000000000000);
     }
 
     struct Payee {

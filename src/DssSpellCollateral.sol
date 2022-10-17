@@ -33,7 +33,7 @@ contract DssSpellCollateralAction {
 
     // --- Math ---
     // uint256 constant THOUSAND   = 10 ** 3;
-    // uint256 constant MILLION    = 10 ** 6;
+    uint256 constant MILLION    = 10 ** 6;
     // uint256 constant BILLION    = 10 ** 9;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
