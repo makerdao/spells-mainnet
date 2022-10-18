@@ -36,6 +36,11 @@ contract DssSpellCollateralAction {
     uint256 constant MILLION    = 10 ** 6;
     // uint256 constant BILLION    = 10 ** 9;
 
+    bytes32 constant RWA007_A                 = "RWA007-A";
+    uint256 constant RWA007_A_AUTOLINE_AMOUNT = 250 * MILLION;
+    uint256 constant RWA007_A_AUTOLINE_GAP    =  50 * MILLION;
+    uint256 constant RWA007_A_AUTOLINE_TTL    = 1 weeks;
+
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     // address constant XXX                  = 0x0000000000000000000000000000000000000000;
     // address constant PIP_XXX              = 0x0000000000000000000000000000000000000000;
@@ -100,6 +105,19 @@ contract DssSpellCollateralAction {
         // DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
         // DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
         // DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
+    }
+
+    function updateCollaterals() internal {
+        // ------------------------------- Collateral updates -------------------------------
+
+        // Enable autoline for MIP65
+        // https://forum.makerdao.com/t/rwa007-mip65-monetalis-clydesdale-ces-domain-team-assessment/17787
+        DssExecLib.setIlkAutoLineParameters(
+            RWA007_A,
+            RWA007_A_AUTOLINE_AMOUNT,
+            RWA007_A_AUTOLINE_GAP,
+            RWA007_A_AUTOLINE_TTL
+        );
     }
 
     function offboardCollaterals() internal {
