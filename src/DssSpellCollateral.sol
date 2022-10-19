@@ -17,6 +17,9 @@
 pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExecLib.sol";
+import "dss-interfaces/dss/GemJoinAbstract.sol";
+import "dss-interfaces/dss/IlkRegistryAbstract.sol";
+import "dss-interfaces/ERC/GemAbstract.sol";
 
 contract DssSpellCollateralAction {
 
@@ -32,35 +35,16 @@ contract DssSpellCollateralAction {
     //
     uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
     // --- Math ---
-    // uint256 constant THOUSAND   = 10 ** 3;
-    // uint256 constant MILLION    = 10 ** 6;
+    uint256 constant THOUSAND = 10 ** 3;
+    uint256 constant MILLION  = 10 ** 6;
     // uint256 constant BILLION    = 10 ** 9;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address internal constant RETH                 = TODO;
-    address internal constant PIP_RETH             = TODO;
-    address internal constant MCD_JOIN_RETH_A      = TODO;
-    address internal constant MCD_CLIP_RETH_A      = TODO;
-    address internal constant MCD_CLIP_CALC_RETH_A = TODO;
-
-    function collateralAction() internal {
-        onboardCollaterals();
-        //updateCollaterals();
-        //offboardCollaterals();
-    }
-
-    
-    // --- Offboarding: Current Liquidation Ratio ---
-    // uint256 constant CURRENT_XXX_A_MAT              =  XYZ * RAY / 100;
-
-    // --- Offboarding: Target Liquidation Ratio ---
-    // uint256 constant TARGET_XXX_A_MAT               =  XYZ * RAY / 100;
-
-    function collateralAction() internal {
-        onboardCollaterals();
-        //updateCollaterals();
-        //offboardCollaterals();
-    }
+    address constant RETH                     = 0xae78736Cd615f374D3085123A210448E74Fc6393;
+    address constant PIP_RETH                 = 0xeE7F0b350aA119b3d05DC733a4621a81972f7D47;
+    address constant MCD_JOIN_RETH_A          = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
+    address constant MCD_CLIP_RETH_A          = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
+    address constant MCD_CLIP_CALC_RETH_A     = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
@@ -81,8 +65,8 @@ contract DssSpellCollateralAction {
                 isOSM:                true,
                 whitelistOSM:         true,
                 ilkDebtCeiling:       0,                 // line updated to 0 (previously 5M)
-                minVaultAmount:       15_000,            // debt floor - dust in DAI
-                maxLiquidationAmount: 2_000_000,
+                minVaultAmount:       15 * THOUSAND,     // debt floor - dust in DAI
+                maxLiquidationAmount: 2 * MILLION,
                 liquidationPenalty:   13_00,             // 13% penalty on liquidation
                 ilkStabilityFee:      ONE_FIVE_PCT_RATE, // 1.50% stability fee
                 startingPriceFactor:  110_00,            // Auction price begins at 110% of oracle price
@@ -95,8 +79,6 @@ contract DssSpellCollateralAction {
             })
         );
 
-         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_RETH_A, 90 seconds, 99_00);
-
         // ChainLog Updates
         // Add the new join, clip, and abacus to the Chainlog
         DssExecLib.setChangelogAddress("RETH",                 RETH);
@@ -104,21 +86,6 @@ contract DssSpellCollateralAction {
         DssExecLib.setChangelogAddress("MCD_JOIN_RETH_A",      MCD_JOIN_RETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_RETH_A",      MCD_CLIP_RETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_RETH_A", MCD_CLIP_CALC_RETH_A);
-
-        }
-
-    function updateCollaterals() internal {
-        // ------------------------------- Collateral updates -------------------------------
-
-        // Enable autoline for XXX-A
-        // Poll Link:
-        // Forum Link:
-        // DssExecLib.setIlkAutoLineParameters(
-        //    XXX-A,
-        //    AMOUNT,
-        //    GAP,
-        //    TTL
-        // );
     }
 
     function offboardCollaterals() internal {
