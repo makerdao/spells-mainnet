@@ -17,9 +17,6 @@
 pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExecLib.sol";
-import "dss-interfaces/dss/GemJoinAbstract.sol";
-import "dss-interfaces/dss/IlkRegistryAbstract.sol";
-import "dss-interfaces/ERC/GemAbstract.sol";
 
 contract DssSpellCollateralAction {
 
@@ -45,6 +42,12 @@ contract DssSpellCollateralAction {
     address internal constant MCD_JOIN_RETH_A          = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
     address internal constant MCD_CLIP_RETH_A          = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
     address internal constant MCD_CLIP_CALC_RETH_A     = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
+
+    function collateralAction() internal {
+        onboardCollaterals();
+        //updateCollaterals();
+        //offboardCollaterals();
+    }
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
