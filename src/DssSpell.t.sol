@@ -679,5 +679,4 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(unpaid, 0, "vest still has a balance");
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
-
 }
