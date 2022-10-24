@@ -160,10 +160,10 @@ interface ArbitrumTeleportBridgeLike is TeleportBridgeLike {
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
-    Rates          rates = new Rates();
-    Addresses       addr = new Addresses();
-    Deployers  deployers = new Deployers();
-    Wallets      wallets = new Wallets();
+    Rates         rates = new Rates();
+    Addresses      addr = new Addresses();
+    Deployers deployers = new Deployers();
+    Wallets     wallets = new Wallets();
 
     // ADDRESSES
     ChainlogAbstract    chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -691,7 +691,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 }
             }
         }
-        //       actual    expected
+        //       actual                               expected
         assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
     }
 
@@ -880,6 +880,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,uint256 line,) = vat.ilks(_ilk);
+        
         assertEq(vat.dai(address(this)), 0);
         // Set max line to ensure we can create a new position
         setIlkLine(_ilk, uint256(-1));
@@ -911,11 +912,13 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         }
         // dart max amount of DAI
         (,,uint256 spot,,) = vat.ilks(_ilk);
+
         // Set max line to ensure we can draw dai
         setIlkLine(_ilk, uint256(-1));
         vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(mul(amount18, spot) / rate));
         // Revert ilk line to proceed with testing
         setIlkLine(_ilk, line);
+
         hevm.warp(block.timestamp + 1);
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
@@ -934,7 +937,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-function checkIlkClipper(
+    function checkIlkClipper(
         bytes32 ilk,
         GemJoinAbstract join,
         ClipAbstract clipper,
