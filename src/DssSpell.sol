@@ -60,10 +60,13 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //
 
     // --- Rates ---
-    // uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
+    // uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
     
     // --- Math ---
     // uint256 internal constant WAD = 10 ** 18;
+    
+    address internal constant NEW_STARKNET_DAI_BRIDGE = TODO;
+    uint256 internal constant L2_FEE_SPELL = TODO;
 
     function actions() public override {
 
@@ -87,14 +90,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // Approve new bridge and cast spell only if the current bridge has closed successfully
         if(currentBridgeClosed == true && StarknetBridgeLike(currentStarknetDAIBridge).isOpen() == 0){
             // Bridge code at time of casting: https://github.com/makerdao/starknet-dai-bridge/blob/ad9f53425582c39c29cb3a7420e430ab01a46d4d/contracts/l1/L1DAIBridge.sol
-            address NEW_STARKNET_DAI_BRIDGE = TODO;
             address starknetEscrow = DssExecLib.getChangelogAddress("STARKNET_ESCROW");
             address dai = DssExecLib.getChangelogAddress("MCD_DAI");
             StarknetEscrowLike(starknetEscrow).approve(dai, NEW_STARKNET_DAI_BRIDGE, type(uint).max);
             // Relay the L2 spell content
             // See: TODO insert L2 content voyager explorer #code URL
             address starknetGovRelay = DssExecLib.getChangelogAddress("STARKNET_GOV_RELAY");
-            uint256 L2_FEE_SPELL = TODO;
             StarknetGovRelayLike(starknetGovRelay).relay(L2_FEE_SPELL);
             // ChangeLog
             DssExecLib.setChangelogAddress("STARKNET_DAI_BRIDGE", NEW_STARKNET_DAI_BRIDGE);
