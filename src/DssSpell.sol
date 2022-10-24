@@ -63,7 +63,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
 
     // --- Math ---
-    //uint256 internal constant WAD = 10 ** 18;
+    // uint256 internal constant WAD = 10 ** 18;
 
     function actions() public override {
 
@@ -103,6 +103,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
         // Bump changelog version either way, due to rETH onboarding
         DssExecLib.setChangelogVersion("1.14.3");
+    }
 }
 
 contract DssSpell is DssExec {

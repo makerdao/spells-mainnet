@@ -49,13 +49,6 @@ contract DssSpellCollateralAction {
         //offboardCollaterals();
     }
 
-    
-    // --- Offboarding: Current Liquidation Ratio ---
-    // uint256 constant CURRENT_XXX_A_MAT              =  XYZ * RAY / 100;
-
-    // --- Offboarding: Target Liquidation Ratio ---
-    // uint256 constant TARGET_XXX_A_MAT               =  XYZ * RAY / 100;
-
     function collateralAction() internal {
         onboardCollaterals();
         //updateCollaterals();
@@ -95,7 +88,7 @@ contract DssSpellCollateralAction {
             })
         );
 
-         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_RETH_A, 90 seconds, 99_00);
+        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_RETH_A, 90 seconds, 99_00);
 
         // ChainLog Updates
         // Add the new join, clip, and abacus to the Chainlog
@@ -105,7 +98,7 @@ contract DssSpellCollateralAction {
         DssExecLib.setChangelogAddress("MCD_CLIP_RETH_A",      MCD_CLIP_RETH_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_RETH_A", MCD_CLIP_CALC_RETH_A);
 
-        }
+    }
 
     function updateCollaterals() internal {
         // ------------------------------- Collateral updates -------------------------------
@@ -123,7 +116,6 @@ contract DssSpellCollateralAction {
 
     function offboardCollaterals() internal {
         // ----------------------------- Collateral offboarding -----------------------------
-
         // 1st Stage of Collateral Offboarding Process
         // Poll Link:
         // uint256 line;
@@ -180,6 +172,12 @@ contract DssSpellCollateralAction {
         //     _end:       TARGET_XXX_A_MAT,
         //     _duration:  30 days
         // });
-
     }
+
+    // --- Offboarding: Current Liquidation Ratio ---
+    // uint256 constant CURRENT_XXX_A_MAT              =  XYZ * RAY / 100;
+
+    // --- Offboarding: Target Liquidation Ratio ---
+    // uint256 constant TARGET_XXX_A_MAT               =  XYZ * RAY / 100;
+
 }

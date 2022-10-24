@@ -99,9 +99,9 @@ contract Config {
         //
         spellValues = SpellValues({
             deployed_spell:                 address(0),        // populate with deployed spell if deployed
-            deployed_spell_created:         0,        // use get-created-timestamp.sh if deployed
+            deployed_spell_created:         0,                 // use `./scripts/get-created-timestamp.sh <deployment-tx>`
             previous_spell:                 address(0),        // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,             // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           weekly_expiration  // (weekly_expiration,monthly_expiration) if weekly or monthly spell
         });
 
@@ -123,7 +123,7 @@ contract Config {
             flap_tau:              72 hours,                // in seconds
             flap_lid:              30 * THOUSAND,           // in whole Dai units
             cat_box:               20 * MILLION,            // In whole Dai units
-            dog_Hole:              70 * MILLION,           // In whole Dai units
+            dog_Hole:              70 * MILLION,            // In whole Dai units
             esm_min:               150 * THOUSAND,          // In whole MKR units
             pause_authority:       chief,                   // Pause authority
             osm_mom_authority:     chief,                   // OsmMom authority
