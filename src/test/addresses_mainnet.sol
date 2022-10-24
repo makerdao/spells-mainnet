@@ -400,10 +400,10 @@ contract Addresses {
         addr["MCD_JOIN_TELEPORT_FW_A"]          = 0x41Ca7a7Aa2Be78Cf7CB80C0F4a9bdfBC96e81815;
         addr["MCD_ORACLE_AUTH_TELEPORT_FW_A"]   = 0x324a895625E7AE38Fc7A6ae91a71e7E937Caa7e6;
         addr["MCD_ROUTER_TELEPORT_FW_A"]        = 0xeEf8B35eD538b6Ef7DbA82236377aDE4204e5115;
-        addr["RETH"]                            = TODO;
-        addr["PIP_RETH"]                        = TODO;
-        addr["MCD_JOIN_RETH_A"]                 = TODO;
-        addr["MCD_CLIP_RETH_A"]                 = TODO;
-        addr["MCD_CLIP_CALC_RETH_A"]            = TODO;
+        addr["RETH"]                            = 0xae78736Cd615f374D3085123A210448E74Fc6393; TODO check these
+        addr["PIP_RETH"]                        = 0xeE7F0b350aA119b3d05DC733a4621a81972f7D47;
+        addr["MCD_JOIN_RETH_A"]                 = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
+        addr["MCD_CLIP_RETH_A"]                 = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
+        addr["MCD_CLIP_CALC_RETH_A"]            = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
     }
 }

@@ -61,7 +61,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     // --- Rates ---
     // uint256 constant THREE_PCT_RATE          = 1000000000937303470807876289;
-
+    
     // --- Math ---
     // uint256 internal constant WAD = 10 ** 18;
 
