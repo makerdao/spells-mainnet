@@ -378,7 +378,8 @@ contract Addresses {
         addr["ARBITRUM_GOV_RELAY"]              = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
         addr["STARKNET_ESCROW_MOM"]             = 0xc238E3D63DfD677Fa0FA9985576f0945C581A266;
         addr["STARKNET_ESCROW"]                 = 0x0437465dfb5B79726e35F08559B0cBea55bb585C;
-        addr["STARKNET_DAI_BRIDGE"]             = 0x659a00c33263d9254Fed382dE81349426C795BB6;
+        addr["STARKNET_DAI_BRIDGE"]             = TODO;
+        addr["STARKNET_DAI_BRIDGE_LEGACY"]      = 0x659a00c33263d9254Fed382dE81349426C795BB6;
         addr["STARKNET_GOV_RELAY"]              = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
         addr["STARKNET_CORE"]                   = 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4;
         addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
@@ -399,5 +400,10 @@ contract Addresses {
         addr["MCD_JOIN_TELEPORT_FW_A"]          = 0x41Ca7a7Aa2Be78Cf7CB80C0F4a9bdfBC96e81815;
         addr["MCD_ORACLE_AUTH_TELEPORT_FW_A"]   = 0x324a895625E7AE38Fc7A6ae91a71e7E937Caa7e6;
         addr["MCD_ROUTER_TELEPORT_FW_A"]        = 0xeEf8B35eD538b6Ef7DbA82236377aDE4204e5115;
+        addr["RETH"]                            = TODO;
+        addr["PIP_RETH"]                        = TODO;
+        addr["MCD_JOIN_RETH_A"]                 = TODO;
+        addr["MCD_CLIP_RETH_A"]                 = TODO;
+        addr["MCD_CLIP_CALC_RETH_A"]            = TODO;
     }
 }

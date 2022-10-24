@@ -30,94 +30,95 @@ contract DssSpellCollateralAction {
     // A table of rates can be found at
     // https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-
+    uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
     // --- Math ---
     // uint256 constant THOUSAND   = 10 ** 3;
-    uint256 constant MILLION    = 10 ** 6;
+    // uint256 constant MILLION    = 10 ** 6;
     // uint256 constant BILLION    = 10 ** 9;
 
-    bytes32 constant RWA007_A                 = "RWA007-A";
-    uint256 constant RWA007_A_AUTOLINE_AMOUNT = 250 * MILLION;
-    uint256 constant RWA007_A_AUTOLINE_GAP    =  50 * MILLION;
-    uint256 constant RWA007_A_AUTOLINE_TTL    = 1 weeks;
-
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    // address constant XXX                  = 0x0000000000000000000000000000000000000000;
-    // address constant PIP_XXX              = 0x0000000000000000000000000000000000000000;
-    // address constant MCD_JOIN_XXX_A       = 0x0000000000000000000000000000000000000000;
-    // address constant MCD_CLIP_XXX_A       = 0x0000000000000000000000000000000000000000;
-    // address constant MCD_CLIP_CALC_XXX_A  = 0x0000000000000000000000000000000000000000;
+    address internal constant RETH                 = TODO;
+    address internal constant PIP_RETH             = TODO;
+    address internal constant MCD_JOIN_RETH_A      = TODO;
+    address internal constant MCD_CLIP_RETH_A      = TODO;
+    address internal constant MCD_CLIP_CALC_RETH_A = TODO;
 
+    function collateralAction() internal {
+        onboardCollaterals();
+        //updateCollaterals();
+        //offboardCollaterals();
+    }
+
+    
     // --- Offboarding: Current Liquidation Ratio ---
     // uint256 constant CURRENT_XXX_A_MAT              =  XYZ * RAY / 100;
 
     // --- Offboarding: Target Liquidation Ratio ---
     // uint256 constant TARGET_XXX_A_MAT               =  XYZ * RAY / 100;
 
+    function collateralAction() internal {
+        onboardCollaterals();
+        //updateCollaterals();
+        //offboardCollaterals();
+    }
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add ______________ as a new Vault Type
-        //  Poll Link:
+        //  Add RETH-A as a new Vault Type
+        //  Poll Link 1: https://vote.makerdao.com/polling/QmfMswF2
+        //  Poll Link 2: https://vote.makerdao.com/polling/QmS7dBuQ
+        //  Forum Post:  https://forum.makerdao.com/t/reth-collateral-onboarding-risk-evaluation/15286
 
-        // DssExecLib.addNewCollateral(
-        //     CollateralOpts({
-        //         ilk:                   "XXX-A",
-        //         gem:                   XXX,
-        //         join:                  MCD_JOIN_XXX_A,
-        //         clip:                  MCD_CLIP_XXX_A,
-        //         calc:                  MCD_CLIP_CALC_XXX_A,
-        //         pip:                   PIP_XXX,
-        //         isLiquidatable:        BOOL,
-        //         isOSM:                 BOOL,
-        //         whitelistOSM:          BOOL,
-        //         ilkDebtCeiling:        line,
-        //         minVaultAmount:        dust,
-        //         maxLiquidationAmount:  hole,
-        //         liquidationPenalty:    chop,
-        //         ilkStabilityFee:       duty,
-        //         startingPriceFactor:   buf,
-        //         breakerTolerance:      tolerance,
-        //         auctionDuration:       tail,
-        //         permittedDrop:         cusp,
-        //         liquidationRatio:      mat,
-        //         kprFlatReward:         tip,
-        //         kprPctReward:          chip
-        //     })
-        // );
+        DssExecLib.addNewCollateral(
+            CollateralOpts({
+                ilk:                  "RETH-A",
+                gem:                  RETH,
+                join:                 MCD_JOIN_RETH_A,
+                clip:                 MCD_CLIP_RETH_A,
+                calc:                 MCD_CLIP_CALC_RETH_A,
+                pip:                  PIP_RETH,
+                isLiquidatable:       true,
+                isOSM:                true,
+                whitelistOSM:         true,
+                ilkDebtCeiling:       0,                 // line updated to 0 (previously 5M)
+                minVaultAmount:       15_000,            // debt floor - dust in DAI
+                maxLiquidationAmount: 2_000_000,
+                liquidationPenalty:   13_00,             // 13% penalty on liquidation
+                ilkStabilityFee:      ONE_FIVE_PCT_RATE, // 1.50% stability fee
+                startingPriceFactor:  110_00,            // Auction price begins at 110% of oracle price
+                breakerTolerance:     50_00,             // Allows for a 50% hourly price drop before disabling liquidation
+                auctionDuration:      120 minutes,
+                permittedDrop:        45_00,             // 45% price drop before reset
+                liquidationRatio:     170_00,            // 170% collateralization
+                kprFlatReward:        250,               // 250 DAI tip - flat fee per kpr
+                kprPctReward:         10                 // 0.1% chip - per kpr
+            })
+        );
 
-        // DssExecLib.setStairstepExponentialDecrease(
-        //     CALC_ADDR,
-        //     DURATION,
-        //     PCT_BPS
-        // );
-
-        // DssExecLib.setIlkAutoLineParameters(
-        //     "XXX-A",
-        //     AMOUNT,
-        //     GAP,
-        //     TTL
-        // );
+         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_RETH_A, 90 seconds, 99_00);
 
         // ChainLog Updates
-        // DssExecLib.setChangelogAddress("XXX", XXX);
-        // DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
-        // DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
-        // DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
-        // DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
-    }
+        // Add the new join, clip, and abacus to the Chainlog
+        DssExecLib.setChangelogAddress("RETH",                 RETH);
+        DssExecLib.setChangelogAddress("PIP_RETH",             PIP_RETH);
+        DssExecLib.setChangelogAddress("MCD_JOIN_RETH_A",      MCD_JOIN_RETH_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_RETH_A",      MCD_CLIP_RETH_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_RETH_A", MCD_CLIP_CALC_RETH_A);
+
+        }
 
     function updateCollaterals() internal {
         // ------------------------------- Collateral updates -------------------------------
 
-        // Enable autoline for MIP65
-        // https://forum.makerdao.com/t/rwa007-mip65-monetalis-clydesdale-ces-domain-team-assessment/17787
-        DssExecLib.setIlkAutoLineParameters(
-            RWA007_A,
-            RWA007_A_AUTOLINE_AMOUNT,
-            RWA007_A_AUTOLINE_GAP,
-            RWA007_A_AUTOLINE_TTL
-        );
+        // Enable autoline for XXX-A
+        // Poll Link:
+        // Forum Link:
+        // DssExecLib.setIlkAutoLineParameters(
+        //    XXX-A,
+        //    AMOUNT,
+        //    GAP,
+        //    TTL
+        // );
     }
 
     function offboardCollaterals() internal {
