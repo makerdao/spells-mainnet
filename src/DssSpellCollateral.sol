@@ -31,6 +31,7 @@ contract DssSpellCollateralAction {
     // https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
+    
     // --- Math ---
     uint256 constant THOUSAND   = 10 ** 3;
     uint256 constant MILLION    = 10 ** 6;
