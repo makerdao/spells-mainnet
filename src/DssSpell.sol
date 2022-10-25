@@ -24,6 +24,7 @@ import "dss-exec-lib/DssAction.sol";
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface StarknetBridgeLike {
+    function isOpen() external returns (uint256);
     function close() external;
 }
 
@@ -61,12 +62,12 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
     // --- Rates ---
     // uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
-    
+
     // --- Math ---
     // uint256 internal constant WAD = 10 ** 18;
-    
-    address internal constant NEW_STARKNET_DAI_BRIDGE = TODO;
-    uint256 internal constant L2_FEE_SPELL = TODO;
+
+    address internal constant NEW_STARKNET_DAI_BRIDGE = 0x9F96fE0633eE838D0298E8b8980E6716bE81388d;
+    uint256 internal constant L2_FEE_SPELL = 0x0726cf4161e783ef0043e4998c61ecd70ea3e6f673fd7cf1060130529f849bc2;
 
     function actions() public override {
 

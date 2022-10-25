@@ -49,11 +49,11 @@ contract DssSpellCollateralAction {
         //offboardCollaterals();
     }
 
-    function collateralAction() internal {
-        onboardCollaterals();
-        //updateCollaterals();
-        //offboardCollaterals();
-    }
+    // function collateralAction() internal {
+    //     onboardCollaterals();
+    //     //updateCollaterals();
+    //     //offboardCollaterals();
+    // }
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
