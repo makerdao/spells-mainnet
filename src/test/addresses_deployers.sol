@@ -21,7 +21,6 @@ contract Deployers {
     address[] public addr;
 
     constructor() public {
-        //TODO refactor and clean up, order addresses and label
         addr = [
             0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
             0xDa0FaB05039809e63C5D068c897c3e602fA97457,

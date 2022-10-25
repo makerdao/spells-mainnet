@@ -49,12 +49,6 @@ contract DssSpellCollateralAction {
         //offboardCollaterals();
     }
 
-    // function collateralAction() internal {
-    //     onboardCollaterals();
-    //     //updateCollaterals();
-    //     //offboardCollaterals();
-    // }
-
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add RETH-A as a new Vault Type

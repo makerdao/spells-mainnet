@@ -24,8 +24,8 @@ import "dss-exec-lib/DssAction.sol";
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
 interface StarknetBridgeLike {
-    function isOpen() external returns (uint256);
     function close() external;
+    function isOpen() external returns (uint256);
 }
 
 interface StarknetGovRelayLike {
@@ -95,7 +95,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
             address dai = DssExecLib.getChangelogAddress("MCD_DAI");
             StarknetEscrowLike(starknetEscrow).approve(dai, NEW_STARKNET_DAI_BRIDGE, type(uint).max);
             // Relay the L2 spell content
-            // See: TODO insert L2 content voyager explorer #code URL
+            // See: https://voyager.online/contract/0x0726cf4161e783ef0043e4998c61ecd70ea3e6f673fd7cf1060130529f849bc2#code
             address starknetGovRelay = DssExecLib.getChangelogAddress("STARKNET_GOV_RELAY");
             StarknetGovRelayLike(starknetGovRelay).relay(L2_FEE_SPELL);
             // ChangeLog
