@@ -46,9 +46,9 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         "2022-10-26 MakerDAO Executive Spell | Hash: 0x2e8fa79dc9702f6d3b8b03523fc45c4f3f95751a833e52958d64182b0ec8b2a5";
 
     // Turn office hours on
-    function officeHours() public override returns (bool) {
-        return true;
-    }
+    /* function officeHours() public override returns (bool) {
+        return false;
+    } */
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
