@@ -1626,16 +1626,26 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         }
     }
 
+    // Allow PIP RETH deployer to be authed against it only if RETH-A line is 0
+    function skipWards(address target, address deployer) internal view returns (bool) {
+        (,,, uint256 line,) = vat.ilks("RETH-A");
+        return (target == 0xeE7F0b350aA119b3d05DC733a4621a81972f7D47 // rETH PIP
+               && deployer  == 0x39aBD7819E5632Fa06D2ECBba45Dca5c90687EE3 // Oracle Deployer
+               && line      == 0);
+    }
+
     function checkWards(address _addr, string memory contractName) internal {
         for (uint256 i = 0; i < deployers.count(); i ++) {
+            address deployer = deployers.addr(i);
             (bool ok, bytes memory data) = _addr.call(
-                abi.encodeWithSignature("wards(address)", deployers.addr(i))
+                abi.encodeWithSignature("wards(address)", deployer)
             );
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
+                if (skipWards(_addr, deployer)) continue;
                 emit log("Error: Bad Auth");
-                emit log_named_address("   Deployer Address", deployers.addr(i));
+                emit log_named_address("   Deployer Address", deployer);
                 emit log_named_string("  Affected Contract", contractName);
                 fail();
             }
