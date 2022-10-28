@@ -130,11 +130,16 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
+
+        checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        checkChainlogKey("STARKNET_TELEPORT_FEE");
+
         checkChainlogKey("RETH");
         checkChainlogKey("PIP_RETH");
         checkChainlogKey("MCD_JOIN_RETH_A");
         checkChainlogKey("MCD_CLIP_RETH_A");
         checkChainlogKey("MCD_CLIP_CALC_RETH_A");
+
         checkChainlogVersion("1.14.3");
     }
 

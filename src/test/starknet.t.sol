@@ -127,8 +127,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
         assertEq(daiBridge.wards(addr.addr("MCD_PAUSE_PROXY")),     1, "StarknetTest/pause-proxy-not-ward-on-dai-bridge");
         assertEq(daiBridge.wards(addr.addr("MCD_ESM")),             1, "StarknetTest/esm-not-ward-on-dai-bridge");
-        // TODO verify that this is intentional or necessary
-        assertEq(daiBridge.wards(addr.addr("STARKNET_ESCROW_MOM")), 1, "StarknetTest/escrow-mom-not-ward-on-dai-bridge");
+        assertEq(daiBridge.wards(addr.addr("STARKNET_ESCROW_MOM")), 0, "StarknetTest/escrow-mom-not-ward-on-dai-bridge");
 
         assertEq(daiBridge.l2DaiBridge(), starknetValues.l2_dai_bridge, "StarknetTest/wrong-l2-dai-bridge-on-dai-bridge");
     }

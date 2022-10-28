@@ -880,7 +880,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,uint256 line,) = vat.ilks(_ilk);
-        
+
         assertEq(vat.dai(address(this)), 0);
         // Set max line to ensure we can create a new position
         setIlkLine(_ilk, uint256(-1));
@@ -1418,6 +1418,38 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         uint256 expectedFee,
         uint256 expectedTtl
     ) internal {
+        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
+
+        // Sanity checks
+        assertEq(TeleportBridgeLike(gateway).l1Escrow(), escrow);
+        assertEq(TeleportBridgeLike(gateway).l1TeleportRouter(), address(router));
+        assertEq(TeleportBridgeLike(gateway).l1Token(), address(dai));
+
+        checkTeleportFWIntegrationInternals(
+            sourceDomain,
+            targetDomain,
+            line,
+            gateway,
+            fee,
+            escrow,
+            toMint,
+            expectedFee,
+            expectedTtl
+        );
+    }
+
+    // NOTE: Only executable by forge
+    function checkTeleportFWIntegrationInternals(
+        bytes32 sourceDomain,
+        bytes32 targetDomain,
+        uint256 line,
+        address gateway,
+        address fee,
+        address escrow,
+        uint256 toMint,
+        uint256 expectedFee,
+        uint256 expectedTtl
+    ) internal {
         TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
         TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
 
@@ -1430,9 +1462,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         assertEq(TeleportFeeLike(fee).ttl(), expectedTtl);
         assertEq(router.gateways(sourceDomain), gateway);
         assertEq(router.domains(gateway), sourceDomain);
-        assertEq(TeleportBridgeLike(gateway).l1Escrow(), escrow);
-        assertEq(TeleportBridgeLike(gateway).l1TeleportRouter(), address(router));
-        assertEq(TeleportBridgeLike(gateway).l1Token(), address(dai));
 
         {
             // NOTE: We are calling the router directly because the bridge code is minimal and unique to each domain
