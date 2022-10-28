@@ -19,6 +19,14 @@ pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
+interface StarknetTeleportBridgeLike {
+    function starkNet() external view returns (address);
+    function dai() external view returns (address);
+    function l2DaiTeleportGateway() external view returns (uint256);
+    function escrow() external view returns (address);
+    function teleportRouter() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -685,4 +693,35 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
+   function testTeleportFW() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        address router = addr.addr("MCD_ROUTER_TELEPORT_FW_A");
+        StarknetTeleportBridgeLike bridge = StarknetTeleportBridgeLike(addr.addr("STARKNET_TELEPORT_BRIDGE"));
+        address escrow = addr.addr("STARKNET_ESCROW");
+
+        bytes32 ilk = "TELEPORT-FW-A";
+        bytes23 domain = "ETH-MAIN-A";
+
+        uint256 l2_teleport_gateway = 0x049673afaba4feee31e014033be7ff2c75bc6c46254390025b17558e05fd6a47;
+
+        assertEq(bridge.escrow(), escrow);
+        assertEq(bridge.teleportRouter(), address(router));
+        assertEq(bridge.dai(), address(dai));
+        assertEq(bridge.l2DaiTeleportGateway(), l2_teleport_gateway);
+
+        checkTeleportFWIntegrationInternals(
+            "STA-MAIN-A",
+            domain,
+            100_000 * WAD,
+            address(bridge),
+            addr.addr("STARKNET_TELEPORT_FEE"),
+            escrow,
+            100 * WAD,
+            WAD / 10000,   // 1bps
+            12 hours
+        );
+   }
 }
