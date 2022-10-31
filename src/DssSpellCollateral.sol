@@ -30,83 +30,26 @@ contract DssSpellCollateralAction {
     // A table of rates can be found at
     // https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
-    
-    // --- Math ---
-    uint256 constant THOUSAND   = 10 ** 3;
-    uint256 constant MILLION    = 10 ** 6;
-    // uint256 constant BILLION    = 10 ** 9;
+    //uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
 
-    // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address internal constant RETH                 = 0xae78736Cd615f374D3085123A210448E74Fc6393;
-    address internal constant PIP_RETH             = 0xeE7F0b350aA119b3d05DC733a4621a81972f7D47;
-    address internal constant MCD_JOIN_RETH_A      = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
-    address internal constant MCD_CLIP_RETH_A      = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
-    address internal constant MCD_CLIP_CALC_RETH_A = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
+    // --- Math ---
+    //uint256 constant THOUSAND   = 10 ** 3;
+    //uint256 constant MILLION    = 10 ** 6;
+    //uint256 constant BILLION    = 10 ** 9;
+
 
     function collateralAction() internal {
         onboardCollaterals();
-        //updateCollaterals();
-        //offboardCollaterals();
+        updateCollaterals();
+        offboardCollaterals();
     }
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add RETH-A as a new Vault Type
-        //  Poll Link 1: https://vote.makerdao.com/polling/QmfMswF2
-        //  Poll Link 2: https://vote.makerdao.com/polling/QmS7dBuQ
-        //  Forum Post:  https://forum.makerdao.com/t/reth-collateral-onboarding-risk-evaluation/15286
-
-        DssExecLib.addNewCollateral(
-            CollateralOpts({
-                ilk:                  "RETH-A",
-                gem:                  RETH,
-                join:                 MCD_JOIN_RETH_A,
-                clip:                 MCD_CLIP_RETH_A,
-                calc:                 MCD_CLIP_CALC_RETH_A,
-                pip:                  PIP_RETH,
-                isLiquidatable:       true,
-                isOSM:                true,
-                whitelistOSM:         true,
-                ilkDebtCeiling:       0,                 // line updated to 0 (previously 5M)
-                minVaultAmount:       15 * THOUSAND,            // debt floor - dust in DAI
-                maxLiquidationAmount: 2 * MILLION,
-                liquidationPenalty:   13_00,             // 13% penalty on liquidation
-                ilkStabilityFee:      ONE_FIVE_PCT_RATE, // 1.50% stability fee
-                startingPriceFactor:  110_00,            // Auction price begins at 110% of oracle price
-                breakerTolerance:     50_00,             // Allows for a 50% hourly price drop before disabling liquidation
-                auctionDuration:      120 minutes,
-                permittedDrop:        45_00,             // 45% price drop before reset
-                liquidationRatio:     170_00,            // 170% collateralization
-                kprFlatReward:        250,               // 250 DAI tip - flat fee per kpr
-                kprPctReward:         10                 // 0.1% chip - per kpr
-            })
-        );
-
-        DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_RETH_A, 90 seconds, 99_00);
-
-        // ChainLog Updates
-        // Add the new join, clip, and abacus to the Chainlog
-        DssExecLib.setChangelogAddress("RETH",                 RETH);
-        DssExecLib.setChangelogAddress("PIP_RETH",             PIP_RETH);
-        DssExecLib.setChangelogAddress("MCD_JOIN_RETH_A",      MCD_JOIN_RETH_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_RETH_A",      MCD_CLIP_RETH_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_RETH_A", MCD_CLIP_CALC_RETH_A);
-
     }
 
     function updateCollaterals() internal {
         // ------------------------------- Collateral updates -------------------------------
-
-        // Enable autoline for XXX-A
-        // Poll Link:
-        // Forum Link:
-        // DssExecLib.setIlkAutoLineParameters(
-        //    XXX-A,
-        //    AMOUNT,
-        //    GAP,
-        //    TTL
-        // );
     }
 
     function offboardCollaterals() internal {

@@ -23,6 +23,13 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
+interface DssVestLike {
+    function yank(uint256) external;
+}
+
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
 
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
@@ -32,10 +39,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     string public constant override description =
         "2022-11-02 MakerDAO Executive Spell | Hash: 0x";
 
-    // Turn office hours on
-    /* function officeHours() public override returns (bool) {
+    // Turn office hours off
+    function officeHours() public override returns (bool) {
         return false;
-    } */
+    }
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -53,6 +60,17 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // --- Math ---
     // uint256 internal constant WAD = 10 ** 18;
 
+    address constant EVENTS_001 = 0x3D274fbAc29C92D2F624483495C0113B44dBE7d2;
+    address constant SH_001     = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
+    address constant RWF_001    = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
+    address constant BLOCKTOWER = 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9;
+    address constant OASISAPP   = 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0;
+
+    DssVestLike immutable MCD_VEST_DAI          = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    DssVestLike immutable MCD_VEST_DAI_LEGACY   = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI_LEGACY"));
+    DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+    GemLike     immutable MKR                   = GemLike(DssExecLib.mkr());
+    address     immutable PIP_RETH              = DssExecLib.getChangelogAddress("PIP_RETH");
 
     function actions() public override {
 
@@ -60,6 +78,63 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // Includes changes from the DssSpellCollateralAction
         // collateralAction();
 
+
+        // CU Offboarding - Yank DAI Streams
+        // https://forum.makerdao.com/t/executive-vote-cu-offboarding-next-steps/18522
+
+        // Yank DAI Stream #4 (EVENTS-001)
+        // https://mips.makerdao.com/mips/details/MIP39c3SP4#sentence-summary
+        MCD_VEST_DAI.yank(4);
+
+        // Yank DAI Stream #5 (SH-001)
+        // https://mips.makerdao.com/mips/details/MIP39c3SP3#sentence-summary
+        MCD_VEST_DAI.yank(5);
+
+        // Yank DAI Stream #35 (RWF-001)
+        // https://mips.makerdao.com/mips/details/MIP39c3SP5#sentence-summary
+        MCD_VEST_DAI_LEGACY.yank(35);
+
+
+        // CU Offboarding - Yank MKR Stream
+        // Yank MKR Stream #23 (SH-001)
+        // https://mips.makerdao.com/mips/details/MIP39c3SP3#sentence-summary
+        MCD_VEST_MKR_TREASURY.yank(23);
+
+
+        // CU Offboarding - DAI Golden Parachutes
+        // EVENTS-001 - 167,666 DAI - 0x3D274fbAc29C92D2F624483495C0113B44dBE7d2
+        // https://mips.makerdao.com/mips/details/MIP39c3SP4#sentence-summary
+
+        DssExecLib.sendPaymentFromSurplusBuffer(EVENTS_001, 167_666);
+
+        // SH-001 - 43,332.0 DAI - 0xc657aC882Fb2D6CcF521801da39e910F8519508d
+        // https://mips.makerdao.com/mips/details/MIP39c3SP3#sentence-summary
+        DssExecLib.sendPaymentFromSurplusBuffer(SH_001, 43_332);
+
+
+        // CU Offboarding - MKR Golden Parachutes
+        // https://forum.makerdao.com/t/executive-vote-cu-offboarding-next-steps/18522
+
+        // SH-001 - 26.04 MKR - 0xc657aC882Fb2D6CcF521801da39e910F8519508d
+        // https://mips.makerdao.com/mips/details/MIP39c3SP4#sentence-summary
+        MKR.transfer(SH_001, 26.04 ether);  // note: ether is a keyword helper, only MKR is transferred here
+
+        // RWF-001 - 143.46 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
+        // https://mips.makerdao.com/mips/details/MIP39c3SP5#sentence-summary
+        MKR.transfer(RWF_001, 143.46 ether);  // note: ether is a keyword helper, only MKR is transferred here
+
+        // SPF Funding
+        // BlockTower Legal and Risk Work SPF - 258,000 DAI - 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9
+        // https://mips.makerdao.com/mips/details/MIP39c3SP5#sentence-summary
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER, 258_000);
+
+
+        // Oracle Whitelisting - carried over from last week, see confirms from Nik in week 43 sheet
+        // https://vote.makerdao.com/polling/QmZzFPFs#vote-breakdown
+        // Whitelist Oasis.app on RETH/USD oracle
+        // https://forum.makerdao.com/t/mip10c9-sp31-proposal-to-whitelist-oasis-app-on-rethusd-oracle/18195
+        // Oasis.app - 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0 - OSM
+        DssExecLib.addReaderToWhitelist(PIP_RETH, OASISAPP);
 
     }
 }
