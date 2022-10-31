@@ -87,5 +87,6 @@ contract Wallets {
         // Legal Domain Work
         addr["BIBTA_WALLET"]                 = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
         addr["MIP65_WALLET"]                 = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
+        addr["BLOCKTOWER_WALLET"]            = 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9;
     }
 }
