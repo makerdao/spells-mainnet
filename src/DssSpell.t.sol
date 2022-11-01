@@ -99,15 +99,15 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkIlkIntegration(
-            "RETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
-            addr.addr("PIP_RETH"),
-            true, /* _isOSM */
-            true, /* _checkLiquidations */
-            false /* _transferFee */
-        );
+        // checkIlkIntegration(
+        //     "RETH-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+        //     addr.addr("PIP_RETH"),
+        //     true, /* _isOSM */
+        //     true, /* _checkLiquidations */
+        //     false /* _transferFee */
+        // );
     }
 
     function testIlkClipper() private { // make public to use
@@ -126,35 +126,35 @@ contract DssSpellTest is DssSpellTestBase {
         // );
     }
 
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        checkChainlogKey("RETH");
-        checkChainlogKey("PIP_RETH");
-        checkChainlogKey("MCD_JOIN_RETH_A");
-        checkChainlogKey("MCD_CLIP_RETH_A");
-        checkChainlogKey("MCD_CLIP_CALC_RETH_A");
-        checkChainlogVersion("1.14.3");
+        // checkChainlogKey("RETH");
+        // checkChainlogKey("PIP_RETH");
+        // checkChainlogKey("MCD_JOIN_RETH_A");
+        // checkChainlogKey("MCD_CLIP_RETH_A");
+        // checkChainlogKey("MCD_CLIP_CALC_RETH_A");
+        // checkChainlogVersion("1.14.3");
     }
 
-    function testNewIlkRegistryValues() public { // make private to disable
+    function testNewIlkRegistryValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
         // RETH-A
-        assertEq(reg.pos("RETH-A"),    54);
-        assertEq(reg.join("RETH-A"),   addr.addr("MCD_JOIN_RETH_A"));
-        assertEq(reg.gem("RETH-A"),    addr.addr("RETH"));
-        assertEq(reg.dec("RETH-A"),    GemAbstract(addr.addr("RETH")).decimals());
-        assertEq(reg.class("RETH-A"),  1);
-        assertEq(reg.pip("RETH-A"),    addr.addr("PIP_RETH"));
-        assertEq(reg.name("RETH-A"),   "Rocket Pool ETH");
-        assertEq(reg.symbol("RETH-A"), GemAbstract(addr.addr("RETH")).symbol());
+        //assertEq(reg.pos("RETH-A"),    54);
+        //assertEq(reg.join("RETH-A"),   addr.addr("MCD_JOIN_RETH_A"));
+        // assertEq(reg.gem("RETH-A"),    addr.addr("RETH"));
+        // assertEq(reg.dec("RETH-A"),    GemAbstract(addr.addr("RETH")).decimals());
+        // assertEq(reg.class("RETH-A"),  1);
+        // assertEq(reg.pip("RETH-A"),    addr.addr("PIP_RETH"));
+        // assertEq(reg.name("RETH-A"),   "Rocket Pool ETH");
+        // assertEq(reg.symbol("RETH-A"), GemAbstract(addr.addr("RETH")).symbol());
     }
 
     function testFailWrongDay() public {
@@ -413,107 +413,43 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
-        uint256 JUL_01_2022 = 1656633600; // Friday,   July      1, 2022 12:00:00 AM
-        uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
-        uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
-        uint256 NOV_01_2022 = 1667260800; // Tuesday,  November  1, 2022 12:00:00 AM
-        uint256 JUN_30_2023 = 1688169599; // Friday,   June     30, 2023 11:59:59 PM
-        uint256 AUG_31_2023 = 1693526399; // Thursday, August   31, 2023 11:59:59 PM
-        uint256 DEC_31_2022 = 1672531199; // Saturday, December 31, 2022 11:59:59 PM
+        // uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
+        // uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
 
-        assertEq(vest.ids(), 9);
+        // assertEq(vest.ids(), 9);
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(vest.ids(), 9 + 4);
+        // assertEq(vest.ids(), 9 + 1);
 
-        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        // assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertTrue(vest.valid(10)); // check for valid contract
-        checkDaiVest({
-            _index:      10,                                             // id
-            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-            _start:      OCT_01_2022,                                    // bgn
-            _cliff:      OCT_01_2022,                                    // clf
-            _end:        OCT_31_2022,                                    // fin
-            _days:       31 days,                                        // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     67_863 * WAD,                                   // tot
-            _claimed:    0                                               // rxd
-        });
+        // assertTrue(vest.valid(10)); // check for valid contract
+        // checkDaiVest({
+        //     _index:      10,                                             // id
+        //     _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
+        //     _start:      OCT_01_2022,                                    // bgn
+        //     _cliff:      OCT_01_2022,                                    // clf
+        //     _end:        OCT_31_2022,                                    // fin
+        //     _days:       31 days,                                        // fin
+        //     _manager:    address(0),                                     // mgr
+        //     _restricted: 1,                                              // res
+        //     _reward:     67_863 * WAD,                                   // tot
+        //     _claimed:    0                                               // rxd
+        // });
 
-        assertTrue(vest.valid(11)); // check for valid contract
-        checkDaiVest({
-            _index:      11,                                             // id
-            _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-            _start:      NOV_01_2022,                                    // bgn
-            _cliff:      NOV_01_2022,                                    // clf
-            _end:        AUG_31_2023,                                    // fin
-            _days:       304 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     329_192 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
+        // // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        // giveAuth(address(vest), address(this));
+        // uint256 prevBalance;
 
-        assertTrue(vest.valid(12)); // check for valid contract
-        checkDaiVest({
-            _index:      12,                                             // id
-            _wallet:     wallets.addr("DAIF_RESERVE_WALLET"),            // usr
-            _start:      OCT_01_2022,                                    // bgn
-            _cliff:      OCT_01_2022,                                    // clf
-            _end:        DEC_31_2022,                                    // fin
-            _days:       92 days,                                        // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     270_000 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
+        // vest.unrestrict(10);
+        // prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
+        // hevm.warp(OCT_01_2022 + 31 days);
+        // assertTrue(tryVest(address(vest), 10));
+        // assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
 
-        assertTrue(vest.valid(13)); // check for valid contract
-        checkDaiVest({
-            _index:      13,                                             // id
-            _wallet:     wallets.addr("ORA_WALLET"),                     // usr
-            _start:      JUL_01_2022,                                    // bgn
-            _cliff:      JUL_01_2022,                                    // clf
-            _end:        JUN_30_2023,                                    // fin
-            _days:       365 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     2_337_804 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
-
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        giveAuth(address(vest), address(this));
-        uint256 prevBalance;
-
-        vest.unrestrict(10);
-        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
-        hevm.warp(OCT_01_2022 + 31 days);
-        assertTrue(tryVest(address(vest), 10));
-        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
-
-        vest.unrestrict(11);
-        prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
-        hevm.warp(NOV_01_2022 + 304 days);
-        assertTrue(tryVest(address(vest), 11));
-        assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 329_192 * WAD);
-
-        vest.unrestrict(12);
-        prevBalance = dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET"));
-        hevm.warp(OCT_01_2022 + 92 days);
-        assertTrue(tryVest(address(vest), 12));
-        assertEq(dai.balanceOf(wallets.addr("DAIF_RESERVE_WALLET")), prevBalance + 270_000 * WAD);
-
-        vest.unrestrict(13);
-        prevBalance = dai.balanceOf(wallets.addr("ORA_WALLET"));
-        hevm.warp(JUL_01_2022 + 365 days);
-        assertTrue(tryVest(address(vest), 13));
-        assertEq(dai.balanceOf(wallets.addr("ORA_WALLET")), prevBalance + 2_337_804 * WAD);
     }
 
     function testYankDAI() public { // make public to use
@@ -563,117 +499,117 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testVestMKR() private { // make public to use
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 24);
+        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        // assertEq(vest.ids(), 24);
 
-        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
+        // uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        // vote(address(spell));
+        // scheduleWaitAndCast(address(spell));
+        // assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.70 ether);
+        // assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.70 ether);
 
-        assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 28);
+        // assertEq(vest.cap(), 1_100 * WAD / 365 days);
+        // assertEq(vest.ids(), 28);
 
-        uint256 AUG_01_2022 = 1659312000;
-        uint256 AUG_01_2023 = 1690848000;
-        uint256 SEP_28_2022 = 1664323200;
-        uint256 SEP_28_2024 = 1727481600;
+        // uint256 AUG_01_2022 = 1659312000;
+        // uint256 AUG_01_2023 = 1690848000;
+        // uint256 SEP_28_2022 = 1664323200;
+        // uint256 SEP_28_2024 = 1727481600;
 
-        address GOV_WALLET1 = 0xbfDD0E744723192f7880493b66501253C34e1241;
-        address GOV_WALLET2 = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
-        address GOV_WALLET3 = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-        address SNE_WALLET = wallets.addr("SNE_WALLET");
+        // address GOV_WALLET1 = 0xbfDD0E744723192f7880493b66501253C34e1241;
+        // address GOV_WALLET2 = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
+        // address GOV_WALLET3 = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+        // address SNE_WALLET = wallets.addr("SNE_WALLET");
 
-        // -----
-        assertEq(vest.usr(25), GOV_WALLET1);
-        assertEq(vest.bgn(25), AUG_01_2022);
-        assertEq(vest.clf(25), AUG_01_2023);
-        assertEq(vest.fin(25), AUG_01_2022 + 365 days);
-        assertEq(vest.fin(25), AUG_01_2023);
-        assertEq(vest.mgr(25), address(0));
-        assertEq(vest.res(25), 1);
-        assertEq(vest.tot(25), 62.50 ether);
-        assertEq(vest.rxd(25), 0);
+        // // -----
+        // assertEq(vest.usr(25), GOV_WALLET1);
+        // assertEq(vest.bgn(25), AUG_01_2022);
+        // assertEq(vest.clf(25), AUG_01_2023);
+        // assertEq(vest.fin(25), AUG_01_2022 + 365 days);
+        // assertEq(vest.fin(25), AUG_01_2023);
+        // assertEq(vest.mgr(25), address(0));
+        // assertEq(vest.res(25), 1);
+        // assertEq(vest.tot(25), 62.50 ether);
+        // assertEq(vest.rxd(25), 0);
 
-        assertEq(vest.usr(26), GOV_WALLET2);
-        assertEq(vest.bgn(26), AUG_01_2022);
-        assertEq(vest.clf(26), AUG_01_2023);
-        assertEq(vest.fin(26), AUG_01_2022 + 365 days);
-        assertEq(vest.fin(26), AUG_01_2023);
-        assertEq(vest.mgr(26), address(0));
-        assertEq(vest.res(26), 1);
-        assertEq(vest.tot(26), 32.69 ether);
-        assertEq(vest.rxd(26), 0);
+        // assertEq(vest.usr(26), GOV_WALLET2);
+        // assertEq(vest.bgn(26), AUG_01_2022);
+        // assertEq(vest.clf(26), AUG_01_2023);
+        // assertEq(vest.fin(26), AUG_01_2022 + 365 days);
+        // assertEq(vest.fin(26), AUG_01_2023);
+        // assertEq(vest.mgr(26), address(0));
+        // assertEq(vest.res(26), 1);
+        // assertEq(vest.tot(26), 32.69 ether);
+        // assertEq(vest.rxd(26), 0);
 
-        assertEq(vest.usr(27), GOV_WALLET3);
-        assertEq(vest.bgn(27), AUG_01_2022);
-        assertEq(vest.clf(27), AUG_01_2023);
-        assertEq(vest.fin(27), AUG_01_2022 + 365 days);
-        assertEq(vest.fin(27), AUG_01_2023);
-        assertEq(vest.mgr(27), address(0));
-        assertEq(vest.res(27), 1);
-        assertEq(vest.tot(27), 152.51 ether);
-        assertEq(vest.rxd(27), 0);
+        // assertEq(vest.usr(27), GOV_WALLET3);
+        // assertEq(vest.bgn(27), AUG_01_2022);
+        // assertEq(vest.clf(27), AUG_01_2023);
+        // assertEq(vest.fin(27), AUG_01_2022 + 365 days);
+        // assertEq(vest.fin(27), AUG_01_2023);
+        // assertEq(vest.mgr(27), address(0));
+        // assertEq(vest.res(27), 1);
+        // assertEq(vest.tot(27), 152.51 ether);
+        // assertEq(vest.rxd(27), 0);
 
-        assertEq(vest.usr(28), SNE_WALLET);
-        assertEq(vest.bgn(28), SEP_28_2022);
-        assertEq(vest.clf(28), SEP_28_2022);
-        assertEq(vest.fin(28), SEP_28_2022 + 731 days);
-        assertEq(vest.fin(28), SEP_28_2024);
-        assertEq(vest.mgr(28), address(0));
-        assertEq(vest.res(28), 1);
-        assertEq(vest.tot(28), 540.00 ether);
-        assertEq(vest.rxd(28), 0);
+        // assertEq(vest.usr(28), SNE_WALLET);
+        // assertEq(vest.bgn(28), SEP_28_2022);
+        // assertEq(vest.clf(28), SEP_28_2022);
+        // assertEq(vest.fin(28), SEP_28_2022 + 731 days);
+        // assertEq(vest.fin(28), SEP_28_2024);
+        // assertEq(vest.mgr(28), address(0));
+        // assertEq(vest.res(28), 1);
+        // assertEq(vest.tot(28), 540.00 ether);
+        // assertEq(vest.rxd(28), 0);
 
-        uint256 prevBalance = gov.balanceOf(GOV_WALLET1);
+        // uint256 prevBalance = gov.balanceOf(GOV_WALLET1);
 
-        // Give admin powers to test contract address and make the vesting unrestricted for testing
-        giveAuth(address(vest), address(this));
-        vest.unrestrict(25);
+        // // Give admin powers to test contract address and make the vesting unrestricted for testing
+        // giveAuth(address(vest), address(this));
+        // vest.unrestrict(25);
 
-        hevm.warp(AUG_01_2022 + 365 days);
-        vest.vest(25);
-        assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
+        // hevm.warp(AUG_01_2022 + 365 days);
+        // vest.vest(25);
+        // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
 
-        hevm.warp(AUG_01_2022 + 365 days + 10 days);
-        vest.vest(25);
-        assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
+        // hevm.warp(AUG_01_2022 + 365 days + 10 days);
+        // vest.vest(25);
+        // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
 
-        prevBalance = gov.balanceOf(GOV_WALLET2);
-        vest.unrestrict(26);
+        // prevBalance = gov.balanceOf(GOV_WALLET2);
+        // vest.unrestrict(26);
 
-        hevm.warp(AUG_01_2022 + 365 days);
-        vest.vest(26);
-        assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
+        // hevm.warp(AUG_01_2022 + 365 days);
+        // vest.vest(26);
+        // assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
 
-        hevm.warp(AUG_01_2022 + 365 days + 10 days);
-        vest.vest(26);
-        assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
+        // hevm.warp(AUG_01_2022 + 365 days + 10 days);
+        // vest.vest(26);
+        // assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
 
-        prevBalance = gov.balanceOf(GOV_WALLET3);
-        vest.unrestrict(27);
+        // prevBalance = gov.balanceOf(GOV_WALLET3);
+        // vest.unrestrict(27);
 
-        hevm.warp(AUG_01_2022 + 365 days);
-        vest.vest(27);
-        assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
+        // hevm.warp(AUG_01_2022 + 365 days);
+        // vest.vest(27);
+        // assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
 
-        hevm.warp(AUG_01_2022 + 365 days + 10 days);
-        vest.vest(27);
-        assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
+        // hevm.warp(AUG_01_2022 + 365 days + 10 days);
+        // vest.vest(27);
+        // assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
 
-        prevBalance = gov.balanceOf(SNE_WALLET);
-        vest.unrestrict(28);
+        // prevBalance = gov.balanceOf(SNE_WALLET);
+        // vest.unrestrict(28);
 
-        hevm.warp(SEP_28_2022 + 731 days);
-        vest.vest(28);
-        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
+        // hevm.warp(SEP_28_2022 + 731 days);
+        // vest.vest(28);
+        // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
 
-        hevm.warp(SEP_28_2022 + 731 days + 10 days);
-        vest.vest(28);
-        assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
+        // hevm.warp(SEP_28_2022 + 731 days + 10 days);
+        // vest.vest(28);
+        // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
     function testMKRPayments() public { // make public to use
