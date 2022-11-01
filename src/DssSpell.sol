@@ -39,7 +39,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     string public constant override description =
         "2022-11-02 MakerDAO Executive Spell | Hash: 0x08cf79923a6aa3e9f67acd8d0bb650a17dd1cea99a6556bc505f3929af15923d";
 
-    string public constant in_memory_of = "Nikolai Mushegian";
+
 
     // Turn office hours off
     function officeHours() public override returns (bool) {
@@ -153,5 +153,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 }
 
 contract DssSpell is DssExec {
+
+    string public constant in_memory_of = "Nikolai Mushegian";
+
     constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) public {}
 }
