@@ -119,7 +119,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // https://forum.makerdao.com/t/executive-vote-cu-offboarding-next-steps/18522
 
         // SH-001 - 26.04 MKR - 0xc657aC882Fb2D6CcF521801da39e910F8519508d
-        // https://mips.makerdao.com/mips/details/MIP39c3SP4#sentence-summary
+        // https://mips.makerdao.com/mips/details/MIP39c3SP3#sentence-summary
         MKR.transfer(SH_001, 26.04 ether);  // note: ether is a keyword helper, only MKR is transferred here
 
         // RWF-001 - 143.46 MKR - 0x96d7b01Cc25B141520C717fa369844d34FF116ec
