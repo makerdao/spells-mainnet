@@ -98,15 +98,16 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
 
 
         // CU Offboarding - Yank MKR Stream
+
         // Yank MKR Stream #23 (SH-001)
         // https://mips.makerdao.com/mips/details/MIP39c3SP3#sentence-summary
         MCD_VEST_MKR_TREASURY.yank(23);
 
 
         // CU Offboarding - DAI Golden Parachutes
+
         // EVENTS-001 - 167,666 DAI - 0x3D274fbAc29C92D2F624483495C0113B44dBE7d2
         // https://mips.makerdao.com/mips/details/MIP39c3SP4#sentence-summary
-
         DssExecLib.sendPaymentFromSurplusBuffer(EVENTS_001, 167_666);
 
         // SH-001 - 43,332.0 DAI - 0xc657aC882Fb2D6CcF521801da39e910F8519508d
@@ -126,22 +127,25 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         MKR.transfer(RWF_001, 143.46 ether);  // note: ether is a keyword helper, only MKR is transferred here
 
         // SPF Funding
+
         // BlockTower Legal and Risk Work SPF - 258,000 DAI - 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9
         // https://mips.makerdao.com/mips/details/MIP39c3SP5#sentence-summary
         DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER, 258_000);
 
 
-        // Oracle Whitelisting - carried over from last week, see confirms from Nik in week 43 sheet
+        // Oracle Whitelisting
         // https://vote.makerdao.com/polling/QmZzFPFs#vote-breakdown
+
         // Whitelist Oasis.app on RETH/USD oracle
         // https://forum.makerdao.com/t/mip10c9-sp31-proposal-to-whitelist-oasis-app-on-rethusd-oracle/18195
         // Oasis.app - 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0 - OSM
         DssExecLib.addReaderToWhitelist(PIP_RETH, OASISAPP);
 
 
-        // PE Housekeeping - Clean up unnecessary ESCROW_MOM auth on Starknet Bridge
-        DssExecLib.deauthorize(STARKNET_DAI_BRIDGE, STARKNET_ESCROW_MOM);
+        // PE Housekeeping
 
+        // Clean up unnecessary ESCROW_MOM auth on Starknet Bridge
+        DssExecLib.deauthorize(STARKNET_DAI_BRIDGE, STARKNET_ESCROW_MOM);
     }
 }
 
