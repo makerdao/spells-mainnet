@@ -407,6 +407,8 @@ contract DssSpellTest is DssSpellTestBase {
         (ok,) = vest.call(abi.encodeWithSignature("vest(uint256)", id));
     }
 
+    // @dev when testing new vest contracts, use the explicit id when testing to assist in
+    //      identifying streams later for modification or removal
     function testVestDAI() private { // make public to use
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
