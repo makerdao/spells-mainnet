@@ -46,10 +46,68 @@ contract DssSpellCollateralAction {
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
+        //  Add ______________ as a new Vault Type
+        //  Poll Link:
+
+        // DssExecLib.addNewCollateral(
+        //     CollateralOpts({
+        //         ilk:                   "XXX-A",
+        //         gem:                   XXX,
+        //         join:                  MCD_JOIN_XXX_A,
+        //         clip:                  MCD_CLIP_XXX_A,
+        //         calc:                  MCD_CLIP_CALC_XXX_A,
+        //         pip:                   PIP_XXX,
+        //         isLiquidatable:        BOOL,
+        //         isOSM:                 BOOL,
+        //         whitelistOSM:          BOOL,
+        //         ilkDebtCeiling:        line,
+        //         minVaultAmount:        dust,
+        //         maxLiquidationAmount:  hole,
+        //         liquidationPenalty:    chop,
+        //         ilkStabilityFee:       duty,
+        //         startingPriceFactor:   buf,
+        //         breakerTolerance:      tolerance,
+        //         auctionDuration:       tail,
+        //         permittedDrop:         cusp,
+        //         liquidationRatio:      mat,
+        //         kprFlatReward:         tip,
+        //         kprPctReward:          chip
+        //     })
+        // );
+
+        // DssExecLib.setStairstepExponentialDecrease(
+        //     CALC_ADDR,
+        //     DURATION,
+        //     PCT_BPS
+        // );
+
+        // DssExecLib.setIlkAutoLineParameters(
+        //     "XXX-A",
+        //     AMOUNT,
+        //     GAP,
+        //     TTL
+        // );
+
+        // ChainLog Updates
+        // DssExecLib.setChangelogAddress("XXX", XXX);
+        // DssExecLib.setChangelogAddress("PIP_XXX", PIP_XXX);
+        // DssExecLib.setChangelogAddress("MCD_JOIN_XXX_A", MCD_JOIN_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_XXX_A", MCD_CLIP_XXX_A);
+        // DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XXX_A", MCD_CLIP_CALC_XXX_A);
     }
 
     function updateCollaterals() internal {
         // ------------------------------- Collateral updates -------------------------------
+
+        // Enable autoline for XXX-A
+        // Poll Link:
+        // Forum Link:
+        // DssExecLib.setIlkAutoLineParameters(
+        //    XXX-A,
+        //    AMOUNT,
+        //    GAP,
+        //    TTL
+        // );
     }
 
     function offboardCollaterals() internal {
