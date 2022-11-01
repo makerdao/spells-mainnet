@@ -410,7 +410,7 @@ contract DssSpellTest is DssSpellTestBase {
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
     function testVestDAI() private { // make public to use
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
         // uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
