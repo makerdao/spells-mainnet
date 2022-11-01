@@ -101,5 +101,5 @@ The process of verifying code on etherscan is a little bit more involved because
    1. Remove `pragma experimental ABIEncoderV2;`
    2. Comment out `DssExecLib.addNewCollateral` method.
 3. Go to etherscan and verify source.
-   1. Add library: `DssExecLib:0xfD88CeE74f7D78697775aBDAE53f9Da1559728E4`
+   1. Add library: `DssExecLib:0x8De6DDbCd5053d32292AAA0D2105A32d108484a6`
    2. Ensure optimizer is off and optimize runs = 200
