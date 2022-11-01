@@ -71,6 +71,8 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     DssVestLike immutable MCD_VEST_MKR_TREASURY = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
     GemLike     immutable MKR                   = GemLike(DssExecLib.mkr());
     address     immutable PIP_RETH              = DssExecLib.getChangelogAddress("PIP_RETH");
+    address     immutable STARKNET_DAI_BRIDGE   = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address     immutable STARKNET_ESCROW_MOM   = DssExecLib.getChangelogAddress("STARKNET_ESCROW_MOM");
 
     function actions() public override {
 
@@ -135,6 +137,10 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // https://forum.makerdao.com/t/mip10c9-sp31-proposal-to-whitelist-oasis-app-on-rethusd-oracle/18195
         // Oasis.app - 0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0 - OSM
         DssExecLib.addReaderToWhitelist(PIP_RETH, OASISAPP);
+
+
+        // PE Housekeeping - Clean up unnecessary ESCROW_MOM auth on Starknet Bridge
+        DssExecLib.deauthorize(STARKNET_DAI_BRIDGE, STARKNET_ESCROW_MOM);
 
     }
 }
