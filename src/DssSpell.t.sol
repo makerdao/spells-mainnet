@@ -276,17 +276,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function testOSMs() private { // make public to use
-        address READER = address(0);
+    function testOSMs() public { // make public to use
+
+        address OASISAPP = address(0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0);
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
+        assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 1);
     }
 
     function testMedianizers() private { // make public to use
