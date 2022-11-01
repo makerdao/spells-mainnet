@@ -87,9 +87,6 @@ contract Config {
     uint256 constant MILLION    = 10 ** 6;
     uint256 constant BILLION    = 10 ** 9;
 
-    uint256 constant monthly_expiration = 4 days;
-    uint256 constant weekly_expiration  = 30 days;
-
     SpellValues  spellValues;
     SystemValues afterSpell;
 
