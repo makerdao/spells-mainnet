@@ -129,6 +129,7 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         // SPF Funding
 
         // BlockTower Legal and Risk Work SPF - 258,000 DAI - 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9
+        // https://mips.makerdao.com/mips/details/MIP55c3SP9#sentence-summary
         // https://vote.makerdao.com/polling/QmcV2pMZ#vote-breakdown
         DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER, 258_000);
 
