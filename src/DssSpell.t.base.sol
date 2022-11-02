@@ -880,7 +880,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // Deposit collateral, generate DAI
         (,uint256 rate,,uint256 line,) = vat.ilks(_ilk);
-        
+
         assertEq(vat.dai(address(this)), 0);
         // Set max line to ensure we can create a new position
         setIlkLine(_ilk, uint256(-1));
@@ -1628,14 +1628,9 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
     // Allow PIP RETH deployer to be authed against it only if RETH-A line is 0
     function skipWards(address target, address deployer) internal view returns (bool) {
-        (,,, uint256 line,) = vat.ilks("RETH-A");
-        return (
-                (
-                    target == 0xeE7F0b350aA119b3d05DC733a4621a81972f7D47    // rETH PIP
-                    || target == 0xF86360f0127f8A441Cfca332c75992D1C692b3D1 // rETH Medianizer
-                )
-                && deployer  == 0x39aBD7819E5632Fa06D2ECBba45Dca5c90687EE3 // Oracle Deployer
-                && line      == 0);
+        // Add logic here in case any wards need to be skipped, otherwise return false.
+        target; deployer;
+        return false;
     }
 
     function checkWards(address _addr, string memory contractName) internal {
