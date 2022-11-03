@@ -1626,7 +1626,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         }
     }
 
-    // Allow PIP RETH deployer to be authed against it only if RETH-A line is 0
+    // Add an exception here if a registered deployer can be a valid auth on target
     function skipWards(address target, address deployer) internal view returns (bool) {
         // Add logic here in case any wards need to be skipped, otherwise return false.
         target; deployer;
