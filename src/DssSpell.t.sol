@@ -126,18 +126,16 @@ contract DssSpellTest is DssSpellTestBase {
         // );
     }
 
-    function testNewChainlogValues() private { // make private to disable
+    function testNewChainlogValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        // checkChainlogKey("RETH");
-        // checkChainlogKey("PIP_RETH");
-        // checkChainlogKey("MCD_JOIN_RETH_A");
-        // checkChainlogKey("MCD_CLIP_RETH_A");
-        // checkChainlogKey("MCD_CLIP_CALC_RETH_A");
-        // checkChainlogVersion("1.14.3");
+        checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        checkChainlogKey("STARKNET_TELEPORT_FEE");
+
+        checkChainlogVersion("1.14.4");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -648,6 +646,35 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+    }
+
+
+    function testTeleportFW() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
+        StarknetTeleportBridgeLike bridge = StarknetTeleportBridgeLike(addr.addr("STARKNET_TELEPORT_BRIDGE"));
+
+        // Sanity check
+        assertEq(router.numDomains(), 4);
+
+        checkTeleportFWIntegration(
+            "STA-MAIN-A",
+            "ETH-MAIN-A",
+            100_000 * WAD,
+            address(bridge),
+            addr.addr("STARKNET_TELEPORT_FEE"),
+            addr.addr("STARKNET_ESCROW"),
+            100 * WAD,
+            WAD / 10000, // 1bps
+            12 hours
+        );
+
+        // Bridge domain specific checks
+        assertEq(bridge.l2TeleportGateway(), 0x05b20d8c7b85456c07bdb8eaaeab52a6bf3770a586af6da8d3f5071ef0dcf234);
+        assertEq(bridge.starkNet(), addr.addr("STARKNET_CORE"));
     }
 
 }

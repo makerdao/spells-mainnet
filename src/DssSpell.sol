@@ -23,6 +23,34 @@ import "dss-exec-lib/DssAction.sol";
 
 import { DssSpellCollateralAction } from "./DssSpellCollateral.sol";
 
+interface TeleportJoinLike {
+    function file(bytes32,bytes32,address) external;
+    function file(bytes32,bytes32,uint256) external;
+}
+
+interface TeleportRouterLike {
+    function file(bytes32,bytes32,address) external;
+}
+
+interface TeleportFeeLike {
+    function fee() external view returns (uint256);
+    function ttl() external view returns (uint256);
+}
+
+interface EscrowLike {
+    function approve(address,address,uint256) external;
+}
+
+interface TeleportBridgeLike {
+    function l1Escrow() external view returns (address);
+    function l1TeleportRouter() external view returns (address);
+    function l1Token() external view returns (address);
+}
+
+interface StarknetTeleportBridgeLike is TeleportBridgeLike {
+    function l2TeleportGateway() external view returns (uint256); // uniquely returning uint256 on starknet
+    function starkNet() external view returns (address);
+}
 
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
@@ -38,6 +66,24 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         return false;
     }
 
+    address internal immutable DAI = DssExecLib.dai();
+
+    address internal immutable TELEPORT_JOIN = DssExecLib.getChangelogAddress("MCD_JOIN_TELEPORT_FW_A");
+    address internal immutable ROUTER        = DssExecLib.getChangelogAddress("MCD_ROUTER_TELEPORT_FW_A");
+
+    bytes32 internal constant ILK        = "TELEPORT-FW-A";
+    bytes32 internal constant DOMAIN_STA = "STA-MAIN-A";
+
+    address internal constant TELEPORT_GATEWAY_STA    = 0x95D8367B74ef8C5d014ff19C212109E243748e28;
+    uint256 internal constant TELEPORT_L2_GATEWAY_STA = 0x05b20d8c7b85456c07bdb8eaaeab52a6bf3770a586af6da8d3f5071ef0dcf234;
+    address internal constant LINEAR_FEE_STA          = 0x2123159d2178f07E3899d9d22aad2Fb177B59C48;
+
+    address internal immutable ESCROW_STA     = DssExecLib.getChangelogAddress("STARKNET_ESCROW");
+    address internal immutable DAI_BRIDGE_STA = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address internal immutable STARKNET_CORE  = DssExecLib.getChangelogAddress("STARKNET_CORE");
+
+    uint256 internal constant CEILING = 100_000; // Whole Dai units
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -49,18 +95,57 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     //
 
     // --- Rates ---
-    // uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
+    uint256 internal constant SEVEN_PT_FIVE_PERCENT_RATE = 1000000002293273137447730714;
 
     // --- Math ---
-    // uint256 internal constant WAD = 10 ** 18;
-
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant MILLION = 10 ** 6;
 
     function actions() public override {
-
 
         // Includes changes from the DssSpellCollateralAction
         // collateralAction();
 
+        // ------------------ Setup Starknet Teleport Fast Withdrawals -----------------
+        // https://vote.makerdao.com/polling/QmZxRgvG
+        // https://forum.makerdao.com/t/request-for-poll-starknet-bridge-deposit-limit-and-starknet-teleport-fees/17187
+
+        // Run sanity checks
+        require(TeleportFeeLike(LINEAR_FEE_STA).fee() == WAD / 10000);
+        require(TeleportFeeLike(LINEAR_FEE_STA).ttl() == 12 hours); // finalization time on Mainnet
+        require(StarknetTeleportBridgeLike(TELEPORT_GATEWAY_STA).l1Escrow() == ESCROW_STA);
+        require(StarknetTeleportBridgeLike(TELEPORT_GATEWAY_STA).l1TeleportRouter() == ROUTER);
+        require(StarknetTeleportBridgeLike(TELEPORT_GATEWAY_STA).l1Token() == DAI);
+        require(StarknetTeleportBridgeLike(TELEPORT_GATEWAY_STA).l2TeleportGateway() == TELEPORT_L2_GATEWAY_STA);
+        require(StarknetTeleportBridgeLike(TELEPORT_GATEWAY_STA).starkNet() == STARKNET_CORE);
+
+        // Increase system debt ceilings
+        DssExecLib.increaseIlkDebtCeiling(ILK, CEILING, true);
+
+        // Configure TeleportJoin
+        TeleportJoinLike(TELEPORT_JOIN).file("fees", DOMAIN_STA, LINEAR_FEE_STA);
+        TeleportJoinLike(TELEPORT_JOIN).file("line", DOMAIN_STA, CEILING * WAD);
+
+        // Configure TeleportRouter
+        TeleportRouterLike(ROUTER).file("gateway", DOMAIN_STA, TELEPORT_GATEWAY_STA);
+
+        // Authorize TeleportGateway to use the escrow
+        EscrowLike(ESCROW_STA).approve(DAI, TELEPORT_GATEWAY_STA, type(uint256).max);
+
+        // Configure Chainlog
+        DssExecLib.setChangelogAddress("STARKNET_TELEPORT_BRIDGE", TELEPORT_GATEWAY_STA);
+        DssExecLib.setChangelogAddress("STARKNET_TELEPORT_FEE", LINEAR_FEE_STA);
+
+        DssExecLib.setChangelogVersion("1.14.4");
+
+        // ------------------ MOMC Parameter Changes -----------------
+        // https://vote.makerdao.com/polling/QmahDuNx#poll-detail
+
+        // Increase the MANA-A Stability Fee from 4.5% to 7.5%
+        DssExecLib.setIlkStabilityFee("MANA-A", SEVEN_PT_FIVE_PERCENT_RATE, true);
+
+        // Decrease the MANA-A line from 17 million DAI to 10 million DAI
+        DssExecLib.setIlkAutoLineDebtCeiling("MANA-A", 10 * MILLION);
     }
 }
 

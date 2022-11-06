@@ -146,15 +146,21 @@ interface TeleportBridgeLike {
     function l1Escrow() external view returns (address);
     function l1TeleportRouter() external view returns (address);
     function l1Token() external view returns (address);
-    function l2TeleportGateway() external view returns (address);
 }
 
 interface OptimismTeleportBridgeLike is TeleportBridgeLike {
+    function l2TeleportGateway() external view returns (address);
     function messenger() external view returns (address);
 }
 
 interface ArbitrumTeleportBridgeLike is TeleportBridgeLike {
+    function l2TeleportGateway() external view returns (address);
     function inbox() external view returns (address);
+}
+
+interface StarknetTeleportBridgeLike {
+    function l2TeleportGateway() external view returns (uint256);
+    function starkNet() external view returns (address);
 }
 
 contract DssSpellTestBase is Config, DSTest, DSMath {
