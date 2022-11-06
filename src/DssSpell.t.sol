@@ -56,42 +56,42 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
-        uint256 prevSin = vat.sin(address(vow));
+    function testPayments() private { // make public to enable
+        // uint256 prevSin = vat.sin(address(vow));
 
-        // For each payment, create a Payee object with
-        //    the Payee address,
-        //    the amount to be paid in whole Dai units
-        // Initialize the array with the number of payees
-        Payee[3] memory payees = [
-            Payee(wallets.addr("EVENTS_WALLET"),         167_666),
-            Payee(wallets.addr("SH_MULTISIG"),            43_332),
-            Payee(wallets.addr("BLOCKTOWER_WALLET"),     258_000)
-        ];
+        // // For each payment, create a Payee object with
+        // //    the Payee address,
+        // //    the amount to be paid in whole Dai units
+        // // Initialize the array with the number of payees
+        // Payee[3] memory payees = [
+        //     Payee(wallets.addr("EVENTS_WALLET"),         167_666),
+        //     Payee(wallets.addr("SH_MULTISIG"),            43_332),
+        //     Payee(wallets.addr("BLOCKTOWER_WALLET"),     258_000)
+        // ];
 
 
-        uint256 prevBalance;
-        uint256 totAmount;
-        uint256[] memory prevAmounts = new uint256[](payees.length);
+        // uint256 prevBalance;
+        // uint256 totAmount;
+        // uint256[] memory prevAmounts = new uint256[](payees.length);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            totAmount += payees[i].amount;
-            prevAmounts[i] = dai.balanceOf(payees[i].addr);
-            prevBalance += prevAmounts[i];
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     totAmount += payees[i].amount;
+        //     prevAmounts[i] = dai.balanceOf(payees[i].addr);
+        //     prevBalance += prevAmounts[i];
+        // }
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
+        // assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(
-                dai.balanceOf(payees[i].addr) - prevAmounts[i],
-                payees[i].amount * WAD
-            );
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     assertEq(
+        //         dai.balanceOf(payees[i].addr) - prevAmounts[i],
+        //         payees[i].amount * WAD
+        //     );
+        // }
     }
 
     function testCollateralIntegrations() private { // make public to use
@@ -276,18 +276,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(castTime, spell.eta());
     }
 
-    function testOSMs() public { // make public to use
+    function testOSMs() private { // make public to use
 
-        address OASISAPP = address(0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0);
+        // address OASISAPP = address(0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0);
 
-        // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 0);
+        // // Track OSM authorizations here
+        // assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 1);
+        // assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 1);
     }
 
     function testMedianizers() private { // make public to use
@@ -418,9 +418,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         // assertEq(vest.ids(), 9);
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
         // assertEq(vest.ids(), 9 + 1);
 
@@ -452,50 +452,50 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
-    function testYankDAI() public { // make public to use
+    function testYankDAI() private { // make public to use
 
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-        VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
+        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
-        // Saturday, December 31, 2022 12:00:00 AM
-        uint256 DEC_31_2022 = 1672444800;
-        // Wednesday, March 15, 2023 12:00:00 AM
-        uint256 MAR_15_2023 = 1678838400;
-        // Monday, May 1, 2023 12:00:00 AM
-        uint256 MAY_1_2023 = 1682899200;
+        // // Saturday, December 31, 2022 12:00:00 AM
+        // uint256 DEC_31_2022 = 1672444800;
+        // // Wednesday, March 15, 2023 12:00:00 AM
+        // uint256 MAR_15_2023 = 1678838400;
+        // // Monday, May 1, 2023 12:00:00 AM
+        // uint256 MAY_1_2023 = 1682899200;
 
-        assertEq(vest.usr(4), wallets.addr("EVENTS_WALLET"));
-        assertEq(vest.fin(4), MAY_1_2023);
-        assertEq(vest.usr(5), wallets.addr("SH_MULTISIG"));
-        assertEq(vest.fin(5), MAR_15_2023);
-        assertEq(vestLegacy.usr(35), wallets.addr("RWF_WALLET"));
-        assertEq(vestLegacy.fin(35), DEC_31_2022);
+        // assertEq(vest.usr(4), wallets.addr("EVENTS_WALLET"));
+        // assertEq(vest.fin(4), MAY_1_2023);
+        // assertEq(vest.usr(5), wallets.addr("SH_MULTISIG"));
+        // assertEq(vest.fin(5), MAR_15_2023);
+        // assertEq(vestLegacy.usr(35), wallets.addr("RWF_WALLET"));
+        // assertEq(vestLegacy.fin(35), DEC_31_2022);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.fin(4), block.timestamp);
-        assertEq(vest.fin(5), block.timestamp);
-        assertEq(vestLegacy.fin(35), block.timestamp);
+        // assertEq(vest.fin(4), block.timestamp);
+        // assertEq(vest.fin(5), block.timestamp);
+        // assertEq(vestLegacy.fin(35), block.timestamp);
     }
 
-    function testYankMKR() public { // make public to use
+    function testYankMKR() private { // make public to use
 
-        VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        //VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
+        // VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        // //VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
 
-        // Sunday, May 31, 2026 12:00:00 AM
-        uint256 MAY_31_2026 = 1780185600;
+        // // Sunday, May 31, 2026 12:00:00 AM
+        // uint256 MAY_31_2026 = 1780185600;
 
-        assertEq(vestTreas.usr(23), wallets.addr("SH_WALLET"));
-        assertEq(vestTreas.fin(23), MAY_31_2026);
+        // assertEq(vestTreas.usr(23), wallets.addr("SH_WALLET"));
+        // assertEq(vestTreas.fin(23), MAY_31_2026);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vestTreas.fin(23), block.timestamp);
+        // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
     function testVestMKR() private { // make public to use
@@ -504,9 +504,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         // uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
-        // vote(address(spell));
-        // scheduleWaitAndCast(address(spell));
-        // assertTrue(spell.done());
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
         // assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.70 ether);
 
@@ -612,42 +612,42 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
-    function testMKRPayments() public { // make public to use
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrSH    = gov.balanceOf(wallets.addr("SH_MULTISIG"));
-        uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
+    function testMKRPayments() private { // make public to use
+        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        // uint256 prevMkrSH    = gov.balanceOf(wallets.addr("SH_MULTISIG"));
+        // uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
 
-        uint256 amountSH     =  26.04 ether;
-        uint256 amountRWF    = 143.46 ether;
+        // uint256 amountSH     =  26.04 ether;
+        // uint256 amountRWF    = 143.46 ether;
 
-        uint256 total        = 169.50 ether;
+        // uint256 total        = 169.50 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("SH_MULTISIG")), prevMkrSH + amountSH);
-        assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(wallets.addr("SH_MULTISIG")), prevMkrSH + amountSH);
+        // assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
     }
 
     function testMKRVestFix() private { // make public to use
-        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        // uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
+        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
-        address usr = vest.usr(2);
-        assertEq(usr, pauseProxy, "usr of id 2 is pause proxy");
+        // address usr = vest.usr(2);
+        // assertEq(usr, pauseProxy, "usr of id 2 is pause proxy");
 
-        uint256 unpaid = vest.unpaid(2);
-        assertEq(unpaid, 63180000000000000000, "amount doesn't match expectation");
+        // uint256 unpaid = vest.unpaid(2);
+        // assertEq(unpaid, 63180000000000000000, "amount doesn't match expectation");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        unpaid = vest.unpaid(2);
-        assertEq(unpaid, 0, "vest still has a balance");
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+        // unpaid = vest.unpaid(2);
+        // assertEq(unpaid, 0, "vest still has a balance");
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
 }
