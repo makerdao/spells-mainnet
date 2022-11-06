@@ -101,7 +101,27 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant MILLION = 10 ** 6;
 
-    function actions() public override {
+    // --- Wallets ---
+    address internal constant STABLENODE_WALLET          = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address internal constant ULTRASCHUPPI_WALLET        = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address internal constant FLIPFLOPFLAP_WALLET        = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address internal constant FLIPSIDE_WALLET            = 0x62a43123FE71f9764f26554b3F5017627996816a;
+    address internal constant FEEDBLACKLOOPS_WALLET      = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address internal constant PENNBLOCKCHAIN_WALLET      = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address internal constant JUSTIN_CASE_WALLET         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address internal constant MHONKASALOTEEMULAU_WALLET  = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
+    address internal constant ACREINVEST_WALLET          = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address internal constant GFXLABS_WALLET             = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address internal constant BLOCKCHAINCOLUMBIA_WALLET  = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
+    address internal constant CHRISBLEC_WALLET           = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
+    address internal constant LBSBLOCKCHAIN_WALLET       = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
+    address internal constant FRONTIERRESEARCH_WALLET    = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address internal constant ONESTONE_WALLET            = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
+    address internal constant CODEKNIGHT_WALLET          = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address internal constant LLAMA_WALLET               = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address internal constant PVL_WALLET                 = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
+
+function actions() public override {
 
         // Includes changes from the DssSpellCollateralAction
         // collateralAction();
@@ -137,6 +157,28 @@ contract DssSpellAction is DssAction, DssSpellCollateralAction {
         DssExecLib.setChangelogAddress("STARKNET_TELEPORT_FEE", LINEAR_FEE_STA);
 
         DssExecLib.setChangelogVersion("1.14.4");
+
+        // ------------------ Delegate Compensation for October -----------------
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-october-2022/18658
+
+        DssExecLib.sendPaymentFromSurplusBuffer(STABLENODE_WALLET,          12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI_WALLET,        12_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP_WALLET,        11_615);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE_WALLET,            11_395);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS_WALLET,      10_671);
+        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN_WALLET,      10_390);
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTIN_CASE_WALLET,          8_056);
+        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU_WALLET,   7_545);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST_WALLET,           6_682);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS_WALLET,              5_306);
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKCHAINCOLUMBIA_WALLET,   5_109);
+        DssExecLib.sendPaymentFromSurplusBuffer(CHRISBLEC_WALLET,            5_057);
+        DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN_WALLET,        2_995);
+        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIERRESEARCH_WALLET,     2_136);
+        DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE_WALLET,               271);
+        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT_WALLET,             270);
+        DssExecLib.sendPaymentFromSurplusBuffer(LLAMA_WALLET,                  149);
+        DssExecLib.sendPaymentFromSurplusBuffer(PVL_WALLET,                     65);
 
         // ------------------ MOMC Parameter Changes -----------------
         // https://vote.makerdao.com/polling/QmahDuNx#poll-detail
