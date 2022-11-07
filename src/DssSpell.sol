@@ -55,10 +55,10 @@ interface StarknetTeleportBridgeLike is TeleportBridgeLike {
 contract DssSpellAction is DssAction, DssSpellCollateralAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/Executive%20vote%20-%20TODO.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/0d5af5697be495ae7064a4067800d26072c49584/governance/votes/Executive%20vote%20-%20November%209%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-11-09 MakerDAO Executive Spell | Hash: TODO";
+        "2022-11-09 MakerDAO Executive Spell | Hash: 0x7a81bf01fb10ba896a8219a49780fc958b639e30d5d8ffefdf9b60583b9bebc7";
 
 
     // Turn office hours off
