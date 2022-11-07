@@ -192,6 +192,5 @@ function actions() public override {
 }
 
 contract DssSpell is DssExec {
-
     constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) public {}
 }
