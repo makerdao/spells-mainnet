@@ -36,7 +36,6 @@ contract Deployers {
     address public constant CES_2022_10_26     = 0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5; //2022-10-26 (New CES)
     address public constant ORACLES_2021_07_20 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3; //2021-07-20 Oracles (NO MATCH IN GOERLI)
     
-
     // Unknown Team Deployers
     address public constant UNKNOWN_2019_06_27 = 0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc; //2019-06-27 (NO MATCH IN GOERLI)
     address public constant UNKNOWN_2020_09_03 = 0xDa0FaB05039809e63C5D068c897c3e602fA97457; //2020-09-03 (NO MATCH IN GOERLI)
