@@ -50,32 +50,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
+    function testPayments() private { // make public to enable
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[18] memory payees = [
-            Payee(wallets.addr("STABLENODE"),           12_000),
-            Payee(wallets.addr("ULTRASCHUPPI"),         12_000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),         11_615),
-            Payee(wallets.addr("FLIPSIDE"),             11_395),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),       10_671),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),       10_390),
-            Payee(wallets.addr("JUSTINCASE"),            8_056),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"),    7_545),
-            Payee(wallets.addr("ACREINVEST"),            6_682),
-            Payee(wallets.addr("GFXLABS"),               5_306),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),    5_109),
-            Payee(wallets.addr("CHRISBLEC"),             5_057),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),         2_995),
-            Payee(wallets.addr("FRONTIERRESEARCH"),      2_136),
-            Payee(wallets.addr("ONESTONE"),                271),
-            Payee(wallets.addr("CODEKNIGHT"),              270),
-            Payee(wallets.addr("LLAMA"),                   149),
-            Payee(wallets.addr("PVL"),                      65)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("XXX"),           1)
         ];
 
         uint256 prevBalance;
@@ -140,10 +123,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
-        checkChainlogKey("STARKNET_TELEPORT_FEE");
+        // checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        // checkChainlogKey("STARKNET_TELEPORT_FEE");
 
-        checkChainlogVersion("1.14.4");
+        // checkChainlogVersion("1.14.4");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -661,7 +644,7 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testTeleportFW() public {
+    function testTeleportFW() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
