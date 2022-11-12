@@ -18,6 +18,12 @@ pragma solidity 0.6.12;
 
 import "dss-exec-lib/DssExecLib.sol";
 
+interface VatLike {
+    function Line() external view returns (uint256);
+    function file(bytes32, uint256) external;
+    function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+}
+
 contract DssSpellCollateralAction {
 
     // --- Rates ---
@@ -30,13 +36,15 @@ contract DssSpellCollateralAction {
     // A table of rates can be found at
     // https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    //uint256 internal constant ONE_FIVE_PCT_RATE = 1000000000472114805215157978;
+    uint256 internal constant FIFTY_PCT_RATE = 1000000012857214317438491659;
 
     // --- Math ---
-    //uint256 constant THOUSAND   = 10 ** 3;
-    //uint256 constant MILLION    = 10 ** 6;
-    //uint256 constant BILLION    = 10 ** 9;
+    uint256 internal constant MILLION  = 10 ** 6;
+    // uint256 internal constant THOUSAND = 10 ** 3;
 
+    function _sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "sub-underflow");
+    }
 
     function collateralAction() internal {
         onboardCollaterals();
@@ -46,8 +54,8 @@ contract DssSpellCollateralAction {
 
     function onboardCollaterals() internal {
         // ----------------------------- Collateral onboarding -----------------------------
-        //  Add ______________ as a new Vault Type
-        //  Poll Link:
+        // Add ______________ as a new Vault Type
+        // Poll Link:
 
         // DssExecLib.addNewCollateral(
         //     CollateralOpts({
@@ -98,16 +106,42 @@ contract DssSpellCollateralAction {
 
     function updateCollaterals() internal {
         // ------------------------------- Collateral updates -------------------------------
+        uint256 lineReduction;
 
-        // Enable autoline for XXX-A
-        // Poll Link:
-        // Forum Link:
-        // DssExecLib.setIlkAutoLineParameters(
-        //    XXX-A,
-        //    AMOUNT,
-        //    GAP,
-        //    TTL
-        // );
+        VatLike vat = VatLike(DssExecLib.vat());
+
+        // Adjust autoline DC for MATIC-A
+        // Poll Link:  N/A
+        // Forum Link: https://forum.makerdao.com/t/urgent-signal-request-urgent-recommended-collateral-parameter-changes/18764
+        DssExecLib.setIlkAutoLineDebtCeiling("MATIC-A", 10 * MILLION);
+
+        // Adjust autoline DC for LINK-A
+        // Poll Link:  N/A
+        // Forum Link: https://forum.makerdao.com/t/urgent-signal-request-urgent-recommended-collateral-parameter-changes/18764
+        DssExecLib.setIlkAutoLineDebtCeiling("LINK-A", 5 * MILLION);
+
+        // Adjust autoline DC for YFI-A
+        // Poll Link:  N/A
+        // Forum Link: https://forum.makerdao.com/t/urgent-signal-request-urgent-recommended-collateral-parameter-changes/18764
+        DssExecLib.setIlkAutoLineDebtCeiling("YFI-A", 3 * MILLION);
+
+        // Set RENBTC-A Maximum Debt Ceiling to 0
+        // Poll Link:  N/A
+        // Forum Link: https://forum.makerdao.com/t/urgent-signal-request-urgent-recommended-collateral-parameter-changes/18764
+        (,,,lineReduction,) = vat.ilks("RENBTC-A");
+        DssExecLib.removeIlkFromAutoLine("RENBTC-A");
+        DssExecLib.setIlkDebtCeiling("RENBTC-A", 0);
+        vat.file("Line", _sub(vat.Line(), lineReduction));
+
+        // Adjust: 
+        //   - autoline DC for MANA-A
+        //   - stability fee for MANA-A to 50%
+        //   - liquidation penalty for MANA-A to 30%
+        // Poll Link:  N/A
+        // Forum Link: https://forum.makerdao.com/t/urgent-signal-request-urgent-recommended-collateral-parameter-changes/18764
+        DssExecLib.setIlkAutoLineDebtCeiling("MANA-A", 3 * MILLION);
+        DssExecLib.setIlkStabilityFee("MANA-A", FIFTY_PCT_RATE, true);
+        DssExecLib.setIlkLiquidationPenalty("MANA-A", 3000); // (30% = 30.00 * 100 = 3000)
     }
 
     function offboardCollaterals() internal {
@@ -169,11 +203,4 @@ contract DssSpellCollateralAction {
         //     _duration:  30 days
         // });
     }
-
-    // --- Offboarding: Current Liquidation Ratio ---
-    // uint256 constant CURRENT_XXX_A_MAT              =  XYZ * RAY / 100;
-
-    // --- Offboarding: Target Liquidation Ratio ---
-    // uint256 constant TARGET_XXX_A_MAT               =  XYZ * RAY / 100;
-
 }

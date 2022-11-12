@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
@@ -50,7 +49,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
+    function testPayments() private { // make public to enable
         uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
@@ -134,16 +133,16 @@ contract DssSpellTest is DssSpellTestBase {
         // );
     }
 
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
-        checkChainlogKey("STARKNET_TELEPORT_FEE");
+        // checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        // checkChainlogKey("STARKNET_TELEPORT_FEE");
 
-        checkChainlogVersion("1.14.4");
+        // checkChainlogVersion("1.14.4");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -283,17 +282,16 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testOSMs() private { // make public to use
+        address READER = address(0);
 
-        // address OASISAPP = address(0x55Dc2Be8020bCa72E58e665dC931E03B749ea5E0);
-
-        // // Track OSM authorizations here
-        // assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 0);
+        // Track OSM authorizations here
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(OsmAbstract(addr.addr("PIP_RETH")).bud(OASISAPP), 1);
+        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
     function testMedianizers() private { // make public to use
@@ -402,6 +400,8 @@ contract DssSpellTest is DssSpellTestBase {
                 fail();
                 return;
             }
+            // We are skipping this part of the test because we need to update the chainlog without bumping the version.
+
             // Fail if the chainlog is the same size but local keys don't match the chainlog.
             for(uint256 i = 0; i < _count; i++) {
                 (, address _val) = chainLog.get(i);
@@ -661,32 +661,83 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testTeleportFW() public {
+        function testAutoLineGap() public {
+        bytes32 ilk;
+        uint256 line;
+
+        giveAuth(address(autoLine), address(this));
+
+        // Inflate Gap and Line - MATIC-A
+        ilk = "MATIC-A";
+        (uint256 alLine, uint256 gap, uint48 ttl,,) = autoLine.ilks(ilk);
+        uint256 highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        uint256 newLine = autoLine.exec(ilk);
+         (uint256 Art, uint256 rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MATIC-gap-boost-failed");
+
+        // Inflate Gap and Line - LINK-A
+        ilk = "LINK-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "LINK-gap-boost-failed");
+
+        // Inflate Gap and Line - YFI-A
+        ilk = "YFI-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        // YFI had a lower line, need to inflate that too
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "YFI-gap-boost-failed");
+
+        // Inflate Gap and Line - MANA-A
+        ilk = "MANA-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MANA-gap-boost-failed");
+
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
-        StarknetTeleportBridgeLike bridge = StarknetTeleportBridgeLike(addr.addr("STARKNET_TELEPORT_BRIDGE"));
+        ilk = "MATIC-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MATIC-line-limit-failed");
 
-        // Sanity check
-        assertEq(router.numDomains(), 4);
+        ilk = "LINK-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "LINK-line-limit-failed");
 
-        checkTeleportFWIntegration(
-            "STA-MAIN-A",
-            "ETH-MAIN-A",
-            100_000 * WAD,
-            address(bridge),
-            addr.addr("STARKNET_TELEPORT_FEE"),
-            addr.addr("STARKNET_ESCROW"),
-            100 * WAD,
-            WAD / 10000, // 1bps
-            12 hours
-        );
+        ilk = "YFI-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "YFI-line-limit-failed");
 
-        // Bridge domain specific checks
-        assertEq(bridge.l2TeleportGateway(), 0x05b20d8c7b85456c07bdb8eaaeab52a6bf3770a586af6da8d3f5071ef0dcf234);
-        assertEq(bridge.starkNet(), addr.addr("STARKNET_CORE"));
+        ilk = "MANA-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MANA-line-limit-failed");
     }
-
 }
