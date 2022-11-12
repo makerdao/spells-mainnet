@@ -285,13 +285,13 @@ contract DssSpellTest is DssSpellTestBase {
         address READER = address(0);
 
         // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
+        // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
+        // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
     function testMedianizers() private { // make public to use
