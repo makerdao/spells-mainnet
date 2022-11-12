@@ -659,7 +659,7 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-        function testAutoLineGap() public {
+    function testAutoLineGap() public {
         bytes32 ilk;
         uint256 line;
 
