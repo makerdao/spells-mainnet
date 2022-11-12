@@ -282,7 +282,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testOSMs() private { // make public to use
-        address READER = address(0);
+        // address READER = address(0);
 
         // Track OSM authorizations here
         // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
