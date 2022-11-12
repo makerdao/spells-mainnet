@@ -400,7 +400,6 @@ contract DssSpellTest is DssSpellTestBase {
                 fail();
                 return;
             }
-            // We are skipping this part of the test because we need to update the chainlog without bumping the version.
 
             // Fail if the chainlog is the same size but local keys don't match the chainlog.
             for(uint256 i = 0; i < _count; i++) {
