@@ -400,7 +400,6 @@ contract DssSpellTest is DssSpellTestBase {
                 fail();
                 return;
             }
-
             // Fail if the chainlog is the same size but local keys don't match the chainlog.
             for(uint256 i = 0; i < _count; i++) {
                 (, address _val) = chainLog.get(i);
