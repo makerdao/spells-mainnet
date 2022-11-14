@@ -95,9 +95,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0),         // populate with deployed spell if deployed
-            deployed_spell_created:         0,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
-            previous_spell:                 address(0xf2BF5b5DFcaf8f22306D786F6b18ffc9d91C7641),         // supply if there is a need to test prior to its cast() function being called on-chain.
+            deployed_spell:                 address(0x16787F838D6562D7A0337ff65130b6a9a1255C77),         // populate with deployed spell if deployed
+            deployed_spell_created:         1668284243,         // use `./scripts/get-created-timestamp.sh <deployment-tx>`
+            previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
@@ -1365,8 +1365,8 @@ contract Config {
         });
         afterSpell.collaterals["RWA007-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      500 * MILLION,
-            aL_gap:       100 * MILLION,
+            aL_line:      250 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       604_800, // 1 week
             line:         0,
             dust:         0,
@@ -1754,10 +1754,10 @@ contract Config {
             lerp:         false
         });
         afterSpell.collaterals["RETH-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      5 * MILLION,
-            aL_gap:       3 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          1_50,

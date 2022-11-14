@@ -56,8 +56,25 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("XXX"),           1)
+        Payee[18] memory payees = [
+            Payee(wallets.addr("STABLENODE"),           12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),         12_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),         11_615),
+            Payee(wallets.addr("FLIPSIDE"),             11_395),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),       10_671),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),       10_390),
+            Payee(wallets.addr("JUSTINCASE"),            8_056),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),    7_545),
+            Payee(wallets.addr("ACREINVEST"),            6_682),
+            Payee(wallets.addr("GFXLABS"),               5_306),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),    5_109),
+            Payee(wallets.addr("CHRISBLEC"),             5_057),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),         2_995),
+            Payee(wallets.addr("FRONTIERRESEARCH"),      2_136),
+            Payee(wallets.addr("ONESTONE"),                271),
+            Payee(wallets.addr("CODEKNIGHT"),              270),
+            Payee(wallets.addr("LLAMA"),                   149),
+            Payee(wallets.addr("PVL"),                      65)
         ];
 
         uint256 prevBalance;
@@ -84,35 +101,36 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() public { // make private to disable
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkIlkIntegration(
-            "RETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
-            addr.addr("PIP_RETH"),
-            true, /* _isOSM */
-            true, /* _checkLiquidations */
-            false /* _transferFee */
-        );
+        // checkIlkIntegration(
+        //     "RETH-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+        //     addr.addr("PIP_RETH"),
+        //     true, /* _isOSM */
+        //     true, /* _checkLiquidations */
+        //     false /* _transferFee */
+        // );
     }
 
-    function testIlkClipper() public { // make private to disable
+    function testIlkClipper() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkIlkClipper(
-            "RETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
-            addr.addr("MCD_CLIP_CALC_RETH_A"),
-            OsmAbstract(addr.addr("PIP_RETH")),
-            20_000 * WAD
-        );
+        // // Insert new ilk clipper tests here
+        // checkIlkClipper(
+        //     "TOKEN-X",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+        //     addr.addr("MCD_CLIP_CALC_TOKEN_X"),
+        //     OsmAbstract(addr.addr("PIP_TOKEN")),
+        //     20_000 * WAD
+        // );
     }
 
     function testNewChainlogValues() private { // make private to disable
@@ -120,32 +138,11 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("RWA007_A_INPUT_CONDUIT");
-        checkChainlogKey("RWA007_A_JAR_INPUT_CONDUIT");
+        // Insert new chainlog values tests here
+        // checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        // checkChainlogKey("STARKNET_TELEPORT_FEE");
 
-        checkChainlogVersion("1.14.5");
-    }
-
-    function testRemoveChainlogValues() public { // make private to disable
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
-
-        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
+        // checkChainlogVersion("1.14.4");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -662,84 +659,83 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testTeleportFW() private { // make public to use
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    function testAutoLineGap() public {
+        bytes32 ilk;
+        uint256 line;
 
-        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
-        StarknetTeleportBridgeLike bridge = StarknetTeleportBridgeLike(addr.addr("STARKNET_TELEPORT_BRIDGE"));
+        giveAuth(address(autoLine), address(this));
 
-        // Sanity check
-        assertEq(router.numDomains(), 4);
+        // Inflate Gap and Line - MATIC-A
+        ilk = "MATIC-A";
+        (uint256 alLine, uint256 gap, uint48 ttl,,) = autoLine.ilks(ilk);
+        uint256 highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        uint256 newLine = autoLine.exec(ilk);
+         (uint256 Art, uint256 rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MATIC-gap-boost-failed");
 
-        checkTeleportFWIntegration(
-            "STA-MAIN-A",
-            "ETH-MAIN-A",
-            100_000 * WAD,
-            address(bridge),
-            addr.addr("STARKNET_TELEPORT_FEE"),
-            addr.addr("STARKNET_ESCROW"),
-            100 * WAD,
-            WAD / 10000, // 1bps
-            12 hours
-        );
+        // Inflate Gap and Line - LINK-A
+        ilk = "LINK-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "LINK-gap-boost-failed");
 
-        // Bridge domain specific checks
-        assertEq(bridge.l2TeleportGateway(), 0x05b20d8c7b85456c07bdb8eaaeab52a6bf3770a586af6da8d3f5071ef0dcf234);
-        assertEq(bridge.starkNet(), addr.addr("STARKNET_CORE"));
-    }
+        // Inflate Gap and Line - YFI-A
+        ilk = "YFI-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        // YFI had a lower line, need to inflate that too
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "YFI-gap-boost-failed");
 
-    // RWA Tests
-
-    string RWA007_OLDDOC      = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
-    string RWA007_NEWDOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
-
-    string RWA008_OLDDOC      = "QmdfzY6p5EpkYMN8wcomF2a1GsJbhkPiRQVRYSPfS4NZtB";
-    string RWA008_NEWDOC      = "QmZ4heYjptvj3ovafADJpXYMFXMyY3yQjkTXpvjFPnAKcy";
-
-    string RWA009_OLDDOC      = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
-    string RWA009_NEWDOC      = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
-
-    function testRWA007DocChange() public {
-        checkRWADocUpdate("RWA007-A", RWA007_OLDDOC, RWA007_NEWDOC);
-    }
-
-    function testRWA008DocChange() public {
-        checkRWADocUpdate("RWA008-A", RWA008_OLDDOC, RWA008_NEWDOC);
-    }
-
-    function testRWA009DocChange() public {
-        checkRWADocUpdate("RWA009-A", RWA009_OLDDOC, RWA009_NEWDOC);
-    }
-
-    function testRWA007OralcePriceBump() public {
-        (, address pip, , ) = liquidationOracle.ilks("RWA007-A");
-        (,,uint256 spot,,) = vat.ilks("RWA007-A");
-
-        assertEq(uint256(DSValueAbstract(pip).read()), 250 * MILLION * WAD, "RWA007: Bad initial PIP value");
-        assertEq(spot, 250 * MILLION * RAY, "RWA007: Bad initial spot value");
+        // Inflate Gap and Line - MANA-A
+        ilk = "MANA-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MANA-gap-boost-failed");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        (,,uint256 spotAfter,,) = vat.ilks("RWA007-A");
+        ilk = "MATIC-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MATIC-line-limit-failed");
 
-        assertEq(uint256(DSValueAbstract(pip).read()), 500 * MILLION * WAD, "RWA007: Bad PIP value after bump()");
-        assertEq(spotAfter, 500 * MILLION * RAY, "RWA007: Bad spot value after bump()");
-    }
+        ilk = "LINK-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "LINK-line-limit-failed");
 
-    // CHANGELOG Houskeeping
-    function testChangelogHousekeeping() public {
-        address rwa007inUrn = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN");
-        address rwa007inJar = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR");
+        ilk = "YFI-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "YFI-line-limit-failed");
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(chainLog.getAddress("RWA007_A_INPUT_CONDUIT"), rwa007inUrn);
-        assertEq(chainLog.getAddress("RWA007_A_JAR_INPUT_CONDUIT"), rwa007inJar);
+        ilk = "MANA-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MANA-line-limit-failed");
     }
 }
