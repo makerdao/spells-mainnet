@@ -269,6 +269,10 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         }
     }
 
+    function cmpStr(string memory a, string memory b) internal pure returns (bool) {
+         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+    
     function concat(string memory a, string memory b) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b));
     }
