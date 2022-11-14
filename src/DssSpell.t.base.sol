@@ -164,7 +164,7 @@ interface StarknetTeleportBridgeLike {
 }
 
 interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory, address, uint48, uint48);
+    function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
 }
 
 contract DssSpellTestBase is Config, DSTest, DSMath {
@@ -272,7 +272,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     function cmpStr(string memory a, string memory b) internal pure returns (bool) {
          return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
-    
+
     function concat(string memory a, string memory b) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b));
     }

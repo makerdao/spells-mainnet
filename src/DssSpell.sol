@@ -22,7 +22,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 interface RwaLiquidationLike {
-    function ilks(bytes32) external returns (string memory, address, uint48, uint48);
+    function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
     function bump(bytes32 ilk, uint256 val) external;
 }
