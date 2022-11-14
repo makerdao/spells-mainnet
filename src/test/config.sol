@@ -1365,8 +1365,8 @@ contract Config {
         });
         afterSpell.collaterals["RWA007-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      250 * MILLION,
-            aL_gap:       50 * MILLION,
+            aL_line:      500 * MILLION,
+            aL_gap:       100 * MILLION,
             aL_ttl:       604_800, // 1 week
             line:         0,
             dust:         0,
@@ -1754,10 +1754,10 @@ contract Config {
             lerp:         false
         });
         afterSpell.collaterals["RETH-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       3 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          1_50,
