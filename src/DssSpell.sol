@@ -34,10 +34,10 @@ interface ChainlogLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/172ffd2b2d87db1fd0e40b2eeae4b45f1dcb8964/governance/votes/Executive%20vote%20-%20November%2012%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d8c711404e9e17db24b611aa03d45507c1993148/governance/votes/Executive%20vote%20-%20November%2016%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-YY-XX MakerDAO Executive Spell | Hash: ";
+        "2022-11-16 MakerDAO Executive Spell | Hash: 0xf3023b0a9b3c423edf28bf4cdbd61d287ab29265d462a5fae0378227c153ea7b";
 
 
     // Turn office hours off

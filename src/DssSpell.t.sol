@@ -49,6 +49,28 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
+    function testRemoveChainlogValues() public { // make private to disable
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
+
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
+    }
+
     struct Payee {
         address addr;
         uint256 amount;
@@ -116,7 +138,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
             addr.addr("MCD_CLIP_CALC_RETH_A"),
             OsmAbstract(addr.addr("PIP_RETH")),
-            2400 * WAD
+            500 * WAD
         );
     }
 
@@ -129,28 +151,6 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogKey("RWA007_A_JAR_INPUT_CONDUIT");
 
         checkChainlogVersion("1.14.5");
-    }
-
-    function testRemoveChainlogValues() public { // make private to disable
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
-
-        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -665,34 +665,6 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
-    }
-
-    function testTeleportFW() private { // make public to use
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        TeleportRouterLike router = TeleportRouterLike(addr.addr("MCD_ROUTER_TELEPORT_FW_A"));
-        StarknetTeleportBridgeLike bridge = StarknetTeleportBridgeLike(addr.addr("STARKNET_TELEPORT_BRIDGE"));
-
-        // Sanity check
-        assertEq(router.numDomains(), 4);
-
-        checkTeleportFWIntegration(
-            "STA-MAIN-A",
-            "ETH-MAIN-A",
-            100_000 * WAD,
-            address(bridge),
-            addr.addr("STARKNET_TELEPORT_FEE"),
-            addr.addr("STARKNET_ESCROW"),
-            100 * WAD,
-            WAD / 10000, // 1bps
-            12 hours
-        );
-
-        // Bridge domain specific checks
-        assertEq(bridge.l2TeleportGateway(), 0x05b20d8c7b85456c07bdb8eaaeab52a6bf3770a586af6da8d3f5071ef0dcf234);
-        assertEq(bridge.starkNet(), addr.addr("STARKNET_CORE"));
     }
 
     // RWA Tests
