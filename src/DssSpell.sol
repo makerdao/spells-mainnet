@@ -40,9 +40,9 @@ contract DssSpellAction is DssAction {
         "2022-11-16 MakerDAO Executive Spell | Hash: 0xf3023b0a9b3c423edf28bf4cdbd61d287ab29265d462a5fae0378227c153ea7b";
 
 
-    // Turn office hours off
+    // Turn office hours on
     function officeHours() public override returns (bool) {
-        return false;
+        return true;
     }
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -59,14 +59,14 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant SEVEN_PT_FIVE_PERCENT_RATE = 1000000002293273137447730714;
 
     // --- Math ---
-    uint256 constant WAD            = 10 ** 18;
-    uint256 constant MILLION        = 10 ** 6;
+    uint256 constant internal WAD     = 10 ** 18;
+    uint256 constant internal MILLION = 10 ** 6;
 
-    address immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
     function _updateDoc(bytes32 ilk, string memory doc) internal {
         ( , address pip, uint48 tau, ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
-        require(pip != address(0), "DssSpell/unexisting-rwa-ilk");
+        require(pip != address(0), "DssSpell/nonexistent-rwa-ilk");
 
         // Init the RwaLiquidationOracle to reset the doc
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
@@ -89,7 +89,7 @@ contract DssSpellAction is DssAction {
         _updateDoc("RWA009-A", "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT");
 
         // RWA007-A autoline changes:
-        // - bump oralce price to 500m
+        // - bump oracle price to 500m
         // - increase DC to 500m
         // - increase autoline `gap` to 100m
         //

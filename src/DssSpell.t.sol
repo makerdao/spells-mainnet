@@ -669,28 +669,28 @@ contract DssSpellTest is DssSpellTestBase {
 
     // RWA Tests
 
-    string RWA007_OLDDOC      = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
-    string RWA007_NEWDOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
+    string OLD_RWA007_DOC      = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
+    string NEW_RWA007_DOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
 
-    string RWA008_OLDDOC      = "QmdfzY6p5EpkYMN8wcomF2a1GsJbhkPiRQVRYSPfS4NZtB";
-    string RWA008_NEWDOC      = "QmZ4heYjptvj3ovafADJpXYMFXMyY3yQjkTXpvjFPnAKcy";
+    string OLD_RWA008_DOC      = "QmdfzY6p5EpkYMN8wcomF2a1GsJbhkPiRQVRYSPfS4NZtB";
+    string NEW_RWA008_DOC      = "QmZ4heYjptvj3ovafADJpXYMFXMyY3yQjkTXpvjFPnAKcy";
 
-    string RWA009_OLDDOC      = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
-    string RWA009_NEWDOC      = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
+    string OLD_RWA009_DOC      = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
+    string NEW_RWA009_DOC      = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
 
     function testRWA007DocChange() public {
-        checkRWADocUpdate("RWA007-A", RWA007_OLDDOC, RWA007_NEWDOC);
+        checkRWADocUpdate("RWA007-A", OLD_RWA007_DOC, NEW_RWA007_DOC);
     }
 
     function testRWA008DocChange() public {
-        checkRWADocUpdate("RWA008-A", RWA008_OLDDOC, RWA008_NEWDOC);
+        checkRWADocUpdate("RWA008-A", OLD_RWA008_DOC, NEW_RWA008_DOC);
     }
 
     function testRWA009DocChange() public {
-        checkRWADocUpdate("RWA009-A", RWA009_OLDDOC, RWA009_NEWDOC);
+        checkRWADocUpdate("RWA009-A", OLD_RWA009_DOC, NEW_RWA009_DOC);
     }
 
-    function testRWA007OralcePriceBump() public {
+    function testRWA007OraclePriceBump() public {
         (, address pip, , ) = liquidationOracle.ilks("RWA007-A");
         (,,uint256 spot,,) = vat.ilks("RWA007-A");
 
