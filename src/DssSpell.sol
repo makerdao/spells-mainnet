@@ -21,6 +21,10 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface OracleLike {
+    function lift(address[] calldata) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -32,6 +36,9 @@ contract DssSpellAction is DssAction {
     address constant internal MCD_CLIP_CALC_GUSD_A = 0xC287E4e9017259f3b21C86A0Ef7840243eC3f4d6;
     address constant internal MCD_CLIP_CALC_USDC_A = 0x00A0F90666c6Cd3E615cF8459A47e89A08817602;
     address constant internal MCD_CLIP_CALC_PAXUSD_A = 0xA2a4aeFEd398661B0a873d3782DA121c194a0201;
+
+    address constant internal RETH_ORACLE = 0xF86360f0127f8A441Cfca332c75992D1C692b3D1;
+    address constant internal RETH_LIGHTFEED = 0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -148,6 +155,9 @@ contract DssSpellAction is DssAction {
 
         // ----------------- Whitelist Light Feed on Oracle for rETH -----------------
         // https://forum.makerdao.com/t/whitelist-light-feed-for-reth-oracle/18908
+        address[] memory lightFeeds = new address[](1);
+        lightFeeds[0] = RETH_LIGHTFEED;
+        OracleLike(RETH_ORACLE).lift(lightFeeds);
 
         // ------------------ Setup new Starknet Governance Relay -----------------
 
