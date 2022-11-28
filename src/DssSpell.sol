@@ -39,6 +39,20 @@ interface D3MOracleLike {
     function file(bytes32, address) external;
 }
 
+interface VatLike {
+    function rely(address) external;
+    function Line() external view returns (uint256);
+    function init(bytes32) external;
+    function file(bytes32, uint256) external;
+    function file(bytes32, bytes32, uint256) external;
+}
+
+interface SpotLike {
+    function file(bytes32, bytes32, address) external;
+    function file(bytes32, bytes32, uint256) external;
+    function poke(bytes32) external;
+}
+
 interface StarknetGovRelayLike {
     function relay(uint256 spell) external;
 }
@@ -58,6 +72,9 @@ contract DssSpellAction is DssAction {
 
     string public constant override description =
         "2022-11-30 MakerDAO Executive Spell | Hash: TODO";
+
+    uint256 constant internal RAY = 10 ** 27;
+    uint256 constant internal RAD = 10 ** 45;
 
     address constant internal D3M_HUB = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
     address constant internal D3M_MOM = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
@@ -93,8 +110,10 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmWYfgY2#poll-detail
         {
             bytes32 _ilk = bytes32("DIRECT-COMPV2-DAI");
-            VatAbstract vat = DssExecLib.vat();
-            SpotAbstract spot = DssExecLib.spotter();
+            VatLike vat = VatLike(DssExecLib.vat());
+            SpotLike spot = SpotLike(DssExecLib.spotter());
+            address vow = DssExecLib.vow();
+            address end = DssExecLib.end();
 
             D3MCompoundPoolLike(D3M_COMPOUND_POOL).rely(D3M_HUB);
 
@@ -103,12 +122,12 @@ contract DssSpellAction is DssAction {
             D3MHubLike(D3M_HUB).file(_ilk, "tau", 7 days);
 
             D3MHubLike(D3M_HUB).file("vow", vow);
-            D3MHubLike(D3M_HUB).file("end", address(end));
+            D3MHubLike(D3M_HUB).file("end", end);
 
             D3MCompoundPlanLike(D3M_COMPOUND_PLAN).rely(D3M_MOM);
 
             D3MOracleLike(D3M_ORACLE).file("hub", D3M_HUB);
-            spot.file(_ilk, "pip", address(pip));
+            spot.file(_ilk, "pip", D3M_ORACLE);
             spot.file(_ilk, "mat", RAY);
             spot.poke(_ilk);
 
