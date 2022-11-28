@@ -21,8 +21,16 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface OracleLike {
+interface StarknetGovRelayLike {
+    function relay(uint256 spell) external;
+}
+
+interface OracleLiftLike {
     function lift(address[] calldata) external;
+}
+
+interface TokenLike {
+    function transfer(address, uint256) external returns (bool);
 }
 
 contract DssSpellAction is DssAction {
@@ -40,6 +48,12 @@ contract DssSpellAction is DssAction {
     address constant internal RETH_ORACLE = 0xF86360f0127f8A441Cfca332c75992D1C692b3D1;
     address constant internal RETH_LIGHTFEED = 0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e;
 
+    address immutable internal STARKNET_GOV_RELAY = DssExecLib.getChangelogAddress("STARKNET_GOV_RELAY");
+    address constant internal NEW_STARKNET_GOV_RELAY = 0x2385C60D2756Ed8CA001817fC37FDa216d7466c0;
+    uint256 constant internal L2_GOV_RELAY_SPELL = 0x013c117c7bdb9dbbb45813fd6de8e301bbceed2cfad7c4c589cafa4478104672;
+
+    address constant internal DUX_WALLET = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -55,7 +69,8 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmWYfgY2#poll-detail
 
         // ----------------- Offboard GUSD-A, USDC-A and USDP-A -----------------
-        // https://vote.makerdao.com/polling/QmZbsHqu#poll-detail
+        // Poll: https://vote.makerdao.com/polling/QmZbsHqu#poll-detail
+        // Forum: https://forum.makerdao.com/t/usdc-a-usdp-a-gusd-a-liquidation-parameters-auctions-activation/18744
         {
             bytes32 _ilk  = bytes32("GUSD-A");
             address _clip = DssExecLib.getChangelogAddress("MCD_CLIP_GUSD_A");
@@ -70,23 +85,20 @@ contract DssSpellAction is DssAction {
             DssExecLib.setContract(_clip, "calc", MCD_CLIP_CALC_GUSD_A);
             // Set Liquidation Penalty to 0
             DssExecLib.setIlkLiquidationPenalty(_ilk, 0);
-            // Set Liquidation Ratio to 150%
-            DssExecLib.setIlkLiquidationRatio(_ilk, 15000);
             // Set Auction Price Multiplier (buf) to 1
-            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 10000);
+            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 100_00);
             // Set Local Liquidation Limit (ilk.hole) to 300k DAI
             DssExecLib.setIlkMaxLiquidationAmount(_ilk, 300_000);
             // Set tau for Abacus/LinearDecrease to 4,320,000 second
             DssExecLib.setLinearDecrease(MCD_CLIP_CALC_GUSD_A, 4_320_000);
             // Set Max Auction Duration (tail) to 43,200 seconds
             DssExecLib.setAuctionTimeBeforeReset(_ilk, 43_200);
-            DssExecLib.setAuctionPermittedDrop(_ilk, 9900);
+            // Set Max Auction Drawdown / Permitted Drop (cusp) to 0.99
+            DssExecLib.setAuctionPermittedDrop(_ilk, 99_00);
             // Set Proportional Kick Incentive (chip) to 0
             DssExecLib.setKeeperIncentivePercent(_ilk, 0);
-            // Set Flat Kick Incentive (tip) to 500
+            // Set Flat Kick Incentive (tip) to 0
             DssExecLib.setKeeperIncentiveFlatRate(_ilk, 0);
-            // Update spotter price
-            DssExecLib.updateCollateralPrice(_ilk);
         }
         {
             bytes32 _ilk  = bytes32("USDC-A");
@@ -102,23 +114,20 @@ contract DssSpellAction is DssAction {
             DssExecLib.setContract(_clip, "calc", MCD_CLIP_CALC_USDC_A);
             // Set Liquidation Penalty to 0
             DssExecLib.setIlkLiquidationPenalty(_ilk, 0);
-            // Set Liquidation Ratio to 150%
-            DssExecLib.setIlkLiquidationRatio(_ilk, 15000);
             // Set Auction Price Multiplier (buf) to 1
-            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 10000);
+            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 100_00);
             // Set Local Liquidation Limit (ilk.hole) to 20m DAI
             DssExecLib.setIlkMaxLiquidationAmount(_ilk, 20_000_000);
             // Set tau for Abacus/LinearDecrease to 4,320,000 second
             DssExecLib.setLinearDecrease(MCD_CLIP_CALC_USDC_A, 4_320_000);
             // Set Max Auction Duration (tail) to 43,200 seconds
             DssExecLib.setAuctionTimeBeforeReset(_ilk, 43_200);
-            DssExecLib.setAuctionPermittedDrop(_ilk, 9900);
+            // Set Max Auction Drawdown / Permitted Drop (cusp) to 0.99
+            DssExecLib.setAuctionPermittedDrop(_ilk, 99_00);
             // Set Proportional Kick Incentive (chip) to 0
             DssExecLib.setKeeperIncentivePercent(_ilk, 0);
-            // Set Flat Kick Incentive (tip) to 500
+            // Set Flat Kick Incentive (tip) to 0
             DssExecLib.setKeeperIncentiveFlatRate(_ilk, 0);
-            // Update spotter price
-            DssExecLib.updateCollateralPrice(_ilk);
         }
         {
             bytes32 _ilk  = bytes32("PAXUSD-A");
@@ -134,42 +143,40 @@ contract DssSpellAction is DssAction {
             DssExecLib.setContract(_clip, "calc", MCD_CLIP_CALC_PAXUSD_A);
             // Set Liquidation Penalty to 0
             DssExecLib.setIlkLiquidationPenalty(_ilk, 0);
-            // Set Liquidation Ratio to 150%
-            DssExecLib.setIlkLiquidationRatio(_ilk, 15000);
             // Set Auction Price Multiplier (buf) to 1
-            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 10000);
+            DssExecLib.setStartingPriceMultiplicativeFactor(_ilk, 100_00);
             // Set Local Liquidation Limit (ilk.hole) to 3m DAI
             DssExecLib.setIlkMaxLiquidationAmount(_ilk, 3_000_000);
             // Set tau for Abacus/LinearDecrease to 4,320,000 second
             DssExecLib.setLinearDecrease(MCD_CLIP_CALC_PAXUSD_A, 4_320_000);
             // Set Max Auction Duration (tail) to 43,200 seconds
             DssExecLib.setAuctionTimeBeforeReset(_ilk, 43_200);
-            DssExecLib.setAuctionPermittedDrop(_ilk, 9900);
+            // Set Max Auction Drawdown / Permitted Drop (cusp) to 0.99
+            DssExecLib.setAuctionPermittedDrop(_ilk, 99_00);
             // Set Proportional Kick Incentive (chip) to 0
             DssExecLib.setKeeperIncentivePercent(_ilk, 0);
-            // Set Flat Kick Incentive (tip) to 500
+            // Set Flat Kick Incentive (tip) to 0
             DssExecLib.setKeeperIncentiveFlatRate(_ilk, 0);
-            // Update spotter price
-            DssExecLib.updateCollateralPrice(_ilk);
         }
 
         // ----------------- Whitelist Light Feed on Oracle for rETH -----------------
         // https://forum.makerdao.com/t/whitelist-light-feed-for-reth-oracle/18908
         address[] memory lightFeeds = new address[](1);
         lightFeeds[0] = RETH_LIGHTFEED;
-        OracleLike(RETH_ORACLE).lift(lightFeeds);
+        OracleLiftLike(RETH_ORACLE).lift(lightFeeds);
 
         // ------------------ Setup new Starknet Governance Relay -----------------
 
         // Relay l2 part of the spell
-        //StarknetGovRelayLike(STARKNET_GOV_RELAY).relay(L2_GOV_RELAY_SPELL);
+        // https://voyager.online/contract/0x013c117c7bdb9dbbb45813fd6de8e301bbceed2cfad7c4c589cafa4478104672#code
+        StarknetGovRelayLike(STARKNET_GOV_RELAY).relay(L2_GOV_RELAY_SPELL);
 
-        // ----------------- MKR Transfers -----------------
-        // TODO
+        // ----------------- MKR Transfer -----------------
+        TokenLike(DssExecLib.mkr()).transfer(DUX_WALLET, 180.6 ether);
 
         // Configure Chainlog
-        //DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY_LEGACY", STARKNET_GOV_RELAY);
-        //DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY", NEW_STARKNET_GOV_RELAY);
+        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY_LEGACY", STARKNET_GOV_RELAY);
+        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY", NEW_STARKNET_GOV_RELAY);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUSD_A", MCD_CLIP_CALC_GUSD_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_USDC_A", MCD_CLIP_CALC_USDC_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_PAXUSD_A", MCD_CLIP_CALC_PAXUSD_A);

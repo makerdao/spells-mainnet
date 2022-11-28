@@ -18,11 +18,6 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface RwaUrnLike {
-    function hope(address) external;
-    function draw(uint256) external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -111,7 +106,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() public { // make private to disable
+    function testCollateralIntegrations() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -133,12 +128,28 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         checkIlkClipper(
-            "RETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
-            addr.addr("MCD_CLIP_CALC_RETH_A"),
-            OsmAbstract(addr.addr("PIP_RETH")),
-            500 * WAD
+            "GUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GUSD_A")),
+            addr.addr("MCD_CLIP_CALC_GUSD_A"),
+            OsmAbstract(addr.addr("PIP_GUSD")),
+            16000 * WAD
+        );
+        checkIlkClipper(
+            "USDC-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_USDC_A")),
+            addr.addr("MCD_CLIP_CALC_USDC_A"),
+            OsmAbstract(addr.addr("PIP_USDC")),
+            16000 * WAD
+        );
+        checkIlkClipper(
+            "PAXUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_PAXUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PAXUSD_A")),
+            addr.addr("MCD_CLIP_CALC_PAXUSD_A"),
+            OsmAbstract(addr.addr("PIP_PAXUSD")),
+            16000 * WAD
         );
     }
 
@@ -147,10 +158,13 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("RWA007_A_INPUT_CONDUIT");
-        checkChainlogKey("RWA007_A_JAR_INPUT_CONDUIT");
+        checkChainlogKey("STARKNET_GOV_RELAY_LEGACY");
+        checkChainlogKey("STARKNET_GOV_RELAY");
+        checkChainlogKey("MCD_CLIP_CALC_GUSD_A");
+        checkChainlogKey("MCD_CLIP_CALC_USDC_A");
+        checkChainlogKey("MCD_CLIP_CALC_PAXUSD_A");
 
-        checkChainlogVersion("1.14.5");
+        checkChainlogVersion("1.14.6");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -302,15 +316,15 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() private { // make public to use
+    function testMedianizers() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // // Track Median authorizations here
-        // address PIP     = addr.addr("PIP_XXX");
-        // address MEDIAN  = OsmAbstract(PIP).src();
-        // assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
+        // Track Median authorizations here
+        address PIP     = addr.addr("PIP_RETH");
+        address MEDIAN  = OsmAbstract(PIP).src();
+        assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
     }
 
     function test_auth() public {
@@ -629,23 +643,20 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
-    function testMKRPayments() private { // make public to use
-        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        // uint256 prevMkrSH    = gov.balanceOf(wallets.addr("SH_MULTISIG"));
-        // uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
+    function testMKRPayments() public { // make private to disable
+        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrDUX    = gov.balanceOf(wallets.addr("DUX_WALLET"));
 
-        // uint256 amountSH     =  26.04 ether;
-        // uint256 amountRWF    = 143.46 ether;
+        uint256 amountDUX = 180.6 ether;
 
-        // uint256 total        = 169.50 ether;
+        uint256 total     = 180.6 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        // assertEq(gov.balanceOf(wallets.addr("SH_MULTISIG")), prevMkrSH + amountSH);
-        // assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")), prevMkrDUX + amountDUX);
     }
 
     function testMKRVestFix() private { // make public to use
@@ -665,71 +676,5 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
-    }
-
-    // RWA Tests
-
-    string OLD_RWA007_DOC      = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
-    string NEW_RWA007_DOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
-
-    string OLD_RWA008_DOC      = "QmdfzY6p5EpkYMN8wcomF2a1GsJbhkPiRQVRYSPfS4NZtB";
-    string NEW_RWA008_DOC      = "QmZ4heYjptvj3ovafADJpXYMFXMyY3yQjkTXpvjFPnAKcy";
-
-    string OLD_RWA009_DOC      = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
-    string NEW_RWA009_DOC      = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
-
-    function testRWA007DocChange() public {
-        checkRWADocUpdate("RWA007-A", OLD_RWA007_DOC, NEW_RWA007_DOC);
-    }
-
-    function testRWA008DocChange() public {
-        checkRWADocUpdate("RWA008-A", OLD_RWA008_DOC, NEW_RWA008_DOC);
-    }
-
-    function testRWA009DocChange() public {
-        checkRWADocUpdate("RWA009-A", OLD_RWA009_DOC, NEW_RWA009_DOC);
-    }
-
-    function testRWA007OraclePriceBump() public {
-        (, address pip, , ) = liquidationOracle.ilks("RWA007-A");
-        (,,uint256 spot,,) = vat.ilks("RWA007-A");
-
-        assertEq(uint256(DSValueAbstract(pip).read()), 250 * MILLION * WAD, "RWA007: Bad initial PIP value");
-        assertEq(spot, 250 * MILLION * RAY, "RWA007: Bad initial spot value");
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
-
-        assertEq(uint256(DSValueAbstract(pip).read()), 500 * MILLION * WAD, "RWA007: Bad PIP value after bump()");
-        assertEq(spotAfter, 500 * MILLION * RAY, "RWA007: Bad spot value after bump()");
-
-        // Test that a draw can be performed.
-        address urn = addr.addr("RWA007_A_URN");
-        giveAuth(urn, address(this));
-        RwaUrnLike(urn).hope(address(this));  // become operator
-        uint256 room = sub(line, mul(Art, rate));
-        uint256 drawAmt = room / RAY;
-        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
-            drawAmt = sub(room, rate) / RAY;
-        }
-        RwaUrnLike(urn).draw(drawAmt);
-        (Art,,,,) = vat.ilks("RWA007-A");
-        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
-    }
-
-    // CHANGELOG Houskeeping
-    function testChangelogHousekeeping() public {
-        address rwa007inUrn = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN");
-        address rwa007inJar = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR");
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(chainLog.getAddress("RWA007_A_INPUT_CONDUIT"), rwa007inUrn);
-        assertEq(chainLog.getAddress("RWA007_A_JAR_INPUT_CONDUIT"), rwa007inJar);
     }
 }
