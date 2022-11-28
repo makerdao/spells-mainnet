@@ -21,6 +21,24 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface D3MHubLike {
+    function file(bytes32, address) external;
+    function file(bytes32, bytes32, address) external;
+    function file(bytes32, bytes32, uint256) external;
+}
+
+interface D3MCompoundPoolLike {
+    function rely(address) external;
+}
+
+interface D3MCompoundPlanLike {
+    function rely(address) external;
+}
+
+interface D3MOracleLike {
+    function file(bytes32, address) external;
+}
+
 interface StarknetGovRelayLike {
     function relay(uint256 spell) external;
 }
@@ -40,6 +58,12 @@ contract DssSpellAction is DssAction {
 
     string public constant override description =
         "2022-11-30 MakerDAO Executive Spell | Hash: TODO";
+
+    address constant internal D3M_HUB = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
+    address constant internal D3M_MOM = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
+    address constant internal D3M_COMPOUND_POOL = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
+    address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
+    address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
 
     address constant internal MCD_CLIP_CALC_GUSD_A = 0xC287E4e9017259f3b21C86A0Ef7840243eC3f4d6;
     address constant internal MCD_CLIP_CALC_USDC_A = 0x00A0F90666c6Cd3E615cF8459A47e89A08817602;
@@ -67,6 +91,32 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ----------------- Compound v2 D3M Onboarding -----------------
         // https://vote.makerdao.com/polling/QmWYfgY2#poll-detail
+        {
+            bytes32 _ilk = bytes32("DIRECT-COMPV2-DAI");
+            VatAbstract vat = DssExecLib.vat();
+            SpotAbstract spot = DssExecLib.spotter();
+
+            D3MCompoundPoolLike(D3M_COMPOUND_POOL).rely(D3M_HUB);
+
+            D3MHubLike(D3M_HUB).file(_ilk, "pool", D3M_COMPOUND_POOL);
+            D3MHubLike(D3M_HUB).file(_ilk, "plan", D3M_COMPOUND_PLAN);
+            D3MHubLike(D3M_HUB).file(_ilk, "tau", 7 days);
+
+            D3MHubLike(D3M_HUB).file("vow", vow);
+            D3MHubLike(D3M_HUB).file("end", address(end));
+
+            D3MCompoundPlanLike(D3M_COMPOUND_PLAN).rely(D3M_MOM);
+
+            D3MOracleLike(D3M_ORACLE).file("hub", D3M_HUB);
+            spot.file(_ilk, "pip", address(pip));
+            spot.file(_ilk, "mat", RAY);
+            spot.poke(_ilk);
+
+            vat.rely(D3M_HUB);
+            vat.init(_ilk);
+            vat.file(_ilk, "line", 5_000_000 * RAD);
+            vat.file("Line", vat.Line() + 5_000_000 * RAD);
+        }
 
         // ----------------- Offboard GUSD-A, USDC-A and USDP-A -----------------
         // Poll: https://vote.makerdao.com/polling/QmZbsHqu#poll-detail
@@ -166,9 +216,9 @@ contract DssSpellAction is DssAction {
         OracleLiftLike(RETH_ORACLE).lift(lightFeeds);
 
         // ------------------ Setup new Starknet Governance Relay -----------------
-
+        // Forum: https://forum.makerdao.com/t/starknet-changes-for-executive-spell-on-the-week-of-2022-11-29/18818
         // Relay l2 part of the spell
-        // https://voyager.online/contract/0x013c117c7bdb9dbbb45813fd6de8e301bbceed2cfad7c4c589cafa4478104672#code
+        // L2 Spell: https://voyager.online/contract/0x013c117c7bdb9dbbb45813fd6de8e301bbceed2cfad7c4c589cafa4478104672#code
         StarknetGovRelayLike(STARKNET_GOV_RELAY).relay(L2_GOV_RELAY_SPELL);
 
         // ----------------- MKR Transfer -----------------
