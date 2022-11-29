@@ -286,9 +286,13 @@ contract DssSpellAction is DssAction {
         TokenLike(DssExecLib.mkr()).transfer(DUX_WALLET, 180.6 ether);
 
         // Configure Chainlog
-        DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_COMPV2_DAI", D3M_HUB);
+        DssExecLib.setChangelogAddress("DIRECT_HUB", D3M_HUB);
         DssExecLib.setChangelogAddress("DIRECT_MOM", D3M_MOM);
         DssExecLib.setChangelogAddress("DIRECT_MOM_LEGACY", D3M_MOM_LEGACY);
+
+        DssExecLib.setChangelogAddress("DIRECT_COMPV2_DAI_POOL", D3M_COMPOUND_POOL);
+        DssExecLib.setChangelogAddress("DIRECT_COMPV2_DAI_PLAN", D3M_COMPOUND_PLAN);
+        DssExecLib.setChangelogAddress("DIRECT_COMPV2_DAI_ORACLE", D3M_ORACLE);
 
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUSD_A", MCD_CLIP_CALC_GUSD_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_USDC_A", MCD_CLIP_CALC_USDC_A);

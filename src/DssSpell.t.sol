@@ -197,9 +197,13 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("MCD_JOIN_DIRECT_COMPV2_DAI");
+        checkChainlogKey("DIRECT_HUB");
         checkChainlogKey("DIRECT_MOM");
         checkChainlogKey("DIRECT_MOM_LEGACY");
+
+        checkChainlogKey("DIRECT_COMPV2_DAI_POOL");
+        checkChainlogKey("DIRECT_COMPV2_DAI_PLAN");
+        checkChainlogKey("DIRECT_COMPV2_DAI_ORACLE");
 
         checkChainlogKey("MCD_CLIP_CALC_GUSD_A");
         checkChainlogKey("MCD_CLIP_CALC_USDC_A");
@@ -720,5 +724,9 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+    }
+
+    function testDirectCompV2Integration() public {
+        
     }
 }

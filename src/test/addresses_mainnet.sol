@@ -62,8 +62,6 @@ contract Addresses {
         addr["OSM_MOM"]                         = 0x76416A4d5190d071bfed309861527431304aA14f;
         addr["FLIPPER_MOM"]                     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]                     = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
-        addr["DIRECT_MOM"]                      = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
-        addr["DIRECT_MOM_LEGACY"]               = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
         addr["MCD_VEST_DAI"]                    = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
@@ -409,6 +407,11 @@ contract Addresses {
         addr["MCD_JOIN_RETH_A"]                 = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
         addr["MCD_CLIP_RETH_A"]                 = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
         addr["MCD_CLIP_CALC_RETH_A"]            = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
-        addr["MCD_JOIN_DIRECT_COMPV2_DAI"]      = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
+        addr["DIRECT_HUB"]                      = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
+        addr["DIRECT_MOM"]                      = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
+        addr["DIRECT_MOM_LEGACY"]               = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
+        addr["DIRECT_COMPV2_DAI_POOL"]          = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
+        addr["DIRECT_COMPV2_DAI_PLAN"]          = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
+        addr["DIRECT_COMPV2_DAI_ORACLE"]        = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
     }
 }
