@@ -197,11 +197,16 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("STARKNET_GOV_RELAY_LEGACY");
-        checkChainlogKey("STARKNET_GOV_RELAY");
+        checkChainlogKey("MCD_JOIN_DIRECT_COMPV2_DAI");
+        checkChainlogKey("DIRECT_MOM");
+        checkChainlogKey("DIRECT_MOM_LEGACY");
+
         checkChainlogKey("MCD_CLIP_CALC_GUSD_A");
         checkChainlogKey("MCD_CLIP_CALC_USDC_A");
         checkChainlogKey("MCD_CLIP_CALC_PAXUSD_A");
+
+        checkChainlogKey("STARKNET_GOV_RELAY_LEGACY");
+        checkChainlogKey("STARKNET_GOV_RELAY");
 
         checkChainlogVersion("1.14.6");
     }

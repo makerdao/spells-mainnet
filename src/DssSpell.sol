@@ -85,6 +85,7 @@ contract DssSpellAction is DssAction {
 
     address constant internal D3M_HUB = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
     address constant internal D3M_MOM = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
+    address constant internal D3M_MOM_LEGACY = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
     address constant internal D3M_COMPOUND_POOL = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
     address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
     address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
@@ -285,11 +286,16 @@ contract DssSpellAction is DssAction {
         TokenLike(DssExecLib.mkr()).transfer(DUX_WALLET, 180.6 ether);
 
         // Configure Chainlog
-        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY_LEGACY", STARKNET_GOV_RELAY);
-        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY", NEW_STARKNET_GOV_RELAY);
+        DssExecLib.setChangelogAddress("MCD_JOIN_DIRECT_COMPV2_DAI", D3M_HUB);
+        DssExecLib.setChangelogAddress("DIRECT_MOM", D3M_MOM);
+        DssExecLib.setChangelogAddress("DIRECT_MOM_LEGACY", D3M_MOM_LEGACY);
+
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GUSD_A", MCD_CLIP_CALC_GUSD_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_USDC_A", MCD_CLIP_CALC_USDC_A);
         DssExecLib.setChangelogAddress("MCD_CLIP_CALC_PAXUSD_A", MCD_CLIP_CALC_PAXUSD_A);
+
+        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY_LEGACY", STARKNET_GOV_RELAY);
+        DssExecLib.setChangelogAddress("STARKNET_GOV_RELAY", NEW_STARKNET_GOV_RELAY);
 
         DssExecLib.setChangelogVersion("1.14.6");
     }
