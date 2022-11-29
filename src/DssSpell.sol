@@ -127,18 +127,14 @@ contract DssSpellAction is DssAction {
         {
             VatAbstract vat = VatAbstract(DssExecLib.vat());
             SpotAbstract spot = SpotAbstract(DssExecLib.spotter());
-            address daiJoin = DssExecLib.daiJoin();
-            address dai = DssExecLib.dai();
-            address vow = DssExecLib.vow();
-            address end = DssExecLib.end();
 
             // Sanity checks
             require(D3MHubLike(D3M_HUB).vat() == address(vat), "Hub vat mismatch");
-            require(D3MHubLike(D3M_HUB).daiJoin() == daiJoin, "Hub daiJoin mismatch");
+            require(D3MHubLike(D3M_HUB).daiJoin() == DssExecLib.daiJoin(), "Hub daiJoin mismatch");
 
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).ilk() == ILK, "Pool ilk mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).vat() == address(vat), "Pool vat mismatch");
-            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).dai() == dai, "Pool dai mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).dai() == DssExecLib.dai(), "Pool dai mismatch");
 
             require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
             require(D3MOracleLike(D3M_ORACLE).ilk() == ILK, "Oracle ilk mismatch");
@@ -146,8 +142,8 @@ contract DssSpellAction is DssAction {
             D3MHubLike(D3M_HUB).file(ILK, "pool", D3M_COMPOUND_POOL);
             D3MHubLike(D3M_HUB).file(ILK, "plan", D3M_COMPOUND_PLAN);
             D3MHubLike(D3M_HUB).file(ILK, "tau", 7 days);
-            D3MHubLike(D3M_HUB).file("vow", vow);
-            D3MHubLike(D3M_HUB).file("end", end);
+            D3MHubLike(D3M_HUB).file("vow", DssExecLib.vow());
+            D3MHubLike(D3M_HUB).file("end", DssExecLib.end());
 
             D3MMomLike(D3M_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
 
