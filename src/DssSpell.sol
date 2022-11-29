@@ -21,36 +21,40 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
+import { JugAbstract } from "dss-interfaces/dss/JugAbstract.sol";
+import { SpotAbstract } from "dss-interfaces/dss/SpotAbstract.sol";
+import { IlkRegistryAbstract } from "dss-interfaces/dss/IlkRegistryAbstract.sol";
+
 interface D3MHubLike {
+    function vat() external view returns (address);
+    function daiJoin() external view returns (address);
     function file(bytes32, address) external;
     function file(bytes32, bytes32, address) external;
     function file(bytes32, bytes32, uint256) external;
 }
 
+interface D3MMomLike {
+    function setAuthority(address) external;
+}
+
 interface D3MCompoundPoolLike {
+    function ilk() external view returns (bytes32);
+    function vat() external view returns (address);
+    function dai() external view returns (address);
+    function file(bytes32, address) external;
     function rely(address) external;
 }
 
 interface D3MCompoundPlanLike {
     function rely(address) external;
+    function file(bytes32, uint256) external;
 }
 
 interface D3MOracleLike {
+    function vat() external view returns (address);
+    function ilk() external view returns (bytes32);
     function file(bytes32, address) external;
-}
-
-interface VatLike {
-    function rely(address) external;
-    function Line() external view returns (uint256);
-    function init(bytes32) external;
-    function file(bytes32, uint256) external;
-    function file(bytes32, bytes32, uint256) external;
-}
-
-interface SpotLike {
-    function file(bytes32, bytes32, address) external;
-    function file(bytes32, bytes32, uint256) external;
-    function poke(bytes32) external;
 }
 
 interface StarknetGovRelayLike {
@@ -75,12 +79,19 @@ contract DssSpellAction is DssAction {
 
     uint256 constant internal RAY = 10 ** 27;
     uint256 constant internal RAD = 10 ** 45;
+    uint256 constant internal MILLION = 10 ** 6;
+
+    bytes32 constant internal ILK = "DIRECT-COMPV2-DAI";
 
     address constant internal D3M_HUB = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
     address constant internal D3M_MOM = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
     address constant internal D3M_COMPOUND_POOL = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
     address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
     address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
+
+    // target 2% borrow apy, see top of D3MCompoundPlan for the formula explanation
+    // ((2.00 / 100) + 1) ^ (1 / 365) - 1) / 7200) * 10^18
+    uint256 constant internal D3M_COMP_BORROW_RATE = 7535450719;
 
     address constant internal MCD_CLIP_CALC_GUSD_A = 0xC287E4e9017259f3b21C86A0Ef7840243eC3f4d6;
     address constant internal MCD_CLIP_CALC_USDC_A = 0x00A0F90666c6Cd3E615cF8459A47e89A08817602;
@@ -109,32 +120,62 @@ contract DssSpellAction is DssAction {
         // ----------------- Compound v2 D3M Onboarding -----------------
         // https://vote.makerdao.com/polling/QmWYfgY2#poll-detail
         {
-            bytes32 _ilk = bytes32("DIRECT-COMPV2-DAI");
-            VatLike vat = VatLike(DssExecLib.vat());
-            SpotLike spot = SpotLike(DssExecLib.spotter());
+            VatAbstract vat = VatAbstract(DssExecLib.vat());
+            SpotAbstract spot = SpotAbstract(DssExecLib.spotter());
+            address daiJoin = DssExecLib.daiJoin();
+            address dai = DssExecLib.dai();
             address vow = DssExecLib.vow();
             address end = DssExecLib.end();
 
-            D3MCompoundPoolLike(D3M_COMPOUND_POOL).rely(D3M_HUB);
+            // Sanity checks
+            require(D3MHubLike(D3M_HUB).vat() == address(vat), "Hub vat mismatch");
+            require(D3MHubLike(D3M_HUB).daiJoin() == daiJoin, "Hub daiJoin mismatch");
 
-            D3MHubLike(D3M_HUB).file(_ilk, "pool", D3M_COMPOUND_POOL);
-            D3MHubLike(D3M_HUB).file(_ilk, "plan", D3M_COMPOUND_PLAN);
-            D3MHubLike(D3M_HUB).file(_ilk, "tau", 7 days);
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).ilk() == ILK, "Pool ilk mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).vat() == address(vat), "Pool vat mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).dai() == dai, "Pool dai mismatch");
 
+            require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
+            require(D3MOracleLike(D3M_ORACLE).ilk() == ILK, "Oracle ilk mismatch");
+
+            D3MHubLike(D3M_HUB).file(ILK, "pool", D3M_COMPOUND_POOL);
+            D3MHubLike(D3M_HUB).file(ILK, "plan", D3M_COMPOUND_PLAN);
+            D3MHubLike(D3M_HUB).file(ILK, "tau", 7 days);
             D3MHubLike(D3M_HUB).file("vow", vow);
             D3MHubLike(D3M_HUB).file("end", end);
 
+            D3MMomLike(D3M_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
+
+            D3MCompoundPoolLike(D3M_COMPOUND_POOL).rely(D3M_HUB);
+            D3MCompoundPoolLike(D3M_COMPOUND_POOL).file("king", address(this));
+
             D3MCompoundPlanLike(D3M_COMPOUND_PLAN).rely(D3M_MOM);
+            D3MCompoundPlanLike(D3M_COMPOUND_PLAN).file("barb", D3M_COMP_BORROW_RATE);
 
             D3MOracleLike(D3M_ORACLE).file("hub", D3M_HUB);
-            spot.file(_ilk, "pip", D3M_ORACLE);
-            spot.file(_ilk, "mat", RAY);
-            spot.poke(_ilk);
 
+            spot.file(ILK, "pip", D3M_ORACLE);
+            spot.file(ILK, "mat", RAY);
             vat.rely(D3M_HUB);
-            vat.init(_ilk);
-            vat.file(_ilk, "line", 5_000_000 * RAD);
-            vat.file("Line", vat.Line() + 5_000_000 * RAD);
+            vat.init(ILK);
+            JugAbstract(DssExecLib.jug()).init(ILK);
+            DssExecLib.increaseGlobalDebtCeiling(5 * MILLION);
+            DssExecLib.setIlkDebtCeiling(ILK, 5 * MILLION);
+            DssExecLib.setIlkAutoLineParameters(ILK, 5 * MILLION, 5 * MILLION, 12 hours);
+            DssExecLib.updateCollateralPrice(ILK);
+
+            // Add to ilk registry
+            IlkRegistryAbstract(DssExecLib.reg()).put(
+                ILK,
+                D3M_HUB,
+                address(0),
+                0,
+                4,
+                address(0),
+                address(0),
+                "",
+                ""
+            );
         }
 
         // ----------------- Offboard GUSD-A, USDC-A and USDP-A -----------------
