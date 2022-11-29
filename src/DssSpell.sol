@@ -151,7 +151,6 @@ contract DssSpellAction is DssAction {
 
             D3MMomLike(D3M_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
 
-            D3MCompoundPoolLike(D3M_COMPOUND_POOL).rely(D3M_HUB);
             D3MCompoundPoolLike(D3M_COMPOUND_POOL).file("king", address(this));
 
             D3MCompoundPlanLike(D3M_COMPOUND_PLAN).rely(D3M_MOM);
