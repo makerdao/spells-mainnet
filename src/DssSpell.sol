@@ -61,6 +61,10 @@ interface StarknetGovRelayLike {
     function relay(uint256 spell) external;
 }
 
+interface OSMLike {
+    function src() external view returns (address);
+}
+
 interface OracleLiftLike {
     function lift(address[] calldata) external;
 }
@@ -85,7 +89,7 @@ contract DssSpellAction is DssAction {
 
     address constant internal D3M_HUB = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
     address constant internal D3M_MOM = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
-    address constant internal D3M_MOM_LEGACY = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
+    address immutable internal D3M_MOM_LEGACY = DssExecLib.getChangelogAddress("DIRECT_MOM");
     address constant internal D3M_COMPOUND_POOL = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
     address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
     address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
@@ -272,6 +276,7 @@ contract DssSpellAction is DssAction {
 
         // ----------------- Whitelist Light Feed on Oracle for rETH -----------------
         // https://forum.makerdao.com/t/whitelist-light-feed-for-reth-oracle/18908
+        require(OSMLike(DssExecLib.getChangelogAddress("PIP_RETH")).src() == RETH_ORACLE, "Bad oracle address");
         address[] memory lightFeeds = new address[](1);
         lightFeeds[0] = RETH_LIGHTFEED;
         OracleLiftLike(RETH_ORACLE).lift(lightFeeds);
