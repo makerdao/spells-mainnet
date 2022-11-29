@@ -182,7 +182,7 @@ contract DssSpellAction is DssAction {
             );
         }
 
-        // ----------------- Offboard GUSD-A, USDC-A and USDP-A -----------------
+        // ----------------- Activate Liquidations for GUSD-A, USDC-A and USDP-A -----------------
         // Poll: https://vote.makerdao.com/polling/QmZbsHqu#poll-detail
         // Forum: https://forum.makerdao.com/t/usdc-a-usdp-a-gusd-a-liquidation-parameters-auctions-activation/18744
         {
