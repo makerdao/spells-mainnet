@@ -45,6 +45,7 @@ interface Hevm {
     function load(address,bytes32) external view returns (bytes32);
     function addr(uint) external returns (address);
     function sign(uint, bytes32) external returns (uint8, bytes32, bytes32);
+    function prank(address) external;
     function startPrank(address) external;
     function stopPrank() external;
 }

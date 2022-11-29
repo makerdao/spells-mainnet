@@ -18,6 +18,18 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
+interface D3MHubLike {
+    function exec(bytes32) external;
+}
+
+interface D3MMomLike {
+    function disable(address) external;
+}
+
+interface D3MCompoundPlanLike {
+    function barb() external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -215,21 +227,21 @@ contract DssSpellTest is DssSpellTestBase {
         checkChainlogVersion("1.14.6");
     }
 
-    function testNewIlkRegistryValues() private { // make private to disable
+    function testNewIlkRegistryValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // RETH-A
-        //assertEq(reg.pos("RETH-A"),    54);
-        //assertEq(reg.join("RETH-A"),   addr.addr("MCD_JOIN_RETH_A"));
-        // assertEq(reg.gem("RETH-A"),    addr.addr("RETH"));
-        // assertEq(reg.dec("RETH-A"),    GemAbstract(addr.addr("RETH")).decimals());
-        // assertEq(reg.class("RETH-A"),  1);
-        // assertEq(reg.pip("RETH-A"),    addr.addr("PIP_RETH"));
-        // assertEq(reg.name("RETH-A"),   "Rocket Pool ETH");
-        // assertEq(reg.symbol("RETH-A"), GemAbstract(addr.addr("RETH")).symbol());
+        // DIRECT-COMPV2-DAI
+        assertEq(reg.pos("DIRECT-COMPV2-DAI"),    55);
+        assertEq(reg.join("DIRECT-COMPV2-DAI"),   addr.addr("DIRECT_HUB"));
+        assertEq(reg.gem("DIRECT-COMPV2-DAI"),    address(0));
+        assertEq(reg.dec("DIRECT-COMPV2-DAI"),    0);
+        assertEq(reg.class("DIRECT-COMPV2-DAI"),  4);
+        assertEq(reg.pip("DIRECT-COMPV2-DAI"),    address(0));
+        assertEq(reg.name("DIRECT-COMPV2-DAI"),   "");
+        assertEq(reg.symbol("DIRECT-COMPV2-DAI"), "");
     }
 
     function testFailWrongDay() public {
@@ -727,6 +739,29 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testDirectCompV2Integration() public {
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes32 ilk = "DIRECT-COMPV2-DAI";
+        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
+        address pool = addr.addr("DIRECT_COMPV2_DAI_POOL");
+        address plan = addr.addr("DIRECT_COMPV2_DAI_PLAN");
+        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
         
+        // Current market conditions should max out the D3M @ 5m DAI
+        hub.exec(ilk);
+        (uint256 ink, uint256 art) = vat.urns(ilk, pool);
+        assertEq(ink, 5 * MILLION * WAD);
+        assertEq(art, 5 * MILLION * WAD);
+
+        // De-activate the D3M via mom
+        hevm.prank(pauseProxy);
+        mom.disable(plan);
+        assertEq(D3MCompoundPlanLike(plan).barb(), 0);
+        hub.exec(ilk);
+        (ink, art) = vat.urns(ilk, pool);
+        assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
+        assertLt(art, WAD);
     }
 }
