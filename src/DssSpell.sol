@@ -155,8 +155,7 @@ contract DssSpellAction is DssAction {
             DssExecLib.authorize(address(vat), D3M_HUB);
             vat.init(ILK);
             JugAbstract(DssExecLib.jug()).init(ILK);
-            DssExecLib.increaseGlobalDebtCeiling(5 * MILLION);
-            DssExecLib.setIlkDebtCeiling(ILK, 5 * MILLION);
+            DssExecLib.increaseIlkDebtCeiling(ILK, 5 * MILLION, true);
             DssExecLib.setIlkAutoLineParameters(ILK, 5 * MILLION, 5 * MILLION, 12 hours);
             DssExecLib.updateCollateralPrice(ILK);
 
