@@ -787,7 +787,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(art, 5 * MILLION * WAD);
 
         // De-activate the D3M via mom
-        hevm.prank(pauseProxy);
+        hevm.prank(DSChiefAbstract(chief).hat());
         mom.disable(address(plan));
         assertEq(plan.barb(), 0);
         hub.exec(ilk);
