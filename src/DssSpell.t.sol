@@ -69,7 +69,7 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testRemoveChainlogValues() public { // make private to disable
+    function testRemoveChainlogValues() private { // make public to enable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
