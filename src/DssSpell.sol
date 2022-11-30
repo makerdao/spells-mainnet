@@ -50,6 +50,11 @@ interface D3MOracleLike {
     function ilk() external view returns (bytes32);
 }
 
+interface CDaiLike {
+    function interestRateModel() external view returns (address);
+    function implementation() external view returns (address);
+}
+
 interface StarknetGovRelayLike {
     function relay(uint256 spell) external;
 }
@@ -141,7 +146,9 @@ contract DssSpellAction is DssAction {
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).cDai() == D3M_CDAI, "Pool cDai mismatch");
 
             require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).tack() == D3M_TACK, "Plan tack mismatch");
+            require(CDaiLike(D3M_CDAI).interestRateModel() == D3M_TACK, "Plan tack mismatch");
             require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).delegate() == D3M_DELEGATE, "Plan delegate mismatch");
+            require(CDaiLike(D3M_CDAI).implementation() == D3M_DELEGATE, "Plan delegate mismatch");
             require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).cDai() == D3M_CDAI, "Plan cDai mismatch");
 
             require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
