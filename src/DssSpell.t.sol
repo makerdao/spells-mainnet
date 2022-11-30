@@ -20,14 +20,27 @@ import "./DssSpell.t.base.sol";
 
 interface D3MHubLike {
     function exec(bytes32) external;
+    function vow() external view returns (address);
+    function end() external view returns (address);
+    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
 }
 
 interface D3MMomLike {
+    function authority() external view returns (address);
     function disable(address) external;
 }
 
+interface D3MCompoundPoolLike {
+    function king() external view returns (address);
+}
+
 interface D3MCompoundPlanLike {
+    function wards(address) external view returns (uint256);
     function barb() external view returns (uint256);
+}
+
+interface D3MOracleLike {
+    function hub() external view returns (address);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -745,24 +758,40 @@ contract DssSpellTest is DssSpellTestBase {
 
         bytes32 ilk = "DIRECT-COMPV2-DAI";
         D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        address pool = addr.addr("DIRECT_COMPV2_DAI_POOL");
-        address plan = addr.addr("DIRECT_COMPV2_DAI_PLAN");
+        D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
+        D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
+        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
         D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
 
-        assertEq(D3MCompoundPlanLike(plan).barb(), 7535450719);
+        // Do a bunch of sanity checks of the values that were set in the spell
+        (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
+        assertEq(_pool, address(pool));
+        assertEq(_plan, address(plan));
+        assertEq(tau, 7 days);
+        assertEq(hub.vow(), address(vow));
+        assertEq(hub.end(), address(end));
+        assertEq(mom.authority(), address(chief));
+        assertEq(pool.king(), pauseProxy);
+        assertEq(plan.wards(address(mom)), 1);
+        assertEq(plan.wards(address(esm)), 1);
+        assertEq(plan.barb(), 7535450719);
+        assertEq(oracle.hub(), address(hub));
+        (address pip,) = spotter.ilks(ilk);
+        assertEq(pip, address(oracle));
+        assertEq(vat.wards(address(hub)), 1);
         
         // Current market conditions should max out the D3M @ 5m DAI
         hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, pool);
+        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
         assertEq(ink, 5 * MILLION * WAD);
         assertEq(art, 5 * MILLION * WAD);
 
         // De-activate the D3M via mom
         hevm.prank(pauseProxy);
-        mom.disable(plan);
-        assertEq(D3MCompoundPlanLike(plan).barb(), 0);
+        mom.disable(address(plan));
+        assertEq(plan.barb(), 0);
         hub.exec(ilk);
-        (ink, art) = vat.urns(ilk, pool);
+        (ink, art) = vat.urns(ilk, address(pool));
         assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
         assertLt(art, WAD);
     }
