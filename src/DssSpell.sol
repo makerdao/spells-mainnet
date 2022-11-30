@@ -34,6 +34,11 @@ interface D3MCompoundPoolLike {
     function ilk() external view returns (bytes32);
     function vat() external view returns (address);
     function dai() external view returns (address);
+    function cDai() external view returns (address);
+}
+
+interface D3MCompoundPlanLike {
+    function cDai() external view returns (address);
 }
 
 interface D3MOracleLike {
@@ -55,6 +60,9 @@ interface OracleLiftLike {
 
 interface TokenLike {
     function transfer(address, uint256) external returns (bool);
+    function decimals() external view returns (uint8);
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
 }
 
 contract DssSpellAction is DssAction {
@@ -77,6 +85,7 @@ contract DssSpellAction is DssAction {
     address constant internal D3M_COMPOUND_POOL = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
     address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
     address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
+    address constant internal D3M_CDAI = 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643;
 
     // target 2% borrow apy, see top of D3MCompoundPlan for the formula explanation
     // ((2.00 / 100) + 1) ^ (1 / 365) - 1) / 7200) * 10^18
@@ -119,6 +128,9 @@ contract DssSpellAction is DssAction {
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).ilk() == ILK, "Pool ilk mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).vat() == address(vat), "Pool vat mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).dai() == DssExecLib.dai(), "Pool dai mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).cDai() == D3M_CDAI, "Pool cDai mismatch");
+
+            require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).cDai() == D3M_CDAI, "Plan cDai mismatch");
 
             require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
             require(D3MOracleLike(D3M_ORACLE).ilk() == ILK, "Oracle ilk mismatch");
@@ -152,13 +164,13 @@ contract DssSpellAction is DssAction {
             IlkRegistryAbstract(DssExecLib.reg()).put(
                 ILK,
                 D3M_HUB,
-                address(0),
-                0,
+                D3M_CDAI,
+                TokenLike(D3M_CDAI).decimals(),
                 4,
+                D3M_ORACLE,
                 address(0),
-                address(0),
-                "",
-                ""
+                TokenLike(D3M_CDAI).name(),
+                TokenLike(D3M_CDAI).symbol()
             );
         }
 

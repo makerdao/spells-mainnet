@@ -236,12 +236,12 @@ contract DssSpellTest is DssSpellTestBase {
         // DIRECT-COMPV2-DAI
         assertEq(reg.pos("DIRECT-COMPV2-DAI"),    55);
         assertEq(reg.join("DIRECT-COMPV2-DAI"),   addr.addr("DIRECT_HUB"));
-        assertEq(reg.gem("DIRECT-COMPV2-DAI"),    address(0));
-        assertEq(reg.dec("DIRECT-COMPV2-DAI"),    0);
+        assertEq(reg.gem("DIRECT-COMPV2-DAI"),    0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+        assertEq(reg.dec("DIRECT-COMPV2-DAI"),    8);
         assertEq(reg.class("DIRECT-COMPV2-DAI"),  4);
-        assertEq(reg.pip("DIRECT-COMPV2-DAI"),    address(0));
-        assertEq(reg.name("DIRECT-COMPV2-DAI"),   "");
-        assertEq(reg.symbol("DIRECT-COMPV2-DAI"), "");
+        assertEq(reg.pip("DIRECT-COMPV2-DAI"),    addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
+        assertEq(reg.name("DIRECT-COMPV2-DAI"),   "Compound Dai");
+        assertEq(reg.symbol("DIRECT-COMPV2-DAI"), "cDAI");
     }
 
     function testFailWrongDay() public {
