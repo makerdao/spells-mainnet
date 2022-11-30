@@ -33,11 +33,15 @@ interface D3MHubLike {
 interface D3MCompoundPoolLike {
     function ilk() external view returns (bytes32);
     function vat() external view returns (address);
+    function comptroller() external view returns (address);
+    function comp() external view returns (address);
     function dai() external view returns (address);
     function cDai() external view returns (address);
 }
 
 interface D3MCompoundPlanLike {
+    function tack() external view returns (address);
+    function delegate() external view returns (address);
     function cDai() external view returns (address);
 }
 
@@ -86,6 +90,10 @@ contract DssSpellAction is DssAction {
     address constant internal D3M_COMPOUND_PLAN = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
     address constant internal D3M_ORACLE = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
     address constant internal D3M_CDAI = 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643;
+    address constant internal D3M_COMPTROLLER = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
+    address constant internal D3M_COMP = 0xc00e94Cb662C3520282E6f5717214004A7f26888;
+    address constant internal D3M_TACK = 0xFB564da37B41b2F6B6EDcc3e56FbF523bD9F2012;
+    address constant internal D3M_DELEGATE = 0x3363BAe2Fc44dA742Df13CD3ee94b6bB868ea376;
 
     // target 2% borrow apy, see top of D3MCompoundPlan for the formula explanation
     // ((2.00 / 100) + 1) ^ (1 / 365) - 1) / 7200) * 10^18
@@ -127,9 +135,13 @@ contract DssSpellAction is DssAction {
 
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).ilk() == ILK, "Pool ilk mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).vat() == address(vat), "Pool vat mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).comptroller() == D3M_COMPTROLLER, "Pool comptroller mismatch");
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).comp() == D3M_COMP, "Pool comp mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).dai() == DssExecLib.dai(), "Pool dai mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).cDai() == D3M_CDAI, "Pool cDai mismatch");
 
+            require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).tack() == D3M_TACK, "Plan tack mismatch");
+            require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).delegate() == D3M_DELEGATE, "Plan delegate mismatch");
             require(D3MCompoundPlanLike(D3M_COMPOUND_PLAN).cDai() == D3M_CDAI, "Plan cDai mismatch");
 
             require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
