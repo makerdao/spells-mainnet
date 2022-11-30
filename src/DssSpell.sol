@@ -23,38 +23,22 @@ import "dss-exec-lib/DssAction.sol";
 
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { JugAbstract } from "dss-interfaces/dss/JugAbstract.sol";
-import { SpotAbstract } from "dss-interfaces/dss/SpotAbstract.sol";
 import { IlkRegistryAbstract } from "dss-interfaces/dss/IlkRegistryAbstract.sol";
 
 interface D3MHubLike {
     function vat() external view returns (address);
     function daiJoin() external view returns (address);
-    function file(bytes32, address) external;
-    function file(bytes32, bytes32, address) external;
-    function file(bytes32, bytes32, uint256) external;
-}
-
-interface D3MMomLike {
-    function setAuthority(address) external;
 }
 
 interface D3MCompoundPoolLike {
     function ilk() external view returns (bytes32);
     function vat() external view returns (address);
     function dai() external view returns (address);
-    function file(bytes32, address) external;
-    function rely(address) external;
-}
-
-interface D3MCompoundPlanLike {
-    function rely(address) external;
-    function file(bytes32, uint256) external;
 }
 
 interface D3MOracleLike {
     function vat() external view returns (address);
     function ilk() external view returns (bytes32);
-    function file(bytes32, address) external;
 }
 
 interface StarknetGovRelayLike {
@@ -126,7 +110,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmWYfgY2#poll-detail
         {
             VatAbstract vat = VatAbstract(DssExecLib.vat());
-            SpotAbstract spot = SpotAbstract(DssExecLib.spotter());
+            address spot = DssExecLib.spotter();
 
             // Sanity checks
             require(D3MHubLike(D3M_HUB).vat() == address(vat), "Hub vat mismatch");
@@ -139,24 +123,24 @@ contract DssSpellAction is DssAction {
             require(D3MOracleLike(D3M_ORACLE).vat() == address(vat), "Oracle vat mismatch");
             require(D3MOracleLike(D3M_ORACLE).ilk() == ILK, "Oracle ilk mismatch");
 
-            D3MHubLike(D3M_HUB).file(ILK, "pool", D3M_COMPOUND_POOL);
-            D3MHubLike(D3M_HUB).file(ILK, "plan", D3M_COMPOUND_PLAN);
-            D3MHubLike(D3M_HUB).file(ILK, "tau", 7 days);
-            D3MHubLike(D3M_HUB).file("vow", DssExecLib.vow());
-            D3MHubLike(D3M_HUB).file("end", DssExecLib.end());
+            DssExecLib.setContract(D3M_HUB, ILK, "pool", D3M_COMPOUND_POOL);
+            DssExecLib.setContract(D3M_HUB, ILK, "plan", D3M_COMPOUND_PLAN);
+            DssExecLib.setValue(D3M_HUB, ILK, "tau", 7 days);
+            DssExecLib.setContract(D3M_HUB, "vow", DssExecLib.vow());
+            DssExecLib.setContract(D3M_HUB, "end", DssExecLib.end());
 
-            D3MMomLike(D3M_MOM).setAuthority(DssExecLib.getChangelogAddress("MCD_ADM"));
+            DssExecLib.setAuthority(D3M_MOM, DssExecLib.getChangelogAddress("MCD_ADM"));
 
-            D3MCompoundPoolLike(D3M_COMPOUND_POOL).file("king", address(this));
+            DssExecLib.setContract(D3M_COMPOUND_POOL, "king", address(this));
 
-            D3MCompoundPlanLike(D3M_COMPOUND_PLAN).rely(D3M_MOM);
-            D3MCompoundPlanLike(D3M_COMPOUND_PLAN).file("barb", D3M_COMP_BORROW_RATE);
+            DssExecLib.authorize(D3M_COMPOUND_PLAN, D3M_MOM);
+            DssExecLib.setValue(D3M_COMPOUND_PLAN, "barb", D3M_COMP_BORROW_RATE);
 
-            D3MOracleLike(D3M_ORACLE).file("hub", D3M_HUB);
+            DssExecLib.setContract(D3M_ORACLE, "hub", D3M_HUB);
 
-            spot.file(ILK, "pip", D3M_ORACLE);
-            spot.file(ILK, "mat", RAY);
-            vat.rely(D3M_HUB);
+            DssExecLib.setContract(spot, ILK, "pip", D3M_ORACLE);
+            DssExecLib.setValue(spot, ILK, "mat", RAY);
+            DssExecLib.authorize(address(vat), D3M_HUB);
             vat.init(ILK);
             JugAbstract(DssExecLib.jug()).init(ILK);
             DssExecLib.increaseGlobalDebtCeiling(5 * MILLION);
