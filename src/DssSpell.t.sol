@@ -748,6 +748,8 @@ contract DssSpellTest is DssSpellTestBase {
         address pool = addr.addr("DIRECT_COMPV2_DAI_POOL");
         address plan = addr.addr("DIRECT_COMPV2_DAI_PLAN");
         D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+
+        assertEq(D3MCompoundPlanLike(plan).barb(), 7535450719);
         
         // Current market conditions should max out the D3M @ 5m DAI
         hub.exec(ilk);
