@@ -31,6 +31,7 @@ interface D3MHubLike {
 }
 
 interface D3MCompoundPoolLike {
+    function hub() external view returns (address);
     function ilk() external view returns (bytes32);
     function vat() external view returns (address);
     function comptroller() external view returns (address);
@@ -138,6 +139,7 @@ contract DssSpellAction is DssAction {
             require(D3MHubLike(D3M_HUB).vat() == address(vat), "Hub vat mismatch");
             require(D3MHubLike(D3M_HUB).daiJoin() == DssExecLib.daiJoin(), "Hub daiJoin mismatch");
 
+            require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).hub() == D3M_HUB, "Pool hub mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).ilk() == ILK, "Pool ilk mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).vat() == address(vat), "Pool vat mismatch");
             require(D3MCompoundPoolLike(D3M_COMPOUND_POOL).comptroller() == D3M_COMPTROLLER, "Pool comptroller mismatch");
