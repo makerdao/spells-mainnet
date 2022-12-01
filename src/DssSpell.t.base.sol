@@ -168,6 +168,10 @@ interface RwaLiquidationLike {
     function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
 }
 
+interface AuthorityLike {
+    function authority() external view returns (address);
+}
+
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
@@ -201,6 +205,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract           flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     ClipperMomAbstract           clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
+    AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
@@ -511,6 +516,9 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         // check ClipperMom authority
         assertEq(clipMom.authority(), values.clipper_mom_authority, "TestError/clipperMom-authority");
+
+        // check D3MMom authority
+        assertEq(d3mMom.authority(), values.d3m_mom_authority, "TestError/d3mMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");

@@ -47,6 +47,7 @@ contract Config {
         address osm_mom_authority;
         address flipper_mom_authority;
         address clipper_mom_authority;
+        address d3m_mom_authority;
         uint256 ilk_count;
         mapping (bytes32 => CollateralValues) collaterals;
     }
@@ -126,6 +127,7 @@ contract Config {
             osm_mom_authority:     chief,                   // OsmMom authority
             flipper_mom_authority: chief,                   // FlipperMom authority
             clipper_mom_authority: chief,                   // ClipperMom authority
+            d3m_mom_authority:     chief,                   // D3MMom authority
             ilk_count:             56                       // Num expected in system
         });
 
