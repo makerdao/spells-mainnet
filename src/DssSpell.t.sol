@@ -773,7 +773,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(mom.authority(), address(chief));
         assertEq(pool.king(), pauseProxy);
         assertEq(plan.wards(address(mom)), 1);
-        assertEq(plan.wards(address(esm)), 1);
         assertEq(plan.barb(), 7535450719);
         assertEq(oracle.hub(), address(hub));
         (address pip,) = spotter.ilks(ilk);

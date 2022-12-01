@@ -166,7 +166,6 @@ contract DssSpellAction is DssAction {
             DssExecLib.setContract(D3M_COMPOUND_POOL, "king", address(this));
 
             DssExecLib.authorize(D3M_COMPOUND_PLAN, D3M_MOM);
-            DssExecLib.authorize(D3M_COMPOUND_PLAN, DssExecLib.esm());
             DssExecLib.setValue(D3M_COMPOUND_PLAN, "barb", D3M_COMP_BORROW_RATE);
 
             DssExecLib.setContract(D3M_ORACLE, "hub", D3M_HUB);
