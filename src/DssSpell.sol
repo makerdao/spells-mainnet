@@ -84,7 +84,6 @@ contract DssSpellAction is DssAction {
         "2022-11-30 MakerDAO Executive Spell | Hash: TODO";
 
     uint256 constant internal RAY = 10 ** 27;
-    uint256 constant internal RAD = 10 ** 45;
     uint256 constant internal MILLION = 10 ** 6;
 
     bytes32 constant internal ILK = "DIRECT-COMPV2-DAI";
