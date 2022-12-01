@@ -298,6 +298,7 @@ contract DssSpellAction is DssAction {
         StarknetGovRelayLike(STARKNET_GOV_RELAY).relay(L2_GOV_RELAY_SPELL);
 
         // ----------------- MKR Transfer -----------------
+        // https://mips.makerdao.com/mips/details/MIP40c3SP27#sentence-summary
         TokenLike(DssExecLib.mkr()).transfer(DUX_WALLET, 180.6 ether);
 
         // Configure Chainlog
