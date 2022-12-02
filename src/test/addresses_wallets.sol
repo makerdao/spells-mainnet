@@ -72,6 +72,8 @@ contract Wallets {
         addr["LBSBLOCKCHAIN"]                = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
         addr["ONESTONE"]                     = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
         addr["PVL"]                          = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
+        addr["CALBLOCKCHAIN"]                = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
+        addr["CONSENSYS"]                    = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
