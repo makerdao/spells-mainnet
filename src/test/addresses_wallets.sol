@@ -61,7 +61,7 @@ contract Wallets {
         addr["ULTRASCHUPPI"]                 = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["STABLENODE"]                   = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
-        addr["FLIPSIDE"]                     = 0x62a43123FE71f9764f26554b3F5017627996816a;
+        addr["FLIPSIDE"]                     = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
         addr["PENNBLOCKCHAIN"]               = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
         addr["CHRISBLEC"]                    = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
         addr["BLOCKCHAINCOLUMBIA"]           = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;

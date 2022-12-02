@@ -21,6 +21,11 @@ pragma solidity 0.6.12;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface GemLike {
+    function allowance(address, address) external view returns (uint256);
+    function approve(address, uint256) external returns (bool);
+    function transfer(address, uint256) external returns (bool);
+}
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -40,6 +45,8 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
+
+    GemLike immutable internal MKR = GemLike(DssExecLib.mkr());
 
     address constant internal STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
     address constant internal ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
@@ -61,6 +68,8 @@ contract DssSpellAction is DssAction {
     address constant internal LLAMA              = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
     address constant internal PVL                = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
     address constant internal CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
+
+    address constant internal TECH_001           = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
 
     function actions() public override {
 
@@ -110,7 +119,7 @@ contract DssSpellAction is DssAction {
         // Tech-Ops MKR Transfer
         // https://mips.makerdao.com/mips/details/MIP40c3SP54
         // TECH-001 - 257.31 MKR - 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B
-        // TODO
+        MKR.transfer(TECH_001, 257.31 ether);
 
         // MOMC Parameter Changes
         // https://vote.makerdao.com/polling/QmVXj9cW
