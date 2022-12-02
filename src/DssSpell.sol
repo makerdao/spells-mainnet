@@ -78,10 +78,10 @@ interface TokenLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/d8c711404e9e17db24b611aa03d45507c1993148/governance/votes/Executive%20vote%20-%20November%2016%2C%202022.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/c94660aff7fa774aacb5c78ee7068ef4b5d9d243/governance/votes/Executive%20vote%20-%20December%202%2C%202022.md -q -O - 2>/dev/null)"
 
     string public constant override description =
-        "2022-11-30 MakerDAO Executive Spell | Hash: TODO";
+        "2022-11-30 MakerDAO Executive Spell | Hash: 0xd2c190b0173eec16d7039cae64ce076e7abb18572af5d5a7fcb9b1b1c30bf170";
 
     uint256 constant internal RAY = 10 ** 27;
     uint256 constant internal MILLION = 10 ** 6;
