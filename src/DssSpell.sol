@@ -43,6 +43,56 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
+        // Delegate Compensation - November 2022
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-november-2022/19012
+        // TODO
+
+
+        // Tech-Ops MKR Transfer
+        // https://mips.makerdao.com/mips/details/MIP40c3SP54
+        // TODO
+
+
+        // MOMC Parameter Changes
+        // https://vote.makerdao.com/polling/QmVXj9cW
+        // TODO
+
+
+        // DSR Adjustment
+        // https://vote.makerdao.com/polling/914#vote-breakdown
+        // TODO
+
+
+        // ----------------------------- Collateral onboarding -----------------------------
+        //  Add GNO-A as a new Vault Type
+        //  Poll Link:   TODO
+        //  Forum Post:  https://forum.makerdao.com/t/gno-collateral-onboarding-risk-evaluation/18820
+
+
+        // RWA-010 Onboarding
+        // https://vote.makerdao.com/polling/QmNucsGt
+        // TODO
+
+
+        // RWA-011 Onboarding
+        // https://vote.makerdao.com/polling/QmNucsGt
+        // TODO
+
+
+        // RWA-012 Onboarding
+        // https://vote.makerdao.com/polling/QmNucsGt
+        // TODO
+
+
+        // RWA-013 Onboarding
+        // https://vote.makerdao.com/polling/QmNucsGt
+        // TODO
+
+
+        // ----------------------------- Collateral offboarding -----------------------------
+        //  Offboard RENBTC-A
+        //  Poll Link:   https://vote.makerdao.com/polling/QmTNMDfb#poll-detail
+        //  Forum Post:  https://forum.makerdao.com/t/renbtc-a-proposed-offboarding-parameters-context/18864
     }
 }
 
