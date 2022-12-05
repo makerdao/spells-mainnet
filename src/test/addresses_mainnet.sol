@@ -413,5 +413,10 @@ contract Addresses {
         addr["DIRECT_COMPV2_DAI_POOL"]          = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
         addr["DIRECT_COMPV2_DAI_PLAN"]          = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
         addr["DIRECT_COMPV2_DAI_ORACLE"]        = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
+        addr["GNO"]                             = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
+        addr["PIP_GNO"]                         = address(0);
+        addr["MCD_JOIN_GNO_A"]                  = address(0);
+        addr["MCD_CLIP_GNO_A"]                  = address(0);
+        addr["MCD_CLIP_CALC_GNO_A"]             = address(0);
     }
 }
