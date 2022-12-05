@@ -25,6 +25,7 @@ interface GemLike {
     function allowance(address, address) external view returns (uint256);
     function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
+    function decimals() external view returns (uint8);
 }
 
 interface VatLike {
@@ -32,9 +33,91 @@ interface VatLike {
     function Line() external view returns (uint256);
 }
 
+interface Initializable {
+    function init(bytes32) external;
+}
+
+interface GemJoinLike {
+    function rely(address) external;
+    function vat() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function gem() external view returns (address);
+    function dec() external view returns (uint256);
+}
+
+interface IlkRegistryLike {
+    function put(bytes32, address, address, uint256, uint256, address, address, string calldata, string calldata) external;
+}
+
+interface RwaLiquidationLike {
+    function ilks(bytes32) external returns (string memory,address,uint48,uint48);
+    function init(bytes32, uint256, string calldata, uint48) external;
+}
+
+interface RwaUrnLike {
+    function daiJoin() external view returns(address);
+    function gemJoin() external view returns(address);
+    function hope(address) external;
+    function jug() external view returns(address);
+    function outputConduit() external view returns(address);
+    function vat() external view returns(address);
+}
+
+interface TinlakeManagerLike {
+    function file(bytes32, address) external;
+    function dai() external view returns (address);
+    function daiJoin() external view returns (address);
+    function end() external view returns (address);
+    function liq() external view returns (address);
+    function lock(uint256) external;
+    function owner() external view returns (address);
+    function pool() external view returns (address);
+    function tranche() external view returns (address);
+    function urn() external view returns (address);
+    function vat() external view returns (address);
+    function vow() external view returns (address);
+    function gem() external view returns (address);
+}
+
 interface StarknetLike {
     function setCeiling(uint256) external;
     function setMaxDeposit(uint256) external;
+}
+
+struct CentrifugeCollateralValues {
+    // MIP21 addresses
+    address GEM_JOIN;
+    address GEM;
+    address OPERATOR;       // MGR
+    address INPUT_CONDUIT;  // MGR
+    address OUTPUT_CONDUIT; // MGR
+    address URN;
+
+    // Centrifuge addresses
+    address DROP;
+    address OWNER;
+    address POOL;
+    address TRANCHE;
+    address ROOT;
+
+    // Changelog keys
+    bytes32 gemID;
+    bytes32 joinID;
+    bytes32 urnID;
+    bytes32 inputConduitID;
+    bytes32 outputConduitID;
+    bytes32 pipID;
+
+    // Misc
+    bytes32 ilk;
+    string  ilkString;
+    string  ilkRegistryName;
+    uint256 RATE;
+    uint256 CEIL;
+    uint256 PRICE;
+    uint256 MAT;
+    uint48  TAU;
+    string  DOC;
 }
 
 contract DssSpellAction is DssAction {
@@ -56,6 +139,7 @@ contract DssSpellAction is DssAction {
     //
     uint256 internal constant ONE_PCT_RATE      = 1000000000315522921573372069;
     uint256 internal constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
+    uint256 internal constant FOUR_PCT_RATE     = 1000000001243680656318820312;
 
     // --- MATH ---
     uint256 internal constant MILLION           = 10 ** 6;
@@ -68,10 +152,21 @@ contract DssSpellAction is DssAction {
         require((z = x - y) <= x, "ds-math-sub-underflow");
     }
 
+    // --- Ilk Registry ---
+    uint256 internal constant REG_RWA_CLASS = 3;
+
     address internal immutable VAT            = DssExecLib.vat();
     address internal immutable MCD_PSM_PAX_A  = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
     address internal immutable MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
     address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address internal immutable DAI            = DssExecLib.dai();
+    address internal immutable DAI_JOIN       = DssExecLib.daiJoin();
+    address internal immutable END            = DssExecLib.end();
+    address internal immutable JUG            = DssExecLib.jug();
+    address internal immutable SPOTTER        = DssExecLib.spotter();
+    address internal immutable VOW            = DssExecLib.vow();
+    address internal immutable ILK_REG        = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+    address internal immutable ORACLE         = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
     GemLike internal immutable MKR = GemLike(DssExecLib.mkr());
 
@@ -104,6 +199,42 @@ contract DssSpellAction is DssAction {
     address internal constant MCD_JOIN_GNO_A      = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
     address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
     address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
+
+    address constant internal RWA010                  = 0x20C72C1fdd589C4Aaa8d9fF56a43F3B17BA129f8;
+    address constant internal PIP_RWA010              = 0xfBAa6a09A39D485a5Be9F5ebfe09C602E63b21EF;
+    address constant internal MCD_JOIN_RWA010_A       = 0xde2828c3F7B2161cF2a1711edc36c73C56EA72aE;
+    address constant internal RWA010_A_URN            = 0x4866d5d24CdC6cc094423717663b2D3343d4EFF9;
+    address constant internal RWA010_A_OUTPUT_CONDUIT = 0x1F5C294EF3Ff2d2Da30ea9EDAd490C28096C91dF;
+    address constant internal RWA010_A_INPUT_CONDUIT  = 0x1F5C294EF3Ff2d2Da30ea9EDAd490C28096C91dF;
+    address constant internal RWA010_A_OPERATOR       = 0x1F5C294EF3Ff2d2Da30ea9EDAd490C28096C91dF;
+    string  internal constant RWA010_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
+
+    address constant internal RWA011                  = 0x0b126F85285d1786F52FC911AfFaaf0d9253e37a;
+    address constant internal PIP_RWA011              = 0xfBAa6a09A39D485a5Be9F5ebfe09C602E63b21EF;
+    address constant internal MCD_JOIN_RWA011_A       = 0x9048cb84F46e94Ff312DcC50f131191c399D9bC3;
+    address constant internal RWA011_A_URN            = 0x32C9bBA0841F2557C10d3f0d30092f138251aFE6;
+    address constant internal RWA011_A_OUTPUT_CONDUIT = 0x8e74e529049bB135CF72276C1845f5bD779749b0;
+    address constant internal RWA011_A_INPUT_CONDUIT  = 0x8e74e529049bB135CF72276C1845f5bD779749b0;
+    address constant internal RWA011_A_OPERATOR       = 0x8e74e529049bB135CF72276C1845f5bD779749b0;
+    string  internal constant RWA011_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
+
+    address constant internal RWA012                  = 0x3c7f1379B5ac286eB3636668dEAe71EaA5f7518c;
+    address constant internal PIP_RWA012              = 0x4FA7c611bD25DA38bC929C2A67290FbE49DDFF56;
+    address constant internal MCD_JOIN_RWA012_A       = 0x75646F68B8c5d8F415891F7204978Efb81ec6410;
+    address constant internal RWA012_A_URN            = 0xB22E9DBF60a5b47c8B2D0D6469548F3C2D036B7E;
+    address constant internal RWA012_A_OUTPUT_CONDUIT = 0x795b917eBe0a812D406ae0f99D71caf36C307e21;
+    address constant internal RWA012_A_INPUT_CONDUIT  = 0x795b917eBe0a812D406ae0f99D71caf36C307e21;
+    address constant internal RWA012_A_OPERATOR       = 0x795b917eBe0a812D406ae0f99D71caf36C307e21;
+    string  internal constant RWA012_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
+
+    address constant internal RWA013                  = 0xD6C7FD4392D328e4a8f8bC50F4128B64f4dB2d4C;
+    address constant internal PIP_RWA013              = 0x69Cf63ed6eD57Ad129bF67EB726Ae1bd293edbB0;
+    address constant internal MCD_JOIN_RWA013_A       = 0x779D0fD012815D4239BAf75140e6B2971BEd5113;
+    address constant internal RWA013_A_URN            = 0x9C170dd80Ee2CA5bfDdF00cbE93e8faB2D05bA6D;
+    address constant internal RWA013_A_OUTPUT_CONDUIT = 0x615984F33604011Fcd76E9b89803Be3816276E61;
+    address constant internal RWA013_A_INPUT_CONDUIT  = 0x615984F33604011Fcd76E9b89803Be3816276E61;
+    address constant internal RWA013_A_OPERATOR       = 0x615984F33604011Fcd76E9b89803Be3816276E61;
+    string  internal constant RWA013_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
 
     function actions() public override {
 
@@ -259,22 +390,130 @@ contract DssSpellAction is DssAction {
 
         // RWA-010 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
-        // TODO
-
+        _addCentrifugeCollateral(CentrifugeCollateralValues({
+            GEM_JOIN:        MCD_JOIN_RWA010_A,
+            GEM:             RWA010,
+            URN:             RWA010_A_URN,
+            OPERATOR:        RWA010_A_OPERATOR,
+            INPUT_CONDUIT:   RWA010_A_INPUT_CONDUIT,
+            OUTPUT_CONDUIT:  RWA010_A_OUTPUT_CONDUIT,
+            DROP:            0x0b304DfFa350B32f608FF3c69f1cE511c11554cF,
+            OWNER:           0x58C2fdCa82B7C564777E3547eA13bf8113A015cC, // Tinlake Clerk
+            POOL:            0x1C8Fb0Ab3694Bc4c0B49402be01ae881ae0D3212, // Tinlake Operator
+            TRANCHE:         0xb913dd925Fdd34867CBFa492c538B7BdB047F3Cd, // Tinlake Tranche
+            ROOT:            0x4597f91cC06687Bdb74147C80C097A79358Ed29b, // Tinlake Root
+            gemID:           "RWA010",
+            joinID:          "MCD_JOIN_RWA010_A",
+            urnID:           "RWA010_A_URN",
+            inputConduitID:  "RWA010_A_INPUT_CONDUIT",
+            outputConduitID: "RWA010_A_OUTPUT_CONDUIT",
+            pipID:           "PIP_RWA010",
+            ilk:             "RWA010-A",
+            ilkString:       "RWA010",
+            ilkRegistryName: "RWA010-A: Centrifuge: BlockTower Credit (I)",
+            RATE:            FOUR_PCT_RATE,
+            CEIL:            20_000_000,
+            PRICE:           24_333_058 * WAD,
+            MAT:             100_00, // Liquidation ratio
+            TAU:             0,      // Remediation period
+            DOC:             RWA010_A_DOC
+        }));
 
         // RWA-011 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
-        // TODO
+        _addCentrifugeCollateral(CentrifugeCollateralValues({
+            GEM_JOIN:        MCD_JOIN_RWA011_A,
+            GEM:             RWA011,
+            URN:             RWA011_A_URN,
+            OPERATOR:        RWA011_A_OPERATOR,
+            INPUT_CONDUIT:   RWA011_A_INPUT_CONDUIT,
+            OUTPUT_CONDUIT:  RWA011_A_OUTPUT_CONDUIT,
+            DROP:            0x1a9cfB3c4D7202a428955D2baBdE5Bbb19621170,
+            OWNER:           0x0411179607F426A001B948C1Be8F25A2522bE9D7, // Tinlake Clerk
+            POOL:            0xD171E4AaBfC8c6d15e6F354608Ca661D367F97ab, // Tinlake Operator
+            TRANCHE:         0x512EC4ec3143A4a586747F049ED76F722cCE8f03, // Tinlake Tranche
+            ROOT:            0xB5c08534d1E73582FBd79e7C45694CAD6A5C5aB2, // Tinlake Root
+            gemID:           "RWA011",
+            joinID:          "MCD_JOIN_RWA011_A",
+            urnID:           "RWA011_A_URN",
+            inputConduitID:  "RWA011_A_INPUT_CONDUIT",
+            outputConduitID: "RWA011_A_OUTPUT_CONDUIT",
+            pipID:           "PIP_RWA011",
+            ilk:             "RWA011-A",
+            ilkString:       "RWA011",
+            ilkRegistryName: "RWA011-A: Centrifuge: BlockTower Credit (II)",
+            RATE:            FOUR_PCT_RATE,
+            CEIL:            30_000_000,
+            PRICE:           36_499_587 * WAD,
+            MAT:             100_00, // Liquidation ratio
+            TAU:             0,      // Remediation period
+            DOC:             RWA011_A_DOC
+        }));
 
 
         // RWA-012 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
-        // TODO
+        _addCentrifugeCollateral(CentrifugeCollateralValues({
+            GEM_JOIN:        MCD_JOIN_RWA012_A,
+            GEM:             RWA012,
+            URN:             RWA012_A_URN,
+            OPERATOR:        RWA012_A_OPERATOR,
+            INPUT_CONDUIT:   RWA012_A_INPUT_CONDUIT,
+            OUTPUT_CONDUIT:  RWA012_A_OUTPUT_CONDUIT,
+            DROP:            0x1407e60059121780f05e90D4bCE14B14D003b8EF,
+            OWNER:           0x17dF3e3722Fc39A6318A0a70127aAceB86b96Da0, // Tinlake Clerk
+            POOL:            0xbaa869bB8964FfB84f897cC52A994816605e84E4, // Tinlake Operator
+            TRANCHE:         0x8b35c25eD7f60bDeCacA2AC093f1DC8522642B48, // Tinlake Tranche
+            ROOT:            0x90040F96aB8f291b6d43A8972806e977631aFFdE, // Tinlake Root
+            gemID:           "RWA012",
+            joinID:          "MCD_JOIN_RWA012_A",
+            urnID:           "RWA012_A_URN",
+            inputConduitID:  "RWA012_A_INPUT_CONDUIT",
+            outputConduitID: "RWA012_A_OUTPUT_CONDUIT",
+            pipID:           "PIP_RWA012",
+            ilk:             "RWA012-A",
+            ilkString:       "RWA012",
+            ilkRegistryName: "RWA012-A: Centrifuge: BlockTower Credit (III)",
+            RATE:            FOUR_PCT_RATE,
+            CEIL:            30_000_000,
+            PRICE:           36_499_587 * WAD,
+            MAT:             100_00, // Liquidation ratio
+            TAU:             0,      // Remediation period
+            DOC:             RWA010_A_DOC
+        }));
 
 
         // RWA-013 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
-        // TODO
+        _addCentrifugeCollateral(CentrifugeCollateralValues({
+            GEM_JOIN:        MCD_JOIN_RWA013_A,
+            GEM:             RWA013,
+            URN:             RWA013_A_URN,
+            OPERATOR:        RWA013_A_OPERATOR,
+            INPUT_CONDUIT:   RWA013_A_INPUT_CONDUIT,
+            OUTPUT_CONDUIT:  RWA013_A_OUTPUT_CONDUIT,
+            DROP:            0x306cC70e3BCB03f47586b83d35698dd783C91390,
+            OWNER:           0xe015FF153fa731f0399E65f08736ae71B6fD1a9F, // Tinlake Clerk
+            POOL:            0x2dE79b227dB3cEf2bD9b841f77b154879Ef4A278, // Tinlake Operator
+            TRANCHE:         0xc39E5cB1055Bff2202695FDbA9CCa5412831240a, // Tinlake Tranche
+            ROOT:            0x55d86d51Ac3bcAB7ab7d2124931FbA106c8b60c7, // Tinlake Root
+            gemID:           "RWA013",
+            joinID:          "MCD_JOIN_RWA013_A",
+            urnID:           "RWA013_A_URN",
+            inputConduitID:  "RWA013_A_INPUT_CONDUIT",
+            outputConduitID: "RWA013_A_OUTPUT_CONDUIT",
+            pipID:           "PIP_RWA013",
+            ilk:             "RWA013-A",
+            ilkString:       "RWA013",
+            ilkRegistryName: "RWA013-A: Centrifuge: BlockTower Credit (IV)",
+            RATE:            FOUR_PCT_RATE,
+            CEIL:            70_000_000,
+            PRICE:           85_165_703 * WAD,
+            MAT:             100_00, // Liquidation ratio
+            TAU:             0,      // Remediation period
+            DOC:             RWA013_A_DOC
+        }));
+
 
 
         // ----------------------------- Collateral offboarding -----------------------------
@@ -294,8 +533,124 @@ contract DssSpellAction is DssAction {
         // Remove Starknet Bridge Deposit Limit
         StarknetLike(STARKNET_DAI_BRIDGE).setMaxDeposit(type(uint256).max);
 
+        // -------------------- Changelog Update ---------------------
+        DssExecLib.setChangelogAddress("GNO",                 GNO);
+        DssExecLib.setChangelogAddress("PIP_GNO",             PIP_GNO);
+        DssExecLib.setChangelogAddress("MCD_JOIN_GNO_A",      MCD_JOIN_GNO_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_GNO_A",      MCD_CLIP_GNO_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GNO_A", MCD_CLIP_CALC_GNO_A);
+
         // Bump changelog
         DssExecLib.setChangelogVersion("1.14.7");
+    }
+
+    function _addCentrifugeCollateral(CentrifugeCollateralValues memory collateral) internal {
+        uint256 gemDecimals = GemLike(collateral.GEM).decimals();
+
+        // Sanity checks
+        {
+            GemJoinLike gemJoin = GemJoinLike(collateral.GEM_JOIN);
+
+            require(gemJoin.vat() == VAT,            "join-vat-not-match");
+            require(gemJoin.ilk() == collateral.ilk, "join-ilk-not-match");
+            require(gemJoin.gem() == collateral.GEM, "join-gem-not-match");
+            require(gemJoin.dec() == gemDecimals,    "join-dec-not-match");
+
+            // Setup the gemjoin
+            gemJoin.rely(collateral.URN);
+        }
+
+        {
+            RwaUrnLike urn = RwaUrnLike(collateral.URN);
+
+            require(urn.vat()           == VAT,                       "urn-vat-not-match");
+            require(urn.jug()           == JUG,                       "urn-jug-not-match");
+            require(urn.daiJoin()       == DAI_JOIN,                  "urn-daijoin-not-match");
+            require(urn.gemJoin()       == collateral.GEM_JOIN,       "urn-gemjoin-not-match");
+            require(urn.outputConduit() == collateral.OUTPUT_CONDUIT, "urn-outputconduit-not-match");
+
+            // Set up the urn
+            urn.hope(collateral.OPERATOR);
+        }
+
+        {
+            TinlakeManagerLike mgr = TinlakeManagerLike(collateral.OPERATOR);
+
+            // Constructor params
+            require(mgr.dai()     == DAI,                "mgr-dai-not-match");
+            require(mgr.daiJoin() == DAI_JOIN,           "mgr-daijoin-not-match");
+            require(mgr.vat()     == VAT,                "mgr-vat-not-match");
+            require(mgr.gem()     == collateral.DROP,    "mgr-drop-not-match");
+            // Fileable constructor params
+            require(mgr.vow()     == VOW,                "mgr-vow-not-match");
+            require(mgr.end()     == END,                "mgr-end-not-match");
+            // Fileable centrifuge-only params
+            require(mgr.pool()    == collateral.POOL,    "mgr-pool-not-match");
+            require(mgr.tranche() == collateral.TRANCHE, "mgr-tranche-not-match");
+            require(mgr.owner()   == collateral.OWNER,   "mgr-owner-not-match");
+        }
+
+        // Initialize the liquidation oracle for RWA0XY
+        RwaLiquidationLike(ORACLE).init(collateral.ilk, collateral.PRICE, collateral.DOC, collateral.TAU);
+        (, address pip, , ) = RwaLiquidationLike(ORACLE).ilks(collateral.ilk);
+
+        // Set price feed for RWA0XY
+        DssExecLib.setContract(SPOTTER, collateral.ilk, "pip", pip);
+
+        // Init RWA0XY in Vat
+        Initializable(VAT).init(collateral.ilk);
+
+        // Init RWA0XY in Jug
+        Initializable(JUG).init(collateral.ilk);
+
+        // Allow RWA0XY_JOIN to modify the Vat registry
+        DssExecLib.authorize(VAT, collateral.GEM_JOIN);
+
+        // Set ilk/global DC
+        DssExecLib.increaseIlkDebtCeiling(collateral.ilk, collateral.CEIL, /* global = */ true);
+
+        // Set stability fee
+        DssExecLib.setIlkStabilityFee(collateral.ilk, collateral.RATE, /* doDrip = */ false);
+
+        // Set liquidation ratio
+        DssExecLib.setIlkLiquidationRatio(collateral.ilk, collateral.MAT);
+
+        // Poke the spotter to pull in a price
+        DssExecLib.updateCollateralPrice(collateral.ilk);
+
+        // Transfer the RwaToken from DSPauseProxy to the operator and lock it into the urn
+        GemLike(collateral.GEM).transfer(collateral.OPERATOR, 1 * WAD);
+
+        // Set TinlakeManager MIP21 components
+        TinlakeManagerLike(collateral.OPERATOR).file("liq", address(ORACLE));
+        TinlakeManagerLike(collateral.OPERATOR).file("urn", collateral.URN);
+        // Lock the RWA Token in the RWA Urn
+        TinlakeManagerLike(collateral.OPERATOR).lock(1 * WAD);
+        // Rely Tinlake Root
+        DssExecLib.authorize(collateral.OPERATOR, collateral.ROOT);
+        // Deny DSPauseProxy
+        DssExecLib.deauthorize(collateral.OPERATOR, address(this));
+
+        // Add RWA-00x contracts to the changelog
+        DssExecLib.setChangelogAddress(collateral.gemID, collateral.GEM);
+        DssExecLib.setChangelogAddress(collateral.pipID, pip);
+        DssExecLib.setChangelogAddress(collateral.joinID, collateral.GEM_JOIN);
+        DssExecLib.setChangelogAddress(collateral.urnID, collateral.URN);
+        DssExecLib.setChangelogAddress(collateral.inputConduitID, collateral.INPUT_CONDUIT);
+        DssExecLib.setChangelogAddress(collateral.outputConduitID, collateral.OUTPUT_CONDUIT);
+
+        // Add RWA0XY to the ilk registry
+        IlkRegistryLike(ILK_REG).put(
+            collateral.ilk,
+            collateral.GEM_JOIN,
+            collateral.GEM,
+            gemDecimals,
+            REG_RWA_CLASS,
+            pip,
+            address(0),
+            collateral.ilkRegistryName,
+            collateral.ilkString
+        );
     }
 }
 
