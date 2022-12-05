@@ -144,7 +144,7 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(

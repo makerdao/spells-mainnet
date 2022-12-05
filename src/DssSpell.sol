@@ -166,9 +166,9 @@ contract DssSpellAction is DssAction {
         // Reduce MANA-A line from 1 million DAI to 0 DAI
         bytes32 _ilk = "MANA-A";
         DssExecLib.removeIlkFromAutoLine(_ilk);
-        (,,, uint256 _line,) = VatLike(VAT).ilks(_ilk);
+        (,,, uint256 _Line,) = VatLike(VAT).ilks(_ilk);
         DssExecLib.setValue(VAT, _ilk, "line", 0);
-        DssExecLib.setValue(VAT, "Line", sub(VatLike(VAT).Line(), _line));
+        DssExecLib.setValue(VAT, "Line", sub(VatLike(VAT).Line(), _Line));
         // Reduce GUNIV3DAIUSDC1-A line from 1 billion DAI to 100 million DAI
         DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC1-A", 100 * MILLION);
         // Reduce GUINV3DAIUSDC2-A line from 1.25 billion DAI to 100 million DAI
