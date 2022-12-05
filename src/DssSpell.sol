@@ -54,8 +54,13 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
+<<<<<<< HEAD
     uint256 internal constant ONE_PCT_RATE      = 1000000000315522921573372069;
     uint256 internal constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
+||||||| parent of d11faca (feat: onboard GNO-A & offboard RENBTC-A)
+=======
+    uint256 internal constant TWO_FIVE_PCT_RATE  = 1000000000782997609082909351;
+>>>>>>> d11faca (feat: onboard GNO-A & offboard RENBTC-A)
 
     // --- MATH ---
     uint256 internal constant MILLION           = 10 ** 6;
@@ -74,6 +79,9 @@ contract DssSpellAction is DssAction {
     address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
 
     GemLike internal immutable MKR = GemLike(DssExecLib.mkr());
+
+    // --- MATH ---
+    uint256 internal constant RAY                = 10 ** 27;
 
     address constant internal STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
     address constant internal ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
@@ -98,6 +106,7 @@ contract DssSpellAction is DssAction {
 
     address constant internal TECH_001           = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
 
+<<<<<<< HEAD
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
     address internal constant PIP_GNO             = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
@@ -105,6 +114,16 @@ contract DssSpellAction is DssAction {
     address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
     address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
 
+||||||| parent of d11faca (feat: onboard GNO-A & offboard RENBTC-A)
+=======
+    // --- DEPLOYED COLLATERAL ADDRESSES ---
+    address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
+    address internal constant PIP_GNO             = address(0);
+    address internal constant MCD_JOIN_GNO_A      = address(0);
+    address internal constant MCD_CLIP_GNO_A      = address(0);
+    address internal constant MCD_CLIP_CALC_GNO_A = address(0);
+
+>>>>>>> d11faca (feat: onboard GNO-A & offboard RENBTC-A)
     function actions() public override {
 
         // Delegate Compensation - November 2022
@@ -260,7 +279,6 @@ contract DssSpellAction is DssAction {
         // RWA-010 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
         // TODO
-
 
         // RWA-011 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
