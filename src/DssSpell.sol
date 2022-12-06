@@ -210,7 +210,7 @@ contract DssSpellAction is DssAction {
 
         // ----------------------------- Collateral onboarding -----------------------------
         //  Add GNO-A as a new Vault Type
-        //  Poll Link:   TODO
+        //  Poll Link:   https://vote.makerdao.com/polling/QmUBoGiu#poll-detail
         //  Forum Post:  https://forum.makerdao.com/t/gno-collateral-onboarding-risk-evaluation/18820
 
         DssExecLib.addNewCollateral(
