@@ -68,9 +68,6 @@ contract DssSpellAction is DssAction {
 
     GemLike internal immutable MKR = GemLike(DssExecLib.mkr());
 
-    // --- MATH ---
-    uint256 internal constant RAY                = 10 ** 27;
-
     address constant internal STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
     address constant internal ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
     address constant internal FLIPFLOPFLAP       = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
