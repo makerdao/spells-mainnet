@@ -97,7 +97,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testPayments() public { // make public to enable
-        uint256 prevSin = vat.sin(address(vow));
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -141,10 +140,14 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+        spell.schedule();
+        hevm.warp(now + pause.delay());
+        pot.drip();
+        uint256 prevSin = vat.sin(address(vow));
+        spell.cast();
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
