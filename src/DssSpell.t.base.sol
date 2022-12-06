@@ -1012,6 +1012,18 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             bytes32(uint256(-1))
         );
 
+        // Initially this test assume that's we are using freshly deployed Cliiper contract without any past auctions
+        if (clipper.kicks() > 0) {
+            // Cleanup clipper auction counter
+            hevm.store(
+                address(clipper),
+                bytes32(uint256(10)),
+                bytes32(uint256(0))
+            );
+
+            assertEq(clipper.kicks(), 0);
+        }
+
         // ----------------------- Check Clipper works and bids can be made -----------------------
 
         {

@@ -228,7 +228,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
             addr.addr("MCD_CLIP_CALC_RENBTC_A"),
             OsmAbstract(addr.addr("PIP_RENBTC")),
-            10 * WAD
+            5 * WAD
         );
     }
 
