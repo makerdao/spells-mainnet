@@ -77,10 +77,10 @@ contract DssSpellAction is DssAction {
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
-    address internal constant PIP_GNO             = address(0);
-    address internal constant MCD_JOIN_GNO_A      = address(0);
-    address internal constant MCD_CLIP_GNO_A      = address(0);
-    address internal constant MCD_CLIP_CALC_GNO_A = address(0);
+    address internal constant PIP_GNO             = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
+    address internal constant MCD_JOIN_GNO_A      = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
+    address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
+    address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
 
     function actions() public override {
 

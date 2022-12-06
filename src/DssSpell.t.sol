@@ -225,7 +225,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
             addr.addr("MCD_CLIP_CALC_RENBTC_A"),
             OsmAbstract(addr.addr("PIP_RENBTC")),
-            5 * WAD
+            10 * WAD
         );
     }
 
@@ -249,7 +249,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // GNO-A
-        assertEq(reg.pos("GNO-A"),    55);
+        assertEq(reg.pos("GNO-A"),    56);
         assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
         assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
         assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
