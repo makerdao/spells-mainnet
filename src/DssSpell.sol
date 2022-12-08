@@ -155,50 +155,50 @@ contract DssSpellAction is DssAction {
     // --- Ilk Registry ---
     uint256 internal constant REG_RWA_CLASS = 3;
 
-    address internal immutable VAT            = DssExecLib.vat();
-    address internal immutable MCD_PSM_PAX_A  = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
-    address internal immutable MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
-    address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
-    address internal immutable DAI            = DssExecLib.dai();
-    address internal immutable DAI_JOIN       = DssExecLib.daiJoin();
-    address internal immutable END            = DssExecLib.end();
-    address internal immutable JUG            = DssExecLib.jug();
-    address internal immutable SPOTTER        = DssExecLib.spotter();
-    address internal immutable VOW            = DssExecLib.vow();
-    address internal immutable ILK_REG        = DssExecLib.getChangelogAddress("ILK_REGISTRY");
-    address internal immutable ORACLE         = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    address internal immutable VAT                    = DssExecLib.vat();
+    address internal immutable MCD_PSM_PAX_A          = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+    address internal immutable MCD_PSM_GUSD_A         = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+    address internal immutable STARKNET_DAI_BRIDGE    = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address internal immutable DAI                    = DssExecLib.dai();
+    address internal immutable DAI_JOIN               = DssExecLib.daiJoin();
+    address internal immutable END                    = DssExecLib.end();
+    address internal immutable JUG                    = DssExecLib.jug();
+    address internal immutable SPOTTER                = DssExecLib.spotter();
+    address internal immutable VOW                    = DssExecLib.vow();
+    address internal immutable ILK_REG                = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+    address internal immutable ORACLE                 = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
-    GemLike internal immutable MKR = GemLike(DssExecLib.mkr());
+    GemLike internal immutable MKR                    = GemLike(DssExecLib.mkr());
 
-    address constant internal STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
-    address constant internal ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
-    address constant internal FLIPFLOPFLAP       = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address constant internal FLIPSIDE           = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
-    address constant internal FEEDBLACKLOOPS     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address constant internal PENNBLOCKCHAIN     = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
-    address constant internal MHONKASALOTEEMULAU = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
-    address constant internal BLOCKCHAINCOLUMBIA = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
-    address constant internal ACREINVEST         = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
-    address constant internal LBSBLOCKCHAIN      = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
-    address constant internal CALBLOCKCHAIN      = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
-    address constant internal JUSTINCASE         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
-    address constant internal FRONTIERRESEARCH   = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
-    address constant internal CHRISBLEC          = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
-    address constant internal GFXLABS            = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
-    address constant internal ONESTONE           = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
-    address constant internal CODEKNIGHT         = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
-    address constant internal LLAMA              = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
-    address constant internal PVL                = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
-    address constant internal CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
+    address constant internal STABLENODE              = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address constant internal ULTRASCHUPPI            = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address constant internal FLIPFLOPFLAP            = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant internal FLIPSIDE                = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
+    address constant internal FEEDBLACKLOOPS          = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant internal PENNBLOCKCHAIN          = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address constant internal MHONKASALOTEEMULAU      = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
+    address constant internal BLOCKCHAINCOLUMBIA      = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
+    address constant internal ACREINVEST              = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+    address constant internal LBSBLOCKCHAIN           = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
+    address constant internal CALBLOCKCHAIN           = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
+    address constant internal JUSTINCASE              = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant internal FRONTIERRESEARCH        = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address constant internal CHRISBLEC               = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
+    address constant internal GFXLABS                 = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address constant internal ONESTONE                = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
+    address constant internal CODEKNIGHT              = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address constant internal LLAMA                   = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address constant internal PVL                     = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
+    address constant internal CONSENSYS               = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
 
-    address constant internal TECH_001           = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+    address constant internal TECH_001                = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
 
     // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
-    address internal constant PIP_GNO             = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
-    address internal constant MCD_JOIN_GNO_A      = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
-    address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
-    address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
+    address internal constant GNO                     = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
+    address internal constant PIP_GNO                 = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
+    address internal constant MCD_JOIN_GNO_A          = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
+    address internal constant MCD_CLIP_GNO_A          = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
+    address internal constant MCD_CLIP_CALC_GNO_A     = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
 
     address constant internal RWA010                  = 0x20C72C1fdd589C4Aaa8d9fF56a43F3B17BA129f8;
     address constant internal PIP_RWA010              = 0xfBAa6a09A39D485a5Be9F5ebfe09C602E63b21EF;
