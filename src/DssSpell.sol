@@ -317,7 +317,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(VAT, "Line", _sub(VatLike(VAT).Line(), _line));
         // Reduce GUNIV3DAIUSDC1-A line from 1 billion DAI to 100 million DAI
         DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC1-A", 100 * MILLION);
-        // Reduce GUINV3DAIUSDC2-A line from 1.25 billion DAI to 100 million DAI
+        // Reduce GUNIV3DAIUSDC2-A line from 1.25 billion DAI to 100 million DAI
         DssExecLib.setIlkAutoLineDebtCeiling("GUNIV3DAIUSDC2-A", 100 * MILLION);
         // Reduce the UNIV2DAIUSDC-A line from 300 million DAI to 100 million DAI
         DssExecLib.setIlkAutoLineDebtCeiling("UNIV2DAIUSDC-A", 100 * MILLION);
