@@ -98,7 +98,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // make public to enable
 
-        // For each payment, create a Payee object with
+        // For each payment, create a Payee obj ect with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
@@ -141,7 +141,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         vote(address(spell));
         spell.schedule();
-        hevm.warp(now + pause.delay());
+        hevm.warp(spell.nextCastTime());
         pot.drip();
         uint256 prevSin = vat.sin(address(vow));
         spell.cast();
