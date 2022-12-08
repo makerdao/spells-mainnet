@@ -243,6 +243,13 @@ contract DssSpellAction is DssAction {
         DssExecLib.setStairstepExponentialDecrease(MCD_CLIP_CALC_GNO_A, 60 seconds, 99_00);
         DssExecLib.setIlkAutoLineParameters("GNO-A", 5_000_000, 3_000_000, 8 hours);
 
+        // -------------------- Changelog Update ---------------------
+        DssExecLib.setChangelogAddress("GNO",                 GNO);
+        DssExecLib.setChangelogAddress("PIP_GNO",             PIP_GNO);
+        DssExecLib.setChangelogAddress("MCD_JOIN_GNO_A",      MCD_JOIN_GNO_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_GNO_A",      MCD_CLIP_GNO_A);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GNO_A", MCD_CLIP_CALC_GNO_A);
+
 
         // RWA-010 Onboarding
         // https://vote.makerdao.com/polling/QmNucsGt
@@ -275,13 +282,6 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib allow to set `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/2afff4373e8a827659df28f6d349feb25f073e59/src/DssExecLib.sol#L733
         DssExecLib.setValue(DssExecLib.spotter(), "RENBTC-A", "mat", 50 * RAY); // 5000%
         DssExecLib.setIlkMaxLiquidationAmount("RENBTC-A", 350_000);
-
-        // -------------------- Changelog Update ---------------------
-        DssExecLib.setChangelogAddress("GNO",                 GNO);
-        DssExecLib.setChangelogAddress("PIP_GNO",             PIP_GNO);
-        DssExecLib.setChangelogAddress("MCD_JOIN_GNO_A",      MCD_JOIN_GNO_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_GNO_A",      MCD_CLIP_GNO_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GNO_A", MCD_CLIP_CALC_GNO_A);
 
         // Bump changelog
         DssExecLib.setChangelogVersion("1.14.7");
