@@ -42,7 +42,7 @@ contract Deployers {
     address public constant UNKNOWN_2017_04_10 = 0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c; //2017-04-10 (NO MATCH IN GOERLI)
     address public constant UNKNOWN_2020_10_09 = 0xd200790f62c8da69973e61d4936cfE4f356ccD07; //2020-10-09 (NO MATCH IN GOERLI)
     address public constant UNKNOWN_2021_09_20 = 0x075da589886BA445d7c7e81c472059dE7AE65250; //2021-09-20 (NO MATCH IN GOERLI)
-    address public constant UNKNOWN_2022_05_10 = 0x7f06941997C7778E7B734fE55f7353f554B06d7d; //2022-05-10 (NO MATCH IN GOERLI)
+    address public constant STARKNET_01 = 0x7f06941997C7778E7B734fE55f7353f554B06d7d;
         
     constructor() public {
         addr = [
