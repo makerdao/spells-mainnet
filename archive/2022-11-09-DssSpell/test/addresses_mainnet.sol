@@ -62,6 +62,7 @@ contract Addresses {
         addr["OSM_MOM"]                         = 0x76416A4d5190d071bfed309861527431304aA14f;
         addr["FLIPPER_MOM"]                     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]                     = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
+        addr["DIRECT_MOM"]                      = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
         addr["MCD_VEST_DAI"]                    = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
@@ -101,7 +102,7 @@ contract Addresses {
         addr["MCD_JOIN_USDC_A"]                 = 0xA191e578a6736167326d05c119CE0c90849E84B7;
         addr["MCD_FLIP_USDC_A"]                 = 0xbe359e53038E41a1ffA47DAE39645756C80e557a;
         addr["MCD_CLIP_USDC_A"]                 = 0x046b1A5718da6A226D912cFd306BA19980772908;
-        addr["MCD_CLIP_CALC_USDC_A"]            = 0x00A0F90666c6Cd3E615cF8459A47e89A08817602;
+        addr["MCD_CLIP_CALC_USDC_A"]            = 0x0FCa4ba0B80123b5d22dD3C8BF595F3E561d594D;
         addr["MCD_JOIN_USDC_B"]                 = 0x2600004fd1585f7270756DDc88aD9cfA10dD0428;
         addr["MCD_FLIP_USDC_B"]                 = 0x77282aD36aADAfC16bCA42c865c674F108c4a616;
         addr["MCD_CLIP_USDC_B"]                 = 0x5590F23358Fe17361d7E4E4f91219145D8cCfCb3;
@@ -160,7 +161,7 @@ contract Addresses {
         addr["MCD_JOIN_PAXUSD_A"]               = 0x7e62B7E279DFC78DEB656E34D6a435cC08a44666;
         addr["MCD_FLIP_PAXUSD_A"]               = 0x52D5D1C05CC79Fc24A629Cb24cB06C5BE5d766E7;
         addr["MCD_CLIP_PAXUSD_A"]               = 0xBCb396Cd139D1116BD89562B49b9D1d6c25378B0;
-        addr["MCD_CLIP_CALC_PAXUSD_A"]          = 0xA2a4aeFEd398661B0a873d3782DA121c194a0201;
+        addr["MCD_CLIP_CALC_PAXUSD_A"]          = 0xAB98De83840b8367046383D2Adef9959E130923e;
         addr["MCD_JOIN_PSM_PAX_A"]              = 0x7bbd8cA5e413bCa521C2c80D8d1908616894Cf21;
         addr["MCD_CLIP_PSM_PAX_A"]              = 0x5322a3551bc6a1b39d5D142e5e38Dc5B4bc5B3d2;
         addr["MCD_CLIP_CALC_PSM_PAX_A"]         = 0xC19eAc21A4FccdD30812F5fF5FebFbD6817b7593;
@@ -200,7 +201,7 @@ contract Addresses {
         addr["MCD_JOIN_GUSD_A"]                 = 0xe29A14bcDeA40d83675aa43B72dF07f649738C8b;
         addr["MCD_FLIP_GUSD_A"]                 = 0xCAa8D152A8b98229fB77A213BE16b234cA4f612f;
         addr["MCD_CLIP_GUSD_A"]                 = 0xa47D68b9dB0A0361284fA04BA40623fcBd1a263E;
-        addr["MCD_CLIP_CALC_GUSD_A"]            = 0xC287E4e9017259f3b21C86A0Ef7840243eC3f4d6;
+        addr["MCD_CLIP_CALC_GUSD_A"]            = 0xF7e80359Cb9C4E6D178E6689eD8A6A6f91060747;
         addr["MCD_JOIN_PSM_GUSD_A"]             = 0x79A0FA989fb7ADf1F8e80C93ee605Ebb94F7c6A5;
         addr["MCD_CLIP_PSM_GUSD_A"]             = 0xf93CC3a50f450ED245e003BFecc8A6Ec1732b0b2;
         addr["MCD_CLIP_CALC_PSM_GUSD_A"]        = 0x7f67a68a0ED74Ea89A82eD9F243C159ed43a502a;
@@ -343,8 +344,8 @@ contract Addresses {
         addr["MCD_JOIN_RWA007_A"]               = 0x476aaD14F42469989EFad0b7A31f07b795FF0621;
         addr["RWA007_A_URN"]                    = 0x481bA2d2e86a1c41427893899B5B0cEae41c6726;
         addr["RWA007_A_JAR"]                    = 0xef1B095F700BE471981aae025f92B03091c3AD47;
-        addr["RWA007_A_INPUT_CONDUIT"]          = 0x58f5e979eF74b60a9e5F955553ab8e0e65ba89c9;
-        addr["RWA007_A_JAR_INPUT_CONDUIT"]      = 0xc8bb4e2B249703640e89265e2Ae7c9D5eA2aF742;
+        addr["RWA007_A_INPUT_CONDUIT_URN"]      = 0x58f5e979eF74b60a9e5F955553ab8e0e65ba89c9;
+        addr["RWA007_A_INPUT_CONDUIT_JAR"]      = 0xc8bb4e2B249703640e89265e2Ae7c9D5eA2aF742;
         addr["RWA007_A_OUTPUT_CONDUIT"]         = 0x701C3a384c613157bf473152844f368F2d6EF191;
         addr["RWA007_A_OPERATOR"]               = 0x94cfBF071f8be325A5821bFeAe00eEbE9CE7c279;
         addr["RWA007_A_COINBASE_CUSTODY"]       = 0xC3acf3B96E46Aa35dBD2aA3BD12D23c11295E774;
@@ -374,8 +375,7 @@ contract Addresses {
         addr["STARKNET_DAI_BRIDGE_LEGACY"]      = 0x659a00c33263d9254Fed382dE81349426C795BB6;
         addr["STARKNET_ESCROW"]                 = 0x0437465dfb5B79726e35F08559B0cBea55bb585C;
         addr["STARKNET_ESCROW_MOM"]             = 0xc238E3D63DfD677Fa0FA9985576f0945C581A266;
-        addr["STARKNET_GOV_RELAY"]              = 0x2385C60D2756Ed8CA001817fC37FDa216d7466c0;
-        addr["STARKNET_GOV_RELAY_LEGACY"]       = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
+        addr["STARKNET_GOV_RELAY"]              = 0x9eed6763BA8D89574af1478748a7FDF8C5236fE0;
         addr["STARKNET_CORE"]                   = 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4;
         addr["OPTIMISM_TELEPORT_BRIDGE"]        = 0x920347f49a9dbe50865EB6161C3B2774AC046A7F;
         addr["OPTIMISM_TELEPORT_FEE"]           = 0xA7C088AAD64512Eff242901E33a516f2381b8823;
@@ -407,16 +407,5 @@ contract Addresses {
         addr["MCD_JOIN_RETH_A"]                 = 0xC6424e862f1462281B0a5FAc078e4b63006bDEBF;
         addr["MCD_CLIP_RETH_A"]                 = 0x27CA5E525ea473eD52Ea9423CD08cCc081d96a98;
         addr["MCD_CLIP_CALC_RETH_A"]            = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
-        addr["DIRECT_HUB"]                      = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
-        addr["DIRECT_MOM"]                      = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
-        addr["DIRECT_MOM_LEGACY"]               = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
-        addr["DIRECT_COMPV2_DAI_POOL"]          = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
-        addr["DIRECT_COMPV2_DAI_PLAN"]          = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
-        addr["DIRECT_COMPV2_DAI_ORACLE"]        = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
-        addr["GNO"]                             = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
-        addr["PIP_GNO"]                         = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
-        addr["MCD_JOIN_GNO_A"]                  = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
-        addr["MCD_CLIP_GNO_A"]                  = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
-        addr["MCD_CLIP_CALC_GNO_A"]             = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
     }
 }

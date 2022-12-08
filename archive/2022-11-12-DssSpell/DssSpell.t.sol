@@ -18,31 +18,6 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface D3MHubLike {
-    function exec(bytes32) external;
-    function vow() external view returns (address);
-    function end() external view returns (address);
-    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
-}
-
-interface D3MMomLike {
-    function authority() external view returns (address);
-    function disable(address) external;
-}
-
-interface D3MCompoundPoolLike {
-    function king() external view returns (address);
-}
-
-interface D3MCompoundPlanLike {
-    function wards(address) external view returns (uint256);
-    function barb() external view returns (uint256);
-}
-
-interface D3MOracleLike {
-    function hub() external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
 
     function testSpellIsCast_GENERAL() public {
@@ -69,64 +44,37 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testRemoveChainlogValues() private { // make public to enable
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
-
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
-    }
-
     struct Payee {
         address addr;
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
+    function testPayments() private { // make public to enable
+        uint256 prevSin = vat.sin(address(vow));
 
-        // For each payment, create a Payee obj ect with
+        // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        //Payee[1] memory payees = [
-        //    Payee(wallets.addr("XXX"),           1)
-        //];
-
-        Payee[20] memory payees = [
-            Payee(wallets.addr("STABLENODE"),        12000),
-            Payee(wallets.addr("ULTRASCHUPPI"),      12000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),      12000),
-            Payee(wallets.addr("FLIPSIDE"),          11396),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),    10900),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),    10385),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"), 8945),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 5109),
-            Payee(wallets.addr("ACREINVEST"),         4568),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),      3797),
-            Payee(wallets.addr("CALBLOCKCHAIN"),      3421),
-            Payee(wallets.addr("JUSTINCASE"),         3208),
-            Payee(wallets.addr("FRONTIERRESEARCH"),   2278),
-            Payee(wallets.addr("CHRISBLEC"),          1883),
-            Payee(wallets.addr("GFXLABS"),             532),
-            Payee(wallets.addr("ONESTONE"),            299),
-            Payee(wallets.addr("CODEKNIGHT"),          271),
-            Payee(wallets.addr("LLAMA"),               145),
-            Payee(wallets.addr("PVL"),                  65),
-            Payee(wallets.addr("CONSENSYS"),            28)
+        Payee[18] memory payees = [
+            Payee(wallets.addr("STABLENODE"),           12_000),
+            Payee(wallets.addr("ULTRASCHUPPI"),         12_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),         11_615),
+            Payee(wallets.addr("FLIPSIDE"),             11_395),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),       10_671),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),       10_390),
+            Payee(wallets.addr("JUSTINCASE"),            8_056),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),    7_545),
+            Payee(wallets.addr("ACREINVEST"),            6_682),
+            Payee(wallets.addr("GFXLABS"),               5_306),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),    5_109),
+            Payee(wallets.addr("CHRISBLEC"),             5_057),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),         2_995),
+            Payee(wallets.addr("FRONTIERRESEARCH"),      2_136),
+            Payee(wallets.addr("ONESTONE"),                271),
+            Payee(wallets.addr("CODEKNIGHT"),              270),
+            Payee(wallets.addr("LLAMA"),                   149),
+            Payee(wallets.addr("PVL"),                      65)
         ];
 
         uint256 prevBalance;
@@ -140,14 +88,10 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
@@ -157,126 +101,65 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() public { // make private to disable
+    function testCollateralIntegrations() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkIlkIntegration(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("PIP_GNO"),
-            true, /* _isOSM */
-            true, /* _checkLiquidations */
-            false /* _transferFee */
-        );
+        // checkIlkIntegration(
+        //     "RETH-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+        //     addr.addr("PIP_RETH"),
+        //     true, /* _isOSM */
+        //     true, /* _checkLiquidations */
+        //     false /* _transferFee */
+        // );
     }
 
-    function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
-        // Special exception GUSD has its storage in a separate contract
-        address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
-
-        // Edge case - balance is already set for some reason
-        if (token.balanceOf(address(this)) == amount) return;
-
-        for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                hevm.store(
-                    STORE,
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
-    }
-
-    function testIlkClipper() public { // make private to disable
+    function testIlkClipper() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkIlkClipper(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("MCD_CLIP_CALC_GNO_A"),
-            OsmAbstract(addr.addr("PIP_GNO")),
-            5_000 * WAD
-        );
-
-        checkIlkClipper(
-            "RENBTC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RENBTC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
-            addr.addr("MCD_CLIP_CALC_RENBTC_A"),
-            OsmAbstract(addr.addr("PIP_RENBTC")),
-            5 * WAD
-        );
+        // // Insert new ilk clipper tests here
+        // checkIlkClipper(
+        //     "TOKEN-X",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+        //     addr.addr("MCD_CLIP_CALC_TOKEN_X"),
+        //     OsmAbstract(addr.addr("PIP_TOKEN")),
+        //     20_000 * WAD
+        // );
     }
 
-    function testPsmValues() public {
-
-        bytes32 _ilk = "MCD_PSM_PAX_A";
-        checkPsmIlkIntegration(
-            _ilk,
-            reg.join(_ilk),
-            reg.xlip(_ilk),
-            reg.pip(_ilk),
-            chainLog.getAddress(PsmAbstract(_ilk)),
-            uint256 tin,
-            uint256 tout
-        );
-
-        checkPsmIlkIntegration();
-
-    }
-
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("GNO");
-        checkChainlogKey("PIP_GNO");
-        checkChainlogKey("MCD_JOIN_GNO_A");
-        checkChainlogKey("MCD_CLIP_GNO_A");
-        checkChainlogKey("MCD_CLIP_CALC_GNO_A");
+        // Insert new chainlog values tests here
+        // checkChainlogKey("STARKNET_TELEPORT_BRIDGE");
+        // checkChainlogKey("STARKNET_TELEPORT_FEE");
 
-        checkChainlogVersion("1.14.7");
+        // checkChainlogVersion("1.14.4");
     }
 
-    function testNewIlkRegistryValues() public { // make private to disable
+    function testNewIlkRegistryValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // GNO-A
-        assertEq(reg.pos("GNO-A"),    56);
-        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
-        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
-        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
-        assertEq(reg.class("GNO-A"),  1);
-        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
-        assertEq(reg.name("GNO-A"),   "Gnosis Token");
-        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
+        // Insert new ilk registry values tests here
+        // RETH-A
+        //assertEq(reg.pos("RETH-A"),    54);
+        //assertEq(reg.join("RETH-A"),   addr.addr("MCD_JOIN_RETH_A"));
+        // assertEq(reg.gem("RETH-A"),    addr.addr("RETH"));
+        // assertEq(reg.dec("RETH-A"),    GemAbstract(addr.addr("RETH")).decimals());
+        // assertEq(reg.class("RETH-A"),  1);
+        // assertEq(reg.pip("RETH-A"),    addr.addr("PIP_RETH"));
+        // assertEq(reg.name("RETH-A"),   "Rocket Pool ETH");
+        // assertEq(reg.symbol("RETH-A"), GemAbstract(addr.addr("RETH")).symbol());
     }
 
     function testFailWrongDay() public {
@@ -411,15 +294,15 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() private { // make private to disable
+    function testMedianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Track Median authorizations here
-        // address PIP     = addr.addr("PIP_RETH");
+        // // Track Median authorizations here
+        // address PIP     = addr.addr("PIP_XXX");
         // address MEDIAN  = OsmAbstract(PIP).src();
-        // assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
+        // assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
     }
 
     function test_auth() public {
@@ -738,20 +621,23 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
-    function testMKRPayments() public { // make private to disable
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrTECH  = gov.balanceOf(wallets.addr("TECH_WALLET"));
+    function testMKRPayments() private { // make public to use
+        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        // uint256 prevMkrSH    = gov.balanceOf(wallets.addr("SH_MULTISIG"));
+        // uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
 
-        uint256 amountTECH = 257.31 ether;
+        // uint256 amountSH     =  26.04 ether;
+        // uint256 amountRWF    = 143.46 ether;
 
-        uint256 total      = 257.31 ether;
+        // uint256 total        = 169.50 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevMkrTECH + amountTECH);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(wallets.addr("SH_MULTISIG")), prevMkrSH + amountSH);
+        // assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
     }
 
     function testMKRVestFix() private { // make public to use
@@ -773,49 +659,83 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testDirectCompV2Integration() private {
-        // TODO: Genericize this test for future D3M additions
+    function testAutoLineGap() public {
+        bytes32 ilk;
+        uint256 line;
+
+        giveAuth(address(autoLine), address(this));
+
+        // Inflate Gap and Line - MATIC-A
+        ilk = "MATIC-A";
+        (uint256 alLine, uint256 gap, uint48 ttl,,) = autoLine.ilks(ilk);
+        uint256 highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        uint256 newLine = autoLine.exec(ilk);
+         (uint256 Art, uint256 rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MATIC-gap-boost-failed");
+
+        // Inflate Gap and Line - LINK-A
+        ilk = "LINK-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "LINK-gap-boost-failed");
+
+        // Inflate Gap and Line - YFI-A
+        ilk = "YFI-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        // YFI had a lower line, need to inflate that too
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "YFI-gap-boost-failed");
+
+        // Inflate Gap and Line - MANA-A
+        ilk = "MANA-A";
+        (alLine, gap, ttl,,) = autoLine.ilks(ilk);
+        highGap = gap * 5;
+        autoLine.setIlk(ilk, highGap * 5, highGap, ttl);
+        hevm.warp(block.timestamp + ttl);
+        newLine = autoLine.exec(ilk);
+        (Art, rate,,,) = vat.ilks(ilk);
+        assertEq(newLine, add(highGap, mul(Art, rate)), "MANA-gap-boost-failed");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // bytes32 ilk = "DIRECT-COMPV2-DAI";
-        // D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        // D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
-        // D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
-        // D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
-        // D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        ilk = "MATIC-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MATIC-line-limit-failed");
 
-        // // Do a bunch of sanity checks of the values that were set in the spell
-        // (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        // assertEq(_pool, address(pool));
-        // assertEq(_plan, address(plan));
-        // assertEq(tau, 7 days);
-        // assertEq(hub.vow(), address(vow));
-        // assertEq(hub.end(), address(end));
-        // assertEq(mom.authority(), address(chief));
-        // assertEq(pool.king(), pauseProxy);
-        // assertEq(plan.wards(address(mom)), 1);
-        // assertEq(plan.barb(), 7535450719);
-        // assertEq(oracle.hub(), address(hub));
-        // (address pip,) = spotter.ilks(ilk);
-        // assertEq(pip, address(oracle));
-        // assertEq(vat.wards(address(hub)), 1);
+        ilk = "LINK-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "LINK-line-limit-failed");
 
-        // // Current market conditions should max out the D3M @ 5m DAI
-        // hub.exec(ilk);
-        // (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        // assertEq(ink, 5 * MILLION * WAD);
-        // assertEq(art, 5 * MILLION * WAD);
+        ilk = "YFI-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "YFI-line-limit-failed");
 
-        // // De-activate the D3M via mom
-        // hevm.prank(DSChiefAbstract(chief).hat());
-        // mom.disable(address(plan));
-        // assertEq(plan.barb(), 0);
-        // hub.exec(ilk);
-        // (ink, art) = vat.urns(ilk, address(pool));
-        // assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        // assertLt(art, WAD);
+        ilk = "MANA-A";
+        hevm.warp(block.timestamp + afterSpell.collaterals[ilk].aL_ttl);
+        newLine = autoLine.exec(ilk);
+        (,,,line,) = vat.ilks(ilk);
+        assertEq(newLine, line);
+        assertEq(line, afterSpell.collaterals[ilk].aL_line * RAD, "MANA-line-limit-failed");
     }
 }

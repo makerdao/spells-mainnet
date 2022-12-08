@@ -3,8 +3,9 @@ all                :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssEx
                        dapp --use solc:0.6.12 build
 clean              :; dapp clean
                       # Usage example: make test match=SpellIsCast
-test               :; ./scripts/test-dssspell.sh match="$(match)" optimizer="$(optimizer)" optimizer-runs="$(optimizer-runs)" block="$(block)"
+test               :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 test-forge         :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
+test-dapp          :; ./scripts/test-dssspell.sh match="$(match)" optimizer="$(optimizer)" optimizer-runs="$(optimizer-runs)" block="$(block)"
 estimate           :; ./scripts/estimate-deploy-gas.sh
 deploy             :; ./scripts/deploy.sh
 deploy-stamp       :; ./scripts/get-created-timestamp.sh tx=$(tx)

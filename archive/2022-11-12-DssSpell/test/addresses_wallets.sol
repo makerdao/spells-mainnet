@@ -61,7 +61,7 @@ contract Wallets {
         addr["ULTRASCHUPPI"]                 = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["STABLENODE"]                   = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
-        addr["FLIPSIDE"]                     = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
+        addr["FLIPSIDE"]                     = 0x62a43123FE71f9764f26554b3F5017627996816a;
         addr["PENNBLOCKCHAIN"]               = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
         addr["CHRISBLEC"]                    = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
         addr["BLOCKCHAINCOLUMBIA"]           = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
@@ -72,8 +72,6 @@ contract Wallets {
         addr["LBSBLOCKCHAIN"]                = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
         addr["ONESTONE"]                     = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
         addr["PVL"]                          = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
-        addr["CALBLOCKCHAIN"]                = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
-        addr["CONSENSYS"]                    = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;

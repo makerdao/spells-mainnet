@@ -45,7 +45,6 @@ interface Hevm {
     function load(address,bytes32) external view returns (bytes32);
     function addr(uint) external returns (address);
     function sign(uint, bytes32) external returns (uint8, bytes32, bytes32);
-    function prank(address) external;
     function startPrank(address) external;
     function stopPrank() external;
 }
@@ -168,10 +167,6 @@ interface RwaLiquidationLike {
     function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
 }
 
-interface AuthorityLike {
-    function authority() external view returns (address);
-}
-
 contract DssSpellTestBase is Config, DSTest, DSMath {
     Hevm hevm;
 
@@ -205,7 +200,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract           flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     ClipperMomAbstract           clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
-    AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
@@ -517,9 +511,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
         // check ClipperMom authority
         assertEq(clipMom.authority(), values.clipper_mom_authority, "TestError/clipperMom-authority");
 
-        // check D3MMom authority
-        assertEq(d3mMom.authority(), values.d3m_mom_authority, "TestError/d3mMom-authority");
-
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
 
@@ -577,7 +568,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
             assertEq(dust, normalizedTestDust, concat("TestError/vat-dust-", ilk));
-            assertTrue((dust >= RAD && dust <= 100 * THOUSAND * RAD) || dust == 0, concat("TestError/vat-dust-range-", ilk)); // eq 0 or gt eq 1 and lte 100k
+            assertTrue((dust >= RAD && dust < 100 * THOUSAND * RAD) || dust == 0, concat("TestError/vat-dust-range-", ilk)); // eq 0 or gt eq 1 and lt 100k
             }
 
             {
@@ -585,7 +576,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             if (pip != address(0)) {
                 // Convert BP to system expected value
                 uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
-                if ( values.collaterals[ilk].offboarding ) {
+                if ( values.collaterals[ilk].lerp ) {
                     assertTrue(mat <= normalizedTestMat, concat("TestError/vat-lerping-mat-", ilk));
                     assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-", ilk));  // cr gt 100% and lt 30000%
                 } else {
@@ -664,9 +655,9 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
                 assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY, concat("TestError/clip-buf-range-", ilk)); // gte 0% and lte 100%
                 assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail, concat("TestError/clip-tail-", ilk));
                 if (ilk == "TUSD-A") { // long tail liquidation
-                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 30 days, concat("TestError/TUSD-clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 30 days
+                    assertTrue(clip.tail() >= 1200 && clip.tail() < 30 days, concat("TestError/TUSD-clip-tail-range-", ilk)); // gt eq 20 minutes and lt 10 hours
                 } else {
-                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 12 hours, concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 12 hours
+                    assertTrue(clip.tail() >= 1200 && clip.tail() < 10 hours, concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt 10 hours
                 } // gt eq 20 minutes and lt 10 hours
                 uint256 normalizedTestCusp = (values.collaterals[ilk].clip_cusp)  * 10**23;
                 assertEq(uint256(clip.cusp()), normalizedTestCusp, concat("TestError/clip-cusp-", ilk));
@@ -883,7 +874,7 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 4 * dust * 10 ** uint256(token.decimals()) / (_isOSM ? getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
+        uint256 amount = 2 * dust * 10 ** uint256(token.decimals()) / (_isOSM ? getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
         uint256 amount18 = token.decimals() == 18 ? amount : amount * 10**(18 - uint256(token.decimals()));
         giveTokens(address(token), amount);
 
@@ -1011,18 +1002,6 @@ contract DssSpellTestBase is Config, DSTest, DSMath {
             bytes32(uint256(4)),
             bytes32(uint256(-1))
         );
-
-        // Initially this test assume that's we are using freshly deployed Cliiper contract without any past auctions
-        if (clipper.kicks() > 0) {
-            // Cleanup clipper auction counter
-            hevm.store(
-                address(clipper),
-                bytes32(uint256(10)),
-                bytes32(uint256(0))
-            );
-
-            assertEq(clipper.kicks(), 0);
-        }
 
         // ----------------------- Check Clipper works and bids can be made -----------------------
 

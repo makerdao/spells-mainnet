@@ -28,7 +28,6 @@ contract ConfigStarknet {
         uint256 dai_bridge_ceiling;
         uint256 dai_bridge_maxDeposit;
         uint256 l2_dai_bridge;
-        uint256 l2_gov_relay;
     }
 
     function setValues() public {
@@ -37,8 +36,7 @@ contract ConfigStarknet {
             dai_bridge_isOpen:         1,        // 1 open, 0 closed
             dai_bridge_ceiling:        200_000,  // Whole Dai Units
             dai_bridge_maxDeposit:     1000,     // Whole Dai Units
-            l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60,
-            l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db
+            l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60
         });
     }
 }
@@ -68,7 +66,6 @@ interface StarknetDaiBridgeLike {
 interface StarknetGovRelayLike {
     function wards(address) external returns (uint256);
     function starkNet() external returns (address);
-    function l2GovernanceRelay() external returns (uint256);
 }
 
 interface StarknetCoreLike {
@@ -141,7 +138,6 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(govRelay.wards(addr.addr("MCD_ESM")),         1, "StarknetTest/esm-not-ward-on-gov-relay");
 
         assertEq(govRelay.starkNet(), addr.addr("STARKNET_CORE"), "StarknetTest/unexpected-starknet-core-on-gov-relay");
-        assertEq(govRelay.l2GovernanceRelay(), starknetValues.l2_gov_relay, "StarknetTest/unexpected-l2-gov-relay-on-gov-relay");
     }
 
     function checkStarknetCore() public {

@@ -31,6 +31,7 @@ contract Deployers {
     address public constant CES_03             = 0xb27B6fa77D7FBf3C1BD34B0f7DA59b39D3DB0f7e; //2022-04-27 ("CES-03")
     address public constant ORACLES_1          = 0x1f42e41A34B71606FcC60b4e624243b365D99745; //2021-09-14 ("ORACLES_1")
     address public constant ORACLES_2          = 0x39aBD7819E5632Fa06D2ECBba45Dca5c90687EE3; //2022-10-26 ("ORACLES_2")
+    address public constant STARKNET_01        = 0x7f06941997C7778E7B734fE55f7353f554B06d7d;
     
     // Unlabelled Team Deployers
     address public constant CES_2022_10_26     = 0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5; //2022-10-26 (New CES)
@@ -42,7 +43,7 @@ contract Deployers {
     address public constant UNKNOWN_2017_04_10 = 0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c; //2017-04-10 (NO MATCH IN GOERLI)
     address public constant UNKNOWN_2020_10_09 = 0xd200790f62c8da69973e61d4936cfE4f356ccD07; //2020-10-09 (NO MATCH IN GOERLI)
     address public constant UNKNOWN_2021_09_20 = 0x075da589886BA445d7c7e81c472059dE7AE65250; //2021-09-20 (NO MATCH IN GOERLI)
-    address public constant STARKNET_01 = 0x7f06941997C7778E7B734fE55f7353f554B06d7d;
+    
         
     constructor() public {
         addr = [

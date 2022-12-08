@@ -74,21 +74,21 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
 
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
     }
 
     struct Payee {
@@ -96,37 +96,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
+    function testPayments() private { // make public to enable
+        uint256 prevSin = vat.sin(address(vow));
 
-        // For each payment, create a Payee obj ect with
+        // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        //Payee[1] memory payees = [
-        //    Payee(wallets.addr("XXX"),           1)
-        //];
-
-        Payee[20] memory payees = [
-            Payee(wallets.addr("STABLENODE"),        12000),
-            Payee(wallets.addr("ULTRASCHUPPI"),      12000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),      12000),
-            Payee(wallets.addr("FLIPSIDE"),          11396),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),    10900),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),    10385),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"), 8945),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 5109),
-            Payee(wallets.addr("ACREINVEST"),         4568),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),      3797),
-            Payee(wallets.addr("CALBLOCKCHAIN"),      3421),
-            Payee(wallets.addr("JUSTINCASE"),         3208),
-            Payee(wallets.addr("FRONTIERRESEARCH"),   2278),
-            Payee(wallets.addr("CHRISBLEC"),          1883),
-            Payee(wallets.addr("GFXLABS"),             532),
-            Payee(wallets.addr("ONESTONE"),            299),
-            Payee(wallets.addr("CODEKNIGHT"),          271),
-            Payee(wallets.addr("LLAMA"),               145),
-            Payee(wallets.addr("PVL"),                  65),
-            Payee(wallets.addr("CONSENSYS"),            28)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("XXX"),           1)
         ];
 
         uint256 prevBalance;
@@ -140,14 +118,10 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
@@ -157,16 +131,16 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() public { // make private to disable
+    function testCollateralIntegrations() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         checkIlkIntegration(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("PIP_GNO"),
+            "RETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+            addr.addr("PIP_RETH"),
             true, /* _isOSM */
             true, /* _checkLiquidations */
             false /* _transferFee */
@@ -213,40 +187,34 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        giveTokensGUSD(
+            DSTokenAbstract(GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")).gem()),
+            16000 * WAD / 10 ** (18 - GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")).dec())
+        );
         checkIlkClipper(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("MCD_CLIP_CALC_GNO_A"),
-            OsmAbstract(addr.addr("PIP_GNO")),
-            5_000 * WAD
+            "GUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GUSD_A")),
+            addr.addr("MCD_CLIP_CALC_GUSD_A"),
+            OsmAbstract(addr.addr("PIP_GUSD")),
+            16000 * WAD
         );
-
         checkIlkClipper(
-            "RENBTC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RENBTC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
-            addr.addr("MCD_CLIP_CALC_RENBTC_A"),
-            OsmAbstract(addr.addr("PIP_RENBTC")),
-            5 * WAD
+            "USDC-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_USDC_A")),
+            addr.addr("MCD_CLIP_CALC_USDC_A"),
+            OsmAbstract(addr.addr("PIP_USDC")),
+            16000 * WAD
         );
-    }
-
-    function testPsmValues() public {
-
-        bytes32 _ilk = "MCD_PSM_PAX_A";
-        checkPsmIlkIntegration(
-            _ilk,
-            reg.join(_ilk),
-            reg.xlip(_ilk),
-            reg.pip(_ilk),
-            chainLog.getAddress(PsmAbstract(_ilk)),
-            uint256 tin,
-            uint256 tout
+        checkIlkClipper(
+            "PAXUSD-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_PAXUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PAXUSD_A")),
+            addr.addr("MCD_CLIP_CALC_PAXUSD_A"),
+            OsmAbstract(addr.addr("PIP_PAXUSD")),
+            16000 * WAD
         );
-
-        checkPsmIlkIntegration();
-
     }
 
     function testNewChainlogValues() public { // make private to disable
@@ -254,13 +222,22 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("GNO");
-        checkChainlogKey("PIP_GNO");
-        checkChainlogKey("MCD_JOIN_GNO_A");
-        checkChainlogKey("MCD_CLIP_GNO_A");
-        checkChainlogKey("MCD_CLIP_CALC_GNO_A");
+        checkChainlogKey("DIRECT_HUB");
+        checkChainlogKey("DIRECT_MOM");
+        checkChainlogKey("DIRECT_MOM_LEGACY");
 
-        checkChainlogVersion("1.14.7");
+        checkChainlogKey("DIRECT_COMPV2_DAI_POOL");
+        checkChainlogKey("DIRECT_COMPV2_DAI_PLAN");
+        checkChainlogKey("DIRECT_COMPV2_DAI_ORACLE");
+
+        checkChainlogKey("MCD_CLIP_CALC_GUSD_A");
+        checkChainlogKey("MCD_CLIP_CALC_USDC_A");
+        checkChainlogKey("MCD_CLIP_CALC_PAXUSD_A");
+
+        checkChainlogKey("STARKNET_GOV_RELAY_LEGACY");
+        checkChainlogKey("STARKNET_GOV_RELAY");
+
+        checkChainlogVersion("1.14.6");
     }
 
     function testNewIlkRegistryValues() public { // make private to disable
@@ -268,15 +245,16 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // GNO-A
-        assertEq(reg.pos("GNO-A"),    56);
-        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
-        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
-        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
-        assertEq(reg.class("GNO-A"),  1);
-        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
-        assertEq(reg.name("GNO-A"),   "Gnosis Token");
-        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
+        // Insert new ilk registry values tests here
+        // DIRECT-COMPV2-DAI
+        assertEq(reg.pos("DIRECT-COMPV2-DAI"),    55);
+        assertEq(reg.join("DIRECT-COMPV2-DAI"),   addr.addr("DIRECT_HUB"));
+        assertEq(reg.gem("DIRECT-COMPV2-DAI"),    0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+        assertEq(reg.dec("DIRECT-COMPV2-DAI"),    8);
+        assertEq(reg.class("DIRECT-COMPV2-DAI"),  4);
+        assertEq(reg.pip("DIRECT-COMPV2-DAI"),    addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
+        assertEq(reg.name("DIRECT-COMPV2-DAI"),   "Compound Dai");
+        assertEq(reg.symbol("DIRECT-COMPV2-DAI"), "cDAI");
     }
 
     function testFailWrongDay() public {
@@ -411,15 +389,15 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() private { // make private to disable
+    function testMedianizers() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Track Median authorizations here
-        // address PIP     = addr.addr("PIP_RETH");
-        // address MEDIAN  = OsmAbstract(PIP).src();
-        // assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
+        address PIP     = addr.addr("PIP_RETH");
+        address MEDIAN  = OsmAbstract(PIP).src();
+        assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
     }
 
     function test_auth() public {
@@ -740,18 +718,18 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testMKRPayments() public { // make private to disable
         uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrTECH  = gov.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevMkrDUX    = gov.balanceOf(wallets.addr("DUX_WALLET"));
 
-        uint256 amountTECH = 257.31 ether;
+        uint256 amountDUX = 180.6 ether;
 
-        uint256 total      = 257.31 ether;
+        uint256 total     = 180.6 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevMkrTECH + amountTECH);
+        assertEq(gov.balanceOf(wallets.addr("DUX_WALLET")), prevMkrDUX + amountDUX);
     }
 
     function testMKRVestFix() private { // make public to use
@@ -773,49 +751,47 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testDirectCompV2Integration() private {
-        // TODO: Genericize this test for future D3M additions
-
+    function testDirectCompV2Integration() public {
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // bytes32 ilk = "DIRECT-COMPV2-DAI";
-        // D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        // D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
-        // D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
-        // D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
-        // D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        bytes32 ilk = "DIRECT-COMPV2-DAI";
+        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
+        D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
+        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
+        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
 
-        // // Do a bunch of sanity checks of the values that were set in the spell
-        // (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        // assertEq(_pool, address(pool));
-        // assertEq(_plan, address(plan));
-        // assertEq(tau, 7 days);
-        // assertEq(hub.vow(), address(vow));
-        // assertEq(hub.end(), address(end));
-        // assertEq(mom.authority(), address(chief));
-        // assertEq(pool.king(), pauseProxy);
-        // assertEq(plan.wards(address(mom)), 1);
-        // assertEq(plan.barb(), 7535450719);
-        // assertEq(oracle.hub(), address(hub));
-        // (address pip,) = spotter.ilks(ilk);
-        // assertEq(pip, address(oracle));
-        // assertEq(vat.wards(address(hub)), 1);
+        // Do a bunch of sanity checks of the values that were set in the spell
+        (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
+        assertEq(_pool, address(pool));
+        assertEq(_plan, address(plan));
+        assertEq(tau, 7 days);
+        assertEq(hub.vow(), address(vow));
+        assertEq(hub.end(), address(end));
+        assertEq(mom.authority(), address(chief));
+        assertEq(pool.king(), pauseProxy);
+        assertEq(plan.wards(address(mom)), 1);
+        assertEq(plan.barb(), 7535450719);
+        assertEq(oracle.hub(), address(hub));
+        (address pip,) = spotter.ilks(ilk);
+        assertEq(pip, address(oracle));
+        assertEq(vat.wards(address(hub)), 1);
+        
+        // Current market conditions should max out the D3M @ 5m DAI
+        hub.exec(ilk);
+        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+        assertEq(ink, 5 * MILLION * WAD);
+        assertEq(art, 5 * MILLION * WAD);
 
-        // // Current market conditions should max out the D3M @ 5m DAI
-        // hub.exec(ilk);
-        // (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        // assertEq(ink, 5 * MILLION * WAD);
-        // assertEq(art, 5 * MILLION * WAD);
-
-        // // De-activate the D3M via mom
-        // hevm.prank(DSChiefAbstract(chief).hat());
-        // mom.disable(address(plan));
-        // assertEq(plan.barb(), 0);
-        // hub.exec(ilk);
-        // (ink, art) = vat.urns(ilk, address(pool));
-        // assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        // assertLt(art, WAD);
+        // De-activate the D3M via mom
+        hevm.prank(DSChiefAbstract(chief).hat());
+        mom.disable(address(plan));
+        assertEq(plan.barb(), 0);
+        hub.exec(ilk);
+        (ink, art) = vat.urns(ilk, address(pool));
+        assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
+        assertLt(art, WAD);
     }
 }

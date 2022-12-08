@@ -18,29 +18,9 @@ pragma solidity 0.6.12;
 
 import "./DssSpell.t.base.sol";
 
-interface D3MHubLike {
-    function exec(bytes32) external;
-    function vow() external view returns (address);
-    function end() external view returns (address);
-    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
-}
-
-interface D3MMomLike {
-    function authority() external view returns (address);
-    function disable(address) external;
-}
-
-interface D3MCompoundPoolLike {
-    function king() external view returns (address);
-}
-
-interface D3MCompoundPlanLike {
-    function wards(address) external view returns (uint256);
-    function barb() external view returns (uint256);
-}
-
-interface D3MOracleLike {
-    function hub() external view returns (address);
+interface RwaUrnLike {
+    function hope(address) external;
+    function draw(uint256) external;
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -69,26 +49,26 @@ contract DssSpellTest is DssSpellTestBase {
         checkCollateralValues(afterSpell);
     }
 
-    function testRemoveChainlogValues() private { // make public to enable
+    function testRemoveChainlogValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
 
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
+        try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
     }
 
     struct Payee {
@@ -96,37 +76,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make public to enable
+    function testPayments() private { // make public to enable
+        uint256 prevSin = vat.sin(address(vow));
 
-        // For each payment, create a Payee obj ect with
+        // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        //Payee[1] memory payees = [
-        //    Payee(wallets.addr("XXX"),           1)
-        //];
-
-        Payee[20] memory payees = [
-            Payee(wallets.addr("STABLENODE"),        12000),
-            Payee(wallets.addr("ULTRASCHUPPI"),      12000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),      12000),
-            Payee(wallets.addr("FLIPSIDE"),          11396),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),    10900),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),    10385),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"), 8945),
-            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"), 5109),
-            Payee(wallets.addr("ACREINVEST"),         4568),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),      3797),
-            Payee(wallets.addr("CALBLOCKCHAIN"),      3421),
-            Payee(wallets.addr("JUSTINCASE"),         3208),
-            Payee(wallets.addr("FRONTIERRESEARCH"),   2278),
-            Payee(wallets.addr("CHRISBLEC"),          1883),
-            Payee(wallets.addr("GFXLABS"),             532),
-            Payee(wallets.addr("ONESTONE"),            299),
-            Payee(wallets.addr("CODEKNIGHT"),          271),
-            Payee(wallets.addr("LLAMA"),               145),
-            Payee(wallets.addr("PVL"),                  65),
-            Payee(wallets.addr("CONSENSYS"),            28)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("XXX"),           1)
         ];
 
         uint256 prevBalance;
@@ -140,14 +98,10 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         vote(address(spell));
-        spell.schedule();
-        hevm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
+        scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD);
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
@@ -163,49 +117,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         checkIlkIntegration(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("PIP_GNO"),
+            "RETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+            addr.addr("PIP_RETH"),
             true, /* _isOSM */
             true, /* _checkLiquidations */
             false /* _transferFee */
         );
-    }
-
-    function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
-        // Special exception GUSD has its storage in a separate contract
-        address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
-
-        // Edge case - balance is already set for some reason
-        if (token.balanceOf(address(this)) == amount) return;
-
-        for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                hevm.store(
-                    STORE,
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
     function testIlkClipper() public { // make private to disable
@@ -214,39 +133,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         checkIlkClipper(
-            "GNO-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
-            addr.addr("MCD_CLIP_CALC_GNO_A"),
-            OsmAbstract(addr.addr("PIP_GNO")),
-            5_000 * WAD
+            "RETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+            addr.addr("MCD_CLIP_CALC_RETH_A"),
+            OsmAbstract(addr.addr("PIP_RETH")),
+            500 * WAD
         );
-
-        checkIlkClipper(
-            "RENBTC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_RENBTC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
-            addr.addr("MCD_CLIP_CALC_RENBTC_A"),
-            OsmAbstract(addr.addr("PIP_RENBTC")),
-            5 * WAD
-        );
-    }
-
-    function testPsmValues() public {
-
-        bytes32 _ilk = "MCD_PSM_PAX_A";
-        checkPsmIlkIntegration(
-            _ilk,
-            reg.join(_ilk),
-            reg.xlip(_ilk),
-            reg.pip(_ilk),
-            chainLog.getAddress(PsmAbstract(_ilk)),
-            uint256 tin,
-            uint256 tout
-        );
-
-        checkPsmIlkIntegration();
-
     }
 
     function testNewChainlogValues() public { // make private to disable
@@ -254,29 +147,27 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkChainlogKey("GNO");
-        checkChainlogKey("PIP_GNO");
-        checkChainlogKey("MCD_JOIN_GNO_A");
-        checkChainlogKey("MCD_CLIP_GNO_A");
-        checkChainlogKey("MCD_CLIP_CALC_GNO_A");
+        checkChainlogKey("RWA007_A_INPUT_CONDUIT");
+        checkChainlogKey("RWA007_A_JAR_INPUT_CONDUIT");
 
-        checkChainlogVersion("1.14.7");
+        checkChainlogVersion("1.14.5");
     }
 
-    function testNewIlkRegistryValues() public { // make private to disable
+    function testNewIlkRegistryValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // GNO-A
-        assertEq(reg.pos("GNO-A"),    56);
-        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
-        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
-        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
-        assertEq(reg.class("GNO-A"),  1);
-        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
-        assertEq(reg.name("GNO-A"),   "Gnosis Token");
-        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
+        // Insert new ilk registry values tests here
+        // RETH-A
+        //assertEq(reg.pos("RETH-A"),    54);
+        //assertEq(reg.join("RETH-A"),   addr.addr("MCD_JOIN_RETH_A"));
+        // assertEq(reg.gem("RETH-A"),    addr.addr("RETH"));
+        // assertEq(reg.dec("RETH-A"),    GemAbstract(addr.addr("RETH")).decimals());
+        // assertEq(reg.class("RETH-A"),  1);
+        // assertEq(reg.pip("RETH-A"),    addr.addr("PIP_RETH"));
+        // assertEq(reg.name("RETH-A"),   "Rocket Pool ETH");
+        // assertEq(reg.symbol("RETH-A"), GemAbstract(addr.addr("RETH")).symbol());
     }
 
     function testFailWrongDay() public {
@@ -411,15 +302,15 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() private { // make private to disable
+    function testMedianizers() private { // make public to use
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Track Median authorizations here
-        // address PIP     = addr.addr("PIP_RETH");
+        // // Track Median authorizations here
+        // address PIP     = addr.addr("PIP_XXX");
         // address MEDIAN  = OsmAbstract(PIP).src();
-        // assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
+        // assertEq(MedianAbstract(MEDIAN).bud(PIP), 1);
     }
 
     function test_auth() public {
@@ -738,20 +629,23 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
-    function testMKRPayments() public { // make private to disable
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrTECH  = gov.balanceOf(wallets.addr("TECH_WALLET"));
+    function testMKRPayments() private { // make public to use
+        // uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
+        // uint256 prevMkrSH    = gov.balanceOf(wallets.addr("SH_MULTISIG"));
+        // uint256 prevMkrRWF   = gov.balanceOf(wallets.addr("RWF_WALLET"));
 
-        uint256 amountTECH = 257.31 ether;
+        // uint256 amountSH     =  26.04 ether;
+        // uint256 amountRWF    = 143.46 ether;
 
-        uint256 total      = 257.31 ether;
+        // uint256 total        = 169.50 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevMkrTECH + amountTECH);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(wallets.addr("SH_MULTISIG")), prevMkrSH + amountSH);
+        // assertEq(gov.balanceOf(wallets.addr("RWF_WALLET")), prevMkrRWF + amountRWF);
     }
 
     function testMKRVestFix() private { // make public to use
@@ -773,49 +667,69 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testDirectCompV2Integration() private {
-        // TODO: Genericize this test for future D3M additions
+    // RWA Tests
+
+    string OLD_RWA007_DOC      = "QmRLwB7Ty3ywSzq17GdDdwHvsZGwBg79oUTpSTJGtodToY";
+    string NEW_RWA007_DOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
+
+    string OLD_RWA008_DOC      = "QmdfzY6p5EpkYMN8wcomF2a1GsJbhkPiRQVRYSPfS4NZtB";
+    string NEW_RWA008_DOC      = "QmZ4heYjptvj3ovafADJpXYMFXMyY3yQjkTXpvjFPnAKcy";
+
+    string OLD_RWA009_DOC      = "QmQx3bMtjncka2jUsGwKu7ButuPJFn9yDEEvpg9xZ71ECh";
+    string NEW_RWA009_DOC      = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
+
+    function testRWA007DocChange() public {
+        checkRWADocUpdate("RWA007-A", OLD_RWA007_DOC, NEW_RWA007_DOC);
+    }
+
+    function testRWA008DocChange() public {
+        checkRWADocUpdate("RWA008-A", OLD_RWA008_DOC, NEW_RWA008_DOC);
+    }
+
+    function testRWA009DocChange() public {
+        checkRWADocUpdate("RWA009-A", OLD_RWA009_DOC, NEW_RWA009_DOC);
+    }
+
+    function testRWA007OraclePriceBump() public {
+        (, address pip, , ) = liquidationOracle.ilks("RWA007-A");
+        (,,uint256 spot,,) = vat.ilks("RWA007-A");
+
+        assertEq(uint256(DSValueAbstract(pip).read()), 250 * MILLION * WAD, "RWA007: Bad initial PIP value");
+        assertEq(spot, 250 * MILLION * RAY, "RWA007: Bad initial spot value");
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // bytes32 ilk = "DIRECT-COMPV2-DAI";
-        // D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        // D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
-        // D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
-        // D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
-        // D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
 
-        // // Do a bunch of sanity checks of the values that were set in the spell
-        // (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        // assertEq(_pool, address(pool));
-        // assertEq(_plan, address(plan));
-        // assertEq(tau, 7 days);
-        // assertEq(hub.vow(), address(vow));
-        // assertEq(hub.end(), address(end));
-        // assertEq(mom.authority(), address(chief));
-        // assertEq(pool.king(), pauseProxy);
-        // assertEq(plan.wards(address(mom)), 1);
-        // assertEq(plan.barb(), 7535450719);
-        // assertEq(oracle.hub(), address(hub));
-        // (address pip,) = spotter.ilks(ilk);
-        // assertEq(pip, address(oracle));
-        // assertEq(vat.wards(address(hub)), 1);
+        assertEq(uint256(DSValueAbstract(pip).read()), 500 * MILLION * WAD, "RWA007: Bad PIP value after bump()");
+        assertEq(spotAfter, 500 * MILLION * RAY, "RWA007: Bad spot value after bump()");
 
-        // // Current market conditions should max out the D3M @ 5m DAI
-        // hub.exec(ilk);
-        // (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        // assertEq(ink, 5 * MILLION * WAD);
-        // assertEq(art, 5 * MILLION * WAD);
+        // Test that a draw can be performed.
+        address urn = addr.addr("RWA007_A_URN");
+        giveAuth(urn, address(this));
+        RwaUrnLike(urn).hope(address(this));  // become operator
+        uint256 room = sub(line, mul(Art, rate));
+        uint256 drawAmt = room / RAY;
+        if (mul(divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
+        }
+        RwaUrnLike(urn).draw(drawAmt);
+        (Art,,,,) = vat.ilks("RWA007-A");
+        assertTrue(sub(line, mul(Art, rate)) < mul(2, rate));  // got very close to line
+    }
 
-        // // De-activate the D3M via mom
-        // hevm.prank(DSChiefAbstract(chief).hat());
-        // mom.disable(address(plan));
-        // assertEq(plan.barb(), 0);
-        // hub.exec(ilk);
-        // (ink, art) = vat.urns(ilk, address(pool));
-        // assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        // assertLt(art, WAD);
+    // CHANGELOG Houskeeping
+    function testChangelogHousekeeping() public {
+        address rwa007inUrn = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN");
+        address rwa007inJar = chainLog.getAddress("RWA007_A_INPUT_CONDUIT_JAR");
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(chainLog.getAddress("RWA007_A_INPUT_CONDUIT"), rwa007inUrn);
+        assertEq(chainLog.getAddress("RWA007_A_JAR_INPUT_CONDUIT"), rwa007inJar);
     }
 }
