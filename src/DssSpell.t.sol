@@ -232,23 +232,6 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testPsmValues() public {
-
-        bytes32 _ilk = "MCD_PSM_PAX_A";
-        checkPsmIlkIntegration(
-            _ilk,
-            reg.join(_ilk),
-            reg.xlip(_ilk),
-            reg.pip(_ilk),
-            chainLog.getAddress(PsmAbstract(_ilk)),
-            uint256 tin,
-            uint256 tout
-        );
-
-        checkPsmIlkIntegration();
-
-    }
-
     function testNewChainlogValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
@@ -420,6 +403,43 @@ contract DssSpellTest is DssSpellTestBase {
         // address PIP     = addr.addr("PIP_RETH");
         // address MEDIAN  = OsmAbstract(PIP).src();
         // assertEq(MedianAbstract(MEDIAN).orcl(0xa580BBCB1Cee2BCec4De2Ea870D20a12A964819e), 1);
+    }
+
+    function testPSMs() public {
+
+        vote(address(spell));
+        scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes32 _ilk = "PSM-PAX-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_PAX"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_PAX_A"), chainLog.getAddress("MCD_PSM_PAX_A"));
+        checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
+            addr.addr("PIP_PAX"),
+            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
+            calcPSMRateFromBPS(10),
+            calcPSMRateFromBPS(0)
+        );
+
+        _ilk = "PSM-GUSD-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_GUSD_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_GUSD"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_GUSD_A"), chainLog.getAddress("MCD_PSM_GUSD_A"));
+        checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
+            addr.addr("PIP_GUSD"),
+            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
+            calcPSMRateFromBPS(10),
+            calcPSMRateFromBPS(10)
+        );
     }
 
     function test_auth() public {
