@@ -19,30 +19,6 @@ pragma experimental ABIEncoderV2;
 
 import "./DssSpell.t.base.sol";
 
-interface D3MHubLike {
-    function exec(bytes32) external;
-    function vow() external view returns (address);
-    function end() external view returns (address);
-    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
-}
-
-interface D3MMomLike {
-    function authority() external view returns (address);
-    function disable(address) external;
-}
-
-interface D3MCompoundPoolLike {
-    function king() external view returns (address);
-}
-
-interface D3MCompoundPlanLike {
-    function wards(address) external view returns (uint256);
-    function barb() external view returns (uint256);
-}
-
-interface D3MOracleLike {
-    function hub() external view returns (address);
-}
 
 interface RwaUrnLike {
     function can(address) external view returns (uint256);

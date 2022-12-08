@@ -142,9 +142,9 @@ contract DssSpellAction is DssAction {
     uint256 internal constant FOUR_PCT_RATE     = 1000000001243680656318820312;
 
     // --- MATH ---
-    uint256 internal constant MILLION           = 10 ** 6;
-    uint256 internal constant WAD               = 10 ** 18;
-    uint256 internal constant RAY               = 10 ** 27;
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant RAY     = 10 ** 27;
 
     uint256 internal constant PSM_TEN_BASIS_POINTS = 10 * WAD / 10000;
 
