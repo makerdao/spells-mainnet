@@ -50,8 +50,8 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    uint256 internal constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
     uint256 internal constant ONE_PCT_RATE      = 1000000000315522921573372069;
+    uint256 internal constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
 
     // --- MATH ---
     uint256 internal constant MILLION           = 10 ** 6;
