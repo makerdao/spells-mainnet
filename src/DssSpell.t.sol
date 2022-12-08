@@ -243,6 +243,23 @@ contract DssSpellTest is DssSpellTestBase {
         ); */
     }
 
+    function testPsmValues() public {
+
+        bytes32 _ilk = "MCD_PSM_PAX_A";
+        checkPsmIlkIntegration(
+            _ilk,
+            reg.join(_ilk),
+            reg.xlip(_ilk),
+            reg.pip(_ilk),
+            chainLog.getAddress(PsmAbstract(_ilk)),
+            uint256 tin,
+            uint256 tout
+        );
+
+        checkPsmIlkIntegration();
+
+    }
+
     function testNewChainlogValues() private { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
