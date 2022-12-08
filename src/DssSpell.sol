@@ -57,7 +57,9 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD               = 10 ** 18;
     uint256 internal constant RAY               = 10 ** 27;
 
-    function sub(uint x, uint y) internal pure returns (uint z) {
+    uint256 internal constant PSM_TEN_BASIS_POINTS = 10 * WAD / 10000;
+
+    function _sub(uint x, uint y) internal pure returns (uint z) {
         require((z = x - y) <= x, "ds-math-sub-underflow");
     }
 
@@ -192,13 +194,13 @@ contract DssSpellAction is DssAction {
 
         // PSM tin increases
         // Increase PSM-USDP-A tin from 0% to 0.1%
-        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 10 * WAD / 10000);
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", PSM_TEN_BASIS_POINTS);
         // Increase PSM-GUSD-A tin from 0% to 0.1%
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", 10 * WAD / 10000);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", PSM_TEN_BASIS_POINTS);
 
         // PSM tout decrease
         // Reduce PSM-GUSD-A tout from 0.2% to 0.1%
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 10 * WAD / 10000);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", PSM_TEN_BASIS_POINTS);
 
 
         // DSR Adjustment
