@@ -34,9 +34,9 @@ contract ConfigStarknet {
     function setValues() public {
         starknetValues = StarknetValues({
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
-            dai_bridge_isOpen:         1,        // 1 open, 0 closed
-            dai_bridge_ceiling:        200_000,  // Whole Dai Units
-            dai_bridge_maxDeposit:     1000,     // Whole Dai Units
+            dai_bridge_isOpen:         1,                     // 1 open, 0 closed
+            dai_bridge_ceiling:        1_000_000,             // Whole Dai Units
+            dai_bridge_maxDeposit:     type(uint256).max,     // Wei
             l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60,
             l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db
         });
@@ -122,7 +122,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
         assertEq(daiBridge.isOpen(),     starknetValues.dai_bridge_isOpen,           "StarknetTestError/dai-bridge-isOpen-unexpected");
         assertEq(daiBridge.ceiling(),    starknetValues.dai_bridge_ceiling * WAD,    "StarknetTestError/dai-bridge-ceiling-unexpected");
-        assertEq(daiBridge.maxDeposit(), starknetValues.dai_bridge_maxDeposit * WAD, "StarknetTestError/dai-bridge-maxDeposit-unexpected");
+        assertEq(daiBridge.maxDeposit(), starknetValues.dai_bridge_maxDeposit,       "StarknetTestError/dai-bridge-maxDeposit-unexpected");
 
         assertEq(daiBridge.dai(),      addr.addr("MCD_DAI"),         "StarknetTest/dai-bridge-dai");
         assertEq(daiBridge.starkNet(), addr.addr("STARKNET_CORE"),   "StarknetTest/dai-bridge-core");

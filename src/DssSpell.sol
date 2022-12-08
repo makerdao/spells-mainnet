@@ -32,6 +32,11 @@ interface VatLike {
     function Line() external view returns (uint256);
 }
 
+interface StarknetLike {
+    function setCeiling(uint256) external;
+    function setMaxDeposit(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -66,6 +71,7 @@ contract DssSpellAction is DssAction {
     address internal immutable VAT            = DssExecLib.vat();
     address internal immutable MCD_PSM_PAX_A  = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
     address internal immutable MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+    address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
 
     GemLike internal immutable MKR = GemLike(DssExecLib.mkr());
 
