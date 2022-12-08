@@ -244,41 +244,6 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
-        // Special exception GUSD has its storage in a separate contract
-        address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
-
-        // Edge case - balance is already set for some reason
-        if (token.balanceOf(address(this)) == amount) return;
-
-        for (uint256 i = 0; i < 200; i++) {
-            // Scan the storage for the balance storage slot
-            bytes32 prevValue = hevm.load(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i)))
-            );
-            hevm.store(
-                STORE,
-                keccak256(abi.encode(address(this), uint256(i))),
-                bytes32(amount)
-            );
-            if (token.balanceOf(address(this)) == amount) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                hevm.store(
-                    STORE,
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
-    }
-
     function testIlkClipper() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
