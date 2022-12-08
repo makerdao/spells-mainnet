@@ -37,7 +37,8 @@ contract Deployers {
             0x7f06941997C7778E7B734fE55f7353f554B06d7d,  // Starknet
             0xb27B6fa77D7FBf3C1BD34B0f7DA59b39D3DB0f7e,  // CES
             0x39aBD7819E5632Fa06D2ECBba45Dca5c90687EE3,  // Oracles from 2022-10-26
-            0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5   // CES from 2022-10-26
+            0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5,  // CES from 2022-10-26
+            0x5C82d7Eafd66d7f5edC2b844860BfD93C3B0474f   // CES from 2022-12-09
         ];
     }
 

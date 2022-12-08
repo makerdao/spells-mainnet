@@ -98,7 +98,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // make public to enable
 
-        // For each payment, create a Payee object with
+        // For each payment, create a Payee obj ect with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
@@ -141,7 +141,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         vote(address(spell));
         spell.schedule();
-        hevm.warp(now + pause.delay());
+        hevm.warp(spell.nextCastTime());
         pot.drip();
         uint256 prevSin = vat.sin(address(vow));
         spell.cast();
@@ -157,20 +157,20 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() private { // make private to disable
+    function testCollateralIntegrations() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // checkIlkIntegration(
-        //     "RETH-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
-        //     addr.addr("PIP_RETH"),
-        //     true, /* _isOSM */
-        //     true, /* _checkLiquidations */
-        //     false /* _transferFee */
-        // );
+        checkIlkIntegration(
+            "GNO-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
+            addr.addr("PIP_GNO"),
+            true, /* _isOSM */
+            true, /* _checkLiquidations */
+            false /* _transferFee */
+        );
     }
 
     function giveTokensGUSD(DSTokenAbstract token, uint256 amount) internal {
@@ -208,39 +208,28 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
-    function testIlkClipper() private { // make private to disable
+    function testIlkClipper() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        /* giveTokensGUSD(
-            DSTokenAbstract(GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")).gem()),
-            16000 * WAD / 10 ** (18 - GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")).dec())
-        );
         checkIlkClipper(
-            "GUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_GUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_GUSD_A")),
-            addr.addr("MCD_CLIP_CALC_GUSD_A"),
-            OsmAbstract(addr.addr("PIP_GUSD")),
-            16000 * WAD
+            "GNO-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_GNO_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_GNO_A")),
+            addr.addr("MCD_CLIP_CALC_GNO_A"),
+            OsmAbstract(addr.addr("PIP_GNO")),
+            5_000 * WAD
         );
+
         checkIlkClipper(
-            "USDC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_USDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_USDC_A")),
-            addr.addr("MCD_CLIP_CALC_USDC_A"),
-            OsmAbstract(addr.addr("PIP_USDC")),
-            16000 * WAD
+            "RENBTC-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_RENBTC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_RENBTC_A")),
+            addr.addr("MCD_CLIP_CALC_RENBTC_A"),
+            OsmAbstract(addr.addr("PIP_RENBTC")),
+            5 * WAD
         );
-        checkIlkClipper(
-            "PAXUSD-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_PAXUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PAXUSD_A")),
-            addr.addr("MCD_CLIP_CALC_PAXUSD_A"),
-            OsmAbstract(addr.addr("PIP_PAXUSD")),
-            16000 * WAD
-        ); */
     }
 
     function testPsmValues() public {
@@ -260,32 +249,34 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
-    function testNewChainlogValues() private { // make private to disable
+    function testNewChainlogValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // checkChainlogKey("STARKNET_GOV_RELAY_LEGACY");
-        // checkChainlogKey("STARKNET_GOV_RELAY");
+        checkChainlogKey("GNO");
+        checkChainlogKey("PIP_GNO");
+        checkChainlogKey("MCD_JOIN_GNO_A");
+        checkChainlogKey("MCD_CLIP_GNO_A");
+        checkChainlogKey("MCD_CLIP_CALC_GNO_A");
 
-        // checkChainlogVersion("1.14.6");
+        checkChainlogVersion("1.14.7");
     }
 
-    function testNewIlkRegistryValues() private { // make private to disable
+    function testNewIlkRegistryValues() public { // make private to disable
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new ilk registry values tests here
-        // DIRECT-COMPV2-DAI
-        // assertEq(reg.pos("DIRECT-COMPV2-DAI"),    55);
-        // assertEq(reg.join("DIRECT-COMPV2-DAI"),   addr.addr("DIRECT_HUB"));
-        // assertEq(reg.gem("DIRECT-COMPV2-DAI"),    0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-        // assertEq(reg.dec("DIRECT-COMPV2-DAI"),    8);
-        // assertEq(reg.class("DIRECT-COMPV2-DAI"),  4);
-        // assertEq(reg.pip("DIRECT-COMPV2-DAI"),    addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
-        // assertEq(reg.name("DIRECT-COMPV2-DAI"),   "Compound Dai");
-        // assertEq(reg.symbol("DIRECT-COMPV2-DAI"), "cDAI");
+        // GNO-A
+        assertEq(reg.pos("GNO-A"),    56);
+        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
+        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
+        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
+        assertEq(reg.class("GNO-A"),  1);
+        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
+        assertEq(reg.name("GNO-A"),   "Gnosis Token");
+        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
     }
 
     function testFailWrongDay() public {
