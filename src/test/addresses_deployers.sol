@@ -46,22 +46,22 @@ contract Deployers {
         
     constructor() public {
         addr = [
-            PE_01, 
-            PE_02, 
-            PE_03, 
-            PE_07, 
-            PE_CURRENT, 
-            CES_03, 
+            PE_01,
+            PE_02,
+            PE_03,
+            PE_07,
+            PE_CURRENT,
+            CES_03,
             ORACLES_1,
-            ORACLES_2, 
+            ORACLES_2,
             CES_2022_10_26,
-            ORACLES_2021_07_20, 
-            UNKNOWN_2019_06_27, 
-            UNKNOWN_2020_09_03, 
+            ORACLES_2021_07_20,
+            UNKNOWN_2019_06_27,
+            UNKNOWN_2020_09_03,
             UNKNOWN_2017_04_10,
-            UNKNOWN_2020_10_09,             
-            UNKNOWN_2021_09_20, 
-            UNKNOWN_2022_05_10, 
+            UNKNOWN_2020_10_09, 
+            UNKNOWN_2021_09_20,
+            UNKNOWN_2022_05_10,
         ];
     }
 
