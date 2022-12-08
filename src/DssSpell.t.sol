@@ -393,6 +393,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertLe(totalGas, 15 * MILLION);
     }
 
+    function testDeployCost() public {
+        uint256 startGas = gasleft();
+        new DssSpell();
+        uint256 endGas = gasleft();
+        uint256 totalGas = startGas - endGas;
+        // Fail if deploy is too expensive
+        assertLe(totalGas, 15 * MILLION);
+    }
+
     // The specific date doesn't matter that much since function is checking for difference between warps
     function test_nextCastTime() public {
         hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
