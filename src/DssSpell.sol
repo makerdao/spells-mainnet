@@ -54,13 +54,8 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-<<<<<<< HEAD
     uint256 internal constant ONE_PCT_RATE      = 1000000000315522921573372069;
     uint256 internal constant TWO_FIVE_PCT_RATE = 1000000000782997609082909351;
-||||||| parent of d11faca (feat: onboard GNO-A & offboard RENBTC-A)
-=======
-    uint256 internal constant TWO_FIVE_PCT_RATE  = 1000000000782997609082909351;
->>>>>>> d11faca (feat: onboard GNO-A & offboard RENBTC-A)
 
     // --- MATH ---
     uint256 internal constant MILLION           = 10 ** 6;
@@ -103,7 +98,6 @@ contract DssSpellAction is DssAction {
 
     address constant internal TECH_001           = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
 
-<<<<<<< HEAD
     // --- DEPLOYED COLLATERAL ADDRESSES ---
     address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
     address internal constant PIP_GNO             = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
@@ -111,16 +105,6 @@ contract DssSpellAction is DssAction {
     address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
     address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
 
-||||||| parent of d11faca (feat: onboard GNO-A & offboard RENBTC-A)
-=======
-    // --- DEPLOYED COLLATERAL ADDRESSES ---
-    address internal constant GNO                 = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
-    address internal constant PIP_GNO             = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
-    address internal constant MCD_JOIN_GNO_A      = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
-    address internal constant MCD_CLIP_GNO_A      = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
-    address internal constant MCD_CLIP_CALC_GNO_A = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
-
->>>>>>> d11faca (feat: onboard GNO-A & offboard RENBTC-A)
     function actions() public override {
 
         // Delegate Compensation - November 2022
