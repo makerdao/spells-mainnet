@@ -887,51 +887,6 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testDirectCompV2Integration() private {
-        // TODO: Genericize this test for future D3M additions
-
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // bytes32 ilk = "DIRECT-COMPV2-DAI";
-        // D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        // D3MCompoundPoolLike pool = D3MCompoundPoolLike(addr.addr("DIRECT_COMPV2_DAI_POOL"));
-        // D3MCompoundPlanLike plan = D3MCompoundPlanLike(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
-        // D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_COMPV2_DAI_ORACLE"));
-        // D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
-
-        // // Do a bunch of sanity checks of the values that were set in the spell
-        // (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        // assertEq(_pool, address(pool));
-        // assertEq(_plan, address(plan));
-        // assertEq(tau, 7 days);
-        // assertEq(hub.vow(), address(vow));
-        // assertEq(hub.end(), address(end));
-        // assertEq(mom.authority(), address(chief));
-        // assertEq(pool.king(), pauseProxy);
-        // assertEq(plan.wards(address(mom)), 1);
-        // assertEq(plan.barb(), 7535450719);
-        // assertEq(oracle.hub(), address(hub));
-        // (address pip,) = spotter.ilks(ilk);
-        // assertEq(pip, address(oracle));
-        // assertEq(vat.wards(address(hub)), 1);
-
-        // // Current market conditions should max out the D3M @ 5m DAI
-        // hub.exec(ilk);
-        // (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        // assertEq(ink, 5 * MILLION * WAD);
-        // assertEq(art, 5 * MILLION * WAD);
-
-        // // De-activate the D3M via mom
-        // hevm.prank(DSChiefAbstract(chief).hat());
-        // mom.disable(address(plan));
-        // assertEq(plan.barb(), 0);
-        // hub.exec(ilk);
-        // (ink, art) = vat.urns(ilk, address(pool));
-        // assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        // assertLt(art, WAD);
-    }
 
     // ---------------------- Centrifuge-Blocktower Vaults ----------------------
 
