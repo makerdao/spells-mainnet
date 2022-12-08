@@ -533,13 +533,6 @@ contract DssSpellAction is DssAction {
         // Remove Starknet Bridge Deposit Limit
         StarknetLike(STARKNET_DAI_BRIDGE).setMaxDeposit(type(uint256).max);
 
-        // -------------------- Changelog Update ---------------------
-        DssExecLib.setChangelogAddress("GNO",                 GNO);
-        DssExecLib.setChangelogAddress("PIP_GNO",             PIP_GNO);
-        DssExecLib.setChangelogAddress("MCD_JOIN_GNO_A",      MCD_JOIN_GNO_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_GNO_A",      MCD_CLIP_GNO_A);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_GNO_A", MCD_CLIP_CALC_GNO_A);
-
         // Bump changelog
         DssExecLib.setChangelogVersion("1.14.7");
     }
