@@ -35,10 +35,9 @@ interface VatLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
-
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/8ef80506bda5a3115105ec227733e68b4a63430d/governance/votes/Executive%20Vote%20-%20December%209%2C%202022.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-12-09 MakerDAO Executive Spell | Hash: 0x";
+        "2022-12-09 MakerDAO Executive Spell | Hash: 0xc1363d6a233492ab13d88e8bb9d9cab0033439f0817e152f0b3a4218989983ef";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -274,7 +273,7 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib allow to set `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/2afff4373e8a827659df28f6d349feb25f073e59/src/DssExecLib.sol#L733
         DssExecLib.setValue(DssExecLib.spotter(), "RENBTC-A", "mat", 50 * RAY); // 5000%
         DssExecLib.setIlkMaxLiquidationAmount("RENBTC-A", 350_000);
-        
+
         // -------------------- Changelog Update ---------------------
         DssExecLib.setChangelogAddress("GNO",                 GNO);
         DssExecLib.setChangelogAddress("PIP_GNO",             PIP_GNO);
