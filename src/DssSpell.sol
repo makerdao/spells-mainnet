@@ -201,7 +201,6 @@ contract DssSpellAction is DssAction {
     address internal constant MCD_CLIP_CALC_GNO_A     = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
 
     address constant internal RWA010                  = 0x20C72C1fdd589C4Aaa8d9fF56a43F3B17BA129f8;
-    address constant internal PIP_RWA010              = 0xfBAa6a09A39D485a5Be9F5ebfe09C602E63b21EF;
     address constant internal MCD_JOIN_RWA010_A       = 0xde2828c3F7B2161cF2a1711edc36c73C56EA72aE;
     address constant internal RWA010_A_URN            = 0x4866d5d24CdC6cc094423717663b2D3343d4EFF9;
     address constant internal RWA010_A_OUTPUT_CONDUIT = 0x1F5C294EF3Ff2d2Da30ea9EDAd490C28096C91dF;
@@ -210,7 +209,6 @@ contract DssSpellAction is DssAction {
     string  internal constant RWA010_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
 
     address constant internal RWA011                  = 0x0b126F85285d1786F52FC911AfFaaf0d9253e37a;
-    address constant internal PIP_RWA011              = 0xfBAa6a09A39D485a5Be9F5ebfe09C602E63b21EF;
     address constant internal MCD_JOIN_RWA011_A       = 0x9048cb84F46e94Ff312DcC50f131191c399D9bC3;
     address constant internal RWA011_A_URN            = 0x32C9bBA0841F2557C10d3f0d30092f138251aFE6;
     address constant internal RWA011_A_OUTPUT_CONDUIT = 0x8e74e529049bB135CF72276C1845f5bD779749b0;
@@ -219,7 +217,6 @@ contract DssSpellAction is DssAction {
     string  internal constant RWA011_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
 
     address constant internal RWA012                  = 0x3c7f1379B5ac286eB3636668dEAe71EaA5f7518c;
-    address constant internal PIP_RWA012              = 0x4FA7c611bD25DA38bC929C2A67290FbE49DDFF56;
     address constant internal MCD_JOIN_RWA012_A       = 0x75646F68B8c5d8F415891F7204978Efb81ec6410;
     address constant internal RWA012_A_URN            = 0xB22E9DBF60a5b47c8B2D0D6469548F3C2D036B7E;
     address constant internal RWA012_A_OUTPUT_CONDUIT = 0x795b917eBe0a812D406ae0f99D71caf36C307e21;
@@ -228,7 +225,6 @@ contract DssSpellAction is DssAction {
     string  internal constant RWA012_A_DOC            = "QmRqsQRnLfaRuhFr5wCfDQZKzNo7FRVUyTJPhS76nfz6nX";
 
     address constant internal RWA013                  = 0xD6C7FD4392D328e4a8f8bC50F4128B64f4dB2d4C;
-    address constant internal PIP_RWA013              = 0x69Cf63ed6eD57Ad129bF67EB726Ae1bd293edbB0;
     address constant internal MCD_JOIN_RWA013_A       = 0x779D0fD012815D4239BAf75140e6B2971BEd5113;
     address constant internal RWA013_A_URN            = 0x9C170dd80Ee2CA5bfDdF00cbE93e8faB2D05bA6D;
     address constant internal RWA013_A_OUTPUT_CONDUIT = 0x615984F33604011Fcd76E9b89803Be3816276E61;
