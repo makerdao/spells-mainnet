@@ -283,6 +283,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(DssExecLib.spotter(), "RENBTC-A", "mat", 50 * RAY); // 5000%
         DssExecLib.setIlkMaxLiquidationAmount("RENBTC-A", 350_000);
 
+        // Increase Starknet Bridge Limit from 200,000 DAI to 1,000,000 DAI
+        StarknetLike(STARKNET_DAI_BRIDGE).setCeiling(1_000_000 * WAD);
+        // Remove Starknet Bridge Deposit Limit
+        StarknetLike(STARKNET_DAI_BRIDGE).setMaxDeposit(type(uint256).max);
+
         // Bump changelog
         DssExecLib.setChangelogVersion("1.14.7");
     }
