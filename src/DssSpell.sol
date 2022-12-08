@@ -193,13 +193,13 @@ contract DssSpellAction is DssAction {
 
         // PSM tin increases
         // Increase PSM-USDP-A tin from 0% to 0.1%
-        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 1 * WAD / 1000);
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 10 * WAD / 10000);
         // Increase PSM-GUSD-A tin from 0% to 0.1%
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", 1 * WAD / 1000);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", 10 * WAD / 10000);
 
         // PSM tout decrease
         // Reduce PSM-GUSD-A tout from 0.2% to 0.1%
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 1 * WAD / 1000);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 10 * WAD / 10000);
 
 
         // DSR Adjustment
