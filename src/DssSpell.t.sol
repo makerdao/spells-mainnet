@@ -35,6 +35,7 @@ interface WriteableRwaLiquidationLike is RwaLiquidationLike {
     function cure(bytes32) external;
     function cull(bytes32, address) external;
     function good(bytes32) external view returns (bool);
+<<<<<<< HEAD
 }
 
 interface Root {
@@ -67,6 +68,40 @@ interface TinlakeManagerLike {
     function free(uint256 wad) external;
 }
 
+=======
+}
+
+interface Root {
+    function wards(address) external view returns (uint256);
+    function relyContract(address, address) external;
+}
+
+interface MemberList {
+    function updateMember(address, uint256) external;
+}
+
+interface AssessorLike {
+    function calcSeniorTokenPrice() external returns (uint256);
+}
+
+interface FileLike {
+    function file(bytes32 what, address data) external;
+}
+
+interface TinlakeManagerLike {
+    function gem() external view returns (address);
+    function liq() external view returns (address);
+    function urn() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function lock(uint256 wad) external;
+    function join(uint256 wad) external;
+    function draw(uint256 wad) external;
+    function wipe(uint256 wad) external;
+    function exit(uint256 wad) external;
+    function free(uint256 wad) external;
+}
+
+>>>>>>> master
 interface DropTokenAbstract is DSTokenAbstract {
     function wards(address) external view returns (uint256);
 }
