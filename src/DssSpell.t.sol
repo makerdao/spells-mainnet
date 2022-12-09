@@ -401,7 +401,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Warn if deploy exceeds block target size
         if (totalGas > 15 * MILLION) {
-            emit log("Warn: deploy gas > average block target");
+            emit log("Warn: deploy gas exceeds average block target");
             emit log_named_uint("    deploy gas", totalGas);
             emit log_named_uint("  block target", 15 * MILLION);
         }
@@ -412,8 +412,8 @@ contract DssSpellTest is DssSpellTestBase {
 
 
     // Fail when contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon).
-    //  This contract may not be deployable on mainnet.
-    //  Consider enabling the optimizer (with a low "runs" value!),
+    // This contract may not be deployable.
+    // Consider enabling the optimizer (with a low "runs" value!),
     //   turning off revert strings, or using libraries.
     function testContractSize() public {
         uint256 _sizeSpell;
