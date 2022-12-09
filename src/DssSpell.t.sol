@@ -402,6 +402,23 @@ contract DssSpellTest is DssSpellTestBase {
         assertLe(totalGas, 15 * MILLION);
     }
 
+    function testContractSize() public {
+        uint256 _sizeSpell;
+        address _spellAddr  = address(spell);
+        assembly {
+            _sizeSpell := extcodesize(_spellAddr)
+        }
+        assertLe(_sizeSpell, 24576, "testContractSize/DssSpell-exceeds-max-contract-size");
+
+        uint256 _sizeAction;
+        address _actionAddr = spell.action();
+        assembly {
+            _sizeAction := extcodesize(_actionAddr)
+        }
+        assertLe(_sizeAction, 24576, "testContractSize/DssSpellAction-exceeds-max-contract-size");
+
+    }
+
     // The specific date doesn't matter that much since function is checking for difference between warps
     function test_nextCastTime() public {
         hevm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
