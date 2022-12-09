@@ -398,8 +398,16 @@ contract DssSpellTest is DssSpellTestBase {
         new DssSpell();
         uint256 endGas = gasleft();
         uint256 totalGas = startGas - endGas;
+
+        // Warn if deploy exceeds block target size
+        if (totalGas >= 15 * MILLIION) {
+            emit log("Warn: deploy gas < average block target");
+            emit log_named_uint("    deploy gas", totalGas);
+            emit log_named_uint("  block target", 15 * MILLION);
+        }
+
         // Fail if deploy is too expensive
-        assertLe(totalGas, 15 * MILLION);
+        assertLe(totalGas, 30 * MILLION, "testDeployCost/DssSpell-exceeds-max-block-size");
     }
 
     function testContractSize() public {
