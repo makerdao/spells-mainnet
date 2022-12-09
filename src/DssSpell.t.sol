@@ -413,7 +413,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // Fail when contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon).
     // This contract may not be deployable.
-    //  Consider enabling the optimizer (with a low "runs" value!),
+    // Consider enabling the optimizer (with a low "runs" value!),
     //   turning off revert strings, or using libraries.
     function testContractSize() public {
         uint256 _sizeSpell;
