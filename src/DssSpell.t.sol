@@ -401,7 +401,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Warn if deploy exceeds block target size
         if (totalGas >= 15 * MILLION) {
-            emit log("Warn: deploy gas > average block target");
+            emit log("Warn: deploy gas exceeds average block target");
             emit log_named_uint("    deploy gas", totalGas);
             emit log_named_uint("  block target", 15 * MILLION);
         }
