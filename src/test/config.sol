@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.16;
 
 contract Config {
 
@@ -96,7 +96,7 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x8c762BA54cA0791b8251e604CB7e3434C9153d22),         // populate with deployed spell if deployed
+            deployed_spell:                 address(0),         // populate with deployed spell if deployed
             deployed_spell_created:         1670560751,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
             previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
@@ -106,30 +106,28 @@ contract Config {
         //
         // Values for all system configuration changes
         //
-        afterSpell = SystemValues({
-            line_offset:           500 * MILLION,           // Offset between the global line against the sum of local lines
-            pot_dsr:               100,                     // In basis points
-            pause_delay:           48 hours,                // In seconds
-            vow_wait:              156 hours,               // In seconds
-            vow_dump:              250,                     // In whole Dai units
-            vow_sump:              50 * THOUSAND,           // In whole Dai units
-            vow_bump:              30 * THOUSAND,           // In whole Dai units
-            vow_hump_min:          250 * MILLION,           // In whole Dai units
-            vow_hump_max:          250 * MILLION,           // In whole Dai units
-            flap_beg:              400,                     // in basis points
-            flap_ttl:              30 minutes,              // in seconds
-            flap_tau:              72 hours,                // in seconds
-            flap_lid:              30 * THOUSAND,           // in whole Dai units
-            cat_box:               20 * MILLION,            // In whole Dai units
-            dog_Hole:              70 * MILLION,            // In whole Dai units
-            esm_min:               150 * THOUSAND,          // In whole MKR units
-            pause_authority:       chief,                   // Pause authority
-            osm_mom_authority:     chief,                   // OsmMom authority
-            flipper_mom_authority: chief,                   // FlipperMom authority
-            clipper_mom_authority: chief,                   // ClipperMom authority
-            d3m_mom_authority:     chief,                   // D3MMom authority
-            ilk_count:             61                       // Num expected in system
-        });
+        afterSpell.line_offset =           500 * MILLION;           // Offset between the global line against the sum of local lines
+        afterSpell.pot_dsr =               100;                     // In basis points
+        afterSpell.pause_delay =           48 hours;                // In seconds
+        afterSpell.vow_wait =              156 hours;               // In seconds
+        afterSpell.vow_dump =              250;                     // In whole Dai units
+        afterSpell.vow_sump =              50 * THOUSAND;           // In whole Dai units
+        afterSpell.vow_bump =              30 * THOUSAND;           // In whole Dai units
+        afterSpell.vow_hump_min =          250 * MILLION;           // In whole Dai units
+        afterSpell.vow_hump_max =          250 * MILLION;           // In whole Dai units
+        afterSpell.flap_beg =              400;                     // in basis points
+        afterSpell.flap_ttl =              30 minutes;              // in seconds
+        afterSpell.flap_tau =              72 hours;                // in seconds
+        afterSpell.flap_lid =              30 * THOUSAND;           // in whole Dai units
+        afterSpell.cat_box =               20 * MILLION;            // In whole Dai units
+        afterSpell.dog_Hole =              70 * MILLION;            // In whole Dai units
+        afterSpell.esm_min =               150 * THOUSAND;          // In whole MKR units
+        afterSpell.pause_authority =       chief;                   // Pause authority
+        afterSpell.osm_mom_authority =     chief;                   // OsmMom authority
+        afterSpell.flipper_mom_authority = chief;                   // FlipperMom authority
+        afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
+        afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
+        afterSpell.ilk_count =             61;                      // Num expected in system
 
         //
         // Values for all collateral

@@ -16,5 +16,5 @@ do
     esac
 done
 
-echo -e "Network: $(seth chain)"
-seth block "$(seth tx "${TXHASH}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}'
+echo -e "Network: $(cast chain)"
+cast block "$(cast tx "${TXHASH}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}'

@@ -13,13 +13,12 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
+
+pragma solidity 0.8.16;
 
 import "../DssSpell.t.base.sol";
 
 contract ConfigStarknet {
-
     StarknetValues starknetValues;
 
     struct StarknetValues {
@@ -32,11 +31,12 @@ contract ConfigStarknet {
     }
 
     function setValues() public {
+        uint256 WAD = 10 ** 18;
         starknetValues = StarknetValues({
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
             dai_bridge_isOpen:         1,                     // 1 open, 0 closed
-            dai_bridge_ceiling:        1_000_000,             // Whole Dai Units
-            dai_bridge_maxDeposit:     type(uint256).max,     // Wei
+            dai_bridge_ceiling:        1_000_000 * WAD,       // wei
+            dai_bridge_maxDeposit:     type(uint256).max,     // wei
             l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60,
             l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db
         });
@@ -114,22 +114,22 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
         DaiLike dai = DaiLike(addr.addr("MCD_DAI"));
 
-        assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), uint256(-1), "StarknetTest/unexpected-escrow-allowance");
+        assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), type(uint256).max, "StarknetTest/unexpected-escrow-allowance");
     }
 
     function checkStarknetDaiBridge() public {
         StarknetDaiBridgeLike daiBridge = StarknetDaiBridgeLike(addr.addr("STARKNET_DAI_BRIDGE"));
 
-        assertEq(daiBridge.isOpen(),     starknetValues.dai_bridge_isOpen,           "StarknetTestError/dai-bridge-isOpen-unexpected");
-        assertEq(daiBridge.ceiling(),    starknetValues.dai_bridge_ceiling * WAD,    "StarknetTestError/dai-bridge-ceiling-unexpected");
-        assertEq(daiBridge.maxDeposit(), starknetValues.dai_bridge_maxDeposit,       "StarknetTestError/dai-bridge-maxDeposit-unexpected");
+        assertEq(daiBridge.isOpen(),     starknetValues.dai_bridge_isOpen,     "StarknetTestError/dai-bridge-isOpen-unexpected");
+        assertEq(daiBridge.ceiling(),    starknetValues.dai_bridge_ceiling,    "StarknetTestError/dai-bridge-ceiling-unexpected");
+        assertEq(daiBridge.maxDeposit(), starknetValues.dai_bridge_maxDeposit, "StarknetTestError/dai-bridge-maxDeposit-unexpected");
 
         assertEq(daiBridge.dai(),      addr.addr("MCD_DAI"),         "StarknetTest/dai-bridge-dai");
         assertEq(daiBridge.starkNet(), addr.addr("STARKNET_CORE"),   "StarknetTest/dai-bridge-core");
         assertEq(daiBridge.escrow(),   addr.addr("STARKNET_ESCROW"), "StarknetTest/dai-bridge-escrow");
 
-        assertEq(daiBridge.wards(addr.addr("MCD_PAUSE_PROXY")),     1, "StarknetTest/pause-proxy-not-ward-on-dai-bridge");
-        assertEq(daiBridge.wards(addr.addr("MCD_ESM")),             1, "StarknetTest/esm-not-ward-on-dai-bridge");
+        assertEq(daiBridge.wards(addr.addr("MCD_PAUSE_PROXY")), 1, "StarknetTest/pause-proxy-not-ward-on-dai-bridge");
+        assertEq(daiBridge.wards(addr.addr("MCD_ESM")),         1, "StarknetTest/esm-not-ward-on-dai-bridge");
 
         assertEq(daiBridge.l2DaiBridge(), starknetValues.l2_dai_bridge, "StarknetTest/wrong-l2-dai-bridge-on-dai-bridge");
     }
