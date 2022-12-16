@@ -20,7 +20,7 @@ contract Wallets {
 
     mapping (bytes32 => address) public addr;
 
-    constructor() public {
+    constructor() {
 
         // Core Units
         addr["CES_WALLET"]                   = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;

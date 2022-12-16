@@ -1376,13 +1376,13 @@ contract DssSpellTestBase is Config, Test {
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
-        cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(divup(dust, rate)));
+        cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(divup(dust, rate)));
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
         assertTrue(vat.dai(address(this)) >= dust && vat.dai(address(this)) <= dust + RAY);
 
         // Payback DAI, withdraw collateral
         vat.hope(address(cropper));      // Need to grant the cropper permission to remove dai
-        cropper.frob(_ilk, address(this), address(this), address(this), -int(amount), -int(divup(dust, rate)));
+        cropper.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(divup(dust, rate)));
         assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
         assertEq(vat.dai(address(this)), 0);
 
@@ -1398,7 +1398,7 @@ contract DssSpellTestBase is Config, Test {
             // dart max amount of DAI
             {   // Stack too deep
                 (,,uint256 spot,,) = vat.ilks(_ilk);
-                cropper.frob(_ilk, address(this), address(this), address(this), int(amount), int(mul(amount, spot) / rate));
+                cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(amount * spot / rate));
             }
             vm.warp(block.timestamp + 1);
             jug.drip(_ilk);
@@ -1690,7 +1690,7 @@ contract DssSpellTestBase is Config, Test {
     }
 
     // Add an exception here if a registered deployer can be a valid auth on target
-    function skipWards(address target, address deployer) internal view returns (bool) {
+    function skipWards(address target, address deployer) internal pure returns (bool) {
         // Add logic here in case any wards need to be skipped, otherwise return false.
         target; deployer;
         return false;

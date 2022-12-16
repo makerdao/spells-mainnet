@@ -20,7 +20,7 @@ contract Addresses {
 
     mapping (bytes32 => address) public addr;
 
-    constructor() public {
+    constructor() {
         addr["CHANGELOG"]                       = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
         addr["MULTICALL"]                       = 0x5e227AD1969Ea493B43F840cfF78d08a6fc17796;
         addr["FAUCET"]                          = 0x0000000000000000000000000000000000000000;
