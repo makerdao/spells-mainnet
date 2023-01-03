@@ -287,8 +287,38 @@ contract DssSpellTest is DssSpellTestBase {
         new DssSpell();
         uint256 endGas = gasleft();
         uint256 totalGas = startGas - endGas;
+
+        // Warn if deploy exceeds block target size
+        if (totalGas > 15 * MILLION) {
+            emit log("Warn: deploy gas exceeds average block target");
+            emit log_named_uint("    deploy gas", totalGas);
+            emit log_named_uint("  block target", 15 * MILLION);
+        }
+
         // Fail if deploy is too expensive
-        assertLe(totalGas, 15 * MILLION);
+        assertLe(totalGas, 30 * MILLION, "testDeployCost/DssSpell-exceeds-max-block-size");
+    }
+
+
+    // Fail when contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon).
+    // This contract may not be deployable.
+    // Consider enabling the optimizer (with a low "runs" value!),
+    //   turning off revert strings, or using libraries.
+    function testContractSize() public {
+        uint256 _sizeSpell;
+        address _spellAddr  = address(spell);
+        assembly {
+            _sizeSpell := extcodesize(_spellAddr)
+        }
+        assertLe(_sizeSpell, 24576, "testContractSize/DssSpell-exceeds-max-contract-size");
+
+        uint256 _sizeAction;
+        address _actionAddr = spell.action();
+        assembly {
+            _sizeAction := extcodesize(_actionAddr)
+        }
+        assertLe(_sizeAction, 24576, "testContractSize/DssSpellAction-exceeds-max-contract-size");
+
     }
 
     // The specific date doesn't matter that much since function is checking for difference between warps
