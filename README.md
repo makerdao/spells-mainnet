@@ -12,22 +12,6 @@ $ git clone git@github.com:makerdao/spells-mainnet.git
 $ dapp update
 ```
 
-### Adding Collaterals to the System
-
-If the weekly executive needs to onboard a new collateral:
-
-1. Update the `onboardNewCollaterals()` function in `DssSpellCollateral.sol`
-2. Update the values in `src/test/config.sol`
-3. Add `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
-
-### Removing Collaterals from the System
-
-If the weekly executive needs to offboard collaterals:
-
-1. Update the `offboardCollaterals()` function in `DssSpellCollateral.sol`
-2. Update the values in `src/test/config.sol`
-3. Add `offboardCollaterals();` in the `actions()` function in `DssSpellAction`
-
 ### Build
 
 ```bash
