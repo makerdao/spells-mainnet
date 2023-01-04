@@ -724,20 +724,26 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
-        uint256 prevMkrPause = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrXXX  = gov.balanceOf(wallets.addr("XXX_WALLET"));
+    function testMKRPayments() public { // make private to disable
+        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
+        uint256 prevMkrRisk   = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
+        uint256 prevMkrOracle = gov.balanceOf(wallets.addr("ORA_WALLET"));
 
-        uint256 amountXXX = 0 ether;
+        uint256 amountDeco   = 125    ether;
+        uint256 amountRisk   = 175    ether;
+        uint256 amountOracle = 843.69 ether;
 
-        uint256 total     = 0 ether;
+        uint256 total      = 1_143.69 ether;
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("XXX_WALLET")), prevMkrXXX + amountXXX);
+        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco + amountDeco);
+        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
+        assertEq(gov.balanceOf(wallets.addr("ORA_WALLET")), prevMkrOracle + amountOracle);
     }
 
     function testMKRVestFix() private { // make private to disable

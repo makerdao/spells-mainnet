@@ -27,6 +27,7 @@ interface VestLike {
 interface GemLike {
     function allowance(address, address) external view returns (uint256);
     function approve(address, uint256) external returns (bool);
+    function transfer(address, uint256) external returns (bool);
 }
 
 contract DssSpellAction is DssAction {
@@ -49,10 +50,14 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE      = ;
 
     // uint256 internal constant MILLION = 10 ** 6;
-    // uint256 internal constant WAD     = 10 ** 18;
     // uint256 internal constant RAY     = 10 ** 27;
+    uint256 internal constant WAD     = 10 ** 18;
 
     GemLike internal immutable MKR               = GemLike(DssExecLib.mkr());
+
+    address internal constant DECO_WALLET        = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address internal constant RISK_WALLET        = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+    address internal constant ORA_WALLET         = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
 
     address internal constant STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
     address internal constant ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
@@ -75,11 +80,22 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
-        // Core Unit DAI Budget Streams
+        // ----- Core Unit DAI Budget Streams -----
 
-        // Core Unit MKR Transfer
+        // ------ Core Unit MKR Transfers -----
+        // DECO-001 - 125.0 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
+        // https://mips.makerdao.com/mips/details/MIP40c3SP36
+        MKR.transfer(DECO_WALLET, 125 * WAD);
 
-        // MKR Vesting Stream
+        // RISK-001 - 175.00 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
+        // https://mips.makerdao.com/mips/details/MIP40c3SP25
+        MKR.transfer(RISK_WALLET, 175 * WAD);
+
+        // ORA-001 - 843.69 MKR - 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf
+        // https://forum.makerdao.com/t/psa-oracle-core-unit-mkr-distribution/19030
+        MKR.transfer(ORA_WALLET, 843.69 * 100 * WAD / 100);
+
+        // ----- MKR Vesting Stream ------
         VestLike vest = VestLike(
             DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
         );
@@ -98,7 +114,7 @@ contract DssSpellAction is DssAction {
         //     )
         // );
 
-        // Delegate Compensation for December 2022
+        // ----- Delegate Compensation for December 2022 -----
         // Link: TODO
         // StableNode - 12000 DAI - 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0
         DssExecLib.sendPaymentFromSurplusBuffer(STABLENODE,          12_000);
