@@ -19,6 +19,16 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface VestLike {
+    function restrict(uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+}
+
+interface GemLike {
+    function allowance(address, address) external view returns (uint256);
+    function approve(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -41,6 +51,8 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant MILLION = 10 ** 6;
     // uint256 internal constant WAD     = 10 ** 18;
     // uint256 internal constant RAY     = 10 ** 27;
+
+    GemLike internal immutable MKR               = GemLike(DssExecLib.mkr());
 
     address internal constant STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
     address internal constant ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
@@ -68,6 +80,23 @@ contract DssSpellAction is DssAction {
         // Core Unit MKR Transfer
 
         // MKR Vesting Stream
+        VestLike vest = VestLike(
+            DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
+        );
+
+        // Increase allowance by new vesting delta
+        MKR.approve(address(vest), MKR.allowance(address(this), address(vest)) + 0 ether);
+
+        // vest.restrict(
+        //     vest.create(
+        //         ,                                             // usr
+        //         ether,                                             // tot
+        //         ,                                             // bgn
+        //         ,                               // tau
+        //         ,                               // eta
+        //         address(0)                                               // mgr
+        //     )
+        // );
 
         // Delegate Compensation for December 2022
         // Link: TODO

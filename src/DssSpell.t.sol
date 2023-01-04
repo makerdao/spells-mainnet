@@ -673,20 +673,20 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
-    function testVestMKR() private { // make private to disable
-        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        // assertEq(vest.ids(), 24);
+    function testVestMKR() public { // make private to disable
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        assertEq(vest.ids(), 28);
 
-        // uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 787.70 ether);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 0 ether);
 
         // assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        // assertEq(vest.ids(), 28);
+        assertEq(vest.ids(), 29);
 
         // uint256 AUG_01_2022 = 1659312000;
         // uint256 AUG_01_2023 = 1690848000;
@@ -699,92 +699,29 @@ contract DssSpellTest is DssSpellTestBase {
         // address SNE_WALLET = wallets.addr("SNE_WALLET");
 
         // // -----
-        // assertEq(vest.usr(25), GOV_WALLET1);
-        // assertEq(vest.bgn(25), AUG_01_2022);
-        // assertEq(vest.clf(25), AUG_01_2023);
-        // assertEq(vest.fin(25), AUG_01_2022 + 365 days);
-        // assertEq(vest.fin(25), AUG_01_2023);
-        // assertEq(vest.mgr(25), address(0));
-        // assertEq(vest.res(25), 1);
-        // assertEq(vest.tot(25), 62.50 ether);
-        // assertEq(vest.rxd(25), 0);
-
-        // assertEq(vest.usr(26), GOV_WALLET2);
-        // assertEq(vest.bgn(26), AUG_01_2022);
-        // assertEq(vest.clf(26), AUG_01_2023);
-        // assertEq(vest.fin(26), AUG_01_2022 + 365 days);
-        // assertEq(vest.fin(26), AUG_01_2023);
-        // assertEq(vest.mgr(26), address(0));
-        // assertEq(vest.res(26), 1);
-        // assertEq(vest.tot(26), 32.69 ether);
-        // assertEq(vest.rxd(26), 0);
-
-        // assertEq(vest.usr(27), GOV_WALLET3);
-        // assertEq(vest.bgn(27), AUG_01_2022);
-        // assertEq(vest.clf(27), AUG_01_2023);
-        // assertEq(vest.fin(27), AUG_01_2022 + 365 days);
-        // assertEq(vest.fin(27), AUG_01_2023);
-        // assertEq(vest.mgr(27), address(0));
-        // assertEq(vest.res(27), 1);
-        // assertEq(vest.tot(27), 152.51 ether);
-        // assertEq(vest.rxd(27), 0);
-
-        // assertEq(vest.usr(28), SNE_WALLET);
-        // assertEq(vest.bgn(28), SEP_28_2022);
-        // assertEq(vest.clf(28), SEP_28_2022);
-        // assertEq(vest.fin(28), SEP_28_2022 + 731 days);
-        // assertEq(vest.fin(28), SEP_28_2024);
-        // assertEq(vest.mgr(28), address(0));
-        // assertEq(vest.res(28), 1);
-        // assertEq(vest.tot(28), 540.00 ether);
-        // assertEq(vest.rxd(28), 0);
+        // assertEq(vest.usr(29), GOV_WALLET1);
+        // assertEq(vest.bgn(29), AUG_01_2022);
+        // assertEq(vest.clf(29), AUG_01_2023);
+        // assertEq(vest.fin(29), AUG_01_2022 + 365 days);
+        // assertEq(vest.fin(29), AUG_01_2023);
+        // assertEq(vest.mgr(29), address(0));
+        // assertEq(vest.res(29), 1);
+        // assertEq(vest.tot(29), 62.50 ether);
+        // assertEq(vest.rxd(29), 0);
 
         // uint256 prevBalance = gov.balanceOf(GOV_WALLET1);
 
         // // Give admin powers to test contract address and make the vesting unrestricted for testing
         // giveAuth(address(vest), address(this));
-        // vest.unrestrict(25);
+        // vest.unrestrict(29);
 
         // vm.warp(AUG_01_2022 + 365 days);
-        // vest.vest(25);
+        // vest.vest(29);
         // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
 
         // vm.warp(AUG_01_2022 + 365 days + 10 days);
-        // vest.vest(25);
+        // vest.vest(29);
         // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
-
-        // prevBalance = gov.balanceOf(GOV_WALLET2);
-        // vest.unrestrict(26);
-
-        // vm.warp(AUG_01_2022 + 365 days);
-        // vest.vest(26);
-        // assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
-
-        // vm.warp(AUG_01_2022 + 365 days + 10 days);
-        // vest.vest(26);
-        // assertEq(gov.balanceOf(GOV_WALLET2), prevBalance + 32.69 ether);
-
-        // prevBalance = gov.balanceOf(GOV_WALLET3);
-        // vest.unrestrict(27);
-
-        // vm.warp(AUG_01_2022 + 365 days);
-        // vest.vest(27);
-        // assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
-
-        // vm.warp(AUG_01_2022 + 365 days + 10 days);
-        // vest.vest(27);
-        // assertEq(gov.balanceOf(GOV_WALLET3), prevBalance + 152.51 ether);
-
-        // prevBalance = gov.balanceOf(SNE_WALLET);
-        // vest.unrestrict(28);
-
-        // vm.warp(SEP_28_2022 + 731 days);
-        // vest.vest(28);
-        // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
-
-        // vm.warp(SEP_28_2022 + 731 days + 10 days);
-        // vest.vest(28);
-        // assertEq(gov.balanceOf(SNE_WALLET), prevBalance + 540.00 ether);
     }
 
     function testMKRPayments() private { // make private to disable
