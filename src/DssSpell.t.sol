@@ -585,46 +585,63 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
-        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+    function testVestDAI() public { // make private to disable
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
-        // uint256 OCT_01_2022 = 1664582400; // Saturday, October   1, 2022 12:00:00 AM
-        // uint256 OCT_31_2022 = 1667260799; // Monday,   October  31, 2022 11:59:59 PM
+        uint256 FEB_01_2023 = 1675234800; // Wednesday, February  1, 2023 00:00:00
+        uint256 JAN_31_2024 = 1706770799; //  Thursday, January  31, 2024 23:59:59
 
-        // assertEq(vest.ids(), 9);
+        assertEq(vest.ids(), 10);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(vest.ids(), 9 + 1);
+        assertEq(vest.ids(), 10 + 2);
 
-        // assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        // assertTrue(vest.valid(10)); // check for valid contract
-        // checkDaiVest({
-        //     _index:      10,                                             // id
-        //     _wallet:     wallets.addr("DAIF_WALLET"),                    // usr
-        //     _start:      OCT_01_2022,                                    // bgn
-        //     _cliff:      OCT_01_2022,                                    // clf
-        //     _end:        OCT_31_2022,                                    // fin
-        //     _days:       31 days,                                        // fin
-        //     _manager:    address(0),                                     // mgr
-        //     _restricted: 1,                                              // res
-        //     _reward:     67_863 * WAD,                                   // tot
-        //     _claimed:    0                                               // rxd
-        // });
+        assertTrue(vest.valid(11)); // check for valid contract
+        checkDaiVest({
+            _index:      11,                                             // id
+            _wallet:     wallets.addr("DUX_WALLET"),                     // usr
+            _start:      FEB_01_2023,                                    // bgn
+            _cliff:      FEB_01_2023,                                    // clf
+            _end:        JAN_31_2024,                                    // fin
+            _days:       365 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     1_611_420 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+
+        assertTrue(vest.valid(12)); // check for valid contract
+        checkDaiVest({
+            _index:      12,                                             // id
+            _wallet:     wallets.addr("SES_WALLET"),                     // usr
+            _start:      FEB_01_2023,                                    // bgn
+            _cliff:      FEB_01_2023,                                    // clf
+            _end:        JAN_31_2024,                                    // fin
+            _days:       365 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     3_199_200 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        // giveAuth(address(vest), address(this));
-        // uint256 prevBalance;
+        giveAuth(address(vest), address(this));
+        uint256 prevDuxBalance = dai.balanceOf(wallets.addr("DUX_WALLET"));
+        uint256 prevSesBalance = dai.balanceOf(wallets.addr("SES_WALLET"));
 
-        // vest.unrestrict(10);
-        // prevBalance = dai.balanceOf(wallets.addr("DAIF_WALLET"));
-        // vm.warp(OCT_01_2022 + 31 days);
-        // assertTrue(tryVest(address(vest), 10));
-        // assertEq(dai.balanceOf(wallets.addr("DAIF_WALLET")), prevBalance + 67_863 * WAD);
+        vest.unrestrict(11);
+        vest.unrestrict(12);
+        vm.warp(FEB_01_2023 + 365 days);
+        assertTrue(tryVest(address(vest), 11));
+        assertEq(dai.balanceOf(wallets.addr("DUX_WALLET")), prevDuxBalance + 1_611_420 * WAD);
+        assertTrue(tryVest(address(vest), 11));
+        assertEq(dai.balanceOf(wallets.addr("SES_WALLET")), prevSesBalance + 3_199_200 * WAD);
     }
 
     function testYankDAI() private { // make private to disable

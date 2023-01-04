@@ -51,9 +51,19 @@ contract DssSpellAction is DssAction {
 
     // uint256 internal constant MILLION = 10 ** 6;
     // uint256 internal constant RAY     = 10 ** 27;
-    uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant WAD                = 10 ** 18;
 
-    GemLike internal immutable MKR               = GemLike(DssExecLib.mkr());
+    GemLike  internal immutable MKR              = GemLike(DssExecLib.mkr());
+    VestLike internal immutable MCD_VEST_MKR     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+    VestLike internal immutable MCD_VEST_DAI     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+
+    // Start Date - Start of Day
+    uint256 internal constant FEB_01_2023        = 1675234800;
+    // End Date - End of Day
+    uint256 internal constant ONE_YEAR           = 365 days;
+
+    address internal constant DUX_WALLET         = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address internal constant SES_WALLET         = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
     address internal constant DECO_WALLET        = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
     address internal constant RISK_WALLET        = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
@@ -82,6 +92,43 @@ contract DssSpellAction is DssAction {
 
         // ----- Core Unit DAI Budget Streams -----
 
+        // VEST.restrict( Only recipient can request funds
+        //     VEST.create(
+        //         Recipient of vest,
+        //         Total token amount of vest over period,
+        //         Start timestamp of vest,
+        //         Duration of the vesting period (in seconds),
+        //         Length of cliff period (in seconds),
+        //         Manager address
+        //     )
+        // );
+
+        // DUX-001 | 2023-02-01 to 2024-01-31 | 1,611,420 DAI | 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
+        // https://vote.makerdao.com/polling/QmdhJVvN#vote-breakdown
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                DUX_WALLET,
+                1_611_420 * WAD,
+                FEB_01_2023,
+                ONE_YEAR,
+                0,
+                address(0)
+            )
+        );
+
+        // SES-001 | 2023-02-01 to 2024-01-31 | 3,199,200 DAI | 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
+        // https://vote.makerdao.com/polling/QmegsRNC#vote-breakdown
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                SES_WALLET,
+                3_199_200 * WAD,
+                FEB_01_2023,
+                ONE_YEAR,
+                0,
+                address(0)
+            )
+        );
+
         // ------ Core Unit MKR Transfers -----
         // DECO-001 - 125.0 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
         // https://mips.makerdao.com/mips/details/MIP40c3SP36
@@ -96,12 +143,8 @@ contract DssSpellAction is DssAction {
         MKR.transfer(ORA_WALLET, 843.69 * 100 * WAD / 100);
 
         // ----- MKR Vesting Stream ------
-        VestLike vest = VestLike(
-            DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY")
-        );
-
         // Increase allowance by new vesting delta
-        MKR.approve(address(vest), MKR.allowance(address(this), address(vest)) + 0 ether);
+        MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 0 ether);
 
         // vest.restrict(
         //     vest.create(
