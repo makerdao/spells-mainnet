@@ -24,7 +24,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2022-XX-XX MakerDAO Executive Spell | Hash: ";
+        "2023-XX-XX MakerDAO Executive Spell | Hash: ";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -38,9 +38,9 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    uint256 internal constant MILLION = 10 ** 6;
-    uint256 internal constant WAD     = 10 ** 18;
-    uint256 internal constant RAY     = 10 ** 27;
+    // uint256 internal constant MILLION = 10 ** 6;
+    // uint256 internal constant WAD     = 10 ** 18;
+    // uint256 internal constant RAY     = 10 ** 27;
 
     function actions() public override {
 
