@@ -24,7 +24,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community//governance/votes/.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-XX-XX MakerDAO Executive Spell | Hash: ";
+        "2023-01-11 MakerDAO Executive Spell | Hash: ";
 
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -42,7 +42,71 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant WAD     = 10 ** 18;
     // uint256 internal constant RAY     = 10 ** 27;
 
+    address internal constant STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address internal constant ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
+    address internal constant FLIPFLOPFLAP       = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address internal constant FLIPSIDE           = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
+    address internal constant FEEDBLACKLOOPS     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address internal constant PENNBLOCKCHAIN     = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address internal constant MHONKASALOTEEMULAU = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
+    address internal constant GFXLABS            = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address internal constant JUSTINCASE         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address internal constant LBSBLOCKCHAIN      = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
+    address internal constant CALBLOCKCHAIN      = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
+    address internal constant BLOCKCHAINCOLUMBIA = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
+    address internal constant FRONTIERRESEARCH   = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address internal constant CHRISBLEC          = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
+    address internal constant CODEKNIGHT         = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address internal constant ONESTONE           = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
+    address internal constant PVL                = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
+    address internal constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
+
     function actions() public override {
+
+        // Core Unit DAI Budget Streams
+
+        // Core Unit MKR Transfer
+
+        // MKR Vesting Stream
+
+        // Delegate Compensation for December 2022
+        // Link: TODO
+        // StableNode - 12000 DAI - 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0
+        DssExecLib.sendPaymentFromSurplusBuffer(STABLENODE,          12_000);
+        // schuppi - 12000 DAI - 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167
+        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI,        12_000);
+        // Flip Flop Flap Delegate LLC - 12000 DAI - 0x688d508f3a6B0a377e266405A1583B3316f9A2B3
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP,        12_000);
+        // Flipside Crypto - 11400 DAI - 0x1ef753934C40a72a60EaB12A68B6f8854439AA78
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE,            11_400);
+        // Feedblack Loops LLC - 10808 DAI - 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS,      10_808);
+        // Penn Blockchain - 10385 DAI - 0x2165d41af0d8d5034b9c266597c1a415fa0253bd
+        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN,      10_385);
+        // mhonkasalo & teemulau - 9484 DAI - 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d
+        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU,   9_484);
+        // GFX Labs - 8903 DAI - 0xa6e8772af29b29B9202a073f8E36f447689BEef6
+        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS,              8_903);
+        // JustinCase - 7235 DAI - 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTINCASE,           7_235);
+        // London Business School Blockchain - 3798 DAI - 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C
+        DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN,        3_798);
+        // CalBlockchain - 3421 DAI - 0x7AE109A63ff4DC852e063a673b40BED85D22E585
+        DssExecLib.sendPaymentFromSurplusBuffer(CALBLOCKCHAIN,        3_421);
+        // Blockchain@Columbia - 2851 DAI - 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKCHAINCOLUMBIA,   2_851);
+        // Frontier Research LLC - 2285 DAI - 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8
+        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIERRESEARCH,     2_285);
+        // Chris Blec - 1334 DAI - 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170
+        DssExecLib.sendPaymentFromSurplusBuffer(CHRISBLEC,            1_334);
+        // CodeKnight - 355 DAI - 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428
+        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT,             355);
+        // ONESTONE - 342 DAI - 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a
+        DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE,               342);
+        // pvl - 56 DAI - 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416
+        DssExecLib.sendPaymentFromSurplusBuffer(PVL,                     56);
+        // ConsenSys - 33 DAI - 0xE78658A8acfE982Fde841abb008e57e6545e38b3
+        DssExecLib.sendPaymentFromSurplusBuffer(CONSENSYS,               33);
 
     }
 }
