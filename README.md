@@ -12,22 +12,6 @@ $ git clone git@github.com:makerdao/spells-mainnet.git
 $ dapp update
 ```
 
-### Adding Collaterals to the System
-
-If the weekly executive needs to onboard a new collateral:
-
-1. Update the `onboardNewCollaterals()` function in `DssSpellCollateral.sol`
-2. Update the values in `src/test/config.sol`
-3. Add `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
-
-### Removing Collaterals from the System
-
-If the weekly executive needs to offboard collaterals:
-
-1. Update the `offboardCollaterals()` function in `DssSpellCollateral.sol`
-2. Update the values in `src/test/config.sol`
-3. Add `offboardCollaterals();` in the `actions()` function in `DssSpellAction`
-
 ### Build
 
 ```bash
@@ -91,16 +75,3 @@ ETH_GAS_PRICE line.
 ```bash
 export ETH_GAS_PRICE=$(seth --to-wei 420 "gwei")
 ```
-
-#### Verifying spells on etherscan
-
-The process of verifying code on etherscan is a little bit more involved because of `solc`'s weird behaviour around ABI Encoder v2.
-
-1. Run `make flatten`
-2. If your spell didn't use `DssExecLib.addNewCollateral` you need to tweak the flattened source.
-   1. Remove `pragma experimental ABIEncoderV2;`
-   2. Comment out `DssExecLib.addNewCollateral` method.
-3. Go to etherscan and verify source.
-   1. Add library: `DssExecLib:<LIBRARY_CONTRACT_ADDRESS>`
-      * See `./DssExecLib.address` file for the current library address
-   2. Ensure optimizer is off and optimize runs = 200

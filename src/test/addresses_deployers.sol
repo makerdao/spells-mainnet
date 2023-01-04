@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.16;
 
 contract Deployers {
 
     address[] public addr;
 
-    constructor() public {
+    constructor() {
         addr = [
             0xdDb108893104dE4E1C6d0E47c42237dB4E617ACc,
             0xDa0FaB05039809e63C5D068c897c3e602fA97457,

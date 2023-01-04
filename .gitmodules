@@ -1,12 +1,9 @@
-[submodule "lib/ds-test"]
-	path = lib/ds-test
-	url = https://github.com/dapphub/ds-test
-[submodule "lib/ds-math"]
-	path = lib/ds-math
-	url = https://github.com/dapphub/ds-math.git
 [submodule "lib/dss-interfaces"]
 	path = lib/dss-interfaces
-	url = https://github.com/makerdao/dss-interfaces.git
+	url = https://github.com/makerdao/dss-interfaces
 [submodule "lib/dss-exec-lib"]
 	path = lib/dss-exec-lib
 	url = https://github.com/makerdao/dss-exec-lib
+[submodule "lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

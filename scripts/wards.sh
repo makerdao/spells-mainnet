@@ -17,7 +17,7 @@ do
 done
 
 ### Override maxFeePerGas to avoid spikes
-baseFee=$(seth basefee)
+baseFee=$(cast basefee)
 [[ -n "$ETH_GAS_PRICE" ]] && ethGasPriceLtBaseFee=$(echo "$ETH_GAS_PRICE < $baseFee" | bc)
 [[ "$ethGasPriceLtBaseFee" == 1 ]] && export "ETH_GAS_PRICE=$(echo "$baseFee * 3" | bc)"
 
@@ -26,19 +26,19 @@ CHANGELOG=0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F
 if [[ "$TARGET" =~ 0x* ]]; then
     target=$TARGET
 else
-    key=$(seth --to-bytes32 "$(seth --from-ascii "$TARGET")")
-    target=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
+    key=$(cast --to-bytes32 "$(cast --from-ascii "$TARGET")")
+    target=$(cast call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
 fi
 
-echo -e "Network: $(seth chain)"
-list=$(seth call "$CHANGELOG" 'list()(bytes32[])')
+echo -e "Network: $(cast chain)"
+list=$(cast call "$CHANGELOG" 'list()(bytes32[])')
 IFS=","
 for key in $list
 do
-    contractName=$(seth --to-ascii "$key" | tr -d '\0')
-    contract=$(seth call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
-    [[ $(seth call "$target" 'wards(address)(uint256)' "$contract" 2>/dev/null) == "1" ]] && echo "$1 -> $contractName"
-    [[ $(seth call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$contractName -> $1"
-    src=$(seth call "$contract" 'src()(address)' 2>/dev/null) || continue
-    [[ $(seth call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$src (source of $contractName) -> $1"
+    contractName=$(cast --to-ascii "$key" | tr -d '\0')
+    contract=$(cast call "$CHANGELOG" 'getAddress(bytes32)(address)' "$key")
+    [[ $(cast call "$target" 'wards(address)(uint256)' "$contract" 2>/dev/null) == "1" ]] && echo "$1 -> $contractName"
+    [[ $(cast call "$contract" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$contractName -> $1"
+    src=$(cast call "$contract" 'src()(address)' 2>/dev/null) || continue
+    [[ $(cast call "$src" 'wards(address)(uint256)' "$target" 2>/dev/null) == "1" ]] && echo "$src (source of $contractName) -> $1"
 done

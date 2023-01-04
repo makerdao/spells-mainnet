@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.16;
 
 contract Wallets {
 
     mapping (bytes32 => address) public addr;
 
-    constructor() public {
+    constructor() {
 
         // Core Units
         addr["CES_WALLET"]                   = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;

@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.16;
 
 contract Rates {
 
     mapping (uint256 => uint256) public rates;
 
-    constructor() public {
+    constructor() {
         rates[    0] = 1000000000000000000000000000;
         rates[    1] = 1000000000003170820659990704;
         rates[    2] = 1000000000006341324285480111;

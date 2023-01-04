@@ -186,12 +186,6 @@ for signature, block in libraries.items():
     new_block = get_warning(library_name) + stubs
     code = code.replace(block, new_block)
 
-if 'addNewCollateral' not in remove_comments(code):
-    code = code.replace(
-        'pragma experimental ABIEncoderV2;',
-        '// pragma experimental ABIEncoderV2;'
-    )
-
 def get_library_info():
     try:
         library_name = "DssExecLib"

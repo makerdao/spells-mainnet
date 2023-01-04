@@ -4,11 +4,11 @@
 
 export OSM=$1
 
-rawStorage=$(seth storage "$OSM" 3)
-nextPrice=$(seth --from-wei "$(seth --to-dec "${rawStorage:34:32}")")
-rawStorage=$(seth storage "$OSM" 4)
-currentPrice=$(seth --from-wei "$(seth --to-dec "${rawStorage:34:32}")")
-hazPoke=$(seth call "$OSM" 'pass()(bool)')
+rawStorage=$(cast storage "$OSM" 3)
+nextPrice=$(cast --from-wei "$(cast --to-dec "${rawStorage:34:32}")")
+rawStorage=$(cast storage "$OSM" 4)
+currentPrice=$(cast --from-wei "$(cast --to-dec "${rawStorage:34:32}")")
+hazPoke=$(cast call "$OSM" 'pass()(bool)')
 
 echo "canPoke: ${hazPoke}"
 echo "next price: ${currentPrice}"
