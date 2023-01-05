@@ -61,10 +61,13 @@ contract DssSpellAction is DssAction {
     VestLike internal immutable MCD_VEST_MKR     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
     VestLike internal immutable MCD_VEST_DAI     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
 
-    // Start Date - Start of Day
-    uint256 internal constant FEB_01_2023        = 1675234800;
-    // End Date - End of Day
-    uint256 internal constant ONE_YEAR           = 365 days;
+    // Start Dates - Start of Day
+    uint256 internal constant AUG_01_2022        = 1659312000;
+    uint256 internal constant FEB_01_2023        = 1675209600;
+    uint256 internal constant APR_30_2025        = 1745971200; // This aligns with other fin values of April 30 2025 00:00:00
+    // End Dates - End of Day
+    uint256 internal constant JUL_31_2023        = 1690847999;
+    uint256 internal constant JAN_31_2024        = 1706745599;
 
     address internal constant DUX_WALLET         = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
     address internal constant SES_WALLET         = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
@@ -114,7 +117,7 @@ contract DssSpellAction is DssAction {
                 DUX_WALLET,
                 1_611_420 * WAD,
                 FEB_01_2023,
-                ONE_YEAR,
+                JAN_31_2024 - FEB_01_2023,
                 0,
                 address(0)
             )
@@ -127,7 +130,7 @@ contract DssSpellAction is DssAction {
                 SES_WALLET,
                 3_199_200 * WAD,
                 FEB_01_2023,
-                ONE_YEAR,
+                JAN_31_2024 - FEB_01_2023,
                 0,
                 address(0)
             )
@@ -148,18 +151,18 @@ contract DssSpellAction is DssAction {
 
         // ----- MKR Vesting Stream ------
         // Increase allowance by new vesting delta
-        MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 0 ether);
+        MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 675 ether);
 
-        // vest.restrict(
-        //     vest.create(
-        //         ,                                             // usr
-        //         ether,                                             // tot
-        //         ,                                             // bgn
-        //         ,                               // tau
-        //         ,                               // eta
-        //         address(0)                                               // mgr
-        //     )
-        // );
+        MCD_VEST_MKR.restrict(
+            MCD_VEST_MKR.create(
+                0xa91c40621D63599b00476eC3e528E06940B03B9D, // usr
+                675 ether,                                  // tot
+                AUG_01_2022,                                // bgn
+                APR_30_2025 - AUG_01_2022,                  // tau
+                365 days,                                   // eta
+                0xe2c16c308b843eD02B09156388Cb240cEd58C01c  // mgr
+            )
+        );
 
         // ----- Delegate Compensation for December 2022 -----
         // Link: TODO

@@ -589,22 +589,22 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
-        uint256 FEB_01_2023 = 1675234800; // Wednesday, February  1, 2023 00:00:00
-        uint256 JAN_31_2024 = 1706770799; //  Thursday, January  31, 2024 23:59:59
+        uint256 FEB_01_2023 = 1675209600; // Wednesday, February  1, 2023 00:00:00
+        uint256 JAN_31_2024 = 1706745599; //  Thursday, January  31, 2024 23:59:59
 
-        assertEq(vest.ids(), 10);
+        assertEq(vest.ids(), 13);
 
         vote(address(spell));
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 10 + 2);
+        assertEq(vest.ids(), 13 + 2);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertTrue(vest.valid(11)); // check for valid contract
+        assertTrue(vest.valid(14)); // check for valid contract
         checkDaiVest({
-            _index:      11,                                             // id
+            _index:      14,                                             // id
             _wallet:     wallets.addr("DUX_WALLET"),                     // usr
             _start:      FEB_01_2023,                                    // bgn
             _cliff:      FEB_01_2023,                                    // clf
@@ -616,9 +616,9 @@ contract DssSpellTest is DssSpellTestBase {
             _claimed:    0                                               // rxd
         });
 
-        assertTrue(vest.valid(12)); // check for valid contract
+        assertTrue(vest.valid(15)); // check for valid contract
         checkDaiVest({
-            _index:      12,                                             // id
+            _index:      15,                                             // id
             _wallet:     wallets.addr("SES_WALLET"),                     // usr
             _start:      FEB_01_2023,                                    // bgn
             _cliff:      FEB_01_2023,                                    // clf
@@ -635,12 +635,12 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevDuxBalance = dai.balanceOf(wallets.addr("DUX_WALLET"));
         uint256 prevSesBalance = dai.balanceOf(wallets.addr("SES_WALLET"));
 
-        vest.unrestrict(11);
-        vest.unrestrict(12);
+        vest.unrestrict(14);
+        vest.unrestrict(15);
         vm.warp(FEB_01_2023 + 365 days);
-        assertTrue(tryVest(address(vest), 11));
+        assertTrue(tryVest(address(vest), 14));
         assertEq(dai.balanceOf(wallets.addr("DUX_WALLET")), prevDuxBalance + 1_611_420 * WAD);
-        assertTrue(tryVest(address(vest), 11));
+        assertTrue(tryVest(address(vest), 15));
         assertEq(dai.balanceOf(wallets.addr("SES_WALLET")), prevSesBalance + 3_199_200 * WAD);
     }
 
@@ -700,45 +700,37 @@ contract DssSpellTest is DssSpellTestBase {
         scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 0 ether);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 675 ether);
 
-        // assertEq(vest.cap(), 1_100 * WAD / 365 days);
+        assertEq(vest.cap(), 1_100 * WAD / 365 days);
         assertEq(vest.ids(), 29);
 
-        // uint256 AUG_01_2022 = 1659312000;
-        // uint256 AUG_01_2023 = 1690848000;
-        // uint256 SEP_28_2022 = 1664323200;
-        // uint256 SEP_28_2024 = 1727481600;
+        uint256 MAY_01_2021 = 1619827200;
+        uint256 AUG_01_2022 = 1659312000;
+        uint256 PE_CLIFF = AUG_01_2022 + 365 days;
+        uint256 PE_FIN = MAY_01_2021 + 365 days * 4;
 
-        // address GOV_WALLET1 = 0xbfDD0E744723192f7880493b66501253C34e1241;
-        // address GOV_WALLET2 = 0xbb147E995c9f159b93Da683dCa7893d6157199B9;
-        // address GOV_WALLET3 = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-        // address SNE_WALLET = wallets.addr("SNE_WALLET");
+        address PE_IC_WALLET = 0xa91c40621D63599b00476eC3e528E06940B03B9D;
 
-        // // -----
-        // assertEq(vest.usr(29), GOV_WALLET1);
-        // assertEq(vest.bgn(29), AUG_01_2022);
-        // assertEq(vest.clf(29), AUG_01_2023);
-        // assertEq(vest.fin(29), AUG_01_2022 + 365 days);
-        // assertEq(vest.fin(29), AUG_01_2023);
-        // assertEq(vest.mgr(29), address(0));
-        // assertEq(vest.res(29), 1);
-        // assertEq(vest.tot(29), 62.50 ether);
-        // assertEq(vest.rxd(29), 0);
+        assertEq(vest.usr(29), PE_IC_WALLET);
+        assertEq(vest.bgn(29), AUG_01_2022);
+        assertEq(vest.clf(29), PE_CLIFF);
+        assertEq(vest.fin(29), PE_FIN);
+        assertEq(vest.mgr(29), wallets.addr("PE_WALLET"));
+        assertEq(vest.res(29), 1);
+        assertEq(vest.tot(29), 675 ether);
+        assertEq(vest.rxd(29), 0);
 
-        // uint256 prevBalance = gov.balanceOf(GOV_WALLET1);
+        uint256 prevBalance = gov.balanceOf(PE_IC_WALLET);
 
-        // // Give admin powers to test contract address and make the vesting unrestricted for testing
-        // giveAuth(address(vest), address(this));
-        // vest.unrestrict(29);
+        // Give admin powers to test contract address and make the vesting unrestricted for testing
+        giveAuth(address(vest), address(this));
+        vest.unrestrict(29);
 
-        // vm.warp(AUG_01_2022 + 365 days);
-        // vest.vest(29);
-        // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
+        vm.warp(PE_FIN);
+        vest.vest(29);
+        assertEq(gov.balanceOf(PE_IC_WALLET), prevBalance + 675 ether);
 
-        // vm.warp(AUG_01_2022 + 365 days + 10 days);
-        // vest.vest(29);
-        // assertEq(gov.balanceOf(GOV_WALLET1), prevBalance + 62.50 ether);
     }
 
     function testMKRPayments() public { // make private to disable
