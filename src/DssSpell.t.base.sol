@@ -1509,6 +1509,7 @@ contract DssSpellTestBase is Config, Test {
     }
 
     function _skipWards(address target, address deployer) internal pure returns (bool) {
+        // Kept for consistency but in general we don't want to skip checking wards on mainnet
         target; deployer;
         return false;
     }
