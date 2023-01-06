@@ -85,18 +85,18 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
     function testStarknet() public {
         setValues();
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        checkStarknetEscrowMom();
-        checkStarknetEscrow();
-        checkStarknetDaiBridge();
-        checkStarknetGovRelay();
-        checkStarknetCore();
+        _checkStarknetEscrowMom();
+        _checkStarknetEscrow();
+        _checkStarknetDaiBridge();
+        _checkStarknetGovRelay();
+        _checkStarknetCore();
     }
 
-    function checkStarknetEscrowMom() public {
+    function _checkStarknetEscrowMom() internal {
         StarknetEscrowMomLike escrowMom = StarknetEscrowMomLike(addr.addr("STARKNET_ESCROW_MOM"));
 
         assertEq(escrowMom.owner(),     addr.addr("MCD_PAUSE_PROXY"), "StarknetTest/pause-proxy-not-owner-on-escrow-mom");
@@ -105,7 +105,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(escrowMom.token(),     addr.addr("MCD_DAI"),         "StarknetTest/unexpected-dai-on-escrow-mom");
     }
 
-    function checkStarknetEscrow() public {
+    function _checkStarknetEscrow() internal {
         StarknetEscrowLike escrow = StarknetEscrowLike(addr.addr("STARKNET_ESCROW"));
 
         assertEq(escrow.wards(addr.addr("MCD_PAUSE_PROXY")),     1, "StarknetTest/pause-proxy-not-ward-on-escrow");
@@ -117,7 +117,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), type(uint256).max, "StarknetTest/unexpected-escrow-allowance");
     }
 
-    function checkStarknetDaiBridge() public {
+    function _checkStarknetDaiBridge() internal {
         StarknetDaiBridgeLike daiBridge = StarknetDaiBridgeLike(addr.addr("STARKNET_DAI_BRIDGE"));
 
         assertEq(daiBridge.isOpen(),     starknetValues.dai_bridge_isOpen,     "StarknetTestError/dai-bridge-isOpen-unexpected");
@@ -134,7 +134,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(daiBridge.l2DaiBridge(), starknetValues.l2_dai_bridge, "StarknetTest/wrong-l2-dai-bridge-on-dai-bridge");
     }
 
-    function checkStarknetGovRelay() public {
+    function _checkStarknetGovRelay() internal {
         StarknetGovRelayLike govRelay = StarknetGovRelayLike(addr.addr("STARKNET_GOV_RELAY"));
 
         assertEq(govRelay.wards(addr.addr("MCD_PAUSE_PROXY")), 1, "StarknetTest/pause-proxy-not-ward-on-gov-relay");
@@ -144,7 +144,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         assertEq(govRelay.l2GovernanceRelay(), starknetValues.l2_gov_relay, "StarknetTest/unexpected-l2-gov-relay-on-gov-relay");
     }
 
-    function checkStarknetCore() public {
+    function _checkStarknetCore() internal {
         StarknetCoreLike core = StarknetCoreLike(addr.addr("STARKNET_CORE"));
 
         // Starknet Core is currently out of scope.

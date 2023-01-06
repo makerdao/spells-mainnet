@@ -37,24 +37,12 @@ struct TeleportGUID {
     uint48 timestamp;
 }
 
-interface DssExecSpellLike {
-    function done() external view returns (bool);
-    function eta() external view returns (uint256);
-    function cast() external;
-    function nextCastTime() external returns (uint256);
-}
-
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
     function tau() external view returns (uint256);
     function bar() external view returns (uint256);
     function king() external view returns (address);
-}
-
-interface FlapLike is FlapAbstract {
-    function fill() external view returns (uint256);
-    function lid() external view returns (uint256);
 }
 
 interface CropperLike {
@@ -72,15 +60,6 @@ interface CropJoinLike {
 
 interface CurveLPOsmLike is LPOsmAbstract {
     function orbs(uint256) external view returns (address);
-}
-
-interface CureLike {
-    function tCount() external view returns (uint256);
-    function srcs(uint256) external view returns (address);
-    function live() external view returns (uint256);
-    function tell() external view returns (uint256);
-    function cage() external;
-    function load(address) external;
 }
 
 interface TeleportJoinLike {
@@ -182,9 +161,9 @@ contract DssSpellTestBase is Config, Test {
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));
-    CureLike                        cure = CureLike(           addr.addr("MCD_CURE"));
+    CureAbstract                    cure = CureAbstract(       addr.addr("MCD_CURE"));
     IlkRegistryAbstract              reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-    FlapLike                        flap = FlapLike(           addr.addr("MCD_FLAP"));
+    FlapAbstract                    flap = FlapAbstract(       addr.addr("MCD_FLAP"));
     CropperLike                  cropper = CropperLike(        addr.addr("MCD_CROPPER"));
 
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
@@ -210,12 +189,12 @@ contract DssSpellTestBase is Config, Test {
     event Debug(uint256 index, address addr);
     event Debug(uint256 index, bytes32 what);
 
-    function rmul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+    function _rmul(uint256 x, uint256 y) internal pure returns (uint256 z) {
         z = (x * y + RAY / 2) / RAY;
     }
 
     // not provided in DSMath
-    function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
+    function _rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
       assembly {
         switch x case 0 {switch n case 0 {z := b} default {z := 0}}
         default {
@@ -239,14 +218,14 @@ contract DssSpellTestBase is Config, Test {
       }
     }
 
-    function divup(uint256 x, uint256 y) internal pure returns (uint256 z) {
+    function _divup(uint256 x, uint256 y) internal pure returns (uint256 z) {
         unchecked {
             z = x != 0 ? ((x - 1) / y) + 1 : 0;
         }
     }
 
     // not provided in DSTest
-    function assertEqApprox(uint256 _a, uint256 _b, uint256 _tolerance) internal {
+    function _assertEqApprox(uint256 _a, uint256 _b, uint256 _tolerance) internal {
         uint256 a = _a;
         uint256 b = _b;
         if (a < b) {
@@ -262,19 +241,19 @@ contract DssSpellTestBase is Config, Test {
         }
     }
 
-    function cmpStr(string memory a, string memory b) internal pure returns (bool) {
+    function _cmpStr(string memory a, string memory b) internal pure returns (bool) {
          return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
 
-    function concat(string memory a, string memory b) internal pure returns (string memory) {
+    function _concat(string memory a, string memory b) internal pure returns (string memory) {
         return string(abi.encodePacked(a, b));
     }
 
-    function concat(string memory a, bytes32 b) internal pure returns (string memory) {
-        return string(abi.encodePacked(a, bytes32ToStr(b)));
+    function _concat(string memory a, bytes32 b) internal pure returns (string memory) {
+        return string(abi.encodePacked(a, _bytes32ToStr(b)));
     }
 
-    function bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
+    function _bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
         bytes memory bytesArray = new bytes(32);
         for (uint256 i; i < 32; i++) {
             bytesArray[i] = _bytes32[i];
@@ -285,29 +264,29 @@ contract DssSpellTestBase is Config, Test {
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
-    function yearlyYield(uint256 duty) public pure returns (uint256) {
-        return rpow(duty, (365 * 24 * 60 * 60), RAY);
+    function _yearlyYield(uint256 duty) internal pure returns (uint256) {
+        return _rpow(duty, (365 * 24 * 60 * 60), RAY);
     }
 
-    function expectedRate(uint256 percentValue) public pure returns (uint256) {
+    function _expectedRate(uint256 percentValue) internal pure returns (uint256) {
         return (10000 + percentValue) * (10 ** 23);
     }
 
-    function diffCalc(
+    function _diffCalc(
         uint256 expectedRate_,
         uint256 yearlyYield_
-    ) public pure returns (uint256) {
+    ) internal pure returns (uint256) {
         return (expectedRate_ > yearlyYield_) ?
             expectedRate_ - yearlyYield_ : yearlyYield_ - expectedRate_;
     }
 
-    function castPreviousSpell() internal {
-        DssExecSpellLike prevSpell = DssExecSpellLike(spellValues.previous_spell);
+    function _castPreviousSpell() internal {
+        DssSpell prevSpell = DssSpell(spellValues.previous_spell);
         // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != DssExecSpellLike(address(0)) && !prevSpell.done()) {
+        if (prevSpell != DssSpell(address(0)) && !prevSpell.done()) {
             if (prevSpell.eta() == 0) {
-                vote(address(prevSpell));
-                scheduleWaitAndCast(address(prevSpell));
+                _vote(address(prevSpell));
+                _scheduleWaitAndCast(address(prevSpell));
             }
             else {
                 // jump to nextCastTime to be a little more forgiving on the spell execution time
@@ -321,53 +300,14 @@ contract DssSpellTestBase is Config, Test {
         setValues(address(chief));
 
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0) ? spellValues.deployed_spell_created : block.timestamp;
-        castPreviousSpell();
+        _castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
     }
 
-    function scheduleWaitAndCastFailDay() public {
-        spell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        uint256 day = (castTime / 1 days + 3) % 7;
-        if (day < 5) {
-            castTime += 5 days - day * 86400;
-        }
-
-        vm.warp(castTime);
-        spell.cast();
-    }
-
-    function scheduleWaitAndCastFailEarly() public {
-        spell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay() + 24 hours;
-        uint256 hour = castTime / 1 hours % 24;
-        if (hour >= 14) {
-            castTime -= hour * 3600 - 13 hours;
-        }
-
-        vm.warp(castTime);
-        spell.cast();
-    }
-
-    function scheduleWaitAndCastFailLate() public {
-        spell.schedule();
-
-        uint256 castTime = block.timestamp + pause.delay();
-        uint256 hour = castTime / 1 hours % 24;
-        if (hour < 21) {
-            castTime += 21 hours - hour * 3600;
-        }
-
-        vm.warp(castTime);
-        spell.cast();
-    }
-
-    function vote(address spell_) internal {
+    function _vote(address spell_) internal {
         if (chief.hat() != spell_) {
-            giveTokens(address(gov), 999999999999 ether);
+            _giveTokens(address(gov), 999999999999 ether);
             gov.approve(address(chief), type(uint256).max);
             chief.lock(999999999999 ether);
 
@@ -383,7 +323,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(chief.hat(), spell_);
     }
 
-    function scheduleWaitAndCast(address spell_) public {
+    function _scheduleWaitAndCast(address spell_) internal {
         DssSpell(spell_).schedule();
 
         vm.warp(DssSpell(spell_).nextCastTime());
@@ -391,13 +331,13 @@ contract DssSpellTestBase is Config, Test {
         DssSpell(spell_).cast();
     }
 
-    function stringToBytes32(string memory source) public pure returns (bytes32 result) {
+    function _stringToBytes32(string memory source) internal pure returns (bytes32 result) {
         assembly {
             result := mload(add(source, 32))
         }
     }
 
-    function checkSystemValues(SystemValues storage values) internal {
+    function _checkSystemValues(SystemValues storage values) internal {
         // dsr
         uint256 expectedDSRRate = rates.rates(values.pot_dsr);
         // make sure dsr is less than 100% APR
@@ -409,7 +349,7 @@ contract DssSpellTestBase is Config, Test {
             "TestError/pot-dsr-range"
         );
         assertTrue(
-            diffCalc(expectedRate(values.pot_dsr), yearlyYield(expectedDSRRate)) <= TOLERANCE,
+            _diffCalc(_expectedRate(values.pot_dsr), _yearlyYield(expectedDSRRate)) <= TOLERANCE,
             "TestError/pot-dsr-rates-table"
         );
 
@@ -526,23 +466,23 @@ contract DssSpellTestBase is Config, Test {
         assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
     }
 
-    function checkCollateralValues(SystemValues storage values) internal {
+    function _checkCollateralValues(SystemValues storage values) internal {
         uint256 sumlines;
         bytes32[] memory ilks = reg.list();
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
 
-            assertEq(duty, rates.rates(values.collaterals[ilk].pct), concat("TestError/jug-duty-", ilk));
+            assertEq(duty, rates.rates(values.collaterals[ilk].pct), _concat("TestError/jug-duty-", ilk));
             // make sure duty is less than 1000% APR
             // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
             // 1000000073014496989316680335
-            assertTrue(duty >= RAY && duty < 1000000073014496989316680335, concat("TestError/jug-duty-range-", ilk));  // gt 0 and lt 1000%
+            assertTrue(duty >= RAY && duty < 1000000073014496989316680335, _concat("TestError/jug-duty-range-", ilk));  // gt 0 and lt 1000%
             assertTrue(
-                diffCalc(expectedRate(values.collaterals[ilk].pct), yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE,
-                concat("TestError/rates-", ilk)
+                _diffCalc(_expectedRate(values.collaterals[ilk].pct), _yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE,
+                _concat("TestError/rates-", ilk)
             );
-            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, concat("TestError/pct-max-", ilk));   // check value lt 1000%
+            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, _concat("TestError/pct-max-", ilk));   // check value lt 1000%
             {
             (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
             // Convert whole Dai units to expected RAD
@@ -550,19 +490,19 @@ contract DssSpellTestBase is Config, Test {
             sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
             if (!values.collaterals[ilk].aL_enabled) {
-                assertTrue(aL_line == 0, concat("TestError/al-Line-not-zero-", ilk));
-                assertEq(line, normalizedTestLine, concat("TestError/vat-line-", ilk));
-                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0, concat("TestError/vat-line-range-", ilk));  // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue(aL_line == 0, _concat("TestError/al-Line-not-zero-", ilk));
+                assertEq(line, normalizedTestLine, _concat("TestError/vat-line-", ilk));
+                assertTrue((line >= RAD && line < 10 * BILLION * RAD) || line == 0, _concat("TestError/vat-line-range-", ilk));  // eq 0 or gt eq 1 RAD and lt 10B
             } else {
-                assertTrue(aL_line > 0, concat("TestError/al-Line-is-zero-", ilk));
-                assertEq(aL_line, values.collaterals[ilk].aL_line * RAD, concat("TestError/al-line-", ilk));
-                assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD, concat("TestError/al-gap-", ilk));
-                assertEq(aL_ttl, values.collaterals[ilk].aL_ttl, concat("TestError/al-ttl-", ilk));
-                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0, concat("TestError/al-line-range-", ilk)); // eq 0 or gt eq 1 RAD and lt 10B
+                assertTrue(aL_line > 0, _concat("TestError/al-Line-is-zero-", ilk));
+                assertEq(aL_line, values.collaterals[ilk].aL_line * RAD, _concat("TestError/al-line-", ilk));
+                assertEq(aL_gap, values.collaterals[ilk].aL_gap * RAD, _concat("TestError/al-gap-", ilk));
+                assertEq(aL_ttl, values.collaterals[ilk].aL_ttl, _concat("TestError/al-ttl-", ilk));
+                assertTrue((aL_line >= RAD && aL_line < 20 * BILLION * RAD) || aL_line == 0, _concat("TestError/al-line-range-", ilk)); // eq 0 or gt eq 1 RAD and lt 10B
             }
             uint256 normalizedTestDust = values.collaterals[ilk].dust * RAD;
-            assertEq(dust, normalizedTestDust, concat("TestError/vat-dust-", ilk));
-            assertTrue((dust >= RAD && dust <= 100 * THOUSAND * RAD) || dust == 0, concat("TestError/vat-dust-range-", ilk)); // eq 0 or gt eq 1 and lte 100k
+            assertEq(dust, normalizedTestDust, _concat("TestError/vat-dust-", ilk));
+            assertTrue((dust >= RAD && dust <= 100 * THOUSAND * RAD) || dust == 0, _concat("TestError/vat-dust-range-", ilk)); // eq 0 or gt eq 1 and lte 100k
             }
 
             {
@@ -571,132 +511,132 @@ contract DssSpellTestBase is Config, Test {
                 // Convert BP to system expected value
                 uint256 normalizedTestMat = (values.collaterals[ilk].mat * 10**23);
                 if (values.collaterals[ilk].offboarding) {
-                    assertTrue(mat <= normalizedTestMat, concat("TestError/vat-lerping-mat-", ilk));
-                    assertTrue(mat >= RAY && mat <= 300 * RAY, concat("TestError/vat-mat-range-", ilk));  // cr gt 100% and lt 30000%
+                    assertTrue(mat <= normalizedTestMat, _concat("TestError/vat-lerping-mat-", ilk));
+                    assertTrue(mat >= RAY && mat <= 300 * RAY, _concat("TestError/vat-mat-range-", ilk));  // cr gt 100% and lt 30000%
                 } else {
-                    assertEq(mat, normalizedTestMat, concat("TestError/vat-mat-", ilk));
-                    assertTrue(mat >= RAY && mat < 10 * RAY, concat("TestError/vat-mat-range-", ilk));    // cr gt 100% and lt 1000%
+                    assertEq(mat, normalizedTestMat, _concat("TestError/vat-mat-", ilk));
+                    assertTrue(mat >= RAY && mat < 10 * RAY, _concat("TestError/vat-mat-range-", ilk));    // cr gt 100% and lt 1000%
                 }
             }
             }
 
             if (values.collaterals[ilk].liqType == "flip") {
                 {
-                assertEq(reg.class(ilk), 2, concat("TestError/reg-class-", ilk));
+                assertEq(reg.class(ilk), 2, _concat("TestError/reg-class-", ilk));
                 (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("cat()"));
-                assertTrue(ok, concat("TestError/reg-xlip-cat-", ilk));
-                assertEq(abi.decode(val, (address)), address(cat), concat("TestError/reg-xlip-cat-", ilk));
+                assertTrue(ok, _concat("TestError/reg-xlip-cat-", ilk));
+                assertEq(abi.decode(val, (address)), address(cat), _concat("TestError/reg-xlip-cat-", ilk));
                 }
                 {
                 (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
                 // Convert BP to system expected value
                 uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                assertEq(chop, normalizedTestChop, concat("TestError/cat-chop-", ilk));
+                assertEq(chop, normalizedTestChop, _concat("TestError/cat-chop-", ilk));
                 // make sure chop is less than 100%
-                assertTrue(chop >= WAD && chop < 2 * WAD, concat("TestError/cat-chop-range-", ilk));   // penalty gt eq 0% and lt 100%
+                assertTrue(chop >= WAD && chop < 2 * WAD, _concat("TestError/cat-chop-range-", ilk));   // penalty gt eq 0% and lt 100%
 
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTestDunk = values.collaterals[ilk].cat_dunk * RAD;
-                assertEq(dunk, normalizedTestDunk, concat("TestError/cat-dunk-", ilk));
-                assertTrue(dunk >= RAD && dunk < MILLION * RAD, concat("TestError/cat-dunk-range-", ilk));
+                assertEq(dunk, normalizedTestDunk, _concat("TestError/cat-dunk-", ilk));
+                assertTrue(dunk >= RAD && dunk < MILLION * RAD, _concat("TestError/cat-dunk-range-", ilk));
 
                 (address flipper,,) = cat.ilks(ilk);
-                assertTrue(flipper != address(0), concat("TestError/invalid-flip-address-", ilk));
+                assertTrue(flipper != address(0), _concat("TestError/invalid-flip-address-", ilk));
                 FlipAbstract flip = FlipAbstract(flipper);
                 // Convert BP to system expected value
                 uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
-                assertEq(uint256(flip.beg()), normalizedTestBeg, concat("TestError/flip-beg-", ilk));
-                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, concat("TestError/flip-beg-range-", ilk)); // gte 0% and lte 10%
-                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, concat("TestError/flip-ttl-", ilk));
-                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, concat("TestError/flip-ttl-range-", ilk));         // gt eq 10 minutes and lt 10 hours
-                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, concat("TestError/flip-tau-", ilk));
-                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, concat("TestError/flip-tau-range-", ilk));          // gt eq 10 minutes and lt eq 3 days
+                assertEq(uint256(flip.beg()), normalizedTestBeg, _concat("TestError/flip-beg-", ilk));
+                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, _concat("TestError/flip-beg-range-", ilk)); // gte 0% and lte 10%
+                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, _concat("TestError/flip-ttl-", ilk));
+                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, _concat("TestError/flip-ttl-range-", ilk));         // gt eq 10 minutes and lt 10 hours
+                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, _concat("TestError/flip-tau-", ilk));
+                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, _concat("TestError/flip-tau-range-", ilk));          // gt eq 10 minutes and lt eq 3 days
 
-                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, concat("TestError/flip-flipperMom-auth-", ilk));
+                assertEq(flip.wards(address(flipMom)), values.collaterals[ilk].flipper_mom, _concat("TestError/flip-flipperMom-auth-", ilk));
 
-                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, concat("TestError/flip-liqOn-", ilk));
-                assertEq(flip.wards(address(end)), 1, concat("TestError/flip-end-auth-", ilk));
-                assertEq(flip.wards(address(pauseProxy)), 1, concat("TestError/flip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
+                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, _concat("TestError/flip-liqOn-", ilk));
+                assertEq(flip.wards(address(end)), 1, _concat("TestError/flip-end-auth-", ilk));
+                assertEq(flip.wards(address(pauseProxy)), 1, _concat("TestError/flip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
             }
             if (values.collaterals[ilk].liqType == "clip") {
                 {
-                assertEq(reg.class(ilk), 1, concat("TestError/reg-class-", ilk));
+                assertEq(reg.class(ilk), 1, _concat("TestError/reg-class-", ilk));
                 (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("dog()"));
-                assertTrue(ok, concat("TestError/reg-xlip-dog-", ilk));
-                assertEq(abi.decode(val, (address)), address(dog), concat("TestError/reg-xlip-dog-", ilk));
+                assertTrue(ok, _concat("TestError/reg-xlip-dog-", ilk));
+                assertEq(abi.decode(val, (address)), address(dog), _concat("TestError/reg-xlip-dog-", ilk));
                 }
                 {
                 (, uint256 chop, uint256 hole,) = dog.ilks(ilk);
                 // Convert BP to system expected value
                 uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                assertEq(chop, normalizedTestChop, concat("TestError/dog-chop-", ilk));
+                assertEq(chop, normalizedTestChop, _concat("TestError/dog-chop-", ilk));
                 // make sure chop is less than 100%
-                assertTrue(chop >= WAD && chop < 2 * WAD, concat("TestError/dog-chop-range-", ilk));   // penalty gt eq 0% and lt 100%
+                assertTrue(chop >= WAD && chop < 2 * WAD, _concat("TestError/dog-chop-range-", ilk));   // penalty gt eq 0% and lt 100%
 
                 // Convert whole Dai units to expected RAD
                 uint256 normalizedTesthole = values.collaterals[ilk].dog_hole * RAD;
-                assertEq(hole, normalizedTesthole, concat("TestError/dog-hole-", ilk));
-                assertTrue(hole == 0 || hole >= RAD && hole <= 100 * MILLION * RAD, concat("TestError/dog-hole-range-", ilk));
+                assertEq(hole, normalizedTesthole, _concat("TestError/dog-hole-", ilk));
+                assertTrue(hole == 0 || hole >= RAD && hole <= 100 * MILLION * RAD, _concat("TestError/dog-hole-range-", ilk));
                 }
                 (address clipper,,,) = dog.ilks(ilk);
-                assertTrue(clipper != address(0), concat("TestError/invalid-clip-address-", ilk));
+                assertTrue(clipper != address(0), _concat("TestError/invalid-clip-address-", ilk));
                 ClipAbstract clip = ClipAbstract(clipper);
                 {
                 // Convert BP to system expected value
                 uint256 normalizedTestBuf = values.collaterals[ilk].clip_buf * 10**23;
-                assertEq(uint256(clip.buf()), normalizedTestBuf, concat("TestError/clip-buf-", ilk));
-                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY, concat("TestError/clip-buf-range-", ilk)); // gte 0% and lte 100%
-                assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail, concat("TestError/clip-tail-", ilk));
+                assertEq(uint256(clip.buf()), normalizedTestBuf, _concat("TestError/clip-buf-", ilk));
+                assertTrue(clip.buf() >= RAY && clip.buf() <= 2 * RAY, _concat("TestError/clip-buf-range-", ilk)); // gte 0% and lte 100%
+                assertEq(uint256(clip.tail()), values.collaterals[ilk].clip_tail, _concat("TestError/clip-tail-", ilk));
                 if (ilk == "TUSD-A") { // long tail liquidation
-                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 30 days, concat("TestError/TUSD-clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 30 days
+                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 30 days, _concat("TestError/TUSD-clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 30 days
                 } else {
-                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 12 hours, concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 12 hours
+                    assertTrue(clip.tail() >= 1200 && clip.tail() <= 12 hours, _concat("TestError/clip-tail-range-", ilk)); // gt eq 20 minutes and lt eq 12 hours
                 }
                 uint256 normalizedTestCusp = (values.collaterals[ilk].clip_cusp)  * 10**23;
-                assertEq(uint256(clip.cusp()), normalizedTestCusp, concat("TestError/clip-cusp-", ilk));
-                assertTrue(clip.cusp() >= RAY / 10 && clip.cusp() < RAY, concat("TestError/clip-cusp-range-", ilk)); // gte 10% and lt 100%
-                assertTrue(rmul(clip.buf(), clip.cusp()) <= RAY, concat("TestError/clip-buf-cusp-limit-", ilk));
+                assertEq(uint256(clip.cusp()), normalizedTestCusp, _concat("TestError/clip-cusp-", ilk));
+                assertTrue(clip.cusp() >= RAY / 10 && clip.cusp() < RAY, _concat("TestError/clip-cusp-range-", ilk)); // gte 10% and lt 100%
+                assertTrue(_rmul(clip.buf(), clip.cusp()) <= RAY, _concat("TestError/clip-buf-cusp-limit-", ilk));
                 uint256 normalizedTestChip = (values.collaterals[ilk].clip_chip)  * 10**14;
-                assertEq(uint256(clip.chip()), normalizedTestChip, concat("TestError/clip-chip-", ilk));
-                assertTrue(clip.chip() < 1 * WAD / 100, concat("TestError/clip-chip-range-", ilk)); // lt 1%
+                assertEq(uint256(clip.chip()), normalizedTestChip, _concat("TestError/clip-chip-", ilk));
+                assertTrue(clip.chip() < 1 * WAD / 100, _concat("TestError/clip-chip-range-", ilk)); // lt 1%
                 uint256 normalizedTestTip = values.collaterals[ilk].clip_tip * RAD;
-                assertEq(uint256(clip.tip()), normalizedTestTip, concat("TestError/clip-tip-", ilk));
-                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 500 * RAD, concat("TestError/clip-tip-range-", ilk));
+                assertEq(uint256(clip.tip()), normalizedTestTip, _concat("TestError/clip-tip-", ilk));
+                assertTrue(clip.tip() == 0 || clip.tip() >= RAD && clip.tip() <= 500 * RAD, _concat("TestError/clip-tip-range-", ilk));
 
-                assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom, concat("TestError/clip-clipperMom-auth-", ilk));
+                assertEq(clip.wards(address(clipMom)), values.collaterals[ilk].clipper_mom, _concat("TestError/clip-clipperMom-auth-", ilk));
 
-                assertEq(clipMom.tolerance(address(clip)), values.collaterals[ilk].cm_tolerance * RAY / 10000, concat("TestError/clipperMom-tolerance-", ilk));
+                assertEq(clipMom.tolerance(address(clip)), values.collaterals[ilk].cm_tolerance * RAY / 10000, _concat("TestError/clipperMom-tolerance-", ilk));
 
                 if (values.collaterals[ilk].liqOn) {
-                    assertEq(clip.stopped(), 0, concat("TestError/clip-liqOn-", ilk));
+                    assertEq(clip.stopped(), 0, _concat("TestError/clip-liqOn-", ilk));
                 } else {
-                    assertTrue(clip.stopped() > 0, concat("TestError/clip-liqOn-", ilk));
+                    assertTrue(clip.stopped() > 0, _concat("TestError/clip-liqOn-", ilk));
                 }
 
-                assertEq(clip.wards(address(end)), 1, concat("TestError/clip-end-auth-", ilk));
-                assertEq(clip.wards(address(pauseProxy)), 1, concat("TestError/clip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
+                assertEq(clip.wards(address(end)), 1, _concat("TestError/clip-end-auth-", ilk));
+                assertEq(clip.wards(address(pauseProxy)), 1, _concat("TestError/clip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
                 {
                     (bool exists, bytes memory value) = clip.calc().call(abi.encodeWithSignature("tau()"));
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_tau, concat("TestError/calc-tau-", ilk));
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_tau, _concat("TestError/calc-tau-", ilk));
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("step()"));
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_step, concat("TestError/calc-step-", ilk));
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, values.collaterals[ilk].calc_step, _concat("TestError/calc-step-", ilk));
                     if (exists) {
-                        assertTrue(abi.decode(value, (uint256)) > 0, concat("TestError/calc-step-is-zero-", ilk));
+                        assertTrue(abi.decode(value, (uint256)) > 0, _concat("TestError/calc-step-is-zero-", ilk));
                     }
                     (exists, value) = clip.calc().call(abi.encodeWithSignature("cut()"));
                     uint256 normalizedTestCut = values.collaterals[ilk].calc_cut * 10**23;
-                    assertEq(exists ? abi.decode(value, (uint256)) : 0, normalizedTestCut, concat("TestError/calc-cut-", ilk));
+                    assertEq(exists ? abi.decode(value, (uint256)) : 0, normalizedTestCut, _concat("TestError/calc-cut-", ilk));
                     if (exists) {
-                        assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY, concat("TestError/calc-cut-range-", ilk));
+                        assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY, _concat("TestError/calc-cut-range-", ilk));
                     }
                 }
             }
             if (reg.class(ilk) < 3) {
                 {
                 GemJoinAbstract join = GemJoinAbstract(reg.join(ilk));
-                assertEq(join.wards(address(pauseProxy)), 1, concat("TestError/join-pause-proxy-auth-", ilk)); // Check pause_proxy ward
+                assertEq(join.wards(address(pauseProxy)), 1, _concat("TestError/join-pause-proxy-auth-", ilk)); // Check pause_proxy ward
                 }
             }
         }
@@ -704,7 +644,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
     }
 
-    function getOSMPrice(address pip) internal returns (uint256) {
+    function _getOSMPrice(address pip) internal returns (uint256) {
         // vm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(vm.load(
             pip,
@@ -720,7 +660,7 @@ contract DssSpellTestBase is Config, Test {
         return price;
     }
 
-    function getUNIV2LPPrice(address pip) internal returns (uint256) {
+    function _getUNIV2LPPrice(address pip) internal returns (uint256) {
         // vm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(vm.load(
             pip,
@@ -736,12 +676,12 @@ contract DssSpellTestBase is Config, Test {
         return price;
     }
 
-    function giveTokens(address token, uint256 amount) internal {
+    function _giveTokens(address token, uint256 amount) internal {
         // Edge case - balance is already set for some reason
         if (GemAbstract(token).balanceOf(address(this)) == amount) return;
 
         if (token == addr.addr("GUSD")) {
-            giveTokensGUSD(token, amount);
+            _giveTokensGUSD(token, amount);
             return;
         }
 
@@ -802,7 +742,7 @@ contract DssSpellTestBase is Config, Test {
         assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
-    function giveTokensGUSD(address _token, uint256 amount) internal {
+    function _giveTokensGUSD(address _token, uint256 amount) internal {
         DSTokenAbstract token = DSTokenAbstract(_token);
         // Special exception GUSD has its storage in a separate contract
         address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
@@ -838,7 +778,7 @@ contract DssSpellTestBase is Config, Test {
         assertTrue(false, "TestError/GiveTokens-slot-not-found");
     }
 
-    function giveAuth(address _base, address target) internal {
+    function _giveAuth(address _base, address target) internal {
         WardsAbstract base = WardsAbstract(_base);
 
         // Edge case - ward is already set
@@ -872,7 +812,7 @@ contract DssSpellTestBase is Config, Test {
         assertTrue(false);
     }
 
-    function checkIlkIntegration(
+    function _checkIlkIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
         ClipAbstract clip,
@@ -880,7 +820,7 @@ contract DssSpellTestBase is Config, Test {
         bool _isOSM,
         bool _checkLiquidations,
         bool _transferFee
-    ) public {
+    ) internal {
         GemAbstract token = GemAbstract(join.gem());
 
         if (_isOSM) OsmAbstract(pip).poke();
@@ -889,29 +829,29 @@ contract DssSpellTestBase is Config, Test {
         spotter.poke(_ilk);
 
         // Authorization
-        assertEq(join.wards(pauseProxy), 1, concat("TestError/checkIlkIntegration-pauseProxy-not-auth-on-join-", _ilk));
-        assertEq(vat.wards(address(join)), 1, concat("TestError/checkIlkIntegration-join-not-auth-on-vat-", _ilk));
-        assertEq(vat.wards(address(clip)), 1, concat("TestError/checkIlkIntegration-clip-not-auth-on-vat-", _ilk));
-        assertEq(dog.wards(address(clip)), 1, concat("TestError/checkIlkIntegration-clip-not-auth-on-dog-", _ilk));
-        assertEq(clip.wards(address(dog)), 1, concat("TestError/checkIlkIntegration-dog-not-auth-on-clip-", _ilk));
-        assertEq(clip.wards(address(end)), 1, concat("TestError/checkIlkIntegration-end-not-auth-on-clip-", _ilk));
-        assertEq(clip.wards(address(clipMom)), 1, concat("TestError/checkIlkIntegration-clipMom-not-auth-on-clip-", _ilk));
-        assertEq(clip.wards(address(esm)), 1, concat("TestError/checkIlkIntegration-esm-not-auth-on-clip-", _ilk));
+        assertEq(join.wards(pauseProxy), 1, _concat("TestError/checkIlkIntegration-pauseProxy-not-auth-on-join-", _ilk));
+        assertEq(vat.wards(address(join)), 1, _concat("TestError/checkIlkIntegration-join-not-auth-on-vat-", _ilk));
+        assertEq(vat.wards(address(clip)), 1, _concat("TestError/checkIlkIntegration-clip-not-auth-on-vat-", _ilk));
+        assertEq(dog.wards(address(clip)), 1, _concat("TestError/checkIlkIntegration-clip-not-auth-on-dog-", _ilk));
+        assertEq(clip.wards(address(dog)), 1, _concat("TestError/checkIlkIntegration-dog-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(end)), 1, _concat("TestError/checkIlkIntegration-end-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(clipMom)), 1, _concat("TestError/checkIlkIntegration-clipMom-not-auth-on-clip-", _ilk));
+        assertEq(clip.wards(address(esm)), 1, _concat("TestError/checkIlkIntegration-esm-not-auth-on-clip-", _ilk));
         if (_isOSM) {
-            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1, concat("TestError/checkIlkIntegration-osmMom-not-auth-on-pip-", _ilk));
-            assertEq(OsmAbstract(pip).bud(address(spotter)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
-            assertEq(OsmAbstract(pip).bud(address(clip)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
-            assertEq(OsmAbstract(pip).bud(address(clipMom)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
-            assertEq(OsmAbstract(pip).bud(address(end)), 1, concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
-            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1, concat("TestError/checkIlkIntegration-pip-not-bud-on-osm-", _ilk));
-            assertEq(OsmMomAbstract(osmMom).osms(_ilk), pip, concat("TestError/checkIlkIntegration-pip-not-bud-on-osmMom-", _ilk));
+            assertEq(OsmAbstract(pip).wards(address(osmMom)), 1, _concat("TestError/checkIlkIntegration-osmMom-not-auth-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(spotter)), 1, _concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(clip)), 1, _concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(clipMom)), 1, _concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(OsmAbstract(pip).bud(address(end)), 1, _concat("TestError/checkIlkIntegration-spot-not-bud-on-pip-", _ilk));
+            assertEq(MedianAbstract(OsmAbstract(pip).src()).bud(pip), 1, _concat("TestError/checkIlkIntegration-pip-not-bud-on-osm-", _ilk));
+            assertEq(OsmMomAbstract(osmMom).osms(_ilk), pip, _concat("TestError/checkIlkIntegration-pip-not-bud-on-osmMom-", _ilk));
         }
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 4 * dust * 10 ** uint256(token.decimals()) / (_isOSM ? getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
+        uint256 amount = 4 * dust * 10 ** uint256(token.decimals()) / (_isOSM ? _getOSMPrice(pip) : uint256(DSValueAbstract(pip).read()));
         uint256 amount18 = token.decimals() == 18 ? amount : amount * 10**(18 - uint256(token.decimals()));
-        giveTokens(address(token), amount);
+        _giveTokens(address(token), amount);
 
         assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
@@ -933,16 +873,16 @@ contract DssSpellTestBase is Config, Test {
 
         assertEq(vat.dai(address(this)), 0);
         // Set max line to ensure we can create a new position
-        setIlkLine(_ilk, type(uint256).max);
-        vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(divup(RAY * dust, rate)));
+        _setIlkLine(_ilk, type(uint256).max);
+        vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(_divup(RAY * dust, rate)));
         // Revert ilk line to proceed with testing
-        setIlkLine(_ilk, line);
+        _setIlkLine(_ilk, line);
         assertEq(vat.gem(_ilk, address(this)), 0);
         assertTrue(vat.dai(address(this)) >= dust * RAY);
         assertTrue(vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int256(amount18), -int256(divup(RAY * dust, rate)));
+        vat.frob(_ilk, address(this), address(this), address(this), -int256(amount18), -int256(_divup(RAY * dust, rate)));
         assertEq(vat.gem(_ilk, address(this)), amount18);
         assertEq(vat.dai(address(this)), 0);
 
@@ -964,18 +904,18 @@ contract DssSpellTestBase is Config, Test {
         (,,uint256 spot,,) = vat.ilks(_ilk);
 
         // Set max line to ensure we can draw dai
-        setIlkLine(_ilk, type(uint256).max);
+        _setIlkLine(_ilk, type(uint256).max);
         vat.frob(_ilk, address(this), address(this), address(this), int256(amount18), int256(amount18 * spot / rate));
         // Revert ilk line to proceed with testing
-        setIlkLine(_ilk, line);
+        _setIlkLine(_ilk, line);
 
         vm.warp(block.timestamp + 1);
         jug.drip(_ilk);
         assertEq(clip.kicks(), 0);
         if (_checkLiquidations) {
-            if (getIlkDuty(_ilk) == rates.rates(0)) {
+            if (_getIlkDuty(_ilk) == rates.rates(0)) {
                 // Rates wont accrue if 0, raise the mat to make the vault unsafe
-                setIlkMat(_ilk, 100000 * RAY);
+                _setIlkMat(_ilk, 100000 * RAY);
                 vm.warp(block.timestamp + 10 days);
                 spotter.poke(_ilk);
             }
@@ -987,7 +927,7 @@ contract DssSpellTestBase is Config, Test {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkIlkClipper(
+    function _checkIlkClipper(
         bytes32 ilk,
         GemJoinAbstract join,
         ClipAbstract clipper,
@@ -1055,7 +995,7 @@ contract DssSpellTestBase is Config, Test {
         {
         GemAbstract token = GemAbstract(join.gem());
         uint256 tknAmt =  ilkAmt / 10 ** (18 - join.dec());
-        giveTokens(address(token), tknAmt);
+        _giveTokens(address(token), tknAmt);
         assertEq(token.balanceOf(address(this)), tknAmt);
 
         // Join to adapter
@@ -1077,10 +1017,10 @@ contract DssSpellTestBase is Config, Test {
         art = int256(ilkAmt * spot / rate);
 
         // dart max amount of DAI
-        setIlkLine(ilk, type(uint256).max);
+        _setIlkLine(ilk, type(uint256).max);
         vat.frob(ilk, address(this), address(this), address(this), int256(ilkAmt), art);
-        setIlkLine(ilk, line);
-        setIlkMat(ilk, 100000 * RAY);
+        _setIlkLine(ilk, line);
+        _setIlkMat(ilk, 100000 * RAY);
         vm.warp(block.timestamp + 10 days);
         spotter.poke(ilk);
         assertEq(clipper.kicks(), 0);
@@ -1117,9 +1057,9 @@ contract DssSpellTestBase is Config, Test {
         assertEq(vat.dai(address(this)), 0);
         assertEq(vat.gem(ilk, address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
         }
-     }
+    }
 
-    function checkUNILPIntegration(
+    function _checkUNILPIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
         ClipAbstract clip,
@@ -1129,7 +1069,7 @@ contract DssSpellTestBase is Config, Test {
         bool _isMedian1,
         bool _isMedian2,
         bool _checkLiquidations
-    ) public {
+    ) internal {
         GemAbstract token = GemAbstract(join.gem());
 
         pip.poke();
@@ -1154,8 +1094,8 @@ contract DssSpellTestBase is Config, Test {
 
         (,,,, uint256 dust) = vat.ilks(_ilk);
         dust /= RAY;
-        uint256 amount = 2 * dust * WAD / getUNIV2LPPrice(address(pip));
-        giveTokens(address(token), amount);
+        uint256 amount = 2 * dust * WAD / _getUNIV2LPPrice(address(pip));
+        _giveTokens(address(token), amount);
 
         assertEq(token.balanceOf(address(this)), amount);
         assertEq(vat.gem(_ilk, address(this)), 0);
@@ -1171,12 +1111,12 @@ contract DssSpellTestBase is Config, Test {
         // Deposit collateral, generate DAI
         (,uint256 rate,,,) = vat.ilks(_ilk);
         assertEq(vat.dai(address(this)), 0);
-        vat.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(divup(RAY * dust, rate)));
+        vat.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(_divup(RAY * dust, rate)));
         assertEq(vat.gem(_ilk, address(this)), 0);
         assertTrue(vat.dai(address(this)) >= dust * RAY && vat.dai(address(this)) <= (dust + 1) * RAY);
 
         // Payback DAI, withdraw collateral
-        vat.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(divup(RAY * dust, rate)));
+        vat.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(_divup(RAY * dust, rate)));
         assertEq(vat.gem(_ilk, address(this)), amount);
         assertEq(vat.dai(address(this)), 0);
 
@@ -1203,15 +1143,17 @@ contract DssSpellTestBase is Config, Test {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkPsmIlkIntegration(
+    function _checkPsmIlkIntegration(
         bytes32 _ilk,
         GemJoinAbstract join,
         ClipAbstract clip,
         address pip,
         PsmAbstract psm,
-        uint256 tin,
-        uint256 tout
-    ) public {
+        uint256 tinBps,
+        uint256 toutBps
+    ) internal {
+        uint256 tin = tinBps * WAD / 10000;
+        uint256 tout = toutBps * WAD / 10000;
         GemAbstract token = GemAbstract(join.gem());
 
         assertTrue(pip != address(0));
@@ -1226,11 +1168,11 @@ contract DssSpellTestBase is Config, Test {
         assertEq(clip.wards(address(end)), 1);
 
         // Check toll in/out
-        assertEq(psm.tin(), tin, concat("Incorrect-tin-", _ilk));
-        assertEq(psm.tout(), tout, concat("Incorrect-tout-", _ilk));
+        assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
+        assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
         uint256 amount = 1000 * (10 ** uint256(token.decimals()));
-        giveTokens(address(token), amount);
+        _giveTokens(address(token), amount);
 
         // Approvals
         token.approve(address(join), amount);
@@ -1239,28 +1181,28 @@ contract DssSpellTestBase is Config, Test {
         // Convert all TOKEN to DAI
         psm.sellGem(address(this), amount);
         amount -= amount * tin / WAD;
-        assertEq(token.balanceOf(address(this)), 0, concat("PSM.sellGem-token-balance-", _ilk));
-        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - uint256(token.decimals()))), concat("PSM.sellGem-dai-balance-", _ilk));
+        assertEq(token.balanceOf(address(this)), 0, _concat("PSM.sellGem-token-balance-", _ilk));
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - uint256(token.decimals()))), _concat("PSM.sellGem-dai-balance-", _ilk));
 
         // Convert all DAI to TOKEN
-        amount -= divup(amount * tout, WAD);
+        amount -= _divup(amount * tout, WAD);
         psm.buyGem(address(this), amount);
         // There may be some Dai dust left over depending on tout and decimals
-        assertTrue(dai.balanceOf(address(this)) < WAD, concat("PSM.buyGem-dai-balance-", _ilk));
-        assertEq(token.balanceOf(address(this)), amount, concat("PSM.buyGem-token-balance-", _ilk));
+        assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
+        assertEq(token.balanceOf(address(this)), amount, _concat("PSM.buyGem-token-balance-", _ilk));
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function checkDirectIlkIntegration(
+    function _checkDirectIlkIntegration(
         bytes32 _ilk,
         DirectDepositLike join,
         ClipAbstract clip,
         address pip,
         uint256 bar,
         uint256 tau
-    ) public {
+    ) internal {
         GemAbstract token = GemAbstract(join.gem());
         assertTrue(pip != address(0));
 
@@ -1279,7 +1221,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(join.king(), pauseProxy);
 
         // Set the target bar to be super low to max out the debt ceiling
-        giveAuth(address(join), address(this));
+        _giveAuth(address(join), address(this));
         join.file("bar", 1 * RAY / 10000);     // 0.01%
         join.deny(address(this));
         join.exec();
@@ -1292,7 +1234,7 @@ contract DssSpellTestBase is Config, Test {
         assertGe(token.balanceOf(address(join)), ink - 1);         // Allow for small rounding error
 
         // Disable the module
-        giveAuth(address(join), address(this));
+        _giveAuth(address(join), address(this));
         join.file("bar", 0);
         join.deny(address(this));
         join.exec();
@@ -1304,129 +1246,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(token.balanceOf(address(join)), 0);
     }
 
-    function checkCropCRVLPIntegration(
-        bytes32 _ilk,
-        CropJoinLike join,
-        ClipAbstract clip,
-        CurveLPOsmLike pip,
-        address _medianizer1,
-        address _medianizer2,
-        bool _isMedian1,
-        bool _isMedian2,
-        bool _checkLiquidations
-    ) public {
-        pip.poke();
-        vm.warp(block.timestamp + 3601);
-        pip.poke();
-        spotter.poke(_ilk);
-
-        // Check medianizer sources
-        assertEq(pip.orbs(0), _medianizer1);
-        assertEq(pip.orbs(1), _medianizer2);
-
-        // Contracts set
-        {
-            (address _clip,,,) = dog.ilks(_ilk);
-            assertEq(_clip, address(clip));
-        }
-        assertEq(clip.ilk(), _ilk);
-        assertEq(clip.vat(), address(vat));
-        assertEq(clip.vow(), address(vow));
-        assertEq(clip.dog(), address(dog));
-        assertEq(clip.spotter(), address(spotter));
-
-        // Authorization
-        assertEq(join.wards(pauseProxy), 1);
-        assertEq(vat.wards(address(join)), 1);
-        assertEq(vat.wards(address(clip)), 1);
-        assertEq(dog.wards(address(clip)), 1);
-        assertEq(clip.wards(address(dog)), 1);
-        assertEq(clip.wards(address(end)), 1);
-        assertEq(clip.wards(address(clipMom)), 1);
-        assertEq(clip.wards(address(esm)), 1);
-        assertEq(pip.wards(address(osmMom)), 1);
-        assertEq(pip.bud(address(spotter)), 1);
-        assertEq(pip.bud(address(end)), 1);
-        assertEq(pip.bud(address(clip)), 1);
-        assertEq(pip.bud(address(clipMom)), 1);
-        if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
-        if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
-
-        (,,,, uint256 dust) = vat.ilks(_ilk);
-        uint256 amount = 2 * dust / (getUNIV2LPPrice(address(pip)) * 1e9);
-        giveTokens(address(join.gem()), amount);
-
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
-        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-        GemAbstract(join.gem()).approve(address(cropper), amount);
-        cropper.join(address(join), address(this), amount);
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), 0);
-        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
-
-        // Tick the fees forward so that art != dai in wad units
-        vm.warp(block.timestamp + 1);
-        jug.drip(_ilk);
-
-        // Check that we got rewards from the time increment above
-        assertEq(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
-        cropper.join(address(join), address(this), 0);
-        // NOTE: LDO rewards are shutting off on Friday so this will fail (bad timing), but they plan to extend
-        //assertGt(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
-
-        // Deposit collateral, generate DAI
-        (,uint256 rate,,,) = vat.ilks(_ilk);
-        assertEq(vat.dai(address(this)), 0);
-        cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(divup(dust, rate)));
-        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-        assertTrue(vat.dai(address(this)) >= dust && vat.dai(address(this)) <= dust + RAY);
-
-        // Payback DAI, withdraw collateral
-        vat.hope(address(cropper));      // Need to grant the cropper permission to remove dai
-        cropper.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(divup(dust, rate)));
-        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
-        assertEq(vat.dai(address(this)), 0);
-
-        // Withdraw from adapter
-        cropper.exit(address(join), address(this), amount);
-        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
-        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-
-        if (_checkLiquidations) {
-            // Generate new DAI to force a liquidation
-            GemAbstract(join.gem()).approve(address(cropper), amount);
-            cropper.join(address(join), address(this), amount);
-            // dart max amount of DAI
-            {   // Stack too deep
-                (,,uint256 spot,,) = vat.ilks(_ilk);
-                cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(amount * spot / rate));
-            }
-            vm.warp(block.timestamp + 1);
-            jug.drip(_ilk);
-            assertEq(clip.kicks(), 0);
-
-            // Kick off the liquidation
-            dog.bark(_ilk, cropper.getOrCreateProxy(address(this)), address(this));
-            assertEq(clip.kicks(), 1);
-
-            // Complete the liquidation
-            vat.hope(address(clip));
-            (, uint256 tab,,,,) = clip.sales(1);
-            vm.store(
-                address(vat),
-                keccak256(abi.encode(address(this), uint256(5))),
-                bytes32(tab)
-            );
-            assertEq(vat.dai(address(this)), tab);
-            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
-            clip.take(1, type(uint256).max, type(uint256).max, address(this), "");
-            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
-        }
-
-        // Dump all dai for next run
-        vat.move(address(this), address(0x0), vat.dai(address(this)));
-    }
-
-    function getSignatures(bytes32 signHash) internal returns (bytes memory signatures, address[] memory signers) {
+    function _getSignatures(bytes32 signHash) internal returns (bytes memory signatures, address[] memory signers) {
         // seeds chosen s.t. corresponding addresses are in ascending order
         uint8[30] memory seeds = [8,10,6,2,9,15,14,20,7,29,24,13,12,25,16,26,21,22,0,18,17,27,3,28,23,19,4,5,1,11];
         uint256 numSigners = seeds.length;
@@ -1440,15 +1260,15 @@ contract DssSpellTestBase is Config, Test {
         assertEq(signatures.length, numSigners * 65);
     }
 
-    function oracleAuthRequestMint(
+    function _oracleAuthRequestMint(
         bytes32 sourceDomain,
         bytes32 targetDomain,
         uint256 toMint,
         uint256 expectedFee
     ) internal {
         TeleportOracleAuthLike oracleAuth = TeleportOracleAuthLike(addr.addr("MCD_ORACLE_AUTH_TELEPORT_FW_A"));
-        giveAuth(address(oracleAuth), address(this));
-        (bytes memory signatures, address[] memory signers) = getSignatures(oracleAuth.getSignHash(TeleportGUID({
+        _giveAuth(address(oracleAuth), address(this));
+        (bytes memory signatures, address[] memory signers) = _getSignatures(oracleAuth.getSignHash(TeleportGUID({
             sourceDomain: sourceDomain,
             targetDomain: targetDomain,
             receiver: bytes32(uint256(uint160(address(this)))),
@@ -1469,8 +1289,7 @@ contract DssSpellTestBase is Config, Test {
         }), signatures, expectedFee, 0);
     }
 
-    // NOTE: Only executable by forge
-    function checkTeleportFWIntegration(
+    function _checkTeleportFWIntegration(
         bytes32 sourceDomain,
         bytes32 targetDomain,
         uint256 line,
@@ -1519,7 +1338,7 @@ contract DssSpellTestBase is Config, Test {
         uint256 _fee = toMint * expectedFee / WAD;
         {
             uint256 prevDai = vat.dai(address(vow));
-            oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
+            _oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
             assertEq(dai.balanceOf(address(this)), toMint * 2 - _fee);
             assertEq(join.debt(sourceDomain), int256(toMint * 2));
             assertEq(vat.dai(address(vow)) - prevDai, _fee * RAY);
@@ -1534,7 +1353,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(join.debt(sourceDomain), int256(_fee));
     }
 
-    function checkCureLoadTeleport(
+    function _checkCureLoadTeleport(
         bytes32 sourceDomain,
         bytes32 targetDomain,
         uint256 toMint,
@@ -1545,7 +1364,7 @@ contract DssSpellTestBase is Config, Test {
         TeleportJoinLike join = TeleportJoinLike(addr.addr("MCD_JOIN_TELEPORT_FW_A"));
 
         // Oracle auth mint -- add custom signatures to test
-        oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
+        _oracleAuthRequestMint(sourceDomain, targetDomain, toMint, expectedFee);
         assertEq(join.debt(sourceDomain), int256(toMint));
 
         // Emulate Global Settlement
@@ -1566,7 +1385,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(cure.tell(), expectedTell);
     }
 
-    function checkDaiVest(
+    function _checkDaiVest(
         uint256 _index,
         address _wallet,
         uint256 _start,
@@ -1577,7 +1396,7 @@ contract DssSpellTestBase is Config, Test {
         uint256 _restricted,
         uint256 _reward,
         uint256 _claimed
-    ) public {
+    ) internal {
         assertEq(vestDai.usr(_index), _wallet,            "usr");
         assertEq(vestDai.bgn(_index), _start,             "bgn");
         assertEq(vestDai.clf(_index), _cliff,             "clf");
@@ -1589,63 +1408,63 @@ contract DssSpellTestBase is Config, Test {
         assertEq(vestDai.rxd(_index), _claimed,           "rxd");
     }
 
-    function getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
+    function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
         (, mat) = spotter.ilks(_ilk);
     }
 
-    function getIlkDuty(bytes32 _ilk) internal view returns (uint256 duty) {
+    function _getIlkDuty(bytes32 _ilk) internal view returns (uint256 duty) {
         (duty,)  = jug.ilks(_ilk);
     }
 
-    function setIlkMat(bytes32 ilk, uint256 amount) internal {
+    function _setIlkMat(bytes32 ilk, uint256 amount) internal {
         vm.store(
             address(spotter),
             bytes32(uint256(keccak256(abi.encode(ilk, uint256(1)))) + 1),
             bytes32(amount)
         );
-        assertEq(getIlkMat(ilk), amount, concat("TestError/setIlkMat-", ilk));
+        assertEq(_getIlkMat(ilk), amount, _concat("TestError/setIlkMat-", ilk));
     }
 
-    function setIlkRate(bytes32 ilk, uint256 amount) internal {
+    function _setIlkRate(bytes32 ilk, uint256 amount) internal {
         vm.store(
             address(vat),
             bytes32(uint256(keccak256(abi.encode(ilk, uint256(2)))) + 1),
             bytes32(amount)
         );
         (,uint256 rate,,,) = vat.ilks(ilk);
-        assertEq(rate, amount, concat("TestError/setIlkRate-", ilk));
+        assertEq(rate, amount, _concat("TestError/setIlkRate-", ilk));
     }
 
-    function setIlkLine(bytes32 ilk, uint256 amount) internal {
+    function _setIlkLine(bytes32 ilk, uint256 amount) internal {
         vm.store(
             address(vat),
             bytes32(uint256(keccak256(abi.encode(ilk, uint256(2)))) + 3),
             bytes32(amount)
         );
         (,,,uint256 line,) = vat.ilks(ilk);
-        assertEq(line, amount, concat("TestError/setIlkLine-", ilk));
+        assertEq(line, amount, _concat("TestError/setIlkLine-", ilk));
     }
 
-    function checkIlkLerpOffboarding(bytes32 _ilk, bytes32 _lerp, uint256 _startMat, uint256 _endMat) public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+    function _checkIlkLerpOffboarding(bytes32 _ilk, bytes32 _lerp, uint256 _startMat, uint256 _endMat) internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         LerpAbstract lerp = LerpAbstract(lerpFactory.lerps(_lerp));
 
         vm.warp(block.timestamp + lerp.duration() / 2);
-        assertEq(getIlkMat(_ilk), _startMat * RAY / 100);
+        assertEq(_getIlkMat(_ilk), _startMat * RAY / 100);
         lerp.tick();
-        assertEqApprox(getIlkMat(_ilk), ((_startMat + _endMat) / 2) * RAY / 100, RAY / 100);
+        _assertEqApprox(_getIlkMat(_ilk), ((_startMat + _endMat) / 2) * RAY / 100, RAY / 100);
 
         vm.warp(block.timestamp + lerp.duration());
         lerp.tick();
-        assertEq(getIlkMat(_ilk), _endMat * RAY / 100);
+        assertEq(_getIlkMat(_ilk), _endMat * RAY / 100);
     }
 
-    function checkIlkLerpIncreaseMatOffboarding(bytes32 _ilk, bytes32 _oldLerp, bytes32 _newLerp, uint256 _newEndMat) public {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+    function _checkIlkLerpIncreaseMatOffboarding(bytes32 _ilk, bytes32 _oldLerp, bytes32 _newLerp, uint256 _newEndMat) internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         LerpFactoryAbstract OLD_LERP_FAB = LerpFactoryAbstract(0x00B416da876fe42dd02813da435Cc030F0d72434);
@@ -1653,28 +1472,28 @@ contract DssSpellTestBase is Config, Test {
 
         uint256 t = (block.timestamp - oldLerp.startTime()) * WAD / oldLerp.duration();
         uint256 tickMat = oldLerp.end() * t / WAD + oldLerp.start() - oldLerp.start() * t / WAD;
-        assertEq(getIlkMat(_ilk), tickMat);
+        assertEq(_getIlkMat(_ilk), tickMat);
         assertEq(spotter.wards(address(oldLerp)), 0);
 
         LerpAbstract newLerp = LerpAbstract(lerpFactory.lerps(_newLerp));
 
         vm.warp(block.timestamp + newLerp.duration() / 2);
-        assertEq(getIlkMat(_ilk), tickMat);
+        assertEq(_getIlkMat(_ilk), tickMat);
         newLerp.tick();
-        assertEqApprox(getIlkMat(_ilk), (tickMat + _newEndMat * RAY / 100) / 2, RAY / 100);
+        _assertEqApprox(_getIlkMat(_ilk), (tickMat + _newEndMat * RAY / 100) / 2, RAY / 100);
 
         vm.warp(block.timestamp + newLerp.duration());
         newLerp.tick();
-        assertEq(getIlkMat(_ilk), _newEndMat * RAY / 100);
+        assertEq(_getIlkMat(_ilk), _newEndMat * RAY / 100);
     }
 
-    function getExtcodesize(address target) public view returns (uint256 exsize) {
+    function _getExtcodesize(address target) internal view returns (uint256 exsize) {
         assembly {
             exsize := extcodesize(target)
         }
     }
 
-    function getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
+    function _getBytecodeMetadataLength(address a) internal view returns (uint256 length) {
         // The Solidity compiler encodes the metadata length in the last two bytes of the contract bytecode.
         assembly {
             let ptr  := mload(0x40)
@@ -1689,14 +1508,13 @@ contract DssSpellTestBase is Config, Test {
         }
     }
 
-    // Add an exception here if a registered deployer can be a valid auth on target
-    function skipWards(address target, address deployer) internal pure returns (bool) {
-        // Add logic here in case any wards need to be skipped, otherwise return false.
+    function _skipWards(address target, address deployer) internal pure returns (bool) {
+        // Kept for consistency but in general we don't want to skip checking wards on mainnet
         target; deployer;
         return false;
     }
 
-    function checkWards(address _addr, string memory contractName) internal {
+    function _checkWards(address _addr, string memory contractName) internal {
         for (uint256 i = 0; i < deployers.count(); i ++) {
             address deployer = deployers.addr(i);
             (bool ok, bytes memory data) = _addr.call(
@@ -1705,7 +1523,7 @@ contract DssSpellTestBase is Config, Test {
             if (!ok || data.length != 32) return;
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                if (skipWards(_addr, deployer)) continue;
+                if (_skipWards(_addr, deployer)) continue;
                 emit log("Error: Bad Auth");
                 emit log_named_address("   Deployer Address", deployer);
                 emit log_named_string("  Affected Contract", contractName);
@@ -1714,7 +1532,7 @@ contract DssSpellTestBase is Config, Test {
         }
     }
 
-    function checkSource(address _addr, string memory contractName) internal {
+    function _checkSource(address _addr, string memory contractName) internal {
         (bool ok, bytes memory data) =
             _addr.call(abi.encodeWithSignature("src()"));
         if (!ok || data.length != 32) return;
@@ -1722,12 +1540,12 @@ contract DssSpellTestBase is Config, Test {
         string memory sourceName = string(
             abi.encodePacked("source of ", contractName)
         );
-        checkWards(source, sourceName);
+        _checkWards(source, sourceName);
     }
 
-    function checkAuth(bool onlySource) internal {
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+    function _checkAuth(bool onlySource) internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         bytes32[] memory contractNames = chainLog.list();
@@ -1736,33 +1554,462 @@ contract DssSpellTestBase is Config, Test {
             string memory contractName = string(
                 abi.encodePacked(contractNames[i])
             );
-            if (onlySource) checkSource(_addr, contractName);
-            else checkWards(_addr, contractName);
+            if (onlySource) _checkSource(_addr, contractName);
+            else _checkWards(_addr, contractName);
         }
     }
 
-    function checkChainlogKey(bytes32 key) internal {
-        assertEq(chainLog.getAddress(key), addr.addr(key), concat("TestError/Chainlog-key-mismatch-", key));
+    function _checkChainlogKey(bytes32 key) internal {
+        assertEq(chainLog.getAddress(key), addr.addr(key), _concat("TestError/Chainlog-key-mismatch-", key));
     }
 
-    function checkChainlogVersion(string memory key) internal {
-        assertEq(chainLog.version(), key, concat("TestError/Chainlog-version-mismatch-", key));
+    function _checkChainlogVersion(string memory key) internal {
+        assertEq(chainLog.version(), key, _concat("TestError/Chainlog-version-mismatch-", key));
     }
 
-    function checkRWADocUpdate(bytes32 ilk, string memory currentDoc, string memory newDoc) internal {
+    function _checkRWADocUpdate(bytes32 ilk, string memory currentDoc, string memory newDoc) internal {
         (string memory doc, address pip, uint48 tau, uint48 toc) = liquidationOracle.ilks(ilk);
 
-        assertEq(doc, currentDoc, concat("TestError/bad-old-document-for-", ilk));
+        assertEq(doc, currentDoc, _concat("TestError/bad-old-document-for-", ilk));
 
-        vote(address(spell));
-        scheduleWaitAndCast(address(spell));
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         (string memory docNew, address pipNew, uint48 tauNew, uint48 tocNew) = liquidationOracle.ilks(ilk);
 
-        assertEq(docNew, newDoc,  concat("TestError/bad-new-document-for-", ilk));
-        assertEq(pip, pipNew,     concat("TestError/pip-is-not-the-same-for-", ilk));
-        assertTrue(tau == tauNew, concat("TestError/tau-is-not-the-same-for-", ilk));
-        assertTrue(toc == tocNew, concat("TestError/toc-is-not-the-same-for", ilk));
+        assertEq(docNew, newDoc,  _concat("TestError/bad-new-document-for-", ilk));
+        assertEq(pip, pipNew,     _concat("TestError/pip-is-not-the-same-for-", ilk));
+        assertTrue(tau == tauNew, _concat("TestError/tau-is-not-the-same-for-", ilk));
+        assertTrue(toc == tocNew, _concat("TestError/toc-is-not-the-same-for", ilk));
     }
+
+    function _testGeneral() internal {
+        string memory description = new DssSpell().description();
+        assertTrue(bytes(description).length > 0, "TestError/spell-description-length");
+        // DS-Test can't handle strings directly, so cast to a bytes32.
+        assertEq(_stringToBytes32(spell.description()),
+                _stringToBytes32(description), "TestError/spell-description");
+
+        if(address(spell) != address(spellValues.deployed_spell)) {
+            assertEq(spell.expiration(), block.timestamp + spellValues.expiration_threshold, "TestError/spell-expiration");
+        } else {
+            assertEq(spell.expiration(), spellValues.deployed_spell_created + spellValues.expiration_threshold, "TestError/spell-expiration");
+        }
+
+        assertTrue(spell.officeHours() == spellValues.office_hours_enabled, "TestError/spell-office-hours");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        _checkSystemValues(afterSpell);
+
+        _checkCollateralValues(afterSpell);
+    }
+
+    function _testFailWrongDay() internal {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
+        if (spell.officeHours()) {
+            _vote(address(spell));
+            spell.schedule();
+
+            uint256 castTime = block.timestamp + pause.delay();
+            uint256 day = (castTime / 1 days + 3) % 7;
+            if (day < 5) {
+                castTime += 5 days - day * 86400;
+            }
+
+            vm.warp(castTime);
+            spell.cast();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
+
+    function _testFailTooEarly() internal {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
+        if (spell.officeHours()) {
+            _vote(address(spell));
+            spell.schedule();
+
+            uint256 castTime = block.timestamp + pause.delay() + 24 hours;
+            uint256 hour = castTime / 1 hours % 24;
+            if (hour >= 14) {
+                castTime -= hour * 3600 - 13 hours;
+            }
+
+            vm.warp(castTime);
+            spell.cast();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
+
+    function _testFailTooLate() internal {
+        require(spell.officeHours() == spellValues.office_hours_enabled);
+        if (spell.officeHours()) {
+            _vote(address(spell));
+            spell.schedule();
+
+            uint256 castTime = block.timestamp + pause.delay();
+            uint256 hour = castTime / 1 hours % 24;
+            if (hour < 21) {
+                castTime += 21 hours - hour * 3600;
+            }
+
+            vm.warp(castTime);
+            spell.cast();
+        } else {
+            revert("Office Hours Disabled");
+        }
+    }
+
+    function _testOnTime() internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+    }
+
+    function _testCastCost() internal {
+        _vote(address(spell));
+        spell.schedule();
+
+        _castPreviousSpell();
+        vm.warp(spell.nextCastTime());
+        uint256 startGas = gasleft();
+        spell.cast();
+        uint256 endGas = gasleft();
+        uint256 totalGas = startGas - endGas;
+
+        assertTrue(spell.done());
+        // Fail if cast is too expensive
+        assertLe(totalGas, 15 * MILLION);
+    }
+
+    function _testDeployCost() internal {
+        uint256 startGas = gasleft();
+        new DssSpell();
+        uint256 endGas = gasleft();
+        uint256 totalGas = startGas - endGas;
+
+        // Warn if deploy exceeds block target size
+        if (totalGas > 15 * MILLION) {
+            emit log("Warn: deploy gas exceeds average block target");
+            emit log_named_uint("    deploy gas", totalGas);
+            emit log_named_uint("  block target", 15 * MILLION);
+        }
+
+        // Fail if deploy is too expensive
+        assertLe(totalGas, 30 * MILLION, "testDeployCost/DssSpell-exceeds-max-block-size");
+    }
+
+    // Fail when contract code size exceeds 24576 bytes (a limit introduced in Spurious Dragon).
+    // This contract may not be deployable.
+    // Consider enabling the optimizer (with a low "runs" value!),
+    //   turning off revert strings, or using libraries.
+    function _testContractSize() internal {
+        uint256 _sizeSpell;
+        address _spellAddr  = address(spell);
+        assembly {
+            _sizeSpell := extcodesize(_spellAddr)
+        }
+        assertLe(_sizeSpell, 24576, "testContractSize/DssSpell-exceeds-max-contract-size");
+
+        uint256 _sizeAction;
+        address _actionAddr = spell.action();
+        assembly {
+            _sizeAction := extcodesize(_actionAddr)
+        }
+        assertLe(_sizeAction, 24576, "testContractSize/DssSpellAction-exceeds-max-contract-size");
+
+    }
+
+    // The specific date doesn't matter that much since function is checking for difference between warps
+    function _testNextCastTime() internal {
+        vm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        _vote(address(spell));
+        spell.schedule();
+
+        uint256 monday_1400_UTC = 1606744800; // Nov 30, 2020
+        uint256 monday_2100_UTC = 1606770000; // Nov 30, 2020
+
+        // Day tests
+        vm.warp(monday_1400_UTC);                                      // Monday,   14:00 UTC
+        assertEq(spell.nextCastTime(), monday_1400_UTC);               // Monday,   14:00 UTC
+
+        if (spell.officeHours()) {
+            vm.warp(monday_1400_UTC - 1 days);                         // Sunday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            vm.warp(monday_1400_UTC - 2 days);                         // Saturday, 14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            vm.warp(monday_1400_UTC - 3 days);                         // Friday,   14:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC - 3 days);  // Able to cast
+
+            vm.warp(monday_2100_UTC);                                  // Monday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC + 1 days);  // Tuesday,  14:00 UTC
+
+            vm.warp(monday_2100_UTC - 1 days);                         // Sunday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            vm.warp(monday_2100_UTC - 2 days);                         // Saturday, 21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            vm.warp(monday_2100_UTC - 3 days);                         // Friday,   21:00 UTC
+            assertEq(spell.nextCastTime(), monday_1400_UTC);           // Monday,   14:00 UTC
+
+            // Time tests
+            uint256 castTime;
+
+            for(uint256 i = 0; i < 5; i++) {
+                castTime = monday_1400_UTC + i * 1 days; // Next day at 14:00 UTC
+                vm.warp(castTime - 1 seconds); // 13:59:59 UTC
+                assertEq(spell.nextCastTime(), castTime);
+
+                vm.warp(castTime + 7 hours + 1 seconds); // 21:00:01 UTC
+                if (i < 4) {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + (i + 1) * 1 days); // Next day at 14:00 UTC
+                } else {
+                    assertEq(spell.nextCastTime(), monday_1400_UTC + 7 days); // Next monday at 14:00 UTC (friday case)
+                }
+            }
+        }
+    }
+
+    function _testFailNotScheduled() internal view {
+        spell.nextCastTime();
+    }
+
+    function _testUseEta() internal {
+        vm.warp(1606161600); // Nov 23, 20 UTC (could be cast Nov 26)
+
+        _vote(address(spell));
+        spell.schedule();
+
+        uint256 castTime = spell.nextCastTime();
+        assertEq(castTime, spell.eta());
+    }
+
+    // Verifies that the bytecode of the action of the spell used for testing
+    // matches what we'd expect.
+    //
+    // Not a complete replacement for Etherscan verification, unfortunately.
+    // This is because the DssSpell bytecode is non-deterministic because it
+    // deploys the action in its constructor and incorporates the action
+    // address as an immutable variable--but the action address depends on the
+    // address of the DssSpell which depends on the address+nonce of the
+    // deploying address. If we had a way to simulate a contract creation by
+    // an arbitrary address+nonce, we could verify the bytecode of the DssSpell
+    // instead.
+    //
+    // Vacuous until the deployed_spell value is non-zero.
+    function _testBytecodeMatches() internal {
+        // The DssSpell bytecode is non-deterministic, compare only code size
+        DssSpell expectedSpell = new DssSpell();
+        assertEq(_getExtcodesize(address(spell)), _getExtcodesize(address(expectedSpell)), "TestError/spell-codesize");
+
+        // The SpellAction bytecode can be compared after chopping off the metada
+        address expectedAction = expectedSpell.action();
+        address actualAction   = spell.action();
+        uint256 expectedBytecodeSize;
+        uint256 actualBytecodeSize;
+        assembly {
+            expectedBytecodeSize := extcodesize(expectedAction)
+            actualBytecodeSize   := extcodesize(actualAction)
+        }
+
+        uint256 metadataLength = _getBytecodeMetadataLength(expectedAction);
+        assertTrue(metadataLength <= expectedBytecodeSize);
+        expectedBytecodeSize -= metadataLength;
+
+        metadataLength = _getBytecodeMetadataLength(actualAction);
+        assertTrue(metadataLength <= actualBytecodeSize);
+        actualBytecodeSize -= metadataLength;
+
+        assertEq(actualBytecodeSize, expectedBytecodeSize);
+        uint256 size = actualBytecodeSize;
+        uint256 expectedHash;
+        uint256 actualHash;
+        assembly {
+            let ptr := mload(0x40)
+
+            extcodecopy(expectedAction, ptr, 0, size)
+            expectedHash := keccak256(ptr, size)
+
+            extcodecopy(actualAction, ptr, 0, size)
+            actualHash := keccak256(ptr, size)
+        }
+        assertEq(actualHash, expectedHash);
+    }
+
+    // Validate addresses in test harness match chainlog
+    function _testChainlogValues() internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        for(uint256 i = 0; i < chainLog.count(); i++) {
+            (bytes32 _key, address _val) = chainLog.get(i);
+            assertEq(_val, addr.addr(_key), _concat("TestError/chainlog-addr-mismatch-", _key));
+        }
+    }
+
+    // Ensure version is updated if chainlog changes
+    function _testChainlogVersionBump() internal {
+        uint256                   _count = chainLog.count();
+        string    memory        _version = chainLog.version();
+        address[] memory _chainlog_addrs = new address[](_count);
+
+        for(uint256 i = 0; i < _count; i++) {
+            (, address _val) = chainLog.get(i);
+            _chainlog_addrs[i] = _val;
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+            // Fail if the version is not updated and the chainlog count has changed
+            if (_count != chainLog.count()) {
+                emit log_named_string("Error", _concat("TestError/chainlog-version-not-updated-count-change-", _version));
+                fail();
+                return;
+            }
+            // Fail if the chainlog is the same size but local keys don't match the chainlog.
+            for(uint256 i = 0; i < _count; i++) {
+                (, address _val) = chainLog.get(i);
+                if (_chainlog_addrs[i] != _val) {
+                    emit log_named_string("Error", _concat("TestError/chainlog-version-not-updated-address-change-", _version));
+                    fail();
+                    return;
+                }
+            }
+        }
+    }
+
+    function _checkCropCRVLPIntegration(
+        bytes32 _ilk,
+        CropJoinLike join,
+        ClipAbstract clip,
+        CurveLPOsmLike pip,
+        address _medianizer1,
+        address _medianizer2,
+        bool _isMedian1,
+        bool _isMedian2,
+        bool _checkLiquidations
+    ) public {
+        pip.poke();
+        vm.warp(block.timestamp + 3601);
+        pip.poke();
+        spotter.poke(_ilk);
+
+        // Check medianizer sources
+        assertEq(pip.orbs(0), _medianizer1);
+        assertEq(pip.orbs(1), _medianizer2);
+
+        // Contracts set
+        {
+            (address _clip,,,) = dog.ilks(_ilk);
+            assertEq(_clip, address(clip));
+        }
+        assertEq(clip.ilk(), _ilk);
+        assertEq(clip.vat(), address(vat));
+        assertEq(clip.vow(), address(vow));
+        assertEq(clip.dog(), address(dog));
+        assertEq(clip.spotter(), address(spotter));
+
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(vat.wards(address(clip)), 1);
+        assertEq(dog.wards(address(clip)), 1);
+        assertEq(clip.wards(address(dog)), 1);
+        assertEq(clip.wards(address(end)), 1);
+        assertEq(clip.wards(address(clipMom)), 1);
+        assertEq(clip.wards(address(esm)), 1);
+        assertEq(pip.wards(address(osmMom)), 1);
+        assertEq(pip.bud(address(spotter)), 1);
+        assertEq(pip.bud(address(end)), 1);
+        assertEq(pip.bud(address(clip)), 1);
+        assertEq(pip.bud(address(clipMom)), 1);
+        if (_isMedian1) assertEq(MedianAbstract(_medianizer1).bud(address(pip)), 1);
+        if (_isMedian2) assertEq(MedianAbstract(_medianizer2).bud(address(pip)), 1);
+
+        (,,,, uint256 dust) = vat.ilks(_ilk);
+        uint256 amount = 2 * dust / (_getUNIV2LPPrice(address(pip)) * 1e9);
+        _giveTokens(address(join.gem()), amount);
+
+        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
+        GemAbstract(join.gem()).approve(address(cropper), amount);
+        cropper.join(address(join), address(this), amount);
+        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), 0);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
+
+        // Tick the fees forward so that art != dai in wad units
+        vm.warp(block.timestamp + 1);
+        jug.drip(_ilk);
+
+        // Check that we got rewards from the time increment above
+        assertEq(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
+        cropper.join(address(join), address(this), 0);
+        // NOTE: LDO rewards are shutting off on Friday so this will fail (bad timing), but they plan to extend
+        //assertGt(GemAbstract(join.bonus()).balanceOf(address(this)), 0);
+
+        // Deposit collateral, generate DAI
+        (,uint256 rate,,,) = vat.ilks(_ilk);
+        assertEq(vat.dai(address(this)), 0);
+        cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(_divup(dust, rate)));
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
+        assertTrue(vat.dai(address(this)) >= dust && vat.dai(address(this)) <= dust + RAY);
+
+        // Payback DAI, withdraw collateral
+        vat.hope(address(cropper));      // Need to grant the cropper permission to remove dai
+        cropper.frob(_ilk, address(this), address(this), address(this), -int256(amount), -int256(_divup(dust, rate)));
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
+        assertEq(vat.dai(address(this)), 0);
+
+        // Withdraw from adapter
+        cropper.exit(address(join), address(this), amount);
+        assertEq(GemAbstract(join.gem()).balanceOf(address(this)), amount);
+        assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
+
+        if (_checkLiquidations) {
+            // Generate new DAI to force a liquidation
+            GemAbstract(join.gem()).approve(address(cropper), amount);
+            cropper.join(address(join), address(this), amount);
+            // dart max amount of DAI
+            {   // Stack too deep
+                (,,uint256 spot,,) = vat.ilks(_ilk);
+                cropper.frob(_ilk, address(this), address(this), address(this), int256(amount), int256(amount * spot / rate));
+            }
+            vm.warp(block.timestamp + 1);
+            jug.drip(_ilk);
+            assertEq(clip.kicks(), 0);
+
+            // Kick off the liquidation
+            dog.bark(_ilk, cropper.getOrCreateProxy(address(this)), address(this));
+            assertEq(clip.kicks(), 1);
+
+            // Complete the liquidation
+            vat.hope(address(clip));
+            (, uint256 tab,,,,) = clip.sales(1);
+            vm.store(
+                address(vat),
+                keccak256(abi.encode(address(this), uint256(5))),
+                bytes32(tab)
+            );
+            assertEq(vat.dai(address(this)), tab);
+            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), 0);
+            clip.take(1, type(uint256).max, type(uint256).max, address(this), "");
+            assertEq(vat.gem(_ilk, cropper.getOrCreateProxy(address(this))), amount);
+        }
+
+        // Dump all dai for next run
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
 }
