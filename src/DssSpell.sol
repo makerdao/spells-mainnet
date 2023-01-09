@@ -152,7 +152,7 @@ contract DssSpellAction is DssAction {
         // ----- MKR Vesting Stream ------
         // Increase allowance by new vesting delta
         MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 675 ether);
-
+// Vest for PE member
         MCD_VEST_MKR.restrict(
             MCD_VEST_MKR.create(
                 0xa91c40621D63599b00476eC3e528E06940B03B9D, // usr
