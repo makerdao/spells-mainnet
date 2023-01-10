@@ -165,7 +165,7 @@ contract DssSpellAction is DssAction {
         );
 
         // ----- Delegate Compensation for December 2022 -----
-        // Link: TODO
+        // Link: https://forum.makerdao.com/t/recognized-delegate-compensation-december-2022/19313
         // StableNode - 12000 DAI - 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0
         DssExecLib.sendPaymentFromSurplusBuffer(STABLENODE,          12_000);
         // schuppi - 12000 DAI - 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167
