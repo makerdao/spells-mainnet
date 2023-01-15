@@ -52,10 +52,34 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant RAY     = 10 ** 27;
     // uint256 internal constant WAD     = 10 ** 18;
 
+    function _sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x, "sub-underflow");
+    }
+
+    uint256 internal constant PSM_ZERO_BASIS_POINTS = 0;
+
+    address internal immutable MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+
     function actions() public override {
 
-        // Content goes here
+        // PSM_GUSD_A changes
+        // Poll Link:   
+        // Forum Post:  
 
+        uint256 lineReduction;
+        VatLike vat = VatLike(DssExecLib.vat());
+
+        // Reduce the PSM-GUSD-A line from 500 million DAI to 0 DAI
+        // This requires removal from dss-autoline and a global line reduction
+        (,,,lineReduction,) = vat.ilks("PSM-GUSD-A");
+        DssExecLib.removeIlkFromAutoLine("PSM-GUSD-A");
+        DssExecLib.setIlkDebtCeiling("PSM-GUSD-A", 0);
+        vat.file("Line", _sub(vat.Line(), lineReduction));
+
+
+        // PSM tout decrease
+        // Reduce PSM-GUSD-A tout from 0.1% to 0%
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", PSM_ZERO_BASIS_POINTS);
     }
 }
 
