@@ -258,7 +258,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    function testPSMs() private { // make private to disable
+    function testPSMs() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -292,11 +292,26 @@ contract DssSpellTest is DssSpellTestBase {
             10,
             10
         );
+
+        _ilk = "PSM-USDC-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
+            addr.addr("PIP_USDC"),
+            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
+            10,
+            10
+        );
     }
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -360,7 +375,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
@@ -460,7 +475,7 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 28);
 
@@ -503,7 +518,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
-    function testMKRPayments() public { // make private to disable
+    function testMKRPayments() private { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
         uint256 prevMkrRisk   = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
