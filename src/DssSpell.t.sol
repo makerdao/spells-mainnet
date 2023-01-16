@@ -342,7 +342,7 @@ contract DssSpellTest is DssSpellTestBase {
         });
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        _giveAuth(address(vest), address(this));
+        GodMode.setWard(address(vest), address(this), 1);
         uint256 prevDuxBalance = dai.balanceOf(wallets.addr("DUX_WALLET"));
         uint256 prevSesBalance = dai.balanceOf(wallets.addr("SES_WALLET"));
 
@@ -494,7 +494,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevBalance = gov.balanceOf(PE_IC_WALLET);
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
-        _giveAuth(address(vest), address(this));
+        GodMode.setWard(address(vest), address(this), 1);
         vest.unrestrict(29);
 
         vm.warp(PE_FIN);

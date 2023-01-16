@@ -16,8 +16,8 @@
 
 pragma solidity 0.8.16;
 
-import "forge-std/Test.sol";
 import "dss-interfaces/Interfaces.sol";
+import {DSSTest, GodMode} from "dss-test/DSSTest.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
@@ -138,7 +138,7 @@ interface AuthorityLike {
     function authority() external view returns (address);
 }
 
-contract DssSpellTestBase is Config, Test {
+contract DssSpellTestBase is Config, DSSTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
     Deployers deployers = new Deployers();
@@ -176,14 +176,6 @@ contract DssSpellTestBase is Config, Test {
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
-
-    // uint256 constant HUNDRED    = 10 ** 2;  // provided by collaterals
-    // uint256 constant THOUSAND   = 10 ** 3;  // provided by collaterals
-    // uint256 constant MILLION    = 10 ** 6;  // provided by collaterals
-    // uint256 constant BILLION    = 10 ** 9;  // provided by collaterals
-    uint256 constant WAD        = 10 ** 18;
-    uint256 constant RAY        = 10 ** 27;
-    uint256 constant RAD        = 10 ** 45;
 
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
@@ -246,11 +238,11 @@ contract DssSpellTestBase is Config, Test {
     }
 
     function _concat(string memory a, string memory b) internal pure returns (string memory) {
-        return string(abi.encodePacked(a, b));
+        return string.concat(a, b);
     }
 
     function _concat(string memory a, bytes32 b) internal pure returns (string memory) {
-        return string(abi.encodePacked(a, _bytes32ToStr(b)));
+        return string.concat(a, _bytes32ToStr(b));
     }
 
     function _bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
@@ -392,7 +384,7 @@ contract DssSpellTestBase is Config, Test {
         uint256 normalizedBump = values.vow_bump * RAD;
         assertEq(vow.bump(), normalizedBump, "TestError/vow-bump");
         assertTrue(
-            (vow.bump() >= RAD && vow.bump() < HUNDRED * THOUSAND * RAD) ||
+            (vow.bump() >= RAD && vow.bump() < 100 * THOUSAND * RAD) ||
             vow.bump() == 0,
             "TestError/vow-bump-range"
         );
@@ -677,73 +669,19 @@ contract DssSpellTestBase is Config, Test {
     }
 
     function _giveTokens(address token, uint256 amount) internal {
-        // Edge case - balance is already set for some reason
-        if (GemAbstract(token).balanceOf(address(this)) == amount) return;
-
         if (token == addr.addr("GUSD")) {
             _giveTokensGUSD(token, amount);
             return;
         }
 
-        // Scan the storage for the balance storage slot
-        for (uint256 i = 0; i < 200; i++) {
-            // Solidity-style storage layout for maps
-            {
-                bytes32 prevValue = vm.load(
-                    address(token),
-                    keccak256(abi.encode(address(this), uint256(i)))
-                );
-
-                vm.store(
-                    address(token),
-                    keccak256(abi.encode(address(this), uint256(i))),
-                    bytes32(amount)
-                );
-                if (GemAbstract(token).balanceOf(address(this)) == amount) {
-                    // Found it
-                    return;
-                } else {
-                    // Keep going after restoring the original value
-                    vm.store(
-                        address(token),
-                        keccak256(abi.encode(address(this), uint256(i))),
-                        prevValue
-                    );
-                }
-            }
-
-            // Vyper-style storage layout for maps
-            {
-                bytes32 prevValue = vm.load(
-                    address(token),
-                    keccak256(abi.encode(uint256(i), address(this)))
-                );
-
-                vm.store(
-                    address(token),
-                    keccak256(abi.encode(uint256(i), address(this))),
-                    bytes32(amount)
-                );
-                if (GemAbstract(token).balanceOf(address(this)) == amount) {
-                    // Found it
-                    return;
-                } else {
-                    // Keep going after restoring the original value
-                    vm.store(
-                        address(token),
-                        keccak256(abi.encode(uint256(i), address(this))),
-                        prevValue
-                    );
-                }
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false, "TestError/GiveTokens-slot-not-found");
+        GodMode.setBalance(token, address(this), amount);
     }
 
     function _giveTokensGUSD(address _token, uint256 amount) internal {
         DSTokenAbstract token = DSTokenAbstract(_token);
+
+        if (token.balanceOf(address(this)) == amount) return;
+
         // Special exception GUSD has its storage in a separate contract
         address STORE = 0xc42B14e49744538e3C239f8ae48A1Eaaf35e68a0;
 
@@ -776,40 +714,6 @@ contract DssSpellTestBase is Config, Test {
 
         // We have failed if we reach here
         assertTrue(false, "TestError/GiveTokens-slot-not-found");
-    }
-
-    function _giveAuth(address _base, address target) internal {
-        WardsAbstract base = WardsAbstract(_base);
-
-        // Edge case - ward is already set
-        if (base.wards(target) == 1) return;
-
-        for (int256 i = 0; i < 100; i++) {
-            // Scan the storage for the ward storage slot
-            bytes32 prevValue = vm.load(
-                address(base),
-                keccak256(abi.encode(target, uint256(i)))
-            );
-            vm.store(
-                address(base),
-                keccak256(abi.encode(target, uint256(i))),
-                bytes32(uint256(1))
-            );
-            if (base.wards(target) == 1) {
-                // Found it
-                return;
-            } else {
-                // Keep going after restoring the original value
-                vm.store(
-                    address(base),
-                    keccak256(abi.encode(target, uint256(i))),
-                    prevValue
-                );
-            }
-        }
-
-        // We have failed if we reach here
-        assertTrue(false);
     }
 
     function _checkIlkIntegration(
@@ -1221,7 +1125,7 @@ contract DssSpellTestBase is Config, Test {
         assertEq(join.king(), pauseProxy);
 
         // Set the target bar to be super low to max out the debt ceiling
-        _giveAuth(address(join), address(this));
+        GodMode.setWard(address(join), address(this), 1);
         join.file("bar", 1 * RAY / 10000);     // 0.01%
         join.deny(address(this));
         join.exec();
@@ -1234,7 +1138,7 @@ contract DssSpellTestBase is Config, Test {
         assertGe(token.balanceOf(address(join)), ink - 1);         // Allow for small rounding error
 
         // Disable the module
-        _giveAuth(address(join), address(this));
+        GodMode.setWard(address(join), address(this), 1);
         join.file("bar", 0);
         join.deny(address(this));
         join.exec();
@@ -1267,7 +1171,7 @@ contract DssSpellTestBase is Config, Test {
         uint256 expectedFee
     ) internal {
         TeleportOracleAuthLike oracleAuth = TeleportOracleAuthLike(addr.addr("MCD_ORACLE_AUTH_TELEPORT_FW_A"));
-        _giveAuth(address(oracleAuth), address(this));
+        GodMode.setWard(address(oracleAuth), address(this), 1);
         (bytes memory signatures, address[] memory signers) = _getSignatures(oracleAuth.getSignHash(TeleportGUID({
             sourceDomain: sourceDomain,
             targetDomain: targetDomain,
