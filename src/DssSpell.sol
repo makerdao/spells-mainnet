@@ -57,8 +57,8 @@ contract DssSpellAction is DssAction {
     function actions() public override {
 
         // PSM_GUSD_A changes
-        // Poll Link:   
-        // Forum Post:  
+        // Poll: https://vote.makerdao.com/polling/QmZs1EMK#poll-detail
+        // Forum:  
 
         uint256 lineReduction;
         VatLike vat = VatLike(DssExecLib.vat());
