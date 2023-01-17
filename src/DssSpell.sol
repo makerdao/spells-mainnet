@@ -56,9 +56,10 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // PSM_GUSD_A changes
-        // Poll: https://vote.makerdao.com/polling/QmZs1EMK#poll-detail
-        // Forum:  
+        // Forum: https://forum.makerdao.com/t/request-to-poll-psm-gusd-a-parameters/19416
 
+        // Set Debt Ceiling to 0
+        // Poll: https://vote.makerdao.com/polling/QmZs1EMK#poll-detail
         uint256 lineReduction;
         VatLike vat = VatLike(DssExecLib.vat());
 
@@ -70,6 +71,7 @@ contract DssSpellAction is DssAction {
         vat.file("Line", vat.Line() - lineReduction);
 
         // PSM tout decrease
+        // Poll: https://vote.makerdao.com/polling/QmRRceEo#poll-detail
         // Reduce PSM-GUSD-A tout from 0.1% to 0%
         DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 0);
     }
