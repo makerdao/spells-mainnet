@@ -83,10 +83,9 @@ contract Config {
         bool    offboarding;
     }
 
-    uint256 constant HUNDRED    = 10 ** 2;
-    uint256 constant THOUSAND   = 10 ** 3;
-    uint256 constant MILLION    = 10 ** 6;
-    uint256 constant BILLION    = 10 ** 9;
+    uint256 constant private THOUSAND   = 10 ** 3;
+    uint256 constant private MILLION    = 10 ** 6;
+    uint256 constant private BILLION    = 10 ** 9;
 
     SpellValues  spellValues;
     SystemValues afterSpell;
@@ -379,7 +378,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         75 * HUNDRED,
+            dust:         7_500,
             pct:          75,
             mat:          17500,
             liqType:      "clip",
