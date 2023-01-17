@@ -1152,7 +1152,6 @@ contract DssSpellTestBase is Config, Test {
         uint256 tinBps,
         uint256 toutBps
     ) internal {
-        
         uint256 tin = tinBps * WAD / 10000;
         uint256 tout = toutBps * WAD / 10000;
         GemAbstract token = GemAbstract(join.gem());
@@ -1197,7 +1196,6 @@ contract DssSpellTestBase is Config, Test {
             assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
             assertEq(token.balanceOf(address(this)), amount, _concat("PSM.buyGem-token-balance-", _ilk));
         }
-
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }

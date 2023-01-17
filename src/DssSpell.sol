@@ -55,7 +55,6 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PSM_GUSD_A = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
 
     function actions() public override {
-
         // PSM_GUSD_A changes
         // Poll: https://vote.makerdao.com/polling/QmZs1EMK#poll-detail
         // Forum:  
@@ -69,7 +68,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.removeIlkFromAutoLine("PSM-GUSD-A");
         DssExecLib.setIlkDebtCeiling("PSM-GUSD-A", 0);
         vat.file("Line", vat.Line() - lineReduction);
-
 
         // PSM tout decrease
         // Reduce PSM-GUSD-A tout from 0.1% to 0%
