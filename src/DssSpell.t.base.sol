@@ -295,6 +295,14 @@ contract DssSpellTestBase is Config, DssTest {
         _castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
+        if (spellValues.deployed_spell_block != 0) {
+            vm.makePersistent(address(this));
+            vm.makePersistent(address(rates));
+            vm.makePersistent(address(addr));
+            vm.makePersistent(address(deployers));
+            vm.makePersistent(address(wallets));
+            vm.rollFork(spellValues.deployed_spell_block);
+        }
     }
 
     function _vote(address spell_) internal {
