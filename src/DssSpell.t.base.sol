@@ -41,6 +41,7 @@ interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
     function tau() external view returns (uint256);
+    function tic() external view returns (uint256);
     function bar() external view returns (uint256);
     function king() external view returns (address);
 }

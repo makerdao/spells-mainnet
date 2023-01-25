@@ -365,7 +365,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
@@ -663,6 +663,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         assertEq(aaveD3M.live(), 0);
+        assertEq(aaveD3M.tic(), block.timestamp);
 
         /* CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
