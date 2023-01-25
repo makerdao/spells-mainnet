@@ -702,6 +702,5 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(name, "");
         assertEq(join, address(0));
         assertEq(xlip, address(0));
-
     }
 }
