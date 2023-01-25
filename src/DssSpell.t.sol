@@ -651,4 +651,33 @@ contract DssSpellTest is DssSpellTestBase {
 
         return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
     }
+
+    function testAaveV2D3MRemoved() public {
+
+        DirectDepositLike aaveD3M = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+
+        assertEq(aaveD3M.live(), 1);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(aaveD3M.live(), 0);
+
+        /* CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
+        bytes32 _ilk = "DIRECT-AAVEV2-DAI";
+        DssExecLib.removeIlkFromAutoLine(_ilk);
+        (,,, uint256 _line,) = VAT.ilks(_ilk);
+        DssExecLib.setValue(address(VAT), _ilk, "line", 0);
+        DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
+        DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
+        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+        CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+        CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+        RegistryLike(DssExecLib.reg()).remove("DIRECT-AAVEV2-DAI"); */
+
+
+    }
 }
