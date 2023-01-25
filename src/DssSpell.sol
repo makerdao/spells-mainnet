@@ -93,7 +93,7 @@ contract DssSpellAction is DssAction {
         // https://vote.makerdao.com/polling/QmbNVQ1E#poll-detail
 
         // CES-001 - 96.15 MKR - 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da
-        GemLike(DssExecLib.mkr()).transfer(CES_WALLET, 96.15 ether);
+        GemLike(DssExecLib.mkr()).transfer(CES_WALLET, 96.15 ether); // ether as solidity alias
 
 
         // Cage DIRECT-AAVEV2-DAI

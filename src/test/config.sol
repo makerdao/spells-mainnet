@@ -49,6 +49,7 @@ contract Config {
         address clipper_mom_authority;
         address d3m_mom_authority;
         uint256 ilk_count;
+        string  chainlog_version;
         mapping (bytes32 => CollateralValues) collaterals;
     }
 
@@ -127,6 +128,7 @@ contract Config {
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
         afterSpell.ilk_count =             61;                      // Num expected in system
+        afterSpell.chainlog_version =      "1.14.8";                // String expected in system
 
         //
         // Values for all collateral
@@ -1699,7 +1701,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         5 * THOUSAND,
-            pct:          0,
+            pct:          25,
             mat:          18500,
             liqType:      "clip",
             liqOn:        true,

@@ -207,16 +207,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // _checkChainlogKey("XXX");
-
-        _checkChainlogVersion("1.14.7");
-    }
-
     function testNewIlkRegistryValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -258,27 +248,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    function testPSMs() private { // make private to disable
+    function testPSMs() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        bytes32 _ilk = "PSM-PAX-A";
-        assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
-        assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
-        assertEq(addr.addr("PIP_PAX"), reg.pip(_ilk));
-        assertEq(addr.addr("MCD_PSM_PAX_A"), chainLog.getAddress("MCD_PSM_PAX_A"));
-        _checkPsmIlkIntegration(
-            _ilk,
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
-            addr.addr("PIP_PAX"),
-            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            10,
-            0
-        );
-
-        _ilk = "PSM-GUSD-A";
+        bytes32 _ilk = "PSM-GUSD-A";
         assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
         assertEq(addr.addr("MCD_CLIP_PSM_GUSD_A"), reg.xlip(_ilk));
         assertEq(addr.addr("PIP_GUSD"), reg.pip(_ilk));
@@ -289,14 +264,44 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
             addr.addr("PIP_GUSD"),
             PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
-            10,
-            10
+            10,  // tin
+            0    // tout
+        );
+
+        _ilk = "PSM-PAX-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_PAX"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_PAX_A"), chainLog.getAddress("MCD_PSM_PAX_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
+            addr.addr("PIP_PAX"),
+            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
+            20,  // tin
+            0    // tout
+        );
+
+        _ilk = "PSM-USDC-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
+            addr.addr("PIP_USDC"),
+            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
+            0,   // tin
+            0    // tout
         );
     }
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -460,7 +465,7 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 28);
 
@@ -505,24 +510,17 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testMKRPayments() public { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrDeco   = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrRisk   = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
-        uint256 prevMkrOracle = gov.balanceOf(wallets.addr("ORA_WALLET"));
+        uint256 prevMkrCES    = gov.balanceOf(wallets.addr("CES_WALLET"));
 
-        uint256 amountDeco   = 125    ether;
-        uint256 amountRisk   = 175    ether;
-        uint256 amountOracle = 843.69 ether;
-
-        uint256 total      = 1_143.69 ether;
+        uint256 amountCES     = 96.15    ether;
+        uint256 total         = 96.15    ether;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDeco + amountDeco);
-        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRisk + amountRisk);
-        assertEq(gov.balanceOf(wallets.addr("ORA_WALLET")), prevMkrOracle + amountOracle);
+        assertEq(gov.balanceOf(wallets.addr("CES_WALLET")), prevMkrCES + amountCES);
     }
 
     function testMKRVestFix() private { // make private to disable
@@ -542,5 +540,35 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+    }
+
+    function testFlash() public {
+
+        FlashAbstract flashLegacy = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
+        FlashAbstract flashCurrent = FlashAbstract(addr.addr("MCD_FLASH"));
+
+        assertEq(vat.wards(address(flashCurrent)), 1);
+        assertEq(vat.wards(address(flashLegacy)), 1);
+
+        assertEq(flashLegacy.max(), 250 * MILLION * WAD);
+        assertEq(flashCurrent.max(), 250 * MILLION * WAD);
+        assertEq(flashLegacy.wards(pauseProxy), 1);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vat.wards(address(flashCurrent)), 1);
+        assertEq(vat.wards(address(flashLegacy)), 0);
+
+        assertEq(flashLegacy.max(), 0);
+        assertEq(flashCurrent.max(), 500 * MILLION * WAD);
+        assertEq(flashLegacy.wards(pauseProxy), 0);
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("MCD_FLASH_LEGACY");
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("FLASH_KILLER");
     }
 }
