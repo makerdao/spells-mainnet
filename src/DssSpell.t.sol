@@ -620,6 +620,7 @@ contract DssSpellTest is DssSpellTestBase {
         flash.flashLoan(address(this), address(dai), 1 * WAD, "");
     }
 
+    // callback required by FlashLoan module
     function onFlashLoan(
         address initiator,
         address token,
@@ -637,6 +638,7 @@ contract DssSpellTest is DssSpellTestBase {
         return keccak256("ERC3156FlashBorrower.onFlashLoan");
     }
 
+    // callback required by FlashLoan module
     function onVatDaiFlashLoan(
         address initiator,
         uint256 amount,

@@ -37,7 +37,6 @@ interface RegistryLike {
 
 interface VatLike {
     function Line() external view returns (uint256);
-    function file(bytes32, uint256) external;
     function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
 
@@ -101,7 +100,7 @@ contract DssSpellAction is DssAction {
 
 
         // MKR Transfer for CES
-        // https://vote.makerdao.com/polling/QmbNVQ1E#poll-detail
+        // https://vote.makerdao.com/polling/QmbNVQ1E
 
         // CES-001 - 96.15 MKR - 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da
         GemLike(DssExecLib.mkr()).transfer(CES_WALLET, 96.15 ether); // ether as solidity alias
@@ -110,8 +109,6 @@ contract DssSpellAction is DssAction {
         // Cage DIRECT-AAVEV2-DAI
         // https://forum.makerdao.com/t/housekeeping-tasks-for-next-executive/19472
 
-        // Cage DIRECT-AAVEV2-DAI to prepare for new deployment
-        //
         CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
         DssExecLib.removeIlkFromAutoLine(_ilk);
@@ -147,7 +144,7 @@ contract DssSpellAction is DssAction {
 
 
         // PSM_GUSD_A tout decrease
-        // Poll: https://vote.makerdao.com/polling/QmRRceEo#poll-detail
+        // Poll: https://vote.makerdao.com/polling/QmRRceEo
         // Forum: https://forum.makerdao.com/t/request-to-poll-psm-gusd-a-parameters/19416
         // Reduce PSM-GUSD-A tout from 0.1% to 0%
         DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 0);
