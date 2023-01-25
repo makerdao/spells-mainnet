@@ -44,6 +44,8 @@ interface DirectDepositLike is GemJoinAbstract {
     function tic() external view returns (uint256);
     function bar() external view returns (uint256);
     function king() external view returns (address);
+    // Aave
+    function adai() external view returns (address);
 }
 
 interface CropperLike {

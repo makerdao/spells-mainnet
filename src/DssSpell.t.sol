@@ -675,6 +675,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3M.live(), 1);
         assertEq(aaveD3MClip.stopped(), 3);
 
+        assertEq(GemAbstract(aaveD3M.adai()).balanceOf(address(aaveD3M)), 0);
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
