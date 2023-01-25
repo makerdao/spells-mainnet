@@ -100,7 +100,7 @@ contract DssSpellAction is DssAction {
 
 
         // MKR Transfer for CES
-        // https://vote.makerdao.com/polling/QmbNVQ1E#poll-detail
+        // https://vote.makerdao.com/polling/QmbNVQ1E
 
         // CES-001 - 96.15 MKR - 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da
         GemLike(DssExecLib.mkr()).transfer(CES_WALLET, 96.15 ether); // ether as solidity alias
