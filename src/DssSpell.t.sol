@@ -620,6 +620,7 @@ contract DssSpellTest is DssSpellTestBase {
         flash.flashLoan(address(this), address(dai), 1 * WAD, "");
     }
 
+    // callback required by FlashLoan module
     function onFlashLoan(
         address initiator,
         address token,
