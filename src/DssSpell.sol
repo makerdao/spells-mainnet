@@ -121,6 +121,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        DssExecLib.deauthorize(DIRECT_MOM_LEGACY, address(this));
+        CHAINLOG.removeAddress("DIRECT_MOM_LEGACY");
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
