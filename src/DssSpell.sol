@@ -70,6 +70,7 @@ contract DssSpellAction is DssAction {
 
     ChainLogLike internal immutable CHAINLOG    = ChainLogLike(DssExecLib.getChangelogAddress("CHANGELOG"));
     VatLike      internal immutable VAT         = VatLike(DssExecLib.vat());
+    address      internal immutable DOG         = DssExecLib.dog();
 
     address internal immutable FLASH_KILLER     = DssExecLib.getChangelogAddress("FLASH_KILLER");
     address internal immutable MCD_FLASH        = DssExecLib.getChangelogAddress("MCD_FLASH");
@@ -119,9 +120,12 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
         DssExecLib.deauthorize(address(VAT), address(MCD_JOIN_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
+        DssExecLib.deauthorize(DOG, MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DOG);
+        DssExecLib.deauthorize(DssExecLib.end(), MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(DssExecLib.esm(), MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
-        DssExecLib.deauthorize(DIRECT_MOM_LEGACY, address(this));
         CHAINLOG.removeAddress("DIRECT_MOM_LEGACY");
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
