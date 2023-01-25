@@ -1077,7 +1077,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
         assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
-        uint256 amount = 1000 * (10 ** uint256(token.decimals()));
+        // grab ilk line as amount
+        (,,, uint256 amount,) = vat.ilks(_ilk);
+        // if line is big, use smaller amount
+        if (amount > 1000 * (10 ** uint256(token.decimals()))) {
+            amount = 1000 * (10 ** uint256(token.decimals()));
+        }
         _giveTokens(address(token), amount);
 
         // Approvals
