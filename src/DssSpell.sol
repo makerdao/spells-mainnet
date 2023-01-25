@@ -37,7 +37,6 @@ interface RegistryLike {
 
 interface VatLike {
     function Line() external view returns (uint256);
-    function file(bytes32, uint256) external;
     function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
 
