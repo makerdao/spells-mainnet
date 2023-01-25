@@ -679,8 +679,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.wards(address(aaveD3MClip)), 1);
         assertEq(dog.wards(address(aaveD3MClip)), 1);
         assertEq(aaveD3MClip.wards(address(dog)), 1);
-        assertEq(end.wards(address(aaveD3MClip)), 0);  // Authed on old end
-        assertEq(esm.wards(address(aaveD3MClip)), 0);  // Authed on old esm
+        assertEq(aaveD3MClip.wards(address(end)), 1);
+        assertEq(aaveD3MClip.wards(address(esm)), 1);
         assertEq(aaveD3M.wards(pauseProxy), 1);
         assertEq(aaveD3MClip.wards(pauseProxy), 1);
 
@@ -705,8 +705,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.wards(address(aaveD3M)), 0);
         assertEq(vat.wards(address(aaveD3MClip)), 0);
         assertEq(dog.wards(address(aaveD3MClip)), 0);
-        assertEq(end.wards(address(aaveD3MClip)), 0);
-        assertEq(esm.wards(address(aaveD3MClip)), 0);
+        assertEq(aaveD3MClip.wards(address(end)), 0);
+        assertEq(aaveD3MClip.wards(address(esm)), 0);
         assertEq(aaveD3MClip.wards(address(dog)), 0);
         assertEq(aaveD3M.wards(pauseProxy), 0);
         assertEq(aaveD3MClip.wards(pauseProxy), 0);

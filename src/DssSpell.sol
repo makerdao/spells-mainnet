@@ -128,8 +128,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(DOG, MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DOG);
-        DssExecLib.deauthorize(DssExecLib.end(), MCD_CLIP_DIRECT_AAVEV2_DAI);
-        DssExecLib.deauthorize(DssExecLib.esm(), MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.end());
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.esm());
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
         D3MLegacyMomLike(DIRECT_MOM_LEGACY).setOwner(address(0));
