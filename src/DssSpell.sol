@@ -109,8 +109,6 @@ contract DssSpellAction is DssAction {
         // Cage DIRECT-AAVEV2-DAI
         // https://forum.makerdao.com/t/housekeeping-tasks-for-next-executive/19472
 
-        // Cage DIRECT-AAVEV2-DAI to prepare for new deployment
-        //
         CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
         DssExecLib.removeIlkFromAutoLine(_ilk);
