@@ -574,4 +574,81 @@ contract DssSpellTest is DssSpellTestBase {
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
         chainLog.getAddress("FLASH_KILLER");
     }
+
+    // Test to ensure test of flash mint is working before the spell is cast...
+    function testFlashWorksBeforeSpell() public {
+        //_vote(address(spell));
+        //_scheduleWaitAndCast(address(spell));
+        //assertTrue(spell.done());
+
+        uint256 vowDai = vat.dai(address(vow));
+
+        // Give ourselves tokens for repayment in the callbacks
+        _giveTokens(address(dai), 1_000 * WAD);
+
+        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
+        assertEq(flash.vat(), address(vat));
+        assertEq(flash.daiJoin(), address(daiJoin));
+        assertEq(flash.dai(), address(dai));
+        assertEq(flash.vow(), address(vow));
+        assertEq(flash.max(), 250 * MILLION * WAD);
+        assertEq(flash.toll(), 0);
+        assertEq(flash.maxFlashLoan(address(dai)), 250 * MILLION * WAD);
+        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 0);
+        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
+        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
+        assertEq(vat.sin(address(flash)), 0);
+        assertEq(vat.dai(address(flash)), 0);
+        flash.accrue();
+        assertEq(vat.dai(address(flash)), 0);
+        assertEq(vat.dai(address(vow)), vowDai);
+    }
+
+    // Test to ensure 1 Dai flash mint fails after spell
+    function testFlashFailsAfterSpell() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Give ourselves tokens for repayment in the callbacks
+        _giveTokens(address(dai), 1_000 * WAD);
+
+        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
+
+        // Fail Here
+        vm.expectRevert("DssFlash/ceiling-exceeded");
+        flash.flashLoan(address(this), address(dai), 1 * WAD, "");
+    }
+
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(token, address(dai));
+        assertEq(amount, 1 * MILLION * WAD);
+        assertEq(fee, 0);
+
+        dai.approve(msg.sender, 1_000_000 * WAD);
+
+        return keccak256("ERC3156FlashBorrower.onFlashLoan");
+    }
+
+    function onVatDaiFlashLoan(
+        address initiator,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
+        assertEq(initiator, address(this));
+        assertEq(amount, 1 * MILLION * RAD);
+        assertEq(fee, 0);
+
+        vat.move(address(this), msg.sender, 1_000_000 * RAD);
+
+        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
+    }
 }
