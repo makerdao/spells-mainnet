@@ -655,8 +655,25 @@ contract DssSpellTest is DssSpellTestBase {
     function testAaveV2D3MRemoved() public {
 
         DirectDepositLike aaveD3M = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        ClipAbstract aaveD3MClip = ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
+
+        // Norevert
+        chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+        chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+        chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+
+        (string memory name, string memory symbol, uint256 class, uint256 dec, address gem, address pip, address join, address xlip) = reg.info("DIRECT-AAVEV2-DAI");
+        assertEq(name, "Aave interest bearing DAI");
+        assertEq(join, address(aaveD3M));
+        assertEq(xlip, address(aaveD3MClip));
+
+        assertEq(vat.wards(address(aaveD3M)), 1);
+        assertEq(vat.wards(address(aaveD3MClip)), 1);
+        assertEq(aaveD3M.wards(pauseProxy), 1);
+        assertEq(aaveD3MClip.wards(pauseProxy), 1);
 
         assertEq(aaveD3M.live(), 1);
+        assertEq(aaveD3MClip.stopped(), 3);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -665,20 +682,26 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3M.live(), 0);
         assertEq(aaveD3M.tic(), block.timestamp);
 
-        /* CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
-        bytes32 _ilk = "DIRECT-AAVEV2-DAI";
-        DssExecLib.removeIlkFromAutoLine(_ilk);
-        (,,, uint256 _line,) = VAT.ilks(_ilk);
-        DssExecLib.setValue(address(VAT), _ilk, "line", 0);
-        DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
-        DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
-        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
-        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
-        CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
-        CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
-        CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
-        RegistryLike(DssExecLib.reg()).remove("DIRECT-AAVEV2-DAI"); */
+        assertEq(aaveD3MClip.stopped(), 3);
 
+        assertEq(vat.wards(address(aaveD3M)), 0);
+        assertEq(vat.wards(address(aaveD3MClip)), 0);
+        assertEq(aaveD3M.wards(pauseProxy), 0);
+        assertEq(aaveD3MClip.wards(pauseProxy), 0);
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+
+        (name, symbol, class, dec, gem, pip, join, xlip) = reg.info("DIRECT-AAVEV2-DAI");
+        assertEq(name, "");
+        assertEq(join, address(0));
+        assertEq(xlip, address(0));
 
     }
 }

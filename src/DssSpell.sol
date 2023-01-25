@@ -119,6 +119,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(address(VAT), _ilk, "line", 0);
         DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
+        DssExecLib.deauthorize(address(VAT), address(MCD_JOIN_DIRECT_AAVEV2_DAI));
+        DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
