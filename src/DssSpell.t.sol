@@ -638,6 +638,7 @@ contract DssSpellTest is DssSpellTestBase {
         return keccak256("ERC3156FlashBorrower.onFlashLoan");
     }
 
+    // callback required by FlashLoan module
     function onVatDaiFlashLoan(
         address initiator,
         uint256 amount,
