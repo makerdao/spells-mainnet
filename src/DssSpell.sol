@@ -31,6 +31,10 @@ interface CageLike {
     function cage() external;
 }
 
+interface D3MLegacyMomLike {
+    function setOwner(address) external;
+}
+
 interface RegistryLike {
     function remove(bytes32) external;
 }
@@ -115,9 +119,11 @@ contract DssSpellAction is DssAction {
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
         DssExecLib.removeIlkFromAutoLine(_ilk);
         (,,, uint256 _line,) = VAT.ilks(_ilk);
+
         DssExecLib.setValue(address(VAT), _ilk, "line", 0);
         DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
+
         DssExecLib.deauthorize(address(VAT), address(MCD_JOIN_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(DOG, MCD_CLIP_DIRECT_AAVEV2_DAI);
@@ -126,10 +132,12 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(DssExecLib.esm(), MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        D3MLegacyMomLike(DIRECT_MOM_LEGACY).setOwner(address(0));
         CHAINLOG.removeAddress("DIRECT_MOM_LEGACY");
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+
         RegistryLike(DssExecLib.reg()).remove("DIRECT-AAVEV2-DAI");
 
         // Flash Mint Module Upgrade Completion

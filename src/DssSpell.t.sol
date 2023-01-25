@@ -18,6 +18,10 @@ pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
 
+interface DirectDepositMomLike {
+    function owner() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -658,11 +662,13 @@ contract DssSpellTest is DssSpellTestBase {
 
         DirectDepositLike aaveD3M = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
         ClipAbstract aaveD3MClip = ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
+        DirectDepositMomLike aaveV1Mom = DirectDepositMomLike(addr.addr("DIRECT_MOM_LEGACY"));
 
         // Norevert
         chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
         chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+        chainLog.getAddress("DIRECT_MOM_LEGACY");
 
         (string memory name, string memory symbol, uint256 class, uint256 dec, address gem, address pip, address join, address xlip) = reg.info("DIRECT-AAVEV2-DAI");
         assertEq(name, "Aave interest bearing DAI");
@@ -679,9 +685,13 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(GemAbstract(aaveD3M.adai()).balanceOf(address(aaveD3M)), 0);
 
+        assertEq(aaveV1Mom.owner(), pauseProxy);
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+
+        assertEq(aaveV1Mom.owner(), address(0));
 
         assertEq(aaveD3M.live(), 0);
         assertEq(aaveD3M.tic(), block.timestamp);
@@ -701,6 +711,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
         chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+
+        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
+        chainLog.getAddress("DIRECT_MOM_LEGACY");
 
         (name, symbol, class, dec, gem, pip, join, xlip) = reg.info("DIRECT-AAVEV2-DAI");
         assertEq(name, "");
