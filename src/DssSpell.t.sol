@@ -546,6 +546,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         FlashAbstract flashLegacy = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
         FlashAbstract flashCurrent = FlashAbstract(addr.addr("MCD_FLASH"));
+        address flashKiller = chainLog.getAddress("FLASH_KILLER");
 
         assertEq(vat.wards(address(flashCurrent)), 1);
         assertEq(vat.wards(address(flashLegacy)), 1);
@@ -553,6 +554,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(flashLegacy.max(), 250 * MILLION * WAD);
         assertEq(flashCurrent.max(), 250 * MILLION * WAD);
         assertEq(flashLegacy.wards(pauseProxy), 1);
+        assertEq(flashLegacy.wards(flashKiller), 1);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -564,6 +566,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(flashLegacy.max(), 0);
         assertEq(flashCurrent.max(), 500 * MILLION * WAD);
         assertEq(flashLegacy.wards(pauseProxy), 0);
+        assertEq(flashLegacy.wards(flashKiller), 0);
 
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
         chainLog.getAddress("MCD_FLASH_LEGACY");

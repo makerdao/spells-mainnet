@@ -31,6 +31,10 @@ interface CageLike {
     function cage() external;
 }
 
+interface RegistryLike {
+    function remove(bytes32) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -108,15 +112,16 @@ contract DssSpellAction is DssAction {
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
-
+        RegistryLike(DssExecLib.reg()).remove("DIRECT-AAVEV2-DAI");
 
         // Flash Mint Module Upgrade Completion
         // https://forum.makerdao.com/t/flashmint-module-housekeeping-task-for-next-executive/19472
 
         // Sunset MCD_FLASH_LEGACY and reduce DC to 0
         DssExecLib.setValue(MCD_FLASH_LEGACY, "max", 0);
-        DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
         DssExecLib.deauthorize(DssExecLib.vat(), MCD_FLASH_LEGACY);
+        DssExecLib.deauthorize(MCD_FLASH_LEGACY, FLASH_KILLER);
+        DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
         CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
 
         // Increase DC of MCD_FLASH to 500 million DAI
