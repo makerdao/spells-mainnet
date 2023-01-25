@@ -35,6 +35,12 @@ interface RegistryLike {
     function remove(bytes32) external;
 }
 
+interface VatLike {
+    function Line() external view returns (uint256);
+    function file(bytes32, uint256) external;
+    function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -64,6 +70,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD     = 10 ** 18;
 
     ChainLogLike internal immutable CHAINLOG    = ChainLogLike(DssExecLib.getChangelogAddress("CHANGELOG"));
+    VatLike      internal immutable VAT         = VatLike(DssExecLib.vat());
 
     address internal immutable FLASH_KILLER     = DssExecLib.getChangelogAddress("FLASH_KILLER");
     address internal immutable MCD_FLASH        = DssExecLib.getChangelogAddress("MCD_FLASH");
@@ -106,6 +113,11 @@ contract DssSpellAction is DssAction {
         // Cage DIRECT-AAVEV2-DAI to prepare for new deployment
         //
         CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
+        bytes32 _ilk = "DIRECT-AAVEV2-DAI";
+        DssExecLib.removeIlkFromAutoLine(_ilk);
+        (,,, uint256 _line,) = VAT.ilks(_ilk);
+        DssExecLib.setValue(address(VAT), _ilk, "line", 0);
+        DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
@@ -119,7 +131,7 @@ contract DssSpellAction is DssAction {
 
         // Sunset MCD_FLASH_LEGACY and reduce DC to 0
         DssExecLib.setValue(MCD_FLASH_LEGACY, "max", 0);
-        DssExecLib.deauthorize(DssExecLib.vat(), MCD_FLASH_LEGACY);
+        DssExecLib.deauthorize(address(VAT), MCD_FLASH_LEGACY);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, FLASH_KILLER);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
         CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
