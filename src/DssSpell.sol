@@ -80,6 +80,7 @@ contract DssSpellAction is DssAction {
 
     address internal immutable MCD_JOIN_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
     address internal immutable MCD_CLIP_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+    address internal immutable DIRECT_MOM_LEGACY = DssExecLib.getChangelogAddress("DIRECT_MOM_LEGACY");
 
     address internal immutable CES_WALLET = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
 
