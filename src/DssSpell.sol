@@ -19,23 +19,24 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface VestLike {
-    function restrict(uint256) external;
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+interface ChainLogLike {
+    function removeAddress(bytes32) external;
 }
 
 interface GemLike {
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
+}
+
+interface CageLike {
+    function cage() external;
 }
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/f20339d4956d043c53968d3bdef474959f1021c7/governance/votes/Executive%20vote%20-%20January%2011%2C%202023.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-01-11 MakerDAO Executive Spell | Hash: 0xeb7cc87f7514362c910303c532230161b435e5b2626027a3f065cec7ce8f52cb";
+        "2023-01-27 MakerDAO Executive Spell | Hash: 0x";
 
         // Turn office hours off
     function officeHours() public pure override returns (bool) {
@@ -52,157 +53,88 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE      = ;
+    uint256 internal constant ZERO_PT_TWO_FIVE_PCT_RATE = 1000000000079175551708715274;
 
-    // uint256 internal constant MILLION = 10 ** 6;
-    // uint256 internal constant RAY     = 10 ** 27;
-    uint256 internal constant WAD                = 10 ** 18;
+    uint256 internal constant MILLION = 10 ** 6;
+    // uint256 internal constant RAY  = 10 ** 27;
+    uint256 internal constant WAD     = 10 ** 18;
 
-    GemLike  internal immutable MKR              = GemLike(DssExecLib.mkr());
-    VestLike internal immutable MCD_VEST_MKR     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
-    VestLike internal immutable MCD_VEST_DAI     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    ChainLogLike internal immutable CHAINLOG    = ChainLogLike(DssExecLib.getChangelogAddress("CHANGELOG"));
 
-    // Start Dates - Start of Day
-    uint256 internal constant AUG_01_2022        = 1659312000;
-    uint256 internal constant FEB_01_2023        = 1675209600;
-    uint256 internal constant APR_30_2025        = 1745971200; // This aligns with other fin values of April 30 2025 00:00:00
-    // End Dates - End of Day
-    uint256 internal constant JUL_31_2023        = 1690847999;
-    uint256 internal constant JAN_31_2024        = 1706745599;
+    address internal immutable FLASH_KILLER     = DssExecLib.getChangelogAddress("FLASH_KILLER");
+    address internal immutable MCD_FLASH        = DssExecLib.getChangelogAddress("MCD_FLASH");
+    address internal immutable MCD_FLASH_LEGACY = DssExecLib.getChangelogAddress("MCD_FLASH_LEGACY");
 
-    address internal constant DUX_WALLET         = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
-    address internal constant SES_WALLET         = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    address internal immutable MCD_PSM_PAX_A    = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+    address internal immutable MCD_PSM_GUSD_A   = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
 
-    address internal constant DECO_WALLET        = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-    address internal constant RISK_WALLET        = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
-    address internal constant ORA_WALLET         = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address internal immutable MCD_JOIN_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+    address internal immutable MCD_CLIP_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
 
-    address internal constant STABLENODE         = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
-    address internal constant ULTRASCHUPPI       = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
-    address internal constant FLIPFLOPFLAP       = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
-    address internal constant FLIPSIDE           = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
-    address internal constant FEEDBLACKLOOPS     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
-    address internal constant PENNBLOCKCHAIN     = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
-    address internal constant MHONKASALOTEEMULAU = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
-    address internal constant GFXLABS            = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
-    address internal constant JUSTINCASE         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
-    address internal constant LBSBLOCKCHAIN      = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
-    address internal constant CALBLOCKCHAIN      = 0x7AE109A63ff4DC852e063a673b40BED85D22E585;
-    address internal constant BLOCKCHAINCOLUMBIA = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
-    address internal constant FRONTIERRESEARCH   = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
-    address internal constant CHRISBLEC          = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
-    address internal constant CODEKNIGHT         = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
-    address internal constant ONESTONE           = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
-    address internal constant PVL                = 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416;
-    address internal constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
+    address internal immutable CES_WALLET = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
 
     function actions() public override {
 
-        // ----- Core Unit DAI Budget Streams -----
+        // MOMC Parameter Changes
+        // https://vote.makerdao.com/polling/QmYUi9Tk
 
-        // VEST.restrict( Only recipient can request funds
-        //     VEST.create(
-        //         Recipient of vest,
-        //         Total token amount of vest over period,
-        //         Start timestamp of vest,
-        //         Duration of the vesting period (in seconds),
-        //         Length of cliff period (in seconds),
-        //         Manager address
-        //     )
-        // );
+        // Increase WSTETH-B Stability Fee to 0.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", ZERO_PT_TWO_FIVE_PCT_RATE, true);
 
-        // DUX-001 | 2023-02-01 to 2024-01-31 | 1,611,420 DAI | 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
-        // https://vote.makerdao.com/polling/QmdhJVvN#vote-breakdown
-        MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(
-                DUX_WALLET,
-                1_611_420 * WAD,
-                FEB_01_2023,
-                JAN_31_2024 - FEB_01_2023,
-                0,
-                address(0)
-            )
-        );
+        // Increase Compound v2 D3M Maximum Debt Ceiling to 20 million
+        // Set Compound v2 D3M Target Available Debt to 5 million DAI (this might already be the case)
+        DssExecLib.setIlkAutoLineParameters("DIRECT-COMPV2-DAI", 20 * MILLION, 5 * MILLION, 12 hours);
 
-        // SES-001 | 2023-02-01 to 2024-01-31 | 3,199,200 DAI | 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
-        // https://vote.makerdao.com/polling/QmegsRNC#vote-breakdown
-        MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(
-                SES_WALLET,
-                3_199_200 * WAD,
-                FEB_01_2023,
-                JAN_31_2024 - FEB_01_2023,
-                0,
-                address(0)
-            )
-        );
+        // Increase the USDP PSM tin to 0.2%
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 20 * WAD / 10000);   // 20 BPS
 
-        // ------ Core Unit MKR Transfers -----
-        // DECO-001 - 125.0 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
-        // https://mips.makerdao.com/mips/details/MIP40c3SP36
-        MKR.transfer(DECO_WALLET, 125 * WAD);
 
-        // RISK-001 - 175.00 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
-        // https://mips.makerdao.com/mips/details/MIP40c3SP25
-        MKR.transfer(RISK_WALLET, 175 * WAD);
+        // MKR Transfer for CES
+        // https://vote.makerdao.com/polling/QmbNVQ1E#poll-detail
 
-        // ORA-001 - 843.69 MKR - 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf
-        // https://forum.makerdao.com/t/psa-oracle-core-unit-mkr-distribution/19030
-        MKR.transfer(ORA_WALLET, 843.69 * 100 * WAD / 100);
+        // CES-001 - 96.15 MKR - 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da
+        GemLike(DssExecLib.mkr()).transfer(CES_WALLET, 96.15 ether);
 
-        // ----- MKR Vesting Stream ------
-        // Increase allowance by new vesting delta
-        MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 675 ether);
-// Vest for PE member
-        MCD_VEST_MKR.restrict(
-            MCD_VEST_MKR.create(
-                0xa91c40621D63599b00476eC3e528E06940B03B9D, // usr
-                675 ether,                                  // tot
-                AUG_01_2022,                                // bgn
-                APR_30_2025 - AUG_01_2022,                  // tau
-                365 days,                                   // eta
-                0xe2c16c308b843eD02B09156388Cb240cEd58C01c  // mgr
-            )
-        );
 
-        // ----- Delegate Compensation for December 2022 -----
-        // Link: https://forum.makerdao.com/t/recognized-delegate-compensation-december-2022/19313
-        // StableNode - 12000 DAI - 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0
-        DssExecLib.sendPaymentFromSurplusBuffer(STABLENODE,          12_000);
-        // schuppi - 12000 DAI - 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167
-        DssExecLib.sendPaymentFromSurplusBuffer(ULTRASCHUPPI,        12_000);
-        // Flip Flop Flap Delegate LLC - 12000 DAI - 0x688d508f3a6B0a377e266405A1583B3316f9A2B3
-        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP,        12_000);
-        // Flipside Crypto - 11400 DAI - 0x1ef753934C40a72a60EaB12A68B6f8854439AA78
-        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE,            11_400);
-        // Feedblack Loops LLC - 10808 DAI - 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1
-        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS,      10_808);
-        // Penn Blockchain - 10385 DAI - 0x2165d41af0d8d5034b9c266597c1a415fa0253bd
-        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN,      10_385);
-        // mhonkasalo & teemulau - 9484 DAI - 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d
-        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU,   9_484);
-        // GFX Labs - 8903 DAI - 0xa6e8772af29b29B9202a073f8E36f447689BEef6
-        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS,              8_903);
-        // JustinCase - 7235 DAI - 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473
-        DssExecLib.sendPaymentFromSurplusBuffer(JUSTINCASE,           7_235);
-        // London Business School Blockchain - 3798 DAI - 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C
-        DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN,        3_798);
-        // CalBlockchain - 3421 DAI - 0x7AE109A63ff4DC852e063a673b40BED85D22E585
-        DssExecLib.sendPaymentFromSurplusBuffer(CALBLOCKCHAIN,        3_421);
-        // Blockchain@Columbia - 2851 DAI - 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432
-        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKCHAINCOLUMBIA,   2_851);
-        // Frontier Research LLC - 2285 DAI - 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8
-        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIERRESEARCH,     2_285);
-        // Chris Blec - 1334 DAI - 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170
-        DssExecLib.sendPaymentFromSurplusBuffer(CHRISBLEC,            1_334);
-        // CodeKnight - 355 DAI - 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428
-        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT,             355);
-        // ONESTONE - 342 DAI - 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a
-        DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE,               342);
-        // pvl - 56 DAI - 0x6ebB1A9031177208A4CA50164206BF2Fa5ff7416
-        DssExecLib.sendPaymentFromSurplusBuffer(PVL,                     56);
-        // ConsenSys - 33 DAI - 0xE78658A8acfE982Fde841abb008e57e6545e38b3
-        DssExecLib.sendPaymentFromSurplusBuffer(CONSENSYS,               33);
+        // Cage DIRECT-AAVEV2-DAI
+        // https://forum.makerdao.com/t/housekeeping-tasks-for-next-executive/19472
 
+        // Cage DIRECT-AAVEV2-DAI to prepare for new deployment
+        //
+        CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
+        DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
+        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+        CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+        CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+
+
+        // Flash Mint Module Upgrade Completion
+        // https://forum.makerdao.com/t/flashmint-module-housekeeping-task-for-next-executive/19472
+
+        // Sunset MCD_FLASH_LEGACY and reduce DC to 0
+        DssExecLib.setValue(MCD_FLASH_LEGACY, "max", 0);
+        DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
+        DssExecLib.deauthorize(DssExecLib.vat(), MCD_FLASH_LEGACY);
+        CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
+
+        // Increase DC of MCD_FLASH to 500 million DAI
+        DssExecLib.setValue(MCD_FLASH, "max", 500 * MILLION * WAD);
+
+        // Deauth FLASH_KILLER and remove from Chainlog
+        // NOTE: Flash Killer's only ward is MCD_FLASH_LEGACY, Pause Proxy cannot deauth
+        CHAINLOG.removeAddress("FLASH_KILLER");
+
+
+        // PSM_GUSD_A tout decrease
+        // Poll: https://vote.makerdao.com/polling/QmRRceEo#poll-detail
+        // Forum: https://forum.makerdao.com/t/request-to-poll-psm-gusd-a-parameters/19416
+        // Reduce PSM-GUSD-A tout from 0.1% to 0%
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 0);
+
+
+        DssExecLib.setChangelogVersion("1.14.8");
     }
 }
 
