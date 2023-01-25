@@ -617,7 +617,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Fail Here
         vm.expectRevert("DssFlash/ceiling-exceeded");
-        flash.flashLoan(address(this), address(dai), 1 * WAD, "");
+        flash.flashLoan(address(this), address(dai), 1, "");
     }
 
     // callback required by FlashLoan module
