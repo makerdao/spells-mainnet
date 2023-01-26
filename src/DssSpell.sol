@@ -32,6 +32,7 @@ interface CageLike {
 }
 
 interface D3MLegacyMomLike {
+    function setAuthority(address) external;
     function setOwner(address) external;
 }
 
@@ -85,6 +86,7 @@ contract DssSpellAction is DssAction {
 
     address internal immutable MCD_JOIN_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
     address internal immutable MCD_CLIP_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+    address internal immutable MCD_CLIP_CALC_DIRECT_AAVEV2_DAI = DssExecLib.getChangelogAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
     address internal immutable DIRECT_MOM_LEGACY = DssExecLib.getChangelogAddress("DIRECT_MOM_LEGACY");
 
     address internal immutable CES_WALLET = 0x25307aB59Cd5d8b4E2C01218262Ddf6a89Ff86da;
@@ -114,25 +116,41 @@ contract DssSpellAction is DssAction {
 
         // Cage DIRECT-AAVEV2-DAI
         // https://forum.makerdao.com/t/housekeeping-tasks-for-next-executive/19472
-
         CageLike(MCD_JOIN_DIRECT_AAVEV2_DAI).cage();
+
+        // Deconstruct module for extra safety
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DOG);
+
+        // Remove module relies on end and esm so we know if our end keeper calls are out of date
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.end());
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.esm());
+        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DssExecLib.esm());
+
+        // Remove module from core
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
         DssExecLib.removeIlkFromAutoLine(_ilk);
         (,,, uint256 _line,) = VAT.ilks(_ilk);
 
+        // set core values to 0/stopped
         DssExecLib.setValue(address(VAT), _ilk, "line", 0);
         DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
 
+        // Remove Core Authorizations
         DssExecLib.deauthorize(address(VAT), address(MCD_JOIN_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
         DssExecLib.deauthorize(DOG, MCD_CLIP_DIRECT_AAVEV2_DAI);
-        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DOG);
-        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.end());
-        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.esm());
+
+        // Ensure governance can't interact with unused modules
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        DssExecLib.deauthorize(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, address(this));
+
+        // Ensure governance can't call unused MOM
+        D3MLegacyMomLike(DIRECT_MOM_LEGACY).setAuthority(address(0));
         D3MLegacyMomLike(DIRECT_MOM_LEGACY).setOwner(address(0));
+
+        // Remove chainlog and ilk records
         CHAINLOG.removeAddress("DIRECT_MOM_LEGACY");
         CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
         CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
@@ -148,6 +166,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(address(VAT), MCD_FLASH_LEGACY);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, FLASH_KILLER);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
+        DssExecLib.deauthorize(MCD_FLASH_LEGACY, DssExecLib.esm());
         CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
 
         // Increase DC of MCD_FLASH to 500 million DAI
