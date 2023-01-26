@@ -584,9 +584,6 @@ contract DssSpellTest is DssSpellTestBase {
 
     // Test to ensure test of flash mint is working before the spell is cast...
     function testFlashWorksBeforeSpell() public {
-        //_vote(address(spell));
-        //_scheduleWaitAndCast(address(spell));
-        //assertTrue(spell.done());
 
         uint256 vowDai = vat.dai(address(vow));
 
