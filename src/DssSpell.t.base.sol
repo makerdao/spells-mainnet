@@ -1160,6 +1160,8 @@ contract DssSpellTestBase is Config, DssTest {
         assertLe(ink, 1);
         assertLe(art, 1);
         assertEq(token.balanceOf(address(join)), 0);
+
+        assertEq(join.tic(), 0);
     }
 
     function _getSignatures(bytes32 signHash) internal returns (bytes memory signatures, address[] memory signers) {
