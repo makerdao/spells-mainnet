@@ -137,13 +137,13 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
 
         // Remove Core Authorizations
-        DssExecLib.deauthorize(address(VAT), address(MCD_JOIN_DIRECT_AAVEV2_DAI));
-        DssExecLib.deauthorize(address(VAT), address(MCD_CLIP_DIRECT_AAVEV2_DAI));
-        DssExecLib.deauthorize(DOG, MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(address(VAT), MCD_JOIN_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(address(VAT), MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(DOG,          MCD_CLIP_DIRECT_AAVEV2_DAI);
 
         // Ensure governance can't interact with unused modules
-        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, address(this));
-        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, address(this));
+        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI,      address(this));
+        DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI,      address(this));
         DssExecLib.deauthorize(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, address(this));
 
         // Ensure governance can't call unused MOM
@@ -165,8 +165,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(MCD_FLASH_LEGACY, "max", 0);
         DssExecLib.deauthorize(address(VAT), MCD_FLASH_LEGACY);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, FLASH_KILLER);
-        DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, DssExecLib.esm());
+        DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
         CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
 
         // Increase DC of MCD_FLASH to 500 million DAI
