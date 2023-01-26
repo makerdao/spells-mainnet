@@ -52,7 +52,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-01-27 MakerDAO Executive Spell | Hash: 0x0544972c4fa0e63df554701e9a8ed2d16fc8ca17b7ea719a35933913f9794967";
 
-        // Turn office hours off
+    // Turn office hours off
     function officeHours() public pure override returns (bool) {
         return false;
     }
