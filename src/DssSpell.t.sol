@@ -663,7 +663,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testAaveV2D3MRemoved() public {
 
-        DirectDepositLike aaveD3M = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
+        AaveDirectDepositLike aaveD3M = AaveDirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
         ClipAbstract aaveD3MClip = ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
         WardsAbstract aaveD3MClipCalc = WardsAbstract(addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
         DirectDepositMomLike aaveV1Mom = DirectDepositMomLike(addr.addr("DIRECT_MOM_LEGACY"));
