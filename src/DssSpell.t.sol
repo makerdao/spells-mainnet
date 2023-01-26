@@ -19,6 +19,7 @@ pragma solidity 0.8.16;
 import "./DssSpell.t.base.sol";
 
 interface DirectDepositMomLike {
+    function authority() external view returns (address);
     function owner() external view returns (address);
 }
 
@@ -559,6 +560,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(flashCurrent.max(), 250 * MILLION * WAD);
         assertEq(flashLegacy.wards(pauseProxy), 1);
         assertEq(flashLegacy.wards(flashKiller), 1);
+        assertEq(flashLegacy.wards(address(esm)), 1);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -571,6 +573,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(flashCurrent.max(), 500 * MILLION * WAD);
         assertEq(flashLegacy.wards(pauseProxy), 0);
         assertEq(flashLegacy.wards(flashKiller), 0);
+        assertEq(flashLegacy.wards(address(esm)), 0);
 
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
         chainLog.getAddress("MCD_FLASH_LEGACY");
@@ -662,6 +665,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         DirectDepositLike aaveD3M = DirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
         ClipAbstract aaveD3MClip = ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
+        WardsAbstract aaveD3MClipCalc = WardsAbstract(addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
         DirectDepositMomLike aaveV1Mom = DirectDepositMomLike(addr.addr("DIRECT_MOM_LEGACY"));
 
         // Norevert
@@ -681,7 +685,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3MClip.wards(address(dog)), 1);
         assertEq(aaveD3MClip.wards(address(end)), 1);
         assertEq(aaveD3MClip.wards(address(esm)), 1);
+        assertEq(aaveD3MClipCalc.wards(pauseProxy), 1);
         assertEq(aaveD3M.wards(pauseProxy), 1);
+        assertEq(aaveD3M.wards(address(esm)), 1);
         assertEq(aaveD3MClip.wards(pauseProxy), 1);
 
         assertEq(aaveD3M.live(), 1);
@@ -690,12 +696,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(GemAbstract(aaveD3M.adai()).balanceOf(address(aaveD3M)), 0);
 
         assertEq(aaveV1Mom.owner(), pauseProxy);
+        assertEq(aaveV1Mom.authority(), address(chief));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(aaveV1Mom.owner(), address(0));
+        assertEq(aaveV1Mom.authority(), address(0));
 
         assertEq(aaveD3M.live(), 0);
         assertEq(aaveD3M.tic(), block.timestamp);
@@ -708,7 +716,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3MClip.wards(address(end)), 0);
         assertEq(aaveD3MClip.wards(address(esm)), 0);
         assertEq(aaveD3MClip.wards(address(dog)), 0);
+        assertEq(aaveD3MClipCalc.wards(pauseProxy), 0);
         assertEq(aaveD3M.wards(pauseProxy), 0);
+        assertEq(aaveD3M.wards(address(esm)), 0);
         assertEq(aaveD3MClip.wards(pauseProxy), 0);
 
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
