@@ -688,6 +688,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3MClipCalc.wards(pauseProxy), 1);
         assertEq(aaveD3M.wards(pauseProxy), 1);
         assertEq(aaveD3M.wards(address(esm)), 1);
+        assertEq(aaveD3M.wards(address(aaveV1Mom)), 1);
         assertEq(aaveD3MClip.wards(pauseProxy), 1);
 
         assertEq(aaveD3M.live(), 1);
@@ -719,6 +720,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(aaveD3MClipCalc.wards(pauseProxy), 0);
         assertEq(aaveD3M.wards(pauseProxy), 0);
         assertEq(aaveD3M.wards(address(esm)), 0);
+        assertEq(aaveD3M.wards(address(aaveV1Mom)), 0);
         assertEq(aaveD3MClip.wards(pauseProxy), 0);
 
         vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));

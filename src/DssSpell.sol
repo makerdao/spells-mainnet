@@ -120,6 +120,7 @@ contract DssSpellAction is DssAction {
 
         // Deconstruct module for extra safety
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DOG);
+        DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI, DIRECT_MOM_LEGACY);
 
         // Remove module relies on end and esm so we know if our end keeper calls are out of date
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI, DssExecLib.end());
