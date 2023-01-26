@@ -73,8 +73,8 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant RAY  = 10 ** 27;
     uint256 internal constant WAD     = 10 ** 18;
 
-    ChainLogLike internal immutable CHAINLOG    = ChainLogLike(DssExecLib.getChangelogAddress("CHANGELOG"));
-    VatLike      internal immutable VAT         = VatLike(DssExecLib.vat());
+    ChainLogLike internal immutable chainlog    = ChainLogLike(DssExecLib.getChangelogAddress("CHANGELOG"));
+    VatLike      internal immutable vat         = VatLike(DssExecLib.vat());
     address      internal immutable DOG         = DssExecLib.dog();
 
     address internal immutable FLASH_KILLER     = DssExecLib.getChangelogAddress("FLASH_KILLER");
@@ -129,16 +129,16 @@ contract DssSpellAction is DssAction {
         // Remove module from core
         bytes32 _ilk = "DIRECT-AAVEV2-DAI";
         DssExecLib.removeIlkFromAutoLine(_ilk);
-        (,,, uint256 _line,) = VAT.ilks(_ilk);
+        (,,, uint256 _line,) = vat.ilks(_ilk);
 
         // set core values to 0/stopped
-        DssExecLib.setValue(address(VAT), _ilk, "line", 0);
-        DssExecLib.setValue(address(VAT), "Line", VAT.Line() - _line);
+        DssExecLib.setValue(address(vat), _ilk, "line", 0);
+        DssExecLib.setValue(address(vat), "Line", vat.Line() - _line);
         DssExecLib.setValue(MCD_CLIP_DIRECT_AAVEV2_DAI, "stopped", 3);
 
         // Remove Core Authorizations
-        DssExecLib.deauthorize(address(VAT), MCD_JOIN_DIRECT_AAVEV2_DAI);
-        DssExecLib.deauthorize(address(VAT), MCD_CLIP_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(address(vat), MCD_JOIN_DIRECT_AAVEV2_DAI);
+        DssExecLib.deauthorize(address(vat), MCD_CLIP_DIRECT_AAVEV2_DAI);
         DssExecLib.deauthorize(DOG,          MCD_CLIP_DIRECT_AAVEV2_DAI);
 
         // Ensure governance can't interact with unused modules
@@ -151,10 +151,10 @@ contract DssSpellAction is DssAction {
         D3MLegacyMomLike(DIRECT_MOM_LEGACY).setOwner(address(0));
 
         // Remove chainlog and ilk records
-        CHAINLOG.removeAddress("DIRECT_MOM_LEGACY");
-        CHAINLOG.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
-        CHAINLOG.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
-        CHAINLOG.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
+        chainlog.removeAddress("DIRECT_MOM_LEGACY");
+        chainlog.removeAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
+        chainlog.removeAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
+        chainlog.removeAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
 
         RegistryLike(DssExecLib.reg()).remove("DIRECT-AAVEV2-DAI");
 
@@ -163,18 +163,18 @@ contract DssSpellAction is DssAction {
 
         // Sunset MCD_FLASH_LEGACY and reduce DC to 0
         DssExecLib.setValue(MCD_FLASH_LEGACY, "max", 0);
-        DssExecLib.deauthorize(address(VAT), MCD_FLASH_LEGACY);
+        DssExecLib.deauthorize(address(vat), MCD_FLASH_LEGACY);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, FLASH_KILLER);
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, DssExecLib.esm());
         DssExecLib.deauthorize(MCD_FLASH_LEGACY, address(this));
-        CHAINLOG.removeAddress("MCD_FLASH_LEGACY");
+        chainlog.removeAddress("MCD_FLASH_LEGACY");
 
         // Increase DC of MCD_FLASH to 500 million DAI
         DssExecLib.setValue(MCD_FLASH, "max", 500 * MILLION * WAD);
 
         // Deauth FLASH_KILLER and remove from Chainlog
         // NOTE: Flash Killer's only ward is MCD_FLASH_LEGACY, Pause Proxy cannot deauth
-        CHAINLOG.removeAddress("FLASH_KILLER");
+        chainlog.removeAddress("FLASH_KILLER");
 
 
         // PSM_GUSD_A tout decrease
