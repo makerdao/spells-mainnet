@@ -143,6 +143,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.deauthorize(DOG,          MCD_CLIP_DIRECT_AAVEV2_DAI);
 
         // Ensure governance can't interact with unused modules
+        // NOTE: This is potentially dangerous, only use if you're sure we never need
+        // the auth again in the future
         DssExecLib.deauthorize(MCD_JOIN_DIRECT_AAVEV2_DAI,      address(this));
         DssExecLib.deauthorize(MCD_CLIP_DIRECT_AAVEV2_DAI,      address(this));
         DssExecLib.deauthorize(MCD_CLIP_CALC_DIRECT_AAVEV2_DAI, address(this));
