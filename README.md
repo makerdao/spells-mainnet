@@ -1,7 +1,7 @@
 # spells-mainnet
 ![Build Status](https://github.com/makerdao/spells-mainnet/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=master)
 
-Staging repo for MakerDAO weekly executive spells.
+Staging repo for MakerDAO executive spells.
 
 ## Instructions
 
@@ -43,11 +43,11 @@ $ make test-forge
 
 ### Deploy
 
-Set `ETH_RPC_URL` to a Mainnet node and ensure `ETH_GAS` is set to a high enough number to deploy the contract.
+Set `ETH_RPC_URL` to a Mainnet node and ensure `ETH_GAS_LIMIT` is set to a high enough number to deploy the contract.
 
 ```bash
 $ export ETH_RPC_URL=<Mainnet URL>
-$ export ETH_GAS=5000000
+$ export ETH_GAS_LIMIT=5000000
 $ export ETH_GAS_PRICE=$(seth --to-wei 100 "gwei")
 $ make deploy
 ```
@@ -61,11 +61,11 @@ make estimate
 ```
 
 Once you have that, add another million gas as a buffer against
-out-of-gas errors.  Set ETH_GAS to this value.
+out-of-gas errors.  Set ETH_GAS_LIMIT to this value.
 
 ```bash
-export ETH_GAS="$((<value from previous step> + 0))"
-export ETH_GAS=$(bc <<< "$ETH_GAS + 1000000")
+export ETH_GAS_LIMIT="$((<value from previous step> + 0))"
+export ETH_GAS_LIMIT=$(bc <<< "$ETH_GAS_LIMIT + 1000000")
 ```
 
 You should also check current gas prices on your favorite site
