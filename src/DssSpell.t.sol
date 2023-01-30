@@ -18,11 +18,6 @@ pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
 
-interface DirectDepositMomLike {
-    function authority() external view returns (address);
-    function owner() external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -253,7 +248,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    function testPSMs() public { // make private to disable
+    // leave puclic for now as this is acting like a config tests
+    function testPSMs() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -513,19 +509,19 @@ contract DssSpellTest is DssSpellTestBase {
 
     }
 
-    function testMKRPayments() public { // make private to disable
-        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrCES    = gov.balanceOf(wallets.addr("CES_WALLET"));
+    function testMKRPayments() private { // make private to disable
+        // uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
+        // uint256 prevMkrCES    = gov.balanceOf(wallets.addr("CES_WALLET"));
 
-        uint256 amountCES     = 96.15    ether;
-        uint256 total         = 96.15    ether;
+        // uint256 amountCES     = 96.15    ether;
+        // uint256 total         = 96.15    ether;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("CES_WALLET")), prevMkrCES + amountCES);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(wallets.addr("CES_WALLET")), prevMkrCES + amountCES);
     }
 
     function testMKRVestFix() private { // make private to disable
@@ -547,194 +543,4 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
-    function testFlash() public {
-
-        FlashAbstract flashLegacy = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
-        FlashAbstract flashCurrent = FlashAbstract(addr.addr("MCD_FLASH"));
-        address flashKiller = chainLog.getAddress("FLASH_KILLER");
-
-        assertEq(vat.wards(address(flashCurrent)), 1);
-        assertEq(vat.wards(address(flashLegacy)), 1);
-
-        assertEq(flashLegacy.max(), 250 * MILLION * WAD);
-        assertEq(flashCurrent.max(), 250 * MILLION * WAD);
-        assertEq(flashLegacy.wards(pauseProxy), 1);
-        assertEq(flashLegacy.wards(flashKiller), 1);
-        assertEq(flashLegacy.wards(address(esm)), 1);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vat.wards(address(flashCurrent)), 1);
-        assertEq(vat.wards(address(flashLegacy)), 0);
-
-        assertEq(flashLegacy.max(), 0);
-        assertEq(flashCurrent.max(), 500 * MILLION * WAD);
-        assertEq(flashLegacy.wards(pauseProxy), 0);
-        assertEq(flashLegacy.wards(flashKiller), 0);
-        assertEq(flashLegacy.wards(address(esm)), 0);
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("MCD_FLASH_LEGACY");
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("FLASH_KILLER");
-    }
-
-    // Test to ensure test of flash mint is working before the spell is cast...
-    function testFlashWorksBeforeSpell() public {
-
-        uint256 vowDai = vat.dai(address(vow));
-
-        // Give ourselves tokens for repayment in the callbacks
-        _giveTokens(address(dai), 1_000 * WAD);
-
-        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
-        assertEq(flash.vat(), address(vat));
-        assertEq(flash.daiJoin(), address(daiJoin));
-        assertEq(flash.dai(), address(dai));
-        assertEq(flash.vow(), address(vow));
-        assertEq(flash.max(), 250 * MILLION * WAD);
-        assertEq(flash.toll(), 0);
-        assertEq(flash.maxFlashLoan(address(dai)), 250 * MILLION * WAD);
-        assertEq(flash.flashFee(address(dai), 1 * MILLION * WAD), 0);
-        flash.flashLoan(address(this), address(dai), 1 * MILLION * WAD, "");
-        flash.vatDaiFlashLoan(address(this), 1 * MILLION * RAD, "");
-        assertEq(vat.sin(address(flash)), 0);
-        assertEq(vat.dai(address(flash)), 0);
-        flash.accrue();
-        assertEq(vat.dai(address(flash)), 0);
-        assertEq(vat.dai(address(vow)), vowDai);
-    }
-
-    // Test to ensure 1 Dai flash mint fails after spell
-    function testFlashFailsAfterSpell() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Give ourselves tokens for repayment in the callbacks
-        _giveTokens(address(dai), 1_000 * WAD);
-
-        FlashAbstract flash = FlashAbstract(addr.addr("MCD_FLASH_LEGACY"));
-
-        // Fail Here
-        vm.expectRevert("DssFlash/ceiling-exceeded");
-        flash.flashLoan(address(this), address(dai), 1, "");
-    }
-
-    // callback required by FlashLoan module
-    function onFlashLoan(
-        address initiator,
-        address token,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));
-        assertEq(token, address(dai));
-        assertEq(amount, 1 * MILLION * WAD);
-        assertEq(fee, 0);
-
-        dai.approve(msg.sender, 1_000_000 * WAD);
-
-        return keccak256("ERC3156FlashBorrower.onFlashLoan");
-    }
-
-    // callback required by FlashLoan module
-    function onVatDaiFlashLoan(
-        address initiator,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external returns (bytes32) {
-        assertEq(initiator, address(this));
-        assertEq(amount, 1 * MILLION * RAD);
-        assertEq(fee, 0);
-
-        vat.move(address(this), msg.sender, 1_000_000 * RAD);
-
-        return keccak256("VatDaiFlashBorrower.onVatDaiFlashLoan");
-    }
-
-    function testAaveV2D3MRemoved() public {
-
-        AaveDirectDepositLike aaveD3M = AaveDirectDepositLike(addr.addr("MCD_JOIN_DIRECT_AAVEV2_DAI"));
-        ClipAbstract aaveD3MClip = ClipAbstract(addr.addr("MCD_CLIP_DIRECT_AAVEV2_DAI"));
-        WardsAbstract aaveD3MClipCalc = WardsAbstract(addr.addr("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"));
-        DirectDepositMomLike aaveV1Mom = DirectDepositMomLike(addr.addr("DIRECT_MOM_LEGACY"));
-
-        // Norevert
-        chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
-        chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
-        chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
-        chainLog.getAddress("DIRECT_MOM_LEGACY");
-
-        (string memory name, string memory symbol, uint256 class, uint256 dec, address gem, address pip, address join, address xlip) = reg.info("DIRECT-AAVEV2-DAI");
-        assertEq(name, "Aave interest bearing DAI");
-        assertEq(join, address(aaveD3M));
-        assertEq(xlip, address(aaveD3MClip));
-
-        assertEq(vat.wards(address(aaveD3M)), 1);
-        assertEq(vat.wards(address(aaveD3MClip)), 1);
-        assertEq(dog.wards(address(aaveD3MClip)), 1);
-        assertEq(aaveD3MClip.wards(address(dog)), 1);
-        assertEq(aaveD3MClip.wards(address(end)), 1);
-        assertEq(aaveD3MClip.wards(address(esm)), 1);
-        assertEq(aaveD3MClipCalc.wards(pauseProxy), 1);
-        assertEq(aaveD3M.wards(pauseProxy), 1);
-        assertEq(aaveD3M.wards(address(esm)), 1);
-        assertEq(aaveD3M.wards(address(aaveV1Mom)), 1);
-        assertEq(aaveD3MClip.wards(pauseProxy), 1);
-
-        assertEq(aaveD3M.live(), 1);
-        assertEq(aaveD3MClip.stopped(), 3);
-
-        assertEq(GemAbstract(aaveD3M.adai()).balanceOf(address(aaveD3M)), 0);
-
-        assertEq(aaveV1Mom.owner(), pauseProxy);
-        assertEq(aaveV1Mom.authority(), address(chief));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(aaveV1Mom.owner(), address(0));
-        assertEq(aaveV1Mom.authority(), address(0));
-
-        assertEq(aaveD3M.live(), 0);
-        assertEq(aaveD3M.tic(), block.timestamp);
-
-        assertEq(aaveD3MClip.stopped(), 3);
-
-        assertEq(vat.wards(address(aaveD3M)), 0);
-        assertEq(vat.wards(address(aaveD3MClip)), 0);
-        assertEq(dog.wards(address(aaveD3MClip)), 0);
-        assertEq(aaveD3MClip.wards(address(end)), 0);
-        assertEq(aaveD3MClip.wards(address(esm)), 0);
-        assertEq(aaveD3MClip.wards(address(dog)), 0);
-        assertEq(aaveD3MClipCalc.wards(pauseProxy), 0);
-        assertEq(aaveD3M.wards(pauseProxy), 0);
-        assertEq(aaveD3M.wards(address(esm)), 0);
-        assertEq(aaveD3M.wards(address(aaveV1Mom)), 0);
-        assertEq(aaveD3MClip.wards(pauseProxy), 0);
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("MCD_JOIN_DIRECT_AAVEV2_DAI");
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("MCD_CLIP_DIRECT_AAVEV2_DAI");
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("MCD_CLIP_CALC_DIRECT_AAVEV2_DAI");
-
-        vm.expectRevert(abi.encodePacked("dss-chain-log/invalid-key"));
-        chainLog.getAddress("DIRECT_MOM_LEGACY");
-
-        (name, symbol, class, dec, gem, pip, join, xlip) = reg.info("DIRECT-AAVEV2-DAI");
-        assertEq(name, "");
-        assertEq(join, address(0));
-        assertEq(xlip, address(0));
-    }
 }
