@@ -44,6 +44,7 @@ contract Wallets {
         addr["RWF_WALLET"]                   = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
         addr["SES_WALLET"]                   = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
         addr["SF_WALLET"]                    = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+        addr["SF01_WALLET"]                  = 0x4Af6f22d454581bF31B2473Ebe25F5C6F55E028D;
         addr["SH_WALLET"]                    = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
         addr["SH_MULTISIG"]                  = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
         addr["SNE_WALLET"]                   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;

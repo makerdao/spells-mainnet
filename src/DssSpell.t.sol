@@ -366,31 +366,27 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[18] memory payees = [
-           Payee(wallets.addr("STABLENODE"),         12_000),
-           Payee(wallets.addr("ULTRASCHUPPI"),       12_000),
-           Payee(wallets.addr("FLIPFLOPFLAP"),       12_000),
-           Payee(wallets.addr("FLIPSIDE"),           11_400),
-           Payee(wallets.addr("FEEDBLACKLOOPS"),     10_808),
-           Payee(wallets.addr("PENNBLOCKCHAIN"),     10_385),
-           Payee(wallets.addr("MHONKASALOTEEMULAU"),  9_484),
-           Payee(wallets.addr("GFXLABS"),             8_903),
-           Payee(wallets.addr("JUSTINCASE"),          7_235),
-           Payee(wallets.addr("LBSBLOCKCHAIN"),       3_798),
-           Payee(wallets.addr("CALBLOCKCHAIN"),       3_421),
-           Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),  2_851),
-           Payee(wallets.addr("FRONTIERRESEARCH"),    2_285),
-           Payee(wallets.addr("CHRISBLEC"),           1_334),
-           Payee(wallets.addr("CODEKNIGHT"),            355),
-           Payee(wallets.addr("ONESTONE"),              342),
-           Payee(wallets.addr("PVL"),                    56),
-           Payee(wallets.addr("CONSENSYS"),              33)
+        Payee[14] memory payees = [
+            Payee(wallets.addr("TECH_WALLET"),                138_894),
+            Payee(wallets.addr("COM_WALLET"),                 131_200),
+            Payee(0x50D2f29206a76aE8a9C2339922fcBCC4DfbdD7ea,   1_336),
+            Payee(0xeD27986bf84Fa8E343aA9Ff90307291dAeF234d3,   1_983),
+            Payee(0x3dfE26bEDA4282ECCEdCaF2a0f146712712e81EA,     715),
+            Payee(0x74520D1690348ba882Af348223A30D760BCbD72a,   1_376),
+            Payee(0x471C5806cadAFB297D9b95B914B65f626fDCD1a7,     583),
+            Payee(0x051cCee0CfBF1Fe9BD891117E85bEbDFa42aFaA9,   1_026),
+            Payee(0x1c138352C779af714b6cE328C9d962E5c82EBA07,     631),
+            Payee(0x55f2E8728cFCCf260040cfcc24E14A6047fF4d31,     255),
+            Payee(0xE004DAabEfe0322Ac1ab46A3CF382a2A0bA81Ab4,   1_758),
+            Payee(0xC2bE81CeB685eea53c77975b5F9c5f82641deBC8,   3_013),
+            Payee(0xdB7c1777b5d4502b3d1228c2449F1816EB507748,   2_683),
+            Payee(wallets.addr("SF01_WALLET"),                209_000)
         ];
 
         uint256 prevBalance;
