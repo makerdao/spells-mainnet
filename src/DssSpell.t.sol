@@ -17,8 +17,31 @@
 pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
+import {ScriptTools} from "dss-test/DssTest.sol";
+
+import {RootDomain} from "dss-test/domains/RootDomain.sol";
+import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
+import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
+
+interface L2Spell {
+    function dstDomain() external returns (bytes32);
+    function gateway() external returns (address);
+}
+
+interface L2Gateway {
+    function validDomains(bytes32) external returns (uint256);
+}
+
+interface BridgeLike {
+    function l2TeleportGateway() external view returns (address);
+}
 
 contract DssSpellTest is DssSpellTestBase {
+    string         config;
+    RootDomain     rootDomain;
+    OptimismDomain optimismDomain;
+    ArbitrumDomain arbitrumDomain;
+
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
         _testGeneral();
@@ -537,6 +560,88 @@ contract DssSpellTest is DssSpellTestBase {
         // unpaid = vest.unpaid(2);
         // assertEq(unpaid, 0, "vest still has a balance");
         // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
+    }
+
+    function _setupRootDomain() internal {
+        vm.makePersistent(address(spell), address(spell.action()));
+
+        string memory root = string.concat(vm.projectRoot(), "/lib/dss-test");
+        config = ScriptTools.readInput(root, "integration");
+
+        rootDomain = new RootDomain(config, getRelativeChain("mainnet"));
+    }
+
+    function testL2OptimismSpell() private {
+        address l2TeleportGateway = BridgeLike(
+            chainLog.getAddress("OPTIMISM_TELEPORT_BRIDGE")
+        ).l2TeleportGateway();
+
+        _setupRootDomain();
+
+        optimismDomain = new OptimismDomain(config, getRelativeChain("optimism"), rootDomain);
+        optimismDomain.selectFork();
+
+        // Check that the L2 Optimism Spell is there and configured
+        L2Spell optimismSpell = L2Spell(address(0) /* <TODO> */);
+
+        L2Gateway optimismGateway = L2Gateway(optimismSpell.gateway());
+        assertEq(address(optimismGateway), l2TeleportGateway, "l2-optimism-wrong-gateway");
+
+        bytes32 optDstDomain = optimismSpell.dstDomain();
+        assertEq(optDstDomain, bytes32("ETH-MAIN-A"), "l2-optimism-wrong-dst-domain");
+
+        // Validate pre-spell optimism state
+        assertEq(optimismGateway.validDomains(optDstDomain), 1, "l2-optimism-invalid-dst-domain");
+        // Cast the L1 Spell
+        rootDomain.selectFork();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // switch to Optimism domain and relay the spell from L1
+        // the `true` keeps us on Optimism rather than `rootDomain.selectFork()
+        optimismDomain.relayFromHost(true);
+
+        // Validate post-spell state
+        assertEq(optimismGateway.validDomains(optDstDomain), 0, "l2-optimism-invalid-dst-domain");
+    }
+
+    function testL2ArbitrumSpell() private {
+        address l2TeleportGateway = BridgeLike(
+            chainLog.getAddress("ARBITRUM_TELEPORT_BRIDGE")
+        ).l2TeleportGateway();
+
+        _setupRootDomain();
+        
+        arbitrumDomain = new ArbitrumDomain(config, getRelativeChain("arbitrum_one"), rootDomain);
+        arbitrumDomain.selectFork();
+
+        // Check that the L2 Arbitrum Spell is there and configured
+        L2Spell arbitrumSpell = L2Spell(address(0) /* <TODO> */);
+
+        L2Gateway arbitrumGateway = L2Gateway(arbitrumSpell.gateway());
+        assertEq(address(arbitrumGateway), l2TeleportGateway, "l2-arbitrum-wrong-gateway");
+
+        bytes32 arbDstDomain = arbitrumSpell.dstDomain();
+        assertEq(arbDstDomain, bytes32("ETH-MAIN-A"), "l2-arbitrum-wrong-dst-domain");
+
+        // Validate pre-spell arbitrum state
+        assertEq(arbitrumGateway.validDomains(arbDstDomain), 1, "l2-arbitrum-invalid-dst-domain");
+
+        // Cast the L1 Spell
+        rootDomain.selectFork();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // switch to Arbitrum domain and relay the spell from L1
+        // the `true` keeps us on Arbitrum rather than `rootDomain.selectFork()
+        arbitrumDomain.relayFromHost(true);
+
+        // Validate post-spell state
+        assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
 }
