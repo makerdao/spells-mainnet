@@ -127,8 +127,8 @@ contract DssSpellAction is DssAction {
         // ------------------ Pause Starknet Goerli L2DaiTeleportGateway -----------------
         // Forum: https://forum.makerdao.com/t/community-notice-pecu-to-redeploy-teleport-l2-gateways/19550
         // L2 Spell to execute via STARKNET_GOV_RELAY:
-        // src: https://github.com/makerdao/starknet-spells-goerli/blob/b7ca995cf1d266aa2382d85e35a86b4fae52aa15/src/spell.cairo
-        // contract: https://testnet.starkscan.co/class/0x00a052591661d7e249b46a1084c63b14dae6aa8b1a56ab3f7df8c8add1c374b1#overview
+        // src: https://github.com/makerdao/starknet-spells-mainnet/blob/55401e8121f93d09f57f61c4e77dc0b6c73fb4f8/src/spell.cairo
+        // contract: https://{TBD}
         // StarknetGovRelayLike(STARKNET_GOV_RELAY).relay{value: STA_L1_CALL_VALUE}(STARKNET_L2_SPELL);
 
         // disallow legacy bridge on escrow

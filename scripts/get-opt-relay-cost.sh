@@ -8,7 +8,7 @@ OPTIMISM_GOERLI_RPC_URL='https://mainnet.optimism.io'
 
 L2_SPELL='0x9495632F53Cc16324d2FcFCdD4EB59fb88dDab12'
 CHANGELOG='0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F'
-X_DOMAIN_MSG_SENDER_SLOT=4 # Note: this become 204 after the Bedrock update!
+X_DOMAIN_MSG_SENDER_SLOT=4 # Note: this becomes 204 after the Bedrock update!
 
 L1_GOV_RELAY=$(
     cast call $CHANGELOG "getAddress(bytes32)(address)" \

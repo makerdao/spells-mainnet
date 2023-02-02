@@ -563,7 +563,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function _setupRootDomain() internal {
-        vm.makePersistent(address(spell), address(spell.action()));
+        vm.makePersistent(address(spell), address(spell.action()), address(addr));
 
         string memory root = string.concat(vm.projectRoot(), "/lib/dss-test");
         config = ScriptTools.readInput(root, "integration");
@@ -571,10 +571,7 @@ contract DssSpellTest is DssSpellTestBase {
         rootDomain = new RootDomain(config, getRelativeChain("mainnet"));
     }
 
-    function testL2OptimismSpell() private {
-        // Ensure the Pause Proxy has some ETH for L2 Spells
-        assertGt(pauseProxy.balance, 0);
-
+    function testL2OptimismSpell() public {
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("OPTIMISM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
@@ -610,10 +607,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(optimismGateway.validDomains(optDstDomain), 0, "l2-optimism-invalid-dst-domain");
     }
 
-    function testL2ArbitrumSpell() private {
-        // Ensure the Pause Proxy has some ETH for L2 Spells
-        assertGt(pauseProxy.balance, 0);
-
+    function testL2ArbitrumSpell() public {
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("ARBITRUM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
