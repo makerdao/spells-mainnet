@@ -20,6 +20,7 @@ import "../DssSpell.t.base.sol";
 
 contract ConfigStarknet {
     StarknetValues starknetValues;
+    bytes32 l2Spell;
 
     struct StarknetValues {
         address core_implementation;
@@ -32,6 +33,9 @@ contract ConfigStarknet {
 
     function setValues() public {
         uint256 WAD = 10 ** 18;
+
+        l2Spell = bytes32(0) /* <TODO> */;  // Set to zero if no spell is set.
+
         starknetValues = StarknetValues({
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
             dai_bridge_isOpen:         1,                     // 1 open, 0 closed
@@ -74,6 +78,8 @@ interface StarknetGovRelayLike {
 interface StarknetCoreLike {
     function implementation() external returns (address);
     function isNotFinalized() external returns (bool);
+    function l1ToL2Messages(bytes32) external returns (uint256);
+    function l1ToL2MessageNonce() external returns (uint256);
 }
 
 interface DaiLike {
@@ -83,6 +89,11 @@ interface DaiLike {
 contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
     function testStarknet() public {
+        if (l2Spell != 0) {
+            // Ensure the Pause Proxy has some ETH for Starknet Spell
+            assertGt(pauseProxy.balance, 0);
+        }
+
         setValues();
 
         _vote(address(spell));
@@ -94,6 +105,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         _checkStarknetDaiBridge();
         _checkStarknetGovRelay();
         _checkStarknetCore();
+        _checkStarknetMessage(l2Spell);
     }
 
     function _checkStarknetEscrowMom() internal {
@@ -115,6 +127,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         DaiLike dai = DaiLike(addr.addr("MCD_DAI"));
 
         assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), type(uint256).max, "StarknetTest/unexpected-escrow-allowance");
+        assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE_LEGACY")), 0, "StarknetTest/unexpected-legacy-escrow-allowance");
     }
 
     function _checkStarknetDaiBridge() internal {
@@ -153,5 +166,49 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         //assertEq(core.implementation(), starknetValues.core_implementation, "StarknetTest/core-implementation");
 
         assertTrue(core.isNotFinalized());
+    }
+
+    function _checkStarknetMessage(bytes32 _spell) internal {
+        StarknetCoreLike core = StarknetCoreLike(addr.addr("STARKNET_CORE"));
+
+        if (_spell != 0) {
+
+            // Nonce increments each message, back up one
+            uint256 _nonce = core.l1ToL2MessageNonce() - 1;
+
+            // Payload must be array
+            uint256[] memory _payload = new uint256[](1);
+            _payload[0] = uint256(_spell);
+
+            // Hardcoded in L1 gov relay, not public
+            uint256 RELAY_SELECTOR = 300224956480472355485152391090755024345070441743081995053718200325371913697;
+
+            // Hash of message created by Starknet Core
+            bytes32 _message = _getL1ToL2MsgHash(addr.addr("STARKNET_GOV_RELAY"), starknetValues.l2_gov_relay, RELAY_SELECTOR, _payload, _nonce);
+
+            // Assert message is scheduled, core returns 0 if not in message array
+            assertTrue(core.l1ToL2Messages(_message) > 0, "StarknetTest/SpellNotQueued");
+        }
+    }
+
+    // Modified version of internal getL1ToL2MsgHash in Starknet Core implementation
+    function _getL1ToL2MsgHash(
+                address sender,
+                uint256 toAddress,
+                uint256 selector,
+                uint256[] memory payload,
+                uint256 nonce
+            ) internal pure returns (bytes32) {
+        return
+            keccak256(
+                abi.encodePacked(
+                    uint256(uint160(sender)),
+                    toAddress,
+                    nonce,
+                    selector,
+                    payload.length,
+                    payload
+                )
+            );
     }
 }
