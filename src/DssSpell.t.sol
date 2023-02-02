@@ -563,7 +563,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function _setupRootDomain() internal {
-        vm.makePersistent(address(spell), address(spell.action()));
+        vm.makePersistent(address(spell), address(spell.action()), address(addr));
 
         string memory root = string.concat(vm.projectRoot(), "/lib/dss-test");
         config = ScriptTools.readInput(root, "integration");
@@ -571,10 +571,7 @@ contract DssSpellTest is DssSpellTestBase {
         rootDomain = new RootDomain(config, getRelativeChain("mainnet"));
     }
 
-    function testL2OptimismSpell() private {
-        // Ensure the Pause Proxy has some ETH for L2 Spells
-        assertGt(pauseProxy.balance, 0);
-
+    function testL2OptimismSpell() public {
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("OPTIMISM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
@@ -585,7 +582,7 @@ contract DssSpellTest is DssSpellTestBase {
         optimismDomain.selectFork();
 
         // Check that the L2 Optimism Spell is there and configured
-        L2Spell optimismSpell = L2Spell(address(0) /* <TODO> */);
+        L2Spell optimismSpell = L2Spell(0x9495632F53Cc16324d2FcFCdD4EB59fb88dDab12);
 
         L2Gateway optimismGateway = L2Gateway(optimismSpell.gateway());
         assertEq(address(optimismGateway), l2TeleportGateway, "l2-optimism-wrong-gateway");
@@ -610,21 +607,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(optimismGateway.validDomains(optDstDomain), 0, "l2-optimism-invalid-dst-domain");
     }
 
-    function testL2ArbitrumSpell() private {
-        // Ensure the Pause Proxy has some ETH for L2 Spells
-        assertGt(pauseProxy.balance, 0);
+    function testL2ArbitrumSpell() public {
+        // Ensure the Arbitrum Gov Relay has some ETH to pay for the Arbitrum spell
+        assertGt(chainLog.getAddress("ARBITRUM_GOV_RELAY").balance, 0);
 
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("ARBITRUM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
 
         _setupRootDomain();
-        
+
         arbitrumDomain = new ArbitrumDomain(config, getRelativeChain("arbitrum_one"), rootDomain);
         arbitrumDomain.selectFork();
 
         // Check that the L2 Arbitrum Spell is there and configured
-        L2Spell arbitrumSpell = L2Spell(address(0) /* <TODO> */);
+        L2Spell arbitrumSpell = L2Spell(0x852CCBB823D73b3e35f68AD6b14e29B02360FD3d);
 
         L2Gateway arbitrumGateway = L2Gateway(arbitrumSpell.gateway());
         assertEq(address(arbitrumGateway), l2TeleportGateway, "l2-arbitrum-wrong-gateway");
