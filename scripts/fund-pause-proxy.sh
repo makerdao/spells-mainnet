@@ -23,5 +23,5 @@ BOMBSHELL=$(forge create \
   jq -r '.deployedTo')
 
 echo "Bombshell located at: ${BOMBSHELL}"
-echo "    https://goerli.etherscan.io/address/${BOMBSHELL}"
+echo "    https://etherscan.io/address/${BOMBSHELL}"
 echo "Pause Proxy ETH balance (wei) after Bombshell: $(cast balance "${MCD_PAUSE_PROXY}")"
