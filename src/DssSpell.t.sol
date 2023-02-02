@@ -271,7 +271,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    // leave puclic for now as this is acting like a config tests
+    // leave public for now as this is acting like a config tests
     function testPSMs() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
