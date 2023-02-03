@@ -1340,7 +1340,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
-        assertGe(allowance, vestableAmt, _concat("TestError/insufficient-mkr-gov-transferrable-allowance", (vestableAmt-allowance)));
+        assertGe(allowance, vestableAmt, "TestError/insufficient-mkr-gov-transferrable-vest-allowance");
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
