@@ -79,7 +79,7 @@ contract DssSpellAction is DssAction {
 
     address constant internal OPTIMISM_L2_SPELL = 0x9495632F53Cc16324d2FcFCdD4EB59fb88dDab12;
     address constant internal ARBITRUM_L2_SPELL = 0x852CCBB823D73b3e35f68AD6b14e29B02360FD3d;
-    // uint256 constant internal STARKNET_L2_SPELL = ;
+    uint256 constant internal STARKNET_L2_SPELL = 0x4e7d83cd693f8b518f9638ce47d573fd2d642371ee266d6ed55e1276d5b43c3;
 
     // run ./scripts/get-opt-relay-cost.sh to help determine Optimism relay param
     uint32 public constant OPT_MAX_GAS = 100_000; // = 44582 gas (estimated L2 execution cost) + margin
@@ -90,14 +90,14 @@ contract DssSpellAction is DssAction {
     uint256 public constant ARB_MAX_SUBMISSION_COST = 1e15; // = ~0.7 * 10^15 (@ ~15 gwei L1 basefee) rounded up to 1*10^15
     uint256 public constant ARB_L1_CALL_VALUE = ARB_MAX_SUBMISSION_COST + ARB_MAX_GAS * ARB_GAS_PRICE_BID;
 
-    // see: https://github.com/makerdao/starknet-spells-goerli/tree/teleport-spell#estimate-l1-l2-fee
-    // uint256 public constant STA_GAS_USAGE_ESTIMATION = 28460;
+    // see: https://github.com/makerdao/starknet-spells-mainnet/blob/55401e8121f93d09f57f61c4e77dc0b6c73fb4f8/README.md#estimate-l1-l2-fee
+    uint256 public constant STA_GAS_USAGE_ESTIMATION = 28460;
 
     // 500gwei, ~upper bound of monthly avg gas price in `21-`22,
     // ~100x max monthly median gas price in `21-`22
     // https://explorer.bitquery.io/ethereum/gas?from=2021-01-01&till=2023-01-31
-    // uint256 public constant STA_GAS_PRICE = 500000000000;
-    // uint256 public constant STA_L1_CALL_VALUE = STA_GAS_USAGE_ESTIMATION * STA_GAS_PRICE;
+    uint256 public constant STA_GAS_PRICE = 500000000000;
+    uint256 public constant STA_L1_CALL_VALUE = STA_GAS_USAGE_ESTIMATION * STA_GAS_PRICE;
 
     function actions() public override {
         // ------------------ Pause Optimism Goerli L2DaiTeleportGateway -----------------
@@ -128,8 +128,8 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/community-notice-pecu-to-redeploy-teleport-l2-gateways/19550
         // L2 Spell to execute via STARKNET_GOV_RELAY:
         // src: https://github.com/makerdao/starknet-spells-mainnet/blob/55401e8121f93d09f57f61c4e77dc0b6c73fb4f8/src/spell.cairo
-        // contract: https://{TBD}
-        // StarknetGovRelayLike(STARKNET_GOV_RELAY).relay{value: STA_L1_CALL_VALUE}(STARKNET_L2_SPELL);
+        // contract: https://voyager.online/contract/0x4e7d83cd693f8b518f9638ce47d573fd2d642371ee266d6ed55e1276d5b43c3#code
+        StarknetGovRelayLike(STARKNET_GOV_RELAY).relay{value: STA_L1_CALL_VALUE}(STARKNET_L2_SPELL);
 
         // disallow legacy bridge on escrow
         // Forum: https://forum.makerdao.com/t/starknet-changes-for-executive-spell-on-the-week-of-2023-01-30/19607

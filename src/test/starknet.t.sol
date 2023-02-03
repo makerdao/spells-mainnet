@@ -34,7 +34,7 @@ contract ConfigStarknet {
     function setValues() public {
         uint256 WAD = 10 ** 18;
 
-        l2Spell = bytes32(0) /* <TODO> */;  // Set to zero if no spell is set.
+        l2Spell = 0x04e7d83cd693f8b518f9638ce47d573fd2d642371ee266d6ed55e1276d5b43c3;  // Set to zero if no spell is set.
 
         starknetValues = StarknetValues({
             core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
