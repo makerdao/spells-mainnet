@@ -45,9 +45,9 @@ interface StarknetEscrowLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/TODO.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://github.com/makerdao/community/blob/9e70dc89aae808906cfe700a2a3767c993e4ad3c/governance/votes/Executive%20vote%20-%20February%203%2C%202023.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-02-03 MakerDAO Executive Spell | Hash: 0x0";
+        "2023-02-03 MakerDAO Executive Spell | Hash: 0x2860a66fff3616b202396aca5d839a3b79d2d49cecfd49d742e3ec00aec8902e";
 
     // Turn office hours off
     function officeHours() public pure override returns (bool) {
