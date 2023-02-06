@@ -140,7 +140,7 @@ contract Config {
             aL_gap:       150 * MILLION,   // In whole Dai units
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
-            dust:         15 * THOUSAND,   // In whole Dai units
+            dust:         7_500,           // In whole Dai units
             pct:          150,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
@@ -170,7 +170,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         40 * THOUSAND,
+            dust:         25 * THOUSAND,
             pct:          300,
             mat:          13000,
             liqType:      "clip",
@@ -200,7 +200,7 @@ contract Config {
             aL_gap:       100 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         3_500,
             pct:          50,
             mat:          17000,
             liqType:      "clip",
@@ -320,7 +320,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         15 * THOUSAND,
+            dust:         7_500,
             pct:          200,
             mat:          14500,
             liqType:      "clip",
@@ -350,7 +350,7 @@ contract Config {
             aL_gap:       10 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         30 * THOUSAND,
+            dust:         25 * THOUSAND,
             pct:          350,
             mat:          13000,
             liqType:      "clip",
@@ -380,7 +380,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         7_500,
+            dust:         3_500,
             pct:          75,
             mat:          17500,
             liqType:      "clip",
@@ -1670,7 +1670,7 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         15 * THOUSAND,
+            dust:         7_500,
             pct:          150,
             mat:          16000,
             liqType:      "clip",
@@ -1700,7 +1700,7 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         5 * THOUSAND,
+            dust:         3_500,
             pct:          25,
             mat:          18500,
             liqType:      "clip",
