@@ -631,6 +631,10 @@ contract DssSpellTestBase is Config, DssTest {
                         assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY, _concat("TestError/calc-cut-range-", ilk));
                     }
                 }
+                {
+                    uint256 _chost = (values.collaterals[ilk].dust * RAD) * ((values.collaterals[ilk].chop * WAD / 10000) + WAD) / WAD;
+                    assertEq(clip.chost(), _chost, _concat("TestError/calc-chost-incorrect-", ilk)); // Ensure clip.upchost() is called when dust changes
+                }
             }
             if (reg.class(ilk) < 3) {
                 {
