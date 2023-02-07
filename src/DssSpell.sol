@@ -100,14 +100,15 @@ contract DssSpellAction is DssAction {
 
         // Chainlink Automation Keeper Network Stream Setup
         // https://vote.makerdao.com/polling/QmXeWcrX
-        // Note: unrestricted stream
-        VestLike(MCD_VEST_DAI).create(
-            CHAINLINK_AUTOMATION,                                    // usr
-            181_000 * WAD,                                           // tot
-            FEB_01_2023,                                             // bgn
-            AUG_01_2023 - FEB_01_2023,                               // tau
-            0,                                                       // eta
-            address(0)                                               // mgr
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                CHAINLINK_AUTOMATION,                                    // usr
+                181_000 * WAD,                                           // tot
+                FEB_01_2023,                                             // bgn
+                AUG_01_2023 - FEB_01_2023,                               // tau
+                0,                                                       // eta
+                address(0)                                               // mgr
+            )
         );
 
 

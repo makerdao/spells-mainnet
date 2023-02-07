@@ -352,17 +352,17 @@ contract DssSpellTest is DssSpellTestBase {
             _end:        AUG_01_2023,                                    // fin
             _days:       181 days,                                       // fin
             _manager:    address(0),                                     // mgr
-            _restricted: 0,                                              // res
+            _restricted: 1,                                              // res
             _reward:     181_000 * WAD,                                  // tot
             _claimed:    0                                               // rxd
         });
 
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        //GodMode.setWard(address(vest), address(this), 1);
+        GodMode.setWard(address(vest), address(this), 1);
         uint256 prevChainlinkBalance = dai.balanceOf(wallets.addr("CHAINLINK_AUTOMATION"));
 
-        //vest.unrestrict(16);
+        vest.unrestrict(16);
         vm.warp(FEB_01_2023 + 365 days);
         vest.vest(16);
         assertEq(dai.balanceOf(wallets.addr("CHAINLINK_AUTOMATION")), prevChainlinkBalance + 181_000 * WAD);
