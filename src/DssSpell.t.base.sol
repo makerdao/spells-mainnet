@@ -632,7 +632,8 @@ contract DssSpellTestBase is Config, DssTest {
                     }
                 }
                 {
-                    uint256 _chost = (values.collaterals[ilk].dust * RAD) * ((values.collaterals[ilk].chop * WAD / 10000) + WAD) / WAD;
+                    uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
+                    uint256 _chost = (values.collaterals[ilk].dust * RAD) * normalizedTestChop / WAD;
                     assertEq(clip.chost(), _chost, _concat("TestError/calc-chost-incorrect-", ilk)); // Ensure clip.upchost() is called when dust changes
                 }
             }
