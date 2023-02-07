@@ -59,7 +59,6 @@ contract Wallets {
         addr["GFXLABS"]                      = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
         addr["JUSTINCASE"]                   = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
         addr["MAKERMAN"]                     = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
-        addr["ULTRASCHUPPI"]                 = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
         addr["COLDIRON"]                     = 0x6634e3555DBF4B149c5AEC99D579A2469015AEca;
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["STABLENODE"]                   = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
