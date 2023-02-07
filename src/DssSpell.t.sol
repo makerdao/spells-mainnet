@@ -325,63 +325,47 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
-        uint256 FEB_01_2023 = 1675209600; // Wednesday, February  1, 2023 00:00:00
-        uint256 JAN_31_2024 = 1706745599; //  Thursday, January  31, 2024 23:59:59
+        // $ make time stamp=<STAMP>
+        uint256 FEB_01_2023 = 1675209600; // Wed 01 Feb 2023 12:00:00 AM UTC
+        uint256 AUG_01_2023 = 1690847999; // Mon 31 Jul 2023 11:59:59 PM UTC
 
-        assertEq(vest.ids(), 13);
+        assertEq(vest.ids(), 15);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 13 + 2);
+        assertEq(vest.ids(), 15 + 1);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
-        assertTrue(vest.valid(14)); // check for valid contract
+        assertTrue(vest.valid(16)); // check for valid contract
         _checkDaiVest({
-            _index:      14,                                             // id
-            _wallet:     wallets.addr("DUX_WALLET"),                     // usr
+            _index:      16,                                             // id
+            _wallet:     wallets.addr("CHAINLINK_AUTOMATION"),                     // usr
             _start:      FEB_01_2023,                                    // bgn
             _cliff:      FEB_01_2023,                                    // clf
-            _end:        JAN_31_2024,                                    // fin
-            _days:       365 days,                                       // fin
+            _end:        AUG_01_2023,                                    // fin
+            _days:       181 days,                                       // fin
             _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     1_611_420 * WAD,                                // tot
+            _restricted: 0,                                              // res
+            _reward:     181_000 * WAD,                                  // tot
             _claimed:    0                                               // rxd
         });
 
-        assertTrue(vest.valid(15)); // check for valid contract
-        _checkDaiVest({
-            _index:      15,                                             // id
-            _wallet:     wallets.addr("SES_WALLET"),                     // usr
-            _start:      FEB_01_2023,                                    // bgn
-            _cliff:      FEB_01_2023,                                    // clf
-            _end:        JAN_31_2024,                                    // fin
-            _days:       365 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     3_199_200 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
 
         // // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevDuxBalance = dai.balanceOf(wallets.addr("DUX_WALLET"));
-        uint256 prevSesBalance = dai.balanceOf(wallets.addr("SES_WALLET"));
+        //GodMode.setWard(address(vest), address(this), 1);
+        uint256 prevChainlinkBalance = dai.balanceOf(wallets.addr("CHAINLINK_AUTOMATION"));
 
-        vest.unrestrict(14);
-        vest.unrestrict(15);
+        //vest.unrestrict(16);
         vm.warp(FEB_01_2023 + 365 days);
-        vest.vest(14);
-        assertEq(dai.balanceOf(wallets.addr("DUX_WALLET")), prevDuxBalance + 1_611_420 * WAD);
-        vest.vest(15);
-        assertEq(dai.balanceOf(wallets.addr("SES_WALLET")), prevSesBalance + 3_199_200 * WAD);
+        vest.vest(16);
+        assertEq(dai.balanceOf(wallets.addr("CHAINLINK_AUTOMATION")), prevChainlinkBalance + 181_000 * WAD);
     }
 
     struct Payee {
@@ -395,21 +379,24 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[14] memory payees = [
-            Payee(wallets.addr("TECH_WALLET"),                138_894),
-            Payee(wallets.addr("COM_WALLET"),                 131_200),
-            Payee(0x50D2f29206a76aE8a9C2339922fcBCC4DfbdD7ea,   1_336),
-            Payee(0xeD27986bf84Fa8E343aA9Ff90307291dAeF234d3,   1_983),
-            Payee(0x3dfE26bEDA4282ECCEdCaF2a0f146712712e81EA,     715),
-            Payee(0x74520D1690348ba882Af348223A30D760BCbD72a,   1_376),
-            Payee(0x471C5806cadAFB297D9b95B914B65f626fDCD1a7,     583),
-            Payee(0x051cCee0CfBF1Fe9BD891117E85bEbDFa42aFaA9,   1_026),
-            Payee(0x1c138352C779af714b6cE328C9d962E5c82EBA07,     631),
-            Payee(0x55f2E8728cFCCf260040cfcc24E14A6047fF4d31,     255),
-            Payee(0xE004DAabEfe0322Ac1ab46A3CF382a2A0bA81Ab4,   1_758),
-            Payee(0xC2bE81CeB685eea53c77975b5F9c5f82641deBC8,   3_013),
-            Payee(0xdB7c1777b5d4502b3d1228c2449F1816EB507748,   2_683),
-            Payee(wallets.addr("SF01_WALLET"),                209_000)
+        Payee[17] memory payees = [
+            Payee(wallets.addr("COLDIRON"),            12_000),
+            Payee(wallets.addr("FLIPFLOPFLAP"),        12_000),
+            Payee(wallets.addr("GFXLABS"),             11_653),
+            Payee(wallets.addr("FLIPSIDE"),            11_407),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),  11_064),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),      10_807),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),      10_738),
+            Payee(wallets.addr("JUSTINCASE"),           9_588),
+            Payee(wallets.addr("STABLENODE"),           9_496),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),        3_797),
+            Payee(wallets.addr("FRONTIERRESEARCH"),     2_419),
+            Payee(wallets.addr("BLOCKCHAINCOLUMBIA"),   1_656),
+            Payee(wallets.addr("CHRISBLEC"),            1_001),
+            Payee(wallets.addr("CODEKNIGHT"),             939),
+            Payee(wallets.addr("ONESTONE"),               352),
+            Payee(wallets.addr("CONSENSYS"),               96),
+            Payee(wallets.addr("PVL"),                     35)
         ];
 
         uint256 prevBalance;
