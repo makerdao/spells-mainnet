@@ -55,4 +55,5 @@ else
     )
 fi
 
-echo "OPT_GAS = $OPT_GAS"
+echo "OPT_GAS = $OPT_GAS (Recommended to use at least 4x this value to be safe)."
+
