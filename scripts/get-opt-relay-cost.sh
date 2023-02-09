@@ -3,10 +3,11 @@ set -e
 trap 'kill $(jobs -p) 2>/dev/null' EXIT
 
 [[ "$(cast chain --rpc-url="$ETH_RPC_URL")" == "ethlive" ]] || { echo "Please set a Mainnet ETH_RPC_URL"; exit 1; }
+[[ "$1" =~ ^0x[[:xdigit:]]{40}$ ]] || { echo "Please specify the Optimism spell address (e.g. 0x9495632F53Cc16324d2FcFCdD4EB59fb88dDab12)"; exit 1; }
+L2_SPELL=$1
 
 OPTIMISM_MAINNET_RPC_URL='https://mainnet.optimism.io'
 
-L2_SPELL='0x9495632F53Cc16324d2FcFCdD4EB59fb88dDab12'
 CHANGELOG='0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F'
 
 PRE_BEDROCK_L1_MESSENGER_IMPL='0xd9166833FF12A5F900ccfBf2c8B62a90F1Ca1FD5'
@@ -22,18 +23,12 @@ L2_MESSENGER=$(cast call --rpc-url="$OPTIMISM_MAINNET_RPC_URL" "$L2_GOV_RELAY" "
 
 EXECUTE_CALLDATA=$(cast calldata 'execute()')
 
-PORT=8555
-LOCALHOST="http://127.0.0.1:$PORT"
-anvil -f "$OPTIMISM_MAINNET_RPC_URL" -p "$PORT" > /dev/null 2>&1 &
-sleep 20
-
-
 if [[ "$L1_MESSENGER_IMPL" == "$PRE_BEDROCK_L1_MESSENGER_IMPL" ]]; then
     echo "Gas estimation performed for pre-Bedrock contracts"
     L1_MESSENGER=$(cast call "$L1_GOV_RELAY" "messenger()(address)")
     L1_MESSENGER_OFFSET="0x$(echo "obase=16;ibase=16;$(echo "${L1_MESSENGER:2} + 1111000000000000000000000000000000001111" | tr a-f A-F)" | bc)"
     OPT_GAS=$(
-        cast estimate --rpc-url="$LOCALHOST" --from "$L1_MESSENGER_OFFSET" \
+        cast estimate --rpc-url="$OPTIMISM_MAINNET_RPC_URL" --from "$L1_MESSENGER_OFFSET" \
         "$L2_MESSENGER" \
         "relayMessage(address,address,bytes,uint256)" \
         "$L2_GOV_RELAY" \
@@ -42,6 +37,11 @@ if [[ "$L1_MESSENGER_IMPL" == "$PRE_BEDROCK_L1_MESSENGER_IMPL" ]]; then
         0
     )
 else
+    PORT=8555
+    LOCALHOST="http://127.0.0.1:$PORT"
+    anvil -f "$OPTIMISM_MAINNET_RPC_URL" -p "$PORT" > /dev/null 2>&1 &
+    sleep 20
+
     X_DOMAIN_MSG_SENDER_SLOT=204 # Note: this was slot "4" pre-Bedrock
     cast rpc --rpc-url="$LOCALHOST" anvil_setStorageAt "$L2_MESSENGER" \
         "$(printf 0x"%064X\n" "$X_DOMAIN_MSG_SENDER_SLOT")" \
