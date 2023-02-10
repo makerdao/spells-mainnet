@@ -295,7 +295,7 @@ contract DssSpellTestBase is Config, DssTest {
         _castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
-        if (spellValues.deployed_spell_block != 0) {
+        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
             // if we have a deployed spell in the config
             // we want to roll our fork to the block where it was deployed
             // this means the test suite will continue to accurately pass/fail

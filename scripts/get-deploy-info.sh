@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-[[ "$ETH_RPC_URL" ]] || { echo "Please set a ETH_RPC_URL"; exit 1; }
+[[ "$(cast chain --rpc-url="$ETH_RPC_URL")" == "ethlive" ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1; }
 
 [[ "$1" =~ 0x* ]] || { echo "Please specify the transaction to inspect (e.g. tx=0x<txhash>)"; exit 1; }
 
@@ -17,4 +17,5 @@ do
 done
 
 echo -e "Network: $(cast chain)"
-cast block "$(cast tx "${TXHASH}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}'
+echo "timestamp: $(cast block "$(cast tx "${TXHASH}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}')"
+echo "block: $(cast tx "${TXHASH}"|grep blockNumber|awk '{print $2}')"
