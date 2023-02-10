@@ -1,0 +1,13 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+fs_permissions = [
+    { access = "read", path = "./lib/dss-test/script/input/"},
+    { access = "read", path = "./out/ArbitrumDomain.sol/ArbSysOverride.json"}
+]
+
+[rpc_endpoints]
+mainnet = "${ETH_RPC_URL}"
+
+# See more config options https://github.com/gakonst/foundry/tree/master/config

@@ -21,7 +21,6 @@ contract Config {
     struct SpellValues {
         address deployed_spell;
         uint256 deployed_spell_created;
-        uint256 deployed_spell_block;
         address previous_spell;
         bool    office_hours_enabled;
         uint256 expiration_threshold;
@@ -97,9 +96,8 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x3c4c8DbA0569Ce1B0210aeC14F9604C63FF80383),         // populate with deployed spell if deployed
-            deployed_spell_created:         1675871759,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
-            deployed_spell_block:           16585091,           // populate with the block where the spell was deployed
+            deployed_spell:                 address(0x40cdba18bfBc525a6cf35251E7d90a9B5b66CE30),         // populate with deployed spell if deployed
+            deployed_spell_created:         1674776099,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
             previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
@@ -142,7 +140,7 @@ contract Config {
             aL_gap:       150 * MILLION,   // In whole Dai units
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
-            dust:         7_500,           // In whole Dai units
+            dust:         15 * THOUSAND,   // In whole Dai units
             pct:          150,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
@@ -172,7 +170,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         25 * THOUSAND,
+            dust:         40 * THOUSAND,
             pct:          300,
             mat:          13000,
             liqType:      "clip",
@@ -202,7 +200,7 @@ contract Config {
             aL_gap:       100 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         3_500,
+            dust:         5 * THOUSAND,
             pct:          50,
             mat:          17000,
             liqType:      "clip",
@@ -322,7 +320,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         7_500,
+            dust:         15 * THOUSAND,
             pct:          200,
             mat:          14500,
             liqType:      "clip",
@@ -352,7 +350,7 @@ contract Config {
             aL_gap:       10 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         25 * THOUSAND,
+            dust:         30 * THOUSAND,
             pct:          350,
             mat:          13000,
             liqType:      "clip",
@@ -382,7 +380,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         3_500,
+            dust:         7_500,
             pct:          75,
             mat:          17500,
             liqType:      "clip",
@@ -1672,7 +1670,7 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         7_500,
+            dust:         15 * THOUSAND,
             pct:          150,
             mat:          16000,
             liqType:      "clip",
@@ -1702,7 +1700,7 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         3_500,
+            dust:         5 * THOUSAND,
             pct:          25,
             mat:          18500,
             liqType:      "clip",

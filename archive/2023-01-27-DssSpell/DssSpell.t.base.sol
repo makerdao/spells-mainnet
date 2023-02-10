@@ -300,18 +300,6 @@ contract DssSpellTestBase is Config, DssTest {
         _castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
-        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
-            // if we have a deployed spell in the config
-            // we want to roll our fork to the block where it was deployed
-            // this means the test suite will continue to accurately pass/fail
-            // even if mainnet has already scheduled/cast the spell
-            vm.makePersistent(address(this));
-            vm.makePersistent(address(rates));
-            vm.makePersistent(address(addr));
-            vm.makePersistent(address(deployers));
-            vm.makePersistent(address(wallets));
-            vm.rollFork(spellValues.deployed_spell_block);
-        }
     }
 
     function _vote(address spell_) internal {
@@ -642,11 +630,6 @@ contract DssSpellTestBase is Config, DssTest {
                     if (exists) {
                         assertTrue(abi.decode(value, (uint256)) > 0 && abi.decode(value, (uint256)) < RAY, _concat("TestError/calc-cut-range-", ilk));
                     }
-                }
-                {
-                    uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                    uint256 _chost = (values.collaterals[ilk].dust * RAD) * normalizedTestChop / WAD;
-                    assertEq(clip.chost(), _chost, _concat("TestError/calc-chost-incorrect-", ilk)); // Ensure clip.upchost() is called when dust changes
                 }
             }
             if (reg.class(ilk) < 3) {

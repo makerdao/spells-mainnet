@@ -22,28 +22,23 @@ contract ConfigStarknet {
     StarknetValues starknetValues;
 
     struct StarknetValues {
-        bytes32 l2_spell;
         address core_implementation;
         uint256 dai_bridge_isOpen;
         uint256 dai_bridge_ceiling;
         uint256 dai_bridge_maxDeposit;
         uint256 l2_dai_bridge;
         uint256 l2_gov_relay;
-        uint256 relay_selector;
     }
 
     function setValues() public {
         uint256 WAD = 10 ** 18;
-
         starknetValues = StarknetValues({
-            l2_spell:                  0,  // Set to zero if no spell is set.
-            core_implementation:       0xE267213B0749Bb94c575F6170812c887330d9cE3,
+            core_implementation:       0x2B3B750f1f10c85c8A6D476Fc209A8DC7E4Ca3F8,
             dai_bridge_isOpen:         1,                     // 1 open, 0 closed
             dai_bridge_ceiling:        1_000_000 * WAD,       // wei
             dai_bridge_maxDeposit:     type(uint256).max,     // wei
             l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60,
-            l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db,
-            relay_selector:            300224956480472355485152391090755024345070441743081995053718200325371913697  // Hardcoded in L1 gov relay, not public
+            l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db
         });
     }
 }
@@ -79,8 +74,6 @@ interface StarknetGovRelayLike {
 interface StarknetCoreLike {
     function implementation() external returns (address);
     function isNotFinalized() external returns (bool);
-    function l1ToL2Messages(bytes32) external returns (uint256);
-    function l1ToL2MessageNonce() external returns (uint256);
 }
 
 interface DaiLike {
@@ -89,20 +82,8 @@ interface DaiLike {
 
 contract StarknetTests is DssSpellTestBase, ConfigStarknet {
 
-    event LogMessageToL2(
-            address indexed fromAddress,
-            uint256 indexed toAddress,
-            uint256 indexed selector,
-            uint256[] payload,
-            uint256 nonce,
-            uint256 fee
-        );
-
-    constructor() {
-        setValues();
-    }
-
     function testStarknet() public {
+        setValues();
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -113,26 +94,6 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         _checkStarknetDaiBridge();
         _checkStarknetGovRelay();
         _checkStarknetCore();
-    }
-
-    function testStarknetSpell() public {
-
-        if (starknetValues.l2_spell != bytes32(0)) {
-            // Ensure the Pause Proxy has some ETH for the Starknet Spell
-            assertGt(pauseProxy.balance, 0);
-            _vote(address(spell));
-            DssSpell(spell).schedule();
-
-            vm.warp(DssSpell(spell).nextCastTime());
-
-            vm.expectEmit(true, true, true, false, addr.addr("STARKNET_CORE"));
-            emit LogMessageToL2(addr.addr("STARKNET_GOV_RELAY"), starknetValues.l2_gov_relay, starknetValues.relay_selector, _payload(starknetValues.l2_spell), 0, 0);
-            DssSpell(spell).cast();
-
-            assertTrue(spell.done());
-
-            _checkStarknetMessage(starknetValues.l2_spell);
-        }
     }
 
     function _checkStarknetEscrowMom() internal {
@@ -154,7 +115,6 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         DaiLike dai = DaiLike(addr.addr("MCD_DAI"));
 
         assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE")), type(uint256).max, "StarknetTest/unexpected-escrow-allowance");
-        assertEq(dai.allowance(addr.addr("STARKNET_ESCROW"), addr.addr("STARKNET_DAI_BRIDGE_LEGACY")), 0, "StarknetTest/unexpected-legacy-escrow-allowance");
     }
 
     function _checkStarknetDaiBridge() internal {
@@ -187,56 +147,11 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
     function _checkStarknetCore() internal {
         StarknetCoreLike core = StarknetCoreLike(addr.addr("STARKNET_CORE"));
 
-        // Checks to see that starknet core implementation matches core
-        //   If the core implementation changes, inspect the new implementation for safety and update the config
-        //   Note: message checks may fail if the message structure changes in the new implementation
-        assertEq(core.implementation(), starknetValues.core_implementation, _concat("StarknetTest/new-core-implementation-", bytes32(uint256(uint160(core.implementation())))));
+        // Starknet Core is currently out of scope.
+        // It is updating frequently and the implementation is not ready to be
+        //    brought into our simulation tests yet.
+        //assertEq(core.implementation(), starknetValues.core_implementation, "StarknetTest/core-implementation");
 
         assertTrue(core.isNotFinalized());
-    }
-
-
-    function _checkStarknetMessage(bytes32 _spell) internal {
-        StarknetCoreLike core = StarknetCoreLike(addr.addr("STARKNET_CORE"));
-
-        if (_spell != 0) {
-
-            // Nonce increments each message, back up one
-            uint256 _nonce = core.l1ToL2MessageNonce() - 1;
-
-            // Hash of message created by Starknet Core
-            bytes32 _message = _getL1ToL2MsgHash(addr.addr("STARKNET_GOV_RELAY"), starknetValues.l2_gov_relay, starknetValues.relay_selector, _payload(_spell), _nonce);
-
-            // Assert message is scheduled, core returns 0 if not in message array
-            assertTrue(core.l1ToL2Messages(_message) > 0, "StarknetTest/SpellNotQueued");
-        }
-    }
-
-    function _payload(bytes32 _spell) internal pure returns (uint256[] memory) {
-        // Payload must be array
-        uint256[] memory payload_ = new uint256[](1);
-        payload_[0] = uint256(_spell);
-        return payload_;
-    }
-
-    // Modified version of internal getL1ToL2MsgHash in Starknet Core implementation
-    function _getL1ToL2MsgHash(
-                address sender,
-                uint256 toAddress,
-                uint256 selector,
-                uint256[] memory payload,
-                uint256 nonce
-            ) internal pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encodePacked(
-                    uint256(uint160(sender)),
-                    toAddress,
-                    nonce,
-                    selector,
-                    payload.length,
-                    payload
-                )
-            );
     }
 }

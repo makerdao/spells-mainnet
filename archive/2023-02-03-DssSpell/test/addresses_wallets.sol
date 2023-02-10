@@ -59,7 +59,7 @@ contract Wallets {
         addr["GFXLABS"]                      = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
         addr["JUSTINCASE"]                   = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
         addr["MAKERMAN"]                     = 0x9AC6A6B24bCd789Fa59A175c0514f33255e1e6D0;
-        addr["COLDIRON"]                     = 0x6634e3555DBF4B149c5AEC99D579A2469015AEca;
+        addr["ULTRASCHUPPI"]                 = 0xCCffDBc38B1463847509dCD95e0D9AAf54D1c167;
         addr["MONETSUPPLY"]                  = 0x4Bd73eeE3d0568Bb7C52DFCad7AD5d47Fff5E2CF;
         addr["STABLENODE"]                   = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
         addr["FLIPSIDE"]                     = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
@@ -80,7 +80,6 @@ contract Wallets {
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
         addr["KEEP3R_VEST_STREAMING"]        = 0x37b375e3D418fbECba6b283e704F840AB32f3b3C;
         addr["KEEP3R_VEST_STREAMING_LEGACY"] = 0xc6A048550C9553F8Ac20fbdeB06f114c27ECcabb;
-        addr["CHAINLINK_AUTOMATION"]         = 0x5E9dfc5fe95A0754084fB235D58752274314924b;
 
         // ETH Amsterdam Event SPF
         addr["ETH_AMSTERDAM"]                = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
