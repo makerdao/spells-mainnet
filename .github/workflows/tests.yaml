@@ -20,4 +20,4 @@ jobs:
       - name: Run tests
         run: make test-forge
         env:
-          ETH_RPC_URL_CS: ${{ secrets.ETH_RPC_URL_CS }}
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}

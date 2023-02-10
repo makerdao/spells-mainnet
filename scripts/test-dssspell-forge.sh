@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-[[ "$(cast chain --rpc-url="$ETH_RPC_URL_CS")" == "ethlive" ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1; }
+[[ "$(cast chain --rpc-url="$ETH_RPC_URL")" == "ethlive" ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1; }
 
 for ARGUMENT in "$@"
 do
@@ -22,11 +22,11 @@ export FOUNDRY_OPTIMIZER=false
 export FOUNDRY_OPTIMIZER_RUNS=200
 
 if [[ -z "$MATCH" && -z "$BLOCK" ]]; then
-    forge test --fork-url "$ETH_RPC_URL_CS"
+    forge test --fork-url "$ETH_RPC_URL"
 elif [[ -z "$BLOCK" ]]; then
-    forge test --fork-url "$ETH_RPC_URL_CS" --match "$MATCH" -vvv
+    forge test --fork-url "$ETH_RPC_URL" --match "$MATCH" -vvv
 elif [[ -z "$MATCH" ]]; then
-    forge test --fork-url "$ETH_RPC_URL_CS" --fork-block-number "$BLOCK"
+    forge test --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK"
 else
-    forge test --fork-url "$ETH_RPC_URL_CS" --match "$MATCH" --fork-block-number "$BLOCK" -vvv
+    forge test --fork-url "$ETH_RPC_URL" --match "$MATCH" --fork-block-number "$BLOCK" -vvv
 fi
