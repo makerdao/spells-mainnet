@@ -47,12 +47,53 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    // uint256 internal constant MILLION = 10 ** 6;
+    uint256 constant ZERO_FIVE_PCT_RATE         = 1000000000158153903837946257;
+    uint256 constant ONE_SEVENTY_FIVE_PCT_RATE  = 1000000000550121712943459312;
+    uint256 constant THREE_TWENTY_FIVE_PCT_RATE = 1000000001014175731521720677;
+
+    uint256 internal constant MILLION = 10 ** 6;
     // uint256 internal constant RAY     = 10 ** 27;
     // uint256 internal constant WAD     = 10 ** 18;
 
     function actions() public override {
 
+        // ---- New Aave v2 D3M ----
+        // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
+        // TODO
+
+        // ---- MOMC Parameter Changes ----
+        // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
+
+        // Stability Fee Changes
+
+        //Increase WSTETH-B Stability Fee to 0.5%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", ZERO_FIVE_PCT_RATE, true);
+
+        // Reduce RETH-A Stability Fee to 0.5%
+        DssExecLib.setIlkStabilityFee("RETH-A", ZERO_FIVE_PCT_RATE, true);
+
+        // Reduce WBTC-A Stability Fee to 1.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", ONE_SEVENTY_FIVE_PCT_RATE, true);
+
+        // Reduce WBTC-B Stability Fee to 3.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", THREE_TWENTY_FIVE_PCT_RATE, true);
+
+        // line changes
+
+        // Increase CRVV1ETHSTETH-A line to 100 million DAI
+        // TODO
+
+        // Increase RETH-A line to 10 million DAI
+        DssExecLib.setIlkAutoLineDebtCeiling("RETH-A", 10 * MILLION);
+
+        // Increase MATIC-A line to 15 million DAI
+        DssExecLib.setIlkAutoLineDebtCeiling("MATIC-A", 15 * MILLION);
+
+        // Increase DIRECT-COMPV2-DAI line to 30 million DAI
+        // TODO
+
+        // ---- SF-001 Contributor Vesting ----
+        // TODO
     }
 }
 
