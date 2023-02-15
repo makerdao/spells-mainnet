@@ -19,6 +19,10 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { MCD, DssInstance } from "dss-test/MCD.sol";
+import { D3MInit, D3MCommonConfig, D3MAaveConfig } from "./dependencies/dss-direct-deposit/D3MInit.sol";
+import { D3MInstance } from "./dependencies/dss-direct-deposit/D3MInstance.sol";
+
 interface VestLike {
     function restrict(uint256) external;
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
@@ -65,6 +69,10 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant RAY     = 10 ** 27;
     // uint256 internal constant WAD     = 10 ** 18;
 
+    address internal immutable AAVE_D3M_PLAN    = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
+    address internal immutable AAVE_D3M_POOL    = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
+    address internal immutable AAVE_D3M_ORACLE  = 0x634051fbA31829E245C616e79E289f89c8B851c2;
+
     GemLike  internal immutable MKR          = GemLike(DssExecLib.mkr());
     VestLike internal immutable MCD_VEST_MKR = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
@@ -72,7 +80,50 @@ contract DssSpellAction is DssAction {
 
         // ---- New Aave v2 D3M ----
         // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
-        // TODO
+
+        // dss-direct-deposit @ e10d92ed647bfc329c04caf306988bb73ed69640
+
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
+        D3MInstance memory d3m = D3MInstance({
+            plan:   AAVE_D3M_PLAN,
+            pool:   AAVE_D3M_POOL,
+            oracle: AAVE_D3M_ORACLE
+        });
+
+        D3MCommonConfig memory cfg = D3MCommonConfig({
+            hub: DssExecLib.getChangelogAddress("DIRECT_HUB"),
+            mom: DssExecLib.getChangelogAddress("DIRECT_MOM"),
+            ilk: "DIRECT-AAVEV2-DAI",
+            existingIlk: false,   // TODO: check if ok or not
+            maxLine: 5_000_000,
+            gap: 3_000_000,
+            ttl: 12 hours,
+            tau: 1 weeks
+        });
+
+        D3MAaveConfig memory aaveCfg = D3MAaveConfig({
+            king: DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
+            bar: 0, // TODO: fill up from here
+            adai: address(0),
+            stableDebt: address(0),
+            variableDebt: address(0),
+            tack: address(0),
+            adaiRevision: 0
+        });
+
+        D3MInit.initAave({
+            dss: dss,
+            d3m: d3m,
+            cfg: cfg,
+            aaveCfg: aaveCfg
+        });
+
+
+        // Set bar to 2%
+        // Set line to 5 million DAI (reduced per PE advice)
+        // Set gap to 5 million DAI
+        // Set ttl to 12 hours
 
         // ---- MOMC Parameter Changes ----
         // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
