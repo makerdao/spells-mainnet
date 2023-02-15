@@ -1758,7 +1758,7 @@ contract Config {
         */
         afterSpell.collaterals["DIRECT-COMPV2-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      20 * MILLION,
+            aL_line:      30 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
@@ -1848,7 +1848,7 @@ contract Config {
         });
         afterSpell.collaterals["CRVV1ETHSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      20 * MILLION,
+            aL_line:      100 * MILLION,
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,

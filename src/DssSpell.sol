@@ -24,6 +24,11 @@ interface VestLike {
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
 }
 
+interface GemLike {
+    function allowance(address, address) external view returns (uint256);
+    function approve(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -51,9 +56,17 @@ contract DssSpellAction is DssAction {
     uint256 constant ONE_SEVENTY_FIVE_PCT_RATE  = 1000000000550121712943459312;
     uint256 constant THREE_TWENTY_FIVE_PCT_RATE = 1000000001014175731521720677;
 
+    // Tuesday, 1 March 2022 00:00:00 UTC
+    uint256 constant public MAR_01_2022 = 1646092800;
+    // Saturday, 1 March 2025 00:00:00 UTC
+    uint256 constant public MAR_01_2025 = 1740787200;
+
     uint256 internal constant MILLION = 10 ** 6;
     // uint256 internal constant RAY     = 10 ** 27;
     // uint256 internal constant WAD     = 10 ** 18;
+
+    GemLike  internal immutable MKR          = GemLike(DssExecLib.mkr());
+    VestLike internal immutable MCD_VEST_MKR = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
     function actions() public override {
 
@@ -81,7 +94,7 @@ contract DssSpellAction is DssAction {
         // line changes
 
         // Increase CRVV1ETHSTETH-A line to 100 million DAI
-        // TODO
+        DssExecLib.setIlkAutoLineDebtCeiling("CRVV1ETHSTETH-A", 100 * MILLION);
 
         // Increase RETH-A line to 10 million DAI
         DssExecLib.setIlkAutoLineDebtCeiling("RETH-A", 10 * MILLION);
@@ -90,10 +103,36 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("MATIC-A", 15 * MILLION);
 
         // Increase DIRECT-COMPV2-DAI line to 30 million DAI
-        // TODO
+        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-COMPV2-DAI", 30 * MILLION);
 
         // ---- SF-001 Contributor Vesting ----
-        // TODO
+
+        // Increase allowance by new vesting delta
+        MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 435 ether);
+
+        // Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 240 MKR | 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD
+        MCD_VEST_MKR.restrict(
+            MCD_VEST_MKR.create(
+                0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD, // usr
+                240 ether,                                  // tot
+                MAR_01_2022,                                // bgn
+                MAR_01_2025 - MAR_01_2022,                  // tau
+                365 days,                                   // eta
+                address(0)                                  // mgr // TODO - need a manager?
+            )
+        );
+
+        // Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 195 MKR | 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9
+        MCD_VEST_MKR.restrict(
+            MCD_VEST_MKR.create(
+                0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9, // usr
+                195 ether,                                  // tot
+                MAR_01_2022,                                // bgn
+                MAR_01_2025 - MAR_01_2022,                  // tau
+                365 days,                                   // eta
+                address(0)                                  // mgr // TODO - need a manager?
+            )
+        );
     }
 }
 

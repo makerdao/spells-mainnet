@@ -472,9 +472,9 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
-    function testVestMKR() private { // make private to disable
+    function testVestMKR() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 28);
+        assertEq(vest.ids(), 29);
 
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
@@ -482,37 +482,55 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 675 ether);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 240 ether + 195 ether);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 29);
+        assertEq(vest.ids(), 31);
 
-        uint256 MAY_01_2021 = 1619827200;
-        uint256 AUG_01_2022 = 1659312000;
-        uint256 PE_CLIFF = AUG_01_2022 + 365 days;
-        uint256 PE_FIN = MAY_01_2021 + 365 days * 4;
+        uint256 MAR_01_2022 = 1646092800;
+        uint256 MAR_01_2025 = 1740787200;
 
-        address PE_IC_WALLET = 0xa91c40621D63599b00476eC3e528E06940B03B9D;
+        uint256 CLIFF = MAR_01_2022 + 365 days;
+        uint256 FIN   = MAR_01_2022 + (365 days) * 3 + 1 days ; // adding 1 day since 2024 is a leap year
 
-        assertEq(vest.usr(29), PE_IC_WALLET);
-        assertEq(vest.bgn(29), AUG_01_2022);
-        assertEq(vest.clf(29), PE_CLIFF);
-        assertEq(vest.fin(29), PE_FIN);
-        assertEq(vest.mgr(29), wallets.addr("PE_WALLET"));
-        assertEq(vest.res(29), 1);
-        assertEq(vest.tot(29), 675 ether);
-        assertEq(vest.rxd(29), 0);
+        address SF_IC_WALLET_0 = 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD;
+        address SF_IC_WALLET_1 = 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9;
 
-        uint256 prevBalance = gov.balanceOf(PE_IC_WALLET);
+        assertEq(vest.usr(30), SF_IC_WALLET_0);
+        assertEq(vest.bgn(30), MAR_01_2022);
+        assertEq(vest.clf(30), CLIFF);
+        assertEq(vest.fin(30), FIN);
+        assertEq(vest.fin(30), MAR_01_2025);
+        assertEq(vest.mgr(30), address(0));
+        assertEq(vest.res(30), 1);
+        assertEq(vest.tot(30), 240 ether);
+        assertEq(vest.rxd(30), 0);
+
+        assertEq(vest.usr(31), SF_IC_WALLET_1);
+        assertEq(vest.bgn(31), MAR_01_2022);
+        assertEq(vest.clf(31), CLIFF);
+        assertEq(vest.fin(31), FIN);
+        assertEq(vest.fin(31), MAR_01_2025);
+        assertEq(vest.mgr(31), address(0));
+        assertEq(vest.res(31), 1);
+        assertEq(vest.tot(31), 195 ether);
+        assertEq(vest.rxd(31), 0);
+
+        uint256 prevBalance0 = gov.balanceOf(SF_IC_WALLET_0);
+        uint256 prevBalance1 = gov.balanceOf(SF_IC_WALLET_1);
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(29);
+        vest.unrestrict(30);
+        vest.unrestrict(31);
 
-        vm.warp(PE_FIN);
-        vest.vest(29);
-        assertEq(gov.balanceOf(PE_IC_WALLET), prevBalance + 675 ether);
+        vm.warp(FIN);
 
+        vest.vest(30);
+        assertEq(gov.balanceOf(SF_IC_WALLET_0), prevBalance0 + 240 ether);
+
+        vest.vest(31);
+        assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
     function testMKRPayments() private { // make private to disable
