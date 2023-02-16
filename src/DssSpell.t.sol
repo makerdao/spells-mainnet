@@ -36,6 +36,31 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
+interface D3MHubLike {
+    function exec(bytes32) external;
+    function vow() external view returns (address);
+    function end() external view returns (address);
+    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
+}
+
+interface D3MMomLike {
+    function authority() external view returns (address);
+    function disable(address) external;
+}
+
+interface D3MAavePoolLike {
+    function king() external view returns (address);
+}
+
+interface D3MAavePlanLike {
+    function wards(address) external view returns (uint256);
+    function bar() external view returns (uint256);
+}
+
+interface D3MOracleLike {
+    function hub() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -230,21 +255,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewIlkRegistryValues() private { // make private to disable
+    function testNewIlkRegistryValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // GNO-A
-        assertEq(reg.pos("GNO-A"),    56);
-        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
-        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
-        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
-        assertEq(reg.class("GNO-A"),  1);
-        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
-        assertEq(reg.name("GNO-A"),   "Gnosis Token");
-        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
+        // DIRECT-AAVEV2-DAI
+        assertEq(reg.pos("DIRECT-AAVEV2-DAI"),    60);
+        assertEq(reg.join("DIRECT-AAVEV2-DAI"),   addr.addr("DIRECT_HUB"));
+        assertEq(reg.gem("DIRECT-AAVEV2-DAI"),    0x028171bCA77440897B824Ca71D1c56caC55b68A3);
+        assertEq(reg.dec("DIRECT-AAVEV2-DAI"),    18);
+        assertEq(reg.class("DIRECT-AAVEV2-DAI"),  4);
+        assertEq(reg.pip("DIRECT-AAVEV2-DAI"),    addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
+        assertEq(reg.name("DIRECT-AAVEV2-DAI"),   "Aave interest bearing DAI");
+        assertEq(reg.symbol("DIRECT-AAVEV2-DAI"), "aDAI");
     }
 
     function testOSMs() private { // make private to disable
@@ -650,6 +675,50 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Validate post-spell state
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
+    }
+
+    function testDirectAaveV2Integration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes32 ilk = "DIRECT-AAVEV2-DAI";
+        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MAavePoolLike pool = D3MAavePoolLike(addr.addr("DIRECT_AAVEV2_DAI_POOL"));
+        D3MAavePlanLike plan = D3MAavePlanLike(addr.addr("DIRECT_AAVEV2_DAI_PLAN"));
+        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
+        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+
+        // Do a bunch of sanity checks of the values that were set in the spell
+        (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
+        assertEq(_pool, address(pool));
+        assertEq(_plan, address(plan));
+        assertEq(tau, 7 days);
+        assertEq(hub.vow(), address(vow));
+        assertEq(hub.end(), address(end));
+        assertEq(mom.authority(), address(chief));
+        assertEq(pool.king(), pauseProxy);
+        assertEq(plan.wards(address(mom)), 1);
+        assertEq(plan.bar(), 2 * RAY / 100);
+        assertEq(oracle.hub(), address(hub));
+        (address pip,) = spotter.ilks(ilk);
+        assertEq(pip, address(oracle));
+        assertEq(vat.wards(address(hub)), 1);
+
+        // Current market conditions should max out the D3M @ 5m DAI
+        hub.exec(ilk);
+        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+        assertEq(ink, 5 * MILLION * WAD);
+        assertEq(art, 5 * MILLION * WAD);
+
+        // De-activate the D3M via mom
+        vm.prank(DSChiefAbstract(chief).hat());
+        mom.disable(address(plan));
+        assertEq(plan.bar(), 0);
+        hub.exec(ilk);
+        (ink, art) = vat.urns(ilk, address(pool));
+        assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
+        assertLt(art, WAD);
     }
 
 }

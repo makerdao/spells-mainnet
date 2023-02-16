@@ -127,8 +127,8 @@ contract Config {
         afterSpell.flipper_mom_authority = chief;                   // FlipperMom authority
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
-        afterSpell.ilk_count =             60;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.14.8";                // String expected in system
+        afterSpell.ilk_count =             61;                      // Num expected in system
+        afterSpell.chainlog_version =      "1.14.9";                // String expected in system
 
         //
         // Values for all collateral
@@ -1724,38 +1724,36 @@ contract Config {
             calc_cut:     9900,
             offboarding:  false
         });
-        /*
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      5 * MILLION,
+            aL_gap:       5 * MILLION,
+            aL_ttl:       12 hours,
             line:         0,
             dust:         0,
             pct:          0,
             mat:          10000,
-            liqType:      "clip",
+            liqType:      "",
             liqOn:        false,
-            chop:         1300,
+            chop:         0,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
             dog_hole:     0,
-            clip_buf:     10500,
-            clip_tail:    220 minutes,
-            clip_cusp:    9000,
-            clip_chip:    10,
-            clip_tip:     300,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  0,
-            cm_tolerance: 9500,
+            cm_tolerance: 0,
             calc_tau:     0,
-            calc_step:    120,
-            calc_cut:     9990,
+            calc_step:    0,
+            calc_cut:     0,
             offboarding:  false
         });
-        */
         afterSpell.collaterals["DIRECT-COMPV2-DAI"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      30 * MILLION,

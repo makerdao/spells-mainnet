@@ -19,9 +19,9 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import { MCD, DssInstance } from "dss-test/MCD.sol";
-import { D3MInit, D3MCommonConfig, D3MAaveConfig } from "./dependencies/dss-direct-deposit/D3MInit.sol";
-import { D3MInstance } from "./dependencies/dss-direct-deposit/D3MInstance.sol";
+import { MCD } from "dss-test/MCD.sol";
+import { D3MInit, D3MCommonConfig, D3MAaveConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
+import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
 
 interface VestLike {
     function restrict(uint256) external;
@@ -31,6 +31,13 @@ interface VestLike {
 interface GemLike {
     function allowance(address, address) external view returns (uint256);
     function approve(address, uint256) external returns (bool);
+}
+
+interface DssDirectDepositAaveDaiLike {
+    function stableDebt() external view returns (address);
+    function variableDebt() external view returns (address);
+    function interestStrategy() external view returns (address);
+    function tau() external view returns (uint256);
 }
 
 contract DssSpellAction is DssAction {
@@ -66,12 +73,14 @@ contract DssSpellAction is DssAction {
     uint256 constant public MAR_01_2025 = 1740787200;
 
     uint256 internal constant MILLION = 10 ** 6;
-    // uint256 internal constant RAY     = 10 ** 27;
-    // uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant RAY     = 10 ** 27;
+    uint256 internal constant RAD     = 10 ** 45;
 
-    address internal immutable AAVE_D3M_PLAN    = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
-    address internal immutable AAVE_D3M_POOL    = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
-    address internal immutable AAVE_D3M_ORACLE  = 0x634051fbA31829E245C616e79E289f89c8B851c2;
+    address internal immutable AAVE_D3M_PLAN     = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
+    address internal immutable AAVE_D3M_POOL     = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
+    address internal immutable AAVE_D3M_ORACLE   = 0x634051fbA31829E245C616e79E289f89c8B851c2;
+    address internal immutable OLD_AAVE_D3M_JOIN = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
 
     GemLike  internal immutable MKR          = GemLike(DssExecLib.mkr());
     VestLike internal immutable MCD_VEST_MKR = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
@@ -80,10 +89,7 @@ contract DssSpellAction is DssAction {
 
         // ---- New Aave v2 D3M ----
         // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
-
         // dss-direct-deposit @ e10d92ed647bfc329c04caf306988bb73ed69640
-
-        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         D3MInstance memory d3m = D3MInstance({
             plan:   AAVE_D3M_PLAN,
@@ -92,38 +98,33 @@ contract DssSpellAction is DssAction {
         });
 
         D3MCommonConfig memory cfg = D3MCommonConfig({
-            hub: DssExecLib.getChangelogAddress("DIRECT_HUB"),
-            mom: DssExecLib.getChangelogAddress("DIRECT_MOM"),
-            ilk: "DIRECT-AAVEV2-DAI",
-            existingIlk: false,   // TODO: check if ok or not
-            maxLine: 5_000_000,
-            gap: 3_000_000,
-            ttl: 12 hours,
-            tau: 1 weeks
+            hub:         DssExecLib.getChangelogAddress("DIRECT_HUB"),
+            mom:         DssExecLib.getChangelogAddress("DIRECT_MOM"),
+            ilk:         "DIRECT-AAVEV2-DAI",
+            existingIlk: true,              // No need to re-init in vat and jug
+            maxLine:     5 * MILLION * RAD, // Set line to 5 million DAI
+            gap:         5 * MILLION * RAD, // Set gap to 5 million DAI
+            ttl:         12 hours,          // Set ttl to 12 hours
+            tau:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).tau()
         });
 
         D3MAaveConfig memory aaveCfg = D3MAaveConfig({
-            king: DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
-            bar: 0, // TODO: fill up from here
-            adai: address(0),
-            stableDebt: address(0),
-            variableDebt: address(0),
-            tack: address(0),
-            adaiRevision: 0
+            king:         DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
+            bar:          2 * RAY / 100, // Set bar to 2%
+            adai:         DssExecLib.getChangelogAddress("ADAI"),
+            stableDebt:   DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).stableDebt(),       // 0x778A13D3eeb110A4f7bb6529F99c000119a08E92, // TODO: verify same as before and define above
+            variableDebt: DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).variableDebt(),     // 0x6C3c78838c761c6Ac7bE9F59fe808ea2A6E4379d, // TODO: verify same as before and define above
+            tack:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).interestStrategy(), // 0xfffE32106A68aA3eD39CcCE673B646423EEaB62a, // TODO: verify same as before and define above
+            adaiRevision: 2
         });
 
         D3MInit.initAave({
-            dss: dss,
-            d3m: d3m,
-            cfg: cfg,
+            dss:     MCD.loadFromChainlog(DssExecLib.LOG),
+            d3m:     d3m,
+            cfg:     cfg,
             aaveCfg: aaveCfg
         });
 
-
-        // Set bar to 2%
-        // Set line to 5 million DAI (reduced per PE advice)
-        // Set gap to 5 million DAI
-        // Set ttl to 12 hours
 
         // ---- MOMC Parameter Changes ----
         // https://vote.makerdao.com/polling/QmUMyywc#poll-detail
@@ -169,7 +170,7 @@ contract DssSpellAction is DssAction {
                 MAR_01_2022,                                // bgn
                 MAR_01_2025 - MAR_01_2022,                  // tau
                 365 days,                                   // eta
-                address(0)                                  // mgr // TODO - need a manager?
+                address(0)                                  // mgr
             )
         );
 
@@ -181,9 +182,12 @@ contract DssSpellAction is DssAction {
                 MAR_01_2022,                                // bgn
                 MAR_01_2025 - MAR_01_2022,                  // tau
                 365 days,                                   // eta
-                address(0)                                  // mgr // TODO - need a manager?
+                address(0)                                  // mgr
             )
         );
+
+        // Bump changelog
+        DssExecLib.setChangelogVersion("1.14.9");
     }
 }
 
