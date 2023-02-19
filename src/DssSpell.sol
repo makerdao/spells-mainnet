@@ -112,9 +112,9 @@ contract DssSpellAction is DssAction {
             king:         DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
             bar:          2 * RAY / 100, // Set bar to 2%
             adai:         DssExecLib.getChangelogAddress("ADAI"),
-            stableDebt:   DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).stableDebt(),       // 0x778A13D3eeb110A4f7bb6529F99c000119a08E92, // TODO: verify same as before and define above
-            variableDebt: DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).variableDebt(),     // 0x6C3c78838c761c6Ac7bE9F59fe808ea2A6E4379d, // TODO: verify same as before and define above
-            tack:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).interestStrategy(), // 0xfffE32106A68aA3eD39CcCE673B646423EEaB62a, // TODO: verify same as before and define above
+            stableDebt:   DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).stableDebt(),
+            variableDebt: DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).variableDebt(),
+            tack:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).interestStrategy(),
             adaiRevision: 2
         });
 
@@ -162,7 +162,7 @@ contract DssSpellAction is DssAction {
         // Increase allowance by new vesting delta
         MKR.approve(address(MCD_VEST_MKR), MKR.allowance(address(this), address(MCD_VEST_MKR)) + 435 ether);
 
-        // Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 240 MKR | 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD
+        // Restrict: yes | Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 240 MKR | 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD
         MCD_VEST_MKR.restrict(
             MCD_VEST_MKR.create(
                 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD, // usr
@@ -174,7 +174,7 @@ contract DssSpellAction is DssAction {
             )
         );
 
-        // Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 195 MKR | 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9
+        // Restrict: yes | Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 195 MKR | 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9
         MCD_VEST_MKR.restrict(
             MCD_VEST_MKR.create(
                 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9, // usr
