@@ -77,10 +77,10 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RAY     = 10 ** 27;
     uint256 internal constant RAD     = 10 ** 45;
 
-    address internal immutable AAVE_D3M_PLAN     = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
-    address internal immutable AAVE_D3M_POOL     = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
-    address internal immutable AAVE_D3M_ORACLE   = 0x634051fbA31829E245C616e79E289f89c8B851c2;
-    address internal immutable OLD_AAVE_D3M_JOIN = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
+    address internal constant AAVE_D3M_PLAN     = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
+    address internal constant AAVE_D3M_POOL     = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
+    address internal constant AAVE_D3M_ORACLE   = 0x634051fbA31829E245C616e79E289f89c8B851c2;
+    address internal constant OLD_AAVE_D3M_JOIN = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
 
     GemLike  internal immutable MKR          = GemLike(DssExecLib.mkr());
     VestLike internal immutable MCD_VEST_MKR = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
