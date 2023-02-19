@@ -33,13 +33,6 @@ interface GemLike {
     function approve(address, uint256) external returns (bool);
 }
 
-interface DssDirectDepositAaveDaiLike {
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-    function interestStrategy() external view returns (address);
-    function tau() external view returns (uint256);
-}
-
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -80,7 +73,10 @@ contract DssSpellAction is DssAction {
     address internal constant AAVE_D3M_PLAN     = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
     address internal constant AAVE_D3M_POOL     = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
     address internal constant AAVE_D3M_ORACLE   = 0x634051fbA31829E245C616e79E289f89c8B851c2;
-    address internal constant OLD_AAVE_D3M_JOIN = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
+
+    address internal constant AAVE_DAI_STABLE_DEBT       = 0x778A13D3eeb110A4f7bb6529F99c000119a08E92;
+    address internal constant AAVE_DAI_VARIABLE_DEBT     = 0x6C3c78838c761c6Ac7bE9F59fe808ea2A6E4379d;
+    address internal constant AAVE_DAI_INTEREST_STRATEGY = 0xfffE32106A68aA3eD39CcCE673B646423EEaB62a;
 
     address internal constant SF_IC_WALLET_0    = 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD;
     address internal constant SF_IC_WALLET_1    = 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9;
@@ -108,16 +104,16 @@ contract DssSpellAction is DssAction {
             maxLine:     5 * MILLION * RAD, // Set line to 5 million DAI
             gap:         5 * MILLION * RAD, // Set gap to 5 million DAI
             ttl:         12 hours,          // Set ttl to 12 hours
-            tau:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).tau()
+            tau:         7 days             // Set tau to 7 days
         });
 
         D3MAaveConfig memory aaveCfg = D3MAaveConfig({
             king:         DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
             bar:          2 * RAY / 100, // Set bar to 2%
             adai:         DssExecLib.getChangelogAddress("ADAI"),
-            stableDebt:   DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).stableDebt(),
-            variableDebt: DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).variableDebt(),
-            tack:         DssDirectDepositAaveDaiLike(OLD_AAVE_D3M_JOIN).interestStrategy(),
+            stableDebt:   AAVE_DAI_STABLE_DEBT,
+            variableDebt: AAVE_DAI_VARIABLE_DEBT,
+            tack:         AAVE_DAI_INTEREST_STRATEGY,
             adaiRevision: 2
         });
 

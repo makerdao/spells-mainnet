@@ -50,15 +50,27 @@ interface D3MMomLike {
 
 interface D3MAavePoolLike {
     function king() external view returns (address);
+    function stableDebt() external view returns (address);
+    function variableDebt() external view returns (address);
 }
 
 interface D3MAavePlanLike {
     function wards(address) external view returns (uint256);
     function bar() external view returns (uint256);
+    function stableDebt() external view returns (address);
+    function variableDebt() external view returns (address);
+    function tack() external view returns (address);
 }
 
 interface D3MOracleLike {
     function hub() external view returns (address);
+}
+
+interface DssDirectDepositAaveDaiLike {
+    function stableDebt() external view returns (address);
+    function variableDebt() external view returns (address);
+    function interestStrategy() external view returns (address);
+    function tau() external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -688,6 +700,7 @@ contract DssSpellTest is DssSpellTestBase {
         D3MAavePlanLike plan = D3MAavePlanLike(addr.addr("DIRECT_AAVEV2_DAI_PLAN"));
         D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
         D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        DssDirectDepositAaveDaiLike oldD3m = DssDirectDepositAaveDaiLike(0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a);
 
         // Do a bunch of sanity checks of the values that were set in the spell
         (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
@@ -704,6 +717,14 @@ contract DssSpellTest is DssSpellTestBase {
         (address pip,) = spotter.ilks(ilk);
         assertEq(pip, address(oracle));
         assertEq(vat.wards(address(hub)), 1);
+
+        // Make sure the spell hard coded values which should match the old D3M indeed do so
+        assertEq(pool.stableDebt(),   oldD3m.stableDebt());
+        assertEq(pool.variableDebt(), oldD3m.variableDebt());
+        assertEq(plan.stableDebt(),   oldD3m.stableDebt());
+        assertEq(plan.variableDebt(), oldD3m.variableDebt());
+        assertEq(plan.tack(),         oldD3m.interestStrategy());
+        assertEq(tau,                 oldD3m.tau());
 
         // Current market conditions should max out the D3M @ 5m DAI
         hub.exec(ilk);
