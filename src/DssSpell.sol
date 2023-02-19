@@ -82,6 +82,9 @@ contract DssSpellAction is DssAction {
     address internal constant AAVE_D3M_ORACLE   = 0x634051fbA31829E245C616e79E289f89c8B851c2;
     address internal constant OLD_AAVE_D3M_JOIN = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
 
+    address internal constant SF_IC_WALLET_0    = 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD;
+    address internal constant SF_IC_WALLET_1    = 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9;
+
     GemLike  internal immutable MKR          = GemLike(DssExecLib.mkr());
     VestLike internal immutable MCD_VEST_MKR = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
@@ -165,7 +168,7 @@ contract DssSpellAction is DssAction {
         // Restrict: yes | Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 240 MKR | 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD
         MCD_VEST_MKR.restrict(
             MCD_VEST_MKR.create(
-                0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD, // usr
+                SF_IC_WALLET_0,                             // usr
                 240 ether,                                  // tot
                 MAR_01_2022,                                // bgn
                 MAR_01_2025 - MAR_01_2022,                  // tau
@@ -177,7 +180,7 @@ contract DssSpellAction is DssAction {
         // Restrict: yes | Cliff: 2023-03-01 | 2022-03-01 to 2025-03-01 | 195 MKR | 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9
         MCD_VEST_MKR.restrict(
             MCD_VEST_MKR.create(
-                0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9, // usr
+                SF_IC_WALLET_1,                             // usr
                 195 ether,                                  // tot
                 MAR_01_2022,                                // bgn
                 MAR_01_2025 - MAR_01_2022,                  // tau

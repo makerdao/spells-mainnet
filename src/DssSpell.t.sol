@@ -264,7 +264,7 @@ contract DssSpellTest is DssSpellTestBase {
         // DIRECT-AAVEV2-DAI
         assertEq(reg.pos("DIRECT-AAVEV2-DAI"),    60);
         assertEq(reg.join("DIRECT-AAVEV2-DAI"),   addr.addr("DIRECT_HUB"));
-        assertEq(reg.gem("DIRECT-AAVEV2-DAI"),    0x028171bCA77440897B824Ca71D1c56caC55b68A3);
+        assertEq(reg.gem("DIRECT-AAVEV2-DAI"),    addr.addr("ADAI"));
         assertEq(reg.dec("DIRECT-AAVEV2-DAI"),    18);
         assertEq(reg.class("DIRECT-AAVEV2-DAI"),  4);
         assertEq(reg.pip("DIRECT-AAVEV2-DAI"),    addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
