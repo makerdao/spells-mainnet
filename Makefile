@@ -7,7 +7,7 @@ test               :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$
 test-forge         :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 estimate           :; ./scripts/estimate-deploy-gas.sh
 deploy             :; ./scripts/deploy.sh
-deploy-stamp       :; ./scripts/get-created-timestamp.sh tx=$(tx)
+deploy-info        :; ./scripts/get-deploy-info.sh tx=$(tx)
 verify             :; ./scripts/verify.py DssSpell $(addr)
 flatten            :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
 archive-spell      :; ./scripts/archive-dssspell.sh "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
