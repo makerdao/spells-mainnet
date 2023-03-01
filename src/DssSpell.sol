@@ -53,7 +53,6 @@ contract DssSpellAction is DssAction {
     address immutable MCD_SPOT = DssExecLib.spotter();
 
     function actions() public override {
-
         // https://forum.makerdao.com/t/usdc-a-usdp-a-gusd-a-proposed-offboarding-parameters/19474
         Fileable(MCD_SPOT).file("USDC-A",   "mat", 15 * RAY); // 1500% collateralization ratio
         Fileable(MCD_SPOT).file("PAXUSD-A", "mat", 15 * RAY);
@@ -61,7 +60,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("USDC-A");
         DssExecLib.updateCollateralPrice("PAXUSD-A");
         DssExecLib.updateCollateralPrice("GUSD-A");
-
     }
 }
 
