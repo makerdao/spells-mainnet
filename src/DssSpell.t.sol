@@ -48,31 +48,6 @@ interface D3MMomLike {
     function disable(address) external;
 }
 
-interface D3MAavePoolLike {
-    function king() external view returns (address);
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-}
-
-interface D3MAavePlanLike {
-    function wards(address) external view returns (uint256);
-    function bar() external view returns (uint256);
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-    function tack() external view returns (address);
-}
-
-interface D3MOracleLike {
-    function hub() external view returns (address);
-}
-
-interface DssDirectDepositAaveDaiLike {
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-    function interestStrategy() external view returns (address);
-    function tau() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -689,57 +664,107 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
-    function testDirectAaveV2Integration() public {
+    function testOffboardings() public {
+        uint256 Art;
+        (Art,,,,) = vat.ilks("USDC-A");
+        assertGt(Art, 0);
+        (Art,,,,) = vat.ilks("PAXUSD-A");
+        assertGt(Art, 0);
+        (Art,,,,) = vat.ilks("GUSD-A");
+        assertGt(Art, 0);
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        bytes32 ilk = "DIRECT-AAVEV2-DAI";
-        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        D3MAavePoolLike pool = D3MAavePoolLike(addr.addr("DIRECT_AAVEV2_DAI_POOL"));
-        D3MAavePlanLike plan = D3MAavePlanLike(addr.addr("DIRECT_AAVEV2_DAI_PLAN"));
-        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
-        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
-        DssDirectDepositAaveDaiLike oldD3m = DssDirectDepositAaveDaiLike(0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a);
+        DssCdpManagerAbstract cdpManager = DssCdpManagerAbstract(addr.addr("CDP_MANAGER"));
 
-        // Do a bunch of sanity checks of the values that were set in the spell
-        (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        assertEq(_pool, address(pool));
-        assertEq(_plan, address(plan));
-        assertEq(tau, 7 days);
-        assertEq(hub.vow(), address(vow));
-        assertEq(hub.end(), address(end));
-        assertEq(mom.authority(), address(chief));
-        assertEq(pool.king(), pauseProxy);
-        assertEq(plan.wards(address(mom)), 1);
-        assertEq(plan.bar(), 2 * RAY / 100);
-        assertEq(oracle.hub(), address(hub));
-        (address pip,) = spotter.ilks(ilk);
-        assertEq(pip, address(oracle));
-        assertEq(vat.wards(address(hub)), 1);
+        dog.bark("USDC-A", cdpManager.urns(14981), address(0));
+        dog.bark("USDC-A", 0x936d9045E7407aBE8acdBaF34EAe4023B44cEfE2, address(0));
+        dog.bark("USDC-A", cdpManager.urns(10791), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9529), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7062), address(0));
+        dog.bark("USDC-A", cdpManager.urns(13008), address(0));
+        dog.bark("USDC-A", cdpManager.urns(18152), address(0));
+        dog.bark("USDC-A", cdpManager.urns(15504), address(0));
+        dog.bark("USDC-A", cdpManager.urns(17116), address(0));
+        dog.bark("USDC-A", cdpManager.urns(20087), address(0));
+        dog.bark("USDC-A", cdpManager.urns(21551), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12964), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7361), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12588), address(0));
+        dog.bark("USDC-A", cdpManager.urns(13641), address(0));
+        dog.bark("USDC-A", cdpManager.urns(18786), address(0));
+        dog.bark("USDC-A", cdpManager.urns(14676), address(0));
+        dog.bark("USDC-A", cdpManager.urns(20189), address(0));
+        dog.bark("USDC-A", cdpManager.urns(15149), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7976), address(0));
+        dog.bark("USDC-A", cdpManager.urns(16639), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8724), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7170), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7337), address(0));
+        dog.bark("USDC-A", cdpManager.urns(14142), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12753), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9579), address(0));
+        dog.bark("USDC-A", cdpManager.urns(14628), address(0));
+        dog.bark("USDC-A", cdpManager.urns(15288), address(0));
+        dog.bark("USDC-A", cdpManager.urns(16139), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12287), address(0));
+        dog.bark("USDC-A", cdpManager.urns(11908), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8829), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7925), address(0));
+        dog.bark("USDC-A", cdpManager.urns(10430), address(0));
+        dog.bark("USDC-A", cdpManager.urns(11122), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12663), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9027), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8006), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12693), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7079), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12220), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8636), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8643), address(0));
+        dog.bark("USDC-A", cdpManager.urns(6992), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7083), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7102), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7124), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7328), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8053), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12246), address(0));
+        dog.bark("USDC-A", cdpManager.urns(7829), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8486), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8677), address(0));
+        dog.bark("USDC-A", cdpManager.urns(8700), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9139), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9240), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9250), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9144), address(0));
+        dog.bark("USDC-A", cdpManager.urns(9568), address(0));
+        dog.bark("USDC-A", cdpManager.urns(10773), address(0));
+        dog.bark("USDC-A", cdpManager.urns(11404), address(0));
+        dog.bark("USDC-A", cdpManager.urns(11609), address(0));
+        dog.bark("USDC-A", cdpManager.urns(11856), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12355), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12778), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12632), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12747), address(0));
+        dog.bark("USDC-A", cdpManager.urns(12679), address(0));
 
-        // Make sure the spell hard coded values which should match the old D3M indeed do so
-        assertEq(pool.stableDebt(),   oldD3m.stableDebt());
-        assertEq(pool.variableDebt(), oldD3m.variableDebt());
-        assertEq(plan.stableDebt(),   oldD3m.stableDebt());
-        assertEq(plan.variableDebt(), oldD3m.variableDebt());
-        assertEq(plan.tack(),         oldD3m.interestStrategy());
-        assertEq(tau,                 oldD3m.tau());
+        dog.bark("PAXUSD-A", cdpManager.urns(14896), address(0));
 
-        // Current market conditions should max out the D3M @ 5m DAI
-        hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        assertEq(ink, 5 * MILLION * WAD);
-        assertEq(art, 5 * MILLION * WAD);
+        vm.store(
+            address(dog),
+            bytes32(uint256(keccak256(abi.encode(bytes32("GUSD-A"), uint256(1)))) + 2),
+            bytes32(type(uint256).max)
+        ); // Remove GUSD-A hole limit to reach the objective of the testing 0 debt after all barks
+        dog.bark("GUSD-A", cdpManager.urns(24382), address(0));
+        dog.bark("GUSD-A", cdpManager.urns(23939), address(0));
+        dog.bark("GUSD-A", cdpManager.urns(25398), address(0));
 
-        // De-activate the D3M via mom
-        vm.prank(DSChiefAbstract(chief).hat());
-        mom.disable(address(plan));
-        assertEq(plan.bar(), 0);
-        hub.exec(ilk);
-        (ink, art) = vat.urns(ilk, address(pool));
-        assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        assertLt(art, WAD);
+        (Art,,,,) = vat.ilks("USDC-A");
+        assertEq(Art, 0, "USDC-A Art is not 0");
+        (Art,,,,) = vat.ilks("PAXUSD-A");
+        assertEq(Art, 0, "PAXUSD-A Art is not 0");
+        (Art,,,,) = vat.ilks("GUSD-A");
+        assertEq(Art, 0, "GUSD-A Art is not 0");
     }
-
 }
