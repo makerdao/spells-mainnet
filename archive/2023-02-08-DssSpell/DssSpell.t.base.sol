@@ -178,7 +178,6 @@ contract DssSpellTestBase is Config, DssTest {
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
-    VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
@@ -301,19 +300,6 @@ contract DssSpellTestBase is Config, DssTest {
         _castPreviousSpell();
         spell = spellValues.deployed_spell != address(0) ?
             DssSpell(spellValues.deployed_spell) : new DssSpell();
-
-        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
-            // if we have a deployed spell in the config
-            // we want to roll our fork to the block where it was deployed
-            // this means the test suite will continue to accurately pass/fail
-            // even if mainnet has already scheduled/cast the spell
-            vm.makePersistent(address(this));
-            vm.makePersistent(address(rates));
-            vm.makePersistent(address(addr));
-            vm.makePersistent(address(deployers));
-            vm.makePersistent(address(wallets));
-            vm.rollFork(spellValues.deployed_spell_block);
-        }
     }
 
     function _vote(address spell_) internal {
@@ -1347,20 +1333,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(vestDai.rxd(_index), _claimed,           "rxd");
     }
 
-    function _checkTransferrableVestMkrAllowance() internal {
-        uint256 vestableAmt;
-
-        for(uint256 i = 1; i <= vestMkr.ids(); i++) {
-            if (vestMkr.valid(i)) {
-                (,,,,,,uint128 tot, uint128 rxd) = vestMkr.awards(i);
-                vestableAmt = vestableAmt + (tot - rxd);
-            }
-        }
-
-        uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
-        assertGe(allowance, vestableAmt, "TestError/insufficient-mkr-gov-transferrable-vest-allowance");
-    }
-
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
         (, mat) = spotter.ilks(_ilk);
     }
@@ -1559,8 +1531,6 @@ contract DssSpellTestBase is Config, DssTest {
         _checkSystemValues(afterSpell);
 
         _checkCollateralValues(afterSpell);
-
-        _checkTransferrableVestMkrAllowance();
     }
 
     function _testFailWrongDay() internal {

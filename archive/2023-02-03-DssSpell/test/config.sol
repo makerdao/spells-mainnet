@@ -21,7 +21,6 @@ contract Config {
     struct SpellValues {
         address deployed_spell;
         uint256 deployed_spell_created;
-        uint256 deployed_spell_block;
         address previous_spell;
         bool    office_hours_enabled;
         uint256 expiration_threshold;
@@ -97,11 +96,10 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x44F703D198D8De5504075170BCeecd3FB4DD0F1B),         // populate with deployed spell if deployed
-            deployed_spell_created:         1677058943,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
-            deployed_spell_block:           16683169,           // populate with the block where the spell was deployed
+            deployed_spell:                 address(0x2aC9F1c14Eec4B7955978f1E808B28dE337f8D20),         // populate with deployed spell if deployed
+            deployed_spell_created:         1675445519,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
             previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
@@ -129,8 +127,8 @@ contract Config {
         afterSpell.flipper_mom_authority = chief;                   // FlipperMom authority
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
-        afterSpell.ilk_count =             61;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.14.9";                // String expected in system
+        afterSpell.ilk_count =             60;                      // Num expected in system
+        afterSpell.chainlog_version =      "1.14.8";                // String expected in system
 
         //
         // Values for all collateral
@@ -142,7 +140,7 @@ contract Config {
             aL_gap:       150 * MILLION,   // In whole Dai units
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
-            dust:         7_500,           // In whole Dai units
+            dust:         15 * THOUSAND,   // In whole Dai units
             pct:          150,             // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
@@ -172,7 +170,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         25 * THOUSAND,
+            dust:         40 * THOUSAND,
             pct:          300,
             mat:          13000,
             liqType:      "clip",
@@ -202,7 +200,7 @@ contract Config {
             aL_gap:       100 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         3_500,
+            dust:         5 * THOUSAND,
             pct:          50,
             mat:          17000,
             liqType:      "clip",
@@ -322,8 +320,8 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         7_500,
-            pct:          175,
+            dust:         15 * THOUSAND,
+            pct:          200,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -352,8 +350,8 @@ contract Config {
             aL_gap:       10 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         25 * THOUSAND,
-            pct:          325,
+            dust:         30 * THOUSAND,
+            pct:          350,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -382,7 +380,7 @@ contract Config {
             aL_gap:       20 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
-            dust:         3_500,
+            dust:         7_500,
             pct:          75,
             mat:          17500,
             liqType:      "clip",
@@ -1578,7 +1576,7 @@ contract Config {
         });
         afterSpell.collaterals["MATIC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      15 * MILLION,
+            aL_line:      10 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -1672,7 +1670,7 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       6 hours,
             line:         0,
-            dust:         7_500,
+            dust:         15 * THOUSAND,
             pct:          150,
             mat:          16000,
             liqType:      "clip",
@@ -1702,8 +1700,8 @@ contract Config {
             aL_gap:       15 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         3_500,
-            pct:          50,
+            dust:         5 * THOUSAND,
+            pct:          25,
             mat:          18500,
             liqType:      "clip",
             liqOn:        true,
@@ -1726,39 +1724,41 @@ contract Config {
             calc_cut:     9900,
             offboarding:  false
         });
+        /*
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      5 * MILLION,
-            aL_gap:       5 * MILLION,
-            aL_ttl:       12 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         0,
             pct:          0,
             mat:          10000,
-            liqType:      "",
+            liqType:      "clip",
             liqOn:        false,
-            chop:         0,
+            chop:         1300,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
             flip_tau:     0,
             flipper_mom:  0,
             dog_hole:     0,
-            clip_buf:     0,
-            clip_tail:    0,
-            clip_cusp:    0,
-            clip_chip:    0,
-            clip_tip:     0,
+            clip_buf:     10500,
+            clip_tail:    220 minutes,
+            clip_cusp:    9000,
+            clip_chip:    10,
+            clip_tip:     300,
             clipper_mom:  0,
-            cm_tolerance: 0,
+            cm_tolerance: 9500,
             calc_tau:     0,
-            calc_step:    0,
-            calc_cut:     0,
+            calc_step:    120,
+            calc_cut:     9990,
             offboarding:  false
         });
+        */
         afterSpell.collaterals["DIRECT-COMPV2-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      30 * MILLION,
+            aL_line:      20 * MILLION,
             aL_gap:       5 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
@@ -1848,7 +1848,7 @@ contract Config {
         });
         afterSpell.collaterals["CRVV1ETHSTETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      100 * MILLION,
+            aL_line:      20 * MILLION,
             aL_gap:       10 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
@@ -1908,12 +1908,12 @@ contract Config {
         });
         afterSpell.collaterals["RETH-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
+            aL_line:      5 * MILLION,
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
-            pct:          50,
+            pct:          1_50,
             mat:          170_00,
             liqType:      "clip",
             liqOn:        true,

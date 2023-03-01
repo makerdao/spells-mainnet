@@ -36,43 +36,6 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface D3MHubLike {
-    function exec(bytes32) external;
-    function vow() external view returns (address);
-    function end() external view returns (address);
-    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
-}
-
-interface D3MMomLike {
-    function authority() external view returns (address);
-    function disable(address) external;
-}
-
-interface D3MAavePoolLike {
-    function king() external view returns (address);
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-}
-
-interface D3MAavePlanLike {
-    function wards(address) external view returns (uint256);
-    function bar() external view returns (uint256);
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-    function tack() external view returns (address);
-}
-
-interface D3MOracleLike {
-    function hub() external view returns (address);
-}
-
-interface DssDirectDepositAaveDaiLike {
-    function stableDebt() external view returns (address);
-    function variableDebt() external view returns (address);
-    function interestStrategy() external view returns (address);
-    function tau() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -267,21 +230,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewIlkRegistryValues() public { // make private to disable
+    function testNewIlkRegistryValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // DIRECT-AAVEV2-DAI
-        assertEq(reg.pos("DIRECT-AAVEV2-DAI"),    60);
-        assertEq(reg.join("DIRECT-AAVEV2-DAI"),   addr.addr("DIRECT_HUB"));
-        assertEq(reg.gem("DIRECT-AAVEV2-DAI"),    addr.addr("ADAI"));
-        assertEq(reg.dec("DIRECT-AAVEV2-DAI"),    18);
-        assertEq(reg.class("DIRECT-AAVEV2-DAI"),  4);
-        assertEq(reg.pip("DIRECT-AAVEV2-DAI"),    addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
-        assertEq(reg.name("DIRECT-AAVEV2-DAI"),   "Aave interest bearing DAI");
-        assertEq(reg.symbol("DIRECT-AAVEV2-DAI"), "aDAI");
+        // GNO-A
+        assertEq(reg.pos("GNO-A"),    56);
+        assertEq(reg.join("GNO-A"),   addr.addr("MCD_JOIN_GNO_A"));
+        assertEq(reg.gem("GNO-A"),    addr.addr("GNO"));
+        assertEq(reg.dec("GNO-A"),    GemAbstract(addr.addr("GNO")).decimals());
+        assertEq(reg.class("GNO-A"),  1);
+        assertEq(reg.pip("GNO-A"),    addr.addr("PIP_GNO"));
+        assertEq(reg.name("GNO-A"),   "Gnosis Token");
+        assertEq(reg.symbol("GNO-A"), GemAbstract(addr.addr("GNO")).symbol());
     }
 
     function testOSMs() private { // make private to disable
@@ -362,7 +325,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -410,7 +373,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
@@ -509,9 +472,9 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestTreas.fin(23), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 29);
+        assertEq(vest.ids(), 28);
 
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
 
@@ -519,55 +482,37 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 240 ether + 195 ether);
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + 675 ether);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 31);
+        assertEq(vest.ids(), 29);
 
-        uint256 MAR_01_2022 = 1646092800;
-        uint256 MAR_01_2025 = 1740787200;
+        uint256 MAY_01_2021 = 1619827200;
+        uint256 AUG_01_2022 = 1659312000;
+        uint256 PE_CLIFF = AUG_01_2022 + 365 days;
+        uint256 PE_FIN = MAY_01_2021 + 365 days * 4;
 
-        uint256 CLIFF = MAR_01_2022 + 365 days;
-        uint256 FIN   = MAR_01_2022 + (365 days) * 3 + 1 days ; // adding 1 day since 2024 is a leap year
+        address PE_IC_WALLET = 0xa91c40621D63599b00476eC3e528E06940B03B9D;
 
-        address SF_IC_WALLET_0 = 0x31C01e90Edcf8602C1A18B2aE4e5A72D8DCE76bD;
-        address SF_IC_WALLET_1 = 0x12b19C5857CF92AaE5e5e5ADc6350e25e4C902e9;
+        assertEq(vest.usr(29), PE_IC_WALLET);
+        assertEq(vest.bgn(29), AUG_01_2022);
+        assertEq(vest.clf(29), PE_CLIFF);
+        assertEq(vest.fin(29), PE_FIN);
+        assertEq(vest.mgr(29), wallets.addr("PE_WALLET"));
+        assertEq(vest.res(29), 1);
+        assertEq(vest.tot(29), 675 ether);
+        assertEq(vest.rxd(29), 0);
 
-        assertEq(vest.usr(30), SF_IC_WALLET_0);
-        assertEq(vest.bgn(30), MAR_01_2022);
-        assertEq(vest.clf(30), CLIFF);
-        assertEq(vest.fin(30), FIN);
-        assertEq(vest.fin(30), MAR_01_2025);
-        assertEq(vest.mgr(30), address(0));
-        assertEq(vest.res(30), 1);
-        assertEq(vest.tot(30), 240 ether);
-        assertEq(vest.rxd(30), 0);
-
-        assertEq(vest.usr(31), SF_IC_WALLET_1);
-        assertEq(vest.bgn(31), MAR_01_2022);
-        assertEq(vest.clf(31), CLIFF);
-        assertEq(vest.fin(31), FIN);
-        assertEq(vest.fin(31), MAR_01_2025);
-        assertEq(vest.mgr(31), address(0));
-        assertEq(vest.res(31), 1);
-        assertEq(vest.tot(31), 195 ether);
-        assertEq(vest.rxd(31), 0);
-
-        uint256 prevBalance0 = gov.balanceOf(SF_IC_WALLET_0);
-        uint256 prevBalance1 = gov.balanceOf(SF_IC_WALLET_1);
+        uint256 prevBalance = gov.balanceOf(PE_IC_WALLET);
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(30);
-        vest.unrestrict(31);
+        vest.unrestrict(29);
 
-        vm.warp(FIN);
+        vm.warp(PE_FIN);
+        vest.vest(29);
+        assertEq(gov.balanceOf(PE_IC_WALLET), prevBalance + 675 ether);
 
-        vest.vest(30);
-        assertEq(gov.balanceOf(SF_IC_WALLET_0), prevBalance0 + 240 ether);
-
-        vest.vest(31);
-        assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
     function testMKRPayments() private { // make private to disable
@@ -687,59 +632,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Validate post-spell state
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
-    }
-
-    function testDirectAaveV2Integration() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        bytes32 ilk = "DIRECT-AAVEV2-DAI";
-        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        D3MAavePoolLike pool = D3MAavePoolLike(addr.addr("DIRECT_AAVEV2_DAI_POOL"));
-        D3MAavePlanLike plan = D3MAavePlanLike(addr.addr("DIRECT_AAVEV2_DAI_PLAN"));
-        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
-        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
-        DssDirectDepositAaveDaiLike oldD3m = DssDirectDepositAaveDaiLike(0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a);
-
-        // Do a bunch of sanity checks of the values that were set in the spell
-        (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-        assertEq(_pool, address(pool));
-        assertEq(_plan, address(plan));
-        assertEq(tau, 7 days);
-        assertEq(hub.vow(), address(vow));
-        assertEq(hub.end(), address(end));
-        assertEq(mom.authority(), address(chief));
-        assertEq(pool.king(), pauseProxy);
-        assertEq(plan.wards(address(mom)), 1);
-        assertEq(plan.bar(), 2 * RAY / 100);
-        assertEq(oracle.hub(), address(hub));
-        (address pip,) = spotter.ilks(ilk);
-        assertEq(pip, address(oracle));
-        assertEq(vat.wards(address(hub)), 1);
-
-        // Make sure the spell hard coded values which should match the old D3M indeed do so
-        assertEq(pool.stableDebt(),   oldD3m.stableDebt());
-        assertEq(pool.variableDebt(), oldD3m.variableDebt());
-        assertEq(plan.stableDebt(),   oldD3m.stableDebt());
-        assertEq(plan.variableDebt(), oldD3m.variableDebt());
-        assertEq(plan.tack(),         oldD3m.interestStrategy());
-        assertEq(tau,                 oldD3m.tau());
-
-        // Current market conditions should max out the D3M @ 5m DAI
-        hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        assertEq(ink, 5 * MILLION * WAD);
-        assertEq(art, 5 * MILLION * WAD);
-
-        // De-activate the D3M via mom
-        vm.prank(DSChiefAbstract(chief).hat());
-        mom.disable(address(plan));
-        assertEq(plan.bar(), 0);
-        hub.exec(ilk);
-        (ink, art) = vat.urns(ilk, address(pool));
-        assertLt(ink, WAD);     // Less than some dust amount is fine (1 DAI)
-        assertLt(art, WAD);
     }
 
 }

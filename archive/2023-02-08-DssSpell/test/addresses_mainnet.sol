@@ -413,6 +413,9 @@ contract Addresses {
         addr["ARBITRUM_GOV_RELAY"]              = 0x9ba25c289e351779E0D481Ba37489317c34A899d;
         addr["ADAI"]                            = 0x028171bCA77440897B824Ca71D1c56caC55b68A3;
         addr["PIP_ADAI"]                        = 0x6A858592fC4cBdf432Fc9A1Bc8A0422B99330bdF;
+        addr["MCD_JOIN_DIRECT_AAVEV2_DAI"]      = 0xa13C0c8eB109F5A13c6c90FC26AFb23bEB3Fb04a;
+        addr["MCD_CLIP_DIRECT_AAVEV2_DAI"]      = 0xa93b98e57dDe14A3E301f20933d59DC19BF8212E;
+        addr["MCD_CLIP_CALC_DIRECT_AAVEV2_DAI"] = 0x786DC9b69abeA503fd101a2A9fa95bcE82C20d0A;
         addr["GUNIV3DAIUSDC2"]                  = 0x50379f632ca68D36E50cfBC8F78fe16bd1499d1e;
         addr["PIP_GUNIV3DAIUSDC2"]              = 0xcCBa43231aC6eceBd1278B90c3a44711a00F4e93;
         addr["MCD_JOIN_GUNIV3DAIUSDC2_A"]       = 0xA7e4dDde3cBcEf122851A7C8F7A55f23c0Daf335;
@@ -430,12 +433,10 @@ contract Addresses {
         addr["MCD_CLIP_CALC_RETH_A"]            = 0xc59B62AFC96cf9737F717B5e5815070C0f154396;
         addr["DIRECT_HUB"]                      = 0x12F36cdEA3A28C35aC8C6Cc71D9265c17C74A27F;
         addr["DIRECT_MOM"]                      = 0x1AB3145E281c01a1597c8c62F9f060E8e3E02fAB;
+        addr["DIRECT_MOM_LEGACY"]               = 0x99A219f3dD2DeEC02c6324df5009aaa60bA36d38;
         addr["DIRECT_COMPV2_DAI_POOL"]          = 0x621fE4Fde2617ea8FFadE08D0FF5A862aD287EC2;
         addr["DIRECT_COMPV2_DAI_PLAN"]          = 0xD0eA20f9f9e64A3582d569c8745DaCD746274AEe;
         addr["DIRECT_COMPV2_DAI_ORACLE"]        = 0x0e2bf18273c953B54FE0a9dEC5429E67851D9468;
-        addr["DIRECT_AAVEV2_DAI_POOL"]          = 0x66aE0574Eb28B92c82569b293B856BB99f80F040;
-        addr["DIRECT_AAVEV2_DAI_PLAN"]          = 0x5846Aee09298f8F3aB5D837d540232d19e5d5813;
-        addr["DIRECT_AAVEV2_DAI_ORACLE"]        = 0x634051fbA31829E245C616e79E289f89c8B851c2;
         addr["GNO"]                             = 0x6810e776880C02933D47DB1b9fc05908e5386b96;
         addr["PIP_GNO"]                         = 0xd800ca44fFABecd159c7889c3bf64a217361AEc8;
         addr["MCD_JOIN_GNO_A"]                  = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;

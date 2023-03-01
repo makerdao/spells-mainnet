@@ -21,7 +21,6 @@ contract Config {
     struct SpellValues {
         address deployed_spell;
         uint256 deployed_spell_created;
-        uint256 deployed_spell_block;
         address previous_spell;
         bool    office_hours_enabled;
         uint256 expiration_threshold;
@@ -99,7 +98,6 @@ contract Config {
         spellValues = SpellValues({
             deployed_spell:                 address(0x44F703D198D8De5504075170BCeecd3FB4DD0F1B),         // populate with deployed spell if deployed
             deployed_spell_created:         1677058943,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
-            deployed_spell_block:           16683169,           // populate with the block where the spell was deployed
             previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
             office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
