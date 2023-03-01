@@ -101,7 +101,7 @@ contract Config {
             deployed_spell_created:         0,                  // use `./scripts/get-created-timestamp.sh <deployment-tx>`
             deployed_spell_block:           16683169,           // populate with the block where the spell was deployed
             previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,              // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
