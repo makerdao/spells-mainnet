@@ -86,7 +86,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkMaxLiquidationAmount("CRVV1ETHSTETH-A", 5 * MILLION);
         DssExecLib.setStartingPriceMultiplicativeFactor("CRVV1ETHSTETH-A", 110_00);
         DssExecLib.setAuctionTimeBeforeReset("CRVV1ETHSTETH-A", 7200);
-        DssExecLib.setAuctionPermittedDrop("CRVV1ETHSTETH-A", 4500);
+        DssExecLib.setAuctionPermittedDrop("CRVV1ETHSTETH-A", 45_00);
 
         // Stablecoin vault offboarding
         // https://vote.makerdao.com/polling/QmemXoCi#poll-detail
