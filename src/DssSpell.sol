@@ -82,13 +82,14 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // CRVV1ETHSTETH-A Liquidation Parameter Changes
+        // https://forum.makerdao.com/t/crvv1ethsteth-a-liquidation-parameters-adjustment/20020
         DssExecLib.setIlkMaxLiquidationAmount("CRVV1ETHSTETH-A", 5 * MILLION);
         DssExecLib.setStartingPriceMultiplicativeFactor("CRVV1ETHSTETH-A", 110_00);
         DssExecLib.setAuctionTimeBeforeReset("CRVV1ETHSTETH-A", 7200);
         DssExecLib.setAuctionPermittedDrop("CRVV1ETHSTETH-A", 4500);
 
         // Stablecoin vault offboarding
-        // https://forum.makerdao.com/t/usdc-a-usdp-a-gusd-a-proposed-offboarding-parameters/19474
+        // https://vote.makerdao.com/polling/QmemXoCi#poll-detail
         Fileable(MCD_SPOT).file("USDC-A",   "mat", 15 * RAY); // 1500% collateralization ratio
         Fileable(MCD_SPOT).file("PAXUSD-A", "mat", 15 * RAY);
         Fileable(MCD_SPOT).file("GUSD-A",   "mat", 15 * RAY);
@@ -97,6 +98,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("GUSD-A");
 
         // MOMC Parameter Changes
+        // https://vote.makerdao.com/polling/QmXGgakY#poll-detail
         DssExecLib.setIlkStabilityFee("ETH-C", ZERO_SEVENTY_FIVE_PCT_RATE, true);
         DssExecLib.setIlkStabilityFee("WSTETH-B", ZERO_SEVENTY_FIVE_PCT_RATE, true);
         DssExecLib.setIlkStabilityFee("WBTC-C", ONE_PCT_RATE, true);
@@ -106,14 +108,19 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-COMPV2-DAI", 70 * MILLION);
 
         // DAI Budget Transfer
+        // https://mips.makerdao.com/mips/details/MIP40c3SP70
         DssExecLib.sendPaymentFromSurplusBuffer(GRO_WALLET, 648_134);
 
         // MKR Vesting Transfers
+        // https://mips.makerdao.com/mips/details/MIP40c3SP54
         DSTokenAbstract(MCD_GOV).transfer(TECH_WALLET, 67.9579 ether);
+        // https://mips.makerdao.com/mips/details/MIP40c3SP36
         DSTokenAbstract(MCD_GOV).transfer(DECO_WALLET, 125 ether);
+        // https://mips.makerdao.com/mips/details/MIP40c3SP25
         DSTokenAbstract(MCD_GOV).transfer(RISK_WALLET_VEST, 175 ether);
 
         // Delegate Compensation for February
+        // https://forum.makerdao.com/t/recognized-delegate-compensation-february-2023/20033
         DssExecLib.sendPaymentFromSurplusBuffer(COLDIRON,           12_000);
         DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP,       12_000);
         DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS,            12_000);
