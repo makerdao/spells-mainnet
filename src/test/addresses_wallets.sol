@@ -68,7 +68,7 @@ contract Wallets {
         addr["BLOCKCHAINCOLUMBIA"]           = 0xdC1F98682F4F8a5c6d54F345F448437b83f5E432;
         addr["MHONKASALOTEEMULAU"]           = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
         addr["LLAMA"]                        = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
-        addr["CODEKNIGHT"]                   = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+        addr["CODEKNIGHT"]                   = 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D;
         addr["FRONTIERRESEARCH"]             = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
         addr["LBSBLOCKCHAIN"]                = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
         addr["ONESTONE"]                     = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;

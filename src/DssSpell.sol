@@ -72,7 +72,7 @@ contract DssSpellAction is DssAction {
     address constant LBSBLOCKCHAIN      = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
     address constant FRONTIERRESEARCH   = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
     address constant CHRISBLEC          = 0xa3f0AbB4Ba74512b5a736C5759446e9B50FDA170;
-    address constant CODEKNIGHT         = 0x46dFcBc2aFD5DD8789Ef0737fEdb03489D33c428;
+    address constant CODEKNIGHT         = 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D;
     address constant ONESTONE           = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
     address constant HKUSTEPI           = 0xE4594A66d9507fFc0d4335CC240BD61C1173E666;
     address constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
