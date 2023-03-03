@@ -21,10 +21,6 @@ import "dss-exec-lib/DssAction.sol";
 
 import "dss-interfaces/dapp/DSTokenAbstract.sol";
 
-interface Fileable {
-    function file(bytes32, bytes32, uint256) external;
-}
-
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -90,9 +86,9 @@ contract DssSpellAction is DssAction {
 
         // Stablecoin vault offboarding
         // https://vote.makerdao.com/polling/QmemXoCi#poll-detail
-        Fileable(MCD_SPOT).file("USDC-A",   "mat", 15 * RAY); // 1500% collateralization ratio
-        Fileable(MCD_SPOT).file("PAXUSD-A", "mat", 15 * RAY);
-        Fileable(MCD_SPOT).file("GUSD-A",   "mat", 15 * RAY);
+        DssExecLib.setValue(MCD_SPOT, "USDC-A",   "mat", 15 * RAY); // 1500% collateralization ratio
+        DssExecLib.setValue(MCD_SPOT, "PAXUSD-A", "mat", 15 * RAY);
+        DssExecLib.setValue(MCD_SPOT, "GUSD-A",   "mat", 15 * RAY);
         DssExecLib.updateCollateralPrice("USDC-A");
         DssExecLib.updateCollateralPrice("PAXUSD-A");
         DssExecLib.updateCollateralPrice("GUSD-A");
