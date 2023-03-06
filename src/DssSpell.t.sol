@@ -402,13 +402,11 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("FLIPSIDE"),            10_347),
             Payee(wallets.addr("JUSTINCASE"),           8_680),
             Payee(wallets.addr("STABLELAB"),            3_961),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),        3_126),
             Payee(wallets.addr("FRONTIERRESEARCH"),     2_455),
             Payee(wallets.addr("CHRISBLEC"),              951),
             Payee(wallets.addr("CODEKNIGHT"),             939),
             Payee(wallets.addr("ONESTONE"),               360),
-            Payee(wallets.addr("HKUSTEPI"),               348),
-            Payee(wallets.addr("CONSENSYS"),              181)
+            Payee(wallets.addr("HKUSTEPI"),               348)
         ];
 
         uint256 prevBalance;
