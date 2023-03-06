@@ -391,7 +391,7 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[17] memory payees = [
+        Payee[15] memory payees = [
             Payee(wallets.addr("GRO_WALLET"),         648_134),
             Payee(wallets.addr("COLDIRON"),            12_000),
             Payee(wallets.addr("FLIPFLOPFLAP"),        12_000),
