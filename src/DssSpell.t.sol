@@ -545,9 +545,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testMKRPayments() public { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrTECH    = gov.balanceOf(wallets.addr("TECH_WALLET"));
-        uint256 prevMkrDECO    = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrRISK    = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
+        uint256 prevMkrTECH   = gov.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevMkrDECO   = gov.balanceOf(wallets.addr("DECO_WALLET"));
+        uint256 prevMkrRISK   = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
 
         uint256 amountTECH    = 67.9579 ether;
         uint256 amountDECO    = 125 ether;
