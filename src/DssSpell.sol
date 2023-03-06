@@ -24,7 +24,7 @@ import "dss-interfaces/dapp/DSTokenAbstract.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3ccd2e061217ef336e1cf1d71b9cfcce36548f74/governance/votes/Executive%20vote%20-%20March%208%2C%202023.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/f427d4bdea4d9cecf0cfeccb466ea26965bd1e6d/governance/votes/Executive%20vote%20-%20March%208%2C%202023.md -q -O - 2>/dev/null)"
     string public constant override description =
         "2023-03-08 MakerDAO Executive Spell | Hash: 0x1a2df7f087facb40bb6bf6b60f9853045793df1f2e664d29c2a660cb3e9c2a0c";
 
