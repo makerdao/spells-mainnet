@@ -20,3 +20,4 @@ exec-hash          :; ./scripts/hash-exec-copy.sh $(url)
 fund-pause-proxy   :; ./scripts/fund-pause-proxy.sh
 opt-cost           :; ./scripts/get-opt-relay-cost.sh $(spell)
 arb-cost           :; ./scripts/get-arb-relay-cost.sh $(spell)
+rate               :; ./scripts/rate.sh $(pct)
