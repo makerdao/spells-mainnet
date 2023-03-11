@@ -190,7 +190,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(MCD_PSM_PAX_A, "tout", PSM_HUNDRED_BASIS_POINTS);
 
         // GSM Pause Delay Reduction to 12 Hours
-        PauseAbstract(MCD_PAUSE).setDelay(12 hours);
+        PauseAbstract(MCD_PAUSE).setDelay(16 hours);
     }
 }
 
