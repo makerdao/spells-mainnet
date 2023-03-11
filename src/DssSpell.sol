@@ -29,6 +29,7 @@ interface PauseAbstract {
     function delay() external view returns (uint256);
     function plot(address, bytes32, bytes calldata, uint256) external;
     function exec(address, bytes32, bytes calldata, uint256) external returns (bytes memory);
+    function setDelay(uint256) external;
 }
 
 interface Changelog {
@@ -140,6 +141,7 @@ contract DssSpellAction is DssAction {
 
     address internal immutable MCD_PSM_USDC_A = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
     address internal immutable MCD_PSM_PAX_A  = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+    address internal immutable MCD_PAUSE      = DssExecLib.getChangelogAddress("MCD_PAUSE");
 
     function actions() public override {
         // Emergency Proposal: Risk and Governance Parameter Changes (11 March 2023)
@@ -186,6 +188,9 @@ contract DssSpellAction is DssAction {
 
         // Increase PSM-USDP-A tout to 1%
         DssExecLib.setValue(MCD_PSM_PAX_A, "tout", PSM_HUNDRED_BASIS_POINTS);
+
+        // GSM Pause Delay Reduction to 12 Hours
+        PauseAbstract(MCD_PAUSE).setDelay(12 hours);
     }
 }
 
