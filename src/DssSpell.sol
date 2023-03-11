@@ -189,7 +189,7 @@ contract DssSpellAction is DssAction {
         // Increase PSM-USDP-A tout to 1%
         DssExecLib.setValue(MCD_PSM_PAX_A, "tout", PSM_HUNDRED_BASIS_POINTS);
 
-        // GSM Pause Delay Reduction to 12 Hours
+        // GSM Pause Delay Reduction to 16 Hours
         PauseAbstract(MCD_PAUSE).setDelay(16 hours);
     }
 }
