@@ -284,7 +284,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // leave public for now as this is acting like a config tests
-    function testPSMs() public {
+    function testPSMs() private { // Disabled since some PSMs are maxed out
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -385,7 +385,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
@@ -543,7 +543,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
-    function testMKRPayments() public { // make private to disable
+    function testMKRPayments() private { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrTECH   = gov.balanceOf(wallets.addr("TECH_WALLET"));
         uint256 prevMkrDECO   = gov.balanceOf(wallets.addr("DECO_WALLET"));
@@ -668,7 +668,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
-    function testOffboardings() public {
+    function testOffboardings() private {
         uint256 Art;
         (Art,,,,) = vat.ilks("USDC-A");
         assertGt(Art, 0);
