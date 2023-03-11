@@ -101,7 +101,7 @@ contract Config {
             deployed_spell_created:         0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:           0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spell:                 address(0x4Fe8caf634004cb3Dd54AcD3F59c861FdC6de215),         // supply if there is a need to test prior to its cast() function being called on-chain.
-            office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
@@ -889,7 +889,7 @@ contract Config {
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      10 * BILLION,
-            aL_gap:       950 * MILLION,
+            aL_gap:       250 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -947,10 +947,10 @@ contract Config {
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2USDCETH-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      50 * MILLION,
-            aL_gap:       5 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         60 * THOUSAND,
             pct:          150,
@@ -977,10 +977,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      100 * MILLION,
-            aL_gap:       20 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          2,
@@ -1608,8 +1608,8 @@ contract Config {
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      450 * MILLION,
-            aL_gap:       50 * MILLION,
+            aL_line:      1 * BILLION,
+            aL_gap:       250 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1637,10 +1637,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      100 * MILLION,
-            aL_gap:       50 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          2,
@@ -1789,7 +1789,7 @@ contract Config {
         afterSpell.collaterals["PSM-GUSD-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       50 * MILLION,
+            aL_gap:       10 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1817,10 +1817,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["GUNIV3DAIUSDC2-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      100 * MILLION,
-            aL_gap:       50 * MILLION,
-            aL_ttl:       8 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          6,

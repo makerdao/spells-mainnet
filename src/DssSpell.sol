@@ -18,6 +18,7 @@ pragma solidity 0.8.16;
 
 // import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/VatAbstract.sol";
 
 interface PauseAbstract {
     function delay() external view returns (uint256);
@@ -68,7 +69,7 @@ contract DssExec {
     // @param _description  A string description of the spell
     // @param _expiration   The timestamp this spell will expire. (Ex. block.timestamp + 30 days)
     // @param _spellAction  The address of the spell action
-    constructor(uint256 _expiration, address _spellAction) public {
+    constructor(uint256 _expiration, address _spellAction) {
         pause       = PauseAbstract(log.getAddress("MCD_PAUSE"));
         expiration  = _expiration;
         action      = _spellAction;
@@ -109,9 +110,9 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-03-11 MakerDAO Executive Spell | Hash: TODO";
 
-    // Turn office hours on
+    // Turn office hours off
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // Many of the settings that change weekly rely on the rate accumulator
@@ -125,7 +126,58 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant BILLION = 10 ** 9;
+
+    uint256 internal constant WAD     = 10 ** 18;
+
+    uint256 internal constant PSM_HUNDRED_BASIS_POINTS = 100 * WAD / 10000;
+
+    address internal immutable MCD_PSM_USDC_A = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable MCD_PSM_PAX_A  = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+
     function actions() public override {
+        // Reduce UNIV2USDCETH-A, UNIV2DAIUSDC-A, GUNIV3DAIUSDC1-A and GUNIV3DAIUSDC2-A Debt Ceilings to 0
+        uint256 totalLineReduction;
+        uint256 line;
+        VatAbstract vat = VatAbstract(DssExecLib.vat());
+
+        (,,,line,) = vat.ilks("UNIV2USDCETH-A");
+        totalLineReduction = totalLineReduction + line;
+        DssExecLib.removeIlkFromAutoLine("UNIV2USDCETH-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2USDCETH-A", 0);
+
+        (,,,line,) = vat.ilks("UNIV2DAIUSDC-A");
+        totalLineReduction = totalLineReduction + line;
+        DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDC-A");
+        DssExecLib.setIlkDebtCeiling("UNIV2DAIUSDC-A", 0);
+
+        (,,,line,) = vat.ilks("GUNIV3DAIUSDC1-A");
+        totalLineReduction = totalLineReduction + line;
+        DssExecLib.removeIlkFromAutoLine("GUNIV3DAIUSDC1-A");
+        DssExecLib.setIlkDebtCeiling("GUNIV3DAIUSDC1-A", 0);
+
+        (,,,line,) = vat.ilks("GUNIV3DAIUSDC2-A");
+        totalLineReduction = totalLineReduction + line;
+        DssExecLib.removeIlkFromAutoLine("GUNIV3DAIUSDC2-A");
+        DssExecLib.setIlkDebtCeiling("GUNIV3DAIUSDC2-A", 0);
+
+        // Decrease Global Debt Ceiling in accordance with Offboarded Ilks
+        vat.file("Line", vat.Line() - totalLineReduction);
+
+        // Set DC-IAM module for PSM-USDC-A, PSM-PAX-A and PSM-GUSD-A
+        DssExecLib.setIlkAutoLineParameters("PSM-USDC-A", 10 * BILLION, 250 * MILLION, 24 hours);
+        DssExecLib.setIlkAutoLineParameters("PSM-PAX-A", 1 * BILLION, 250 * MILLION, 24 hours);
+        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 500 * MILLION, 10 * MILLION, 24 hours);
+
+        // Increase PSM-USDC-A tin from 0% to 1%
+        DssExecLib.setValue(MCD_PSM_USDC_A, "tin", PSM_HUNDRED_BASIS_POINTS);
+
+        // Reduce PSM-USDP-A tin to 0%
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tin", 0);
+
+        // Increase PSM-USDP-A tout to 1%
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tout", PSM_HUNDRED_BASIS_POINTS);
     }
 }
 
