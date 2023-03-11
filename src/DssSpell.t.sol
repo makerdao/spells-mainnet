@@ -828,7 +828,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(plan.barb(), 0);
 
         // this should unwind the position
-        assertTrue(cdai.balanceOf(address(pool)) >= 1);
+        assertTrue(cdai.balanceOf(address(pool)) > 1);
         hub.exec("DIRECT-COMPV2-DAI");
         assertTrue(cdai.balanceOf(address(pool)) <= 1); // rounding error
 
