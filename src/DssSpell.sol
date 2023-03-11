@@ -18,7 +18,12 @@ pragma solidity 0.8.16;
 
 // import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/VatAbstract.sol";
+
+interface VatLike {
+    function Line() external view returns (uint256);
+    function file(bytes32, uint256) external;
+    function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+}
 
 interface PauseAbstract {
     function delay() external view returns (uint256);
@@ -141,32 +146,32 @@ contract DssSpellAction is DssAction {
         // https://forum.makerdao.com/t/emergency-proposal-risk-and-governance-parameter-changes-11-march-2023/20125
 
         // Reduce UNIV2USDCETH-A, UNIV2DAIUSDC-A, GUNIV3DAIUSDC1-A and GUNIV3DAIUSDC2-A Debt Ceilings to 0
-        uint256 totalLineReduction;
         uint256 line;
-        VatAbstract vat = VatAbstract(DssExecLib.vat());
+        uint256 lineReduction;
+        VatLike vat = VatLike(DssExecLib.vat());
 
         (,,,line,) = vat.ilks("UNIV2USDCETH-A");
-        totalLineReduction = totalLineReduction + line;
+        lineReduction += line;
         DssExecLib.removeIlkFromAutoLine("UNIV2USDCETH-A");
         DssExecLib.setIlkDebtCeiling("UNIV2USDCETH-A", 0);
 
         (,,,line,) = vat.ilks("UNIV2DAIUSDC-A");
-        totalLineReduction = totalLineReduction + line;
+        lineReduction += line;
         DssExecLib.removeIlkFromAutoLine("UNIV2DAIUSDC-A");
         DssExecLib.setIlkDebtCeiling("UNIV2DAIUSDC-A", 0);
 
         (,,,line,) = vat.ilks("GUNIV3DAIUSDC1-A");
-        totalLineReduction = totalLineReduction + line;
+        lineReduction += line;
         DssExecLib.removeIlkFromAutoLine("GUNIV3DAIUSDC1-A");
         DssExecLib.setIlkDebtCeiling("GUNIV3DAIUSDC1-A", 0);
 
         (,,,line,) = vat.ilks("GUNIV3DAIUSDC2-A");
-        totalLineReduction = totalLineReduction + line;
+        lineReduction += line;
         DssExecLib.removeIlkFromAutoLine("GUNIV3DAIUSDC2-A");
         DssExecLib.setIlkDebtCeiling("GUNIV3DAIUSDC2-A", 0);
 
         // Decrease Global Debt Ceiling in accordance with Offboarded Ilks
-        vat.file("Line", vat.Line() - totalLineReduction);
+        vat.file("Line", vat.Line() - lineReduction);
 
         // Set DC-IAM module for PSM-USDC-A, PSM-PAX-A and PSM-GUSD-A
         DssExecLib.setIlkAutoLineParameters("PSM-USDC-A", 10 * BILLION, 250 * MILLION, 24 hours);
