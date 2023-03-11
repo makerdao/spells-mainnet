@@ -48,6 +48,22 @@ interface D3MMomLike {
     function disable(address) external;
 }
 
+interface D3MAavePlan {
+    function bar() external view returns (uint256);
+}
+
+interface D3MAavePool {
+    function redeemable() external view returns (address);
+}
+
+interface D3MCompPlan {
+    function barb() external view returns (uint256);
+}
+
+interface D3MCompPool {
+    function redeemable() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -771,4 +787,54 @@ contract DssSpellTest is DssSpellTestBase {
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
+
+    function testAAVEDirectBarChange() public {
+        D3MHubLike  hub  = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MAavePlan plan = D3MAavePlan(addr.addr("DIRECT_AAVEV2_DAI_PLAN"));
+        D3MAavePool pool = D3MAavePool(addr.addr("DIRECT_AAVEV2_DAI_POOL"));
+
+        DSTokenAbstract adai = DSTokenAbstract(pool.redeemable());
+
+        assertEq(plan.bar(), 2.00 * 10**27 / 100);
+
+        _vote(address(spell));
+        spell.schedule();
+
+        // bar should now be 0
+        assertEq(plan.bar(), 0);
+
+        // this should make sure the position is winded down
+        hub.exec("DIRECT-AAVEV2-DAI");
+        assertEq(adai.balanceOf(address(pool)), 0);
+
+        vm.warp(DssSpell(spell).nextCastTime());
+        DssSpell(spell).cast();
+        assertTrue(spell.done());
+    }
+
+    function testCompoundDirectBarbChange() public {
+        D3MHubLike  hub  = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MCompPlan plan = D3MCompPlan(addr.addr("DIRECT_COMPV2_DAI_PLAN"));
+        D3MCompPool pool = D3MCompPool(addr.addr("DIRECT_COMPV2_DAI_POOL"));
+
+        DSTokenAbstract cdai = DSTokenAbstract(pool.redeemable());
+
+        assertEq(plan.barb(), 7535450719);
+
+        _vote(address(spell));
+        spell.schedule();
+
+        // barb should now be 0
+        assertEq(plan.barb(), 0);
+
+        // this should unwind the position
+        assertTrue(cdai.balanceOf(address(pool)) >= 1);
+        hub.exec("DIRECT-COMPV2-DAI");
+        assertTrue(cdai.balanceOf(address(pool)) <= 1); // rounding error
+
+        vm.warp(DssSpell(spell).nextCastTime());
+        DssSpell(spell).cast();
+        assertTrue(spell.done());
+    }
+
 }
