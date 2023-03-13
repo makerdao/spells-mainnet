@@ -300,7 +300,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // leave public for now as this is acting like a config tests
-    function testPSMs() private { // Disabled since some PSMs are maxed out
+    function testPSMs() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -331,8 +331,8 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
             addr.addr("PIP_PAX"),
             PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            20,  // tin
-            0    // tout
+            0,   // tin
+            100    // tout
         );
 
         _ilk = "PSM-USDC-A";
@@ -346,7 +346,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
             addr.addr("PIP_USDC"),
             PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
-            0,   // tin
+            100,   // tin
             0    // tout
         );
     }
