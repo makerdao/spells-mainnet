@@ -278,17 +278,21 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _castPreviousSpell() internal {
-        DssSpell prevSpell = DssSpell(spellValues.previous_spell);
-        // warp and cast previous spell so values are up-to-date to test against
-        if (prevSpell != DssSpell(address(0)) && !prevSpell.done()) {
-            if (prevSpell.eta() == 0) {
-                _vote(address(prevSpell));
-                _scheduleWaitAndCast(address(prevSpell));
-            }
-            else {
-                // jump to nextCastTime to be a little more forgiving on the spell execution time
-                vm.warp(prevSpell.nextCastTime());
-                prevSpell.cast();
+        address[] memory prevSpells = spellValues.previous_spells;
+
+        // warp and cast previous spells so values are up-to-date to test against
+        for (uint256 i; i < prevSpells.length; i++) {
+            DssSpell prevSpell = DssSpell(prevSpells[i]);
+            if (prevSpell != DssSpell(address(0)) && !prevSpell.done()) {
+                if (prevSpell.eta() == 0) {
+                    _vote(address(prevSpell));
+                    _scheduleWaitAndCast(address(prevSpell));
+                }
+                else {
+                    // jump to nextCastTime to be a little more forgiving on the spell execution time
+                    vm.warp(prevSpell.nextCastTime());
+                    prevSpell.cast();
+                }
             }
         }
     }
@@ -479,7 +483,10 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
-        uint256 sumlines;
+        // Using an array to work around stack depth limitations.
+        // sums[0] : sum of all lines
+        // sums[1] : sum over ilks of (line - Art * rate)--i.e. debt that could be drawn at any time
+        uint256[] memory sums = new uint256[](2);
         bytes32[] memory ilks = reg.list();
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
@@ -496,10 +503,19 @@ contract DssSpellTestBase is Config, DssTest {
             );
             assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, _concat("TestError/pct-max-", ilk));   // check value lt 1000%
             {
-            (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
+            uint256 line;
+            uint256 dust;
+            {
+            uint256 Art;
+            uint256 rate;
+            (Art, rate,, line, dust) = vat.ilks(ilk);
+            if (Art * rate < line) {
+                sums[1] += line - Art * rate;
+            }
+            }
             // Convert whole Dai units to expected RAD
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
-            sumlines += line;
+            sums[0] += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
             if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0, _concat("TestError/al-Line-not-zero-", ilk));
@@ -657,8 +673,15 @@ contract DssSpellTestBase is Config, DssTest {
                 }
             }
         }
-        //       actual                               expected
-        assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
+        // Require that debt + (debt that could be drawn) does not exceed Line.
+        // TODO: consider a buffer for fee accrual
+        assertTrue(vat.debt() + sums[1] <= vat.Line(), "TestError/vat-Line-1");
+
+        // Enforce the global Line also falls between (sum of lines) + offset and (sum of lines) + 2*offset.
+        assertTrue(sums[0] +     values.line_offset * RAD <= vat.Line(), "TestError/vat-Line-2");
+        assertTrue(sums[0] + 2 * values.line_offset * RAD >= vat.Line(), "TestError/vat-Line-3");
+
+        // TODO: have a discussion about how we want to manage the global Line going forward.
     }
 
     function _getOSMPrice(address pip) internal returns (uint256) {
