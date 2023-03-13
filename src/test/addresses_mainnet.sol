@@ -62,7 +62,6 @@ contract Addresses {
         addr["OSM_MOM"]                         = 0x76416A4d5190d071bfed309861527431304aA14f;
         addr["FLIPPER_MOM"]                     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]                     = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
-        addr["LINE_MOM"]                        = 0x9c257e5Aaf73d964aEBc2140CA38078988fB0C10;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
         addr["PROXY_REGISTRY"]                  = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
         addr["MCD_VEST_DAI"]                    = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;

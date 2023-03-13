@@ -19,12 +19,12 @@ pragma solidity 0.8.16;
 contract Config {
 
     struct SpellValues {
-        address   deployed_spell;
-        uint256   deployed_spell_created;
-        uint256   deployed_spell_block;
-        address[] previous_spells;
-        bool      office_hours_enabled;
-        uint256   expiration_threshold;
+        address deployed_spell;
+        uint256 deployed_spell_created;
+        uint256 deployed_spell_block;
+        address previous_spell;
+        bool    office_hours_enabled;
+        uint256 expiration_threshold;
     }
 
     struct SystemValues {
@@ -93,27 +93,22 @@ contract Config {
     SystemValues afterSpell;
 
     function setValues(address chief) public {
-        // Add spells if there is a need to test prior to their cast() functions
-        // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = 0x1D07F15aB8c3C015c7b312759dDd858b0f1D8e72;
-
         //
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0),         // populate with deployed spell if deployed
-            deployed_spell_created:         0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
-            previous_spells:                prevSpells,         // older spells to ensure are executed first
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            deployed_spell:                 address(0x1D07F15aB8c3C015c7b312759dDd858b0f1D8e72),         // populate with deployed spell if deployed
+            deployed_spell_created:         1678539431,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           16804986,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            previous_spell:                 address(0x4Fe8caf634004cb3Dd54AcD3F59c861FdC6de215),         // supply if there is a need to test prior to its cast() function being called on-chain.
+            office_hours_enabled:           false,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
         //
         // Values for all system configuration changes
         //
-        afterSpell.line_offset =           750 * MILLION;           // Offset between the global line against the sum of local lines
+        afterSpell.line_offset =           500 * MILLION;           // Offset between the global line against the sum of local lines
         afterSpell.pot_dsr =               100;                     // In basis points
         afterSpell.pause_delay =           16 hours;                // In seconds
         afterSpell.vow_wait =              156 hours;               // In seconds
@@ -135,7 +130,7 @@ contract Config {
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
         afterSpell.ilk_count =             61;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.14.10";               // String expected in system
+        afterSpell.chainlog_version =      "1.14.9";                // String expected in system
 
         //
         // Values for all collateral
