@@ -35,9 +35,9 @@ interface LineMomLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/298990668317c86c8d50760ec5be3ff17bfd2fc2/governance/votes/Executive%20vote%20-%20March%2013%2C%202023.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/5e53b599e95ab33eb60a7d497ae694e873eaefe7/governance/votes/Executive%20vote%20-%20March%2014%2C%202023.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-03-13 MakerDAO Executive Spell | Hash: 0x7335513930bbe4368f09ddf9caaddb5f001e4f7125861952856a2e16cb25c24d";
+        "2023-03-14 MakerDAO Executive Spell | Hash: 0x3b6380bed287e7e601663e741082d254212832deb6797ef3c32e515991c97698";
 
     // Turn office hours off
     function officeHours() public pure override returns (bool) {
@@ -63,7 +63,7 @@ contract DssSpellAction is DssAction {
     address immutable internal AUTOLINE    = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
 
     function actions() public override {
-        //  Out-Of-Schedule executive proposal to implement PSM Breaker (13 March 2023)
+        //  Out-Of-Schedule executive proposal to implement PSM Breaker (14 March 2023)
         // https://forum.makerdao.com/t/out-of-schedule-executive-proposal-to-implement-psm-breaker/20162
 
         VatAbstract vat = VatAbstract(DssExecLib.vat());
