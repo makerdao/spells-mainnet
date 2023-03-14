@@ -3,7 +3,7 @@ set -e
 
 [[ "$(cast chain --rpc-url="$ETH_RPC_URL")" == "ethlive" ]] || { echo "Please set a mainnet ETH_RPC_URL"; exit 1; }
 
-[[ "$1" =~ ^0x[[:xdigit:]]{66}$ ]] || { echo "Please specify the transaction to inspect (e.g. tx=0x<txhash>)"; exit 1; }
+[[ "$1" =~ ^tx=0x[0-9a-fA-F]{64}$ ]] || { echo "Please specify the transaction to inspect (e.g. tx=0x<txhash>)"; exit 1; }
 
 for ARGUMENT in "$@"
 do
