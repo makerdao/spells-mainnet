@@ -1126,8 +1126,7 @@ contract DssSpellTestBase is Config, DssTest {
         // Increase ilk line to allow psm sell even if it is maxed out
         {
             (,,, uint256 line,) = vat.ilks(_ilk);
-            vm.prank(pauseProxy);
-            vat.file(_ilk, "line", line + 1000 * RAD);
+            _setIlkLine(_ilk, line + 1000 * RAD);
         }
 
         uint256 amount = 1000 * (10 ** uint256(token.decimals()));
