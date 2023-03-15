@@ -1123,14 +1123,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
         assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
-        // Increase ilk line to allow psm sell even if it is maxed out
-        {
-            (,,, uint256 line,) = vat.ilks(_ilk);
-            vm.prank(pauseProxy);
-            vat.file(_ilk, "line", line + 1000 * RAD);
+        // grab ilk line as amount
+        (,,, uint256 amount,) = vat.ilks(_ilk);
+        // if line is big, use smaller amount
+        if (amount > 1000 * (10 ** uint256(token.decimals()))) {
+            amount = 1000 * (10 ** uint256(token.decimals()));
         }
-
-        uint256 amount = 1000 * (10 ** uint256(token.decimals()));
         _giveTokens(address(token), amount);
 
         // Approvals
@@ -1139,17 +1137,13 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Convert all TOKEN to DAI
         psm.sellGem(address(this), amount);
-        amount = amount * (10 ** (18 - uint256(token.decimals()))); // scale to 18 decimals
         amount -= amount * tin / WAD;
-
         assertEq(token.balanceOf(address(this)), 0, _concat("PSM.sellGem-token-balance-", _ilk));
-        assertEq(dai.balanceOf(address(this)), amount, _concat("PSM.sellGem-dai-balance-", _ilk));
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - uint256(token.decimals()))), _concat("PSM.sellGem-dai-balance-", _ilk));
 
         // Convert all DAI to TOKEN (Do not do this if the amount is 0)
         if (amount > 0) {
             amount -= _divup(amount * tout, WAD);
-            amount = amount / (10 ** (18 - uint256(token.decimals()))); // scale back to token decimals
-
             psm.buyGem(address(this), amount);
             // There may be some Dai dust left over depending on tout and decimals
             assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
@@ -1157,7 +1151,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // Dump all dai for next run
-        dai.transfer(address(0x0), dai.balanceOf(address(this)));
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
     function _checkDirectIlkIntegration(
