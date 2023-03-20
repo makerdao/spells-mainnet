@@ -477,6 +477,10 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
+
+        // transferrable vest
+        // check mkr allowance
+        _checkTransferrableVestMkrAllowance();
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
@@ -1559,8 +1563,6 @@ contract DssSpellTestBase is Config, DssTest {
         _checkSystemValues(afterSpell);
 
         _checkCollateralValues(afterSpell);
-
-        _checkTransferrableVestMkrAllowance();
     }
 
     function _testFailWrongDay() internal {
