@@ -36,13 +36,16 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface LineMomLike {
-    function owner() external view returns (address);
+interface D3MHubLike {
+    function exec(bytes32) external;
+    function vow() external view returns (address);
+    function end() external view returns (address);
+    function ilks(bytes32) external view returns (address, address, uint256, uint256, uint256);
+}
+
+interface D3MMomLike {
     function authority() external view returns (address);
-    function autoLine() external view returns (address);
-    function vat() external view returns (address);
-    function ilks(bytes32) external view returns (uint256);
-    function wipe(bytes32 ilk) external returns (uint256);
+    function disable(address) external;
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -312,8 +315,8 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
             addr.addr("PIP_PAX"),
             PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            0,   // tin
-            100    // tout
+            20,  // tin
+            0    // tout
         );
 
         _ilk = "PSM-USDC-A";
@@ -327,7 +330,7 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
             addr.addr("PIP_USDC"),
             PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
-            100,   // tin
+            0,   // tin
             0    // tout
         );
     }
@@ -382,7 +385,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee obj ect with
         //    the Payee address,
@@ -540,7 +543,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
+    function testMKRPayments() public { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrTECH   = gov.balanceOf(wallets.addr("TECH_WALLET"));
         uint256 prevMkrDECO   = gov.balanceOf(wallets.addr("DECO_WALLET"));
@@ -665,7 +668,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
-    function testOffboardings() private {
+    function testOffboardings() public {
         uint256 Art;
         (Art,,,,) = vat.ilks("USDC-A");
         assertGt(Art, 0);
@@ -767,101 +770,5 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
-    }
-
-    function testLineMom() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        address LINE_MOM = addr.addr("LINE_MOM");
-
-        // Check modules that need to rely on the LineMom do so
-        assertEq(vat.wards(LINE_MOM), 1, "Vat does not rely on LineMom");
-        assertEq(autoLine.wards(LINE_MOM), 1, "AutoLine does not rely on LineMom");
-
-        // Verify LineMom owner
-        assertEq(LineMomLike(LINE_MOM).owner(), address(pauseProxy), "Pause Proxy not LineMom owner");
-
-        // Verify AutoLine was filed
-        assertEq(LineMomLike(LINE_MOM).autoLine(), address(autoLine), "AutoLine not filed correctly");
-
-        // Verify LineMom authority
-        assertEq(LineMomLike(LINE_MOM).authority(), address(chief), "Chief not LineMom authority");
-
-        // Verify the LineMom has the correct Vat address
-        assertEq(LineMomLike(LINE_MOM).vat(), address(vat), "LineMom has wrong Vat");
-
-        // Verify added ilks
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-USDC-A"), 1, "PSM-USDC-A not subject to LineMom");
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-PAX-A" ), 1, "PSM-PAX-A  not subject to LineMom");
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-GUSD-A"), 1, "PSM-GUSD-A not subject to LineMom");
-
-        // Chainlog verification happens automatically by virtue of adding the LineMom
-        // to the address list and updating the expected Chainlog version.
-
-        // Check that the LineMom actually works -------
-        uint256 line;
-
-        // PSM-USDC-A shut off
-        (,,,line,) = vat.ilks("PSM-USDC-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-USDC-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-USDC-A");
-        (,,,line,) = vat.ilks("PSM-USDC-A");
-        assertTrue(line == 0, "PSM-USDC-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-USDC-A");
-        assertTrue(line == 0, "PSM-USDC-A AutoLine line not zeroed");
-
-        // PSM-PAX-A shut off
-        (,,,line,) = vat.ilks("PSM-PAX-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-PAX-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-PAX-A");
-        (,,,line,) = vat.ilks("PSM-PAX-A");
-        assertTrue(line == 0, "PSM-PAX-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-PAX-A");
-        assertTrue(line == 0, "PSM-PAX-A AutoLine line not zeroed");
-
-        // PSM-GUSD-A shut off
-        (,,,line,) = vat.ilks("PSM-GUSD-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-GUSD-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-GUSD-A");
-        (,,,line,) = vat.ilks("PSM-GUSD-A");
-        assertTrue(line == 0, "PSM-GUSD-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-GUSD-A");
-        assertTrue(line == 0, "PSM-GUSD-A AutoLine line not zeroed");
-    }
-
-    function testLineAdjustment() public {
-        uint256 preLine = vat.Line();
-
-        uint256 correction;
-        uint256 Art;
-        uint256 rate;
-        (Art, rate,,,) = vat.ilks("UNIV2USDCETH-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("UNIV2DAIUSDC-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("GUNIV3DAIUSDC1-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("GUNIV3DAIUSDC2-A");
-        correction += Art * rate;
-        correction = correction * 110 / 100;
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        uint256 postLine = vat.Line();
-        assertGt(postLine, preLine);
-        assertEq(postLine, preLine + correction);
     }
 }

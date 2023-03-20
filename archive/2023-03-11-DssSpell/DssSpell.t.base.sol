@@ -178,7 +178,6 @@ contract DssSpellTestBase is Config, DssTest {
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
-    VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
@@ -279,21 +278,17 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _castPreviousSpell() internal {
-        address[] memory prevSpells = spellValues.previous_spells;
-
-        // warp and cast previous spells so values are up-to-date to test against
-        for (uint256 i; i < prevSpells.length; i++) {
-            DssSpell prevSpell = DssSpell(prevSpells[i]);
-            if (prevSpell != DssSpell(address(0)) && !prevSpell.done()) {
-                if (prevSpell.eta() == 0) {
-                    _vote(address(prevSpell));
-                    _scheduleWaitAndCast(address(prevSpell));
-                }
-                else {
-                    // jump to nextCastTime to be a little more forgiving on the spell execution time
-                    vm.warp(prevSpell.nextCastTime());
-                    prevSpell.cast();
-                }
+        DssSpell prevSpell = DssSpell(spellValues.previous_spell);
+        // warp and cast previous spell so values are up-to-date to test against
+        if (prevSpell != DssSpell(address(0)) && !prevSpell.done()) {
+            if (prevSpell.eta() == 0) {
+                _vote(address(prevSpell));
+                _scheduleWaitAndCast(address(prevSpell));
+            }
+            else {
+                // jump to nextCastTime to be a little more forgiving on the spell execution time
+                vm.warp(prevSpell.nextCastTime());
+                prevSpell.cast();
             }
         }
     }
@@ -481,17 +476,10 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
-
-        // transferrable vest
-        // check mkr allowance
-        _checkTransferrableVestMkrAllowance();
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
-        // Using an array to work around stack depth limitations.
-        // sums[0] : sum of all lines
-        // sums[1] : sum over ilks of (line - Art * rate)--i.e. debt that could be drawn at any time
-        uint256[] memory sums = new uint256[](2);
+        uint256 sumlines;
         bytes32[] memory ilks = reg.list();
         for(uint256 i = 0; i < ilks.length; i++) {
             bytes32 ilk = ilks[i];
@@ -508,19 +496,10 @@ contract DssSpellTestBase is Config, DssTest {
             );
             assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, _concat("TestError/pct-max-", ilk));   // check value lt 1000%
             {
-            uint256 line;
-            uint256 dust;
-            {
-            uint256 Art;
-            uint256 rate;
-            (Art, rate,, line, dust) = vat.ilks(ilk);
-            if (Art * rate < line) {
-                sums[1] += line - Art * rate;
-            }
-            }
+            (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
             // Convert whole Dai units to expected RAD
             uint256 normalizedTestLine = values.collaterals[ilk].line * RAD;
-            sums[0] += line;
+            sumlines += line;
             (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
             if (!values.collaterals[ilk].aL_enabled) {
                 assertTrue(aL_line == 0, _concat("TestError/al-Line-not-zero-", ilk));
@@ -678,15 +657,8 @@ contract DssSpellTestBase is Config, DssTest {
                 }
             }
         }
-        // Require that debt + (debt that could be drawn) does not exceed Line.
-        // TODO: consider a buffer for fee accrual
-        assertTrue(vat.debt() + sums[1] <= vat.Line(), "TestError/vat-Line-1");
-
-        // Enforce the global Line also falls between (sum of lines) + offset and (sum of lines) + 2*offset.
-        assertTrue(sums[0] +     values.line_offset * RAD <= vat.Line(), "TestError/vat-Line-2");
-        assertTrue(sums[0] + 2 * values.line_offset * RAD >= vat.Line(), "TestError/vat-Line-3");
-
-        // TODO: have a discussion about how we want to manage the global Line going forward.
+        //       actual                               expected
+        assertEq(sumlines + values.line_offset * RAD, vat.Line(), "TestError/vat-Line");
     }
 
     function _getOSMPrice(address pip) internal returns (uint256) {
@@ -1128,13 +1100,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
         assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
-        // Increase ilk line to allow psm sell even if it is maxed out
-        {
-            (,,, uint256 line,) = vat.ilks(_ilk);
-            _setIlkLine(_ilk, line + 1000 * RAD);
+        // grab ilk line as amount
+        (,,, uint256 amount,) = vat.ilks(_ilk);
+        // if line is big, use smaller amount
+        if (amount > 1000 * (10 ** uint256(token.decimals()))) {
+            amount = 1000 * (10 ** uint256(token.decimals()));
         }
-
-        uint256 amount = 1000 * (10 ** uint256(token.decimals()));
         _giveTokens(address(token), amount);
 
         // Approvals
@@ -1143,17 +1114,13 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Convert all TOKEN to DAI
         psm.sellGem(address(this), amount);
-        amount = amount * (10 ** (18 - uint256(token.decimals()))); // scale to 18 decimals
         amount -= amount * tin / WAD;
-
         assertEq(token.balanceOf(address(this)), 0, _concat("PSM.sellGem-token-balance-", _ilk));
-        assertEq(dai.balanceOf(address(this)), amount, _concat("PSM.sellGem-dai-balance-", _ilk));
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - uint256(token.decimals()))), _concat("PSM.sellGem-dai-balance-", _ilk));
 
         // Convert all DAI to TOKEN (Do not do this if the amount is 0)
         if (amount > 0) {
             amount -= _divup(amount * tout, WAD);
-            amount = amount / (10 ** (18 - uint256(token.decimals()))); // scale back to token decimals
-
             psm.buyGem(address(this), amount);
             // There may be some Dai dust left over depending on tout and decimals
             assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
@@ -1161,7 +1128,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // Dump all dai for next run
-        dai.transfer(address(0x0), dai.balanceOf(address(this)));
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
     function _checkDirectIlkIntegration(
@@ -1377,20 +1344,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(vestDai.res(_index), _restricted,        "res");
         assertEq(vestDai.tot(_index), _reward,            "tot");
         assertEq(vestDai.rxd(_index), _claimed,           "rxd");
-    }
-
-    function _checkTransferrableVestMkrAllowance() internal {
-        uint256 vestableAmt;
-
-        for(uint256 i = 1; i <= vestMkr.ids(); i++) {
-            if (vestMkr.valid(i)) {
-                (,,,,,,uint128 tot, uint128 rxd) = vestMkr.awards(i);
-                vestableAmt = vestableAmt + (tot - rxd);
-            }
-        }
-
-        uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
-        assertGe(allowance, vestableAmt, "TestError/insufficient-gov-transferrable-vest-mkr-allowance");
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {

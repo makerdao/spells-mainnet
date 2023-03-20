@@ -19,12 +19,12 @@ pragma solidity 0.8.16;
 contract Config {
 
     struct SpellValues {
-        address   deployed_spell;
-        uint256   deployed_spell_created;
-        uint256   deployed_spell_block;
-        address[] previous_spells;
-        bool      office_hours_enabled;
-        uint256   expiration_threshold;
+        address deployed_spell;
+        uint256 deployed_spell_created;
+        uint256 deployed_spell_block;
+        address previous_spell;
+        bool    office_hours_enabled;
+        uint256 expiration_threshold;
     }
 
     struct SystemValues {
@@ -93,29 +93,24 @@ contract Config {
     SystemValues afterSpell;
 
     function setValues(address chief) public {
-        // Add spells if there is a need to test prior to their cast() functions
-        // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](0);
-        // prevSpells[0] = <addr>;
-
         //
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xDae88B7E4b5aBa407C40676B98559f7aEC925817),         // populate with deployed spell if deployed
-            deployed_spell_created:         1678803119,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           16826704,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
-            previous_spells:                prevSpells,         // older spells to ensure are executed first
-            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
+            deployed_spell:                 address(0x4Fe8caf634004cb3Dd54AcD3F59c861FdC6de215),         // populate with deployed spell if deployed
+            deployed_spell_created:         1678195019,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           16776665,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            previous_spell:                 address(0),         // supply if there is a need to test prior to its cast() function being called on-chain.
+            office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
         //
         // Values for all system configuration changes
         //
-        afterSpell.line_offset =           750 * MILLION;           // Offset between the global line against the sum of local lines
+        afterSpell.line_offset =           500 * MILLION;           // Offset between the global line against the sum of local lines
         afterSpell.pot_dsr =               100;                     // In basis points
-        afterSpell.pause_delay =           16 hours;                // In seconds
+        afterSpell.pause_delay =           48 hours;                // In seconds
         afterSpell.vow_wait =              156 hours;               // In seconds
         afterSpell.vow_dump =              250;                     // In whole Dai units
         afterSpell.vow_sump =              50 * THOUSAND;           // In whole Dai units
@@ -135,7 +130,7 @@ contract Config {
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
         afterSpell.ilk_count =             61;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.14.10";               // String expected in system
+        afterSpell.chainlog_version =      "1.14.9";                // String expected in system
 
         //
         // Values for all collateral
@@ -894,7 +889,7 @@ contract Config {
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      10 * BILLION,
-            aL_gap:       250 * MILLION,
+            aL_gap:       950 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -952,10 +947,10 @@ contract Config {
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2USDCETH-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      50 * MILLION,
+            aL_gap:       5 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         60 * THOUSAND,
             pct:          150,
@@ -982,10 +977,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      100 * MILLION,
+            aL_gap:       20 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          2,
@@ -1613,8 +1608,8 @@ contract Config {
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1 * BILLION,
-            aL_gap:       250 * MILLION,
+            aL_line:      450 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1642,10 +1637,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      100 * MILLION,
+            aL_gap:       50 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          2,
@@ -1794,7 +1789,7 @@ contract Config {
         afterSpell.collaterals["PSM-GUSD-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1822,10 +1817,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["GUNIV3DAIUSDC2-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      100 * MILLION,
+            aL_gap:       50 * MILLION,
+            aL_ttl:       8 hours,
             line:         0,
             dust:         15 * THOUSAND,
             pct:          6,

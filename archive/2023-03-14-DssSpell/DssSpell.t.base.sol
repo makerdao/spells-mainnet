@@ -178,7 +178,6 @@ contract DssSpellTestBase is Config, DssTest {
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
-    VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
@@ -481,10 +480,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
-
-        // transferrable vest
-        // check mkr allowance
-        _checkTransferrableVestMkrAllowance();
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
@@ -1128,13 +1123,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
         assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
-        // Increase ilk line to allow psm sell even if it is maxed out
-        {
-            (,,, uint256 line,) = vat.ilks(_ilk);
-            _setIlkLine(_ilk, line + 1000 * RAD);
+        // grab ilk line as amount
+        (,,, uint256 amount,) = vat.ilks(_ilk);
+        // if line is big, use smaller amount
+        if (amount > 1000 * (10 ** uint256(token.decimals()))) {
+            amount = 1000 * (10 ** uint256(token.decimals()));
         }
-
-        uint256 amount = 1000 * (10 ** uint256(token.decimals()));
         _giveTokens(address(token), amount);
 
         // Approvals
@@ -1143,17 +1137,13 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Convert all TOKEN to DAI
         psm.sellGem(address(this), amount);
-        amount = amount * (10 ** (18 - uint256(token.decimals()))); // scale to 18 decimals
         amount -= amount * tin / WAD;
-
         assertEq(token.balanceOf(address(this)), 0, _concat("PSM.sellGem-token-balance-", _ilk));
-        assertEq(dai.balanceOf(address(this)), amount, _concat("PSM.sellGem-dai-balance-", _ilk));
+        assertEq(dai.balanceOf(address(this)), amount * (10 ** (18 - uint256(token.decimals()))), _concat("PSM.sellGem-dai-balance-", _ilk));
 
         // Convert all DAI to TOKEN (Do not do this if the amount is 0)
         if (amount > 0) {
             amount -= _divup(amount * tout, WAD);
-            amount = amount / (10 ** (18 - uint256(token.decimals()))); // scale back to token decimals
-
             psm.buyGem(address(this), amount);
             // There may be some Dai dust left over depending on tout and decimals
             assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
@@ -1161,7 +1151,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // Dump all dai for next run
-        dai.transfer(address(0x0), dai.balanceOf(address(this)));
+        vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
     function _checkDirectIlkIntegration(
@@ -1377,20 +1367,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(vestDai.res(_index), _restricted,        "res");
         assertEq(vestDai.tot(_index), _reward,            "tot");
         assertEq(vestDai.rxd(_index), _claimed,           "rxd");
-    }
-
-    function _checkTransferrableVestMkrAllowance() internal {
-        uint256 vestableAmt;
-
-        for(uint256 i = 1; i <= vestMkr.ids(); i++) {
-            if (vestMkr.valid(i)) {
-                (,,,,,,uint128 tot, uint128 rxd) = vestMkr.awards(i);
-                vestableAmt = vestableAmt + (tot - rxd);
-            }
-        }
-
-        uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
-        assertGe(allowance, vestableAmt, "TestError/insufficient-gov-transferrable-vest-mkr-allowance");
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
