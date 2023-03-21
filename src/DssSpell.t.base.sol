@@ -178,6 +178,7 @@ contract DssSpellTestBase is Config, DssTest {
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
+    VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
@@ -480,6 +481,10 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
+
+        // transferrable vest
+        // check mkr allowance
+        _checkTransferrableVestMkrAllowance();
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
@@ -1372,6 +1377,20 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(vestDai.res(_index), _restricted,        "res");
         assertEq(vestDai.tot(_index), _reward,            "tot");
         assertEq(vestDai.rxd(_index), _claimed,           "rxd");
+    }
+
+    function _checkTransferrableVestMkrAllowance() internal {
+        uint256 vestableAmt;
+
+        for(uint256 i = 1; i <= vestMkr.ids(); i++) {
+            if (vestMkr.valid(i)) {
+                (,,,,,,uint128 tot, uint128 rxd) = vestMkr.awards(i);
+                vestableAmt = vestableAmt + (tot - rxd);
+            }
+        }
+
+        uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
+        assertGe(allowance, vestableAmt, "TestError/insufficient-gov-transferrable-vest-mkr-allowance");
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
