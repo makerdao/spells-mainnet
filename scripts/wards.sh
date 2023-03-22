@@ -31,7 +31,7 @@ else
 fi
 
 echo -e "Network: $(cast chain)"
-list=$(cast call "$CHANGELOG" 'list()(bytes32[])' | sed 's/[][]//g')
+list=$(cast call "$CHANGELOG" 'list()(bytes32[])' | sed 's/[][]//g') # Strip array brackets
 IFS=","
 for key in $list
 do
