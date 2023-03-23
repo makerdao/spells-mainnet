@@ -36,15 +36,6 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface LineMomLike {
-    function owner() external view returns (address);
-    function authority() external view returns (address);
-    function autoLine() external view returns (address);
-    function vat() external view returns (address);
-    function ilks(bytes32) external view returns (uint256);
-    function wipe(bytes32 ilk) external returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -769,99 +760,30 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testLineMom() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+    function testNewModulesAuthorizingEsm() public {
+        uint256 ward;
+        address ESM = addr.addr("MCD_ESM");
 
-        address LINE_MOM = addr.addr("LINE_MOM");
+        ward = WardsAbstract(addr.addr("MCD_CROPPER")).wards(ESM);
+        assertEq(ward, 0, "unexpected ward");
 
-        // Check modules that need to rely on the LineMom do so
-        assertEq(vat.wards(LINE_MOM), 1, "Vat does not rely on LineMom");
-        assertEq(autoLine.wards(LINE_MOM), 1, "AutoLine does not rely on LineMom");
+        ward = WardsAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")).wards(ESM);
+        assertEq(ward, 0, "unexpected ward");
 
-        // Verify LineMom owner
-        assertEq(LineMomLike(LINE_MOM).owner(), address(pauseProxy), "Pause Proxy not LineMom owner");
-
-        // Verify AutoLine was filed
-        assertEq(LineMomLike(LINE_MOM).autoLine(), address(autoLine), "AutoLine not filed correctly");
-
-        // Verify LineMom authority
-        assertEq(LineMomLike(LINE_MOM).authority(), address(chief), "Chief not LineMom authority");
-
-        // Verify the LineMom has the correct Vat address
-        assertEq(LineMomLike(LINE_MOM).vat(), address(vat), "LineMom has wrong Vat");
-
-        // Verify added ilks
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-USDC-A"), 1, "PSM-USDC-A not subject to LineMom");
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-PAX-A" ), 1, "PSM-PAX-A  not subject to LineMom");
-        assertEq(LineMomLike(LINE_MOM).ilks("PSM-GUSD-A"), 1, "PSM-GUSD-A not subject to LineMom");
-
-        // Chainlog verification happens automatically by virtue of adding the LineMom
-        // to the address list and updating the expected Chainlog version.
-
-        // Check that the LineMom actually works -------
-        uint256 line;
-
-        // PSM-USDC-A shut off
-        (,,,line,) = vat.ilks("PSM-USDC-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-USDC-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-USDC-A");
-        (,,,line,) = vat.ilks("PSM-USDC-A");
-        assertTrue(line == 0, "PSM-USDC-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-USDC-A");
-        assertTrue(line == 0, "PSM-USDC-A AutoLine line not zeroed");
-
-        // PSM-PAX-A shut off
-        (,,,line,) = vat.ilks("PSM-PAX-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-PAX-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-PAX-A");
-        (,,,line,) = vat.ilks("PSM-PAX-A");
-        assertTrue(line == 0, "PSM-PAX-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-PAX-A");
-        assertTrue(line == 0, "PSM-PAX-A AutoLine line not zeroed");
-
-        // PSM-GUSD-A shut off
-        (,,,line,) = vat.ilks("PSM-GUSD-A");
-        assertTrue(line > 0);
-        (line,,,,) = autoLine.ilks("PSM-GUSD-A");
-        assertTrue(line > 0);
-        vm.prank(chief.hat());  // send as the spell
-        LineMomLike(LINE_MOM).wipe("PSM-GUSD-A");
-        (,,,line,) = vat.ilks("PSM-GUSD-A");
-        assertTrue(line == 0, "PSM-GUSD-A Vat line not zeroed");
-        (line,,,,) = autoLine.ilks("PSM-GUSD-A");
-        assertTrue(line == 0, "PSM-GUSD-A AutoLine line not zeroed");
-    }
-
-    function testLineAdjustment() public {
-        uint256 preLine = vat.Line();
-
-        uint256 correction;
-        uint256 Art;
-        uint256 rate;
-        (Art, rate,,,) = vat.ilks("UNIV2USDCETH-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("UNIV2DAIUSDC-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("GUNIV3DAIUSDC1-A");
-        correction += Art * rate;
-        (Art, rate,,,) = vat.ilks("GUNIV3DAIUSDC2-A");
-        correction += Art * rate;
-        correction = correction * 110 / 100;
+        ward = WardsAbstract(addr.addr("CHANGELOG")).wards(ESM);
+        assertEq(ward, 0, "unexpected ward");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 postLine = vat.Line();
-        assertGt(postLine, preLine);
-        assertEq(postLine, preLine + correction);
+        ward = WardsAbstract(addr.addr("MCD_CROPPER")).wards(ESM);
+        assertEq(ward, 1, "MCD_CROPPER does not authorize ESM");
+
+        ward = WardsAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")).wards(ESM);
+        assertEq(ward, 1, "MCD_JOIN_CRVV1ETHSTETH_A does not authorize ESM");
+
+        ward = WardsAbstract(addr.addr("CHANGELOG")).wards(ESM);
+        assertEq(ward, 1, "CHANGELOG does not authorize ESM");
     }
 }
