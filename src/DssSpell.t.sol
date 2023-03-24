@@ -373,28 +373,16 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
-        // For each payment, create a Payee obj ect with
+        // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[15] memory payees = [
-            Payee(wallets.addr("GRO_WALLET"),         648_134),
-            Payee(wallets.addr("COLDIRON"),            12_000),
-            Payee(wallets.addr("FLIPFLOPFLAP"),        12_000),
-            Payee(wallets.addr("GFXLABS"),             12_000),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"),  11_447),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),      11_178),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),      10_802),
-            Payee(wallets.addr("FLIPSIDE"),            10_347),
-            Payee(wallets.addr("JUSTINCASE"),           8_680),
-            Payee(wallets.addr("STABLELAB"),            3_961),
-            Payee(wallets.addr("FRONTIERRESEARCH"),     2_455),
-            Payee(wallets.addr("CHRISBLEC"),              951),
-            Payee(wallets.addr("CODEKNIGHT"),             939),
-            Payee(wallets.addr("ONESTONE"),               360),
-            Payee(wallets.addr("HKUSTEPI"),               348)
+        Payee[3] memory payees = [
+            Payee(wallets.addr("PHOENIX_LABS"),      50_000),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),      3_126),
+            Payee(wallets.addr("CONSENSYS"),            181)
         ];
 
         uint256 prevBalance;
@@ -531,25 +519,22 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
+    function testMKRPayments() public { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrTECH   = gov.balanceOf(wallets.addr("TECH_WALLET"));
-        uint256 prevMkrDECO   = gov.balanceOf(wallets.addr("DECO_WALLET"));
-        uint256 prevMkrRISK   = gov.balanceOf(wallets.addr("RISK_WALLET_VEST"));
+        uint256 prevMkrSES    = gov.balanceOf(wallets.addr("SES_WALLET"));
+        uint256 prevMkrCES    = gov.balanceOf(wallets.addr("CES_WALLET"));
 
-        uint256 amountTECH    = 67.9579 ether;
-        uint256 amountDECO    = 125 ether;
-        uint256 amountRISK    = 175 ether;
-        uint256 total         = 367.9579 ether;
+        uint256 amountSES     = 229.78 ether;
+        uint256 amountCES     =  77.34 ether;
+        uint256 total         = 307.12 ether;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevMkrTECH + amountTECH);
-        assertEq(gov.balanceOf(wallets.addr("DECO_WALLET")), prevMkrDECO + amountDECO);
-        assertEq(gov.balanceOf(wallets.addr("RISK_WALLET_VEST")), prevMkrRISK + amountRISK);
+        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
+        assertEq(gov.balanceOf(wallets.addr("CES_WALLET")), prevMkrCES + amountCES);
     }
 
     function testMKRVestFix() private { // make private to disable

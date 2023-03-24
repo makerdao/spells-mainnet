@@ -28,6 +28,7 @@ contract Deployers {
             0xDA0FaB0700A4389F6E6679aBAb1692B4601ce9bf,
             0x0048d6225D1F3eA4385627eFDC5B4709Cab4A21c,
             0xd200790f62c8da69973e61d4936cfE4f356ccD07,
+            0x92723e0bF280942B98bf2d1e832Bde9A3Bd2F2c2,  // Chainlog Deployer
             0xdA0C0de01d90A5933692Edf03c7cE946C7c50445,  // Old PE
             0xDa0c0De020F80d43dde58c2653aa73d28Df1fBe1,  // Old PE
             0xC1E6d8136441FC66612Df3584007f7CB68765e5D,  // PE
