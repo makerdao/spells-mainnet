@@ -36,6 +36,19 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
+// For PE-1208
+interface RwaUrnLike {
+    function hope(address) external;
+    function draw(uint256) external;
+}
+
+interface RwaOutputConduitLike {
+    function hope(address) external;
+    function bud(address) external view returns (uint256);
+    function pick(address) external;
+    function push() external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
