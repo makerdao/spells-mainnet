@@ -277,7 +277,26 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        bytes32 _ilk = "PSM-GUSD-A";
+        bytes32 _ilk;
+
+        // USDC
+        _ilk = "PSM-USDC-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
+            addr.addr("PIP_USDC"),
+            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
+            0,   // tin
+            0    // tout
+        );
+        
+        // GUSD
+        _ilk = "PSM-GUSD-A";
         assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
         assertEq(addr.addr("MCD_CLIP_PSM_GUSD_A"), reg.xlip(_ilk));
         assertEq(addr.addr("PIP_GUSD"), reg.pip(_ilk));
@@ -288,10 +307,11 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
             addr.addr("PIP_GUSD"),
             PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
-            10,  // tin
-            0    // tout
+            0,  // tin
+            1    // tout
         );
 
+        // USDP
         _ilk = "PSM-PAX-A";
         assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
         assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
@@ -304,23 +324,9 @@ contract DssSpellTest is DssSpellTestBase {
             addr.addr("PIP_PAX"),
             PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
             0,   // tin
-            100    // tout
-        );
-
-        _ilk = "PSM-USDC-A";
-        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
-        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
-        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
-        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
-        _checkPsmIlkIntegration(
-            _ilk,
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
-            addr.addr("PIP_USDC"),
-            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
-            100,   // tin
             0    // tout
         );
+
     }
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
@@ -745,30 +751,64 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testNewModulesAuthorizingEsm() public {
-        uint256 ward;
-        address ESM = addr.addr("MCD_ESM");
+    // For PE-1208
+    // RWA007-A Tests
 
-        ward = WardsAbstract(addr.addr("MCD_CROPPER")).wards(ESM);
-        assertEq(ward, 0, "unexpected ward");
+    function testRWA007OraclePriceBumpNEW() public {
 
-        ward = WardsAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")).wards(ESM);
-        assertEq(ward, 0, "unexpected ward");
+        // Read the pip address and spot value before cast
+        (,address pip,,  ) = liquidationOracle.ilks("RWA007-A");
+        (,,uint256 spot,,) = vat.ilks("RWA007-A");
 
-        ward = WardsAbstract(addr.addr("CHANGELOG")).wards(ESM);
-        assertEq(ward, 0, "unexpected ward");
+        // Check the pip and spot values before cast
+        assertEq(uint256(DSValueAbstract(pip).read()), 500 * MILLION * WAD, "RWA007: Bad initial PIP value");
+        assertEq(spot, 500 * MILLION * RAY, "RWA007: Bad initial spot value");
+
+        // Load RWA007-A output conduit balance
+        RwaOutputConduitLike conduit = RwaOutputConduitLike(
+            addr.addr("RWA007_A_OUTPUT_CONDUIT")
+        );
+
+        // Check the conduit balance is 0 before cast
+        assertEq(dai.balanceOf(address(conduit)), 0);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        ward = WardsAbstract(addr.addr("MCD_CROPPER")).wards(ESM);
-        assertEq(ward, 1, "MCD_CROPPER does not authorize ESM");
+        // Read the pip address and spot value after cast, as well as Art and rate
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
 
-        ward = WardsAbstract(addr.addr("MCD_JOIN_CRVV1ETHSTETH_A")).wards(ESM);
-        assertEq(ward, 1, "MCD_JOIN_CRVV1ETHSTETH_A does not authorize ESM");
+        // Check the pip and spot values after cast
+        assertEq(uint256(DSValueAbstract(pip).read()), 1_250 * MILLION * WAD, "RWA007: Bad PIP value after bump()");
+        assertEq(spotAfter, 1_250 * MILLION * RAY, "RWA007: Bad spot value after bump()");
 
-        ward = WardsAbstract(addr.addr("CHANGELOG")).wards(ESM);
-        assertEq(ward, 1, "CHANGELOG does not authorize ESM");
-    }
+        // Test that a draw() can be performed
+        address urn = addr.addr("RWA007_A_URN");
+        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
+
+        // Calculate how much 'room' we can draw to get close to line
+        uint256 room = line - (Art * rate);
+        uint256 drawAmt = room / RAY;
+
+        // Correct our draw amount if it is too large
+        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
+            drawAmt = (room - rate) / RAY;
+        }
+
+        // Perform draw()
+        RwaUrnLike(urn).draw(drawAmt);
+
+        // Check the conduit balance after cast
+        assertEq(dai.balanceOf(address(conduit)), drawAmt);
+
+        // Read new Art
+        (Art,,,,) = vat.ilks("RWA007-A");
+
+        // Assert that we are within 2 `rate` of line
+        assertTrue(line - (Art * rate) < (2 * rate));  
+
+    } 
 }

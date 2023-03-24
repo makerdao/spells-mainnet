@@ -894,7 +894,7 @@ contract Config {
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      10 * BILLION,
-            aL_gap:       250 * MILLION,
+            aL_gap:       400 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1372,11 +1372,11 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["RWA007-A"] = CollateralValues({
-            aL_enabled:   true,
+            aL_enabled:   false,
             aL_line:      500 * MILLION,
             aL_gap:       100 * MILLION,
             aL_ttl:       604_800, // 1 week
-            line:         0,
+            line:         1_250 * MILLION,
             dust:         0,
             pct:          0,
             mat:          10000,
@@ -1613,8 +1613,8 @@ contract Config {
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1 * BILLION,
-            aL_gap:       250 * MILLION,
+            aL_line:      500 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1794,7 +1794,7 @@ contract Config {
         afterSpell.collaterals["PSM-GUSD-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_gap:       50 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
@@ -1917,7 +1917,7 @@ contract Config {
             aL_gap:       3 * MILLION,
             aL_ttl:       8 hours,
             line:         0,
-            dust:         15 * THOUSAND,
+            dust:         7_500,
             pct:          50,
             mat:          170_00,
             liqType:      "clip",
