@@ -22,9 +22,9 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO/governance/votes/TODO.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/3c83167342af102994093588d5259d461a11763a/governance/votes/Executive%20vote%20-%20March%2024%2C%202023.md -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-03-24 MakerDAO Executive Spell | Hash: TODO";
+        "2023-03-24 MakerDAO Executive Spell | Hash: 0xaa8673db1a97cdb45f8efb4fe677bb1d194db54779cdfd82a3d6d1be40345426";
 
     // Turn office hours off
     function officeHours() public pure override returns (bool) {
@@ -49,7 +49,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // Out-Of-Schedule executive proposal to fix ESM authorizations (24 March 2023)
-        // TODO(forum post or other reference)
+        // https://forum.makerdao.com/t/emergency-shutdown-governance-vulnerability-proposed-emergency-spell/20255
 
         DssExecLib.authorize(CROPPER, ESM);
         DssExecLib.authorize(STECRV_JOIN, ESM);
