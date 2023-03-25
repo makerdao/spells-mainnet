@@ -86,6 +86,9 @@ contract Wallets {
         // ETH Amsterdam Event SPF
         addr["ETH_AMSTERDAM"]                = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
 
+        // Phoenix Labs SPF
+        addr["PHOENIX_LABS"]                 = 0xD9847E6b1314f0327F320E43B51ca0AaAD6FF509;
+
         // Ambassador Program Pilot Multisig
         addr["AMBASSADOR_WALLET"]            = 0xF411d823a48D18B32e608274Df16a9957fE33E45;
 
