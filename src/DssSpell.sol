@@ -79,7 +79,7 @@ contract DssSpellAction is DssAction {
     // Monetalis Update - Excess Funds Declaration
     // Poll:  https://vote.makerdao.com/polling/QmfZ2nxw#poll-details
     // Forum: https://forum.makerdao.com/t/request-to-poll-return-excess-mip65-funds-to-surplus-buffer/20115
-    string constant public MIP65 = "HASH_TBD";
+    string constant public MIP65 = "Qmf7oGxgVoGKMGkzPi2T6nBSTLgrU5C7jmNqaefjJ52Zup";
 
     function actions() public override {
 
