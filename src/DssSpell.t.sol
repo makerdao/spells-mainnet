@@ -42,13 +42,6 @@ interface RwaUrnLike {
     function draw(uint256) external;
 }
 
-interface RwaOutputConduitLike {
-    function hope(address) external;
-    function bud(address) external view returns (uint256);
-    function pick(address) external;
-    function push() external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -339,7 +332,6 @@ contract DssSpellTest is DssSpellTestBase {
             0,   // tin
             0    // tout
         );
-
     }
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
@@ -778,9 +770,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(spot, 500 * MILLION * RAY, "RWA007: Bad initial spot value");
 
         // Load RWA007-A output conduit balance
-        RwaOutputConduitLike conduit = RwaOutputConduitLike(
-            addr.addr("RWA007_A_OUTPUT_CONDUIT")
-        );
+        address conduit = addr.addr("RWA007_A_OUTPUT_CONDUIT");
 
         // Check the conduit balance is 0 before cast
         assertEq(dai.balanceOf(address(conduit)), 0);
@@ -822,6 +812,5 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Assert that we are within 2 `rate` of line
         assertTrue(line - (Art * rate) < (2 * rate));  
-
     } 
 }

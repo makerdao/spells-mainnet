@@ -147,7 +147,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("RWA007-A");
 
         // PSM Parameter Normalization
-        // Poll:  https://vote.makerdao.com/polling/QmPcQ5vn#poll-detail
+        // Poll:  https://vote.makerdao.com/polling/QmQ1fYm3#poll-detail
         // Forum: https://forum.makerdao.com/t/signal-request-set-psm-fees-to-0/10894
 
         //PSM-USDC-A
