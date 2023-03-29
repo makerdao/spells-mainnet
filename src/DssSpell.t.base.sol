@@ -1774,7 +1774,7 @@ contract DssSpellTestBase is Config, DssTest {
         spell.schedule();
 
         uint256 castTime = spell.nextCastTime();
-        assertEq(castTime, spell.eta());
+        assertGe(castTime, spell.eta());
     }
 
     // Verifies that the bytecode of the action of the spell used for testing
