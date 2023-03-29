@@ -19,16 +19,11 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-
 interface GemLike {
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
 }
 
 interface RwaLiquidationLike {
-    function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
-    function init(bytes32, uint256, string calldata, uint48) external;
     function bump(bytes32 ilk, uint256 val) external;
 }
 
@@ -60,8 +55,8 @@ contract DssSpellAction is DssAction {
     
     uint256 internal constant WAD     = 10 ** 18;
 
-    uint256 internal constant PSM_ZERO_BASIS_POINTS = 0;
-    uint256 internal constant PSM_ONE_BASIS_POINT   = 1 * WAD / 10000;
+    uint256 internal constant ZERO_BASIS_POINTS = 0;
+    uint256 internal constant ONE_BASIS_POINT   = 1 * WAD / 10000;
 
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable MCD_PSM_USDC_A           = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
@@ -106,7 +101,7 @@ contract DssSpellAction is DssAction {
         MKR.transfer(CES_WALLET, 77.34 ether);  // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
 
-        // Phoenix Labs SPF DAI Funding (MAINNET SPELL ONLY)
+        // Phoenix Labs SPF DAI Funding
         // Poll:  https://vote.makerdao.com/polling/QmYBegVf#poll-details
         // Forum: https://forum.makerdao.com/t/mip55c3-sp15-phoenix-labs-initial-funding-spf/19733
 
@@ -152,21 +147,21 @@ contract DssSpellAction is DssAction {
 
         //PSM-USDC-A
         //Reduce the Fee In (tin) by 1% from 1% to 0%.
-        DssExecLib.setValue(MCD_PSM_USDC_A, "tin", PSM_ZERO_BASIS_POINTS);
+        DssExecLib.setValue(MCD_PSM_USDC_A, "tin", ZERO_BASIS_POINTS);
         //Increase the Target Available Debt (gap) by 150 million DAI from 250 million DAI to 400 million DAI.
         DssExecLib.setIlkAutoLineParameters("PSM-USDC-A", 10 * BILLION, 400 * MILLION, 24 hours);
 
         // PSM-GUSD-A
         // Reduce the Fee In (tin) by 0.1% from 0.1% to 0%.
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", PSM_ZERO_BASIS_POINTS);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tin", ZERO_BASIS_POINTS);
         // Increase the Fee Out (tout) by 0.01% from 0% to 0.01%.
-        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", PSM_ONE_BASIS_POINT);
+        DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", ONE_BASIS_POINT);
         // Increase the Target Available Debt (gap) by 40 million DAI from 10 million DAI to 50 million DAI.
         DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 500 * MILLION, 50 * MILLION, 24 hours);
 
         // PSM-PAX-A
         // Reduce the Fee Out (tout) by 1% from 1% to 0%.
-        DssExecLib.setValue(MCD_PSM_PAX_A, "tout", PSM_ZERO_BASIS_POINTS);
+        DssExecLib.setValue(MCD_PSM_PAX_A, "tout", ZERO_BASIS_POINTS);
         // Reduce the Target Available Debt (gap) by 200 million DAI from 250 million DAI to 50 million DAI.
         // Reduce the Maximum Debt Ceiling (line) by 500 million DAI from 1 billion DAI to 500 million DAI.
         DssExecLib.setIlkAutoLineParameters("PSM-PAX-A", 500 * MILLION, 50 * MILLION, 24 hours);
