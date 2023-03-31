@@ -100,5 +100,11 @@ contract Wallets {
         addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
         addr["STEAKHOUSE"]                   = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
+
+        // Ecosystem Actors
+        addr["PHOENIX_LABS_STREAM"]          = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+        addr["VIRIDIAN"]                     = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
+        addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
+        addr["SIDESTREAM"]                   = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
     }
 }

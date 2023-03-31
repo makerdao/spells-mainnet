@@ -101,6 +101,12 @@ contract DssSpellAction is DssAction {
     address constant STEAKHOUSE = 0xf737C76D2B358619f7ef696cf3F94548fEcec379; // SF_WALLET
     address constant BA_LABS    = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
 
+    // ECOSYSTEM ACTORS
+    address constant PHOENIX_LABS_STREAM = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+    address constant VIRIDIAN            = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
+    address constant DEWIZ               = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
+    address constant SIDESTREAM          = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
+
     function actions() public override {
 
         // ----- GSM Pause Delay Reset to 48 Hours -----
@@ -237,7 +243,7 @@ contract DssSpellAction is DssAction {
             )
         );
 
-        // ----- Yank old SF-001 MKR Vesting Streams - being replaced with single stream to SF Wallet
+        // ----- Yank old SF-001 MKR Vesting Streams - being replaced with single stream to SF Wallet -----
         // VOTE: N/A
         // FORUM: https://mips.makerdao.com/mips/details/MIP113
         VestLike(MCD_VEST_MKR_TREASURY).yank(18);
@@ -250,6 +256,61 @@ contract DssSpellAction is DssAction {
         // GovAlpha - 226.64 MKR - 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
         MKR.transfer(GOV_ALPHA, 226.64 ether);  // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
+
+        // ----- Ecosystem Actor Dai Streams -----
+        // Forum: https://mips.makerdao.com/mips/details/MIP106
+
+        // Vote: https://vote.makerdao.com/polling/QmRxNdG7
+        // Phoenix Labs | 2023-04-01 to 2024-04-01 | 204,000 DAI | 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                PHOENIX_LABS_STREAM,       // usr
+                204_000 * WAD,             // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Vote: https://vote.makerdao.com/polling/QmV9MR8B
+        // Viridian Protector Advisory Company | 2023-04-01 to 2024-04-01 | 1,029,000 DAI | 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                VIRIDIAN,                  // usr
+                1_029_000 * WAD,           // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Vote: https://vote.makerdao.com/polling/QmVo7VXV
+        // dewiz | 2023-04-01 to 2024-04-01 | 1,800,000 DAI | 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                DEWIZ,                     // usr
+                1_800_000 * WAD,           // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Vote: https://vote.makerdao.com/polling/Qmd5R3Jz
+        // Sidestream | 2023-04-01 to 2024-04-01 | 850,950 DAI | 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                SIDESTREAM,                // usr
+                850_950 * WAD,             // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
     }
 }
 

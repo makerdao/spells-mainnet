@@ -353,7 +353,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 16 + 5);
+        assertEq(vest.ids(), 16 + 9);
 
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
 
@@ -471,6 +471,98 @@ contract DssSpellTest is DssSpellTestBase {
         vm.warp(APR_01_2023 + 365 days);
         vest.vest(21);
         assertEq(dai.balanceOf(wallets.addr("BA_LABS")), prevBALabsBalance + 876_000 * WAD);
+
+        assertTrue(vest.valid(22)); // check for valid contract
+        _checkDaiVest({
+            _index:      22,                                             // id
+            _wallet:     wallets.addr("PHOENIX_LABS_STREAM"),            // usr
+            _start:      APR_01_2023,                                    // bgn
+            _cliff:      APR_01_2023,                                    // clf
+            _end:        APR_01_2024,                                    // fin
+            _days:       366 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     204_000 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        uint256 prevPhoenixBalance = dai.balanceOf(wallets.addr("PHOENIX_LABS_STREAM"));
+
+        vest.unrestrict(22);
+        vm.warp(APR_01_2023 + 366 days);
+        vest.vest(22);
+        assertEq(dai.balanceOf(wallets.addr("PHOENIX_LABS_STREAM")), prevPhoenixBalance + 204_000 * WAD);
+
+        assertTrue(vest.valid(23)); // check for valid contract
+        _checkDaiVest({
+            _index:      23,                                             // id
+            _wallet:     wallets.addr("VIRIDIAN"),                       // usr
+            _start:      APR_01_2023,                                    // bgn
+            _cliff:      APR_01_2023,                                    // clf
+            _end:        APR_01_2024,                                    // fin
+            _days:       366 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     1_029_000 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        uint256 prevViridianBalance = dai.balanceOf(wallets.addr("VIRIDIAN"));
+
+        vest.unrestrict(23);
+        vm.warp(APR_01_2023 + 366 days);
+        vest.vest(23);
+        assertEq(dai.balanceOf(wallets.addr("VIRIDIAN")), prevViridianBalance + 1_029_000 * WAD);
+
+        assertTrue(vest.valid(24)); // check for valid contract
+        _checkDaiVest({
+            _index:      24,                                             // id
+            _wallet:     wallets.addr("DEWIZ"),                          // usr
+            _start:      APR_01_2023,                                    // bgn
+            _cliff:      APR_01_2023,                                    // clf
+            _end:        APR_01_2024,                                    // fin
+            _days:       366 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     1_800_000 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        uint256 prevDewizBalance = dai.balanceOf(wallets.addr("DEWIZ"));
+
+        vest.unrestrict(24);
+        vm.warp(APR_01_2023 + 366 days);
+        vest.vest(24);
+        assertEq(dai.balanceOf(wallets.addr("DEWIZ")), prevDewizBalance + 1_800_000 * WAD);
+
+        assertTrue(vest.valid(25)); // check for valid contract
+        _checkDaiVest({
+            _index:      25,                                             // id
+            _wallet:     wallets.addr("SIDESTREAM"),                     // usr
+            _start:      APR_01_2023,                                    // bgn
+            _cliff:      APR_01_2023,                                    // clf
+            _end:        APR_01_2024,                                    // fin
+            _days:       366 days,                                       // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     850_950 * WAD,                                  // tot
+            _claimed:    0                                               // rxd
+        });
+
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        uint256 prevSidestreamBalance = dai.balanceOf(wallets.addr("SIDESTREAM"));
+
+        vest.unrestrict(25);
+        vm.warp(APR_01_2023 + 366 days);
+        vest.vest(25);
+        assertEq(dai.balanceOf(wallets.addr("SIDESTREAM")), prevSidestreamBalance + 850_950 * WAD);
     }
 
     struct Payee {
