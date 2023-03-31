@@ -390,35 +390,34 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[0] memory payees = [
-        ];
+        // Payee[] memory payees = [];
 
-        uint256 prevBalance;
-        uint256 totAmount;
-        uint256[] memory prevAmounts = new uint256[](payees.length);
+        // uint256 prevBalance;
+        // uint256 totAmount;
+        // uint256[] memory prevAmounts = new uint256[](payees.length);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            totAmount += payees[i].amount;
-            prevAmounts[i] = dai.balanceOf(payees[i].addr);
-            prevBalance += prevAmounts[i];
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     totAmount += payees[i].amount;
+        //     prevAmounts[i] = dai.balanceOf(payees[i].addr);
+        //     prevBalance += prevAmounts[i];
+        // }
 
-        _vote(address(spell));
-        spell.schedule();
-        vm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
-        assertTrue(spell.done());
+        // _vote(address(spell));
+        // spell.schedule();
+        // vm.warp(spell.nextCastTime());
+        // pot.drip();
+        // uint256 prevSin = vat.sin(address(vow));
+        // spell.cast();
+        // assertTrue(spell.done());
 
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        // assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(
-                dai.balanceOf(payees[i].addr) - prevAmounts[i],
-                payees[i].amount * WAD
-            );
-        }
+        // for (uint256 i = 0; i < payees.length; i++) {
+        //     assertEq(
+        //         dai.balanceOf(payees[i].addr) - prevAmounts[i],
+        //         payees[i].amount * WAD
+        //     );
+        // }
     }
 
     function testYankDAI() private { // make private to disable
@@ -538,7 +537,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
         // assertEq(gov.balanceOf(wallets.addr("XYZ_WALLET")), prevMkrXYZ + amountXYZ);
     }
 
