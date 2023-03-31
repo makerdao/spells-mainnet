@@ -896,4 +896,19 @@ contract DssSpellTest is DssSpellTestBase {
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
+
+    function testTransferMKR() public {
+        uint256 prevMkrPause    = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrGovAlpha = gov.balanceOf(wallets.addr("GOV_ALPHA"));
+
+        uint256 amountGovAlpha = 226.64 ether;
+        uint256 total          = 226.64 ether;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevMkrGovAlpha + amountGovAlpha);
+    }
 }
