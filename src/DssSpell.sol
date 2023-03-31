@@ -55,10 +55,45 @@ contract DssSpellAction is DssAction {
 
     address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
 
+    address constant COLDIRON           = 0x6634e3555DBF4B149c5AEC99D579A2469015AEca;
+    address constant FLIPFLOPFLAP       = 0x688d508f3a6B0a377e266405A1583B3316f9A2B3;
+    address constant GFXLABS            = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
+    address constant MHONKASALOTEEMULAU = 0x97Fb39171ACd7C82c439b6158EA2F71D26ba383d;
+    address constant PENNBLOCKCHAIN     = 0x2165D41aF0d8d5034b9c266597c1A415FA0253bd;
+    address constant FEEDBLACKLOOPS     = 0x80882f2A36d49fC46C3c654F7f9cB9a2Bf0423e1;
+    address constant STABLELAB          = 0x3B91eBDfBC4B78d778f62632a4004804AC5d2DB0;
+    address constant LBSBLOCKCHAIN      = 0xB83b3e9C8E3393889Afb272D354A7a3Bd1Fbcf5C;
+    address constant HKUSTEPI           = 0x2dA0d746938Efa28C7DC093b1da286b3D8bAC34a;
+    address constant JUSTINCASE         = 0xE070c2dCfcf6C6409202A8a210f71D51dbAe9473;
+    address constant FRONTIERRESEARCH   = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
+    address constant CODEKNIGHT         = 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D;
+    address constant FLIPSIDE           = 0x1ef753934C40a72a60EaB12A68B6f8854439AA78;
+    address constant ONESTONE           = 0x4eFb12d515801eCfa3Be456B5F348D3CD68f9E8a;
+    address constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
+    address constant ACREINVEST         = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
+
     function actions() public override {
 
         // ----- GSM Pause Delay Reset to 48 Hours -----
         PauseLike(MCD_PAUSE).setDelay(48 hours);
+
+        // ----- FINAL DELEGATE COMPENSATION -----
+        // FORUM: https://forum.makerdao.com/t/final-recognized-delegate-compensation-payments/20341
+        DssExecLib.sendPaymentFromSurplusBuffer(COLDIRON,           10_452);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPFLOPFLAP,       10_452);
+        DssExecLib.sendPaymentFromSurplusBuffer(GFXLABS,            10_452);
+        DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU,  9_929);
+        DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN,      9_568);
+        DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS,      9_408);
+        DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN,       3_045);
+        DssExecLib.sendPaymentFromSurplusBuffer(HKUSTEPI,            2_607);
+        DssExecLib.sendPaymentFromSurplusBuffer(JUSTINCASE,          2_488);
+        DssExecLib.sendPaymentFromSurplusBuffer(FRONTIERRESEARCH,    2_421);
+        DssExecLib.sendPaymentFromSurplusBuffer(CODEKNIGHT,            630);
+        DssExecLib.sendPaymentFromSurplusBuffer(FLIPSIDE,              541);
+        DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE,              314);
+        DssExecLib.sendPaymentFromSurplusBuffer(CONSENSYS,             154);
+        DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST,             33);
     }
 }
 
