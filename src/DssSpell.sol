@@ -21,6 +21,8 @@ import "dss-exec-lib/DssAction.sol";
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
+    function approve(address, uint256) external returns (bool);
 }
 
 interface PauseLike {
@@ -77,7 +79,9 @@ contract DssSpellAction is DssAction {
     address constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
     address constant ACREINVEST         = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
 
-    address immutable public MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    GemLike internal immutable MKR                   = GemLike(DssExecLib.mkr());
+    address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
 
     // 01 Mar 2023 12:00:00 AM UTC
     uint256 constant public MAR_01_2023 = 1677697200;
@@ -172,6 +176,59 @@ contract DssSpellAction is DssAction {
             VestLike(MCD_VEST_DAI).create(
                 BA_LABS,                                      // usr
                 876_000 * WAD,                                // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+
+        // ----- RESPONSIBLE FACILITATOR MKR STREAMS
+        // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
+        // Increase allowance by new vesting delta
+        uint256 newVesting = (690 + 432 + 340 + 180) * WAD;
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
+
+        // FORUM: https://mips.makerdao.com/mips/details/MIP113
+        // Steakhouse Financial | 2023-04-01 to 2024-03-31 | Cliff Date 2023-04-01 | 690 MKR
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                STEAKHOUSE,                                   // usr
+                690 * WAD,                                    // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // TECH | 2023-04-01 to 2024-03-31 | Cliff Date 2023-04-01 | 432 MKR
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                TECH,                                         // usr
+                432 * WAD,                                    // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // GovAlpha | 2023-04-01 to 2024-03-31 | Cliff Date 2023-04-01 | 340 MKR
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                GOV_ALPHA,                                    // usr
+                340 * WAD,                                    // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // FORUM: https://mips.makerdao.com/mips/details/MIP104
+        // BA Labs - Data Insights | 2023-04-01 to 2024-03-31 | Cliff Date 2023-04-01 | 180 MKR
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                BA_LABS,                                      // usr
+                180 * WAD,                                    // tot
                 APR_01_2023,                                  // bgn
                 MAR_31_2024 - APR_01_2023,                    // tau
                 0,                                            // eta
