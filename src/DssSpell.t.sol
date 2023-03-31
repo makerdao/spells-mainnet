@@ -300,7 +300,7 @@ contract DssSpellTest is DssSpellTestBase {
             0,   // tin
             0    // tout
         );
-        
+
         // GUSD
         _ilk = "PSM-GUSD-A";
         assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
@@ -384,16 +384,13 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[3] memory payees = [
-            Payee(wallets.addr("PHOENIX_LABS"),      50_000),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),      3_126),
-            Payee(wallets.addr("CONSENSYS"),            181)
+        Payee[0] memory payees = [
         ];
 
         uint256 prevBalance;
@@ -530,22 +527,19 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(SF_IC_WALLET_1), prevBalance1 + 195 ether);
     }
 
-    function testMKRPayments() public { // make private to disable
+    function testMKRPayments() private { // make private to disable
         uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrSES    = gov.balanceOf(wallets.addr("SES_WALLET"));
-        uint256 prevMkrCES    = gov.balanceOf(wallets.addr("CES_WALLET"));
+        // uint256 prevMkrXYZ    = gov.balanceOf(wallets.addr("XYZ_WALLET"));
 
-        uint256 amountSES     = 229.78 ether;
-        uint256 amountCES     =  77.34 ether;
-        uint256 total         = 307.12 ether;
+        // uint256 amountXYZ     = 229.78 ether;
+        // uint256 total         = 307.12 ether;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("SES_WALLET")), prevMkrSES + amountSES);
-        assertEq(gov.balanceOf(wallets.addr("CES_WALLET")), prevMkrCES + amountCES);
+        // assertEq(gov.balanceOf(wallets.addr("XYZ_WALLET")), prevMkrXYZ + amountXYZ);
     }
 
     function testMKRVestFix() private { // make private to disable
@@ -755,62 +749,4 @@ contract DssSpellTest is DssSpellTestBase {
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
-
-    // For PE-1208
-    // RWA007-A Tests
-
-    function testRWA007OraclePriceBumpNEW() public {
-
-        // Read the pip address and spot value before cast
-        (,address pip,,  ) = liquidationOracle.ilks("RWA007-A");
-        (,,uint256 spot,,) = vat.ilks("RWA007-A");
-
-        // Check the pip and spot values before cast
-        assertEq(uint256(DSValueAbstract(pip).read()), 500 * MILLION * WAD, "RWA007: Bad initial PIP value");
-        assertEq(spot, 500 * MILLION * RAY, "RWA007: Bad initial spot value");
-
-        // Load RWA007-A output conduit balance
-        address conduit = addr.addr("RWA007_A_OUTPUT_CONDUIT");
-
-        // Check the conduit balance is 0 before cast
-        assertEq(dai.balanceOf(address(conduit)), 0);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Read the pip address and spot value after cast, as well as Art and rate
-        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
-
-        // Check the pip and spot values after cast
-        assertEq(uint256(DSValueAbstract(pip).read()), 1_250 * MILLION * WAD, "RWA007: Bad PIP value after bump()");
-        assertEq(spotAfter, 1_250 * MILLION * RAY, "RWA007: Bad spot value after bump()");
-
-        // Test that a draw() can be performed
-        address urn = addr.addr("RWA007_A_URN");
-        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
-        GodMode.setWard(urn, address(this), 1);
-        RwaUrnLike(urn).hope(address(this));
-
-        // Calculate how much 'room' we can draw to get close to line
-        uint256 room = line - (Art * rate);
-        uint256 drawAmt = room / RAY;
-
-        // Correct our draw amount if it is too large
-        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
-            drawAmt = (room - rate) / RAY;
-        }
-
-        // Perform draw()
-        RwaUrnLike(urn).draw(drawAmt);
-
-        // Check the conduit balance after cast
-        assertEq(dai.balanceOf(address(conduit)), drawAmt);
-
-        // Read new Art
-        (Art,,,,) = vat.ilks("RWA007-A");
-
-        // Assert that we are within 2 `rate` of line
-        assertTrue(line - (Art * rate) < (2 * rate));  
-    } 
 }
