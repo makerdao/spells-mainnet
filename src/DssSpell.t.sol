@@ -681,68 +681,91 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 newAllowance = 690 ether + 432 ether + 340 ether + 180 ether;
+        uint256 newAllowance = 690 ether; // Steakhouse
+               newAllowance += 432 ether; // TECH
+               newAllowance += 340 ether; // GovAlpha
+               newAllowance += 180 ether; // BA Labs
+               newAllowance += 252 ether; // Dewiz
+               newAllowance += 120 ether; // Phoenix Labs
 
         assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newAllowance);
 
         assertEq(vest.cap(), 1_100 * WAD / 365 days);
-        assertEq(vest.ids(), 31 + 4);
+        assertEq(vest.ids(), 31 + 6);
 
         uint256 APR_01_2023 = 1680372000; // 01 Apr 2023 12:00:00 AM UTC
         uint256 MAR_31_2024 = 1711907999; // 31 Mar 2024 11:59:59 PM UTC
+        uint256 APR_01_2024 = 1711994399; // 01 Apr 2024 11:59:59 PM UTC
 
-        uint256 CLIFF = APR_01_2023;
-        uint256 FIN   = APR_01_2023 + (365 days) - 1; // -1 because we are going to 11:59:59 on Mar 31 24
+        uint256 facilitator_FIN   = APR_01_2023 + (365 days) - 1; // -1 because we are going to 11:59:59 on Mar 31 24
+        uint256 ecosystem_FIN     = APR_01_2023 + (366 days) - 1; // -1 because we are going to 11:59:59 on Apr 01 24
 
-        address STEAKHOUSE = wallets.addr("STEAKHOUSE");
-        address TECH       = wallets.addr("TECH_WALLET");
-        address GOV_ALPHA  = wallets.addr("GOV_ALPHA");
-        address BA_LABS    = wallets.addr("BA_LABS");
-
-        assertEq(vest.usr(32), STEAKHOUSE);
+        assertEq(vest.usr(32), wallets.addr("STEAKHOUSE"));
         assertEq(vest.bgn(32), APR_01_2023);
-        assertEq(vest.clf(32), CLIFF);
-        assertEq(vest.fin(32), FIN);
+        assertEq(vest.clf(32), APR_01_2023);
+        assertEq(vest.fin(32), facilitator_FIN);
         assertEq(vest.fin(32), MAR_31_2024);
         assertEq(vest.mgr(32), address(0));
         assertEq(vest.res(32), 1);
         assertEq(vest.tot(32), 690 ether);
         assertEq(vest.rxd(32), 0);
 
-        assertEq(vest.usr(33), TECH);
+        assertEq(vest.usr(33), wallets.addr("TECH_WALLET"));
         assertEq(vest.bgn(33), APR_01_2023);
-        assertEq(vest.clf(33), CLIFF);
-        assertEq(vest.fin(33), FIN);
+        assertEq(vest.clf(33), APR_01_2023);
+        assertEq(vest.fin(33), facilitator_FIN);
         assertEq(vest.fin(33), MAR_31_2024);
         assertEq(vest.mgr(33), address(0));
         assertEq(vest.res(33), 1);
         assertEq(vest.tot(33), 432 ether);
         assertEq(vest.rxd(33), 0);
 
-        assertEq(vest.usr(34), GOV_ALPHA);
+        assertEq(vest.usr(34), wallets.addr("GOV_ALPHA"));
         assertEq(vest.bgn(34), APR_01_2023);
-        assertEq(vest.clf(34), CLIFF);
-        assertEq(vest.fin(34), FIN);
+        assertEq(vest.clf(34), APR_01_2023);
+        assertEq(vest.fin(34), facilitator_FIN);
         assertEq(vest.fin(34), MAR_31_2024);
         assertEq(vest.mgr(34), address(0));
         assertEq(vest.res(34), 1);
         assertEq(vest.tot(34), 340 ether);
         assertEq(vest.rxd(34), 0);
 
-        assertEq(vest.usr(35), BA_LABS);
+        assertEq(vest.usr(35), wallets.addr("BA_LABS"));
         assertEq(vest.bgn(35), APR_01_2023);
-        assertEq(vest.clf(35), CLIFF);
-        assertEq(vest.fin(35), FIN);
+        assertEq(vest.clf(35), APR_01_2023);
+        assertEq(vest.fin(35), facilitator_FIN);
         assertEq(vest.fin(35), MAR_31_2024);
         assertEq(vest.mgr(35), address(0));
         assertEq(vest.res(35), 1);
         assertEq(vest.tot(35), 180 ether);
         assertEq(vest.rxd(35), 0);
 
-        uint256 prevBalance0 = gov.balanceOf(STEAKHOUSE);
-        uint256 prevBalance1 = gov.balanceOf(TECH);
-        uint256 prevBalance2 = gov.balanceOf(GOV_ALPHA);
-        uint256 prevBalance3 = gov.balanceOf(BA_LABS);
+        assertEq(vest.usr(36), wallets.addr("DEWIZ"));
+        assertEq(vest.bgn(36), APR_01_2023);
+        assertEq(vest.clf(36), APR_01_2023);
+        assertEq(vest.fin(36), ecosystem_FIN);
+        assertEq(vest.fin(36), APR_01_2024);
+        assertEq(vest.mgr(36), address(0));
+        assertEq(vest.res(36), 1);
+        assertEq(vest.tot(36), 252 ether);
+        assertEq(vest.rxd(36), 0);
+
+        assertEq(vest.usr(37), wallets.addr("PHOENIX_LABS_STREAM"));
+        assertEq(vest.bgn(37), APR_01_2023);
+        assertEq(vest.clf(37), APR_01_2023);
+        assertEq(vest.fin(37), ecosystem_FIN);
+        assertEq(vest.fin(37), APR_01_2024);
+        assertEq(vest.mgr(37), address(0));
+        assertEq(vest.res(37), 1);
+        assertEq(vest.tot(37), 120 ether);
+        assertEq(vest.rxd(37), 0);
+
+        uint256 prevBalance0 = gov.balanceOf(wallets.addr("STEAKHOUSE"));
+        uint256 prevBalance1 = gov.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevBalance2 = gov.balanceOf(wallets.addr("GOV_ALPHA"));
+        uint256 prevBalance3 = gov.balanceOf(wallets.addr("BA_LABS"));
+        uint256 prevBalance4 = gov.balanceOf(wallets.addr("DEWIZ"));
+        uint256 prevBalance5 = gov.balanceOf(wallets.addr("PHOENIX_LABS_STREAM"));
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
@@ -750,20 +773,30 @@ contract DssSpellTest is DssSpellTestBase {
         vest.unrestrict(33);
         vest.unrestrict(34);
         vest.unrestrict(35);
+        vest.unrestrict(36);
+        vest.unrestrict(37);
 
-        vm.warp(FIN);
+        vm.warp(facilitator_FIN);
 
         vest.vest(32);
-        assertEq(gov.balanceOf(STEAKHOUSE), prevBalance0 + 690 ether);
+        assertEq(gov.balanceOf(wallets.addr("STEAKHOUSE")), prevBalance0 + 690 ether);
 
         vest.vest(33);
-        assertEq(gov.balanceOf(TECH), prevBalance1 + 432 ether);
+        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevBalance1 + 432 ether);
 
         vest.vest(34);
-        assertEq(gov.balanceOf(GOV_ALPHA), prevBalance2 + 340 ether);
+        assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevBalance2 + 340 ether);
 
         vest.vest(35);
-        assertEq(gov.balanceOf(BA_LABS), prevBalance3 + 180 ether);
+        assertEq(gov.balanceOf(wallets.addr("BA_LABS")), prevBalance3 + 180 ether);
+
+        vm.warp(ecosystem_FIN);
+
+        vest.vest(36);
+        assertEq(gov.balanceOf(wallets.addr("DEWIZ")), prevBalance4 + 252 ether);
+
+        vest.vest(37);
+        assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_STREAM")), prevBalance5 + 120 ether);
     }
 
     function testMKRPayments() public { // make private to disable

@@ -193,7 +193,12 @@ contract DssSpellAction is DssAction {
         // ----- RESPONSIBLE FACILITATOR MKR STREAMS
         // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
         // Increase allowance by new vesting delta
-        uint256 newVesting = (690 + 432 + 340 + 180) * WAD;
+        uint256 newVesting = 690 * WAD; // STEAKHOUSE
+               newVesting += 432 * WAD; // TECH
+               newVesting += 340 * WAD; // GovAlpha
+               newVesting += 180 * WAD; // BA Labs
+               newVesting += 252 * WAD; // Dewiz
+               newVesting += 120 * WAD; // Phoenix Labs
         MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
 
         // FORUM: https://mips.makerdao.com/mips/details/MIP113
@@ -305,6 +310,35 @@ contract DssSpellAction is DssAction {
             VestLike(MCD_VEST_DAI).create(
                 SIDESTREAM,                // usr
                 850_950 * WAD,             // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // ----- Ecosystem Actor MKR Streams -----
+        // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
+
+        // VOTE: https://vote.makerdao.com/polling/QmVo7VXV
+        // dewiz | 2023-04-01 to 2024-04-01 | 252 MKR | 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                DEWIZ,                     // usr
+                252 * WAD,                 // tot
+                APR_01_2023,               // bgn
+                APR_01_2024 - APR_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // VOTE: https://vote.makerdao.com/polling/QmRxNdG7
+        // Phoenix Labs | 2023-04-01 to 2024-04-01 | 120 MKR | 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                PHOENIX_LABS_STREAM,       // usr
+                120 * WAD,                 // tot
                 APR_01_2023,               // bgn
                 APR_01_2024 - APR_01_2023, // tau
                 0,                         // eta
