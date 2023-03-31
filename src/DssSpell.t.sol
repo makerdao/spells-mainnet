@@ -674,19 +674,19 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(BA_LABS), prevBalance3 + 180 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
-        uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        // uint256 prevMkrXYZ    = gov.balanceOf(wallets.addr("XYZ_WALLET"));
+    function testMKRPayments() public { // make private to disable
+        uint256 prevMkrPause    = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrGovAlpha = gov.balanceOf(wallets.addr("GOV_ALPHA"));
 
-        // uint256 amountXYZ     = 229.78 ether;
-        // uint256 total         = 307.12 ether;
+        uint256 amountGovAlpha = 226.64 ether;
+        uint256 total          = 226.64 ether;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        // assertEq(gov.balanceOf(wallets.addr("XYZ_WALLET")), prevMkrXYZ + amountXYZ);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
+        assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevMkrGovAlpha + amountGovAlpha);
     }
 
     function testMKRVestFix() private { // make private to disable
@@ -895,20 +895,5 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
-    }
-
-    function testTransferMKR() public {
-        uint256 prevMkrPause    = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrGovAlpha = gov.balanceOf(wallets.addr("GOV_ALPHA"));
-
-        uint256 amountGovAlpha = 226.64 ether;
-        uint256 total          = 226.64 ether;
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevMkrGovAlpha + amountGovAlpha);
     }
 }
