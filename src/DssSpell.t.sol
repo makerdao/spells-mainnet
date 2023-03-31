@@ -559,22 +559,24 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestLegacy.fin(35), block.timestamp);
     }
 
-    function testYankMKR() private { // make private to disable
+    function testYankMKR() public { // make private to disable
 
-        // VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        // //VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
+        VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        // VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
 
-        // // Sunday, May 31, 2026 12:00:00 AM
-        // uint256 MAY_31_2026 = 1780185600;
-
-        // assertEq(vestTreas.usr(23), wallets.addr("SH_WALLET"));
-        // assertEq(vestTreas.fin(23), MAY_31_2026);
+        assertGt(vestTreas.fin(18), block.timestamp);
+        assertGt(vestTreas.fin(19), block.timestamp);
+        assertGt(vestTreas.fin(30), block.timestamp);
+        assertGt(vestTreas.fin(31), block.timestamp);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // assertEq(vestTreas.fin(23), block.timestamp);
+        assertEq(vestTreas.fin(18), block.timestamp);
+        assertEq(vestTreas.fin(19), block.timestamp);
+        assertEq(vestTreas.fin(30), block.timestamp);
+        assertEq(vestTreas.fin(31), block.timestamp);
     }
 
     function testVestMKR() public { // make private to disable

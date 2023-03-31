@@ -32,6 +32,7 @@ interface PauseLike {
 interface VestLike {
     function restrict(uint256) external;
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function yank(uint256) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -235,6 +236,15 @@ contract DssSpellAction is DssAction {
                 address(0)                                    // mgr
             )
         );
+
+        // ----- Yank old SF-001 MKR Vesting Streams - being replaced with single stream to SF Wallet
+        // VOTE: N/A
+        // FORUM: https://mips.makerdao.com/mips/details/MIP113
+        VestLike(MCD_VEST_MKR_TREASURY).yank(18);
+        VestLike(MCD_VEST_MKR_TREASURY).yank(19);
+        VestLike(MCD_VEST_MKR_TREASURY).yank(30);
+        VestLike(MCD_VEST_MKR_TREASURY).yank(31);
+
     }
 }
 
