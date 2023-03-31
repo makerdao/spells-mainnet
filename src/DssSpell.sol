@@ -27,6 +27,11 @@ interface PauseLike {
     function setDelay(uint256) external;
 }
 
+interface VestLike {
+    function restrict(uint256) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -72,6 +77,25 @@ contract DssSpellAction is DssAction {
     address constant CONSENSYS          = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
     address constant ACREINVEST         = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
 
+    address immutable public MCD_VEST_DAI = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+
+    // 01 Mar 2023 12:00:00 AM UTC
+    uint256 constant public MAR_01_2023 = 1677697200;
+    // 01 Apr 2023 12:00:00 AM UTC
+    uint256 constant public APR_01_2023 = 1680372000;
+    // 29 Feb 2024 11:59:59 PM UTC
+    uint256 constant public FEB_29_2024 = 1709233199;
+    // 31 Mar 2024 11:59:59 PM UTC
+    uint256 constant public MAR_31_2024 = 1711907999;
+    // 01 Apr 2024 11:59:59 PM UTC
+    uint256 constant public APR_01_2024 = 1711994399;
+
+    // RESPONSIBLE FACILITATORS
+    address constant GOV_ALPHA  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address constant TECH       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B; // TECH_WALLET
+    address constant STEAKHOUSE = 0xf737C76D2B358619f7ef696cf3F94548fEcec379; // SF_WALLET
+    address constant BA_LABS    = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
+
     function actions() public override {
 
         // ----- GSM Pause Delay Reset to 48 Hours -----
@@ -94,6 +118,66 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(ONESTONE,              314);
         DssExecLib.sendPaymentFromSurplusBuffer(CONSENSYS,             154);
         DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST,             33);
+
+        // ----- RESPONSIBLE FACILITATOR DAI STREAMS
+        // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
+        // FORUM: https://mips.makerdao.com/mips/details/MIP113
+        // GovAlpha | 2023-04-01 to 2024-03-31 | 900,000 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                GOV_ALPHA,                                    // usr
+                900_000 * WAD,                                // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // TECH | 2023-04-01 to 2024-03-31 | 1,380,000 DAI | 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                TECH,                                         // usr
+                1_380_000 * WAD,                              // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // Steakhouse Financial | 2023-04-01 to 2024-03-31 | 2,220,000 DAI | 0xf737C76D2B358619f7ef696cf3F94548fEcec379
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                STEAKHOUSE,                                   // usr
+                2_220_000 * WAD,                              // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // FORUM: https://mips.makerdao.com/mips/details/MIP104
+        // BA Labs | 2023-03-01 to 2024-02-29 | 2,484,000 DAI | 0xDfe08A40054685E205Ed527014899d1EDe49B892
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                BA_LABS,                                      // usr
+                2_484_000 * WAD,                              // tot
+                MAR_01_2023,                                  // bgn
+                FEB_29_2024 - MAR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
+        // BA Labs - Data Insights | 2023-04-01 to 2024-03-31 | 876,000 DAI | 0xDfe08A40054685E205Ed527014899d1EDe49B892
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                BA_LABS,                                      // usr
+                876_000 * WAD,                                // tot
+                APR_01_2023,                                  // bgn
+                MAR_31_2024 - APR_01_2023,                    // tau
+                0,                                            // eta
+                address(0)                                    // mgr
+            )
+        );
     }
 }
 

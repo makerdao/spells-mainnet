@@ -43,12 +43,10 @@ contract Wallets {
         addr["RISK_WALLET_VEST"]             = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
         addr["RWF_WALLET"]                   = 0x96d7b01Cc25B141520C717fa369844d34FF116ec;
         addr["SES_WALLET"]                   = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
-        addr["SF_WALLET"]                    = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["SF01_WALLET"]                  = 0x4Af6f22d454581bF31B2473Ebe25F5C6F55E028D;
         addr["SH_WALLET"]                    = 0x955993Df48b0458A01cfB5fd7DF5F5DCa6443550;
         addr["SH_MULTISIG"]                  = 0xc657aC882Fb2D6CcF521801da39e910F8519508d;
         addr["SNE_WALLET"]                   = 0x6D348f18c88D45243705D4fdEeB6538c6a9191F1;
-        addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
         addr["SIDESTREAM_WALLET"]            = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
 
         // Recognized Delegates
@@ -96,5 +94,11 @@ contract Wallets {
         addr["BIBTA_WALLET"]                 = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
         addr["MIP65_WALLET"]                 = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
         addr["BLOCKTOWER_WALLET"]            = 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9;
+
+        // Responsible Facilitators
+        addr["GOV_ALPHA"]                    = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+        addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+        addr["STEAKHOUSE"]                   = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+        addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
     }
 }
