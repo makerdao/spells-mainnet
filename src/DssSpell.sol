@@ -34,9 +34,9 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-04-05 MakerDAO Executive Spell | Hash: TODO";
 
-    // Turn office hours on
+    // Turn office hours off
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // Many of the settings that change weekly rely on the rate accumulator
