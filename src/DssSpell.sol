@@ -83,6 +83,9 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     GemLike internal immutable MKR                   = GemLike(DssExecLib.mkr());
     address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    address immutable internal ESM                   = DssExecLib.getChangelogAddress("MCD_ESM");
+    address immutable internal RWA_LIQ_ORACLE        = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+
 
     // 01 Mar 2023 12:00:00 AM UTC
     uint256 constant public MAR_01_2023 = 1677697200;
@@ -345,6 +348,9 @@ contract DssSpellAction is DssAction {
                 address(0)                 // mgr
             )
         );
+
+        // ----- Additional ESM authorization fix -----
+        DssExecLib.authorize(RWA_LIQ_ORACLE, ESM);
     }
 }
 

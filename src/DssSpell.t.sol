@@ -1021,4 +1021,19 @@ contract DssSpellTest is DssSpellTestBase {
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
+
+    function testNewModulesAuthorizingEsm() public {
+        uint256 ward;
+        address ESM = addr.addr("MCD_ESM");
+
+        ward = WardsAbstract(addr.addr("MIP21_LIQUIDATION_ORACLE")).wards(ESM);
+        assertEq(ward, 0, "unexpected ward");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        ward = WardsAbstract(addr.addr("MIP21_LIQUIDATION_ORACLE")).wards(ESM);
+        assertEq(ward, 1, "MIP21_LIQUIDATION_ORACLE does not authorize ESM");
+    }
 }
