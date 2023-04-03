@@ -88,15 +88,15 @@ contract DssSpellAction is DssAction {
 
 
     // 01 Mar 2023 12:00:00 AM UTC
-    uint256 constant public MAR_01_2023 = 1677697200;
+    uint256 constant public MAR_01_2023 = 1677628800;
     // 01 Apr 2023 12:00:00 AM UTC
-    uint256 constant public APR_01_2023 = 1680372000;
+    uint256 constant public APR_01_2023 = 1680307200;
     // 29 Feb 2024 11:59:59 PM UTC
-    uint256 constant public FEB_29_2024 = 1709233199;
+    uint256 constant public FEB_29_2024 = 1709251199;
     // 31 Mar 2024 11:59:59 PM UTC
-    uint256 constant public MAR_31_2024 = 1711907999;
+    uint256 constant public MAR_31_2024 = 1711929599;
     // 01 Apr 2024 11:59:59 PM UTC
-    uint256 constant public APR_01_2024 = 1711994399;
+    uint256 constant public APR_01_2024 = 1712015999;
 
     // RESPONSIBLE FACILITATORS
     address constant GOV_ALPHA  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
@@ -124,6 +124,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(MHONKASALOTEEMULAU,  9_929);
         DssExecLib.sendPaymentFromSurplusBuffer(PENNBLOCKCHAIN,      9_568);
         DssExecLib.sendPaymentFromSurplusBuffer(FEEDBLACKLOOPS,      9_408);
+        DssExecLib.sendPaymentFromSurplusBuffer(STABLELAB,           3_282);
         DssExecLib.sendPaymentFromSurplusBuffer(LBSBLOCKCHAIN,       3_045);
         DssExecLib.sendPaymentFromSurplusBuffer(HKUSTEPI,            2_607);
         DssExecLib.sendPaymentFromSurplusBuffer(JUSTINCASE,          2_488);
