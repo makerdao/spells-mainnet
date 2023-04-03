@@ -106,7 +106,8 @@ contract DssSpellAction is DssAction {
 
     // ECOSYSTEM ACTORS
     address constant PHOENIX_LABS_STREAM = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address constant VIRIDIAN            = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
+    address constant VIRIDIAN_STREAM     = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
+    address constant VIRIDIAN_TRANSFER   = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
     address constant DEWIZ               = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
     address constant SIDESTREAM          = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
 
@@ -285,7 +286,7 @@ contract DssSpellAction is DssAction {
         // Viridian Protector Advisory Company | 2023-04-01 to 2024-04-01 | 1,029,000 DAI | 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
-                VIRIDIAN,                  // usr
+                VIRIDIAN_STREAM,           // usr
                 1_029_000 * WAD,           // tot
                 APR_01_2023,               // bgn
                 APR_01_2024 - APR_01_2023, // tau
@@ -348,6 +349,15 @@ contract DssSpellAction is DssAction {
                 address(0)                 // mgr
             )
         );
+
+        // ----- Ecosystem Actor Dai Transfers -----
+        // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
+
+        // VOTE: https://vote.makerdao.com/polling/QmRxNdG7
+        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_STREAM, 347_100);
+
+        // VOTE: https://vote.makerdao.com/polling/QmV9MR8B
+        DssExecLib.sendPaymentFromSurplusBuffer(VIRIDIAN_TRANSFER,   257_250);
 
         // ----- Additional ESM authorization fix -----
         DssExecLib.authorize(RWA_LIQ_ORACLE, ESM);

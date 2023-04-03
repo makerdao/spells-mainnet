@@ -498,7 +498,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(vest.valid(23)); // check for valid contract
         _checkDaiVest({
             _index:      23,                                             // id
-            _wallet:     wallets.addr("VIRIDIAN"),                       // usr
+            _wallet:     wallets.addr("VIRIDIAN_STREAM"),                // usr
             _start:      APR_01_2023,                                    // bgn
             _cliff:      APR_01_2023,                                    // clf
             _end:        APR_01_2024,                                    // fin
@@ -511,12 +511,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevViridianBalance = dai.balanceOf(wallets.addr("VIRIDIAN"));
+        uint256 prevViridianBalance = dai.balanceOf(wallets.addr("VIRIDIAN_STREAM"));
 
         vest.unrestrict(23);
         vm.warp(APR_01_2023 + 366 days);
         vest.vest(23);
-        assertEq(dai.balanceOf(wallets.addr("VIRIDIAN")), prevViridianBalance + 1_029_000 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("VIRIDIAN_STREAM")), prevViridianBalance + 1_029_000 * WAD);
 
         assertTrue(vest.valid(24)); // check for valid contract
         _checkDaiVest({
@@ -576,24 +576,26 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[15] memory payees = [
+        Payee[17] memory payees = [
             // DELEGATE PAYMENTS
-            Payee(wallets.addr("COLDIRON"),            10_452),
-            Payee(wallets.addr("FLIPFLOPFLAP"),        10_452),
-            Payee(wallets.addr("GFXLABS"),             10_452),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"),   9_929),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),       9_568),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),       9_408),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),        3_045),
-            Payee(wallets.addr("HKUSTEPI"),             2_607),
-            Payee(wallets.addr("JUSTINCASE"),           2_488),
-            Payee(wallets.addr("FRONTIERRESEARCH"),     2_421),
-            Payee(wallets.addr("CODEKNIGHT"),             630),
-            Payee(wallets.addr("FLIPSIDE"),               541),
-            Payee(wallets.addr("ONESTONE"),               314),
-            Payee(wallets.addr("CONSENSYS"),              154),
-            Payee(wallets.addr("ACREINVEST"),              33)
+            Payee(wallets.addr("COLDIRON"),              10_452),
+            Payee(wallets.addr("FLIPFLOPFLAP"),          10_452),
+            Payee(wallets.addr("GFXLABS"),               10_452),
+            Payee(wallets.addr("MHONKASALOTEEMULAU"),     9_929),
+            Payee(wallets.addr("PENNBLOCKCHAIN"),         9_568),
+            Payee(wallets.addr("FEEDBLACKLOOPS"),         9_408),
+            Payee(wallets.addr("LBSBLOCKCHAIN"),          3_045),
+            Payee(wallets.addr("HKUSTEPI"),               2_607),
+            Payee(wallets.addr("JUSTINCASE"),             2_488),
+            Payee(wallets.addr("FRONTIERRESEARCH"),       2_421),
+            Payee(wallets.addr("CODEKNIGHT"),               630),
+            Payee(wallets.addr("FLIPSIDE"),                 541),
+            Payee(wallets.addr("ONESTONE"),                 314),
+            Payee(wallets.addr("CONSENSYS"),                154),
+            Payee(wallets.addr("ACREINVEST"),                33),
             // ECOSYSTEM ACTOR DAI TRANSFERS
+            Payee(wallets.addr("PHOENIX_LABS_STREAM"),  347_100),
+            Payee(wallets.addr("VIRIDIAN_TRANSFER"),    257_250)
         ];
 
         uint256 prevBalance;
