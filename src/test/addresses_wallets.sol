@@ -97,7 +97,7 @@ contract Wallets {
 
         // Responsible Facilitators
         addr["GOV_ALPHA"]                    = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-        addr["TECH_WALLET"]                  = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+        addr["TECH"]                         = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
         addr["STEAKHOUSE"]                   = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
 
