@@ -383,7 +383,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(vest.valid(18)); // check for valid contract
         _checkDaiVest({
             _index:      18,                                             // id
-            _wallet:     wallets.addr("TECH_WALLET"),                    // usr
+            _wallet:     wallets.addr("TECH"),                    // usr
             _start:      APR_01_2023,                                    // bgn
             _cliff:      APR_01_2023,                                    // clf
             _end:        MAR_31_2024,                                    // fin
@@ -396,12 +396,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevTechBalance = dai.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevTechBalance = dai.balanceOf(wallets.addr("TECH"));
 
         vest.unrestrict(18);
         vm.warp(APR_01_2023 + 366 days);
         vest.vest(18);
-        assertEq(dai.balanceOf(wallets.addr("TECH_WALLET")), prevTechBalance + 1_380_000 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("TECH")), prevTechBalance + 1_380_000 * WAD);
 
         assertTrue(vest.valid(19)); // check for valid contract
         _checkDaiVest({
@@ -713,7 +713,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.tot(32), 690 ether);
         assertEq(vest.rxd(32), 0);
 
-        assertEq(vest.usr(33), wallets.addr("TECH_WALLET"));
+        assertEq(vest.usr(33), wallets.addr("TECH"));
         assertEq(vest.bgn(33), APR_01_2023);
         assertEq(vest.clf(33), APR_01_2023);
         assertEq(vest.fin(33), facilitator_FIN);
@@ -764,7 +764,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.rxd(37), 0);
 
         uint256 prevBalance0 = gov.balanceOf(wallets.addr("STEAKHOUSE"));
-        uint256 prevBalance1 = gov.balanceOf(wallets.addr("TECH_WALLET"));
+        uint256 prevBalance1 = gov.balanceOf(wallets.addr("TECH"));
         uint256 prevBalance2 = gov.balanceOf(wallets.addr("GOV_ALPHA"));
         uint256 prevBalance3 = gov.balanceOf(wallets.addr("BA_LABS"));
         uint256 prevBalance4 = gov.balanceOf(wallets.addr("DEWIZ"));
@@ -785,7 +785,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("STEAKHOUSE")), prevBalance0 + 690 ether);
 
         vest.vest(33);
-        assertEq(gov.balanceOf(wallets.addr("TECH_WALLET")), prevBalance1 + 432 ether);
+        assertEq(gov.balanceOf(wallets.addr("TECH")), prevBalance1 + 432 ether);
 
         vest.vest(34);
         assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevBalance2 + 340 ether);
