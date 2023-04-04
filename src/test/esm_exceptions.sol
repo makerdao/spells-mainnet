@@ -21,8 +21,10 @@ contract EsmExceptions {
 
     constructor() {
         exceptions = [           // Why?
-            bytes32("WETH"),     // External Token
-            "USDC"               // External Token
+            bytes32("MCD_ESD"),  // Self-referential
+            "PROXY_DEPLOYER",    // Ecosystem tool
+            "MCD_DAI"            // Governance can't mint
+            // TODO MORE
         ];
     }
 
