@@ -2018,8 +2018,8 @@ contract DssSpellTestBase is Config, DssTest {
                 }
             }
             if (!_found) {
-                (bool ok, bytes memory data) = address(esm).call(
-                    abi.encodeWithSignature("wards(address)", chainLog.getAddress(_tags[i]))
+                (bool ok, bytes memory data) = address(chainLog.getAddress(_tags[i])).call(
+                    abi.encodeWithSignature("wards(address)", address(esm))
                 );
                 if (ok) {
                     assertEq(uint256(bytes32(data)), 1, _concat("TestError/not-esm-ward-", _tags[i]));
