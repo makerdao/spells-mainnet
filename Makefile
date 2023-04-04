@@ -19,3 +19,4 @@ time               :; ./scripts/time.sh date="$(date)" stamp="$(stamp)"
 exec-hash          :; ./scripts/hash-exec-copy.sh $(url)
 opt-cost           :; ./scripts/get-opt-relay-cost.sh $(spell)
 arb-cost           :; ./scripts/get-arb-relay-cost.sh $(spell)
+rates              :; ./scripts/rates.sh $(pct)
