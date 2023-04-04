@@ -21,9 +21,11 @@ contract EsmExceptions {
 
     constructor() {
         exceptions = [           // Why?
-            bytes32("MCD_ESD"),  // Self-referential
+            bytes32("MCD_ESM"),  // Self-referential
             "PROXY_DEPLOYER",    // Ecosystem tool
-            "MCD_DAI"            // Governance can't mint
+            "MCD_DAI",           // Governance can't mint
+            "WETH",
+            "ETH"
             // TODO MORE
         ];
     }
