@@ -100,7 +100,7 @@ contract DssSpellAction is DssAction {
 
     // RESPONSIBLE FACILITATORS
     address constant GOV_ALPHA  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    address constant TECH       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B; // TECH_WALLET
+    address constant TECH       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
     address constant STEAKHOUSE = 0xf737C76D2B358619f7ef696cf3F94548fEcec379; // SF_WALLET
     address constant BA_LABS    = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
 
@@ -135,7 +135,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(CONSENSYS,             154);
         DssExecLib.sendPaymentFromSurplusBuffer(ACREINVEST,             33);
 
-        // ----- RESPONSIBLE FACILITATOR DAI STREAMS
+        // ----- RESPONSIBLE FACILITATOR DAI STREAMS -----
         // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
         // FORUM: https://mips.makerdao.com/mips/details/MIP113
         // GovAlpha | 2023-04-01 to 2024-03-31 | 900,000 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
@@ -261,7 +261,7 @@ contract DssSpellAction is DssAction {
         VestLike(MCD_VEST_MKR_TREASURY).yank(30);
         VestLike(MCD_VEST_MKR_TREASURY).yank(31);
 
-        // ----- Responsible Facilitator MKR Transfers
+        // ----- Responsible Facilitator MKR Transfers -----
         // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
         // GovAlpha - 226.64 MKR - 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
         MKR.transfer(GOV_ALPHA, 226.64 ether);  // NOTE: 'ether' is a keyword helper, only MKR is transferred here
