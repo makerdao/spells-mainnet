@@ -2001,10 +2001,6 @@ contract DssSpellTestBase is Config, DssTest {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
-    function testESMWards() public {
-        _checkESMWards();
-    }
-
     function _checkESMWards() internal {
 
         bytes32[] memory _tags       = chainLog.list();

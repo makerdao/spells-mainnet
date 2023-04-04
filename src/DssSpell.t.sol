@@ -112,6 +112,10 @@ contract DssSpellTest is DssSpellTestBase {
     function testChainlogVersionBump() public {
         _testChainlogVersionBump();
     }
+
+    function testESMWards() public {
+        _checkESMWards();
+    }
     // END OF TESTS THAT SHOULD BE RUN ON EVERY SPELL
 
     function testOsmAuth() private {  // make private to disable
