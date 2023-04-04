@@ -475,7 +475,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(vest.valid(22)); // check for valid contract
         _checkDaiVest({
             _index:      22,                                             // id
-            _wallet:     wallets.addr("PHOENIX_LABS_STREAM"),            // usr
+            _wallet:     wallets.addr("PHOENIX_LABS_2"),            // usr
             _start:      APR_01_2023,                                    // bgn
             _cliff:      APR_01_2023,                                    // clf
             _end:        APR_01_2024,                                    // fin
@@ -488,12 +488,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevPhoenixBalance = dai.balanceOf(wallets.addr("PHOENIX_LABS_STREAM"));
+        uint256 prevPhoenixBalance = dai.balanceOf(wallets.addr("PHOENIX_LABS_2"));
 
         vest.unrestrict(22);
         vm.warp(APR_01_2023 + 367 days);
         vest.vest(22);
-        assertEq(dai.balanceOf(wallets.addr("PHOENIX_LABS_STREAM")), prevPhoenixBalance + 204_000 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevPhoenixBalance + 204_000 * WAD);
 
         assertTrue(vest.valid(23)); // check for valid contract
         _checkDaiVest({
@@ -595,7 +595,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("CONSENSYS"),                154),
             Payee(wallets.addr("ACREINVEST"),                33),
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("PHOENIX_LABS_STREAM"),  347_100),
+            Payee(wallets.addr("PHOENIX_LABS_2"),       347_100),
             Payee(wallets.addr("VIRIDIAN_TRANSFER"),    257_250)
         ];
 
@@ -753,7 +753,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.tot(36), 252 ether);
         assertEq(vest.rxd(36), 0);
 
-        assertEq(vest.usr(37), wallets.addr("PHOENIX_LABS_STREAM"));
+        assertEq(vest.usr(37), wallets.addr("PHOENIX_LABS_2"));
         assertEq(vest.bgn(37), APR_01_2023);
         assertEq(vest.clf(37), APR_01_2023);
         assertEq(vest.fin(37), ecosystem_FIN);
@@ -768,7 +768,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevBalance2 = gov.balanceOf(wallets.addr("GOV_ALPHA"));
         uint256 prevBalance3 = gov.balanceOf(wallets.addr("BA_LABS"));
         uint256 prevBalance4 = gov.balanceOf(wallets.addr("DEWIZ"));
-        uint256 prevBalance5 = gov.balanceOf(wallets.addr("PHOENIX_LABS_STREAM"));
+        uint256 prevBalance5 = gov.balanceOf(wallets.addr("PHOENIX_LABS_2"));
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
@@ -799,7 +799,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("DEWIZ")), prevBalance4 + 252 ether);
 
         vest.vest(37);
-        assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_STREAM")), prevBalance5 + 120 ether);
+        assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevBalance5 + 120 ether);
     }
 
     function testMKRPayments() public { // make private to disable

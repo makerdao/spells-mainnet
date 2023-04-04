@@ -69,15 +69,15 @@ contract DssSpellAction is DssAction {
     address immutable internal RWA_LIQ_ORACLE        = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
     // 01 Mar 2023 12:00:00 AM UTC
-    uint256 constant public MAR_01_2023 = 1677628800;
+    uint256 public constant MAR_01_2023 = 1677628800;
     // 01 Apr 2023 12:00:00 AM UTC
-    uint256 constant public APR_01_2023 = 1680307200;
+    uint256 public constant APR_01_2023 = 1680307200;
     // 29 Feb 2024 11:59:59 PM UTC
-    uint256 constant public FEB_29_2024 = 1709251199;
+    uint256 public constant FEB_29_2024 = 1709251199;
     // 31 Mar 2024 11:59:59 PM UTC
-    uint256 constant public MAR_31_2024 = 1711929599;
+    uint256 public constant MAR_31_2024 = 1711929599;
     // 01 Apr 2024 11:59:59 PM UTC
-    uint256 constant public APR_01_2024 = 1712015999;
+    uint256 public constant APR_01_2024 = 1712015999;
 
     // DELEGATES
     address internal constant COLDIRON           = 0x6634e3555DBF4B149c5AEC99D579A2469015AEca;
@@ -98,17 +98,17 @@ contract DssSpellAction is DssAction {
     address internal constant ACREINVEST         = 0x5b9C98e8A3D9Db6cd4B4B4C1F92D0A551D06F00D;
 
     // RESPONSIBLE FACILITATORS
-    address constant GOV_ALPHA  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
-    address constant TECH       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
-    address constant STEAKHOUSE = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
-    address constant BA_LABS    = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
+    address internal constant GOV_ALPHA  = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
+    address internal constant TECH       = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
+    address internal constant STEAKHOUSE = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
+    address internal constant BA_LABS    = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
 
     // ECOSYSTEM ACTORS
-    address constant PHOENIX_LABS_STREAM = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address constant VIRIDIAN_STREAM     = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
-    address constant VIRIDIAN_TRANSFER   = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
-    address constant DEWIZ               = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
-    address constant SIDESTREAM          = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
+    address internal constant PHOENIX_LABS_2      = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+    address internal constant VIRIDIAN_STREAM     = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
+    address internal constant VIRIDIAN_TRANSFER   = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
+    address internal constant DEWIZ               = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
+    address internal constant SIDESTREAM          = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
 
     function actions() public override {
 
@@ -273,7 +273,7 @@ contract DssSpellAction is DssAction {
         // Phoenix Labs | 2023-04-01 to 2024-04-01 | 204,000 DAI | 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
-                PHOENIX_LABS_STREAM,       // usr
+                PHOENIX_LABS_2,            // usr
                 204_000 * WAD,             // tot
                 APR_01_2023,               // bgn
                 APR_01_2024 - APR_01_2023, // tau
@@ -341,7 +341,7 @@ contract DssSpellAction is DssAction {
         // Phoenix Labs | 2023-04-01 to 2024-04-01 | 120 MKR | 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
-                PHOENIX_LABS_STREAM,       // usr
+                PHOENIX_LABS_2,            // usr
                 120 * WAD,                 // tot
                 APR_01_2023,               // bgn
                 APR_01_2024 - APR_01_2023, // tau
@@ -354,9 +354,11 @@ contract DssSpellAction is DssAction {
         // VOTE: https://vote.makerdao.com/polling/Qmbndmkr#vote-breakdown
 
         // VOTE: https://vote.makerdao.com/polling/QmRxNdG7
-        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_STREAM, 347_100);
+        // Phoenix Labs - 347,100 DAI - 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
+        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_2, 347_100);
 
         // VOTE: https://vote.makerdao.com/polling/QmV9MR8B
+        // Viridian Protector Advisory Company - 257,250 DAI - 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07
         DssExecLib.sendPaymentFromSurplusBuffer(VIRIDIAN_TRANSFER,   257_250);
 
         // ----- Additional ESM authorization fix -----

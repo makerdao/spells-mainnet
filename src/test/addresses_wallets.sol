@@ -102,7 +102,7 @@ contract Wallets {
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
 
         // Ecosystem Actors
-        addr["PHOENIX_LABS_STREAM"]          = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+        addr["PHOENIX_LABS_2"]               = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
         addr["VIRIDIAN_STREAM"]              = 0xbB8AA212267477C3dbfF6643E497919ec2E3dEC9;
         addr["VIRIDIAN_TRANSFER"]            = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
         addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
