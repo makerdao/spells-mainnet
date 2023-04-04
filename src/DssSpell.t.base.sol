@@ -23,6 +23,7 @@ import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
+import "./test/esm_exceptions.sol";
 import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
@@ -144,10 +145,11 @@ interface AuthorityLike {
 }
 
 contract DssSpellTestBase is Config, DssTest {
-    Rates         rates = new Rates();
-    Addresses      addr = new Addresses();
-    Deployers deployers = new Deployers();
-    Wallets     wallets = new Wallets();
+    Rates         rates      = new Rates();
+    Addresses      addr      = new Addresses();
+    Deployers deployers      = new Deployers();
+    Wallets     wallets      = new Wallets();
+    EsmExceptions exceptions = new EsmExceptions();
 
     // ADDRESSES
     ChainlogAbstract            chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -1997,6 +1999,23 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function testESMWards() public {
+        _checkESMWards();
+    }
+
+    function _checkESMWards() internal {
+
+        bytes32[] memory _tags       = chainLog.list();
+        bytes32[] memory _exceptions = exceptions.list();
+
+        for (uint256 i = 0; i < _tags.length; i++) {
+            for (uint256 j = 0; j < _exceptions.length; j++) {
+                if (_tags[i] == _exceptions[j]) { break; }
+            }
+            assertEq(esm.wards(chainLog.getAddress(_tags[i])), 1, _concat("TestError/not-esm-ward-", _tags[i]));
+        }
     }
 
 }
