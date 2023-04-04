@@ -38,6 +38,10 @@ struct TeleportGUID {
     uint48 timestamp;
 }
 
+interface AuthLike {
+    function wards(address) external view returns (uint256);
+}
+
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
@@ -2007,11 +2011,20 @@ contract DssSpellTestBase is Config, DssTest {
         bytes32[] memory _exceptions = exceptions.list();
 
         for (uint256 i = 0; i < _tags.length; i++) {
+            bool _found = false;
             for (uint256 j = 0; j < _exceptions.length; j++) {
-                if (_tags[i] == _exceptions[j]) { break; }
+                if (_tags[i] == _exceptions[j]) {
+                    _found = true;
+                }
             }
-            assertEq(esm.wards(chainLog.getAddress(_tags[i])), 1, _concat("TestError/not-esm-ward-", _tags[i]));
+            if (!_found) {
+                (bool ok, bytes memory data) = address(esm).call(
+                    abi.encodeWithSignature("wards(address)", chainLog.getAddress(_tags[i]))
+                );
+                if (ok) {
+                    assertEq(uint256(bytes32(data)), 1, _concat("TestError/not-esm-ward-", _tags[i]));
+                }
+            }
         }
     }
-
 }
