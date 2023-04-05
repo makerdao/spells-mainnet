@@ -2,7 +2,7 @@
 
 set -e
 
-# Define colors
+# Define Colors
 GREEN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m' # No Color
@@ -28,21 +28,21 @@ CONFIG_PATH="src/test/config.sol"
 LICENSE="GNU AGPLv3"
 SOLC="v0.8.16+commit.07a7930e"
 
-# Read contract address, block number, and timestamp from Solidity source code
+# Read spell address, block number, and timestamp from config.sol
 deployed_spell_address=$(grep -oE 'deployed_spell:\s+address\((0x[a-fA-F0-9]+)\)' $CONFIG_PATH | sed -E 's/^.*\((.*)\)/\1/')
 deployed_spell_block=$(grep -oE 'deployed_spell_block\s*:\s*[0-9]+' $CONFIG_PATH | sed -E 's/.*:\s*//')
 deployed_spell_timestamp=$(grep -oE 'deployed_spell_created\s*:\s*[0-9]+' $CONFIG_PATH | sed -E 's/.*:\s*//')
 
-# Check if contract address, block number, and timestamp are zero
+# Check if spell address, block number, and timestamp are zero
 if [[ "$deployed_spell_address" =~ ^(address\(0\)|0)$ ]] || [[ "$deployed_spell_block" = "0" ]] || [[ "$deployed_spell_timestamp" = "0" ]]; then
   echo "DssSpell address, block number, or timestamp is not set in config file."
   exit 1
 fi
 
-# Get contract verification information
+# Get spell verification information
 verified_spell_info=$(curl -s "$ETHERSCAN_API?module=contract&action=getsourcecode&address=$deployed_spell_address" | jq -r .result[0])
 
-# Check contract verification status
+# Check spell verification status
 verified=$(echo "$verified_spell_info" | jq -r '.SourceCode != null')
 if [ "$verified" ]; then
   success_check "DssSpell is verified."
@@ -50,7 +50,7 @@ else
   error_check "DssSpell not verified."
 fi
 
-# Check license type
+# Check verified spell license type
 license=$(echo "$verified_spell_info" | jq -r '.LicenseType')
 if [ "$license" == "$LICENSE" ]; then
   success_check "DssSpell was verified with a valid license."
@@ -58,7 +58,7 @@ else
   error_check "DssSpell was verified with an invalid or unknown license."
 fi
 
-# Check contract solc version
+# Check verified spell solc version
 solc_version=$(echo "$verified_spell_info" | jq -r '.CompilerVersion')
 if [ "$solc_version" == "$SOLC" ]; then
   success_check "DssSpell solc version matches."
@@ -66,7 +66,7 @@ else
   error_check "DssSpell solc version does not match."
 fi
 
-# Check contract optimizations
+# Check verified spell optimizations
 optimized=$(echo "$verified_spell_info" | jq -r '.OptimizationUsed == "1"')
 if [ "$optimized" = "false" ]; then
   success_check "DssSpell was not compiled with optimizations."
@@ -74,7 +74,7 @@ else
   error_check "DssSpell was compiled with optimizations."
 fi
 
-# Check contract library
+# Check verified spell linked library
 library_address=$(echo "$verified_spell_info" | jq -r '.Library | split(":") | .[1]')
 checksum_library_address=$(cast --to-checksum-address "$library_address")
 if [ "$checksum_library_address" == "$(cat DssExecLib.address)" ]; then
@@ -86,17 +86,18 @@ fi
 # Retrieve transaction hash
 tx_hash=$(curl -s "$ETHERSCAN_API?module=account&action=txlistinternal&address=$deployed_spell_address&startblock=0&endblock=99999999&sort=asc&apikey=$ETHERSCAN_API_KEY" | jq -r ".result[0].hash")
 
-# Retrieve deployed contract timestamp and block number info
+# Retrieve deployed spell timestamp and block number info
 timestamp=$(cast block "$(cast tx "${tx_hash}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}')
 block=$(cast tx "${tx_hash}"|grep blockNumber|awk '{print $2}')
 
-# Check contract timestamp and block number
+# Check deployed spell timestamp
 if [ "$timestamp" == "$deployed_spell_timestamp" ]; then
   success_check "DssSpell deployment timestamp matches."
 else
   error_check "DssSpell deployment timestamp does not match."
 fi
 
+# Check deployed spell block number
 if [ "$block" == "$deployed_spell_block" ]; then
   success_check "DssSpell deployment block number matches."
 else
