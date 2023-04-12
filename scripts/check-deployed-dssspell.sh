@@ -51,8 +51,8 @@ else
 fi
 
 # Check verified spell license type
-license=$(echo "$verified_spell_info" | jq -r '.LicenseType')
-if [ "$license" == "$LICENSE" ]; then
+license_type=$(echo "$verified_spell_info" | jq -r '.LicenseType')
+if [ "$license_type" == "$LICENSE" ]; then
   success_check "DssSpell was verified with a valid license."
 else
   error_check "DssSpell was verified with an invalid or unknown license."
