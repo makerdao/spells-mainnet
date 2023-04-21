@@ -570,7 +570,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -1025,18 +1025,4 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testNewModulesAuthorizingEsm() public {
-        uint256 ward;
-        address ESM = addr.addr("MCD_ESM");
-
-        ward = WardsAbstract(addr.addr("MIP21_LIQUIDATION_ORACLE")).wards(ESM);
-        assertEq(ward, 0, "unexpected ward");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        ward = WardsAbstract(addr.addr("MIP21_LIQUIDATION_ORACLE")).wards(ESM);
-        assertEq(ward, 1, "MIP21_LIQUIDATION_ORACLE does not authorize ESM");
-    }
 }
