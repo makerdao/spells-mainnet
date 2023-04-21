@@ -1025,4 +1025,20 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
+    function testGlobalLineDecrease() public {
+        (, , , uint256 rwa008ALine, ) = vat.ilks("RWA008-A");
+        (, , , uint256 yfiALine,    ) = vat.ilks("YFI-A");
+        (, , , uint256 maticALine,  ) = vat.ilks("MATIC-A");
+        (, , , uint256 linkALine,   ) = vat.ilks("LINK-A");
+
+        uint256 sumLines         = rwa008ALine + yfiALine + maticALine + linkALine;
+        uint256 globalLineBefore = vat.Line();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 globalLineAfter = vat.Line();
+        assertEq(globalLineAfter, globalLineBefore - sumLines, "TestError/global-dc-not-updated");
+    }
 }
