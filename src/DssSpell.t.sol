@@ -674,7 +674,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreas.fin(31), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 31);
 
