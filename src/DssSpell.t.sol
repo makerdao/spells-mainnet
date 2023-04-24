@@ -659,7 +659,7 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         // VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
 
-        uint256 endTime = 1682899199;
+        uint256 endTime = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
 
         assertGt(vestTreas.fin(4),  endTime);
         assertGt(vestTreas.fin(5),  endTime);
@@ -690,6 +690,50 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreas.fin(16), endTime);
         assertEq(vestTreas.fin(17), endTime);
         assertEq(vestTreas.fin(29), endTime);
+
+        // Give admin powers to test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vestTreas), address(this), 1);
+
+        vestTreas.unrestrict(4);
+        vestTreas.unrestrict(5);
+        vestTreas.unrestrict(6);
+        vestTreas.unrestrict(7);
+        vestTreas.unrestrict(10);
+        vestTreas.unrestrict(11);
+        vestTreas.unrestrict(12);
+        vestTreas.unrestrict(14);
+        vestTreas.unrestrict(15);
+        vestTreas.unrestrict(16);
+        vestTreas.unrestrict(17);
+        vestTreas.unrestrict(29);
+
+        vm.warp(endTime + 30 days);
+
+        vestTreas.vest(4);
+        vestTreas.vest(5);
+        vestTreas.vest(6);
+        vestTreas.vest(7);
+        vestTreas.vest(10);
+        vestTreas.vest(11);
+        vestTreas.vest(12);
+        vestTreas.vest(14);
+        vestTreas.vest(15);
+        vestTreas.vest(16);
+        vestTreas.vest(17);
+        vestTreas.vest(29);
+
+        assertTrue(!vestTreas.valid(4));
+        assertTrue(!vestTreas.valid(5));
+        assertTrue(!vestTreas.valid(6));
+        assertTrue(!vestTreas.valid(7));
+        assertTrue(!vestTreas.valid(10));
+        assertTrue(!vestTreas.valid(11));
+        assertTrue(!vestTreas.valid(12));
+        assertTrue(!vestTreas.valid(14));
+        assertTrue(!vestTreas.valid(15));
+        assertTrue(!vestTreas.valid(16));
+        assertTrue(!vestTreas.valid(17));
+        assertTrue(!vestTreas.valid(29));
     }
 
     function testVestMKR() private { // make private to disable
