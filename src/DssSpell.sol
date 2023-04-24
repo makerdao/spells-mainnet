@@ -28,7 +28,7 @@ interface VatLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20April%2024%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/d9947f3e785e1d9b1d9d24242c9e18fa268926f9/governance/votes/Executive%20vote%20-%20April%2024%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2023-04-24 MakerDAO Executive Spell | Hash: 0x6306ef3946bf3bcc63e15e5254ea6266b1c8ed54cf9d34b4f18f01d00b3be0fb";
 
