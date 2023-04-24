@@ -21,8 +21,8 @@ import "dss-exec-lib/DssAction.sol";
 
 interface VatLike {
     function Line() external view returns (uint256);
-    function file(bytes32 ilk, uint256 data) external;
-    function ilks(bytes32 ilk) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+    function file(bytes32 what, uint256 data) external;
+    function ilks(bytes32 ilk) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
 
 contract DssSpellAction is DssAction {
