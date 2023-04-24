@@ -21,8 +21,8 @@ import "dss-exec-lib/DssAction.sol";
 
 interface VatLike {
     function Line() external view returns (uint256);
-    function file(bytes32, uint256) external;
-    function ilks(bytes32) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+    function file(bytes32 ilk, uint256 data) external;
+    function ilks(bytes32 ilk) external returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
 
 contract DssSpellAction is DssAction {
@@ -107,7 +107,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("WBTC-C", FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the GNO-A Stability Fee from 2.50% to 4.90%
-        DssExecLib.setIlkStabilityFee("GNO-A", FOUR_NINE_PCT_RATE, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("GNO-A",  FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
     }
 }

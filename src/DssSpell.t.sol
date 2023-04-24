@@ -1039,6 +1039,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         uint256 globalLineAfter = vat.Line();
-        assertEq(globalLineAfter, globalLineBefore - sumLines, "TestError/global-dc-not-updated");
+        assertEq(globalLineAfter, globalLineBefore - sumLines, "TestError/global-line-not-updated");
     }
 }
