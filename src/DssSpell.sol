@@ -61,9 +61,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant WAD     = 10 ** 18;
 
-
     function actions() public override {
-
     }
 }
 

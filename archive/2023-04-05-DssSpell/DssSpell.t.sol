@@ -112,10 +112,6 @@ contract DssSpellTest is DssSpellTestBase {
     function testChainlogVersionBump() public {
         _testChainlogVersionBump();
     }
-
-    function testESMWards() public {
-        _checkESMWards();
-    }
     // END OF TESTS THAT SHOULD BE RUN ON EVERY SPELL
 
     function testOsmAuth() private {  // make private to disable
@@ -574,7 +570,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
