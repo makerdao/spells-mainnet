@@ -23,6 +23,7 @@ import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
+import "./test/esm_exceptions.sol";
 import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
@@ -144,10 +145,11 @@ interface AuthorityLike {
 }
 
 contract DssSpellTestBase is Config, DssTest {
-    Rates         rates = new Rates();
-    Addresses      addr = new Addresses();
-    Deployers deployers = new Deployers();
-    Wallets     wallets = new Wallets();
+    Rates         rates      = new Rates();
+    Addresses      addr      = new Addresses();
+    Deployers deployers      = new Deployers();
+    Wallets     wallets      = new Wallets();
+    EsmExceptions exceptions = new EsmExceptions();
 
     // ADDRESSES
     ChainlogAbstract            chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -1999,4 +2001,38 @@ contract DssSpellTestBase is Config, DssTest {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
+    // Test checks that any contracts in the chainlog which are a ward of
+    //  the pause proxy are also have the ESM authed. Any new contracts
+    //  that are added to the chainlog should have an ESM auth if the
+    //  pause proxy is authorized on them. If it is not necessary to remove
+    //  proxy access after a shutdown event, it can be added to the
+    //  test/esm_exceptions.sol array. Add a comment to indicate why this
+    //  authorization is not necessary.
+    function _checkESMWards() internal {
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes32[] memory _tags       = chainLog.list();
+        bytes32[] memory _exceptions = exceptions.list();
+
+        for (uint256 i = 0; i < _tags.length; i++) {
+            bool _found = false;
+            for (uint256 j = 0; j < _exceptions.length; j++) {
+                if (_tags[i] == _exceptions[j]) {
+                    _found = true;
+                }
+            }
+            if (!_found) {
+                address _tagAddr = chainLog.getAddress(_tags[i]);
+                (bool ok, bytes memory data) = address(_tagAddr).call(
+                    abi.encodeWithSignature("wards(address)", address(esm))
+                );
+                if (ok && WardsAbstract(_tagAddr).wards(pauseProxy) == 1) {
+                    assertEq(uint256(bytes32(data)), 1, _concat("TestError/not-esm-ward-", _tags[i]));
+                }
+            }
+        }
+    }
 }
