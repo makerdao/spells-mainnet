@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2021 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2023 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,9 @@ contract EsmExceptions {
             "PROXY_DEPLOYER",    // Ecosystem tool
             "MCD_DAI",           // Governance can't mint
             "WETH",
-            "ETH"
-            // TODO MORE
+            "ETH",
+            // Everything after this should be evaluated
+
         ];
     }
 
