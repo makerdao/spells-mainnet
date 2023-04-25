@@ -25,6 +25,14 @@ interface VatLike {
     function ilks(bytes32 ilk) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
 
+interface VestLike {
+    function yank(uint256, uint256) external;
+}
+
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -32,11 +40,17 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-04-24 MakerDAO Executive Spell | Hash: 0x6306ef3946bf3bcc63e15e5254ea6266b1c8ed54cf9d34b4f18f01d00b3be0fb";
 
+    address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
+
     uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
 
+    uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAD = 10 ** 45;
 
     VatLike internal immutable vat = VatLike(DssExecLib.vat());
+    VestLike internal immutable vest = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+
+    uint256  internal constant END_VEST_TIMESTAMP = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
 
     // Turn office hours off
     function officeHours() public pure override returns (bool) {
@@ -109,6 +123,46 @@ contract DssSpellAction is DssAction {
         // Increase the GNO-A Stability Fee from 2.50% to 4.90%
         DssExecLib.setIlkStabilityFee("GNO-A",  FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
+        // ---------- PE MKR Vesting Stream Cleanup ----------
+
+        // PE-001 Contributor - 248 MKR - 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263
+        GemLike(DssExecLib.mkr()).transfer(PE_CONTRIBUTOR, 248 * WAD);
+
+        // Yank MKR Stream ID 4 at timestamp 1682899199
+        vest.yank(4, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 5 at timestamp 1682899199
+        vest.yank(5, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 6 at timestamp 1682899199
+        vest.yank(6, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 7 at timestamp 1682899199
+        vest.yank(7, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 10 at timestamp 1682899199
+        vest.yank(10, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 11 at timestamp 1682899199
+        vest.yank(11, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 12 at timestamp 1682899199
+        vest.yank(12, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 14 at timestamp 1682899199
+        vest.yank(14, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 15 at timestamp 1682899199
+        vest.yank(15, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 16 at timestamp 1682899199
+        vest.yank(16, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 17 at timestamp 1682899199
+        vest.yank(17, END_VEST_TIMESTAMP);
+
+        // Yank MKR Stream ID 29 at timestamp 1682899199
+        vest.yank(29, END_VEST_TIMESTAMP);
     }
 }
 

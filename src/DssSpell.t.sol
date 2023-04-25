@@ -654,24 +654,86 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestLegacy.fin(35), block.timestamp);
     }
 
-    function testYankMKR() private { // make private to disable
+    function testYankMKR() public { // make private to disable
 
-        VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         // VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
 
-        assertGt(vestTreas.fin(18), block.timestamp);
-        assertGt(vestTreas.fin(19), block.timestamp);
-        assertGt(vestTreas.fin(30), block.timestamp);
-        assertGt(vestTreas.fin(31), block.timestamp);
+        uint256 endTime = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
+
+        assertGt(vestTreasury.fin(4),  endTime);
+        assertGt(vestTreasury.fin(5),  endTime);
+        assertGt(vestTreasury.fin(6),  endTime);
+        assertGt(vestTreasury.fin(7),  endTime);
+        assertGt(vestTreasury.fin(10), endTime);
+        assertGt(vestTreasury.fin(11), endTime);
+        assertGt(vestTreasury.fin(12), endTime);
+        assertGt(vestTreasury.fin(14), endTime);
+        assertGt(vestTreasury.fin(15), endTime);
+        assertGt(vestTreasury.fin(16), endTime);
+        assertGt(vestTreasury.fin(17), endTime);
+        assertGt(vestTreasury.fin(29), endTime);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vestTreas.fin(18), block.timestamp);
-        assertEq(vestTreas.fin(19), block.timestamp);
-        assertEq(vestTreas.fin(30), block.timestamp);
-        assertEq(vestTreas.fin(31), block.timestamp);
+        assertEq(vestTreasury.fin(4),  endTime);
+        assertEq(vestTreasury.fin(5),  endTime);
+        assertEq(vestTreasury.fin(6),  endTime);
+        assertEq(vestTreasury.fin(7),  endTime);
+        assertEq(vestTreasury.fin(10), endTime);
+        assertEq(vestTreasury.fin(11), endTime);
+        assertEq(vestTreasury.fin(12), endTime);
+        assertEq(vestTreasury.fin(14), endTime);
+        assertEq(vestTreasury.fin(15), endTime);
+        assertEq(vestTreasury.fin(16), endTime);
+        assertEq(vestTreasury.fin(17), endTime);
+        assertEq(vestTreasury.fin(29), endTime);
+
+        // Give admin powers to test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vestTreasury), address(this), 1);
+
+        vestTreasury.unrestrict(4);
+        vestTreasury.unrestrict(5);
+        vestTreasury.unrestrict(6);
+        vestTreasury.unrestrict(7);
+        vestTreasury.unrestrict(10);
+        vestTreasury.unrestrict(11);
+        vestTreasury.unrestrict(12);
+        vestTreasury.unrestrict(14);
+        vestTreasury.unrestrict(15);
+        vestTreasury.unrestrict(16);
+        vestTreasury.unrestrict(17);
+        vestTreasury.unrestrict(29);
+
+        vm.warp(endTime + 30 days);
+
+        vestTreasury.vest(4);
+        vestTreasury.vest(5);
+        vestTreasury.vest(6);
+        vestTreasury.vest(7);
+        vestTreasury.vest(10);
+        vestTreasury.vest(11);
+        vestTreasury.vest(12);
+        vestTreasury.vest(14);
+        vestTreasury.vest(15);
+        vestTreasury.vest(16);
+        vestTreasury.vest(17);
+        vestTreasury.vest(29);
+
+        assertTrue(!vestTreasury.valid(4));
+        assertTrue(!vestTreasury.valid(5));
+        assertTrue(!vestTreasury.valid(6));
+        assertTrue(!vestTreasury.valid(7));
+        assertTrue(!vestTreasury.valid(10));
+        assertTrue(!vestTreasury.valid(11));
+        assertTrue(!vestTreasury.valid(12));
+        assertTrue(!vestTreasury.valid(14));
+        assertTrue(!vestTreasury.valid(15));
+        assertTrue(!vestTreasury.valid(16));
+        assertTrue(!vestTreasury.valid(17));
+        assertTrue(!vestTreasury.valid(29));
     }
 
     function testVestMKR() private { // make private to disable
@@ -802,19 +864,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevBalance5 + 120 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
-        uint256 prevMkrPause    = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrGovAlpha = gov.balanceOf(wallets.addr("GOV_ALPHA"));
+    function testMKRPayments() public { // make private to disable
+        address peContributor = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
 
-        uint256 amountGovAlpha = 226.64 ether;
-        uint256 total          = 226.64 ether;
+        uint256 prevMkrPause         = gov.balanceOf(address(pauseProxy));
+        uint256 prevMkrPeContributor = gov.balanceOf(peContributor);
+
+        uint256 amount = 248 * WAD;
+        uint256 total  = 248 * WAD;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(wallets.addr("GOV_ALPHA")), prevMkrGovAlpha + amountGovAlpha);
+        assertEq(gov.balanceOf(peContributor), prevMkrPeContributor + amount);
     }
 
     function testMKRVestFix() private { // make private to disable
