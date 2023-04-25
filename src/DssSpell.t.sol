@@ -340,7 +340,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -574,7 +574,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -658,7 +658,7 @@ contract DssSpellTest is DssSpellTestBase {
         // assertEq(vestLegacy.fin(35), block.timestamp);
     }
 
-    function testYankMKR() public { // make private to disable
+    function testYankMKR() private { // make private to disable
 
         VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         // VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
@@ -678,7 +678,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreas.fin(31), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 31);
 

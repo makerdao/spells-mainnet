@@ -2003,6 +2003,10 @@ contract DssSpellTestBase is Config, DssTest {
 
     function _checkESMWards() internal {
 
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
         bytes32[] memory _tags       = chainLog.list();
         bytes32[] memory _exceptions = exceptions.list();
 
