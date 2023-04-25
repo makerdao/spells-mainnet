@@ -40,17 +40,17 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-04-24 MakerDAO Executive Spell | Hash: 0x6306ef3946bf3bcc63e15e5254ea6266b1c8ed54cf9d34b4f18f01d00b3be0fb";
 
-    address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
-
     uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
 
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAD = 10 ** 45;
 
-    VatLike internal immutable vat = VatLike(DssExecLib.vat());
-    VestLike internal immutable vest = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+    address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
 
-    uint256  internal constant END_VEST_TIMESTAMP = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
+    uint256 internal constant END_VEST_TIMESTAMP = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
+
+    VatLike  internal immutable vat  = VatLike(DssExecLib.vat());
+    VestLike internal immutable vest = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
     // Turn office hours off
     function officeHours() public pure override returns (bool) {
@@ -163,6 +163,7 @@ contract DssSpellAction is DssAction {
 
         // Yank MKR Stream ID 29 at timestamp 1682899199
         vest.yank(29, END_VEST_TIMESTAMP);
+
     }
 }
 
