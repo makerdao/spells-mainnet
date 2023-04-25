@@ -656,84 +656,84 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testYankMKR() public { // make private to disable
 
-        VestAbstract vestTreas = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         // VestAbstract vestMint  = VestAbstract(addr.addr("MCD_VEST_MKR"));
 
         uint256 endTime = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
 
-        assertGt(vestTreas.fin(4),  endTime);
-        assertGt(vestTreas.fin(5),  endTime);
-        assertGt(vestTreas.fin(6),  endTime);
-        assertGt(vestTreas.fin(7),  endTime);
-        assertGt(vestTreas.fin(10), endTime);
-        assertGt(vestTreas.fin(11), endTime);
-        assertGt(vestTreas.fin(12), endTime);
-        assertGt(vestTreas.fin(14), endTime);
-        assertGt(vestTreas.fin(15), endTime);
-        assertGt(vestTreas.fin(16), endTime);
-        assertGt(vestTreas.fin(17), endTime);
-        assertGt(vestTreas.fin(29), endTime);
+        assertGt(vestTreasury.fin(4),  endTime);
+        assertGt(vestTreasury.fin(5),  endTime);
+        assertGt(vestTreasury.fin(6),  endTime);
+        assertGt(vestTreasury.fin(7),  endTime);
+        assertGt(vestTreasury.fin(10), endTime);
+        assertGt(vestTreasury.fin(11), endTime);
+        assertGt(vestTreasury.fin(12), endTime);
+        assertGt(vestTreasury.fin(14), endTime);
+        assertGt(vestTreasury.fin(15), endTime);
+        assertGt(vestTreasury.fin(16), endTime);
+        assertGt(vestTreasury.fin(17), endTime);
+        assertGt(vestTreasury.fin(29), endTime);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vestTreas.fin(4),  endTime);
-        assertEq(vestTreas.fin(5),  endTime);
-        assertEq(vestTreas.fin(6),  endTime);
-        assertEq(vestTreas.fin(7),  endTime);
-        assertEq(vestTreas.fin(10), endTime);
-        assertEq(vestTreas.fin(11), endTime);
-        assertEq(vestTreas.fin(12), endTime);
-        assertEq(vestTreas.fin(14), endTime);
-        assertEq(vestTreas.fin(15), endTime);
-        assertEq(vestTreas.fin(16), endTime);
-        assertEq(vestTreas.fin(17), endTime);
-        assertEq(vestTreas.fin(29), endTime);
+        assertEq(vestTreasury.fin(4),  endTime);
+        assertEq(vestTreasury.fin(5),  endTime);
+        assertEq(vestTreasury.fin(6),  endTime);
+        assertEq(vestTreasury.fin(7),  endTime);
+        assertEq(vestTreasury.fin(10), endTime);
+        assertEq(vestTreasury.fin(11), endTime);
+        assertEq(vestTreasury.fin(12), endTime);
+        assertEq(vestTreasury.fin(14), endTime);
+        assertEq(vestTreasury.fin(15), endTime);
+        assertEq(vestTreasury.fin(16), endTime);
+        assertEq(vestTreasury.fin(17), endTime);
+        assertEq(vestTreasury.fin(29), endTime);
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vestTreas), address(this), 1);
+        GodMode.setWard(address(vestTreasury), address(this), 1);
 
-        vestTreas.unrestrict(4);
-        vestTreas.unrestrict(5);
-        vestTreas.unrestrict(6);
-        vestTreas.unrestrict(7);
-        vestTreas.unrestrict(10);
-        vestTreas.unrestrict(11);
-        vestTreas.unrestrict(12);
-        vestTreas.unrestrict(14);
-        vestTreas.unrestrict(15);
-        vestTreas.unrestrict(16);
-        vestTreas.unrestrict(17);
-        vestTreas.unrestrict(29);
+        vestTreasury.unrestrict(4);
+        vestTreasury.unrestrict(5);
+        vestTreasury.unrestrict(6);
+        vestTreasury.unrestrict(7);
+        vestTreasury.unrestrict(10);
+        vestTreasury.unrestrict(11);
+        vestTreasury.unrestrict(12);
+        vestTreasury.unrestrict(14);
+        vestTreasury.unrestrict(15);
+        vestTreasury.unrestrict(16);
+        vestTreasury.unrestrict(17);
+        vestTreasury.unrestrict(29);
 
         vm.warp(endTime + 30 days);
 
-        vestTreas.vest(4);
-        vestTreas.vest(5);
-        vestTreas.vest(6);
-        vestTreas.vest(7);
-        vestTreas.vest(10);
-        vestTreas.vest(11);
-        vestTreas.vest(12);
-        vestTreas.vest(14);
-        vestTreas.vest(15);
-        vestTreas.vest(16);
-        vestTreas.vest(17);
-        vestTreas.vest(29);
+        vestTreasury.vest(4);
+        vestTreasury.vest(5);
+        vestTreasury.vest(6);
+        vestTreasury.vest(7);
+        vestTreasury.vest(10);
+        vestTreasury.vest(11);
+        vestTreasury.vest(12);
+        vestTreasury.vest(14);
+        vestTreasury.vest(15);
+        vestTreasury.vest(16);
+        vestTreasury.vest(17);
+        vestTreasury.vest(29);
 
-        assertTrue(!vestTreas.valid(4));
-        assertTrue(!vestTreas.valid(5));
-        assertTrue(!vestTreas.valid(6));
-        assertTrue(!vestTreas.valid(7));
-        assertTrue(!vestTreas.valid(10));
-        assertTrue(!vestTreas.valid(11));
-        assertTrue(!vestTreas.valid(12));
-        assertTrue(!vestTreas.valid(14));
-        assertTrue(!vestTreas.valid(15));
-        assertTrue(!vestTreas.valid(16));
-        assertTrue(!vestTreas.valid(17));
-        assertTrue(!vestTreas.valid(29));
+        assertTrue(!vestTreasury.valid(4));
+        assertTrue(!vestTreasury.valid(5));
+        assertTrue(!vestTreasury.valid(6));
+        assertTrue(!vestTreasury.valid(7));
+        assertTrue(!vestTreasury.valid(10));
+        assertTrue(!vestTreasury.valid(11));
+        assertTrue(!vestTreasury.valid(12));
+        assertTrue(!vestTreasury.valid(14));
+        assertTrue(!vestTreasury.valid(15));
+        assertTrue(!vestTreasury.valid(16));
+        assertTrue(!vestTreasury.valid(17));
+        assertTrue(!vestTreasury.valid(29));
     }
 
     function testVestMKR() private { // make private to disable
