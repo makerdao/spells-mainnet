@@ -44,6 +44,7 @@ contract DssSpellAction is DssAction {
 
     uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
 
+    uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAD = 10 ** 45;
 
     VatLike internal immutable vat = VatLike(DssExecLib.vat());
