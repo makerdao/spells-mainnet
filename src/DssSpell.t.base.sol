@@ -2001,6 +2001,13 @@ contract DssSpellTestBase is Config, DssTest {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
+    // Test checks that any contracts in the chainlog which are a ward of
+    //  the pause proxy are also have the ESM authed. Any new contracts
+    //  that are added to the chainlog should have an ESM auth if the
+    //  pause proxy is authorized on them. If it is not necessary to remove
+    //  proxy access after a shutdown event, it can be added to the
+    //  test/esm_exceptions.sol array. Add a comment to indicate why this
+    //  authorization is not necessary.
     function _checkESMWards() internal {
 
         _vote(address(spell));
