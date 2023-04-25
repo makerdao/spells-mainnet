@@ -40,7 +40,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-04-24 MakerDAO Executive Spell | Hash: 0xb162b58d901b99d194f9917b4e104b214592ff366c92cf5623fcc9ed5495f15f";
 
-    address constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
+    address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
 
     uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
 
@@ -125,7 +125,7 @@ contract DssSpellAction is DssAction {
         // ---------- PE MKR Vesting Stream Cleanup ----------
 
         // PE-001 Contributor - 248 MKR - 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263
-        GemLike(DssExecLib.mkr()).transfer(PE_CONTRIBUTOR, 248 ether);  // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        GemLike(DssExecLib.mkr()).transfer(PE_CONTRIBUTOR, 248 * WAD);
 
         // Yank MKR Stream ID 4 at timestamp 1682899199
         vest.yank(4, END_VEST_TIMESTAMP);

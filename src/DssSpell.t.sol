@@ -870,8 +870,8 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevMkrPause         = gov.balanceOf(address(pauseProxy));
         uint256 prevMkrPeContributor = gov.balanceOf(peContributor);
 
-        uint256 amount = 248 ether;
-        uint256 total  = 248 ether;
+        uint256 amount = 248 * WAD;
+        uint256 total  = 248 * WAD;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
