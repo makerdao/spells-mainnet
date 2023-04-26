@@ -36,7 +36,7 @@ interface GemLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/6412a97ef329516efe0e8b0a81cc135748e83084/governance/votes/Executive%20vote%20-%20April%2026%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/b4b7c953df5d9391bfd2a2d80e973b2f74b80878/governance/votes/Executive%20vote%20-%20April%2026%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2023-04-26 MakerDAO Executive Spell | Hash: 0xcb6486208b3cd076038392e547db55b56f4221ffd966ee1aa6573e6c86ec21d2";
 
