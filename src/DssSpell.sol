@@ -32,9 +32,9 @@ interface PoolConfiguratorLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/d9947f3e785e1d9b1d9d24242c9e18fa268926f9/governance/votes/Executive%20vote%20-%20April%2024%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/98e98eae03662eeab0dd2092ccc7edafb2dd75d3/governance/votes/Executive%20vote%20-%20April%2028%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-04-28 MakerDAO Executive Spell | Hash: TODO";
+        "2023-04-28 MakerDAO Executive Spell | Hash: 0xc42b83cc4f41bb759b62ac255533edba2a11195092d219b1eca54819d64069ca";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
