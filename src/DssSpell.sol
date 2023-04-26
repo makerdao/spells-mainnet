@@ -43,7 +43,6 @@ contract DssSpellAction is DssAction {
     uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
 
     uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAD = 10 ** 45;
 
     address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
 
