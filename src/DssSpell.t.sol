@@ -299,21 +299,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewIlkRegistryValues() private { // make private to disable
+    function testNewIlkRegistryValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // DIRECT-AAVEV2-DAI
-        assertEq(reg.pos("DIRECT-AAVEV2-DAI"),    60);
-        assertEq(reg.join("DIRECT-AAVEV2-DAI"),   addr.addr("DIRECT_HUB"));
-        assertEq(reg.gem("DIRECT-AAVEV2-DAI"),    addr.addr("ADAI"));
-        assertEq(reg.dec("DIRECT-AAVEV2-DAI"),    18);
-        assertEq(reg.class("DIRECT-AAVEV2-DAI"),  4);
-        assertEq(reg.pip("DIRECT-AAVEV2-DAI"),    addr.addr("DIRECT_AAVEV2_DAI_ORACLE"));
-        assertEq(reg.name("DIRECT-AAVEV2-DAI"),   "Aave interest bearing DAI");
-        assertEq(reg.symbol("DIRECT-AAVEV2-DAI"), "aDAI");
+        // DIRECT-SPARK-DAI
+        assertEq(reg.pos("DIRECT-SPARK-DAI"),    61);
+        assertEq(reg.join("DIRECT-SPARK-DAI"),   addr.addr("DIRECT_HUB"));
+        assertEq(reg.gem("DIRECT-SPARK-DAI"),    0x4DEDf26112B3Ec8eC46e7E31EA5e123490B05B8B);
+        assertEq(reg.dec("DIRECT-SPARK-DAI"),    18);
+        assertEq(reg.class("DIRECT-SPARK-DAI"),  4);
+        assertEq(reg.pip("DIRECT-SPARK-DAI"),    addr.addr("DIRECT_SPARK_DAI_ORACLE"));
+        assertEq(reg.name("DIRECT-SPARK-DAI"),   "Spark DAI");
+        assertEq(reg.symbol("DIRECT-SPARK-DAI"), "spDAI");
     }
 
     function testOSMs() private { // make private to disable
