@@ -442,5 +442,8 @@ contract Addresses {
         addr["MCD_JOIN_GNO_A"]                  = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
         addr["MCD_CLIP_GNO_A"]                  = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
         addr["MCD_CLIP_CALC_GNO_A"]             = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
+        addr["DIRECT_SPARK_DAI_POOL"]           = 0xAfA2DD8a0594B2B24B59de405Da9338C4Ce23437;
+        addr["DIRECT_SPARK_DAI_PLAN"]           = 0x104FaDbb7e17db1A685bBa61007DfB015206a4D2;
+        addr["DIRECT_SPARK_DAI_ORACLE"]         = 0xCBD53B683722F82Dc82EBa7916065532980d4833;
     }
 }

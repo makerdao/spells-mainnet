@@ -19,18 +19,14 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface VatLike {
-    function Line() external view returns (uint256);
-    function file(bytes32 what, uint256 data) external;
-    function ilks(bytes32 ilk) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
-}
+import { DssInstance, MCD } from "dss-test/MCD.sol";
+import { D3MInit, D3MCommonConfig, D3MAavePoolConfig, D3MAaveBufferPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
+import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
 
-interface VestLike {
-    function yank(uint256, uint256) external;
-}
-
-interface GemLike {
-    function transfer(address, uint256) external returns (bool);
+interface PoolConfiguratorLike {
+    function setReserveFreeze(address asset, bool freeze) external;
+    function setReserveInterestRateStrategyAddress(address asset, address newRateStrategyAddress) external;
+    function setReserveFactor(address asset, uint256 newReserveFactor) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -38,24 +34,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/d9947f3e785e1d9b1d9d24242c9e18fa268926f9/governance/votes/Executive%20vote%20-%20April%2024%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-04-24 MakerDAO Executive Spell | Hash: 0x6306ef3946bf3bcc63e15e5254ea6266b1c8ed54cf9d34b4f18f01d00b3be0fb";
-
-    uint256 internal constant FOUR_NINE_PCT_RATE = 1000000001516911765932351183;
-
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAD = 10 ** 45;
-
-    address internal constant PE_CONTRIBUTOR = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
-
-    uint256 internal constant END_VEST_TIMESTAMP = 1682899199; // Sun 30 Apr 23:59:59 UTC 2023
-
-    VatLike  internal immutable vat  = VatLike(DssExecLib.vat());
-    VestLike internal immutable vest = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
-
-    // Turn office hours off
-    function officeHours() public pure override returns (bool) {
-        return false;
-    }
+        "2023-04-28 MakerDAO Executive Spell | Hash: TODO";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -68,102 +47,82 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+    address internal immutable D3M_HUB                  = DssExecLib.getChangelogAddress("DIRECT_HUB");
+    address internal immutable D3M_MOM                  = DssExecLib.getChangelogAddress("DIRECT_MOM");
+
+    address internal constant SPARK_D3M_PLAN            = 0x104FaDbb7e17db1A685bBa61007DfB015206a4D2;
+    address internal constant SPARK_D3M_POOL            = 0xAfA2DD8a0594B2B24B59de405Da9338C4Ce23437;
+    address internal constant SPARK_D3M_ORACLE          = 0xCBD53B683722F82Dc82EBa7916065532980d4833;
+
+    address internal constant SPARK_ADAI                = 0x4DEDf26112B3Ec8eC46e7E31EA5e123490B05B8B;
+    address internal constant SPARK_DAI_STABLE_DEBT     = 0xfe2B7a7F4cC0Fb76f7Fc1C6518D586F1e4559176;
+    address internal constant SPARK_DAI_VARIABLE_DEBT   = 0xf705d2B7e92B3F38e6ae7afaDAA2fEE110fE5914;
+    address internal constant SPARK_POOL_CONFIGURATOR   = 0x542DBa469bdE58FAeE189ffB60C6b49CE60E0738;
+
+    address internal constant WBTC                      = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address internal constant INTEREST_RATE_STRATEGY    = 0x113dc45c524404F91DcbbAbB103506bABC8Df0FE;
+
+    uint256 constant MILLION = 10 ** 6;
+    uint256 constant WAD = 10 ** 18;
+    uint256 constant RAD = 10 ** 45;
+
     function actions() public override {
 
-        uint256 lineReduction;
-        uint256 line;
+        // ---- Spark D3M ----
+        // https://mips.makerdao.com/mips/details/MIP106
+        // https://mips.makerdao.com/mips/details/MIP104
+        // dss-direct-deposit @ 665afffea10c71561bd234a88caf6586bf46ada2
 
-        // ---------- RWA008-A Offboarding ----------
-        // Poll: N/A
-        // Forum: https://forum.makerdao.com/t/security-tokens-refinancing-mip6-application-for-ofh-tokens/10605/51
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+        D3MInstance memory d3m = D3MInstance({
+            plan:   SPARK_D3M_PLAN,
+            pool:   SPARK_D3M_POOL,
+            oracle: SPARK_D3M_ORACLE
+        });
+        D3MCommonConfig memory cfg = D3MCommonConfig({
+            hub:         D3M_HUB,
+            mom:         D3M_MOM,
+            ilk:         "DIRECT-SPARK-DAI",
+            existingIlk: false,
+            maxLine:     5 * MILLION * RAD, // Set line to 5 million DAI
+            gap:         5 * MILLION * RAD, // Set gap to 5 million DAI
+            ttl:         8 hours,           // Set ttl to 8 hours
+            tau:         7 days             // Set tau to 7 days
+        });
+        D3MAavePoolConfig memory poolCfg = D3MAavePoolConfig({
+            king:         DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY"),
+            adai:         SPARK_ADAI,
+            stableDebt:   SPARK_DAI_STABLE_DEBT,
+            variableDebt: SPARK_DAI_VARIABLE_DEBT
+        });
+        D3MAaveBufferPlanConfig memory planCfg = D3MAaveBufferPlanConfig({
+            buffer:       30 * MILLION * WAD,
+            adai:         SPARK_ADAI
+        });
 
-        // Set RWA008-A Debt Ceiling to 0
-        (,,,line,) = vat.ilks("RWA008-A");
-        lineReduction += line;
-        DssExecLib.setIlkDebtCeiling("RWA008-A", 0);
+        D3MInit.initCommon({
+            dss:     dss,
+            d3m:     d3m,
+            cfg:     cfg
+        });
+        D3MInit.initAavePool({
+            dss:     dss,
+            d3m:     d3m,
+            cfg:     cfg,
+            aaveCfg: poolCfg
+        });
+        D3MInit.initAaveBufferPlan({
+            d3m:     d3m,
+            aaveCfg: planCfg
+        });
 
-        // ---------- First Stage of Offboarding ----------
-        // Poll: https://vote.makerdao.com/polling/QmPwHhLT
-        // Forum: https://forum.makerdao.com/t/decentralized-collateral-scope-parameter-changes-1-april-2023/20302
+        // ---- Spark Lend Parameter Adjustments ----
+        PoolConfiguratorLike(SPARK_POOL_CONFIGURATOR).setReserveFreeze(WBTC, true);
+        PoolConfiguratorLike(SPARK_POOL_CONFIGURATOR).setReserveInterestRateStrategyAddress(address(dss.dai), INTEREST_RATE_STRATEGY);
+        PoolConfiguratorLike(SPARK_POOL_CONFIGURATOR).setReserveFactor(address(dss.dai), 0);
 
-        // Set YFI-A line to 0
-        (,,,line,) = vat.ilks("YFI-A");
-        lineReduction += line;
-        DssExecLib.removeIlkFromAutoLine("YFI-A");
-        DssExecLib.setIlkDebtCeiling("YFI-A", 0);
-
-        // Set MATIC-A line to 0
-        (,,,line,) = vat.ilks("MATIC-A");
-        lineReduction += line;
-        DssExecLib.removeIlkFromAutoLine("MATIC-A");
-        DssExecLib.setIlkDebtCeiling("MATIC-A", 0);
-
-        // Set LINK-A line to 0
-        (,,,line,) = vat.ilks("LINK-A");
-        lineReduction += line;
-        DssExecLib.removeIlkFromAutoLine("LINK-A");
-        DssExecLib.setIlkDebtCeiling("LINK-A", 0);
-
-        // Decrease Global Debt Ceiling in accordance with Offboarded Ilks
-        vat.file("Line", vat.Line() - lineReduction);
-
-        // ---------- Stability Fee Changes ----------
-        // Poll: N/A
-        // Forum: https://forum.makerdao.com/t/decentralized-collateral-scope-parameter-changes-1-april-2023/20302
-
-        // Increase the WBTC-A Stability Fee from 1.75% to 4.90%
-        DssExecLib.setIlkStabilityFee("WBTC-A", FOUR_NINE_PCT_RATE, /* doDrip = */ true);
-
-        // Increase the WBTC-B Stability Fee from 3.25% to 4.90%
-        DssExecLib.setIlkStabilityFee("WBTC-B", FOUR_NINE_PCT_RATE, /* doDrip = */ true);
-
-        // Increase the WBTC-C Stability Fee from 1.00% to 4.90%
-        DssExecLib.setIlkStabilityFee("WBTC-C", FOUR_NINE_PCT_RATE, /* doDrip = */ true);
-
-        // Increase the GNO-A Stability Fee from 2.50% to 4.90%
-        DssExecLib.setIlkStabilityFee("GNO-A",  FOUR_NINE_PCT_RATE, /* doDrip = */ true);
-
-        // ---------- PE MKR Vesting Stream Cleanup ----------
-
-        // PE-001 Contributor - 248 MKR - 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263
-        GemLike(DssExecLib.mkr()).transfer(PE_CONTRIBUTOR, 248 * WAD);
-
-        // Yank MKR Stream ID 4 at timestamp 1682899199
-        vest.yank(4, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 5 at timestamp 1682899199
-        vest.yank(5, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 6 at timestamp 1682899199
-        vest.yank(6, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 7 at timestamp 1682899199
-        vest.yank(7, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 10 at timestamp 1682899199
-        vest.yank(10, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 11 at timestamp 1682899199
-        vest.yank(11, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 12 at timestamp 1682899199
-        vest.yank(12, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 14 at timestamp 1682899199
-        vest.yank(14, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 15 at timestamp 1682899199
-        vest.yank(15, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 16 at timestamp 1682899199
-        vest.yank(16, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 17 at timestamp 1682899199
-        vest.yank(17, END_VEST_TIMESTAMP);
-
-        // Yank MKR Stream ID 29 at timestamp 1682899199
-        vest.yank(29, END_VEST_TIMESTAMP);
-
+        // Bump the chainlog
+        DssExecLib.setChangelogVersion("1.14.11");
     }
 }
 
