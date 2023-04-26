@@ -62,9 +62,9 @@ contract DssSpellAction is DssAction {
     address internal constant WBTC                      = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant INTEREST_RATE_STRATEGY    = 0x113dc45c524404F91DcbbAbB103506bABC8Df0FE;
 
-    uint256 constant MILLION = 10 ** 6;
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAD = 10 ** 45;
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAD = 10 ** 45;
 
     function actions() public override {
 
