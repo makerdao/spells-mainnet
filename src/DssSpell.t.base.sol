@@ -2022,6 +2022,7 @@ contract DssSpellTestBase is Config, DssTest {
             for (uint256 j = 0; j < _exceptions.length; j++) {
                 if (_tags[i] == _exceptions[j]) {
                     _found = true;
+                    break;
                 }
             }
             if (!_found) {
