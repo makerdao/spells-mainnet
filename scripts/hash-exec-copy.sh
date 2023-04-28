@@ -16,7 +16,7 @@ fi
 # Format input date into GitHub date URL format
 # %-d displays the day of the month without a leading zero
 # sed replace spaces with %20 and commas with %2C
-DATE=$(date -d "$1" +"%B %-d, %Y" | sed 's/ /%20/g; s/,/%2C/g')
+DATE=$(LC_ALL=en_US.utf8 date -d "$1" +"%B %-d, %Y" | sed 's/ /%20/g; s/,/%2C/g')
 
 if [[ -x "$(command -v curl)" ]]; then
     # Get latest change git commit hash for target exec copy
