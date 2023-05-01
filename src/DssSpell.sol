@@ -47,6 +47,11 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+    // Turn office hours on
+    function officeHours() public pure override returns (bool) {
+        return true;
+    }
+
     address internal immutable D3M_HUB                  = DssExecLib.getChangelogAddress("DIRECT_HUB");
     address internal immutable D3M_MOM                  = DssExecLib.getChangelogAddress("DIRECT_MOM");
 
