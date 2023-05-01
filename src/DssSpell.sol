@@ -64,7 +64,7 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_DAI_VARIABLE_DEBT   = 0xf705d2B7e92B3F38e6ae7afaDAA2fEE110fE5914;
     address internal constant SPARK_POOL_CONFIGURATOR   = 0x542DBa469bdE58FAeE189ffB60C6b49CE60E0738;
 
-    address internal constant WBTC                      = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address internal immutable WBTC                     = DssExecLib.getChangelogAddress("WBTC");
     address internal constant INTEREST_RATE_STRATEGY    = 0x113dc45c524404F91DcbbAbB103506bABC8Df0FE;
 
     uint256 internal constant MILLION = 10 ** 6;

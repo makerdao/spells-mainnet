@@ -1202,7 +1202,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 RESERVE_FACTOR_START_BIT_POSITION = 64;
         uint256 RESERVE_FACTOR_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF;
         PoolLike pool = PoolLike(0xC13e21B648A5Ee794902342038FF3aDAB66BE987);
-        address wbtc = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+        address wbtc = addr.addr("WBTC");
 
         PoolLike.ReserveData memory daiReserveData = pool.getReserveData(address(dai));
         PoolLike.ReserveData memory wbtcReserveData = pool.getReserveData(wbtc);
