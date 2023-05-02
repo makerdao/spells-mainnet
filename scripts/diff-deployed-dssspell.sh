@@ -14,11 +14,16 @@ fi
 make all && make flatten
 
 spell_source="out/flat.sol"
+etherscan_source="out/etherscan.sol"
 
 # Download the deployed spell source code from Etherscan API
-spell_etherscan=$(curl -s "https://api.etherscan.io/api?module=contract&action=getsourcecode&address=$deployed_spell_address" | jq -r '.result[0].SourceCode')
+curl -s "https://api.etherscan.io/api?module=contract&action=getsourcecode&address=${deployed_spell_address}" \
+    | jq -r '.result[0].SourceCode' > $etherscan_source
 
 # Compare the downloaded source code with the local spell
-diff --color -u <(echo "$spell_etherscan") "$spell_source"
+# Notice: Etherscan apparently returns the source code with Windows-style ('\n\r') line breaks sometimes.
+#   We use `--string-trailing-cr` to ignore any `\r` characters.
+# Notice: With `printf` below we ignore any trailing empty lines.
+diff --strip-trailing-cr --color -u <(printf "%s" "$(< $etherscan_source)") <(printf "%s" "$(< $spell_source)")
 
 make clean
