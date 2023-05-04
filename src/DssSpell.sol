@@ -26,6 +26,7 @@ interface GemLike {
 }
 
 interface VestLike {
+    function file(bytes32, uint256) external;
     function restrict(uint256) external;
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
     function yank(uint256) external;
@@ -67,7 +68,7 @@ contract DssSpellAction is DssAction {
 
     // ECOSYSTEM ACTORS
     address internal constant PHOENIX_LABS_2         = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address internal constant PULL_UP                = address(0);
+    address internal constant PULL_UP                = 0x868B44e8191A2574334deB8E7efA38910df941FA;
 
     address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -88,7 +89,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
 
         // Vote:
-        // Phoenix Labs | 2023-05-01 to 2024-05-01 | 1,534,000 DAI | 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
+        // Phoenix Labs | 2023-05-01 to 2024-05-01 | 1,534,000 DAI
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
                 PHOENIX_LABS_2,            // usr
@@ -101,21 +102,24 @@ contract DssSpellAction is DssAction {
         );
 
         // Vote: https://vote.makerdao.com/polling/QmebPdpa#poll-detail
-        // PullUp | 2023-05-01 to 2024-05-01 | 3,300,000 DAI | TBD
-        // VestLike(MCD_VEST_DAI).restrict(
-        //     VestLike(MCD_VEST_DAI).create(
-        //         PULL_UP,                   // usr
-        //         3_300_000 * WAD,           // tot
-        //         APR_01_2023,               // bgn
-        //         APR_01_2024 - APR_01_2023, // tau
-        //         0,                         // eta
-        //         address(0)                 // mgr
-        //     )
-        // );
+        // PullUp | 2023-05-01 to 2024-05-01 | 3,300,000 DAI
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                PULL_UP,                   // usr
+                3_300_000 * WAD,           // tot
+                MAY_01_2023,               // bgn
+                MAY_01_2024 - MAY_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
 
         // ----- Ecosystem Actor MKR Streams -----
         // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+
+        // Set system-wide cap on maximum vesting speed
+        VestLike(MCD_VEST_MKR_TREASURY).file("cap", 2_200 * WAD / 365 days);
 
         // Increase allowance by new vesting delta
         uint256 newVesting = 4_000 * WAD; // PULLUP
@@ -137,17 +141,16 @@ contract DssSpellAction is DssAction {
 
         // VOTE: https://vote.makerdao.com/polling/QmcswbHs#poll-detail, https://vote.makerdao.com/polling/QmebPdpa#poll-detail
         // PullUp | 2023-05-01 to 2025-05-01 | Cliff 2023-05-01 | 4,000 MKR
-        // VestLike(MCD_VEST_MKR_TREASURY).restrict(
-        //     VestLike(MCD_VEST_MKR_TREASURY).create(
-        //         PULL_UP,                   // usr
-        //         4_000 * WAD,               // tot
-        //         MAY_01_2023,               // bgn
-        //         MAY_01_2025 - MAY_01_2023, // tau
-        //         0,                         // eta
-        //         address(0)                 // mgr
-        //     )
-        // );
-
+        VestLike(MCD_VEST_MKR_TREASURY).restrict(
+            VestLike(MCD_VEST_MKR_TREASURY).create(
+                PULL_UP,                   // usr
+                4_000 * WAD,               // tot
+                MAY_01_2023,               // bgn
+                MAY_01_2025 - MAY_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
         // Bump the chainlog
         DssExecLib.setChangelogVersion("1.14.12");
