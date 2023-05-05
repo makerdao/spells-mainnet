@@ -19,6 +19,10 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface StarknetLike {
+    function setCeiling(uint256 _ceiling) external;
+}
+
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
     function allowance(address, address) external view returns (uint256);
@@ -55,6 +59,11 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
+    uint256 internal constant ZERO_PT_SEVEN_FIVE_PCT_RATE    = 1000000000236936036262880196;
+    uint256 internal constant ONE_PCT_RATE                   = 1000000000315522921573372069;
+    uint256 internal constant ONE_PT_SEVEN_FIVE_PCT_RATE     = 1000000000550121712943459312;
+    uint256 internal constant THREE_PT_TWO_FIVE_PCT_RATE     = 1000000001014175731521720677;
+
     uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant WAD     = 10 ** 18;
     uint256 internal constant RAD     = 10 ** 45;
@@ -74,7 +83,60 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     GemLike internal immutable MKR                   = GemLike(DssExecLib.mkr());
 
+    address internal immutable STARKNET_DAI_BRIDGE   = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+
     function actions() public override {
+
+        // ---------- Starknet ----------
+        // Increase L1 Starknet Bridge Limit from 1,000,000 DAI to 5,000,000 DAI
+        // Forum: https://forum.makerdao.com/t/april-26th-2023-spell-starknet-bridge-limit/20589
+        StarknetLike(STARKNET_DAI_BRIDGE).setCeiling(5 * MILLION * WAD);
+
+        // ---------- Risk Parameters Changes (Stability Fee & DC-IAM) ----------
+        // Poll: https://vote.makerdao.com/polling/QmYFfRuR#poll-detail
+        // Forum: https://forum.makerdao.com/t/out-of-scope-proposed-risk-parameters-changes-stability-fee-dc-iam/20564
+
+        // Increase ETH-A Stability Fee by 0.25% from 1.5% to 1.75%.
+        DssExecLib.setIlkStabilityFee("ETH-A", ONE_PT_SEVEN_FIVE_PCT_RATE, true);
+
+        // Increase ETH-B Stability Fee by 0.25% from 3% to 3.25%.
+        DssExecLib.setIlkStabilityFee("ETH-B", THREE_PT_TWO_FIVE_PCT_RATE, true);
+
+        // Increase ETH-C Stability Fee by 0.25% from 0.75% to 1%.
+        DssExecLib.setIlkStabilityFee("ETH-C", ONE_PCT_RATE, true);
+
+        // Increase WSTETH-A Stability Fee by 0.25% from 1.5% to 1.75%.
+        DssExecLib.setIlkStabilityFee("WSTETH-A", ONE_PT_SEVEN_FIVE_PCT_RATE, true);
+
+        // Increase WSTETH-B Stability Fee by 0.25% from 0.75% to 1%.
+        DssExecLib.setIlkStabilityFee("WSTETH-B", ONE_PCT_RATE, true);
+
+        // Increase RETH-A Stability Fee by 0.25% from 0.5% to 0.75%.
+        DssExecLib.setIlkStabilityFee("RETH-A", ZERO_PT_SEVEN_FIVE_PCT_RATE, true);
+
+        // Increase CRVV1ETHSTETH-A Stability Fee by 0.25% from 1.5% to 1.75%.
+        // NOTE: ignore in goerli
+        // DssExecLib.setIlkStabilityFee("CRVV1ETHSTETH-A", ONE_SEVENTY_FIVE_PCT_RATE, true);
+
+
+        // Increase the WSTETH-A gap by 15 million DAI from 15 million DAI to 30 million DAI.
+        // Increase the WSTETH-A ttl by 21,600 seconds from 21,600 seconds to 43,200 seconds
+        DssExecLib.setIlkAutoLineParameters("WSTETH-A", 500 * MILLION, 30 * MILLION, 12 hours);
+
+        // Increase the WSTETH-B gap by 15 million DAI from 15 million DAI to 30 million DAI.
+        // Increase the WSTETH-B ttl by 28,800 seconds from 28,800 seconds to 57,600 seconds.
+        DssExecLib.setIlkAutoLineParameters("WSTETH-B", 500 * MILLION, 30 * MILLION, 16 hours);
+
+        // Reduce the WBTC-A gap by 10 million DAI from 20 million DAI to 10 million DAI.
+        DssExecLib.setIlkAutoLineParameters("WBTC-A", 500 * MILLION, 10 * MILLION, 24 hours);
+
+        // Reduce the WBTC-B gap by 5 million DAI from 10 million DAI to 5 million DAI.
+        DssExecLib.setIlkAutoLineParameters("WBTC-B", 250 * MILLION, 5 * MILLION, 24 hours);
+
+        // Reduce the WBTC-C gap by 10 million DAI from 20 million DAI to 10 million DAI.
+        DssExecLib.setIlkAutoLineParameters("WBTC-C", 500 * MILLION, 10 * MILLION, 24 hours);
+
+
         // ----- Stream Yanks -----
         // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
         // GovAlpha | 2023-04-01 to 2024-03-31 | 900,000 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
