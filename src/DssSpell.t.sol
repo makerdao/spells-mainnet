@@ -241,7 +241,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
         
-        _checkChainlogVersion("1.14.12");
+        _checkChainlogVersion("1.14.11");
     }
 
     function testNewIlkRegistryValues() private { // make public to enable

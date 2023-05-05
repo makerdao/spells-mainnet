@@ -212,9 +212,6 @@ contract DssSpellAction is DssAction {
                 address(0)                 // mgr
             )
         );
-
-        // Bump the chainlog
-        DssExecLib.setChangelogVersion("1.14.12");
     }
 }
 
