@@ -148,7 +148,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          175,             // In basis points
+            pct:          1_75,            // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -178,7 +178,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          325,
+            pct:          3_25,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -208,7 +208,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          100,
+            pct:          1_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -1678,7 +1678,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          175,
+            pct:          1_75,
             mat:          16000,
             liqType:      "clip",
             liqOn:        true,
@@ -1708,7 +1708,7 @@ contract Config {
             aL_ttl:       16 hours,
             line:         0,
             dust:         3_500,
-            pct:          100,
+            pct:          1_00,
             mat:          18500,
             liqType:      "clip",
             liqOn:        true,
@@ -1858,7 +1858,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          1_50,
+            pct:          1_75,
             mat:          15500,
             liqType:      "clip",
             liqOn:        true,
