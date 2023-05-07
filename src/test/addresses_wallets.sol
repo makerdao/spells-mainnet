@@ -110,6 +110,6 @@ contract Wallets {
         addr["PULL_UP"]                      = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
 
         // Vest Managers
-        addr["PULL_UP_VEST_MNG"]             = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
+        addr["PULL_UP_VEST_MGR"]             = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
     }
 }

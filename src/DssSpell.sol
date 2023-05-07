@@ -79,7 +79,7 @@ contract DssSpellAction is DssAction {
     address internal constant PHOENIX_LABS_2                 = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
     address internal constant PULL_UP                        = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
     
-    address internal constant PULL_UP_VEST_MNG               = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
+    address internal constant PULL_UP_VEST_MGR               = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
     address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -173,7 +173,7 @@ contract DssSpellAction is DssAction {
                 MAY_01_2023,               // bgn
                 MAY_01_2024 - MAY_01_2023, // tau
                 0,                         // eta
-                PULL_UP_VEST_MNG           // mgr
+                PULL_UP_VEST_MGR           // mgr
             )
         );
 
@@ -211,7 +211,7 @@ contract DssSpellAction is DssAction {
                 MAY_01_2023,               // bgn
                 MAY_01_2025 - MAY_01_2023, // tau
                 0,                         // eta
-                PULL_UP_VEST_MNG           // mgr
+                PULL_UP_VEST_MGR           // mgr
             )
         );
     }
