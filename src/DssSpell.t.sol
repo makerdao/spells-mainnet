@@ -374,7 +374,7 @@ contract DssSpellTest is DssSpellTestBase {
             _days:       367 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     1_534_000 * WAD,                                  // tot
+            _reward:     1_534_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
 
@@ -395,7 +395,7 @@ contract DssSpellTest is DssSpellTestBase {
             _cliff:      MAY_01_2023,                                    // clf
             _end:        MAY_01_2024,                                    // fin
             _days:       367 days,                                       // fin
-            _manager:    address(0),                                     // mgr
+            _manager:    wallets.addr("PULL_UP_VEST_MNG"),               // mgr
             _restricted: 1,                                              // res
             _reward:     3_300_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
@@ -560,7 +560,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.clf(39), MAY_01_2023);
         assertEq(vest.fin(39), PULL_UP_FIN);
         assertEq(vest.fin(39), MAY_01_2025);
-        assertEq(vest.mgr(39), address(0));
+        assertEq(vest.mgr(39), wallets.addr("PULL_UP_VEST_MNG"));
         assertEq(vest.res(39), 1);
         assertEq(vest.tot(39), 4_000 ether);
         assertEq(vest.rxd(39), 0);

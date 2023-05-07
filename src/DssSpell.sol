@@ -39,9 +39,9 @@ interface VestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/98e98eae03662eeab0dd2092ccc7edafb2dd75d3/governance/votes/Executive%20vote%20-%20April%2028%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8969e3d5c3d3fb35361f13647e5c3556ccc6d442/governance/votes/Executive%20vote%20-%20May%2010%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-05-10 MakerDAO Executive Spell | Hash: TODO";
+        "2023-05-10 MakerDAO Executive Spell | Hash: 0xc52a816fcf2b5068934f275cdbfe09d4b6f55160dd937ff873b4b355a60086eb";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -64,26 +64,28 @@ contract DssSpellAction is DssAction {
     uint256 internal constant ONE_PT_SEVEN_FIVE_PCT_RATE     = 1000000000550121712943459312;
     uint256 internal constant THREE_PT_TWO_FIVE_PCT_RATE     = 1000000001014175731521720677;
 
-    uint256 internal constant MILLION = 10 ** 6;
-    uint256 internal constant WAD     = 10 ** 18;
-    uint256 internal constant RAD     = 10 ** 45;
+    uint256 internal constant MILLION                        = 10 ** 6;
+    uint256 internal constant WAD                            = 10 ** 18;
+    uint256 internal constant RAD                            = 10 ** 45;
 
     // 01 May 2023 12:00:00 AM UTC
-    uint256 public constant MAY_01_2023              = 1682899200;
+    uint256 public constant MAY_01_2023                      = 1682899200;
     // 01 May 2024 11:59:59 PM UTC
-    uint256 public constant MAY_01_2024              = 1714607999;
+    uint256 public constant MAY_01_2024                      = 1714607999;
     // 01 May 2025 11:59:59 PM UTC
-    uint256 public constant MAY_01_2025              = 1746143999;
+    uint256 public constant MAY_01_2025                      = 1746143999;
 
     // ECOSYSTEM ACTORS
-    address internal constant PHOENIX_LABS_2         = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address internal constant PULL_UP                = 0x868B44e8191A2574334deB8E7efA38910df941FA;
+    address internal constant PHOENIX_LABS_2                 = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+    address internal constant PULL_UP                        = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
+    
+    address internal constant PULL_UP_VEST_MNG               = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
-    address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
-    address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-    GemLike internal immutable MKR                   = GemLike(DssExecLib.mkr());
+    address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    GemLike internal immutable MKR                           = GemLike(DssExecLib.mkr());
 
-    address internal immutable STARKNET_DAI_BRIDGE   = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address internal immutable STARKNET_DAI_BRIDGE           = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
 
     function actions() public override {
 
@@ -171,7 +173,7 @@ contract DssSpellAction is DssAction {
                 MAY_01_2023,               // bgn
                 MAY_01_2024 - MAY_01_2023, // tau
                 0,                         // eta
-                address(0)                 // mgr
+                PULL_UP_VEST_MNG           // mgr
             )
         );
 
@@ -209,7 +211,7 @@ contract DssSpellAction is DssAction {
                 MAY_01_2023,               // bgn
                 MAY_01_2025 - MAY_01_2023, // tau
                 0,                         // eta
-                address(0)                 // mgr
+                PULL_UP_VEST_MNG           // mgr
             )
         );
     }
