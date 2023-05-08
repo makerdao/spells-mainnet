@@ -39,9 +39,9 @@ interface VestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8969e3d5c3d3fb35361f13647e5c3556ccc6d442/governance/votes/Executive%20vote%20-%20May%2010%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/3e28783bb8e5dc0ad2ea2597cf5ae825b6ee7ee8/governance/votes/Executive%20vote%20-%20May%2010%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-05-10 MakerDAO Executive Spell | Hash: 0xc52a816fcf2b5068934f275cdbfe09d4b6f55160dd937ff873b4b355a60086eb";
+        "2023-05-10 MakerDAO Executive Spell | Hash: 0x194493aa72c265dd0e40716e4d56a3e9f5c54343cc42ef9cb4ca5439ccd0d51c";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -140,7 +140,6 @@ contract DssSpellAction is DssAction {
 
         // ----- Stream Yanks -----
         // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
-        // GovAlpha | 2023-04-01 to 2024-03-31 | 900,000 DAI | 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73
 
         // Yank DAI Stream ID 22 to Phoenix Labs as being replaced with new stream
         VestLike(MCD_VEST_DAI).yank(22);
@@ -180,6 +179,7 @@ contract DssSpellAction is DssAction {
 
         // ----- Ecosystem Actor MKR Streams -----
         // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+        // VOTE: VOTE: https://vote.makerdao.com/polling/QmTYdpaU#poll-detail
 
         // Set system-wide cap on maximum vesting speed
         VestLike(MCD_VEST_MKR_TREASURY).file("cap", 2_200 * WAD / 365 days);
@@ -189,7 +189,6 @@ contract DssSpellAction is DssAction {
                newVesting += 986.25 ether; // Phoenix Labs
         MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
 
-        // VOTE: 
         // Phoenix Labs | 2023-05-01 to 2024-05-01 | Cliff 2023-05-01 | 986.25 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
@@ -214,6 +213,13 @@ contract DssSpellAction is DssAction {
                 PULL_UP_VEST_MGR           // mgr
             )
         );
+
+        // ----- Ecosystem Actor Dai Transfers -----
+        // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+        // VOTE:  https://vote.makerdao.com/polling/QmTYdpaU#poll-detail
+
+        // Phoenix Labs - 318,000 DAI - 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
+        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_2, 318_000);
     }
 }
 

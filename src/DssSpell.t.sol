@@ -416,33 +416,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[18] memory payees = [
-            // DELEGATE PAYMENTS
-            Payee(wallets.addr("COLDIRON"),              10_452),
-            Payee(wallets.addr("FLIPFLOPFLAP"),          10_452),
-            Payee(wallets.addr("GFXLABS"),               10_452),
-            Payee(wallets.addr("MHONKASALOTEEMULAU"),     9_929),
-            Payee(wallets.addr("PENNBLOCKCHAIN"),         9_568),
-            Payee(wallets.addr("FEEDBLACKLOOPS"),         9_408),
-            Payee(wallets.addr("STABLELAB"),              3_282),
-            Payee(wallets.addr("LBSBLOCKCHAIN"),          3_045),
-            Payee(wallets.addr("HKUSTEPI"),               2_607),
-            Payee(wallets.addr("JUSTINCASE"),             2_488),
-            Payee(wallets.addr("FRONTIERRESEARCH"),       2_421),
-            Payee(wallets.addr("CODEKNIGHT"),               630),
-            Payee(wallets.addr("FLIPSIDE"),                 541),
-            Payee(wallets.addr("ONESTONE"),                 314),
-            Payee(wallets.addr("CONSENSYS"),                154),
-            Payee(wallets.addr("ACREINVEST"),                33),
+        Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("PHOENIX_LABS_2"),       347_100),
-            Payee(wallets.addr("VIRIDIAN_TRANSFER"),    257_250)
+            Payee(wallets.addr("PHOENIX_LABS_2"), 318_000)
         ];
 
         uint256 prevBalance;
