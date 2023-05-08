@@ -351,8 +351,8 @@ contract DssSpellTest is DssSpellTestBase {
         // $ make time stamp=<STAMP>
         // 01 May 2023 12:00:00 AM UTC
         uint256 MAY_01_2023 = 1682899200;
-        // 01 May 2024 11:59:59 PM UTC
-        uint256 MAY_01_2024 = 1714607999;
+        // 30 Apr 2024 11:59:59 PM UTC
+        uint256 APR_30_2024 = 1714521599;
 
         assertEq(vest.ids(), 25);
 
@@ -370,8 +370,8 @@ contract DssSpellTest is DssSpellTestBase {
             _wallet:     wallets.addr("PHOENIX_LABS_2"),                 // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
-            _end:        MAY_01_2024,                                    // fin
-            _days:       367 days,                                       // fin
+            _end:        APR_30_2024,                                    // fin
+            _days:       366 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
             _reward:     1_534_000 * WAD,                                // tot
@@ -383,7 +383,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevPhoenixLabsBalance = dai.balanceOf(wallets.addr("PHOENIX_LABS_2"));
 
         vest.unrestrict(26);
-        vm.warp(MAY_01_2023 + 367 days);
+        vm.warp(MAY_01_2023 + 366 days);
         vest.vest(26);
         assertEq(dai.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevPhoenixLabsBalance + 1_534_000 * WAD);
 
@@ -393,8 +393,8 @@ contract DssSpellTest is DssSpellTestBase {
             _wallet:     wallets.addr("PULL_UP"),                        // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
-            _end:        MAY_01_2024,                                    // fin
-            _days:       367 days,                                       // fin
+            _end:        APR_30_2024,                                    // fin
+            _days:       366 days,                                       // fin
             _manager:    wallets.addr("PULL_UP_VEST_MGR"),               // mgr
             _restricted: 1,                                              // res
             _reward:     3_300_000 * WAD,                                // tot
@@ -406,7 +406,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevTechBalance = dai.balanceOf(wallets.addr("PULL_UP"));
 
         vest.unrestrict(27);
-        vm.warp(MAY_01_2023 + 367 days);
+        vm.warp(MAY_01_2023 + 366 days);
         vest.vest(27);
         assertEq(dai.balanceOf(wallets.addr("PULL_UP")), prevTechBalance + 3_300_000 * WAD);
     }
@@ -518,20 +518,20 @@ contract DssSpellTest is DssSpellTestBase {
 
         // 01 May 2023 12:00:00 AM UTC
         uint256 MAY_01_2023 = 1682899200;
-        // 01 May 2024 11:59:59 PM UTC
-        uint256 MAY_01_2024 = 1714607999;
-        // 01 May 2025 11:59:59 PM UTC
-        uint256 MAY_01_2025 = 1746143999;
+        // 30 Apr 2024 11:59:59 PM UTC
+        uint256 APR_30_2024 = 1714521599;
+        // 30 Apr 2025 11:59:59 PM UTC
+        uint256 APR_30_2025 = 1746057599;
 
 
-        uint256 PHOENIX_LABS_FIN  = MAY_01_2023 + (367 days) - 1; // -1 because we are going to 11:59:59 on May 01 24
-        uint256 PULL_UP_FIN       = MAY_01_2023 + (367 days + 365 days) - 1; // -1 because we are going to 11:59:59 on May 01 25
+        uint256 PHOENIX_LABS_FIN  = MAY_01_2023 + (366 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 24
+        uint256 PULL_UP_FIN       = MAY_01_2023 + (366 days + 365 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 25
 
         assertEq(vest.usr(38), wallets.addr("PHOENIX_LABS_2"));
         assertEq(vest.bgn(38), MAY_01_2023);
         assertEq(vest.clf(38), MAY_01_2023);
         assertEq(vest.fin(38), PHOENIX_LABS_FIN);
-        assertEq(vest.fin(38), MAY_01_2024);
+        assertEq(vest.fin(38), APR_30_2024);
         assertEq(vest.mgr(38), address(0));
         assertEq(vest.res(38), 1);
         assertEq(vest.tot(38), 986.25 ether);
@@ -541,7 +541,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.bgn(39), MAY_01_2023);
         assertEq(vest.clf(39), MAY_01_2023);
         assertEq(vest.fin(39), PULL_UP_FIN);
-        assertEq(vest.fin(39), MAY_01_2025);
+        assertEq(vest.fin(39), APR_30_2025);
         assertEq(vest.mgr(39), wallets.addr("PULL_UP_VEST_MGR"));
         assertEq(vest.res(39), 1);
         assertEq(vest.tot(39), 4_000 ether);

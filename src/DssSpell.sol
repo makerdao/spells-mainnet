@@ -70,10 +70,10 @@ contract DssSpellAction is DssAction {
 
     // 01 May 2023 12:00:00 AM UTC
     uint256 public constant MAY_01_2023                      = 1682899200;
-    // 01 May 2024 11:59:59 PM UTC
-    uint256 public constant MAY_01_2024                      = 1714607999;
-    // 01 May 2025 11:59:59 PM UTC
-    uint256 public constant MAY_01_2025                      = 1746143999;
+    // 30 Apr 2024 11:59:59 PM UTC
+    uint256 public constant APR_30_2024                      = 1714521599;
+    // 30 Apr 2025 11:59:59 PM UTC
+    uint256 public constant APR_30_2025                      = 1746057599;
 
     // ECOSYSTEM ACTORS
     address internal constant PHOENIX_LABS_2                 = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
@@ -83,7 +83,7 @@ contract DssSpellAction is DssAction {
 
     address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-    GemLike internal immutable MKR                           = GemLike(DssExecLib.mkr());
+    address internal immutable MKR                           = DssExecLib.mkr();
 
     address internal immutable STARKNET_DAI_BRIDGE           = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
 
@@ -157,7 +157,7 @@ contract DssSpellAction is DssAction {
                 PHOENIX_LABS_2,            // usr
                 1_534_000 * WAD,           // tot
                 MAY_01_2023,               // bgn
-                MAY_01_2024 - MAY_01_2023, // tau
+                APR_30_2024 - MAY_01_2023, // tau
                 0,                         // eta
                 address(0)                 // mgr
             )
@@ -170,7 +170,7 @@ contract DssSpellAction is DssAction {
                 PULL_UP,                   // usr
                 3_300_000 * WAD,           // tot
                 MAY_01_2023,               // bgn
-                MAY_01_2024 - MAY_01_2023, // tau
+                APR_30_2024 - MAY_01_2023, // tau
                 0,                         // eta
                 PULL_UP_VEST_MGR           // mgr
             )
@@ -179,7 +179,6 @@ contract DssSpellAction is DssAction {
 
         // ----- Ecosystem Actor MKR Streams -----
         // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
-        // VOTE: VOTE: https://vote.makerdao.com/polling/QmTYdpaU#poll-detail
 
         // Set system-wide cap on maximum vesting speed
         VestLike(MCD_VEST_MKR_TREASURY).file("cap", 2_200 * WAD / 365 days);
@@ -187,7 +186,7 @@ contract DssSpellAction is DssAction {
         // Increase allowance by new vesting delta
         uint256 newVesting = 4_000 * WAD; // PULLUP
                newVesting += 986.25 ether; // Phoenix Labs
-        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
+        GemLike(MKR).approve(address(MCD_VEST_MKR_TREASURY), GemLike(MKR).allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
 
         // Phoenix Labs | 2023-05-01 to 2024-05-01 | Cliff 2023-05-01 | 986.25 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
@@ -195,7 +194,7 @@ contract DssSpellAction is DssAction {
                 PHOENIX_LABS_2,            // usr
                 986.25 ether,              // tot
                 MAY_01_2023,               // bgn
-                MAY_01_2024 - MAY_01_2023, // tau
+                APR_30_2024 - MAY_01_2023, // tau
                 0,                         // eta
                 address(0)                 // mgr
             )
@@ -208,7 +207,7 @@ contract DssSpellAction is DssAction {
                 PULL_UP,                   // usr
                 4_000 * WAD,               // tot
                 MAY_01_2023,               // bgn
-                MAY_01_2025 - MAY_01_2023, // tau
+                APR_30_2025 - MAY_01_2023, // tau
                 0,                         // eta
                 PULL_UP_VEST_MGR           // mgr
             )
