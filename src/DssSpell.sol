@@ -39,9 +39,9 @@ interface VestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8d9266124fcf45a8065ecc50b43ef1c8b6f099ce/governance/votes/Executive%20vote%20-%20May%2010%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/4593c4f4d947b6393d49ea8d6ddfc018d8ad963b/governance/votes/Executive%20vote%20-%20May%2010%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-05-10 MakerDAO Executive Spell | Hash: 0x194493aa72c265dd0e40716e4d56a3e9f5c54343cc42ef9cb4ca5439ccd0d51c";
+        "2023-05-10 MakerDAO Executive Spell | Hash: 0xd6627860aae2eeeabc22baf5afcb90a4e528239cd8a71cb1a72194342e20fd47";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
