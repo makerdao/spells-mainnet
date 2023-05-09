@@ -56,7 +56,7 @@ contract DssSpellAction is DssAction {
 
     // Turn office hours on
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     uint256 internal constant ZERO_PT_SEVEN_FIVE_PCT_RATE    = 1000000000236936036262880196;
