@@ -95,8 +95,8 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = 0x77107F74bf30250aFFada0fbD09fa517658B4916;
+        address[] memory prevSpells = new address[](0);
+        // prevSpells[0] = <addr>;
 
         //
         // Values for spell-specific parameters

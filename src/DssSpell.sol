@@ -78,7 +78,7 @@ contract DssSpellAction is DssAction {
     // ECOSYSTEM ACTORS
     address internal constant PHOENIX_LABS_2                 = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
     address internal constant PULL_UP                        = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
-    
+
     address internal constant PULL_UP_VEST_MGR               = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
     address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
@@ -92,6 +92,7 @@ contract DssSpellAction is DssAction {
         // ---------- Starknet ----------
         // Increase L1 Starknet Bridge Limit from 1,000,000 DAI to 5,000,000 DAI
         // Forum: https://forum.makerdao.com/t/april-26th-2023-spell-starknet-bridge-limit/20589
+        // Poll: https://vote.makerdao.com/polling/QmUnhQZy#vote-breakdown
         StarknetLike(STARKNET_DAI_BRIDGE).setCeiling(5 * MILLION * WAD);
 
         // ---------- Risk Parameters Changes (Stability Fee & DC-IAM) ----------
@@ -186,7 +187,7 @@ contract DssSpellAction is DssAction {
         // Increase allowance by new vesting delta
         uint256 newVesting = 4_000 * WAD; // PULLUP
                newVesting += 986.25 ether; // Phoenix Labs
-        GemLike(MKR).approve(address(MCD_VEST_MKR_TREASURY), GemLike(MKR).allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + newVesting);
+        GemLike(MKR).approve(MCD_VEST_MKR_TREASURY, GemLike(MKR).allowance(address(this), MCD_VEST_MKR_TREASURY) + newVesting);
 
         // Phoenix Labs | 2023-05-01 to 2024-05-01 | Cliff 2023-05-01 | 986.25 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
