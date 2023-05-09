@@ -107,9 +107,9 @@ contract Wallets {
         addr["VIRIDIAN_TRANSFER"]            = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
         addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
         addr["SIDESTREAM"]                   = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
-        addr["PULL_UP"]                      = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
+        addr["PULLUP"]                       = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
 
         // Vest Managers
-        addr["PULL_UP_VEST_MGR"]             = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
+        addr["PULLUP_VEST_MGR"]              = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
     }
 }

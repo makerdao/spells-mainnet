@@ -24,16 +24,16 @@ interface StarknetLike {
 }
 
 interface GemLike {
-    function transfer(address, uint256) external returns (bool);
-    function allowance(address, address) external view returns (uint256);
-    function approve(address, uint256) external returns (bool);
+    function transfer(address dst, uint256 wad) external returns (bool);
+    function allowance(address src, address guy) external view returns (uint256);
+    function approve(address guy, uint256 wad) external returns (bool);
 }
 
 interface VestLike {
-    function file(bytes32, uint256) external;
-    function restrict(uint256) external;
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function yank(uint256) external;
+    function file(bytes32 what, uint256 data) external;
+    function restrict(uint256 _id) external;
+    function create(address _usr, uint256 _tot, uint256 _bgn, uint256 _tau, uint256 _eta, address _mgr) external returns (uint256 id);
+    function yank(uint256 _id) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -66,7 +66,6 @@ contract DssSpellAction is DssAction {
 
     uint256 internal constant MILLION                        = 10 ** 6;
     uint256 internal constant WAD                            = 10 ** 18;
-    uint256 internal constant RAD                            = 10 ** 45;
 
     // 01 May 2023 12:00:00 AM UTC
     uint256 public constant MAY_01_2023                      = 1682899200;
@@ -76,10 +75,10 @@ contract DssSpellAction is DssAction {
     uint256 public constant APR_30_2025                      = 1746057599;
 
     // ECOSYSTEM ACTORS
-    address internal constant PHOENIX_LABS_2                 = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address internal constant PULL_UP                        = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
+    address internal constant PHOENIX_LABS_2_WALLET          = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
+    address internal constant PULLUP_WALLET                  = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
 
-    address internal constant PULL_UP_VEST_MGR               = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
+    address internal constant PULLUP_VEST_MGR_WALLET         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
     address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -140,7 +139,7 @@ contract DssSpellAction is DssAction {
 
 
         // ----- Stream Yanks -----
-        // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+        // Forum: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
 
         // Yank DAI Stream ID 22 to Phoenix Labs as being replaced with new stream
         VestLike(MCD_VEST_DAI).yank(22);
@@ -151,11 +150,10 @@ contract DssSpellAction is DssAction {
         // ----- Ecosystem Actor Dai Streams -----
         // Forum: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
 
-        // Vote:
         // Phoenix Labs | 2023-05-01 to 2024-05-01 | 1,534,000 DAI
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
-                PHOENIX_LABS_2,            // usr
+                PHOENIX_LABS_2_WALLET,     // usr
                 1_534_000 * WAD,           // tot
                 MAY_01_2023,               // bgn
                 APR_30_2024 - MAY_01_2023, // tau
@@ -164,35 +162,36 @@ contract DssSpellAction is DssAction {
             )
         );
 
-        // Vote: https://vote.makerdao.com/polling/QmebPdpa#poll-detail
+        // Poll: https://vote.makerdao.com/polling/QmebPdpa#poll-detail
         // PullUp | 2023-05-01 to 2024-05-01 | 3,300,000 DAI
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
-                PULL_UP,                   // usr
+                PULLUP_WALLET,             // usr
                 3_300_000 * WAD,           // tot
                 MAY_01_2023,               // bgn
                 APR_30_2024 - MAY_01_2023, // tau
                 0,                         // eta
-                PULL_UP_VEST_MGR           // mgr
+                PULLUP_VEST_MGR_WALLET     // mgr
             )
         );
 
 
         // ----- Ecosystem Actor MKR Streams -----
-        // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+        // Forum: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
 
         // Set system-wide cap on maximum vesting speed
         VestLike(MCD_VEST_MKR_TREASURY).file("cap", 2_200 * WAD / 365 days);
 
         // Increase allowance by new vesting delta
-        uint256 newVesting = 4_000 * WAD; // PULLUP
+        // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        uint256 newVesting = 4_000 ether;  // PullUp
                newVesting += 986.25 ether; // Phoenix Labs
         GemLike(MKR).approve(MCD_VEST_MKR_TREASURY, GemLike(MKR).allowance(address(this), MCD_VEST_MKR_TREASURY) + newVesting);
 
         // Phoenix Labs | 2023-05-01 to 2024-05-01 | Cliff 2023-05-01 | 986.25 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
-                PHOENIX_LABS_2,            // usr
+                PHOENIX_LABS_2_WALLET,     // usr
                 986.25 ether,              // tot
                 MAY_01_2023,               // bgn
                 APR_30_2024 - MAY_01_2023, // tau
@@ -201,25 +200,25 @@ contract DssSpellAction is DssAction {
             )
         );
 
-        // VOTE: https://vote.makerdao.com/polling/QmcswbHs#poll-detail, https://vote.makerdao.com/polling/QmebPdpa#poll-detail
+        // Poll: https://vote.makerdao.com/polling/QmcswbHs#poll-detail, https://vote.makerdao.com/polling/QmebPdpa#poll-detail
         // PullUp | 2023-05-01 to 2025-05-01 | Cliff 2023-05-01 | 4,000 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
-                PULL_UP,                   // usr
+                PULLUP_WALLET,             // usr
                 4_000 * WAD,               // tot
                 MAY_01_2023,               // bgn
                 APR_30_2025 - MAY_01_2023, // tau
                 0,                         // eta
-                PULL_UP_VEST_MGR           // mgr
+                PULLUP_VEST_MGR_WALLET     // mgr
             )
         );
 
         // ----- Ecosystem Actor Dai Transfers -----
-        // FORUM: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
-        // VOTE:  https://vote.makerdao.com/polling/QmTYdpaU#poll-detail
+        // Forum: https://mips.makerdao.com/mips/details/MIP106#6-6-2-1a-
+        // Poll:  https://vote.makerdao.com/polling/QmTYdpaU#poll-detail
 
         // Phoenix Labs - 318,000 DAI - 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA
-        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_2, 318_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(PHOENIX_LABS_2_WALLET, 318_000);
     }
 }
 

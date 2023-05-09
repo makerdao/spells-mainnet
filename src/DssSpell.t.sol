@@ -390,12 +390,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(vest.valid(27)); // check for valid contract
         _checkDaiVest({
             _index:      27,                                             // id
-            _wallet:     wallets.addr("PULL_UP"),                        // usr
+            _wallet:     wallets.addr("PULLUP"),                        // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
             _end:        APR_30_2024,                                    // fin
             _days:       366 days,                                       // fin
-            _manager:    wallets.addr("PULL_UP_VEST_MGR"),               // mgr
+            _manager:    wallets.addr("PULLUP_VEST_MGR"),               // mgr
             _restricted: 1,                                              // res
             _reward:     3_300_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
@@ -403,12 +403,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevTechBalance = dai.balanceOf(wallets.addr("PULL_UP"));
+        uint256 prevTechBalance = dai.balanceOf(wallets.addr("PULLUP"));
 
         vest.unrestrict(27);
         vm.warp(MAY_01_2023 + 366 days);
         vest.vest(27);
-        assertEq(dai.balanceOf(wallets.addr("PULL_UP")), prevTechBalance + 3_300_000 * WAD);
+        assertEq(dai.balanceOf(wallets.addr("PULLUP")), prevTechBalance + 3_300_000 * WAD);
     }
 
     struct Payee {
@@ -525,7 +525,7 @@ contract DssSpellTest is DssSpellTestBase {
 
 
         uint256 PHOENIX_LABS_FIN  = MAY_01_2023 + (366 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 24
-        uint256 PULL_UP_FIN       = MAY_01_2023 + (366 days + 365 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 25
+        uint256 PULLUP_FIN       = MAY_01_2023 + (366 days + 365 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 25
 
         assertEq(vest.usr(38), wallets.addr("PHOENIX_LABS_2"));
         assertEq(vest.bgn(38), MAY_01_2023);
@@ -537,18 +537,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.tot(38), 986.25 ether);
         assertEq(vest.rxd(38), 0);
 
-        assertEq(vest.usr(39), wallets.addr("PULL_UP"));
+        assertEq(vest.usr(39), wallets.addr("PULLUP"));
         assertEq(vest.bgn(39), MAY_01_2023);
         assertEq(vest.clf(39), MAY_01_2023);
-        assertEq(vest.fin(39), PULL_UP_FIN);
+        assertEq(vest.fin(39), PULLUP_FIN);
         assertEq(vest.fin(39), APR_30_2025);
-        assertEq(vest.mgr(39), wallets.addr("PULL_UP_VEST_MGR"));
+        assertEq(vest.mgr(39), wallets.addr("PULLUP_VEST_MGR"));
         assertEq(vest.res(39), 1);
         assertEq(vest.tot(39), 4_000 ether);
         assertEq(vest.rxd(39), 0);
 
         uint256 prevBalance0 = gov.balanceOf(wallets.addr("PHOENIX_LABS_2"));
-        uint256 prevBalance1 = gov.balanceOf(wallets.addr("PULL_UP"));
+        uint256 prevBalance1 = gov.balanceOf(wallets.addr("PULLUP"));
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
@@ -560,10 +560,10 @@ contract DssSpellTest is DssSpellTestBase {
         vest.vest(38);
         assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevBalance0 + 986.25 ether);
 
-        vm.warp(PULL_UP_FIN);
+        vm.warp(PULLUP_FIN);
 
         vest.vest(39);
-        assertEq(gov.balanceOf(wallets.addr("PULL_UP")), prevBalance1 + 4_000 ether);
+        assertEq(gov.balanceOf(wallets.addr("PULLUP")), prevBalance1 + 4_000 ether);
     }
 
     function testMKRPayments() private { // make private to disable
