@@ -24,7 +24,6 @@ interface StarknetLike {
 }
 
 interface GemLike {
-    function transfer(address dst, uint256 wad) external returns (bool);
     function allowance(address src, address guy) external view returns (uint256);
     function approve(address guy, uint256 wad) external returns (bool);
 }
@@ -76,9 +75,9 @@ contract DssSpellAction is DssAction {
 
     // ECOSYSTEM ACTORS
     address internal constant PHOENIX_LABS_2_WALLET          = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
-    address internal constant PULLUP_WALLET                  = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
+    address internal constant PULLUP_LABS_WALLET             = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
 
-    address internal constant PULLUP_VEST_MGR_WALLET         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
+    address internal constant PULLUP_LABS_VEST_MGR_WALLET    = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
     address internal immutable MCD_VEST_MKR_TREASURY         = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -163,15 +162,15 @@ contract DssSpellAction is DssAction {
         );
 
         // Poll: https://vote.makerdao.com/polling/QmebPdpa#poll-detail
-        // PullUp | 2023-05-01 to 2024-05-01 | 3,300,000 DAI
+        // PullUp Labs | 2023-05-01 to 2024-05-01 | 3,300,000 DAI
         VestLike(MCD_VEST_DAI).restrict(
             VestLike(MCD_VEST_DAI).create(
-                PULLUP_WALLET,             // usr
-                3_300_000 * WAD,           // tot
-                MAY_01_2023,               // bgn
-                APR_30_2024 - MAY_01_2023, // tau
-                0,                         // eta
-                PULLUP_VEST_MGR_WALLET     // mgr
+                PULLUP_LABS_WALLET,         // usr
+                3_300_000 * WAD,            // tot
+                MAY_01_2023,                // bgn
+                APR_30_2024 - MAY_01_2023,  // tau
+                0,                          // eta
+                PULLUP_LABS_VEST_MGR_WALLET // mgr
             )
         );
 
@@ -184,7 +183,7 @@ contract DssSpellAction is DssAction {
 
         // Increase allowance by new vesting delta
         // NOTE: 'ether' is a keyword helper, only MKR is transferred here
-        uint256 newVesting = 4_000 ether;  // PullUp
+        uint256 newVesting = 4_000 ether;  // PullUp Labs
                newVesting += 986.25 ether; // Phoenix Labs
         GemLike(MKR).approve(MCD_VEST_MKR_TREASURY, GemLike(MKR).allowance(address(this), MCD_VEST_MKR_TREASURY) + newVesting);
 
@@ -201,15 +200,15 @@ contract DssSpellAction is DssAction {
         );
 
         // Poll: https://vote.makerdao.com/polling/QmcswbHs#poll-detail, https://vote.makerdao.com/polling/QmebPdpa#poll-detail
-        // PullUp | 2023-05-01 to 2025-05-01 | Cliff 2023-05-01 | 4,000 MKR
+        // PullUp Labs | 2023-05-01 to 2025-05-01 | Cliff 2023-05-01 | 4,000 MKR
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
-                PULLUP_WALLET,             // usr
-                4_000 * WAD,               // tot
-                MAY_01_2023,               // bgn
-                APR_30_2025 - MAY_01_2023, // tau
-                0,                         // eta
-                PULLUP_VEST_MGR_WALLET     // mgr
+                PULLUP_LABS_WALLET,         // usr
+                4_000 * WAD,                // tot
+                MAY_01_2023,                // bgn
+                APR_30_2025 - MAY_01_2023,  // tau
+                0,                          // eta
+                PULLUP_LABS_VEST_MGR_WALLET // mgr
             )
         );
 
