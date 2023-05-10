@@ -67,11 +67,11 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD                            = 10 ** 18;
 
     // 01 May 2023 12:00:00 AM UTC
-    uint256 public constant MAY_01_2023                      = 1682899200;
+    uint256 internal constant MAY_01_2023                    = 1682899200;
     // 30 Apr 2024 11:59:59 PM UTC
-    uint256 public constant APR_30_2024                      = 1714521599;
+    uint256 internal constant APR_30_2024                    = 1714521599;
     // 30 Apr 2025 11:59:59 PM UTC
-    uint256 public constant APR_30_2025                      = 1746057599;
+    uint256 internal constant APR_30_2025                    = 1746057599;
 
     // ECOSYSTEM ACTORS
     address internal constant PHOENIX_LABS_2_WALLET          = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
@@ -204,7 +204,7 @@ contract DssSpellAction is DssAction {
         VestLike(MCD_VEST_MKR_TREASURY).restrict(
             VestLike(MCD_VEST_MKR_TREASURY).create(
                 PULLUP_LABS_WALLET,         // usr
-                4_000 * WAD,                // tot
+                4_000 ether,                // tot
                 MAY_01_2023,                // bgn
                 APR_30_2025 - MAY_01_2023,  // tau
                 0,                          // eta
