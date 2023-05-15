@@ -200,19 +200,45 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testIlkClipper() private { // make private to disable
+    function testIlkClipper() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // XXX
         _checkIlkClipper(
-            "XXX-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_XXX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_XXX_A")),
-            addr.addr("MCD_CLIP_CALC_XXX_A"),
-            OsmAbstract(addr.addr("PIP_XXX")),
-            5_000 * WAD
+            "LINK-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_LINK_A")),
+            addr.addr("MCD_CLIP_CALC_LINK_A"),
+            OsmAbstract(addr.addr("PIP_LINK")),
+            1_000_000 * WAD
+        );
+
+        _checkIlkClipper(
+            "MATIC-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
+            addr.addr("MCD_CLIP_CALC_MATIC_A"),
+            OsmAbstract(addr.addr("PIP_MATIC")),
+            10_000_000 * WAD
+        );
+
+        _checkIlkClipper(
+            "YFI-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_YFI_A")),
+            addr.addr("MCD_CLIP_CALC_YFI_A"),
+            OsmAbstract(addr.addr("PIP_YFI")),
+            1_000 * WAD
+        );
+
+        _checkIlkClipper(
+            "UNIV2USDCETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
+            addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
+            OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
+            1 * WAD
         );
     }
 
@@ -344,71 +370,70 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
         // $ make time stamp=<STAMP>
-        // 01 May 2023 12:00:00 AM UTC
+        // 01 May 2023 00:00:00 UTC
         uint256 MAY_01_2023 = 1682899200;
-        // 30 Apr 2024 11:59:59 PM UTC
+        // 30 Apr 2024 23:59:59 UTC
         uint256 APR_30_2024 = 1714521599;
 
-        assertEq(vest.ids(), 25);
+        // Check previous amount of streams
+        assertEq(vest.ids(), 27);
 
+        // Cast the spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.ids(), 25 + 2);
+        // Check that 2 new streams are added
+        assertEq(vest.ids(), 27 + 2);
 
-        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days);
-
-        assertTrue(vest.valid(26)); // check for valid contract
+        // Check the first stream
+        assertTrue(vest.valid(28)); // check for valid contract
         _checkDaiVest({
-            _index:      26,                                             // id
-            _wallet:     wallets.addr("PHOENIX_LABS_2"),                 // usr
+            _index:      28,                                             // id
+            _wallet:     wallets.addr("GOV_SECURITY_ENGINEERING"),       // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
             _end:        APR_30_2024,                                    // fin
             _days:       366 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     1_534_000 * WAD,                                // tot
+            _reward:     2_200_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
-
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevPhoenixLabsBalance = dai.balanceOf(wallets.addr("PHOENIX_LABS_2"));
-
-        vest.unrestrict(26);
+        uint256 prevBalance = dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING"));
+        vest.unrestrict(28);
         vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(26);
-        assertEq(dai.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevPhoenixLabsBalance + 1_534_000 * WAD);
+        vest.vest(28);
+        assertEq(dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING")), prevBalance + 2_200_000 * WAD);
 
-        assertTrue(vest.valid(27)); // check for valid contract
+        // Check the second stream
+        assertTrue(vest.valid(29)); // check for valid contract
         _checkDaiVest({
-            _index:      27,                                             // id
-            _wallet:     wallets.addr("PULLUP_LABS"),                    // usr
+            _index:      29,                                             // id
+            _wallet:     wallets.addr("MULTICHAIN_ENGINEERING"),         // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
             _end:        APR_30_2024,                                    // fin
             _days:       366 days,                                       // fin
-            _manager:    wallets.addr("PULLUP_LABS_VEST_MGR"),           // mgr
+            _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     3_300_000 * WAD,                                // tot
+            _reward:     2_300_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
-
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevTechBalance = dai.balanceOf(wallets.addr("PULLUP_LABS"));
-
-        vest.unrestrict(27);
+        uint256 prevTechBalance = dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING"));
+        vest.unrestrict(29);
         vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(27);
-        assertEq(dai.balanceOf(wallets.addr("PULLUP_LABS")), prevTechBalance + 3_300_000 * WAD);
+        vest.vest(29);
+        assertEq(dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING")), prevTechBalance + 2_300_000 * WAD);
     }
 
     struct Payee {
@@ -566,21 +591,47 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("PULLUP_LABS")), prevBalance1 + 4_000 ether);
     }
 
-    function testMKRPayments() private { // make private to disable
-        address peContributor = 0x18A0609b14dB84bbcC3d911915a07CA9a28b9263;
+    function testMKRPayments() public { // make private to disable
+        // For each payment, create a Payee object with
+        //    the Payee address,
+        //    the amount to be paid
+        // Initialize the array with the number of payees
+        Payee[12] memory payees = [
+            Payee(wallets.addr("DEFENSOR"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),      23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("FRONTIERRESEARCH"), 23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("GFXLABS"),          23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("QGOV"),             23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CODEKNIGHT"),       5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("FLIPFLOPFLAP"),     5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),              5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),          5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DIN_WALLET"),       103.16 ether) // note: ether is a keyword helper, only MKR is transferred here
+        ];
 
-        uint256 prevMkrPause         = gov.balanceOf(address(pauseProxy));
-        uint256 prevMkrPeContributor = gov.balanceOf(peContributor);
+        // Calculate and save previous balances
+        uint256 totalAmountToTransfer;
+        uint256[] memory prevBalances = new uint256[](payees.length);
+        uint256 prevMkrBalance       = gov.balanceOf(address(pauseProxy));
+        for (uint256 i = 0; i < payees.length; i++) {
+            totalAmountToTransfer += payees[i].amount;
+            prevBalances[i] = gov.balanceOf(payees[i].addr);
+        }
 
-        uint256 amount = 248 * WAD;
-        uint256 total  = 248 * WAD;
-
+        // Cast the spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause - total);
-        assertEq(gov.balanceOf(peContributor), prevMkrPeContributor + amount);
+        // Check that pause proxy balance has decreased
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer);
+
+        // Check that payees received their payments
+        for (uint256 i = 0; i < payees.length; i++) {
+            assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
+        }
     }
 
     function testMKRVestFix() private { // make private to disable
