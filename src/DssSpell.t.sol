@@ -240,7 +240,7 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-        
+
         _checkChainlogVersion("1.14.11");
     }
 
@@ -344,7 +344,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -416,7 +416,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -455,7 +455,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() public { // make private to disable
+    function testYankDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
@@ -472,7 +472,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(22), block.timestamp);
     }
 
-    function testYankMKR() public { // make private to disable
+    function testYankMKR() private { // make private to disable
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
         // 01 Apr 2024 11:59:59 PM UTC
@@ -498,7 +498,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreasury.fin(37), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         assertEq(vest.ids(), 37);
 
