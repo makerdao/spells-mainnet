@@ -40,7 +40,8 @@ contract Deployers {
             0xb27B6fa77D7FBf3C1BD34B0f7DA59b39D3DB0f7e,  // CES
             0x39aBD7819E5632Fa06D2ECBba45Dca5c90687EE3,  // Oracles from 2022-10-26
             0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5,  // CES from 2022-10-26
-            0x5C82d7Eafd66d7f5edC2b844860BfD93C3B0474f   // CES from 2022-12-09
+            0x5C82d7Eafd66d7f5edC2b844860BfD93C3B0474f,  // CES from 2022-12-09
+            0x34DBF275E1Df79D1fC7bf6a37feC56A8b1057490   // Sidestream
         ];
     }
 

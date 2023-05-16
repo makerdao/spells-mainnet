@@ -102,9 +102,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x57C8ea2995a1277B560704792155690FA8a98643),     // populate with deployed spell if deployed
-            deployed_spell_created:         1683750203,         // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           17232341,           // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:                 address(0),         // populate with deployed spell if deployed
+            deployed_spell_created:         0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:                prevSpells,         // older spells to ensure are executed first
             office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
@@ -659,10 +659,10 @@ contract Config {
             line:         0,
             dust:         15 * THOUSAND,
             pct:          250,
-            mat:          16500,
+            mat:          10000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         1300,
+            chop:         0,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
@@ -672,14 +672,14 @@ contract Config {
             clip_buf:     120_00,
             clip_tail:    140 minutes,
             clip_cusp:    40_00,
-            clip_chip:    10,
-            clip_tip:     250,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["BAL-A"] = CollateralValues({
             aL_enabled:   false,
@@ -719,10 +719,10 @@ contract Config {
             line:         0,
             dust:         15 * THOUSAND,
             pct:          150,
-            mat:          16500,
+            mat:          10000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         1300,
+            chop:         0,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
@@ -732,14 +732,14 @@ contract Config {
             clip_buf:     130_00,
             clip_tail:    140 minutes,
             clip_cusp:    40_00,
-            clip_chip:    10,
-            clip_tip:     250,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
             aL_enabled:   false,
@@ -959,10 +959,10 @@ contract Config {
             line:         0,
             dust:         60 * THOUSAND,
             pct:          150,
-            mat:          12000,
+            mat:          10000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         1300,
+            chop:         0,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
@@ -972,14 +972,14 @@ contract Config {
             clip_buf:     11500,
             clip_tail:    215 minutes,
             clip_cusp:    6000,
-            clip_chip:    10,
-            clip_tip:     300,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 7000,
             calc_tau:     0,
             calc_step:    125,
             calc_cut:     9950,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
             aL_enabled:   false,
@@ -1589,10 +1589,10 @@ contract Config {
             line:         0,
             dust:         15 * THOUSAND,
             pct:          300,
-            mat:          17500,
+            mat:          10000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         1300,
+            chop:         0,
             cat_dunk:     0,
             flip_beg:     0,
             flip_ttl:     0,
@@ -1602,14 +1602,14 @@ contract Config {
             clip_buf:     120_00,
             clip_tail:    140 minutes,
             clip_cusp:    40_00,
-            clip_chip:    10,
-            clip_tip:     250,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 5000,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
             aL_enabled:   true,

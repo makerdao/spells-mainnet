@@ -33,25 +33,20 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8f548f10a4ce1db0acdc30fb171eebb72b236c39/governance/votes/Executive%20Vote%20-%20May%2017%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-05-15 MakerDAO Executive Spell | Hash: 0x867a1f6f1b68414fba87ccbb7d0d1fd0ba5e29336f59b88ea4a997780d019859";
+        "2023-05-17 MakerDAO Executive Spell | Hash: 0x867a1f6f1b68414fba87ccbb7d0d1fd0ba5e29336f59b88ea4a997780d019859";
 
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
-    //
-    // uint256 internal constant X_PCT_RATE      = ;
+    // Set office hours according to the summary
+    function officeHours() public pure override returns (bool) {
+        return true;
+    }
+
     uint256 internal constant WAD       = 10 ** 18;
     uint256 internal constant RAY       = 10 ** 27;
 
     // 01 May 2023 00:00:00 UTC
-    uint256 public constant MAY_01_2023 = 1682899200;
+    uint256 internal constant MAY_01_2023 = 1682899200;
     // 30 Apr 2024 23:59:59 UTC
-    uint256 public constant APR_30_2024 = 1714521599;
+    uint256 internal constant APR_30_2024 = 1714521599;
 
     // Prime Constitutional Delegates
     address internal constant DEFENSOR                 = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
@@ -78,11 +73,6 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_SPOT         = DssExecLib.spotter();
     GemLike internal immutable MKR              = GemLike(DssExecLib.mkr());
     DssVestLike internal immutable MCD_VEST_DAI = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
-
-    // Set office hours according to the summary
-    function officeHours() public pure override returns (bool) {
-        return true;
-    }
 
     function actions() public override {
         // --------- Collateral Offboardings ---------
