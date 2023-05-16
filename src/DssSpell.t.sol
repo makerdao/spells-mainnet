@@ -380,8 +380,8 @@ contract DssSpellTest is DssSpellTestBase {
         // 30 Apr 2024 23:59:59 UTC
         uint256 APR_30_2024 = 1714521599;
 
-        // Check previous amount of streams
-        assertEq(vest.ids(), 27);
+        // Store previous amount of streams
+        uint256 prevStreamCount = vest.ids();
 
         // Cast the spell
         _vote(address(spell));
@@ -389,12 +389,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Check that 2 new streams are added
-        assertEq(vest.ids(), 27 + 2);
+        assertEq(vest.ids(), prevStreamCount + 2);
 
         // Check the first stream
-        assertTrue(vest.valid(28)); // check for valid contract
+        uint256 govSecurityEngineeringStreamId = prevStreamCount + 1;
+        assertTrue(vest.valid(govSecurityEngineeringStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      28,                                             // id
+            _index:      govSecurityEngineeringStreamId,                 // id
             _wallet:     wallets.addr("GOV_SECURITY_ENGINEERING"),       // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
@@ -408,15 +409,16 @@ contract DssSpellTest is DssSpellTestBase {
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
         uint256 prevBalance = dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING"));
-        vest.unrestrict(28);
+        vest.unrestrict(govSecurityEngineeringStreamId);
         vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(28);
+        vest.vest(govSecurityEngineeringStreamId);
         assertEq(dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING")), prevBalance + 2_200_000 * WAD);
 
         // Check the second stream
-        assertTrue(vest.valid(29)); // check for valid contract
+        uint256 multichainEngineeringStreamId = prevStreamCount + 2;
+        assertTrue(vest.valid(multichainEngineeringStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      29,                                             // id
+            _index:      multichainEngineeringStreamId,                  // id
             _wallet:     wallets.addr("MULTICHAIN_ENGINEERING"),         // usr
             _start:      MAY_01_2023,                                    // bgn
             _cliff:      MAY_01_2023,                                    // clf
@@ -430,9 +432,9 @@ contract DssSpellTest is DssSpellTestBase {
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
         uint256 prevTechBalance = dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING"));
-        vest.unrestrict(29);
+        vest.unrestrict(multichainEngineeringStreamId);
         vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(29);
+        vest.vest(multichainEngineeringStreamId);
         assertEq(dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING")), prevTechBalance + 2_300_000 * WAD);
     }
 
@@ -600,12 +602,12 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("DEFENSOR"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("BONAPUBLICA"),      23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("FRONTIERRESEARCH"), 23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("GFXLABS"),          23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("GFXLABS_2"),        23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("QGOV"),             23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("TRUENAME"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("VIGILANT"),         23.8 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("CODEKNIGHT"),       5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("FLIPFLOPFLAP"),     5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("FLIPFLOPFLAP_2"),   5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("PBG"),              5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("UPMAKER"),          5.95 ether), // note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("DIN_WALLET"),       103.16 ether) // note: ether is a keyword helper, only MKR is transferred here
