@@ -48,7 +48,7 @@ contract DssSpellAction is DssAction {
     // 30 Apr 2024 23:59:59 UTC
     uint256 internal constant APR_30_2024 = 1714521599;
 
-    // Prime Constitutional Delegates
+    // Constitutional Delegates
     address internal constant DEFENSOR                 = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
     address internal constant BONAPUBLICA              = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
     address internal constant FRONTIERRESEARCH         = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
@@ -56,14 +56,12 @@ contract DssSpellAction is DssAction {
     address internal constant QGOV                     = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
     address internal constant TRUENAME                 = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
     address internal constant VIGILANT                 = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
-
-    // Reserve Constitutional Delegates
     address internal constant CODEKNIGHT               = 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D;
     address internal constant FLIPFLOPFLAP_2           = 0x3d9751EFd857662f2B007A881e05CfD1D7833484;
     address internal constant PBG                      = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
     address internal constant UPMAKER                  = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
 
-    // Ecosystem Scope
+    // Protocol Engineering Scope
     address internal constant GOV_SECURITY_ENGINEERING = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
     address internal constant MULTICHAIN_ENGINEERING   = 0x868B44e8191A2574334deB8E7efA38910df941FA;
 
