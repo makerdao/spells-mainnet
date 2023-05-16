@@ -202,6 +202,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testIlkClipper() public { // make private to disable
         _vote(address(spell));
+        _castPreviousSpell();
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 

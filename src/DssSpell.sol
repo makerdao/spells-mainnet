@@ -89,7 +89,7 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
         DssExecLib.setValue(MCD_SPOT, "YFI-A", "mat", 100 * RAY);
         // Update spotter price
-        // DssExecLib.updateCollateralPrice("YFI-A");
+        DssExecLib.updateCollateralPrice("YFI-A");
 
         // Set Liquidation Penalty (chop) to 0%.
         DssExecLib.setIlkLiquidationPenalty("LINK-A", 0);
@@ -101,7 +101,7 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
         DssExecLib.setValue(MCD_SPOT, "LINK-A", "mat", 100 * RAY);
         // Update spotter price
-        // DssExecLib.updateCollateralPrice("LINK-A");
+        DssExecLib.updateCollateralPrice("LINK-A");
 
         // Set Liquidation Penalty (chop) to 0%.
         DssExecLib.setIlkLiquidationPenalty("MATIC-A", 0);
@@ -113,7 +113,7 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
         DssExecLib.setValue(MCD_SPOT, "MATIC-A", "mat", 100 * RAY);
         // Update spotter price
-        // DssExecLib.updateCollateralPrice("MATIC-A");
+        DssExecLib.updateCollateralPrice("MATIC-A");
 
         // Set Liquidation Penalty (chop) to 0%.
         DssExecLib.setIlkLiquidationPenalty("UNIV2USDCETH-A", 0);
@@ -125,7 +125,7 @@ contract DssSpellAction is DssAction {
         // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
         DssExecLib.setValue(MCD_SPOT, "UNIV2USDCETH-A", "mat", 100 * RAY);
         // Update spotter price
-        // DssExecLib.updateCollateralPrice("UNIV2USDCETH-A");
+        DssExecLib.updateCollateralPrice("UNIV2USDCETH-A");
 
         // --------- Delegate Compensation MKR Transfers ---------
         // Poll: N/A
