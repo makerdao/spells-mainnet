@@ -136,16 +136,16 @@ contract DssSpellAction is DssAction {
         // BONAPUBLICA                 - 23.8 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
         MKR.transfer(BONAPUBLICA,        23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
 
-        // Frontier Research           - 23.8 MKR - 0xa2d55b89654079987cf3985aeff5a7bd44da15a8
+        // Frontier Research           - 23.8 MKR - 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8
         MKR.transfer(FRONTIERRESEARCH,   23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
 
-        // GFX Labs                    - 23.8 MKR - 0x9b68c14e936104e9a7a24c712beecdc220002984
+        // GFX Labs                    - 23.8 MKR - 0x9B68c14e936104e9a7a24c712BEecdc220002984
         MKR.transfer(GFXLABS_2,          23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
 
         // QGov                        - 23.8 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
         MKR.transfer(QGOV,               23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
 
-        // TRUE NAME                   - 23.8 MKR - 0x612f7924c367575a0edf21333d96b15f1b345a5d
+        // TRUE NAME                   - 23.8 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
         MKR.transfer(TRUENAME,           23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
 
         // vigilant                    - 23.8 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
@@ -160,7 +160,7 @@ contract DssSpellAction is DssAction {
         // PBG                         - 5.95 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
         MKR.transfer(PBG,                5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
 
-        // UPMaker                     - 5.95 MKR - 0xbb819df169670dc71a16f58f55956fe642cc6bcd
+        // UPMaker                     - 5.95 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
         MKR.transfer(UPMAKER,            5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
 
         // --------- DAI Budget Streams ---------
