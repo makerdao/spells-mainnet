@@ -102,7 +102,7 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xa1c423ee0bbc927ef5809c7ebb24c86d4284e431),         // populate with deployed spell if deployed
+            deployed_spell:                 address(0xa1c423ee0bbC927EF5809c7ebB24c86D4284e431),         // populate with deployed spell if deployed
             deployed_spell_created:         1684340339,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:           17280478,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:                prevSpells,         // older spells to ensure are executed first
