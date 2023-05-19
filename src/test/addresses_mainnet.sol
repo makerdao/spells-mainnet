@@ -385,6 +385,16 @@ contract Addresses {
         addr["RWA013_A_URN"]                    = 0x9C170dd80Ee2CA5bfDdF00cbE93e8faB2D05bA6D;
         addr["RWA013_A_OUTPUT_CONDUIT"]         = 0x615984F33604011Fcd76E9b89803Be3816276E61;
         addr["RWA013_A_INPUT_CONDUIT"]          = 0x615984F33604011Fcd76E9b89803Be3816276E61;
+        addr["RWA014"]                          = address(0); // TODO
+        addr["PIP_RWA014"]                      = address(0); // TODO
+        addr["MCD_JOIN_RWA014_A"]               = address(0); // TODO
+        addr["RWA014_A_URN"]                    = address(0); // TODO
+        addr["RWA014_A_JAR"]                    = address(0); // TODO
+        addr["RWA014_A_INPUT_CONDUIT_URN"]      = address(0); // TODO
+        addr["RWA014_A_INPUT_CONDUIT_JAR"]      = address(0); // TODO
+        addr["RWA014_A_OUTPUT_CONDUIT"]         = address(0); // TODO
+        addr["RWA014_A_OPERATOR"]               = 0x3064D13712338Ee0E092b66Afb3B054F0b7779CB;
+        addr["RWA014_A_COINBASE_CUSTODY"]       = 0x2E5F1f08EBC01d6136c95a40e19D4c64C0be772c;
         addr["GUNIV3DAIUSDC1"]                  = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
         addr["PIP_GUNIV3DAIUSDC1"]              = 0x7F6d78CC0040c87943a0e0c140De3F77a273bd58;
         addr["MCD_JOIN_GUNIV3DAIUSDC1_A"]       = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
