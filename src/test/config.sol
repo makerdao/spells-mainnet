@@ -96,15 +96,15 @@ contract Config {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
         address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x57C8ea2995a1277B560704792155690FA8a98643);
+        prevSpells[0] = address(0xa1c423ee0bbC927EF5809c7ebB24c86D4284e431);
 
         //
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0xa1c423ee0bbC927EF5809c7ebB24c86D4284e431),         // populate with deployed spell if deployed
-            deployed_spell_created:         1684340339,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           17280478,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:                 address(0),         // populate with deployed spell if deployed
+            deployed_spell_created:         0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:                prevSpells,         // older spells to ensure are executed first
             office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
@@ -135,7 +135,7 @@ contract Config {
         afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
         afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
         afterSpell.ilk_count =             62;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.14.11";               // String expected in system
+        afterSpell.chainlog_version =      "1.14.12";               // String expected in system
 
         //
         // Values for all collateral

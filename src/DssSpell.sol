@@ -19,184 +19,132 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface DssVestLike {
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function restrict(uint256) external;
+interface VestLike {
+    function restrict(uint256 _id) external;
+    function create(address _usr, uint256 _tot, uint256 _bgn, uint256 _tau, uint256 _eta, address _mgr) external returns (uint256 id);
+    function yank(uint256 _id) external;
+}
+interface NetworkPaymentAdapterLike {
+    function bufferMax() external view returns (uint256);
+    function minimumPayment() external view returns (uint256);
+    function file(bytes32 what, uint256 data) external;
+    function file(bytes32 what, address data) external;
 }
 
-interface GemLike {
-    function transfer(address, uint256) external returns (bool);
+interface DssCronSequencerLike {
+    function windows(bytes32) external view returns (uint256 start, uint256 length);
 }
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8f548f10a4ce1db0acdc30fb171eebb72b236c39/governance/votes/Executive%20Vote%20-%20May%2017%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-05-17 MakerDAO Executive Spell | Hash: 0x867a1f6f1b68414fba87ccbb7d0d1fd0ba5e29336f59b88ea4a997780d019859";
+        "2023-05-24 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return true;
     }
 
-    uint256 internal constant WAD       = 10 ** 18;
-    uint256 internal constant RAY       = 10 ** 27;
+    uint256 internal constant WAD                       = 10 ** 18;
 
-    // 01 May 2023 00:00:00 UTC
-    uint256 internal constant MAY_01_2023 = 1682899200;
-    // 30 Apr 2024 23:59:59 UTC
-    uint256 internal constant APR_30_2024 = 1714521599;
+    // 24 May 2023 12:00:00 AM UTC
+    uint256 internal constant MAY_24_2023               = 1684886400;
+    // 23 May 2023 11:59:59 PM UTC
+    uint256 internal constant MAY_23_2024               = 1716508799;
+    // 23 May 2026 11:59:59 PM UTC
+    uint256 internal constant MAY_23_2026               = 1779580799;
 
-    // Constitutional Delegates
-    address internal constant DEFENSOR                 = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
-    address internal constant BONAPUBLICA              = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant FRONTIERRESEARCH         = 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8;
-    address internal constant GFXLABS_2                = 0x9B68c14e936104e9a7a24c712BEecdc220002984;
-    address internal constant QGOV                     = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
-    address internal constant TRUENAME                 = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
-    address internal constant VIGILANT                 = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
-    address internal constant CODEKNIGHT               = 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D;
-    address internal constant FLIPFLOPFLAP_2           = 0x3d9751EFd857662f2B007A881e05CfD1D7833484;
-    address internal constant PBG                      = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
-    address internal constant UPMAKER                  = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
-
-    // Protocol Engineering Scope
-    address internal constant GOV_SECURITY_ENGINEERING = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
-    address internal constant MULTICHAIN_ENGINEERING   = 0x868B44e8191A2574334deB8E7efA38910df941FA;
-
-    // Data Insights Core Unit (DIN-001)
-    address internal constant DIN_WALLET               = 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F;
-
-    address internal immutable MCD_SPOT         = DssExecLib.spotter();
-    GemLike internal immutable MKR              = GemLike(DssExecLib.mkr());
-    DssVestLike internal immutable MCD_VEST_DAI = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    // Keeper Network
+    address internal constant GELATO_PAYMENT_ADAPTER    = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
+    address internal constant GELATO_TREASURY           = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
+    address internal constant KEEP3R_PAYMENT_ADAPTER    = 0xaeFed819b6657B3960A8515863abe0529Dfc444A;
+    address internal constant KEEP3R_TREASURY           = 0x4DfC6DA2089b0dfCF04788b341197146Ea97f743;
+    address internal constant CHAINLINK_PAYMENT_ADAPTER = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
+    address internal constant TECHOPS_VEST_STREAMING    = 0x5A6007d17302238D63aB21407FF600a67765f982;
+    
+    address internal constant DSS_CRON_SEQUENCER        = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
+    address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
 
     function actions() public override {
-        // --------- Collateral Offboardings ---------
-        // Poll: https://vote.makerdao.com/polling/QmPwHhLT#poll-detail
-        // Forum: https://forum.makerdao.com/t/decentralized-collateral-scope-parameter-changes-1-april-2023/20302
 
-        // Set Liquidation Penalty (chop) to 0%.
-        DssExecLib.setIlkLiquidationPenalty("YFI-A", 0);
-        // Set Flat Kick Incentive (tip) to 0.
-        DssExecLib.setKeeperIncentiveFlatRate("YFI-A", 0);
-        // Set Proportional Kick Incentive (chip) to 0.
-        DssExecLib.setKeeperIncentivePercent("YFI-A", 0);
-        // Set Liquidation Ratio (mat) to 10,000%.
-        // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
-        DssExecLib.setValue(MCD_SPOT, "YFI-A", "mat", 100 * RAY);
-        // Update spotter price
-        DssExecLib.updateCollateralPrice("YFI-A");
+        // --------- Keeper Network Amendments ---------
+        // Poll: https://vote.makerdao.com/polling/QmZZJcCj#poll-detail
 
-        // Set Liquidation Penalty (chop) to 0%.
-        DssExecLib.setIlkLiquidationPenalty("LINK-A", 0);
-        // Set Flat Kick Incentive (tip) to 0.
-        DssExecLib.setKeeperIncentiveFlatRate("LINK-A", 0);
-        // Set Proportional Kick Incentive (chip) to 0.
-        DssExecLib.setKeeperIncentivePercent("LINK-A", 0);
-        // Set Liquidation Ratio (mat) to 10,000%.
-        // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
-        DssExecLib.setValue(MCD_SPOT, "LINK-A", "mat", 100 * RAY);
-        // Update spotter price
-        DssExecLib.updateCollateralPrice("LINK-A");
+        // Yank DAI stream ID 16 to Chainlink Automation - being replaced by new stream
+        VestLike(MCD_VEST_DAI).yank(16);
 
-        // Set Liquidation Penalty (chop) to 0%.
-        DssExecLib.setIlkLiquidationPenalty("MATIC-A", 0);
-        // Set Flat Kick Incentive (tip) to 0.
-        DssExecLib.setKeeperIncentiveFlatRate("MATIC-A", 0);
-        // Set Proportional Kick Incentive (chip) to 0.
-        DssExecLib.setKeeperIncentivePercent("MATIC-A", 0);
-        // Set Liquidation Ratio (mat) to 10,000%.
-        // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
-        DssExecLib.setValue(MCD_SPOT, "MATIC-A", "mat", 100 * RAY);
-        // Update spotter price
-        DssExecLib.updateCollateralPrice("MATIC-A");
 
-        // Set Liquidation Penalty (chop) to 0%.
-        DssExecLib.setIlkLiquidationPenalty("UNIV2USDCETH-A", 0);
-        // Set Flat Kick Incentive (tip) to 0.
-        DssExecLib.setKeeperIncentiveFlatRate("UNIV2USDCETH-A", 0);
-        // Set Proportional Kick Incentive (chip) to 0.
-        DssExecLib.setKeeperIncentivePercent("UNIV2USDCETH-A", 0);
-        // Set Liquidation Ratio (mat) to 10,000%.
-        // We are using low level methods because DssExecLib only allows setting `mat < 1000%`: https://github.com/makerdao/dss-exec-lib/blob/69b658f35d8618272cd139dfc18c5713caf6b96b/src/DssExecLib.sol#L717
-        DssExecLib.setValue(MCD_SPOT, "UNIV2USDCETH-A", "mat", 100 * RAY);
-        // Update spotter price
-        DssExecLib.updateCollateralPrice("UNIV2USDCETH-A");
+        // GELATO    | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD | Treasury: 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206
+        (,uint256 windowLengthGelato) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("GELATO"));
+        require(windowLengthGelato == 13, "Gelato/incrorrect-window-length");
+        require(NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Gelato-Payment-Adapter/incorrect-buffer-max");
+        require(NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Gelato-Payment-Adapter/incorrect-minimum-payment");
+        uint256 gelatoVestId = VestLike(MCD_VEST_DAI).create(
+                GELATO_PAYMENT_ADAPTER,    // usr
+                1_644_000 * WAD,           // tot
+                MAY_24_2023,               // bgn
+                MAY_23_2026 - MAY_24_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+        );
+        VestLike(MCD_VEST_DAI).restrict(gelatoVestId);
+        NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).file("vestId", gelatoVestId);
+        NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).file("treasury", GELATO_TREASURY);
 
-        // --------- Delegate Compensation MKR Transfers ---------
-        // Poll: N/A
-        // Forum: https://forum.makerdao.com/t/constitutional-delegate-compensation-april-2023/20804
-        // Mip: https://mips.makerdao.com/mips/details/MIP113#5-4-constitutional-delegate-income-management
+        // KEEP3R    | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0xaeFed819b6657B3960A8515863abe0529Dfc444A | Treasury: 0x4DfC6DA2089b0dfCF04788b341197146Ea97f743
+        (,uint256 windowLengthKeeper) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("KEEP3R"));
+        require(windowLengthKeeper == 13, "Keep3r/incrorrect-window-length");
+        require(NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Keep3r-Payment-Adapter/incorrect-buffer-max");
+        require(NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Keep3r-Payment-Adapter/incorrect-minimum-payment");
+        uint256 kepperVestId = VestLike(MCD_VEST_DAI).create(
+                KEEP3R_PAYMENT_ADAPTER,    // usr
+                1_644_000 * WAD,           // tot
+                MAY_24_2023,               // bgn
+                MAY_23_2026 - MAY_24_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+        );
+        VestLike(MCD_VEST_DAI).restrict(kepperVestId);
+        NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).file("vestId", kepperVestId);
+        NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).file("treasury", KEEP3R_TREASURY);
 
-        // 0xDefensor                  - 23.8 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
-        MKR.transfer(DEFENSOR,           23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
+        // CHAINLINK | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065
+        (,uint256 windowLengthChainlink) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("CHAINLINK"));
+        require(windowLengthChainlink == 13, "Chainling/incrorrect-window-length");
+        require(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Chainlink-Payment-Adapter/incorrect-buffer-max");
+        require(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Chainlink-Payment-Adapter/incorrect-minimum-payment");
+        uint256 chainlinkVestId = VestLike(MCD_VEST_DAI).create(
+                CHAINLINK_PAYMENT_ADAPTER, // usr
+                1_644_000 * WAD,           // tot
+                MAY_24_2023,               // bgn
+                MAY_23_2026 - MAY_24_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+        );
+        VestLike(MCD_VEST_DAI).restrict(chainlinkVestId);
+        NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).file("vestId", chainlinkVestId);
 
-        // BONAPUBLICA                 - 23.8 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
-        MKR.transfer(BONAPUBLICA,        23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // Frontier Research           - 23.8 MKR - 0xA2d55b89654079987CF3985aEff5A7Bd44DA15A8
-        MKR.transfer(FRONTIERRESEARCH,   23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // GFX Labs                    - 23.8 MKR - 0x9B68c14e936104e9a7a24c712BEecdc220002984
-        MKR.transfer(GFXLABS_2,          23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // QGov                        - 23.8 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
-        MKR.transfer(QGOV,               23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // TRUE NAME                   - 23.8 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
-        MKR.transfer(TRUENAME,           23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // vigilant                    - 23.8 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
-        MKR.transfer(VIGILANT,           23.8 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // CodeKnight                  - 5.95 MKR - 0xf6006d4cF95d6CB2CD1E24AC215D5BF3bca81e7D
-        MKR.transfer(CODEKNIGHT,         5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // Flip Flop Flap Delegate LLC - 5.95 MKR - 0x3d9751EFd857662f2B007A881e05CfD1D7833484
-        MKR.transfer(FLIPFLOPFLAP_2,     5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // PBG                         - 5.95 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
-        MKR.transfer(PBG,                5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // UPMaker                     - 5.95 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
-        MKR.transfer(UPMAKER,            5.95 ether); // note: ether is a keyword helper, only MKR is transferred here
-
-        // --------- DAI Budget Streams ---------
-        // Poll: https://vote.makerdao.com/polling/Qmbndmkr#poll-detail
-        // Forum: https://forum.makerdao.com/t/mip101-the-maker-constitution/19621
-
-        // Mip: https://mips.makerdao.com/mips/details/MIP107#6-1-governance-security-engineering-budget
-        // Governance Security Engineering Budget | 2023-05-01 00:00:00 to 2024-04-30 23:59:59 | 2,200,000 DAI | 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0
-        MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(
-                GOV_SECURITY_ENGINEERING,  // usr
-                2_200_000 * WAD,           // tot
-                MAY_01_2023,               // bgn
-                APR_30_2024 - MAY_01_2023, // tau
+        // TECHOPS   | 1,000 DAI/day | 366_000 DAI   | 1 years | Vest Target: 0x5A6007d17302238D63aB21407FF600a67765f982
+        VestLike(MCD_VEST_DAI).restrict(
+            VestLike(MCD_VEST_DAI).create(
+                TECHOPS_VEST_STREAMING,    // usr
+                366_000 * WAD,             // tot
+                MAY_24_2023,               // bgn
+                MAY_23_2024 - MAY_24_2023, // tau
                 0,                         // eta
                 address(0)                 // mgr
             )
         );
 
-        // Mip: https://mips.makerdao.com/mips/details/MIP107#7-1-multichain-engineering-budget
-        // Multichain Engineering Budget          | 2023-05-01 00:00:00 to 2024-04-30 23:59:59 | 2,300,000 DAI | 0x868B44e8191A2574334deB8E7efA38910df941FA
-        MCD_VEST_DAI.restrict(
-            MCD_VEST_DAI.create(
-                MULTICHAIN_ENGINEERING,    // usr
-                2_300_000 * WAD,           // tot
-                MAY_01_2023,               // bgn
-                APR_30_2024 - MAY_01_2023, // tau
-                0,                         // eta
-                address(0)                 // mgr
-            )
-        );
 
-        // --------- Data Insights MKR Transfer ---------
-        // Mip: https://mips.makerdao.com/mips/details/MIP40c3SP64#mkr-vesting
-        // DIN-001 - 103.16 MKR - 0x7327Aed0Ddf75391098e8753512D8aEc8D740a1F
-        MKR.transfer(DIN_WALLET, 103.16 ether); // note: ether is a keyword helper, only MKR is transferred here
+        // --------- CAIS Bootstrap Funding ---------
+        // Poll: https://vote.makerdao.com/polling/Qmc6Wqrc#poll-detail
+        // DssExecLib.sendPaymentFromSurplusBuffer(CAIS_WALLET, XXX_XXX);
+
+        // Bump the chainlog
+        DssExecLib.setChangelogVersion("1.14.12");
     }
 }
 

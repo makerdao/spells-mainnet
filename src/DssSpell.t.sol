@@ -23,6 +23,10 @@ import {RootDomain} from "dss-test/domains/RootDomain.sol";
 import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
 import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
 
+interface NetworkPaymentAdapterLike {
+    function vestId() external view returns (uint256);
+    function treasury() external view returns (address);
+}
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -200,47 +204,47 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testIlkClipper() public { // make private to disable
-        _vote(address(spell));
+    function testIlkClipper() private { // make public to enable
         _castPreviousSpell();
+        _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkIlkClipper(
-            "LINK-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_LINK_A")),
-            addr.addr("MCD_CLIP_CALC_LINK_A"),
-            OsmAbstract(addr.addr("PIP_LINK")),
-            1_000_000 * WAD
-        );
+        // _checkIlkClipper(
+        //     "LINK-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_LINK_A")),
+        //     addr.addr("MCD_CLIP_CALC_LINK_A"),
+        //     OsmAbstract(addr.addr("PIP_LINK")),
+        //     1_000_000 * WAD
+        // );
 
-        _checkIlkClipper(
-            "MATIC-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
-            addr.addr("MCD_CLIP_CALC_MATIC_A"),
-            OsmAbstract(addr.addr("PIP_MATIC")),
-            10_000_000 * WAD
-        );
+        // _checkIlkClipper(
+        //     "MATIC-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
+        //     addr.addr("MCD_CLIP_CALC_MATIC_A"),
+        //     OsmAbstract(addr.addr("PIP_MATIC")),
+        //     10_000_000 * WAD
+        // );
 
-        _checkIlkClipper(
-            "YFI-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_YFI_A")),
-            addr.addr("MCD_CLIP_CALC_YFI_A"),
-            OsmAbstract(addr.addr("PIP_YFI")),
-            1_000 * WAD
-        );
+        // _checkIlkClipper(
+        //     "YFI-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_YFI_A")),
+        //     addr.addr("MCD_CLIP_CALC_YFI_A"),
+        //     OsmAbstract(addr.addr("PIP_YFI")),
+        //     1_000 * WAD
+        // );
 
-        _checkIlkClipper(
-            "UNIV2USDCETH-A",
-            GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
-            addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
-            OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
-            1 * WAD
-        );
+        // _checkIlkClipper(
+        //     "UNIV2USDCETH-A",
+        //     GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A")),
+        //     ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
+        //     addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
+        //     OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
+        //     1 * WAD
+        // );
     }
 
     function testLerpSurplusBuffer() private { // make private to disable
@@ -268,10 +272,10 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogVersion("1.14.11");
+        _checkChainlogVersion("1.14.12");
     }
 
-    function testNewIlkRegistryValues() private { // make public to enable
+    function testNewIlkRegistryValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -376,10 +380,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // All times in GMT
         // $ make time stamp=<STAMP>
-        // 01 May 2023 00:00:00 UTC
-        uint256 MAY_01_2023 = 1682899200;
-        // 30 Apr 2024 23:59:59 UTC
-        uint256 APR_30_2024 = 1714521599;
+        // 24 May 2023 12:00:00 AM UTC
+        uint256 MAY_24_2023  = 1684886400;
+        // 23 May 2023 11:59:59 PM UTC
+        uint256 MAY_23_2024  = 1716508799;
+        // 23 May 2026 11:59:59 PM UTC
+        uint256 MAY_23_2026  = 1779580799;
+
+        uint256 prevBalance;
 
         // Store previous amount of streams
         uint256 prevStreamCount = vest.ids();
@@ -389,54 +397,100 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check that 2 new streams are added
-        assertEq(vest.ids(), prevStreamCount + 2);
+        // Check that 4 new streams are added
+        assertEq(vest.ids(), prevStreamCount + 4);
 
         // Check the first stream
-        uint256 govSecurityEngineeringStreamId = prevStreamCount + 1;
-        assertTrue(vest.valid(govSecurityEngineeringStreamId)); // check for valid contract
+        uint256 gelatoStreamId = prevStreamCount + 1;
+        assertTrue(vest.valid(gelatoStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      govSecurityEngineeringStreamId,                 // id
-            _wallet:     wallets.addr("GOV_SECURITY_ENGINEERING"),       // usr
-            _start:      MAY_01_2023,                                    // bgn
-            _cliff:      MAY_01_2023,                                    // clf
-            _end:        APR_30_2024,                                    // fin
-            _days:       366 days,                                       // fin
+            _index:      gelatoStreamId,                                 // id
+            _wallet:     wallets.addr("GELATO_PAYMENT_ADAPTER"),         // usr
+            _start:      MAY_24_2023,                                    // bgn
+            _cliff:      MAY_24_2023,                                    // clf
+            _end:        MAY_23_2026,                                    // fin
+            _days:       1096 days,                                      // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     2_200_000 * WAD,                                // tot
+            _reward:     1_644_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevBalance = dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING"));
-        vest.unrestrict(govSecurityEngineeringStreamId);
-        vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(govSecurityEngineeringStreamId);
-        assertEq(dai.balanceOf(wallets.addr("GOV_SECURITY_ENGINEERING")), prevBalance + 2_200_000 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("GELATO_PAYMENT_ADAPTER"));
+        vest.unrestrict(gelatoStreamId);
+        vm.warp(MAY_24_2023 + 1096 days);
+        vest.vest(gelatoStreamId);
+        assertEq(dai.balanceOf(wallets.addr("GELATO_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
 
         // Check the second stream
-        uint256 multichainEngineeringStreamId = prevStreamCount + 2;
-        assertTrue(vest.valid(multichainEngineeringStreamId)); // check for valid contract
+        uint256 keeperStreamId = prevStreamCount + 2;
+        assertTrue(vest.valid(keeperStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      multichainEngineeringStreamId,                  // id
-            _wallet:     wallets.addr("MULTICHAIN_ENGINEERING"),         // usr
-            _start:      MAY_01_2023,                                    // bgn
-            _cliff:      MAY_01_2023,                                    // clf
-            _end:        APR_30_2024,                                    // fin
-            _days:       366 days,                                       // fin
+            _index:      keeperStreamId,                                 // id
+            _wallet:     wallets.addr("KEEP3R_PAYMENT_ADAPTER"),         // usr
+            _start:      MAY_24_2023,                                    // bgn
+            _cliff:      MAY_24_2023,                                    // clf
+            _end:        MAY_23_2026,                                    // fin
+            _days:       1096 days,                                      // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     2_300_000 * WAD,                                // tot
+            _reward:     1_644_000 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
         // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        uint256 prevTechBalance = dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING"));
-        vest.unrestrict(multichainEngineeringStreamId);
-        vm.warp(MAY_01_2023 + 366 days);
-        vest.vest(multichainEngineeringStreamId);
-        assertEq(dai.balanceOf(wallets.addr("MULTICHAIN_ENGINEERING")), prevTechBalance + 2_300_000 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("KEEP3R_PAYMENT_ADAPTER"));
+        vest.unrestrict(keeperStreamId);
+        vm.warp(MAY_24_2023 + 1096 days);
+        vest.vest(keeperStreamId);
+        assertEq(dai.balanceOf(wallets.addr("KEEP3R_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
+
+        // Check the third stream
+        uint256 chainlinkStreamId = prevStreamCount + 3;
+        assertTrue(vest.valid(chainlinkStreamId)); // check for valid contract
+        _checkDaiVest({
+            _index:      chainlinkStreamId,                                 // id
+            _wallet:     wallets.addr("CHAINLINK_PAYMENT_ADAPTER"),         // usr
+            _start:      MAY_24_2023,                                    // bgn
+            _cliff:      MAY_24_2023,                                    // clf
+            _end:        MAY_23_2026,                                    // fin
+            _days:       1096 days,                                      // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     1_644_000 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        prevBalance = dai.balanceOf(wallets.addr("CHAINLINK_PAYMENT_ADAPTER"));
+        vest.unrestrict(chainlinkStreamId);
+        vm.warp(MAY_24_2023 + 1096 days);
+        vest.vest(chainlinkStreamId);
+        assertEq(dai.balanceOf(wallets.addr("CHAINLINK_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
+
+        // Check the fourth stream
+        uint256 techopsStreamId = prevStreamCount + 4;
+        assertTrue(vest.valid(techopsStreamId)); // check for valid contract
+        _checkDaiVest({
+            _index:      techopsStreamId,                                 // id
+            _wallet:     wallets.addr("TECHOPS_VEST_STREAMING"),         // usr
+            _start:      MAY_24_2023,                                    // bgn
+            _cliff:      MAY_24_2023,                                    // clf
+            _end:        MAY_23_2024,                                    // fin
+            _days:       366 days,                                      // fin
+            _manager:    address(0),                                     // mgr
+            _restricted: 1,                                              // res
+            _reward:     366_000 * WAD,                                // tot
+            _claimed:    0                                               // rxd
+        });
+        // Give admin powers to Test contract address and make the vesting unrestricted for testing
+        GodMode.setWard(address(vest), address(this), 1);
+        prevBalance = dai.balanceOf(wallets.addr("TECHOPS_VEST_STREAMING"));
+        vest.unrestrict(techopsStreamId);
+        vm.warp(MAY_24_2023 + 1096 days);
+        vest.vest(techopsStreamId);
+        assertEq(dai.balanceOf(wallets.addr("TECHOPS_VEST_STREAMING")), prevBalance + 366_000 * WAD);
     }
 
     struct Payee {
@@ -483,21 +537,21 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() private { // make private to disable
+    function testYankDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
-        // 01 Apr 2024 11:59:59 PM UTC
-        uint256 APR_1_2024 = 1712015999;
+        // 31 Jul 2023 11:59:59 PM UTC
+        uint256 JUL_31_2023 = 1690847999;
 
-        assertEq(vest.usr(22), wallets.addr("PHOENIX_LABS_2"));
-        assertEq(vest.fin(22), APR_1_2024);
+        assertEq(vest.usr(16), wallets.addr("CHAINLINK_AUTOMATION"));
+        assertEq(vest.fin(16), JUL_31_2023);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.fin(22), block.timestamp);
+        assertEq(vest.fin(16), block.timestamp);
     }
 
     function testYankMKR() private { // make private to disable
@@ -594,7 +648,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("PULLUP_LABS")), prevBalance1 + 4_000 ether);
     }
 
-    function testMKRPayments() public { // make private to disable
+    function testMKRPayments() private { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -843,5 +897,29 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
+    }
+
+    function testDssCronPaymentAdaptersParams() public {
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+
+        // Store previous amount of streams
+        uint256 prevStreamCount = vest.ids();
+
+        uint256 gelatoVestId = prevStreamCount + 1;
+        uint256 keeperVestId = prevStreamCount + 2;
+        uint256 chainlinkVestId = prevStreamCount + 3;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+
+        require(NetworkPaymentAdapterLike(wallets.addr("GELATO_PAYMENT_ADAPTER")).vestId() == gelatoVestId, "Gelato/incorrect-vestId");
+        require(NetworkPaymentAdapterLike(wallets.addr("GELATO_PAYMENT_ADAPTER")).treasury() == wallets.addr("GELATO_TREASURY"), "Gelato/incorrect-treasury");
+
+        require(NetworkPaymentAdapterLike(wallets.addr("KEEP3R_PAYMENT_ADAPTER")).vestId() == keeperVestId, "Keeper/incorrect-vestId");
+        require(NetworkPaymentAdapterLike(wallets.addr("KEEP3R_PAYMENT_ADAPTER")).treasury() == wallets.addr("KEEP3R_TREASURY"), "Keeper/incorrect-treasury");
+
+        require(NetworkPaymentAdapterLike(wallets.addr("CHAINLINK_PAYMENT_ADAPTER")).vestId() == chainlinkVestId, "Chainlionk/incorrect-vestId");
     }
 }
