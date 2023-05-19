@@ -171,6 +171,9 @@ contract DssSpellAction is DssAction {
     address internal constant CHAINLINK_PAYMENT_ADAPTER      = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
     address internal constant TECHOPS_VEST_STREAMING         = 0x5A6007d17302238D63aB21407FF600a67765f982;
 
+    // Ecosystem Scope
+    address internal constant ECOSYSTEM_SCOPE_WALLET         = 0x6E51E0b5813152880C1389E3e860e69E06aD04D9;
+
     // -- Spark GNO Onboarding components --
     address internal constant SPARK_POOL_CONFIGURATOR        = 0x542DBa469bdE58FAeE189ffB60C6b49CE60E0738;
     address internal constant SPARK_AAVE_ORACLE              = 0x8105f69D9C41644c6A0803fDA7D03Aa70996cFD9;
@@ -397,7 +400,8 @@ contract DssSpellAction is DssAction {
 
         // --------- CAIS Bootstrap Funding ---------
         // Poll: https://vote.makerdao.com/polling/Qmc6Wqrc#poll-detail
-        // DssExecLib.sendPaymentFromSurplusBuffer(CAIS_WALLET, XXX_XXX);
+        // CAIS Budget - 100,000 DAI - 0x6E51E0b5813152880C1389E3e860e69E06aD04D9
+        DssExecLib.sendPaymentFromSurplusBuffer(ECOSYSTEM_SCOPE_WALLET, 100_000);
 
 
         // --------- Onboard GNO to Spark ---------

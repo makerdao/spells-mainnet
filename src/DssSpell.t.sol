@@ -365,14 +365,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
          // RWA014
-        _checkChainlogKey("RWA014_A_JAR");
-        _checkChainlogKey("RWA014");
-        _checkChainlogKey("MCD_JOIN_RWA014_A");
-        _checkChainlogKey("RWA014_A_URN");
-        _checkChainlogKey("RWA014_A_INPUT_CONDUIT_URN");
-        _checkChainlogKey("RWA014_A_INPUT_CONDUIT_JAR");
-        _checkChainlogKey("RWA014_A_OUTPUT_CONDUIT");
-        _checkChainlogKey("PIP_RWA014");
+        // _checkChainlogKey("RWA014_A_JAR");
+        // _checkChainlogKey("RWA014");
+        // _checkChainlogKey("MCD_JOIN_RWA014_A");
+        // _checkChainlogKey("RWA014_A_URN");
+        // _checkChainlogKey("RWA014_A_INPUT_CONDUIT_URN");
+        // _checkChainlogKey("RWA014_A_INPUT_CONDUIT_JAR");
+        // _checkChainlogKey("RWA014_A_OUTPUT_CONDUIT");
+        // _checkChainlogKey("PIP_RWA014");
 
         _checkChainlogVersion("1.14.12");
     }
@@ -384,14 +384,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert new ilk registry values tests here
         // RWA014
-        assertEq(reg.pos("RWA014-A"),    61);
-        assertEq(reg.join("RWA014-A"),   addr.addr("MCD_JOIN_RWA014_A"));
-        assertEq(reg.gem("RWA014-A"),    addr.addr("RWA014"));
-        assertEq(reg.dec("RWA014-A"),    GemAbstract(addr.addr("RWA014")).decimals());
-        assertEq(reg.class("RWA014-A"),  3);
-        assertEq(reg.pip("RWA014-A"),    addr.addr("PIP_RWA014"));
-        assertEq(reg.name("RWA014-A"),   "RWA014-A: Coinbase Custody");
-        assertEq(reg.symbol("RWA014-A"), GemAbstract(addr.addr("RWA014")).symbol());
+        // assertEq(reg.pos("RWA014-A"),    61);
+        // assertEq(reg.join("RWA014-A"),   addr.addr("MCD_JOIN_RWA014_A"));
+        // assertEq(reg.gem("RWA014-A"),    addr.addr("RWA014"));
+        // assertEq(reg.dec("RWA014-A"),    GemAbstract(addr.addr("RWA014")).decimals());
+        // assertEq(reg.class("RWA014-A"),  3);
+        // assertEq(reg.pip("RWA014-A"),    addr.addr("PIP_RWA014"));
+        // assertEq(reg.name("RWA014-A"),   "RWA014-A: Coinbase Custody");
+        // assertEq(reg.symbol("RWA014-A"), GemAbstract(addr.addr("RWA014")).symbol());
     }
 
     function testOSMs() private { // make private to disable
@@ -600,7 +600,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -608,7 +608,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("PHOENIX_LABS_2"), 318_000)
+            Payee(wallets.addr("ECOSYSTEM_SCOPE_WALLET"), 100_000)
         ];
 
         uint256 prevBalance;
