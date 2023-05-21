@@ -1048,21 +1048,21 @@ contract DssSpellTest is DssSpellTestBase {
     //     assertTrue(spell.done());
 
     //     assertEq(rwaconduitout_014.wards(ESM), 1, "OutputConduit/ward-esm-not-set");
-    //     assertEq(rwaconduitout_014.can(pauseProxy), 1, "OutputConduit/pause-proxy-not-operator");
-    //     assertEq(rwaconduitout_014.can(RWA014_A_OPERATOR), 1, "OutputConduit/monetalis-not-operator");
+    //     assertEq(rwaconduitout_014.can(pauseProxy), 1, "OutputConduit/pause-proxy-not-hope");
+    //     assertEq(rwaconduitout_014.can(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
     //     assertEq(rwaconduitout_014.may(pauseProxy), 1, "OutputConduit/pause-proxy-not-mate");
-    //     assertEq(rwaconduitout_014.may(RWA014_A_OPERATOR), 1, "OutputConduit/monetalis-not-mate");
+    //     assertEq(rwaconduitout_014.may(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
     //     assertEq(rwaconduitout_014.quitTo(), address(rwaurn_014), "OutputConduit/quit-to-not-urn");     
-    //     assertEq(rwaconduitout_014.bud(RWA014_A_COINBASE_CUSTODY), 1, "OutputConduit/coinbase-custody-not-whitelisted-for-pick");
+    //     assertEq(rwaconduitout_014.bud(RWA014_A_COINBASE_CUSTODY), 1, "OutputConduit/destination-address-not-whitelisted-for-pick");
 
     //     assertEq(rwaconduitinurn_014.wards(ESM), 1, "InputConduitUrn/ward-esm-not-set");
     //     assertEq(rwaconduitinurn_014.may(pauseProxy), 1, "InputConduitUrn/pause-proxy-not-mate");
-    //     assertEq(rwaconduitinurn_014.may(RWA014_A_OPERATOR), 1, "InputConduitUrn/monetalis-not-mate");
+    //     assertEq(rwaconduitinurn_014.may(RWA014_A_OPERATOR), 1, "InputConduitUrn/operator-not-mate");
     //     assertEq(rwaconduitinurn_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitUrn/quit-to-not-set");
 
     //     assertEq(rwaconduitinjar_014.wards(ESM), 1, "InputConduitJar/ward-esm-not-set");
     //     assertEq(rwaconduitinjar_014.may(pauseProxy), 1, "InputConduitJar/pause-proxy-not-mate");
-    //     assertEq(rwaconduitinjar_014.may(RWA014_A_OPERATOR), 1, "InputConduitJar/monetalis-not-mate");
+    //     assertEq(rwaconduitinjar_014.may(RWA014_A_OPERATOR), 1, "InputConduitJar/operator-not-mate");
     //     assertEq(rwaconduitinjar_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitJar/quit-to-not-set");
 
     //     assertEq(rwajoin_014.wards(address(rwaurn_014)), 1, "Join/ward-urn-not-set");
@@ -1176,7 +1176,7 @@ contract DssSpellTest is DssSpellTestBase {
     //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
     //     assertEq(rwaurn_014.can(address(this)), 1);
 
-    //     // Check if spell lock 1 * WAD of RWA009
+    //     // Check if spell lock 1 * WAD of RWA014
     //     assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
     //     assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
 
@@ -1186,7 +1186,7 @@ contract DssSpellTest is DssSpellTestBase {
     //     // Draw 500mm
     //     rwaurn_014.draw(drawAmount);
 
-    //     // 1mm DAI in Output Conduit
+    //     // 500mm DAI in Output Conduit
     //     assertEq(dai.balanceOf(address(rwaconduitout_014)), drawAmount, "RWA014: Dai drawn was not send to the recipient");
 
     //     (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
@@ -1222,6 +1222,7 @@ contract DssSpellTest is DssSpellTestBase {
     //     // as we have SF 0 we need to pay exectly the same amount of DAI we have drawn
     //     uint256 daiToPay = drawAmount;
 
+    //     // Note: In the version of outputCounduit for this deal `push` is permissionles
     //     // // wards
     //     // GodMode.setWard(address(rwaconduitinurn_014), address(this), 1);
     //     // // may
@@ -1241,7 +1242,7 @@ contract DssSpellTest is DssSpellTestBase {
     //     rwaurn_014.wipe(daiToPay);
     //     rwaurn_014.free(1 * WAD);
 
-    //     // check if we get back RWA009 Tokens
+    //     // check if we get back RWA014 Tokens
     //     assertEq(rwagem_014.balanceOf(address(this)), 1 * WAD, "RWA014: gem not sent back to the caller");
 
     //     // check if we have 0 collateral and outstanding debt in the VAT
@@ -1260,21 +1261,21 @@ contract DssSpellTest is DssSpellTestBase {
     //     // setting address(this) as operator
     //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-    //     // Draw 2mm
+    //     // Draw 500m + 1
     //     rwaurn_014.draw(drawAmount);
     // }
 
-    // function testFailRWA014_PUSH_ABOVE_LINE() public {
+    // function testFailRWA014_CONDUIT_PUSH_ABOVE_BALANCE() public {
     //     _vote(address(spell));
     //     _scheduleWaitAndCast(address(spell));
     //     assertTrue(spell.done());
 
-    //     uint256 drawAmount = 1_000_000 * WAD;
+    //     uint256 drawAmount = 500_000_000 * WAD;
 
     //     // setting address(this) as operator
     //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-    //     // Draw 1mm
+    //     // Draw 500mm
     //     rwaurn_014.draw(drawAmount);
 
     //     // auth
@@ -1285,8 +1286,8 @@ contract DssSpellTest is DssSpellTestBase {
     //     rwaconduitout_014.kiss(address(this)); // allow this to be picked
     //     rwaconduitout_014.pick(address(this));
 
-    //     // push above line
-    //     uint256 pushAmount = 2_000_000 * WAD;
+    //     // push above balance
+    //     uint256 pushAmount = drawAmount + 1 * WAD;
     //     rwaconduitout_014.mate(address(this)); // allow this to call push
     //     rwaconduitout_014.push(pushAmount);    // fail
     // }
@@ -1296,13 +1297,13 @@ contract DssSpellTest is DssSpellTestBase {
     //     _scheduleWaitAndCast(address(spell));
     //     assertTrue(spell.done());
 
-    //     uint256 drawAmount = 1_000_000 * WAD;
+    //     uint256 drawAmount = 500_000_000 * WAD;
 
     //     // setting address(this) as operator
     //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
     //     assertEq(rwaurn_014.can(address(this)), 1);
 
-    //     // Check if spell lock 1 * WAD of RWA009
+    //     // Check if spell lock 1 * WAD of RWA014
     //     assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
     //     assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
 
@@ -1367,17 +1368,17 @@ contract DssSpellTest is DssSpellTestBase {
 
     //     end.flow("RWA014-A");
 
-    //     GodMode.setBalance(address(dai), address(this), 1_000_000 * WAD);
-    //     dai.approve(address(daiJoin), 1_000_000 * WAD);
-    //     daiJoin.join(address(this), 1_000_000 * WAD);
+    //     GodMode.setBalance(address(dai), address(this), 500_000_000 * WAD);
+    //     dai.approve(address(daiJoin), 500_000_000 * WAD);
+    //     daiJoin.join(address(this), 500_000_000 * WAD);
 
     //     vat.hope(address(end));
-    //     end.pack(1_000_000 * WAD);
+    //     end.pack(500_000_000 * WAD);
 
     //     // Check DAI redemption after "cage()"
     //     assertEq(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem");
     //     assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance");
-    //     end.cash("RWA014-A", 1_000_000 * WAD);
+    //     end.cash("RWA014-A", 500_000_000 * WAD);
     //     assertGt(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem after cash");
     //     assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance after cash");
     //     rwajoin_014.exit(address(this), vat.gem("RWA014-A", address(this)));

@@ -28,6 +28,10 @@ interface Initializable {
     function init(bytes32 ilk) external;
 }
 
+interface VatLike {
+    function ilks(bytes32 ilk) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+}
+
 interface RwaLiquidationLike {
     function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
     function init(bytes32 ilk, uint256 val, string calldata doc, uint48 tau) external;
@@ -129,6 +133,7 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
+    uint256 internal constant RAD                            = 10 ** 45;
     uint256 internal constant WAD                            = 10 ** 18;
     uint256 internal constant MILLION                        = 10 ** 6;
     uint256 internal constant DEBT_CEILING_UNITS             = 10 ** 2;
@@ -453,6 +458,11 @@ contract DssSpellAction is DssAction {
                 oracles
             );
         }
+
+        // Reduce Maker Protocol GNO Debt Ceiling to Zero
+        (,,,uint256 line,) = VatLike(MCD_VAT).ilks("GNO-A");
+        DssExecLib.removeIlkFromAutoLine("GNO-A");
+        DssExecLib.decreaseIlkDebtCeiling("GNO-A", line / RAD, true);
 
         // Bump the chainlog
         DssExecLib.setChangelogVersion("1.14.12");
