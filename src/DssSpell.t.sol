@@ -154,6 +154,11 @@ interface PoolLike {
     ) external;
 }
 
+interface OracleLike {
+    function latestAnswer() external view returns (int256);
+    function kiss(address who) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -1491,6 +1496,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(tokenReserveData.configuration & ~LTV_MASK, 20_00);
         assertEq((tokenReserveData.configuration & ~LIQUIDATION_THRESHOLD_MASK) >> LIQUIDATION_THRESHOLD_START_BIT_POSITION, 25_00);
         assertEq((tokenReserveData.configuration & ~LIQUIDATION_BONUS_MASK) >> LIQUIDATION_BONUS_START_BIT_POSITION, 110_00);
+
+        GodMode.setWard(oracleAdapter, address(this), 1);
+        OracleLike(oracleAdapter).kiss(address(this));
+        assertApproxEqRel(OracleLike(oracleAdapter).latestAnswer(), 113_00000000, 10 * WAD / 100);    // Price is in 8 decimals and is around $113 USD / GNO (Allow 10% deviation)
 
         // Integration test - take out a maximum loan
 
