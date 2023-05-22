@@ -1409,7 +1409,12 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkLendCollateralOnboarding() public {
         // Configuration masking parameters pulled from https://github.com/aave/aave-v3-core/blob/62dfda56bd884db2c291560c03abae9727a7635e/contracts/protocol/libraries/configuration/ReserveConfiguration.sol
+        uint256 LTV_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000;
+        uint256 LIQUIDATION_THRESHOLD_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFF;
+        uint256 LIQUIDATION_BONUS_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFF;
         uint256 BORROWABLE_IN_ISOLATION_MASK = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF;
+        uint256 LIQUIDATION_THRESHOLD_START_BIT_POSITION = 16;
+        uint256 LIQUIDATION_BONUS_START_BIT_POSITION = 32;
         PoolLike pool = PoolLike(0xC13e21B648A5Ee794902342038FF3aDAB66BE987);
         address token = addr.addr("GNO");
         MedianAbstract medianizer = MedianAbstract(0x31BFA908637C29707e155Cfac3a50C9823bF8723);
@@ -1422,6 +1427,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq((daiReserveData.configuration & ~BORROWABLE_IN_ISOLATION_MASK) != 0, false);
         assertTrue(tokenReserveData.aTokenAddress == address(0));   // Not set yet
         assertEq(medianizer.bud(oracleAdapter), 0);
+        assertEq(tokenReserveData.configuration & ~LTV_MASK, 20_00);
+        assertEq((tokenReserveData.configuration & ~LIQUIDATION_THRESHOLD_MASK) >> LIQUIDATION_THRESHOLD_START_BIT_POSITION, 25_00);
+        assertEq((tokenReserveData.configuration & ~LIQUIDATION_BONUS_MASK) >> LIQUIDATION_BONUS_START_BIT_POSITION, 110_00);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
