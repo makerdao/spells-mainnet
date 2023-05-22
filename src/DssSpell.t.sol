@@ -56,9 +56,13 @@ interface RwaLiquidationOracleLike {
 }
 
 interface RwaUrnLike {
+    function vat() external view returns (address);
+    function jug() external view returns (address);
+    function daiJoin() external view returns (address);
+    function outputConduit() external view returns (address);
     function wards(address) external view returns (uint256);
     function can(address) external view returns (uint256);
-    function gemJoin() external view returns (GemAbstract);
+    function gemJoin() external view returns (address);
     function lock(uint256) external;
     function draw(uint256) external;
     function wipe(uint256) external;
@@ -69,7 +73,9 @@ interface RwaOutputConduitLike {
     function wards(address) external view returns (uint256);
     function can(address) external view returns (uint256);
     function may(address) external view returns (uint256);
-    function gem() external view returns (GemAbstract);
+    function dai() external view returns (address);
+    function psm() external view returns (address);
+    function gem() external view returns (address);
     function bud(address) external view returns (uint256);
     function pick(address) external;
     function push() external;
@@ -82,11 +88,21 @@ interface RwaOutputConduitLike {
 }
 
 interface RwaInputConduitLike {
+    function dai() external view returns (address);
+    function gem() external view returns (address);
+    function psm() external view returns (address);
+    function to() external view returns (address);
     function wards(address) external view returns (uint256);
     function may(address) external view returns (uint256);
     function quitTo() external view returns (address);
     function mate(address) external;
     function push() external;
+}
+
+interface RwaJarLike {
+    function chainlog() external view returns (address);
+    function dai() external view returns (address);
+    function daiJoin() external view returns (address);
 }
 
 interface PoolLike {
@@ -365,14 +381,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
          // RWA014
-        // _checkChainlogKey("RWA014_A_JAR");
-        // _checkChainlogKey("RWA014");
-        // _checkChainlogKey("MCD_JOIN_RWA014_A");
-        // _checkChainlogKey("RWA014_A_URN");
-        // _checkChainlogKey("RWA014_A_INPUT_CONDUIT_URN");
-        // _checkChainlogKey("RWA014_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogKey("RWA014_A_OUTPUT_CONDUIT");
-        // _checkChainlogKey("PIP_RWA014");
+        _checkChainlogKey("RWA014_A_JAR");
+        _checkChainlogKey("RWA014");
+        _checkChainlogKey("MCD_JOIN_RWA014_A");
+        _checkChainlogKey("RWA014_A_URN");
+        _checkChainlogKey("RWA014_A_INPUT_CONDUIT_URN");
+        _checkChainlogKey("RWA014_A_INPUT_CONDUIT_JAR");
+        _checkChainlogKey("RWA014_A_OUTPUT_CONDUIT");
+        _checkChainlogKey("PIP_RWA014");
 
         _checkChainlogVersion("1.14.12");
     }
@@ -384,14 +400,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert new ilk registry values tests here
         // RWA014
-        // assertEq(reg.pos("RWA014-A"),    61);
-        // assertEq(reg.join("RWA014-A"),   addr.addr("MCD_JOIN_RWA014_A"));
-        // assertEq(reg.gem("RWA014-A"),    addr.addr("RWA014"));
-        // assertEq(reg.dec("RWA014-A"),    GemAbstract(addr.addr("RWA014")).decimals());
-        // assertEq(reg.class("RWA014-A"),  3);
-        // assertEq(reg.pip("RWA014-A"),    addr.addr("PIP_RWA014"));
-        // assertEq(reg.name("RWA014-A"),   "RWA014-A: Coinbase Custody");
-        // assertEq(reg.symbol("RWA014-A"), GemAbstract(addr.addr("RWA014")).symbol());
+        assertEq(reg.pos("RWA014-A"),    62);
+        assertEq(reg.join("RWA014-A"),   addr.addr("MCD_JOIN_RWA014_A"));
+        assertEq(reg.gem("RWA014-A"),    addr.addr("RWA014"));
+        assertEq(reg.dec("RWA014-A"),    GemAbstract(addr.addr("RWA014")).decimals());
+        assertEq(reg.class("RWA014-A"),  3);
+        assertEq(reg.pip("RWA014-A"),    addr.addr("PIP_RWA014"));
+        assertEq(reg.name("RWA014-A"),   "RWA014-A: Coinbase Custody");
+        assertEq(reg.symbol("RWA014-A"), GemAbstract(addr.addr("RWA014")).symbol());
     }
 
     function testOSMs() private { // make private to disable
@@ -1027,385 +1043,417 @@ contract DssSpellTest is DssSpellTestBase {
 
     // RWA tests
 
-    // address RWA014_A_OPERATOR                  = addr.addr("RWA014_A_OPERATOR");
-    // address RWA014_A_COINBASE_CUSTODY          = addr.addr("RWA014_A_COINBASE_CUSTODY");
+    address RWA014_A_OPERATOR                  = addr.addr("RWA014_A_OPERATOR");
+    address RWA014_A_COINBASE_CUSTODY          = addr.addr("RWA014_A_COINBASE_CUSTODY");
     
-    // address ESM                                = addr.addr("MCD_ESM");
-    // RwaLiquidationOracleLike oracle            = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    address ESM                                = addr.addr("MCD_ESM");
+    RwaLiquidationOracleLike oracle            = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
-    // GemAbstract          rwagem_014            = GemAbstract(addr.addr("RWA014"));
-    // GemJoinAbstract      rwajoin_014           = GemJoinAbstract(addr.addr("MCD_JOIN_RWA014_A"));
-    // RwaUrnLike           rwaurn_014            = RwaUrnLike(addr.addr("RWA014_A_URN"));
-    // RwaOutputConduitLike rwaconduitout_014     = RwaOutputConduitLike(addr.addr("RWA014_A_OUTPUT_CONDUIT"));
-    // GemAbstract          psmGem                = rwaconduitout_014.gem();
-    // RwaInputConduitLike  rwaconduitinurn_014   = RwaInputConduitLike(addr.addr("RWA014_A_INPUT_CONDUIT_URN"));
-    // RwaInputConduitLike  rwaconduitinjar_014   = RwaInputConduitLike(addr.addr("RWA014_A_INPUT_CONDUIT_JAR"));
-    // uint256 daiPsmGemDiffDecimals              = 10 ** (dai.decimals() - psmGem.decimals());
+    GemAbstract          rwagem_014            = GemAbstract(addr.addr("RWA014"));
+    GemJoinAbstract      rwajoin_014           = GemJoinAbstract(addr.addr("MCD_JOIN_RWA014_A"));
+    RwaUrnLike           rwaurn_014            = RwaUrnLike(addr.addr("RWA014_A_URN"));
+    RwaOutputConduitLike rwaconduitout_014     = RwaOutputConduitLike(addr.addr("RWA014_A_OUTPUT_CONDUIT"));
+    RwaJarLike           rwajar_014            = RwaJarLike(addr.addr("RWA014_A_JAR"));
+    GemAbstract          psmGem                = GemAbstract(rwaconduitout_014.gem());
+    RwaInputConduitLike  rwaconduitinurn_014   = RwaInputConduitLike(addr.addr("RWA014_A_INPUT_CONDUIT_URN"));
+    RwaInputConduitLike  rwaconduitinjar_014   = RwaInputConduitLike(addr.addr("RWA014_A_INPUT_CONDUIT_JAR"));
+    uint256 daiPsmGemDiffDecimals              = 10 ** (dai.decimals() - psmGem.decimals());
 
-    // function testRWA014_INTEGRATION_CONDUITS_SETUP() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testRWA014_CONTRACT_DEPLOYMENT_SETUP() public {
+        require(rwajoin_014.vat()                        == addr.addr("MCD_VAT"),            "join-vat-not-match");
+        require(rwajoin_014.ilk()                        == "RWA014-A",                      "join-ilk-not-match");
+        require(rwajoin_014.gem()                        == address(rwagem_014),             "join-gem-not-match");
+        require(rwajoin_014.dec()                        == rwagem_014.decimals(),           "join-dec-not-match");
 
-    //     assertEq(rwaconduitout_014.wards(ESM), 1, "OutputConduit/ward-esm-not-set");
-    //     assertEq(rwaconduitout_014.can(pauseProxy), 1, "OutputConduit/pause-proxy-not-hope");
-    //     assertEq(rwaconduitout_014.can(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
-    //     assertEq(rwaconduitout_014.may(pauseProxy), 1, "OutputConduit/pause-proxy-not-mate");
-    //     assertEq(rwaconduitout_014.may(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
-    //     assertEq(rwaconduitout_014.quitTo(), address(rwaurn_014), "OutputConduit/quit-to-not-urn");     
-    //     assertEq(rwaconduitout_014.bud(RWA014_A_COINBASE_CUSTODY), 1, "OutputConduit/destination-address-not-whitelisted-for-pick");
+        require(rwaurn_014.vat()                         == addr.addr("MCD_VAT"),            "urn-vat-not-match");
+        require(rwaurn_014.jug()                         == addr.addr("MCD_JUG"),            "urn-jug-not-match");
+        require(rwaurn_014.daiJoin()                     == addr.addr("MCD_JOIN_DAI"),       "urn-daijoin-not-match");
+        require(rwaurn_014.gemJoin()                     == address(rwajoin_014),            "urn-gemjoin-not-match");
+        require(rwaurn_014.outputConduit()               == address(rwaconduitout_014),      "urn-outputconduit-not-match");
 
-    //     assertEq(rwaconduitinurn_014.wards(ESM), 1, "InputConduitUrn/ward-esm-not-set");
-    //     assertEq(rwaconduitinurn_014.may(pauseProxy), 1, "InputConduitUrn/pause-proxy-not-mate");
-    //     assertEq(rwaconduitinurn_014.may(RWA014_A_OPERATOR), 1, "InputConduitUrn/operator-not-mate");
-    //     assertEq(rwaconduitinurn_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitUrn/quit-to-not-set");
+        require(rwajar_014.chainlog()                    == addr.addr("CHANGELOG"),          "jar-chainlog-not-match");
+        require(rwajar_014.dai()                         == addr.addr("MCD_DAI"),            "jar-dai-not-match");
+        require(rwajar_014.daiJoin()                     == addr.addr("MCD_JOIN_DAI"),       "jar-daijoin-not-match");
 
-    //     assertEq(rwaconduitinjar_014.wards(ESM), 1, "InputConduitJar/ward-esm-not-set");
-    //     assertEq(rwaconduitinjar_014.may(pauseProxy), 1, "InputConduitJar/pause-proxy-not-mate");
-    //     assertEq(rwaconduitinjar_014.may(RWA014_A_OPERATOR), 1, "InputConduitJar/operator-not-mate");
-    //     assertEq(rwaconduitinjar_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitJar/quit-to-not-set");
+        require(rwaconduitout_014.dai()                  == addr.addr("MCD_DAI"),            "output-conduit-dai-not-match");
+        require(rwaconduitout_014.gem()                  == addr.addr("USDC"),               "output-conduit-gem-not-match");
+        require(rwaconduitout_014.psm()                  == addr.addr("MCD_PSM_USDC_A"),     "output-conduit-psm-not-match");
 
-    //     assertEq(rwajoin_014.wards(address(rwaurn_014)), 1, "Join/ward-urn-not-set");
-    //     assertEq(rwajoin_014.wards(ESM), 1, "Join/ward-esm-not-set");
+        require(rwaconduitinurn_014.psm()                == addr.addr("MCD_PSM_USDC_A"),     "input-conduit-urn-psm-not-match");
+        require(rwaconduitinurn_014.to()                 == address(rwaurn_014),             "input-conduit-urn-to-not-match");
+        require(rwaconduitinurn_014.dai()                == addr.addr("MCD_DAI"),            "input-conduit-urn-dai-not-match");
+        require(rwaconduitinurn_014.gem()                == addr.addr("USDC"),               "input-conduit-urn-gem-not-match");
 
-    //     assertEq(rwaurn_014.wards(ESM), 1, "Urn/ward-esm-not-set");
-    //     assertEq(rwaurn_014.can(pauseProxy), 1, "Urn/pause-proxy-not-hoped");
-    //     assertEq(rwaurn_014.can(RWA014_A_OPERATOR), 1, "Urn/operator-not-hoped");
-    // }
+        require(rwaconduitinjar_014.psm()                == addr.addr("MCD_PSM_USDC_A"),     "input-conduit-jar-psm-not-match");
+        require(rwaconduitinjar_014.to()                 == address(rwajar_014),             "input-conduit-jar-to-not-match");
+        require(rwaconduitinjar_014.dai()                == addr.addr("MCD_DAI"),            "input-conduit-jar-dai-not-match");
+        require(rwaconduitinjar_014.gem()                == addr.addr("USDC"),               "input-conduit-jar-gem-not-match");
+    }
 
-    // function testRWA014_INTEGRATION_BUMP() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testRWA014_INTEGRATION_CONDUITS_SETUP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     GodMode.setWard(address(oracle), address(this), 1);
+        assertEq(rwaconduitout_014.wards(ESM), 1, "OutputConduit/ward-esm-not-set");
+        assertEq(rwaconduitout_014.can(pauseProxy), 1, "OutputConduit/pause-proxy-not-hope");
+        assertEq(rwaconduitout_014.can(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
+        assertEq(rwaconduitout_014.may(pauseProxy), 1, "OutputConduit/pause-proxy-not-mate");
+        assertEq(rwaconduitout_014.may(RWA014_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
+        assertEq(rwaconduitout_014.quitTo(), address(rwaurn_014), "OutputConduit/quit-to-not-urn");     
+        assertEq(rwaconduitout_014.bud(RWA014_A_COINBASE_CUSTODY), 1, "OutputConduit/destination-address-not-whitelisted-for-pick");
 
-    //     (, address pip, , ) = oracle.ilks("RWA014-A");
+        assertEq(rwaconduitinurn_014.wards(ESM), 1, "InputConduitUrn/ward-esm-not-set");
+        assertEq(rwaconduitinurn_014.may(pauseProxy), 1, "InputConduitUrn/pause-proxy-not-mate");
+        assertEq(rwaconduitinurn_014.may(RWA014_A_OPERATOR), 1, "InputConduitUrn/operator-not-mate");
+        assertEq(rwaconduitinurn_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitUrn/quit-to-not-set");
 
-    //     assertEq(DSValueAbstract(pip).read(), bytes32(500 * MILLION * WAD), "RWA014: Bad initial PIP value");
+        assertEq(rwaconduitinjar_014.wards(ESM), 1, "InputConduitJar/ward-esm-not-set");
+        assertEq(rwaconduitinjar_014.may(pauseProxy), 1, "InputConduitJar/pause-proxy-not-mate");
+        assertEq(rwaconduitinjar_014.may(RWA014_A_OPERATOR), 1, "InputConduitJar/operator-not-mate");
+        assertEq(rwaconduitinjar_014.quitTo(), RWA014_A_COINBASE_CUSTODY, "InputConduitJar/quit-to-not-set");
 
-    //     oracle.bump("RWA014-A", 510 * MILLION * WAD);
+        assertEq(rwajoin_014.wards(address(rwaurn_014)), 1, "Join/ward-urn-not-set");
+        assertEq(rwajoin_014.wards(ESM), 1, "Join/ward-esm-not-set");
 
-    //     assertEq(DSValueAbstract(pip).read(), bytes32(510 * MILLION * WAD), "RWA014: Bad PIP value after bump()");
-    // }
+        assertEq(rwaurn_014.wards(ESM), 1, "Urn/ward-esm-not-set");
+        assertEq(rwaurn_014.can(pauseProxy), 1, "Urn/pause-proxy-not-hoped");
+        assertEq(rwaurn_014.can(RWA014_A_OPERATOR), 1, "Urn/operator-not-hoped");
+    }
 
-    // function testRWA014_INTEGRATION_TELL() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testRWA014_INTEGRATION_BUMP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     GodMode.setWard(address(vat), address(this), 1);
-    //     GodMode.setWard(address(oracle), address(this), 1);
+        GodMode.setWard(address(oracle), address(this), 1);
 
-    //     (, , , uint48 tocPre) = oracle.ilks("RWA014-A");
-    //     assertEq(uint256(tocPre), 0, "RWA014: `toc` is not 0 before tell()");
-    //     assertTrue(oracle.good("RWA014-A"), "RWA014: Oracle not good before tell()");
+        (, address pip, , ) = oracle.ilks("RWA014-A");
 
-    //     vat.file("RWA014-A", "line", 0);
-    //     oracle.tell("RWA014-A");
+        assertEq(DSValueAbstract(pip).read(), bytes32(500 * MILLION * WAD), "RWA014: Bad initial PIP value");
 
-    //     (, , , uint48 tocPost) = oracle.ilks("RWA014-A");
-    //     assertGt(uint256(tocPost), 0, "RWA014: `toc` is not set after tell()");
-    //     assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
-    // }
+        oracle.bump("RWA014-A", 510 * MILLION * WAD);
 
-    // function testRWA014_INTEGRATION_TELL_CURE_GOOD() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+        assertEq(DSValueAbstract(pip).read(), bytes32(510 * MILLION * WAD), "RWA014: Bad PIP value after bump()");
+    }
 
-    //     GodMode.setWard(address(vat), address(this), 1);
-    //     GodMode.setWard(address(oracle), address(this), 1);
+    function testRWA014_INTEGRATION_TELL() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     vat.file("RWA014-A", "line", 0);
-    //     oracle.tell("RWA014-A");
+        GodMode.setWard(address(vat), address(this), 1);
+        GodMode.setWard(address(oracle), address(this), 1);
 
-    //     assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
+        (, , , uint48 tocPre) = oracle.ilks("RWA014-A");
+        assertEq(uint256(tocPre), 0, "RWA014: `toc` is not 0 before tell()");
+        assertTrue(oracle.good("RWA014-A"), "RWA014: Oracle not good before tell()");
 
-    //     oracle.cure("RWA014-A");
+        vat.file("RWA014-A", "line", 0);
+        oracle.tell("RWA014-A");
 
-    //     assertTrue(oracle.good("RWA014-A"), "RWA014: Oracle not good after cure()");
-    //     (, , , uint48 toc) = oracle.ilks("RWA014-A");
-    //     assertEq(uint256(toc), 0, "RWA014: `toc` not zero after cure()");
-    // }
+        (, , , uint48 tocPost) = oracle.ilks("RWA014-A");
+        assertGt(uint256(tocPost), 0, "RWA014: `toc` is not set after tell()");
+        assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
+    }
 
-    // function testFailRWA014_INTEGRATION_CURE_BEFORE_TELL() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testRWA014_INTEGRATION_TELL_CURE_GOOD() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     GodMode.setWard(address(oracle), address(this), 1);
+        GodMode.setWard(address(vat), address(this), 1);
+        GodMode.setWard(address(oracle), address(this), 1);
 
-    //     oracle.cure("RWA014-A");
-    // }
+        vat.file("RWA014-A", "line", 0);
+        oracle.tell("RWA014-A");
 
-    // function testRWA014_INTEGRATION_TELL_CULL() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+        assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
 
-    //     GodMode.setWard(address(vat), address(this), 1);
-    //     GodMode.setWard(address(oracle), address(this), 1);
+        oracle.cure("RWA014-A");
 
-    //     assertTrue(oracle.good("RWA014-A"));
+        assertTrue(oracle.good("RWA014-A"), "RWA014: Oracle not good after cure()");
+        (, , , uint48 toc) = oracle.ilks("RWA014-A");
+        assertEq(uint256(toc), 0, "RWA014: `toc` not zero after cure()");
+    }
 
-    //     vat.file("RWA014-A", "line", 0);
-    //     oracle.tell("RWA014-A");
+    function testFailRWA014_INTEGRATION_CURE_BEFORE_TELL() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
+        GodMode.setWard(address(oracle), address(this), 1);
 
-    //     oracle.cull("RWA014-A", addr.addr("RWA014_A_URN"));
+        oracle.cure("RWA014-A");
+    }
 
-    //     assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after cull()");
-    //     (, address pip, , ) = oracle.ilks("RWA014-A");
-    //     assertEq(DSValueAbstract(pip).read(), bytes32(0), "RWA014: Oracle PIP value not set to zero after cull()");
-    // }
+    function testRWA014_INTEGRATION_TELL_CULL() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    // function testRWA014_PAUSE_PROXY_OWNS_RWA014_TOKEN_BEFORE_SPELL() public {
-    //     assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 1 * WAD);
-    // }
+        GodMode.setWard(address(vat), address(this), 1);
+        GodMode.setWard(address(oracle), address(this), 1);
 
-    // function testRWA014_SPELL_LOCK_OPERATOR_DRAW_WIPE_FREE() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+        assertTrue(oracle.good("RWA014-A"));
 
-    //     uint256 drawAmount = 500_000_000 * WAD;
+        vat.file("RWA014-A", "line", 0);
+        oracle.tell("RWA014-A");
 
-    //     // setting address(this) as operator
-    //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
-    //     assertEq(rwaurn_014.can(address(this)), 1);
+        assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after tell()");
 
-    //     // Check if spell lock 1 * WAD of RWA014
-    //     assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
-    //     assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
+        oracle.cull("RWA014-A", addr.addr("RWA014_A_URN"));
 
-    //     // 0 DAI in Output Conduit
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Dangling Dai in input conduit before draw()");
+        assertTrue(!oracle.good("RWA014-A"), "RWA014: Oracle still good after cull()");
+        (, address pip, , ) = oracle.ilks("RWA014-A");
+        assertEq(DSValueAbstract(pip).read(), bytes32(0), "RWA014: Oracle PIP value not set to zero after cull()");
+    }
 
-    //     // Draw 500mm
-    //     rwaurn_014.draw(drawAmount);
+    function testRWA014_PAUSE_PROXY_OWNS_RWA014_TOKEN_BEFORE_SPELL() public {
+        assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 1 * WAD);
+    }
 
-    //     // 500mm DAI in Output Conduit
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), drawAmount, "RWA014: Dai drawn was not send to the recipient");
+    function testRWA014_SPELL_LOCK_OPERATOR_DRAW_WIPE_FREE() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     assertEq(art, drawAmount, "RWA014: bad `art` after spell"); // DAI drawn == art as rate should always be 1 RAY
-    //     assertEq(ink, 1 * WAD, "RWA014: bad `ink` after spell"); // Whole unit of collateral is locked
+        uint256 drawAmount = 500_000_000 * WAD;
 
-    //     vm.warp(block.timestamp + 10 days);
-    //     jug.drip("RWA014-A");
+        // setting address(this) as operator
+        vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwaurn_014.can(address(this)), 1);
 
-    //     (, uint256 rate,,,) = vat.ilks("RWA014-A");
-    //     assertEq(rate, RAY, 'RWA014: bad `rate`'); // rate keeps being 1 RAY
+        // Check if spell lock 1 * WAD of RWA014
+        assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
+        assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
 
-    //     // wards
-    //     GodMode.setWard(address(rwaconduitout_014), address(this), 1);
-    //     // may
-    //     rwaconduitout_014.mate(address(this));
-    //     assertEq(rwaconduitout_014.may(address(this)), 1);
-    //     rwaconduitout_014.hope(address(this));
-    //     assertEq(rwaconduitout_014.can(address(this)), 1);
+        // 0 DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Dangling Dai in input conduit before draw()");
 
-    //     rwaconduitout_014.kiss(address(this));
-    //     assertEq(rwaconduitout_014.bud(address(this)), 1);
-    //     rwaconduitout_014.pick(address(this));
+        // Draw 500mm
+        rwaurn_014.draw(drawAmount);
 
-    //     uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
-    //     rwaconduitout_014.push(pushAmount);
-    //     rwaconduitout_014.quit();
+        // 500mm DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), drawAmount, "RWA014: Dai drawn was not send to the recipient");
 
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Output conduit still holds Dai after quit()");
-    //     assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to destination after push()");
-    //     assertEq(dai.balanceOf(address(rwaurn_014)), drawAmount - pushAmount, "RWA014: Dai not sent to destination after push()");
+        (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
+        assertEq(art, drawAmount, "RWA014: bad `art` after spell"); // DAI drawn == art as rate should always be 1 RAY
+        assertEq(ink, 1 * WAD, "RWA014: bad `ink` after spell"); // Whole unit of collateral is locked
 
-    //     // as we have SF 0 we need to pay exectly the same amount of DAI we have drawn
-    //     uint256 daiToPay = drawAmount;
+        vm.warp(block.timestamp + 10 days);
+        jug.drip("RWA014-A");
 
-    //     // Note: In the version of outputCounduit for this deal `push` is permissionles
-    //     // // wards
-    //     // GodMode.setWard(address(rwaconduitinurn_014), address(this), 1);
-    //     // // may
-    //     // rwaconduitinurn_014.mate(address(this));
-    //     // assertEq(rwaconduitinurn_014.may(address(this)), 1);
+        (, uint256 rate,,,) = vat.ilks("RWA014-A");
+        assertEq(rate, RAY, 'RWA014: bad `rate`'); // rate keeps being 1 RAY
 
-    //     // transfer PSM GEM to input conduit
-    //     psmGem.transfer(address(rwaconduitinurn_014), pushAmount / daiPsmGemDiffDecimals);
-    //     assertEq(psmGem.balanceOf(address(rwaconduitinurn_014)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to input conduit");
+        // wards
+        GodMode.setWard(address(rwaconduitout_014), address(this), 1);
+        // may
+        rwaconduitout_014.mate(address(this));
+        assertEq(rwaconduitout_014.may(address(this)), 1);
+        rwaconduitout_014.hope(address(this));
+        assertEq(rwaconduitout_014.can(address(this)), 1);
+
+        rwaconduitout_014.kiss(address(this));
+        assertEq(rwaconduitout_014.bud(address(this)), 1);
+        rwaconduitout_014.pick(address(this));
+
+        uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
+        rwaconduitout_014.push(pushAmount);
+        rwaconduitout_014.quit();
+
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(rwaurn_014)), drawAmount - pushAmount, "RWA014: Dai not sent to destination after push()");
+
+        // as we have SF 0 we need to pay exectly the same amount of DAI we have drawn
+        uint256 daiToPay = drawAmount;
+
+        // Note: In the version of outputCounduit for this deal `push` is permissionles
+        // // wards
+        // GodMode.setWard(address(rwaconduitinurn_014), address(this), 1);
+        // // may
+        // rwaconduitinurn_014.mate(address(this));
+        // assertEq(rwaconduitinurn_014.may(address(this)), 1);
+
+        // transfer PSM GEM to input conduit
+        psmGem.transfer(address(rwaconduitinurn_014), pushAmount / daiPsmGemDiffDecimals);
+        assertEq(psmGem.balanceOf(address(rwaconduitinurn_014)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to input conduit");
         
-    //     // input conduit 'push()' to the urn
-    //     rwaconduitinurn_014.push();
+        // input conduit 'push()' to the urn
+        rwaconduitinurn_014.push();
 
-    //     assertEq(dai.balanceOf(address(rwaurn_014)), daiToPay, "Balance of the URN doesnt match");
+        assertEq(dai.balanceOf(address(rwaurn_014)), daiToPay, "Balance of the URN doesnt match");
 
-    //     // repay debt and free our collateral
-    //     rwaurn_014.wipe(daiToPay);
-    //     rwaurn_014.free(1 * WAD);
+        // repay debt and free our collateral
+        rwaurn_014.wipe(daiToPay);
+        rwaurn_014.free(1 * WAD);
 
-    //     // check if we get back RWA014 Tokens
-    //     assertEq(rwagem_014.balanceOf(address(this)), 1 * WAD, "RWA014: gem not sent back to the caller");
+        // check if we get back RWA014 Tokens
+        assertEq(rwagem_014.balanceOf(address(this)), 1 * WAD, "RWA014: gem not sent back to the caller");
 
-    //     // check if we have 0 collateral and outstanding debt in the VAT
-    //     (ink, art) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     assertEq(ink, 0, "RWA014: bad `ink` after free()");
-    //     assertEq(art, 0, "RWA014: bad `art` after wipe()");
-    // }
+        // check if we have 0 collateral and outstanding debt in the VAT
+        (ink, art) = vat.urns("RWA014-A", address(rwaurn_014));
+        assertEq(ink, 0, "RWA014: bad `ink` after free()");
+        assertEq(art, 0, "RWA014: bad `art` after wipe()");
+    }
 
-    // function testFailRWA014_DRAW_ABOVE_LINE() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testFailRWA014_DRAW_ABOVE_LINE() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     uint256 drawAmount = 500_000_001 * WAD;
+        uint256 drawAmount = 500_000_001 * WAD;
 
-    //     // setting address(this) as operator
-    //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        // setting address(this) as operator
+        vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-    //     // Draw 500m + 1
-    //     rwaurn_014.draw(drawAmount);
-    // }
+        // Draw 500m + 1
+        rwaurn_014.draw(drawAmount);
+    }
 
-    // function testFailRWA014_CONDUIT_PUSH_ABOVE_BALANCE() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testFailRWA014_CONDUIT_PUSH_ABOVE_BALANCE() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     uint256 drawAmount = 500_000_000 * WAD;
+        uint256 drawAmount = 500_000_000 * WAD;
 
-    //     // setting address(this) as operator
-    //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        // setting address(this) as operator
+        vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-    //     // Draw 500mm
-    //     rwaurn_014.draw(drawAmount);
+        // Draw 500mm
+        rwaurn_014.draw(drawAmount);
 
-    //     // auth
-    //     GodMode.setWard(address(rwaconduitout_014), address(this), 1);
+        // auth
+        GodMode.setWard(address(rwaconduitout_014), address(this), 1);
 
-    //     // pick address(this)
-    //     rwaconduitout_014.hope(address(this)); // allow this to call pick
-    //     rwaconduitout_014.kiss(address(this)); // allow this to be picked
-    //     rwaconduitout_014.pick(address(this));
+        // pick address(this)
+        rwaconduitout_014.hope(address(this)); // allow this to call pick
+        rwaconduitout_014.kiss(address(this)); // allow this to be picked
+        rwaconduitout_014.pick(address(this));
 
-    //     // push above balance
-    //     uint256 pushAmount = drawAmount + 1 * WAD;
-    //     rwaconduitout_014.mate(address(this)); // allow this to call push
-    //     rwaconduitout_014.push(pushAmount);    // fail
-    // }
+        // push above balance
+        uint256 pushAmount = drawAmount + 1 * WAD;
+        rwaconduitout_014.mate(address(this)); // allow this to call push
+        rwaconduitout_014.push(pushAmount);    // fail
+    }
 
-    // function testRWA014_OPERATOR_LOCK_DRAW_CAGE() public {
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+    function testRWA014_OPERATOR_LOCK_DRAW_CAGE() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     uint256 drawAmount = 500_000_000 * WAD;
+        uint256 drawAmount = 500_000_000 * WAD;
 
-    //     // setting address(this) as operator
-    //     vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
-    //     assertEq(rwaurn_014.can(address(this)), 1);
+        // setting address(this) as operator
+        vm.store(address(rwaurn_014), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwaurn_014.can(address(this)), 1);
 
-    //     // Check if spell lock 1 * WAD of RWA014
-    //     assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
-    //     assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
+        // Check if spell lock 1 * WAD of RWA014
+        assertEq(rwagem_014.balanceOf(addr.addr('MCD_PAUSE_PROXY')), 0, "RWA014: gem not transfered from the pause proxy");
+        assertEq(rwagem_014.balanceOf(address(rwajoin_014)), 1 * WAD, "RWA014: gem not locked into the urn");
 
-    //     // 0 DAI in Output Conduit
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Dangling Dai in input conduit before draw()");
+        // 0 DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Dangling Dai in input conduit before draw()");
 
-    //     // Draw 500mm
-    //     rwaurn_014.draw(drawAmount);
+        // Draw 500mm
+        rwaurn_014.draw(drawAmount);
 
-    //     // 500mm DAI in Output Conduit
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), drawAmount, "RWA014: Dai drawn was not send to the recipient");
+        // 500mm DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), drawAmount, "RWA014: Dai drawn was not send to the recipient");
 
-    //     (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     assertEq(art, drawAmount, "RWA014: bad `art` after spell"); // DAI drawn == art as rate should always be 1 RAY
-    //     assertEq(ink, 1 * WAD, "RWA014: bad `ink` after spell"); // Whole unit of collateral is locked
+        (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
+        assertEq(art, drawAmount, "RWA014: bad `art` after spell"); // DAI drawn == art as rate should always be 1 RAY
+        assertEq(ink, 1 * WAD, "RWA014: bad `ink` after spell"); // Whole unit of collateral is locked
 
-    //     vm.warp(block.timestamp + 10 days);
-    //     jug.drip("RWA014-A");
+        vm.warp(block.timestamp + 10 days);
+        jug.drip("RWA014-A");
 
-    //     (, uint256 rate,,,) = vat.ilks("RWA014-A");
-    //     assertEq(rate, RAY, 'RWA014: bad `rate`'); // rate keeps being 1 RAY
+        (, uint256 rate,,,) = vat.ilks("RWA014-A");
+        assertEq(rate, RAY, 'RWA014: bad `rate`'); // rate keeps being 1 RAY
 
-    //     // wards
-    //     GodMode.setWard(address(rwaconduitout_014), address(this), 1);
-    //     // may
-    //     rwaconduitout_014.mate(address(this));
-    //     rwaconduitout_014.hope(address(this));
+        // wards
+        GodMode.setWard(address(rwaconduitout_014), address(this), 1);
+        // may
+        rwaconduitout_014.mate(address(this));
+        rwaconduitout_014.hope(address(this));
 
-    //     rwaconduitout_014.kiss(address(this));
-    //     assertEq(rwaconduitout_014.bud(address(this)), 1);
-    //     rwaconduitout_014.pick(address(this));
+        rwaconduitout_014.kiss(address(this));
+        assertEq(rwaconduitout_014.bud(address(this)), 1);
+        rwaconduitout_014.pick(address(this));
 
-    //     uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
-    //     rwaconduitout_014.push(pushAmount);
-    //     rwaconduitout_014.quit();
+        uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
+        rwaconduitout_014.push(pushAmount);
+        rwaconduitout_014.quit();
 
-    //     assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Output conduit still holds Dai after quit()");
-    //     assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to destination after push()");
-    //     assertEq(dai.balanceOf(address(rwaurn_014)), drawAmount - pushAmount, "RWA014: Dai not sent to destination after push()");
+        assertEq(dai.balanceOf(address(rwaconduitout_014)), 0, "RWA014: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA014: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(rwaurn_014)), drawAmount - pushAmount, "RWA014: Dai not sent to destination after push()");
 
-    //     // END
-    //     GodMode.setWard(address(end), address(this), 1);
-    //     end.cage();
-    //     end.cage("RWA014-A");
+        // END
+        GodMode.setWard(address(end), address(this), 1);
+        end.cage();
+        end.cage("RWA014-A");
 
-    //     end.skim("RWA014-A", address(rwaurn_014));
+        end.skim("RWA014-A", address(rwaurn_014));
 
-    //     (ink, art) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     uint256 skimmedInk = drawAmount / 500_000_000;
-    //     assertEq(ink, 1 * WAD - skimmedInk, "RWA014: wrong ink in urn after skim");
-    //     assertEq(art, 0, "RWA014: wrong art in urn after skim");
-    //     vm.warp(block.timestamp + end.wait());
+        (ink, art) = vat.urns("RWA014-A", address(rwaurn_014));
+        uint256 skimmedInk = drawAmount / 500_000_000;
+        assertEq(ink, 1 * WAD - skimmedInk, "RWA014: wrong ink in urn after skim");
+        assertEq(art, 0, "RWA014: wrong art in urn after skim");
+        vm.warp(block.timestamp + end.wait());
 
-    //     // Removing the surplus to allow continuing the execution.
-    //     vm.store(
-    //         address(vat),
-    //         keccak256(abi.encode(address(vow), uint256(5))),
-    //         bytes32(uint256(0))
-    //     );
+        // Removing the surplus to allow continuing the execution.
+        vm.store(
+            address(vat),
+            keccak256(abi.encode(address(vow), uint256(5))),
+            bytes32(uint256(0))
+        );
 
-    //     end.thaw();
+        end.thaw();
 
-    //     end.flow("RWA014-A");
+        end.flow("RWA014-A");
 
-    //     GodMode.setBalance(address(dai), address(this), 500_000_000 * WAD);
-    //     dai.approve(address(daiJoin), 500_000_000 * WAD);
-    //     daiJoin.join(address(this), 500_000_000 * WAD);
+        GodMode.setBalance(address(dai), address(this), 500_000_000 * WAD);
+        dai.approve(address(daiJoin), 500_000_000 * WAD);
+        daiJoin.join(address(this), 500_000_000 * WAD);
 
-    //     vat.hope(address(end));
-    //     end.pack(500_000_000 * WAD);
+        vat.hope(address(end));
+        end.pack(500_000_000 * WAD);
 
-    //     // Check DAI redemption after "cage()"
-    //     assertEq(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem");
-    //     assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance");
-    //     end.cash("RWA014-A", 500_000_000 * WAD);
-    //     assertGt(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem after cash");
-    //     assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance after cash");
-    //     rwajoin_014.exit(address(this), vat.gem("RWA014-A", address(this)));
-    //     assertEq(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem after exit");
-    //     assertGt(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance after exit");
-    // }
+        // Check DAI redemption after "cage()"
+        assertEq(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem");
+        assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance");
+        end.cash("RWA014-A", 500_000_000 * WAD);
+        assertGt(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem after cash");
+        assertEq(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance after cash");
+        rwajoin_014.exit(address(this), vat.gem("RWA014-A", address(this)));
+        assertEq(vat.gem("RWA014-A", address(this)), 0, "RWA014: wrong vat gem after exit");
+        assertGt(rwagem_014.balanceOf(address(this)), 0, "RWA014: wrong gem balance after exit");
+    }
 
-    // function testRWA014_SPELL_LOCK() public {
-    //     (uint256 pink, uint256 part) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     uint256 prevBalance = rwagem_014.balanceOf(address(rwaurn_014.gemJoin()));
+    function testRWA014_SPELL_LOCK() public {
+        (uint256 pink, uint256 part) = vat.urns("RWA014-A", address(rwaurn_014));
+        uint256 prevBalance = rwagem_014.balanceOf(address(rwaurn_014.gemJoin()));
 
-    //     assertEq(part, 0, "RWA014/bad-art-before-spell");
-    //     assertEq(pink, 0, "RWA014/bad-ink-before-spell");
+        assertEq(part, 0, "RWA014/bad-art-before-spell");
+        assertEq(pink, 0, "RWA014/bad-ink-before-spell");
 
-    //     uint256 lockAmount = 1 * WAD;
+        uint256 lockAmount = 1 * WAD;
 
-    //     _vote(address(spell));
-    //     _scheduleWaitAndCast(address(spell));
-    //     assertTrue(spell.done());
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
 
-    //     // Check if spell lock whole unit of RWA014 Token to the Urn
-    //     assertEq(rwagem_014.balanceOf(address(rwaurn_014.gemJoin())), prevBalance + lockAmount, "RWA014/spell-do-not-lock-rwa014-token");
+        // Check if spell lock whole unit of RWA014 Token to the Urn
+        assertEq(rwagem_014.balanceOf(address(rwaurn_014.gemJoin())), prevBalance + lockAmount, "RWA014/spell-do-not-lock-rwa014-token");
         
-    //     (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
-    //     assertEq(art, 0, "RWA014/bad-art-after-spell");
-    //     assertEq(ink, lockAmount, "RWA014/bad-ink-after-spell"); // Whole unit of collateral is locked
-    // }
+        (uint256 ink, uint256 art) = vat.urns("RWA014-A", address(rwaurn_014));
+        assertEq(art, 0, "RWA014/bad-art-after-spell");
+        assertEq(ink, lockAmount, "RWA014/bad-ink-after-spell"); // Whole unit of collateral is locked
+    }
 
     function testSparkLendCollateralOnboarding() public {
         // Configuration masking parameters pulled from https://github.com/aave/aave-v3-core/blob/62dfda56bd884db2c291560c03abae9727a7635e/contracts/protocol/libraries/configuration/ReserveConfiguration.sol

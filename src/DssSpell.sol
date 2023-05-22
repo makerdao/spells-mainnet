@@ -39,33 +39,15 @@ interface RwaLiquidationLike {
 
 interface RwaUrnLike {
     function lock(uint256 wad) external;
-    function vat() external view returns (address);
-    function jug() external view returns (address);
-    function gemJoin() external view returns (address);
-    function daiJoin() external view returns (address);
-    function outputConduit() external view returns (address);
     function hope(address usr) external;
 }
 
-interface RwaJarLike {
-    function chainlog() external view returns (address);
-    function dai() external view returns (address);
-    function daiJoin() external view returns (address);
-}
-
 interface RwaInputConduitLike {
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function psm() external view returns (address);
-    function to() external view returns (address);
     function mate(address usr) external;
     function file(bytes32 what, address data) external;
 }
 
 interface RwaOutputConduitLike {
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function psm() external view returns (address);
     function file(bytes32 what, address data) external;
     function hope(address usr) external;
     function mate(address usr) external;
@@ -139,13 +121,13 @@ contract DssSpellAction is DssAction {
     uint256 internal constant HUNDRED                        = 10 ** 2;
 
     // -- RWA014 MIP21 components --
-    address internal constant RWA014                         = address(0);
-    address internal constant MCD_JOIN_RWA014_A              = address(0);
-    address internal constant RWA014_A_URN                   = address(0);
-    address internal constant RWA014_A_JAR                   = address(0);
-    address internal constant RWA014_A_INPUT_CONDUIT_URN     = address(0);
-    address internal constant RWA014_A_INPUT_CONDUIT_JAR     = address(0);
-    address internal constant RWA014_A_OUTPUT_CONDUIT        = address(0);
+    address internal constant RWA014                         = 0x75dCa04C4aCC1FfB0AEF940e5b49e2C17416008a;
+    address internal constant MCD_JOIN_RWA014_A              = 0xAd722E51569EF41861fFf5e11942a8E07c7C309e;
+    address internal constant RWA014_A_URN                   = 0xf082566Ac42566cF7B392C8e58116a27eEdcBe63;
+    address internal constant RWA014_A_JAR                   = 0x71eC6d5Ee95B12062139311CA1fE8FD698Cbe0Cf;
+    address internal constant RWA014_A_INPUT_CONDUIT_URN     = 0x6B86bA08Bd7796464cEa758061Ac173D0268cf49;
+    address internal constant RWA014_A_INPUT_CONDUIT_JAR     = 0x391470cD3D8307AdC051d878A95Fa9459F800Dbc;
+    address internal constant RWA014_A_OUTPUT_CONDUIT        = 0xD7cBDFdE553DE2063caAfBF230Be135e5DbB5064;
     // TODO: IPFS link
     string  internal constant RWA014_DOC                     = "TODO";
     uint256 internal constant RWA014_A_INITIAL_PRICE         = 500 * MILLION * WAD;
@@ -205,38 +187,6 @@ contract DssSpellAction is DssAction {
 
     function onboardRWA014() internal {
         bytes32 ilk      = "RWA014-A";
-        uint256 decimals = GemAbstract(RWA014).decimals();
-
-        // Sanity checks
-        require(GemJoinAbstract(MCD_JOIN_RWA014_A).vat()                             == MCD_VAT,                                    "join-vat-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA014_A).ilk()                             == ilk,                                        "join-ilk-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA014_A).gem()                             == RWA014,                                     "join-gem-not-match");
-        require(GemJoinAbstract(MCD_JOIN_RWA014_A).dec()                             == decimals,                                   "join-dec-not-match");
-
-        require(RwaUrnLike(RWA014_A_URN).vat()                                       == MCD_VAT,                                    "urn-vat-not-match");
-        require(RwaUrnLike(RWA014_A_URN).jug()                                       == MCD_JUG,                                    "urn-jug-not-match");
-        require(RwaUrnLike(RWA014_A_URN).daiJoin()                                   == MCD_JOIN_DAI,                               "urn-daijoin-not-match");
-        require(RwaUrnLike(RWA014_A_URN).gemJoin()                                   == MCD_JOIN_RWA014_A,                          "urn-gemjoin-not-match");
-        require(RwaUrnLike(RWA014_A_URN).outputConduit()                             == RWA014_A_OUTPUT_CONDUIT,                    "urn-outputconduit-not-match");
-
-        require(RwaJarLike(RWA014_A_JAR).chainlog()                                  == DssExecLib.LOG,                             "jar-chainlog-not-match");
-        require(RwaJarLike(RWA014_A_JAR).dai()                                       == DssExecLib.dai(),                           "jar-dai-not-match");
-        require(RwaJarLike(RWA014_A_JAR).daiJoin()                                   == MCD_JOIN_DAI,                               "jar-daijoin-not-match");
-
-        require(RwaOutputConduitLike(RWA014_A_OUTPUT_CONDUIT).dai()                  == DssExecLib.dai(),                           "output-conduit-dai-not-match");
-        require(RwaOutputConduitLike(RWA014_A_OUTPUT_CONDUIT).gem()                  == DssExecLib.getChangelogAddress("USDC"),     "output-conduit-gem-not-match");
-        require(RwaOutputConduitLike(RWA014_A_OUTPUT_CONDUIT).psm()                  == MCD_PSM_USDC_A,                             "output-conduit-psm-not-match");
-
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_URN).psm()                == MCD_PSM_USDC_A,                             "input-conduit-urn-psm-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_URN).to()                 == RWA014_A_URN,                               "input-conduit-urn-to-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_URN).dai()                == DssExecLib.dai(),                           "input-conduit-urn-dai-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_URN).gem()                == DssExecLib.getChangelogAddress("USDC"),     "input-conduit-urn-gem-not-match");
-
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_JAR).psm()                == MCD_PSM_USDC_A,                             "input-conduit-jar-psm-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_JAR).to()                 == RWA014_A_JAR,                               "input-conduit-jar-to-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_JAR).dai()                == DssExecLib.dai(),                           "input-conduit-jar-dai-not-match");
-        require(RwaInputConduitLike(RWA014_A_INPUT_CONDUIT_JAR).gem()                == DssExecLib.getChangelogAddress("USDC"),     "input-conduit-jar-gem-not-match");
-
 
         // Init the RwaLiquidationOracle
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA014_A_INITIAL_PRICE, RWA014_DOC, RWA014_A_TAU);
@@ -306,7 +256,7 @@ contract DssSpellAction is DssAction {
             ilk,
             MCD_JOIN_RWA014_A,
             RWA014,
-            decimals,
+            GemAbstract(RWA014).decimals(),
             RWA014_REG_CLASS_RWA,
             pip,
             address(0),
@@ -321,17 +271,17 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmdRELY7#poll-detail
         // Forum: https://forum.makerdao.com/t/coinbase-custody-legal-assessment/20384
 
-        // onboardRWA014();
-        // // Lock RWA014 Token in the URN
-        // GemAbstract(RWA014).approve(RWA014_A_URN, 1 * WAD);
-        // RwaUrnLike(RWA014_A_URN).lock(1 * WAD);
+        onboardRWA014();
+        // Lock RWA014 Token in the URN
+        GemAbstract(RWA014).approve(RWA014_A_URN, 1 * WAD);
+        RwaUrnLike(RWA014_A_URN).lock(1 * WAD);
 
         // ----- Additional ESM authorization -----
-        // DssExecLib.authorize(MCD_JOIN_RWA014_A, ESM);
-        // DssExecLib.authorize(RWA014_A_URN, ESM);
-        // DssExecLib.authorize(RWA014_A_OUTPUT_CONDUIT, ESM);
-        // DssExecLib.authorize(RWA014_A_INPUT_CONDUIT_URN, ESM);
-        // DssExecLib.authorize(RWA014_A_INPUT_CONDUIT_JAR, ESM);
+        DssExecLib.authorize(MCD_JOIN_RWA014_A, ESM);
+        DssExecLib.authorize(RWA014_A_URN, ESM);
+        DssExecLib.authorize(RWA014_A_OUTPUT_CONDUIT, ESM);
+        DssExecLib.authorize(RWA014_A_INPUT_CONDUIT_URN, ESM);
+        DssExecLib.authorize(RWA014_A_INPUT_CONDUIT_JAR, ESM);
 
         // --------- Keeper Network Amendments ---------
         // Poll: https://vote.makerdao.com/polling/QmZZJcCj#poll-detail
