@@ -1427,9 +1427,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq((daiReserveData.configuration & ~BORROWABLE_IN_ISOLATION_MASK) != 0, false);
         assertTrue(tokenReserveData.aTokenAddress == address(0));   // Not set yet
         assertEq(medianizer.bud(oracleAdapter), 0);
-        assertEq(tokenReserveData.configuration & ~LTV_MASK, 20_00);
-        assertEq((tokenReserveData.configuration & ~LIQUIDATION_THRESHOLD_MASK) >> LIQUIDATION_THRESHOLD_START_BIT_POSITION, 25_00);
-        assertEq((tokenReserveData.configuration & ~LIQUIDATION_BONUS_MASK) >> LIQUIDATION_BONUS_START_BIT_POSITION, 110_00);
+
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1441,6 +1439,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(tokenReserveData.aTokenAddress != address(0));
         assertEq(tokenReserveData.interestRateStrategyAddress, interestRateStrategy);
         assertEq(medianizer.bud(oracleAdapter), 1);
+
+        assertEq(tokenReserveData.configuration & ~LTV_MASK, 20_00);
+        assertEq((tokenReserveData.configuration & ~LIQUIDATION_THRESHOLD_MASK) >> LIQUIDATION_THRESHOLD_START_BIT_POSITION, 25_00);
+        assertEq((tokenReserveData.configuration & ~LIQUIDATION_BONUS_MASK) >> LIQUIDATION_BONUS_START_BIT_POSITION, 110_00);
 
         // Integration test - take out a maximum loan
 
