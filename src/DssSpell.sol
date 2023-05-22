@@ -176,12 +176,10 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_DAI                  = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     address internal immutable REGISTRY                      = DssExecLib.reg();
     address internal immutable MIP21_LIQUIDATION_ORACLE      = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
-    address internal immutable MCD_PSM_USDC_A                = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
     address internal immutable ESM                           = DssExecLib.getChangelogAddress("MCD_ESM");
     address internal immutable MCD_VAT                       = DssExecLib.vat();
     address internal immutable MCD_JUG                       = DssExecLib.jug();
     address internal immutable MCD_SPOT                      = DssExecLib.spotter();
-    address internal immutable MCD_JOIN_DAI                  = DssExecLib.daiJoin();
     address internal immutable MCD_DAI                       = DssExecLib.dai();
 
 
