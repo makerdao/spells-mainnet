@@ -1059,6 +1059,7 @@ contract DssSpellTest is DssSpellTestBase {
     RwaInputConduitLike  rwaconduitinjar_014   = RwaInputConduitLike(addr.addr("RWA014_A_INPUT_CONDUIT_JAR"));
     uint256 daiPsmGemDiffDecimals              = 10 ** (dai.decimals() - psmGem.decimals());
 
+    // Note: This is an exception because of exceeding the `action` size in the spell. Main pattern is to have this checks in the spell itself 
     function testRWA014_CONTRACT_DEPLOYMENT_SETUP() public {
         require(rwajoin_014.vat()                        == addr.addr("MCD_VAT"),            "join-vat-not-match");
         require(rwajoin_014.ilk()                        == "RWA014-A",                      "join-ilk-not-match");
@@ -1313,7 +1314,7 @@ contract DssSpellTest is DssSpellTestBase {
         rwaurn_014.draw(drawAmount);
     }
 
-    function testFailRWA014_CONDUIT_PUSH_ABOVE_BALANCE() public {
+    function testFailRWA014_OUTPUT_CONDUIT_PUSH_ABOVE_BALANCE() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
