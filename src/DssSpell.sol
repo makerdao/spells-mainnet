@@ -128,7 +128,7 @@ contract DssSpellAction is DssAction {
     address internal constant RWA014_A_INPUT_CONDUIT_URN     = 0x6B86bA08Bd7796464cEa758061Ac173D0268cf49;
     address internal constant RWA014_A_INPUT_CONDUIT_JAR     = 0x391470cD3D8307AdC051d878A95Fa9459F800Dbc;
     address internal constant RWA014_A_OUTPUT_CONDUIT        = 0xD7cBDFdE553DE2063caAfBF230Be135e5DbB5064;
-    // TODO: IPFS link
+
     string  internal constant RWA014_DOC                     = "QmT2Dr1tTw4idtVXZHxjT5Cs22KsNJyZgmYy9LGf9kR7vU";
     uint256 internal constant RWA014_A_INITIAL_PRICE         = 500 * MILLION * WAD;
     uint48  internal constant RWA014_A_TAU                   = 0;
