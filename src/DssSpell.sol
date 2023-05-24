@@ -289,7 +289,7 @@ contract DssSpellAction is DssAction {
 
         // GELATO    | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD | Treasury: 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206
         (,uint256 windowLengthGelato) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("GELATO"));
-        require(windowLengthGelato == 13, "Gelato/incrorrect-window-length");
+        require(windowLengthGelato == 13, "Gelato/incorrect-window-length");
         require(NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Gelato-Payment-Adapter/incorrect-buffer-max");
         require(NetworkPaymentAdapterLike(GELATO_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Gelato-Payment-Adapter/incorrect-minimum-payment");
         uint256 gelatoVestId = VestLike(MCD_VEST_DAI).create(
@@ -306,7 +306,7 @@ contract DssSpellAction is DssAction {
 
         // KEEP3R    | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0xaeFed819b6657B3960A8515863abe0529Dfc444A | Treasury: 0x4DfC6DA2089b0dfCF04788b341197146Ea97f743
         (,uint256 windowLengthKeeper) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("KEEP3R"));
-        require(windowLengthKeeper == 13, "Keep3r/incrorrect-window-length");
+        require(windowLengthKeeper == 13, "Keep3r/incorrect-window-length");
         require(NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Keep3r-Payment-Adapter/incorrect-buffer-max");
         require(NetworkPaymentAdapterLike(KEEP3R_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Keep3r-Payment-Adapter/incorrect-minimum-payment");
         uint256 kepperVestId = VestLike(MCD_VEST_DAI).create(
@@ -323,7 +323,7 @@ contract DssSpellAction is DssAction {
 
         // CHAINLINK | 1,500 DAI/day | 1_644_000 DAI | 3 years | Vest Target: 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065
         (,uint256 windowLengthChainlink) = DssCronSequencerLike(DSS_CRON_SEQUENCER).windows(bytes32("CHAINLINK"));
-        require(windowLengthChainlink == 13, "Chainling/incrorrect-window-length");
+        require(windowLengthChainlink == 13, "Chainling/incorrect-window-length");
         require(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).bufferMax() == 20_000 * WAD, "Chainlink-Payment-Adapter/incorrect-buffer-max");
         require(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).minimumPayment() == 4_000 * WAD, "Chainlink-Payment-Adapter/incorrect-minimum-payment");
         uint256 chainlinkVestId = VestLike(MCD_VEST_DAI).create(
