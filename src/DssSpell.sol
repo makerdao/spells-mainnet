@@ -138,7 +138,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RWA015_A_MAT  = 100_00;
     // -- RWA015 END --
 
-    // -- MKR VESTING --
+    // -- MKR TRANSFERS --
     address internal immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
     address internal immutable DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
