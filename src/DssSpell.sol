@@ -21,6 +21,12 @@ import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
 
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+    function approve(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
+}
+
 interface VatLike {
     function Line() external view returns (uint256);
     function file(bytes32 what, uint256 data) external;
@@ -81,6 +87,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-05-24 MakerDAO Executive Spell | Hash: 0xfe3ea529455620ded327e3f6781e75c799567ce8d87824c6585671c8fe392946";
     VatLike internal immutable vat = VatLike(DssExecLib.getChangelogAddress("MCD_VAT"));
+    GemLike internal immutable mkr = GemLike(DssExecLib.mkr());
     DssVestLike internal immutable vest = DssVestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
     RwaLiquidationLike immutable rwaLiquidation = RwaLiquidationLike(DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE"));
 
@@ -130,6 +137,11 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RWA015_A_LINE = 2_500_000;
     uint256 internal constant RWA015_A_MAT  = 100_00;
     // -- RWA015 END --
+
+    // -- MKR VESTING --
+    address internal immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+    address internal immutable DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+
 
     address internal immutable reg  = DssExecLib.reg();
     address internal immutable jug  = DssExecLib.jug();
@@ -290,13 +302,13 @@ contract DssSpellAction is DssAction {
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP44#estimated-mkr-expenditure
 
-        // Skip for goerli
+        mkr.transfer(SIDESTREAM_WALLET, 34828 * WAD / 100);
 
         // DUX - 225.12 MKR - 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP27
 
-        // Skip for goerli
+        mkr.transfer(DUX_WALLET, 22512 * WAD / 100);
 
         // --- Stability Scope Defined Parameter Adjustments ---
         // Poll: https://vote.makerdao.com/polling/QmaoGpAQ#poll-detail
