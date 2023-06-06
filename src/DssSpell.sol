@@ -142,7 +142,6 @@ contract DssSpellAction is DssAction {
     address internal immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
     address internal immutable DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
-
     address internal immutable reg  = DssExecLib.reg();
     address internal immutable jug  = DssExecLib.jug();
     address internal immutable spot = DssExecLib.spotter();
@@ -266,10 +265,7 @@ contract DssSpellAction is DssAction {
         // Pick the destination for the assets
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).pick(RWA015_A_CUSTODY);
         // Swap Dai for the chosen stablecoin through the PSM and send it to the picked address.
-        // For Goerli we push only 100 Dai
-        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).push(100 * WAD);
-        // For Mainnet we push the entire balance
-        // RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).push();
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).push();
 
         // Revoke all granted permissions from MCD_PAUSE_PROXY
         RwaUrnLike(RWA015_A_URN).nope(address(this));

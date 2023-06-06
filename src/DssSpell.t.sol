@@ -1263,8 +1263,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.bud(address(this)), 1);
         rwa015AOutputConduit.pick(address(this));
 
-        uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
-        // uint256 pushAmount = drawAmount; // We push all on Mainnet
+        uint256 pushAmount = drawAmount; // We push all on Mainnet
         rwa015AOutputConduit.push(pushAmount);
         rwa015AOutputConduit.quit();
 
@@ -1390,8 +1389,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.bud(address(this)), 1);
         rwa015AOutputConduit.pick(address(this));
 
-        uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
-        // uint256 pushAmount = drawAmount; // We push all on Mainnet
+        uint256 pushAmount = drawAmount; // We push all on Mainnet
         rwa015AOutputConduit.push(pushAmount);
         rwa015AOutputConduit.quit();
 
@@ -1470,7 +1468,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 drawAmount = 2_500_000 * WAD; // We push only 100 DAI on Görli
+        uint256 drawAmount = 2_500_000 * WAD;
         // as we have SF 0 we need to pay exectly the same amount of DAI we have pushed
         uint256 daiToPay = drawAmount;
 
@@ -1574,8 +1572,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRWA015A_SPELL_EXECUTES_LOCK_DRAW_PUSH() public {
         uint256 drawAmount = 2_500_000 * WAD;
-        uint256 pushAmount = 100 * WAD; // We push only 100 DAI on Görli
-        // uint256 pushAmount = drawAmount; // We push all on Mainnet
+        uint256 pushAmount = drawAmount; // We push all on Mainnet
         uint256 expectedBalanceChange = pushAmount / daiPsmGemDiffDecimals;
 
         uint256 pBalance = psmGem.balanceOf(RWA015_A_CUSTODY);
