@@ -22,11 +22,6 @@ import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
 import "dss-interfaces/dapp/DSTokenAbstract.sol";
 
-interface DssVestLike {
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function file(bytes32, uint256) external;
-    function restrict(uint256) external;
-}
 interface RwaLiquidationLike {
     function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
@@ -285,6 +280,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("RWA011-A", 0);
         // Increase the Debt Ceiling (line) of BlockTower S3 (RWA012-A) from 30 million Dai to 80 million Dai.
         DssExecLib.increaseIlkDebtCeiling("RWA012-A", 50 * MILLION, /* do not increase global line */ false);
+
         _updateDoc("RWA010-A", "QmY382BPa5UQfmpTfi6KhjqQHtqq1fFFg2owBfsD2LKmYU");
         _updateDoc("RWA011-A", "QmY382BPa5UQfmpTfi6KhjqQHtqq1fFFg2owBfsD2LKmYU");
         _updateDoc("RWA012-A", "QmY382BPa5UQfmpTfi6KhjqQHtqq1fFFg2owBfsD2LKmYU");
