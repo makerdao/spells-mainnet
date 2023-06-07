@@ -21,10 +21,14 @@ import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
 import "dss-interfaces/dapp/DSTokenAbstract.sol";
+interface VatLike {
+    function ilks(bytes32) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
+}
 
 interface RwaLiquidationLike {
-    function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
-    function init(bytes32, uint256, string calldata, uint48) external;
+    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+    function init(bytes32 ilk, uint256 val, string memory doc, uint48 tau) external;
+    function bump(bytes32 ilk, uint256 val) external;
 }
 
 interface ACLManagerLike {
@@ -106,6 +110,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant SIX_PT_THREE_PCT_RATE          = 1000000001937312893803622469;
     uint256 internal constant FIVE_PT_FIVE_FIVE_PCT_RATE     = 1000000001712791360746325100;
 
+    // -- Spark Components --
     address internal constant SPARK_ACL_MANAGER = 0xdA135Cd78A086025BcdC87B038a1C462032b510C;
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL = 0x41D7c79aE5Ecba7428283F66998DedFD84451e0e;
@@ -124,11 +129,11 @@ contract DssSpellAction is DssAction {
     address internal constant RWA015_A_CUSTODY           = 0x65729807485F6f7695AF863d97D62140B7d69d83;
 
     // Ilk registry params
-    uint256 internal constant RWA015_REG_CLASS_RWA = 3;
+    uint256 internal constant RWA015_A_REG_CLASS_RWA = 3;
 
     // RWA Oracle Params
     uint256 internal constant RWA015_A_INITIAL_PRICE = 2_500_000;
-    string  internal constant RWA015_DOC             = "QmdbPyQLDdGQhKGXBgod7TbQmrUJ7tiN9aX1zSL7bmtkTN";
+    string  internal constant RWA015_A_DOC             = "QmdbPyQLDdGQhKGXBgod7TbQmrUJ7tiN9aX1zSL7bmtkTN";
     uint48  internal constant RWA015_A_TAU           = 0;
 
     // Remaining params
@@ -161,7 +166,7 @@ contract DssSpellAction is DssAction {
             ilk,
             // We are not using DssExecLib, so the precision has to be set explicitly
             RWA015_A_INITIAL_PRICE * WAD,
-            RWA015_DOC,
+            RWA015_A_DOC,
             RWA015_A_TAU
         );
         (, address pip, , ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
@@ -175,6 +180,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(MCD_VAT, MCD_JOIN_RWA015_A);
 
         // 500m debt ceiling
+        // Stability Fee is 0 for this ilk
         DssExecLib.increaseIlkDebtCeiling(ilk, RWA015_A_LINE, /* _global = */ true);
 
         // Set price feed for RWA015
@@ -226,7 +232,7 @@ contract DssSpellAction is DssAction {
             MCD_JOIN_RWA015_A,
             RWA015,
             GemAbstract(RWA015).decimals(),
-            RWA015_REG_CLASS_RWA,
+            RWA015_A_REG_CLASS_RWA,
             pip,
             address(0),
             "RWA015-A: BlockTower Andromeda",
@@ -273,12 +279,24 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmPMrvfV#poll-detail
         // Forum: https://forum.makerdao.com/t/blocktower-credit-rwa-vaults-parameters-shift/20707
 
-        // Decrease the Debt Ceiling (line) of BlockTower S1 (RWA010-A) from 20 million Dai to zero Dai.
-        DssExecLib.setIlkDebtCeiling("RWA010-A", 0);
-        // Decrease the Debt Ceiling (line) of BlockTower S2 (RWA011-A) from 30 million Dai to zero Dai.
-        DssExecLib.setIlkDebtCeiling("RWA011-A", 0);
-        // Increase the Debt Ceiling (line) of BlockTower S3 (RWA012-A) from 30 million Dai to 80 million Dai.
-        DssExecLib.increaseIlkDebtCeiling("RWA012-A", 50 * MILLION, /* do not increase global line */ false);
+        (uint256 RWA010_A_ART, , , ,) = VatLike(MCD_VAT).ilks("RWA010-A");
+        (uint256 RWA011_A_ART, , , ,) = VatLike(MCD_VAT).ilks("RWA011-A");
+
+        if (RWA010_A_ART + RWA011_A_ART == 0) {
+            // Decrease the Debt Ceiling (line) of BlockTower S1 (RWA010-A) from 20 million Dai to zero Dai.
+            DssExecLib.setIlkDebtCeiling("RWA010-A", 0);
+            // Decrease the Debt Ceiling (line) of BlockTower S2 (RWA011-A) from 30 million Dai to zero Dai.
+            DssExecLib.setIlkDebtCeiling("RWA011-A", 0);
+            // Increase the Debt Ceiling (line) of BlockTower S3 (RWA012-A) from 30 million Dai to 80 million Dai.
+            // Note: Do not increase global Line because there is no net change from these operations
+            DssExecLib.increaseIlkDebtCeiling("RWA012-A", 50 * MILLION, /* global */ false);
+
+            RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
+                "RWA012-A",
+                 80 * MILLION * WAD
+            );
+        }
+
 
         _updateDoc("RWA010-A", "QmY382BPa5UQfmpTfi6KhjqQHtqq1fFFg2owBfsD2LKmYU");
         _updateDoc("RWA011-A", "QmY382BPa5UQfmpTfi6KhjqQHtqq1fFFg2owBfsD2LKmYU");
@@ -303,7 +321,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-2-non-scope-defined-parameter-changes-may-2023/20981#stability-scope-parameter-changes-proposal-6
 
         // Increase DSR to 3.49%
-        DssExecLib.setDSR(THREE_PT_FOUR_NINE_PCT_RATE, true);
+        DssExecLib.setDSR(THREE_PT_FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
         // Set ETH-A Stability Fee to 3.74%
         DssExecLib.setIlkStabilityFee("ETH-A", THREE_PT_SEVEN_FOUR_PCT_RATE, /* doDrip = */ true);
@@ -330,7 +348,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(SPARK_PROXY, DssExecLib.esm());
         ACLManagerLike(SPARK_ACL_MANAGER).addPoolAdmin(SPARK_PROXY);
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
-        DssExecLib.setChangelogAddress("EXEC_PROXY_SPARK", SPARK_PROXY);
+        DssExecLib.setChangelogAddress("SUBPROXY_SPARK", SPARK_PROXY);
 
         // --- Non-Scope Defined Parameter Adjustments ---
         // Poll: https://vote.makerdao.com/polling/QmQXhS3Z#poll-detail

@@ -362,7 +362,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogKey("EXEC_PROXY_SPARK");
+        _checkChainlogKey("SUBPROXY_SPARK");
 
 
         // RWA015
@@ -384,15 +384,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // RWA014
-        assertEq(reg.pos("RWA014-A"),    62);
-        assertEq(reg.join("RWA014-A"),   addr.addr("MCD_JOIN_RWA014_A"));
-        assertEq(reg.gem("RWA014-A"),    addr.addr("RWA014"));
-        assertEq(reg.dec("RWA014-A"),    GemAbstract(addr.addr("RWA014")).decimals());
-        assertEq(reg.class("RWA014-A"),  3);
-        assertEq(reg.pip("RWA014-A"),    addr.addr("PIP_RWA014"));
-        assertEq(reg.name("RWA014-A"),   "RWA014-A: Coinbase Custody");
-        assertEq(reg.symbol("RWA014-A"), GemAbstract(addr.addr("RWA014")).symbol());
+        // RWA015
+        assertEq(reg.pos("RWA015-A"),    62);
+        assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
+        assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
+        assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
+        assertEq(reg.class("RWA015-A"),  3);
+        assertEq(reg.pip("RWA015-A"),    addr.addr("PIP_RWA015"));
+        assertEq(reg.name("RWA015-A"),   "RWA015-A: BlockTower Andromeda");
+        assertEq(reg.symbol("RWA015-A"), GemAbstract(addr.addr("RWA015")).symbol());
     }
 
     function testOSMs() private { // make private to disable
@@ -1135,9 +1135,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(DSValueAbstract(pip).read(), bytes32(2_500_000 * WAD), "RWA015-A: Bad initial PIP value");
 
-        oracle.bump("RWA015-A", 1_280_000_000 * WAD);
+        oracle.bump("RWA015-A", 1_280 * MILLION * WAD);
 
-        assertEq(DSValueAbstract(pip).read(), bytes32(1_280_000_000 * WAD), "RWA015-A: Bad PIP value after bump()");
+        assertEq(DSValueAbstract(pip).read(), bytes32(1_280 * MILLION * WAD), "RWA015-A: Bad PIP value after bump()");
     }
 
     function testRWA015_INTEGRATION_TELL() public {
@@ -1465,6 +1465,13 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 drawAmount = 2_500_000 * WAD;
         // as we have SF 0 we need to pay exectly the same amount of DAI we have pushed
         uint256 daiToPay = drawAmount;
+
+        // Note: In the version of inputConduit for this deal `push` is permissionles
+        // // wards
+        // GodMode.setWard(address(rwa015AInputConduitUrn), address(this), 1);
+        // // may
+        // rwa015AInputConduitUrn.mate(address(this));
+        // assertEq(rwa015AInputConduitUrn.may(address(this)), 1);
 
         // transfer PSM GEM to input conduit
         vm.prank(RWA015_A_CUSTODY);
