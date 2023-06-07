@@ -1274,16 +1274,10 @@ contract DssSpellTest is DssSpellTestBase {
         // as we have SF 0 we need to pay exectly the same amount of DAI we have drawn
         uint256 daiToPay = drawAmount;
 
-        // Note: In the version of inputConduit for this deal `push` is permissionles
-        // // wards
-        // GodMode.setWard(address(rwa015AInputConduitUrn), address(this), 1);
-        // // may
-        // rwa015AInputConduitUrn.mate(address(this));
-        // assertEq(rwa015AInputConduitUrn.may(address(this)), 1);
-
         // transfer PSM GEM to input conduit
-        psmGem.transfer(address(rwa015AInputConduitUrn), pushAmount / daiPsmGemDiffDecimals);
-        assertEq(psmGem.balanceOf(address(rwa015AInputConduitUrn)), pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to input conduit");
+        vm.prank(RWA015_A_CUSTODY);
+        psmGem.transfer(address(rwa015AInputConduitUrn), daiToPay / daiPsmGemDiffDecimals);
+        assertEq(psmGem.balanceOf(address(rwa015AInputConduitUrn)), daiToPay / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to input conduit");
 
         // input conduit 'push()' to the urn
         rwa015AInputConduitUrn.push();
