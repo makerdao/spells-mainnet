@@ -295,6 +295,8 @@ contract DssSpellAction is DssAction {
                 "RWA012-A",
                  80 * MILLION * WAD
             );
+            // Update the RWA012-A `spot` value in Vat
+            DssExecLib.updateCollateralPrice("RWA012-A");
         }
 
 
