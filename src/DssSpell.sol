@@ -108,8 +108,7 @@ contract DssSpellAction is DssAction {
 
     address internal constant SPARK_ACL_MANAGER = 0xdA135Cd78A086025BcdC87B038a1C462032b510C;
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    // TODO add the address when SPARK_SPELL is deployed
-    address internal constant SPARK_SPELL = 0x3068FA0B6Fc6A5c998988a271501fF7A6892c6Ff;
+    address internal constant SPARK_SPELL = 0x41D7c79aE5Ecba7428283F66998DedFD84451e0e;
 
     // -- RWA015 components --
     address internal constant RWA015                     = 0xf5E5E706EfC841BeD1D24460Cd04028075cDbfdE;

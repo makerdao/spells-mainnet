@@ -993,10 +993,10 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testSparkSpell() public {
-        ACLManagerLike SPARK_ACL_MANAGER = ACLManagerLike(0xb137E7d16564c81ae2b0C8ee6B55De81dd46ECe5);
-        address SPARK_PROXY = 0x4e847915D8a9f2Ab0cDf2FC2FD0A30428F25665d;
-        address RETH = 0x62BC478FFC429161115A6E4090f819CE5C50A5d9;
-        PoolLike pool = PoolLike(0x26ca51Af4506DE7a6f0785D20CD776081a05fF6d);
+        ACLManagerLike SPARK_ACL_MANAGER = ACLManagerLike(0xdA135Cd78A086025BcdC87B038a1C462032b510C);
+        address SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+        address RETH = 0xae78736Cd615f374D3085123A210448E74Fc6393;
+        PoolLike pool = PoolLike(0xC13e21B648A5Ee794902342038FF3aDAB66BE987);
 
         // Spell is thoroughly checked in Spark repo, but just triple check the spell was cast here
         assertEq(WardsAbstract(SPARK_PROXY).wards(address(esm)), 0);
