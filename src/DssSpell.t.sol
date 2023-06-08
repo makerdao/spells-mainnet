@@ -1603,6 +1603,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(ink, lockAmount, "RWA015-A/bad-ink-after-spell"); // Whole unit of collateral is locked
     }
 
+    // TODO: cleanup below
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require((z = x - y) <= x);
+    }
+
     function test_RWA012_Update() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1619,10 +1627,10 @@ contract DssSpellTest is DssSpellTestBase {
         // Set this address to be operator
         GodMode.setWard(address(urn), address(this), 1);
         RwaUrnLike(urn).hope(address(this));  // become operator
-        uint256 room = line - _rmul(Art, rate);
-        uint256 drawAmt = _divup(room, RAY);
-        if (_rmul(_divup(_rmul(drawAmt, RAY), rate), rate) > room) {
-            drawAmt = (room - rate) / RAY;
+        uint256 room = line - mul(Art, rate);
+        uint256 drawAmt = room / RAY;
+        if (mul(_divup(mul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = sub(room, rate) / RAY;
         }
 
         // execute draw
