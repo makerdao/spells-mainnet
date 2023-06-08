@@ -366,8 +366,7 @@ contract DssSpellAction is DssAction {
         // Increase the RETH-A Stability Fee from 0.75% to 3.74%
         DssExecLib.setIlkStabilityFee("RETH-A", THREE_PT_SEVEN_FOUR_PCT_RATE, true);
 
-        // TODO: adjust the comment on the next line
-        // Increase CRVV1ETHSTETH-A Stability Fee to 4.24%
+        // Increase the CRVV1ETHSTETH-A Stability Fee from 1.75% to 4.24%
         DssExecLib.setIlkStabilityFee("CRVV1ETHSTETH-A", FOUR_PT_TWO_FOUR_PCT_RATE, true);
 
         // Increase the WBTC-A Stability Fee from 4.90% to 5.80%
