@@ -23,6 +23,10 @@ import {RootDomain} from "dss-test/domains/RootDomain.sol";
 import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
 import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
 
+interface JugLike {
+    function drip(bytes32 ilk) external returns (uint);
+}
+
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -1615,13 +1619,15 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+        address MCD_JUG = addr.addr("MCD_JUG");
+        JugLike(MCD_JUG).drip("RWA012-A");
 
         // Get collateral's parameters
         ( uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks("RWA012-A");
         // Get the oracle address
         (,address pip,,  ) = oracle.ilks("RWA012-A");
         assertEq(uint256(DSValueAbstract(pip).read()), 97_332_233 * WAD, "RWA012: Bad PIP value after bump()");
-        assertEq(spot, 97_332_233 * RAY, "RWA007: Bad spot value after bump()");
+        assertEq(spot, 97_332_233 * RAY, "RWA012: Bad spot value after bump()");
 
         address urn = addr.addr("RWA012_A_URN");
         // Set this address to be operator
@@ -1629,9 +1635,6 @@ contract DssSpellTest is DssSpellTestBase {
         RwaUrnLike(urn).hope(address(this));  // become operator
         uint256 room = line - mul(Art, rate);
         uint256 drawAmt = room / RAY;
-        if (mul(_divup(mul(drawAmt, RAY), rate), rate) > room) {
-            drawAmt = sub(room, rate) / RAY;
-        }
 
         // execute draw
         RwaUrnLike(urn).draw(drawAmt - 1);
