@@ -1603,4 +1603,33 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(ink, lockAmount, "RWA015-A/bad-ink-after-spell"); // Whole unit of collateral is locked
     }
 
+    function test_RWA012_Update() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Get collateral's parameters
+        ( uint256 Art, uint256 rate, uint256 spot, uint256 line,) = vat.ilks("RWA012-A");
+        // Get the oracle address
+        (,address pip,,  ) = oracle.ilks("RWA012-A");
+        assertEq(uint256(DSValueAbstract(pip).read()), 97_332_233 * WAD, "RWA012: Bad PIP value after bump()");
+        assertEq(spot, 97_332_233 * RAY, "RWA007: Bad spot value after bump()");
+
+        address urn = addr.addr("RWA012_A_URN");
+        // Set this address to be operator
+        GodMode.setWard(address(urn), address(this), 1);
+        RwaUrnLike(urn).hope(address(this));  // become operator
+        uint256 room = line - _rmul(Art, rate);
+        uint256 drawAmt = _divup(room, RAY);
+        if (_rmul(_divup(_rmul(drawAmt, RAY), rate), rate) > room) {
+            drawAmt = (room - rate) / RAY;
+        }
+
+        // execute draw
+        RwaUrnLike(urn).draw(drawAmt - 1);
+        (Art, rate, ,line,) = vat.ilks("RWA012-A");
+        assertTrue(line - Art * rate < 2 * rate, "RWA012_A - Did not get close to the line");  // got very close to line
+    }
+
 }
+
