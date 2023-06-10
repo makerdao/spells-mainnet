@@ -132,8 +132,8 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RWA015_A_REG_CLASS_RWA = 3;
 
     // RWA Oracle Params
-    uint256 internal constant RWA015_A_INITIAL_PRICE = 2_500_000;
-    string  internal constant RWA015_A_DOC             = "QmdbPyQLDdGQhKGXBgod7TbQmrUJ7tiN9aX1zSL7bmtkTN";
+    uint256 internal constant RWA015_A_INITIAL_PRICE = 2_500_000 * WAD;
+    string  internal constant RWA015_A_DOC           = "QmdbPyQLDdGQhKGXBgod7TbQmrUJ7tiN9aX1zSL7bmtkTN";
     uint48  internal constant RWA015_A_TAU           = 0;
 
     // Remaining params
@@ -162,13 +162,7 @@ contract DssSpellAction is DssAction {
         bytes32 ilk = "RWA015-A";
 
         // Init the RwaLiquidationOracle
-        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
-            ilk,
-            // We are not using DssExecLib, so the precision has to be set explicitly
-            RWA015_A_INITIAL_PRICE * WAD,
-            RWA015_A_DOC,
-            RWA015_A_TAU
-        );
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(ilk, RWA015_A_INITIAL_PRICE, RWA015_A_DOC, RWA015_A_TAU);
         (, address pip, , ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
 
         // Init RWA015 in Vat
@@ -179,8 +173,9 @@ contract DssSpellAction is DssAction {
         // Allow RWA015 Join to modify Vat registry
         DssExecLib.authorize(MCD_VAT, MCD_JOIN_RWA015_A);
 
-        // 500m debt ceiling
         // Stability Fee is 0 for this ilk
+
+        // 2_500_000 debt ceiling
         DssExecLib.increaseIlkDebtCeiling(ilk, RWA015_A_LINE, /* _global = */ true);
 
         // Set price feed for RWA015
@@ -196,7 +191,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(MCD_JOIN_RWA015_A, RWA015_A_URN);
 
         // OPERATOR permission on URN
-        RwaUrnLike(RWA015_A_URN).hope(address(RWA015_A_OPERATOR));
+        RwaUrnLike(RWA015_A_URN).hope(RWA015_A_OPERATOR);
 
         // OPERATOR permission on RWA015_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).hope(RWA015_A_OPERATOR);
@@ -292,7 +287,7 @@ contract DssSpellAction is DssAction {
             DssExecLib.setIlkDebtCeiling("RWA012-A", 80 * MILLION);
 
             // Increase the price to enable DAI to be drawn -- value corresponds to
-            // [ (debt ceiling) + (2 years interest at current rate) ] * mat, i.e.
+            // Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio
             // 80M * 1.04^5 * 1.00 as a WAD
             RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
                 "RWA012-A",
