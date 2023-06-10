@@ -1699,7 +1699,7 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
             aL_enabled:   false,
