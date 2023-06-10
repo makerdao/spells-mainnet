@@ -389,12 +389,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert new ilk registry values tests here
         // RWA015
+        (, address pipRwa015,,) = oracle.ilks("RWA015-A");
+
         assertEq(reg.pos("RWA015-A"),    62);
         assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
         assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
         assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
         assertEq(reg.class("RWA015-A"),  3);
-        assertEq(reg.pip("RWA015-A"),    addr.addr("PIP_RWA015"));
+        assertEq(reg.pip("RWA015-A"),    pipRwa015);
         assertEq(reg.name("RWA015-A"),   "RWA015-A: BlockTower Andromeda");
         assertEq(reg.symbol("RWA015-A"), GemAbstract(addr.addr("RWA015")).symbol());
     }
@@ -423,7 +425,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    // leave public for now as this is acting like a config tests
+    // Leave this test public (for now) as this is acting like a config test
     function testPSMs() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1139,9 +1141,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(DSValueAbstract(pip).read(), bytes32(2_500_000 * WAD), "RWA015-A: Bad initial PIP value");
 
-        oracle.bump("RWA015-A", 1_280 * MILLION * WAD);
+        oracle.bump("RWA015-A", 12_500_000 * WAD);
 
-        assertEq(DSValueAbstract(pip).read(), bytes32(1_280 * MILLION * WAD), "RWA015-A: Bad PIP value after bump()");
+        assertEq(DSValueAbstract(pip).read(), bytes32(12_500_000 * WAD), "RWA015-A: Bad PIP value after bump()");
     }
 
     function testRWA015_INTEGRATION_TELL() public {
@@ -1239,10 +1241,10 @@ contract DssSpellTest is DssSpellTestBase {
         // 0 DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Dangling Dai in input conduit before draw()");
 
-        // Draw 500mm
+        // Draw entire balance up to line
         rwa015AUrn.draw(drawAmount);
 
-        // 500mm DAI in Output Conduit
+        // Line DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount, "RWA015-A: Dai drawn was not send to the recipient");
 
         (uint256 ink, uint256 art) = vat.urns("RWA015-A", address(rwa015AUrn));
@@ -1311,7 +1313,7 @@ contract DssSpellTest is DssSpellTestBase {
         // setting address(this) as operator
         vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-        // Draw 500m + 1
+        // Draw line + 1 DAI
         rwa015AUrn.draw(drawAmount);
     }
 
@@ -1320,12 +1322,12 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 drawAmount = 1_000 * WAD;
+        uint256 drawAmount = 2_500_000 * WAD;
 
         // setting address(this) as operator
         vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
 
-        // Draw 500mm
+        // Draw line DAI
         rwa015AUrn.draw(drawAmount);
 
         // auth
@@ -1361,10 +1363,10 @@ contract DssSpellTest is DssSpellTestBase {
         // 0 DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Dangling Dai in input conduit before draw()");
 
-        // Draw 500mm
+        // Draw line DAI
         rwa015AUrn.draw(drawAmount);
 
-        // 500mm DAI in Output Conduit
+        // entire balance up to line DAI in Output Conduit
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount, "RWA015-A: Dai drawn was not send to the recipient");
 
         (uint256 ink, uint256 art) = vat.urns("RWA015-A", address(rwa015AUrn));
@@ -1607,12 +1609,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(ink, lockAmount, "RWA015-A/bad-ink-after-spell"); // Whole unit of collateral is locked
     }
 
-    // TODO: cleanup below
     function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require(y == 0 || (z = x * y) / y == x);
-    }
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x - y) <= x);
     }
 
     function test_RWA012_Update() public {
