@@ -1467,6 +1467,7 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+        uint256 prevInputConduitUrnBalance = psmGem.balanceOf(address(rwa015AInputConduitUrn));
 
         uint256 drawAmount = 2_500_000 * WAD;
         // as we have SF 0 we need to pay exectly the same amount of DAI we have pushed
@@ -1482,12 +1483,12 @@ contract DssSpellTest is DssSpellTestBase {
         // transfer PSM GEM to input conduit
         vm.prank(RWA015_A_CUSTODY);
         psmGem.transfer(address(rwa015AInputConduitUrn), daiToPay / daiPsmGemDiffDecimals);
-        assertEq(psmGem.balanceOf(address(rwa015AInputConduitUrn)), daiToPay / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to input conduit");
+        assertEq(psmGem.balanceOf(address(rwa015AInputConduitUrn)), daiToPay / daiPsmGemDiffDecimals + prevInputConduitUrnBalance, "RWA015-A: Psm GEM not sent to input conduit");
 
         // input conduit 'push()' to the urn
         rwa015AInputConduitUrn.push();
 
-        assertEq(dai.balanceOf(address(rwa015AUrn)), daiToPay, "Balance of the URN doesnt match");
+        assertEq(dai.balanceOf(address(rwa015AUrn)), daiToPay + prevInputConduitUrnBalance * daiPsmGemDiffDecimals, "Balance of the URN doesnt match");
 
         // wards
         GodMode.setWard(address(rwa015AUrn), address(this), 1);
