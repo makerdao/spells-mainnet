@@ -142,8 +142,8 @@ contract DssSpellAction is DssAction {
     // -- RWA015 END --
 
     // -- MKR TRANSFERS --
-    address internal immutable SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
-    address internal immutable DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address internal constant SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
+    address internal constant DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
     function _updateDoc(bytes32 ilk, string memory doc) internal {
         ( , address pip, uint48 tau, ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
@@ -197,7 +197,7 @@ contract DssSpellAction is DssAction {
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).hope(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).mate(RWA015_A_OPERATOR);
         // Custody whitelist for output conduit destination address
-        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(address(RWA015_A_CUSTODY));
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY);
         // Set "quitTo" address for RWA015_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).file("quitTo", RWA015_A_URN);
 
