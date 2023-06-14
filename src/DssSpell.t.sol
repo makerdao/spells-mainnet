@@ -765,7 +765,7 @@ contract DssSpellTest is DssSpellTestBase {
         ];
 
         // Calculate and save previous balances
-        uint256 totalAmountToTransfer;
+        uint256 totalAmountToTransfer = 0; // Increment in the loop below
         uint256[] memory prevBalances = new uint256[](payees.length);
         uint256 prevMkrBalance       = gov.balanceOf(address(pauseProxy));
         for (uint256 i = 0; i < payees.length; i++) {

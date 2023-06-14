@@ -20,7 +20,6 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
-import "dss-interfaces/dapp/DSTokenAbstract.sol";
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
@@ -79,13 +78,6 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-06-14 MakerDAO Executive Spell | Hash: 0x8d9ac29d96cec17771f198f641e3c7148aa281d6f32b276edb50084c84ab098e";
 
-    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
-    address internal immutable REGISTRY = DssExecLib.reg();
-    address internal immutable MCD_JUG  = DssExecLib.jug();
-    address internal immutable MCD_SPOT = DssExecLib.spotter();
-    address internal immutable MCD_ESM  = DssExecLib.esm();
-    address internal immutable MCD_VAT  = DssExecLib.vat();
-
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return true;
@@ -113,10 +105,19 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD               = 10 ** 18;
     uint256 internal constant RAD               = 10 ** 45;
 
+    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    address internal immutable REGISTRY = DssExecLib.reg();
+    address internal immutable MCD_JUG  = DssExecLib.jug();
+    address internal immutable MCD_SPOT = DssExecLib.spotter();
+    address internal immutable MCD_ESM  = DssExecLib.esm();
+    address internal immutable MCD_VAT  = DssExecLib.vat();
+    GemLike internal immutable MKR      = GemLike(DssExecLib.mkr());
+
+
     // -- Spark Components --
     address internal constant SPARK_ACL_MANAGER = 0xdA135Cd78A086025BcdC87B038a1C462032b510C;
-    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x41D7c79aE5Ecba7428283F66998DedFD84451e0e;
+    address internal constant SPARK_PROXY       = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL       = 0x41D7c79aE5Ecba7428283F66998DedFD84451e0e;
 
     // -- RWA015 components --
     address internal constant RWA015                     = 0xf5E5E706EfC841BeD1D24460Cd04028075cDbfdE;
@@ -145,13 +146,12 @@ contract DssSpellAction is DssAction {
     // -- RWA015 END --
 
     // -- MKR TRANSFERS --
-    GemLike immutable MKR                       = GemLike(DssExecLib.mkr());
     address internal constant SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
     address internal constant DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
     function _updateDoc(bytes32 ilk, string memory doc) internal {
         ( , address pip, uint48 tau, ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
-        require(pip != address(0), "DssSpell/unexisting-rwa-ilk");
+        require(pip != address(0), "DssSpell/nonexistent-rwa-ilk");
 
         // Init the RwaLiquidationOracle to reset the doc
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
@@ -328,19 +328,19 @@ contract DssSpellAction is DssAction {
         DssExecLib.setDSR(THREE_PT_FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-A Stability Fee from 1.75% to 3.74%
-        DssExecLib.setIlkStabilityFee("ETH-A", THREE_PT_SEVEN_FOUR_PCT_RATE, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-A",    THREE_PT_SEVEN_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-B Stability Fee from 3.25% to 4.24%
-        DssExecLib.setIlkStabilityFee("ETH-B", FOUR_PT_TWO_FOUR_PCT_RATE, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-B",    FOUR_PT_TWO_FOUR_PCT_RATE,    /* doDrip = */ true);
 
         // Increase the ETH-C Stability Fee from 1.00% to 3.49%
-        DssExecLib.setIlkStabilityFee("ETH-C", THREE_PT_FOUR_NINE_PCT_RATE, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-C",    THREE_PT_FOUR_NINE_PCT_RATE,  /* doDrip = */ true);
 
         // Increase the WSTETH-A Stability Fee from 1.75% to 3.74%
         DssExecLib.setIlkStabilityFee("WSTETH-A", THREE_PT_SEVEN_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WSTETH-B Stability Fee from 1.00% to 3.49%
-        DssExecLib.setIlkStabilityFee("WSTETH-B", THREE_PT_FOUR_NINE_PCT_RATE, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WSTETH-B", THREE_PT_FOUR_NINE_PCT_RATE,  /* doDrip = */ true);
 
         // --- Spark Protocol Parameter Changes ---
         // D3M Parameter Adjustments Poll: https://vote.makerdao.com/polling/QmWatYqy#poll-detail
