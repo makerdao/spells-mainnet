@@ -352,7 +352,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(SPARK_PROXY, DssExecLib.esm());
         ACLManagerLike(SPARK_ACL_MANAGER).addPoolAdmin(SPARK_PROXY);
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
-        DssExecLib.setChangelogAddress("SUBPROXY_SPARK", SPARK_PROXY);
 
         // --- Non-Scope Defined Parameter Adjustments ---
         // Poll: https://vote.makerdao.com/polling/QmQXhS3Z#poll-detail

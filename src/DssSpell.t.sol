@@ -366,9 +366,6 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogKey("SUBPROXY_SPARK");
-
-
         // RWA015
         _checkChainlogKey("RWA015_A_JAR");
         _checkChainlogKey("RWA015");
