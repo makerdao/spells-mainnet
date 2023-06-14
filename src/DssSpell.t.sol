@@ -379,7 +379,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkChainlogVersion("1.14.13");
     }
 
-    function testNewIlkRegistryValues() private { // make private to disable
+    function testNewIlkRegistryValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -388,7 +388,7 @@ contract DssSpellTest is DssSpellTestBase {
         // RWA015
         (, address pipRwa015,,) = oracle.ilks("RWA015-A");
 
-        assertEq(reg.pos("RWA015-A"),    62);
+        assertEq(reg.pos("RWA015-A"),    63);
         assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
         assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
         assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
