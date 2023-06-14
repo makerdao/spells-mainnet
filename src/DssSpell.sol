@@ -383,6 +383,7 @@ contract DssSpellAction is DssAction {
         //   - https://forum.makerdao.com/t/project-andromeda-risk-legal-assessment/20969
         //   - https://forum.makerdao.com/t/rwa015-project-andromeda-technical-assessment/20974
         _onboardRWA015A();
+        DssExecLib.setChangelogVersion("1.14.13");
 
         // --- USDP PSM Debt Ceiling ---
         // Poll: https://vote.makerdao.com/polling/QmQYSLHH#poll-detail
@@ -393,8 +394,6 @@ contract DssSpellAction is DssAction {
         // https://github.com/makerdao/spells-goerli/pull/202#discussion_r1217131039
         DssExecLib.removeIlkFromAutoLine("PSM-PAX-A");
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
-
-        DssExecLib.setChangelogVersion("1.14.13");
     }
 }
 
