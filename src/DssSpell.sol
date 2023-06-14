@@ -71,9 +71,9 @@ interface RwaOutputConduitLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://github.com/makerdao/community/blob/78ca48d951e0b1a80d233497dbbb8a0ebd63749d/governance/votes/Executive%20vote%20-%20June%2014%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/78ca48d951e0b1a80d233497dbbb8a0ebd63749d/governance/votes/Executive%20vote%20-%20June%2014%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-06-07 MakerDAO Executive Spell | Hash: 0xbaa10bcd6a57e0ea8c979de1a97b9f2c36651f4ae88dc143f032b1c447966c59";
+        "2023-06-07 MakerDAO Executive Spell | Hash: 0xfc04cb79584d4541ccf1635f112991de995733143468afeb6bba99b8a678ea0d";
 
     address internal immutable MCD_GOV = DssExecLib.mkr();
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
