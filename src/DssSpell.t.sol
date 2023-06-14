@@ -1098,7 +1098,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.wards(address(esm)),    1, "OutputConduit/ward-esm-not-set");
         assertEq(rwa015AOutputConduit.can(pauseProxy),        0, "OutputConduit/pause-proxy-hoped");
         assertEq(rwa015AOutputConduit.can(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
-        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-not-mated");
+        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-mated");
         assertEq(rwa015AOutputConduit.may(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
         assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
 
