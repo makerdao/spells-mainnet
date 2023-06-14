@@ -21,6 +21,11 @@ import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/IlkRegistryAbstract.sol";
 import "dss-interfaces/ERC/GemAbstract.sol";
 import "dss-interfaces/dapp/DSTokenAbstract.sol";
+
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
+
 interface VatLike {
     function ilks(bytes32) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
 }
@@ -72,7 +77,6 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-06-07 MakerDAO Executive Spell | Hash: 0xfc04cb79584d4541ccf1635f112991de995733143468afeb6bba99b8a678ea0d";
 
-    address internal immutable MCD_GOV = DssExecLib.mkr();
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable REGISTRY = DssExecLib.reg();
     address internal immutable MCD_JUG  = DssExecLib.jug();
@@ -139,6 +143,7 @@ contract DssSpellAction is DssAction {
     // -- RWA015 END --
 
     // -- MKR TRANSFERS --
+    GemLike immutable MKR                       = GemLike(DssExecLib.mkr());
     address internal constant SIDESTREAM_WALLET = 0xb1f950a51516a697E103aaa69E152d839182f6Fe;
     address internal constant DUX_WALLET        = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
 
@@ -305,13 +310,13 @@ contract DssSpellAction is DssAction {
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP44#estimated-mkr-expenditure
 
-        DSTokenAbstract(MCD_GOV).transfer(SIDESTREAM_WALLET, 34828 * WAD / 100);
+        MKR.transfer(SIDESTREAM_WALLET, 34828 * WAD / 100);
 
         // DUX - 225.12 MKR - 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP27#total-mkr-expenditure-cap
 
-        DSTokenAbstract(MCD_GOV).transfer(DUX_WALLET, 22512 * WAD / 100);
+        MKR.transfer(DUX_WALLET, 22512 * WAD / 100);
 
         // --- Stability Scope Defined Parameter Adjustments ---
         // Poll: https://vote.makerdao.com/polling/QmaoGpAQ#poll-detail
