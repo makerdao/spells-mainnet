@@ -77,7 +77,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/78ca48d951e0b1a80d233497dbbb8a0ebd63749d/governance/votes/Executive%20vote%20-%20June%2014%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-06-07 MakerDAO Executive Spell | Hash: 0xfc04cb79584d4541ccf1635f112991de995733143468afeb6bba99b8a678ea0d";
+        "2023-06-14 MakerDAO Executive Spell | Hash: 0xfc04cb79584d4541ccf1635f112991de995733143468afeb6bba99b8a678ea0d";
 
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable REGISTRY = DssExecLib.reg();
@@ -312,13 +312,13 @@ contract DssSpellAction is DssAction {
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP44#estimated-mkr-expenditure
 
-        MKR.transfer(SIDESTREAM_WALLET, 34828 * WAD / 100);
+        MKR.transfer(SIDESTREAM_WALLET, 348.28 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // DUX - 225.12 MKR - 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
         // Poll: N/A
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP27#total-mkr-expenditure-cap
 
-        MKR.transfer(DUX_WALLET, 22512 * WAD / 100);
+        MKR.transfer(DUX_WALLET, 225.12 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // --- Stability Scope Defined Parameter Adjustments ---
         // Poll: https://vote.makerdao.com/polling/QmaoGpAQ#poll-detail
