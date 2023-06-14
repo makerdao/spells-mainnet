@@ -465,6 +465,6 @@ contract Addresses {
         addr["MCD_JOIN_GNO_A"]                  = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
         addr["MCD_CLIP_GNO_A"]                  = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
         addr["MCD_CLIP_CALC_GNO_A"]             = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
-        addr["SUBPROXY_SPARK"]                  = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+        addr["SPARK_PROXY"]                     = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     }
 }
