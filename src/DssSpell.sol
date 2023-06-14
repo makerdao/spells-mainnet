@@ -68,6 +68,8 @@ interface RwaOutputConduitLike {
     function mate(address usr) external;
     function hate(address usr) external;
     function kiss(address who) external;
+    function pick(address who) external;
+    function push() external;
 }
 
 contract DssSpellAction is DssAction {
