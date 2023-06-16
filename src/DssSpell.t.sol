@@ -361,20 +361,20 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // amke private to disable
+    function testNewChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // RWA015
-        // _checkChainlogKey("RWA015_A_JAR");
-        // _checkChainlogKey("RWA015");
-        // _checkChainlogKey("MCD_JOIN_RWA015_A");
-        // _checkChainlogKey("RWA015_A_URN");
-        // _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN");
-        // _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
-        // _checkChainlogKey("PIP_RWA015");
+        _checkChainlogKey("RWA015_A_JAR");
+        _checkChainlogKey("RWA015");
+        _checkChainlogKey("MCD_JOIN_RWA015_A");
+        _checkChainlogKey("RWA015_A_URN");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR");
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+        _checkChainlogKey("PIP_RWA015");
 
         _checkChainlogVersion("1.14.13");
     }
@@ -388,14 +388,14 @@ contract DssSpellTest is DssSpellTestBase {
         // RWA015
         // (, address pipRwa015,,) = oracle.ilks("RWA015-A");
 
-        // assertEq(reg.pos("RWA015-A"),    63);
-        // assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
-        // assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
-        // assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
-        // assertEq(reg.class("RWA015-A"),  3);
+        assertEq(reg.pos("RWA015-A"),    63);
+        assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
+        assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
+        assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
+        assertEq(reg.class("RWA015-A"),  3);
         // assertEq(reg.pip("RWA015-A"),    pipRwa015);
-        // assertEq(reg.name("RWA015-A"),   "RWA015-A: BlockTower Andromeda");
-        // assertEq(reg.symbol("RWA015-A"), GemAbstract(addr.addr("RWA015")).symbol());
+        assertEq(reg.name("RWA015-A"),   "RWA015-A: BlockTower Andromeda");
+        assertEq(reg.symbol("RWA015-A"), GemAbstract(addr.addr("RWA015")).symbol());
     }
 
     function testOSMs() private { // make private to disable
