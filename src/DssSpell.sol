@@ -29,6 +29,7 @@ contract DssSpellAction is DssAction {
     // ----- 2023-06-16 DAO Resolutions -----
     // Emergency Proposal: Out-of-Schedule Executive to Fortify Elasticity of On-chain 1:1 Liquidity of USDC
     // Forum: https://forum.makerdao.com/t/out-of-schedule-executive-to-fortify-elasticity-of-on-chain-1-1-liquidity-of-usdc/21168
+    // MIP:   https://mips.makerdao.com/mips/details/MIP24
 
     // Comma-separated list of DAO resolutions IPFS hashes.
     string public constant dao_resolutions = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
