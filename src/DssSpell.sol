@@ -22,9 +22,9 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/4b8f4ba042910b2fd8d27ccd06a15988ff23c113/governance/votes/Executive%20vote%20-%20June%2016%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-06-16 MakerDAO Executive Spell | Hash: TODO";
+        "2023-06-16 MakerDAO Executive Spell | Hash: 0xecdc5a5a1be69f23d299235ad966c82c7e03365e45aaed69ed1eb2f03daff4a6";
 
     // Comma-separated list of DAO resolutions.
     string public constant resolutions = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
