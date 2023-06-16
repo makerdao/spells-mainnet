@@ -26,8 +26,10 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-06-16 MakerDAO Executive Spell | Hash: 0xecdc5a5a1be69f23d299235ad966c82c7e03365e45aaed69ed1eb2f03daff4a6";
 
-    // Comma-separated list of DAO resolutions.
-    string public constant resolutions = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
+    // ----- 2023-06-16 DAO Resolutions -----
+    // Forum: https://forum.makerdao.com/t/out-of-schedule-executive-to-fortify-elasticity-of-on-chain-1-1-liquidity-of-usdc/21168
+    // Comma-separated list of DAO resolutions IPFS hashes.
+    string public constant dao_resolutions = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
