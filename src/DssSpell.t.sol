@@ -23,10 +23,6 @@ import {RootDomain} from "dss-test/domains/RootDomain.sol";
 import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
 import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
 
-interface JugLike {
-    function drip(bytes32 ilk) external returns (uint);
-}
-
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -38,106 +34,6 @@ interface L2Gateway {
 
 interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
-}
-
-interface ACLManagerLike {
-    function isPoolAdmin(address admin) external view returns (bool);
-}
-
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
-    function bump(bytes32 ilk, uint256 val) external;
-    function tell(bytes32) external;
-    function cure(bytes32) external;
-    function cull(bytes32, address) external;
-    function good(bytes32) external view returns (bool);
-}
-
-interface RwaUrnLike {
-    function vat() external view returns (address);
-    function jug() external view returns (address);
-    function daiJoin() external view returns (address);
-    function outputConduit() external view returns (address);
-    function wards(address) external view returns (uint256);
-    function hope(address) external;
-    function can(address) external view returns (uint256);
-    function gemJoin() external view returns (address);
-    function lock(uint256) external;
-    function draw(uint256) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
-}
-
-interface RwaOutputConduitLike {
-    function wards(address) external view returns (uint256);
-    function can(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function dai() external view returns (address);
-    function psm() external view returns (address);
-    function gem() external view returns (address);
-    function bud(address) external view returns (uint256);
-    function pick(address) external;
-    function push() external;
-    function push(uint256) external;
-    function quit() external;
-    function kiss(address) external;
-    function mate(address) external;
-    function hope(address) external;
-    function quitTo() external view returns (address);
-}
-
-interface RwaInputConduitLike {
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function psm() external view returns (address);
-    function to() external view returns (address);
-    function wards(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function quitTo() external view returns (address);
-    function mate(address) external;
-    function push() external;
-}
-
-interface RwaJarLike {
-    function chainlog() external view returns (address);
-    function dai() external view returns (address);
-    function daiJoin() external view returns (address);
-}
-
-interface PoolLike {
-    struct ReserveData {
-        //stores the reserve configuration
-        uint256 configuration;
-        //the liquidity index. Expressed in ray
-        uint128 liquidityIndex;
-        //the current supply rate. Expressed in ray
-        uint128 currentLiquidityRate;
-        //variable borrow index. Expressed in ray
-        uint128 variableBorrowIndex;
-        //the current variable borrow rate. Expressed in ray
-        uint128 currentVariableBorrowRate;
-        //the current stable borrow rate. Expressed in ray
-        uint128 currentStableBorrowRate;
-        //timestamp of last update
-        uint40 lastUpdateTimestamp;
-        //the id of the reserve. Represents the position in the list of the active reserves
-        uint16 id;
-        //aToken address
-        address aTokenAddress;
-        //stableDebtToken address
-        address stableDebtTokenAddress;
-        //variableDebtToken address
-        address variableDebtTokenAddress;
-        //address of the interest rate strategy
-        address interestRateStrategyAddress;
-        //the current treasury balance, scaled
-        uint128 accruedToTreasury;
-        //the outstanding unbacked aTokens minted through the bridging feature
-        uint128 unbacked;
-        //the outstanding debt borrowed against this asset in isolation mode
-        uint128 isolationModeTotalDebt;
-    }
-    function getReserveData(address asset) external view returns (ReserveData memory);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -385,17 +281,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        // RWA015
-        // (, address pipRwa015,,) = oracle.ilks("RWA015-A");
-
-        assertEq(reg.pos("RWA015-A"),    63);
-        assertEq(reg.join("RWA015-A"),   addr.addr("MCD_JOIN_RWA015_A"));
-        assertEq(reg.gem("RWA015-A"),    addr.addr("RWA015"));
-        assertEq(reg.dec("RWA015-A"),    GemAbstract(addr.addr("RWA015")).decimals());
-        assertEq(reg.class("RWA015-A"),  3);
-        // assertEq(reg.pip("RWA015-A"),    pipRwa015);
-        assertEq(reg.name("RWA015-A"),   "RWA015-A: BlockTower Andromeda");
-        assertEq(reg.symbol("RWA015-A"), GemAbstract(addr.addr("RWA015")).symbol());
+        checkIlkIntegration(
+             "TOKEN-X",
+             GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
+             ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
+             addr.addr("PIP_TOKEN"),
+             true,
+             true,
+             false
+        );
     }
 
     function testOSMs() private { // make private to disable
