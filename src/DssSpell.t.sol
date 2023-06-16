@@ -281,7 +281,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
-        checkIlkIntegration(
+        _checkIlkIntegration(
              "TOKEN-X",
              GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
              ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
