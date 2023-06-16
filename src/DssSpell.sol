@@ -78,6 +78,9 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-06-16 MakerDAO Executive Spell | Hash: TODO";
 
+    // Comma-separated list of DAO resolutions.
+    string public constant RESOLUTIONS = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
+
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return true;
