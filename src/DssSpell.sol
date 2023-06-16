@@ -83,7 +83,7 @@ contract DssSpellAction is DssAction {
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // Many of the settings that change weekly rely on the rate accumulator
