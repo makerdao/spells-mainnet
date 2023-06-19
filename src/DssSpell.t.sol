@@ -263,9 +263,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
-        assertEq(chainLog.getAddress("XXX"), addr.addr("XXX"));
+        _checkChainlogKey("XXX");
 
-        assertEq(chainLog.version(), "1.X.X");
+        _checkChainlogVersion("1.X.X");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
