@@ -77,15 +77,9 @@ contract Wallets {
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
-        addr["GELATO_PAYMENT_ADAPTER"]       = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
-        addr["GELATO_TREASURY"]              = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
         addr["KEEP3R_VEST_STREAMING"]        = 0x37b375e3D418fbECba6b283e704F840AB32f3b3C;
         addr["KEEP3R_VEST_STREAMING_LEGACY"] = 0xc6A048550C9553F8Ac20fbdeB06f114c27ECcabb;
-        addr["KEEP3R_PAYMENT_ADAPTER"]       = 0xaeFed819b6657B3960A8515863abe0529Dfc444A;
-        addr["KEEP3R_TREASURY"]              = 0x4DfC6DA2089b0dfCF04788b341197146Ea97f743;
         addr["CHAINLINK_AUTOMATION"]         = 0x5E9dfc5fe95A0754084fB235D58752274314924b;
-        addr["CHAINLINK_PAYMENT_ADAPTER"]    = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
-        addr["TECHOPS_VEST_STREAMING"]       = 0x5A6007d17302238D63aB21407FF600a67765f982;
 
         // ETH Amsterdam Event SPF
         addr["ETH_AMSTERDAM"]                = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
@@ -113,27 +107,5 @@ contract Wallets {
         addr["VIRIDIAN_TRANSFER"]            = 0xA1E62c6321eEd0ECFcF2f382c8c82FD940D83c07;
         addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
         addr["SIDESTREAM"]                   = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
-        addr["PULLUP_LABS"]                  = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
-
-        // Ecosystem Scope
-        addr["ECOSYSTEM_SCOPE_WALLET"]       = 0x6E51E0b5813152880C1389E3e860e69E06aD04D9;
-
-        // Vest Managers
-        addr["PULLUP_LABS_VEST_MGR"]         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
-
-        // Constitutional Delegates
-        addr["DEFENSOR"]                     = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
-        addr["BONAPUBLICA"]                  = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-        addr["GFXLABS_2"]                    = 0x9B68c14e936104e9a7a24c712BEecdc220002984;
-        addr["QGOV"]                         = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
-        addr["TRUENAME"]                     = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
-        addr["VIGILANT"]                     = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
-        addr["FLIPFLOPFLAP_2"]               = 0x3d9751EFd857662f2B007A881e05CfD1D7833484;
-        addr["PBG"]                          = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
-        addr["UPMAKER"]                      = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
-
-        // Protocol Engineering Scope
-        addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
-        addr["MULTICHAIN_ENGINEERING"]       = 0x868B44e8191A2574334deB8E7efA38910df941FA;
     }
 }

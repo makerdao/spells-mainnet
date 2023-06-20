@@ -1109,77 +1109,56 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 tinBps,
         uint256 toutBps
     ) internal {
-        uint256 tin  = tinBps  * WAD / 100_00;
-        uint256 tout = toutBps * WAD / 100_00;
+        uint256 tin = tinBps * WAD / 10000;
+        uint256 tout = toutBps * WAD / 10000;
         GemAbstract token = GemAbstract(join.gem());
 
-        // Check PIP is set (ilk exists)
         assertTrue(pip != address(0));
 
-        // Update price (poke spotter)
         spotter.poke(_ilk);
 
-        // Authorization (check wards)
-        assertEq(join.wards(pauseProxy),    1);
-        assertEq(join.wards(address(psm)),  1);
-        assertEq(psm.wards(pauseProxy),     1);
-        assertEq(vat.wards(address(join)),  1);
-        assertEq(clip.wards(address(end)),  1);
+        // Authorization
+        assertEq(join.wards(pauseProxy), 1);
+        assertEq(join.wards(address(psm)), 1);
+        assertEq(psm.wards(pauseProxy), 1);
+        assertEq(vat.wards(address(join)), 1);
+        assertEq(clip.wards(address(end)), 1);
 
-        // Check tin / tout values of PSM
-        assertEq(psm.tin(),  tin,  _concat("Incorrect-tin-",  _ilk));
+        // Check toll in/out
+        assertEq(psm.tin(), tin, _concat("Incorrect-tin-", _ilk));
         assertEq(psm.tout(), tout, _concat("Incorrect-tout-", _ilk));
 
-        // Arbitrary amount of TOKEN to test PSM sellGem and buyGem with (in whole units)
-        // `amount` is the amount of _TOKEN_ we are selling/buying (NOT measured in Dai)
-        uint256 amount = 100_000;
-        // Amount should be more than 10,000 as `tin` and `tout` are basis point measurements
-        require(amount >= 10_000, "checkPsmIlkIntegration/amount-too-low-for-precision-checks");
-
-        // Increase line where necessary to allow for coverage for both `buyGem` and `sellGem`
+        // Increase ilk line to allow psm sell even if it is maxed out
         {
-            // Get the Art (current debt) and line (debt ceiling) for this PSM
-            (uint256 Art ,,, uint256 line,) = vat.ilks(_ilk);
-            // Normalize values to whole units so we can compare them
-            Art  = Art  / WAD; // `rate` is 1 * RAY for all PSMs
-            line = line / RAD;
-
-            // If not enough room below line (e.g. Maxed out PSM)
-            if(Art + amount > line){
-                _setIlkLine(_ilk, (Art + amount + 1) * RAD); // Increase `line` to `Art`+`amount`
-            }
+            (,,, uint256 line,) = vat.ilks(_ilk);
+            _setIlkLine(_ilk, line + 1000 * RAD);
         }
 
-        // Scale up `amount` to the correct Gem decimals value (buyGem and sellGem both use Gem decimals for precision)
-        amount = amount * (10 ** uint256(token.decimals()));
+        uint256 amount = 1000 * (10 ** uint256(token.decimals()));
         _giveTokens(address(token), amount);
 
         // Approvals
         token.approve(address(join), amount);
         dai.approve(address(psm), type(uint256).max);
 
-        // Sell TOKEN _to_ the PSM for DAI (increases debt)
+        // Convert all TOKEN to DAI
         psm.sellGem(address(this), amount);
+        amount = amount * (10 ** (18 - uint256(token.decimals()))); // scale to 18 decimals
+        amount -= amount * tin / WAD;
 
-        amount  =   amount * (10 ** (18 - uint256(token.decimals())));  // Scale to Dai decimals (18) for Dai balance check
-        amount -=   amount * tin / WAD;                                 // Subtract `tin` fee (was deducted by PSM)
+        assertEq(token.balanceOf(address(this)), 0, _concat("PSM.sellGem-token-balance-", _ilk));
+        assertEq(dai.balanceOf(address(this)), amount, _concat("PSM.sellGem-dai-balance-", _ilk));
 
-        assertEq(token.balanceOf(address(this)),    0,  _concat("PSM.sellGem-token-balance-",   _ilk));
-        assertEq(dai.balanceOf(address(this)),  amount, _concat("PSM.sellGem-dai-balance-",     _ilk));
+        // Convert all DAI to TOKEN (Do not do this if the amount is 0)
+        if (amount > 0) {
+            amount -= _divup(amount * tout, WAD);
+            amount = amount / (10 ** (18 - uint256(token.decimals()))); // scale back to token decimals
 
-        // For `sellGem` we had `amount` TOKENS, so there is no issue calling it
-        // For `buyGem` we have `amount` Dai, but `buyGem` takes `gemAmt` as TOKENS
-        // So we need to calculate the `gemAmt` of TOKEN we want to buy (i.e. subtract `tout` in advance)
-        amount -=   _divup(amount * tout, WAD);                         // Subtract `tout` fee (i.e. convert to `gemAmt`)
-        amount  =   amount / (10 ** (18 - uint256(token.decimals())));  // Scale to Gem decimals for `buyGem()`
-
-        // Buy TOKEN _from_ the PSM for DAI (decreases debt)
-        psm.buyGem(address(this), amount);
-
-        // There may be some Dai dust left over depending on tout and decimals
-        // This should always be less than some dust limit
-        assertTrue(dai.balanceOf(address(this)) < 1 * WAD); // TODO lower this
-        assertEq(token.balanceOf(address(this)), amount, _concat("PSM.buyGem-token-balance-", _ilk));
+            psm.buyGem(address(this), amount);
+            // There may be some Dai dust left over depending on tout and decimals
+            assertTrue(dai.balanceOf(address(this)) < WAD, _concat("PSM.buyGem-dai-balance-", _ilk));
+            assertEq(token.balanceOf(address(this)), amount, _concat("PSM.buyGem-token-balance-", _ilk));
+        }
 
         // Dump all dai for next run
         dai.transfer(address(0x0), dai.balanceOf(address(this)));

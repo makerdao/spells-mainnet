@@ -96,17 +96,17 @@ contract Config {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
         address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x9E16c8B4C998604471EA0e63ECBb6d6d30F07fA0);
+        prevSpells[0] = address(0xB70254F2C2C342fB3B168cDa1E43db1E43Ab8DE1);
 
         //
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x34c9Be51d7a1ff4Db77Abf48A73601e4B50A4645),         // populate with deployed spell if deployed
-            deployed_spell_created:         1686948227,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           17494849,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:                 address(0x9E16c8B4C998604471EA0e63ECBb6d6d30F07fA0),         // populate with deployed spell if deployed
+            deployed_spell_created:         1686768575,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           17480061,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:                prevSpells,         // older spells to ensure are executed first
-            office_hours_enabled:           false,               // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 

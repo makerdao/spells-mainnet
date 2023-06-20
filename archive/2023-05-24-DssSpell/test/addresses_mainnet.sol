@@ -395,16 +395,6 @@ contract Addresses {
         addr["RWA014_A_OUTPUT_CONDUIT"]         = 0xD7cBDFdE553DE2063caAfBF230Be135e5DbB5064;
         addr["RWA014_A_OPERATOR"]               = 0x3064D13712338Ee0E092b66Afb3B054F0b7779CB;
         addr["RWA014_A_COINBASE_CUSTODY"]       = 0x2E5F1f08EBC01d6136c95a40e19D4c64C0be772c;
-        addr["RWA015"]                          = 0xf5E5E706EfC841BeD1D24460Cd04028075cDbfdE;
-        addr["PIP_RWA015"]                      = 0xDa28e04514E718271b37c9F36fbaf45b4BF42dF4;
-        addr["MCD_JOIN_RWA015_A"]               = 0x8938988f7B368f74bEBdd3dcd8D6A3bd18C15C0b;
-        addr["RWA015_A_URN"]                    = 0xebFDaa143827FD0fc9C6637c3604B75Bbcfb7284;
-        addr["RWA015_A_JAR"]                    = 0xc27C3D3130563C1171feCC4F76C217Db603997cf;
-        addr["RWA015_A_INPUT_CONDUIT_URN"]      = 0xe08cb5E24862eA86328295D5E5c08972203C20D8;
-        addr["RWA015_A_INPUT_CONDUIT_JAR"]      = 0xB9373C557f3aE8cDdD068c1644ED226CfB18A997;
-        addr["RWA015_A_OUTPUT_CONDUIT"]         = 0xC35E60736ec2E3de612535dba2dFB1f4130C82c3;
-        addr["RWA015_A_OPERATOR"]               = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
-        addr["RWA015_A_CUSTODY"]                = 0x65729807485F6f7695AF863d97D62140B7d69d83;
         addr["GUNIV3DAIUSDC1"]                  = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
         addr["PIP_GUNIV3DAIUSDC1"]              = 0x7F6d78CC0040c87943a0e0c140De3F77a273bd58;
         addr["MCD_JOIN_GUNIV3DAIUSDC1_A"]       = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;
@@ -465,6 +455,5 @@ contract Addresses {
         addr["MCD_JOIN_GNO_A"]                  = 0x7bD3f01e24E0f0838788bC8f573CEA43A80CaBB5;
         addr["MCD_CLIP_GNO_A"]                  = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
         addr["MCD_CLIP_CALC_GNO_A"]             = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
-        addr["SPARK_PROXY"]                     = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     }
 }

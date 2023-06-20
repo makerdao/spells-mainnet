@@ -77,15 +77,9 @@ contract Wallets {
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
-        addr["GELATO_PAYMENT_ADAPTER"]       = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
-        addr["GELATO_TREASURY"]              = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
         addr["KEEP3R_VEST_STREAMING"]        = 0x37b375e3D418fbECba6b283e704F840AB32f3b3C;
         addr["KEEP3R_VEST_STREAMING_LEGACY"] = 0xc6A048550C9553F8Ac20fbdeB06f114c27ECcabb;
-        addr["KEEP3R_PAYMENT_ADAPTER"]       = 0xaeFed819b6657B3960A8515863abe0529Dfc444A;
-        addr["KEEP3R_TREASURY"]              = 0x4DfC6DA2089b0dfCF04788b341197146Ea97f743;
         addr["CHAINLINK_AUTOMATION"]         = 0x5E9dfc5fe95A0754084fB235D58752274314924b;
-        addr["CHAINLINK_PAYMENT_ADAPTER"]    = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
-        addr["TECHOPS_VEST_STREAMING"]       = 0x5A6007d17302238D63aB21407FF600a67765f982;
 
         // ETH Amsterdam Event SPF
         addr["ETH_AMSTERDAM"]                = 0xF34ac684BA2734039772f0C0d77bc2545e819212;
@@ -114,9 +108,6 @@ contract Wallets {
         addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
         addr["SIDESTREAM"]                   = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
         addr["PULLUP_LABS"]                  = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
-
-        // Ecosystem Scope
-        addr["ECOSYSTEM_SCOPE_WALLET"]       = 0x6E51E0b5813152880C1389E3e860e69E06aD04D9;
 
         // Vest Managers
         addr["PULLUP_LABS_VEST_MGR"]         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
