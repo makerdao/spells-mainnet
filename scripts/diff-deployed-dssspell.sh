@@ -2,12 +2,7 @@
 
 set -e
 
-if ! command -v jq &> /dev/null
-then
-    echo '`jq` command could not be found. Please install it: https://github.com/stedolan/jq'
-    exit
-fi
-
+command -v jq &> /dev/null || { echo '`jq` command could not be found. Please install it: https://github.com/stedolan/jq'; exit 1; }
 [[ "$ETHERSCAN_API_KEY" ]] || { echo -e "Please set ETHERSCAN_API_KEY"; exit 1; }
 
 if [[ "$1" =~  ^0x[0-9a-fA-F]{40}$ ]]; then
