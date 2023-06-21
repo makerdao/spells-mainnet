@@ -24,15 +24,12 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/4b8f4ba042910b2fd8d27ccd06a15988ff23c113/governance/votes/Executive%20vote%20-%20June%2016%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-06-16 MakerDAO Executive Spell | Hash: 0xecdc5a5a1be69f23d299235ad966c82c7e03365e45aaed69ed1eb2f03daff4a6";
+        "2023-06-28 MakerDAO Executive Spell | Hash: TODO";
 
     // ----- 2023-06-16 DAO Resolutions -----
     // Emergency Proposal: Out-of-Schedule Executive to Fortify Elasticity of On-chain 1:1 Liquidity of USDC
     // Forum: https://forum.makerdao.com/t/out-of-schedule-executive-to-fortify-elasticity-of-on-chain-1-1-liquidity-of-usdc/21168
     // MIP:   https://mips.makerdao.com/mips/details/MIP24
-
-    // Comma-separated list of DAO resolutions IPFS hashes.
-    string public constant dao_resolutions = "QmYPbYoPjrSzBu5gt9tip78siG1gFvY8K4HTkHEFJgMmM8";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -51,7 +48,6 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE      = ;
 
     function actions() public override {
-
     }
 }
 
