@@ -36,6 +36,29 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
+}
+
+interface RwaUrnLike {
+    function outputConduit() external view returns (address);
+}
+
+interface RwaOutputConduitLike {
+    function wards(address) external view returns (uint256);
+    function can(address) external view returns (uint256);
+    function may(address) external view returns (uint256);
+    function dai() external view returns (address);
+    function psm() external view returns (address);
+    function gem() external view returns (address);
+    function bud(address) external view returns (uint256);
+    function quitTo() external view returns (address);
+}
+
+interface NetworkPaymentAdapterLike {
+    function treasury() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -262,7 +285,9 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogVersion("1.14.13");
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+
+        _checkChainlogVersion("1.14.14");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -343,7 +368,7 @@ contract DssSpellTest is DssSpellTestBase {
             addr.addr("PIP_GUSD"),
             PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
             0,  // tin
-            1    // tout
+            0    // tout
         );
 
         // USDP
@@ -877,6 +902,67 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
+    }
+
+    function testChainLinkPaymentAdapterTreasury() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        require(NetworkPaymentAdapterLike(wallets.addr("CHAINLINK_PAYMENT_ADAPTER")).treasury() == wallets.addr("CHAINLINK_TREASURY"), "ChainLink/incorrect-treasury");
+    }
+
+    string OLD_RWA007_DOC      = "QmejL1CKKN5vCwp9QD1gebnnAM2MJSt9XbF64uy4ptkJtR";
+    string NEW_RWA007_DOC      = "QmY185L4tuxFkpSQ33cPHUHSNpwy8V6TMXbXvtVraxXtb5";
+
+    function testRWA007DocChange() public {
+        _checkRWADocUpdate("RWA007-A", OLD_RWA007_DOC, NEW_RWA007_DOC);
+    }
+
+    // RWA tests
+
+    address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
+    address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
+
+    RwaUrnLike               rwa015AUrn             = RwaUrnLike(addr.addr("RWA015_A_URN"));
+    RwaOutputConduitLike     rwa015AOutputConduit   = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
+    RwaLiquidationOracleLike oracle                 = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+
+    function testRWA015_OUTPUT_CONDUIT_DEPLOYMENT_SETUP() public {
+        assertEq(rwa015AOutputConduit.dai(), addr.addr("MCD_DAI"),       "output-conduit-dai-not-match");
+        assertEq(rwa015AOutputConduit.gem(), addr.addr("PAXUSD"),        "output-conduit-gem-not-match");
+        assertEq(rwa015AOutputConduit.psm(), addr.addr("MCD_PSM_PAX_A"), "output-conduit-psm-not-match");
+    }
+
+    function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(rwa015AUrn.outputConduit(), address(rwa015AOutputConduit), "RwaUrn/urn-outputconduit-not-match");
+
+        assertEq(rwa015AOutputConduit.wards(pauseProxy),      1, "OutputConduit/ward-pause-proxy-not-set");
+        assertEq(rwa015AOutputConduit.wards(address(esm)),    1, "OutputConduit/ward-esm-not-set");
+        assertEq(rwa015AOutputConduit.can(pauseProxy),        0, "OutputConduit/pause-proxy-hoped");
+        assertEq(rwa015AOutputConduit.can(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
+        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-not-mated");
+        assertEq(rwa015AOutputConduit.may(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
+        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
+
+        assertEq(rwa015AOutputConduit.quitTo(), address(rwa015AUrn), "OutputConduit/quit-to-not-urn");
+    }
+
+    function test_RWA015_ORACLE_PRICE_BUMP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Get collateral's parameters
+        (,, uint256 spot,,) = vat.ilks("RWA015-A");
+        // Get the oracle address
+        (,address pip,,  ) = oracle.ilks("RWA015-A");
+        assertEq(uint256(DSValueAbstract(pip).read()), 1_280_000_000 * WAD, "RWA015: Bad PIP value after bump()");
+        assertEq(spot, 1_280_000_000 * RAY, "RWA015: Bad spot value after bump()");  // got very close to line
     }
 }
 
