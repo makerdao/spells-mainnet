@@ -513,7 +513,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -521,7 +521,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("ECOSYSTEM_SCOPE_WALLET"), 100_000)
+            Payee(wallets.addr("BLOCKTOWER_WALLET_2"), 133_466)
         ];
 
         uint256 prevBalance;
@@ -663,14 +663,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(gov.balanceOf(wallets.addr("PULLUP_LABS")), prevBalance1 + 4_000 ether);
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[2] memory payees = [
-            Payee(wallets.addr("SIDESTREAM_WALLET"), 348.28 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DUX_WALLET"),        225.12 ether) // note: ether is a keyword helper, only MKR is transferred here
+        Payee[3] memory payees = [
+            Payee(wallets.addr("ORA_WALLET"),       297.3 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RISK_WALLET_VEST"), 175 ether),   // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SES_WALLET"),       10.3 ether)   // note: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
@@ -945,7 +946,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.wards(address(esm)),    1, "OutputConduit/ward-esm-not-set");
         assertEq(rwa015AOutputConduit.can(pauseProxy),        0, "OutputConduit/pause-proxy-hoped");
         assertEq(rwa015AOutputConduit.can(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
-        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-not-mated");
+        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-mated");
         assertEq(rwa015AOutputConduit.may(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
         assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
 

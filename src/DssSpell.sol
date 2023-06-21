@@ -40,6 +40,10 @@ interface NetworkPaymentAdapterLike {
     function file(bytes32 what, address data) external;
 }
 
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -51,6 +55,8 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PSM_GUSD_A           = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
     address internal immutable RWA015_A_URN             = DssExecLib.getChangelogAddress("RWA015_A_URN");
     address internal immutable MCD_ESM                  = DssExecLib.esm();
+    GemLike internal immutable MKR                      = GemLike(DssExecLib.mkr());
+
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -71,6 +77,8 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+    // -- RWA015 components --
+
     // Operator address
     address internal constant RWA015_A_OPERATOR          = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
     // Custody address
@@ -78,8 +86,19 @@ contract DssSpellAction is DssAction {
     // PAXUSD Swap Output Conduit
     address internal constant RWA015_A_OUTPUT_CONDUIT    = 0x1a976926bF6105Ff6dA1F7b1667bBe825974961E;
 
+    // -- RWA015 END --
+    
+    // -- ChainLink Keeper Network addresses --
     address internal constant CHAINLINK_PAYMENT_ADAPTER  = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
     address internal constant CHAINLINK_TREASURY         = 0xaBAbd5e7d6d05672391aB2A914F57ce343D5CFA6;
+
+    // -- MKR TRANSFERS --
+    address internal constant ORA_WALLET                 = 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf;
+    address internal constant RISK_WALLET_VEST           = 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c;
+    address internal constant SES_WALLET                 = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+
+    // -- DAI TRANSFERS --
+    address internal constant BLOCKTOWER_WALLET          = 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767;
 
     // Function from https://github.com/makerdao/spells-goerli/blob/7d783931a6799fe8278e416b5ac60d4bb9c20047/archive/2022-11-14-DssSpell/Goerli-DssSpell.sol#L59
     function _updateDoc(bytes32 ilk, string memory doc) internal {
@@ -104,6 +123,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("RWA015-A", 1_280 * MILLION, 50 * MILLION, 24 hours);
 
         // Bump Oracle Price to 1.28 billion DAI
+        // Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio
+        // As we have SF 0 for this deal, this should be equeal to ilk DC
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
                 "RWA015-A",
                  1_280 * MILLION * WAD
@@ -129,6 +150,39 @@ contract DssSpellAction is DssAction {
 
         DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT", RWA015_A_OUTPUT_CONDUIT);
 
+        // --- CU MKR Vesting Transfers ---
+        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP75#mkr-vesting
+        // ORA-001 - 297.3 MKR - 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf
+
+        MKR.transfer(ORA_WALLET, 297.3 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+        // --- CU MKR Vesting Transfers ---
+        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP25#mkr-vesting-schedule
+        // RISK-001 - 175 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
+
+        MKR.transfer(RISK_WALLET_VEST, 175 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+        // --- CU MKR Vesting Transfers ---
+        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP17
+        // SES-001 - 10.3 MKR - 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
+
+        MKR.transfer(SES_WALLET, 10.3 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+        // --- RWA007 doc parameter update ---
+        // Forum: https://forum.makerdao.com/t/consolidated-action-items-for-2023-06-28-executive/21187
+
+        _updateDoc("RWA007-A", "QmY185L4tuxFkpSQ33cPHUHSNpwy8V6TMXbXvtVraxXtb5");
+
+        // --- Delegate Compensation for May (including offboarded Delegates) ---
+        // Forum: TBD
+        
+        // --- Add Chainlink Keeper Network Treasury Address ---
+        // Forum: https://forum.makerdao.com/t/poll-notice-keeper-network-follow-up-updates/21056
+        // Forum: https://forum.makerdao.com/t/consolidated-action-items-for-2023-06-28-executive/21187
+        // Poll: https://vote.makerdao.com/polling/QmZZJcCj#vote-breakdown
+
+        NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).file("treasury", CHAINLINK_TREASURY);
+
         // --- GUSD PSM Parameter Changes ---
         // Poll: https://vote.makerdao.com/polling/QmaXg3JT#vote-breakdown
 
@@ -137,42 +191,12 @@ contract DssSpellAction is DssAction {
         // Reduce the tout by 0.01% from 0.01% to 0%.
         DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 0);
 
-
-        // --- RWA007 doc parameter update ---
-        // Forum: TODO: https://forum.makerdao.com/t/consolidated-action-items-for-2023-06-28-executive/21187
-
-        _updateDoc("RWA007-A", "QmY185L4tuxFkpSQ33cPHUHSNpwy8V6TMXbXvtVraxXtb5");
-
-        // --- Add Chainlink Keeper Network Treasury Address ---
-        // Forum: https://forum.makerdao.com/t/poll-notice-keeper-network-follow-up-updates/21056
-        // Forum: https://forum.makerdao.com/t/consolidated-action-items-for-2023-06-28-executive/21187
-        // Poll: https://vote.makerdao.com/polling/QmZZJcCj#vote-breakdown
-
-        NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).file("treasury", CHAINLINK_TREASURY);
-
-        // Skip for Goerli
-        // --- CU MKR Vesting Transfers ---
-        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP75#mkr-vesting        
-        // ORA-001 - 297.3 MKR - 0x2d09B7b95f3F312ba6dDfB77bA6971786c5b50Cf
-
-        // Skip for Goerli
-        // --- CU MKR Vesting Transfers ---
-        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP25#mkr-vesting-schedule
-        // RISK-001 - 175 MKR - 0x5d67d5B1fC7EF4bfF31967bE2D2d7b9323c1521c
-
-        // Skip for Goerli
-        // --- CU MKR Vesting Transfers ---
-        // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP17
-        // SES-001 - 10.3 MKR - 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6
-
-        // Skip for Goerli
-        // --- Delegate Compensation for May (including offboarded Delegates) ---
-        // Forum: TBD
-
-        // Skip for Goerli
         // --- BlockTower Legal Expenses DAI Transfer ---
         // Forum: https://forum.makerdao.com/t/project-andromeda-legal-expenses/20984
         // MIP: https://mips.makerdao.com/mips/details/MIP104#5-2-legal-recourse-asset-budget
+
+        // BlockTower Legal Expenses - 133,466 DAI - 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER_WALLET, 133_466);
 
         DssExecLib.setChangelogVersion("1.14.14");
     }

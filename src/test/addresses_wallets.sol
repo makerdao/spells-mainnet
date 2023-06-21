@@ -101,6 +101,7 @@ contract Wallets {
         addr["BIBTA_WALLET"]                 = 0x173d85CD1754daD73cfc673944D9C8BF11A01D3F;
         addr["MIP65_WALLET"]                 = 0x29408abeCe474C85a12ce15B05efBB6A1e8587fe;
         addr["BLOCKTOWER_WALLET"]            = 0x117786ad59BC2f13cf25B2359eAa521acB0aDCD9;
+        addr["BLOCKTOWER_WALLET_2"]          = 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767;
 
         // Responsible Facilitators
         addr["GOV_ALPHA"]                    = 0x01D26f8c5cC009868A4BF66E268c17B057fF7A73;
