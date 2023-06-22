@@ -188,7 +188,7 @@ contract DssSpellAction is DssAction {
         _updateDoc("RWA007-A", "QmY185L4tuxFkpSQ33cPHUHSNpwy8V6TMXbXvtVraxXtb5");
 
         // --- Delegate Compensation for May (including offboarded Delegates) ---
-        // Forum: TBD
+        // Forum: https://forum.makerdao.com/t/aligned-delegate-compensation-for-may-2023/21197
         
         // vigilant - 29.76 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
         MKR.transfer(VIGILANT_WALLET,         29.76 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
