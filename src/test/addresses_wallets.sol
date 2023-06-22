@@ -133,6 +133,9 @@ contract Wallets {
         addr["FLIPFLOPFLAP_2"]               = 0x3d9751EFd857662f2B007A881e05CfD1D7833484;
         addr["PBG"]                          = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
         addr["UPMAKER"]                      = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+        addr["WBC"]                          = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+        addr["LIBERTAS"]                     = 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f;
+        addr["BANDHAR"]                      = 0xE83B6a503A94a5b764CCF00667689B3a522ABc21;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
