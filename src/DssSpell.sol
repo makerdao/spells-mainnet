@@ -47,9 +47,9 @@ interface GemLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/4b8f4ba042910b2fd8d27ccd06a15988ff23c113/governance/votes/Executive%20vote%20-%20June%2016%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/e4bf988dd35f82e2828e1ce02c6762ddd398ff92/governance/votes/Executive%20vote%20-%20June%2028%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-06-28 MakerDAO Executive Spell | Hash: TODO";
+        "2023-06-28 MakerDAO Executive Spell | Hash: 0x79a176bb631e7877acbdca1253e29354aa8fd4e3276dfd503fb3cd43f07d4fcd";
 
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable MCD_PSM_GUSD_A           = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
