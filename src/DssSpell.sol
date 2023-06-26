@@ -51,17 +51,12 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-06-28 MakerDAO Executive Spell | Hash: 0x79a176bb631e7877acbdca1253e29354aa8fd4e3276dfd503fb3cd43f07d4fcd";
 
-    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
-    address internal immutable MCD_PSM_GUSD_A           = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
-    address internal immutable RWA015_A_URN             = DssExecLib.getChangelogAddress("RWA015_A_URN");
-    address internal immutable MCD_ESM                  = DssExecLib.esm();
-    GemLike internal immutable MKR                      = GemLike(DssExecLib.mkr());
-
-
-    // Set office hours according to the summary
-    function officeHours() public pure override returns (bool) {
-        return true;
-    }
+    address internal immutable MIP21_LIQUIDATION_ORACLE       = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    address internal immutable MCD_PSM_GUSD_A                 = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+    address internal immutable RWA015_A_URN                   = DssExecLib.getChangelogAddress("RWA015_A_URN");
+    address internal immutable RWA015_A_OUTPUT_CONDUIT_LEGACY = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal immutable MCD_ESM                        = DssExecLib.esm();
+    GemLike internal immutable MKR                            = GemLike(DssExecLib.mkr());
 
     uint256 internal constant MILLION           = 10 ** 6;
     uint256 internal constant WAD               = 10 ** 18;
@@ -83,7 +78,7 @@ contract DssSpellAction is DssAction {
     address internal constant RWA015_A_OPERATOR          = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
     // Custody address
     address internal constant RWA015_A_CUSTODY           = 0x65729807485F6f7695AF863d97D62140B7d69d83;
-    // PAXUSD Swap Output Conduit
+    // USDP Swap Output Conduit
     address internal constant RWA015_A_OUTPUT_CONDUIT    = 0x1a976926bF6105Ff6dA1F7b1667bBe825974961E;
 
     // -- RWA015 END --
@@ -138,7 +133,7 @@ contract DssSpellAction is DssAction {
 
         // Bump Oracle Price to 1.28 billion DAI
         // Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio
-        // As we have SF 0 for this deal, this should be equeal to ilk DC
+        // As we have SF 0 for this deal, this should be equal to ilk DC
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
                 "RWA015-A",
                  1_280 * MILLION * WAD
@@ -153,7 +148,7 @@ contract DssSpellAction is DssAction {
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).hope(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).mate(RWA015_A_OPERATOR);
         // Custody whitelist for output conduit destination address
-        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(address(RWA015_A_CUSTODY));
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY);
         // Set "quitTo" address for RWA015_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).file("quitTo", RWA015_A_URN);
         // Route URN to new conduit
@@ -163,6 +158,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(RWA015_A_OUTPUT_CONDUIT, MCD_ESM);
 
         DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT", RWA015_A_OUTPUT_CONDUIT);
+        // Add Legacy Conduit to Changelog
+        DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY", RWA015_A_OUTPUT_CONDUIT_LEGACY);
 
         // --- CU MKR Vesting Transfers ---
         // Forum: https://mips.makerdao.com/mips/details/MIP40c3SP75#mkr-vesting
@@ -243,7 +240,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmaXg3JT#vote-breakdown
 
         // Reduce the line by 390 million DAI from 500 million DAI to 110 million DAI.
-        DssExecLib.setIlkAutoLineParameters("PSM-GUSD-A", 110 * MILLION, 50 * MILLION, 24 hours);
+        DssExecLib.setIlkAutoLineDebtCeiling("PSM-GUSD-A", 110 * MILLION);
         // Reduce the tout by 0.01% from 0.01% to 0%.
         DssExecLib.setValue(MCD_PSM_GUSD_A, "tout", 0);
 

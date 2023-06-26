@@ -41,7 +41,11 @@ interface RwaLiquidationOracleLike {
 }
 
 interface RwaUrnLike {
+    function can(address) external view returns (uint256);
     function outputConduit() external view returns (address);
+    function draw(uint256) external;
+    function wipe(uint256) external;
+    function free(uint256) external;
 }
 
 interface RwaOutputConduitLike {
@@ -53,6 +57,13 @@ interface RwaOutputConduitLike {
     function gem() external view returns (address);
     function bud(address) external view returns (uint256);
     function quitTo() external view returns (address);
+    function pick(address) external;
+    function kiss(address) external;
+    function mate(address) external;
+    function hope(address) external;
+    function push() external;
+    function push(uint256) external;
+    function quit() external;
 }
 
 interface NetworkPaymentAdapterLike {
@@ -286,6 +297,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT_LEGACY");
 
         _checkChainlogVersion("1.14.14");
     }
@@ -942,6 +954,9 @@ contract DssSpellTest is DssSpellTestBase {
     RwaUrnLike               rwa015AUrn             = RwaUrnLike(addr.addr("RWA015_A_URN"));
     RwaOutputConduitLike     rwa015AOutputConduit   = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
     RwaLiquidationOracleLike oracle                 = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    GemAbstract              psmGem                 = GemAbstract(rwa015AOutputConduit.gem());
+
+    uint256 daiPsmGemDiffDecimals                   = 10 ** (dai.decimals() - psmGem.decimals());
 
     function testRWA015_OUTPUT_CONDUIT_DEPLOYMENT_SETUP() public {
         assertEq(rwa015AOutputConduit.dai(), addr.addr("MCD_DAI"),       "output-conduit-dai-not-match");
@@ -965,6 +980,78 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
 
         assertEq(rwa015AOutputConduit.quitTo(), address(rwa015AUrn), "OutputConduit/quit-to-not-urn");
+    }
+
+    function testRWA015_OPERATOR_DRAW_CONDUIT_PUSH() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 1_000_000 * WAD;
+
+        // Increas line of RWA015 to be able to draw some DAI
+        GodMode.setWard(address(vat), address(this), 1);
+        vat.file("RWA015-A", "line", 3_500_000 * RAD);
+
+        // setting address(this) as operator
+        vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwa015AUrn.can(address(this)), 1);
+
+        // 0 DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Dangling Dai in input conduit before draw()");
+
+        // Draw 1m to test output conduit
+        rwa015AUrn.draw(drawAmount);
+
+        // DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount, "RWA015-A: Dai drawn was not send to the recipient");
+
+        // wards
+        GodMode.setWard(address(rwa015AOutputConduit), address(this), 1);
+        // may
+        rwa015AOutputConduit.mate(address(this));
+        assertEq(rwa015AOutputConduit.may(address(this)), 1);
+        rwa015AOutputConduit.hope(address(this));
+        assertEq(rwa015AOutputConduit.can(address(this)), 1);
+
+        rwa015AOutputConduit.kiss(address(this));
+        assertEq(rwa015AOutputConduit.bud(address(this)), 1);
+        rwa015AOutputConduit.pick(address(this));
+
+        uint256 pushAmount = drawAmount;
+        rwa015AOutputConduit.push(pushAmount);
+        rwa015AOutputConduit.quit();
+
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount - pushAmount, "RWA015-A: Dai not sent to destination after push()");
+    }
+
+    function testFailRWA015_A_OUTPUT_CONDUIT_PUSH_ABOVE_BALANCE() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 2_500_000 * WAD;
+
+        // setting address(this) as operator
+        vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+
+        // Draw line DAI
+        rwa015AUrn.draw(drawAmount);
+
+        // auth
+        GodMode.setWard(address(rwa015AOutputConduit), address(this), 1);
+
+        // pick address(this)
+        rwa015AOutputConduit.hope(address(this)); // allow this to call pick
+        rwa015AOutputConduit.kiss(address(this)); // allow this to be picked
+        rwa015AOutputConduit.pick(address(this));
+
+        // push above balance
+        uint256 pushAmount = drawAmount + 1 * WAD;
+        rwa015AOutputConduit.mate(address(this)); // allow this to call push
+        rwa015AOutputConduit.push(pushAmount);    // fail
     }
 
     function test_RWA015_ORACLE_PRICE_BUMP() public {
