@@ -27,7 +27,9 @@ interface RwaLiquidationLike {
 
 interface RwaOutputConduitLike {
     function hope(address usr) external;
+    function nope(address usr) external;
     function mate(address usr) external;
+    function hate(address usr) external;
     function kiss(address who) external;
     function file(bytes32 what, address data) external;
 }
@@ -156,6 +158,10 @@ contract DssSpellAction is DssAction {
 
         // ----- Additional ESM authorization -----
         DssExecLib.authorize(RWA015_A_OUTPUT_CONDUIT, MCD_ESM);
+
+        // Revoke OPERATOR permissions on RWA015_A_OUTPUT_CONDUIT_LEGACY
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_LEGACY).nope(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_LEGACY).hate(RWA015_A_OPERATOR);
 
         DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT", RWA015_A_OUTPUT_CONDUIT);
         // Add Legacy Conduit to Changelog

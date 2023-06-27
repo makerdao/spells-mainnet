@@ -951,10 +951,11 @@ contract DssSpellTest is DssSpellTestBase {
     address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
     address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
 
-    RwaUrnLike               rwa015AUrn             = RwaUrnLike(addr.addr("RWA015_A_URN"));
-    RwaOutputConduitLike     rwa015AOutputConduit   = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-    RwaLiquidationOracleLike oracle                 = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-    GemAbstract              psmGem                 = GemAbstract(rwa015AOutputConduit.gem());
+    RwaUrnLike               rwa015AUrn                 = RwaUrnLike(addr.addr("RWA015_A_URN"));
+    RwaOutputConduitLike     rwa015AOutputConduit       = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
+    RwaOutputConduitLike     rwa015AOutputConduitLegacy = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT_LEGACY"));
+    RwaLiquidationOracleLike oracle                     = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    GemAbstract              psmGem                     = GemAbstract(rwa015AOutputConduit.gem());
 
     uint256 daiPsmGemDiffDecimals                   = 10 ** (dai.decimals() - psmGem.decimals());
 
@@ -962,6 +963,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.dai(), addr.addr("MCD_DAI"),       "output-conduit-dai-not-match");
         assertEq(rwa015AOutputConduit.gem(), addr.addr("PAXUSD"),        "output-conduit-gem-not-match");
         assertEq(rwa015AOutputConduit.psm(), addr.addr("MCD_PSM_PAX_A"), "output-conduit-psm-not-match");
+    }
+
+    function testRWA015_REVOKE_OPERATOR_ON_LEGACY_OUTPUT_CONDUIT() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(rwa015AOutputConduitLegacy.can(RWA015_A_OPERATOR), 0, "OutputConduitLegacy/operator-hoped");
+        assertEq(rwa015AOutputConduitLegacy.may(RWA015_A_OPERATOR), 0, "OutputConduitLegacy/operator-mated");
     }
 
     function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
