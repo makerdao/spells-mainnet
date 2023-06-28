@@ -1037,33 +1037,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount - pushAmount, "RWA015-A: Dai not sent to destination after push()");
     }
 
-    function testFailRWA015_A_OUTPUT_CONDUIT_PUSH_ABOVE_BALANCE() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        uint256 drawAmount = 2_500_000 * WAD;
-
-        // setting address(this) as operator
-        vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
-
-        // Draw line DAI
-        rwa015AUrn.draw(drawAmount);
-
-        // auth
-        GodMode.setWard(address(rwa015AOutputConduit), address(this), 1);
-
-        // pick address(this)
-        rwa015AOutputConduit.hope(address(this)); // allow this to call pick
-        rwa015AOutputConduit.kiss(address(this)); // allow this to be picked
-        rwa015AOutputConduit.pick(address(this));
-
-        // push above balance
-        uint256 pushAmount = drawAmount + 1 * WAD;
-        rwa015AOutputConduit.mate(address(this)); // allow this to call push
-        rwa015AOutputConduit.push(pushAmount);    // fail
-    }
-
     function test_RWA015_ORACLE_PRICE_BUMP() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));

@@ -84,7 +84,7 @@ contract DssSpellAction is DssAction {
     address internal constant RWA015_A_OUTPUT_CONDUIT    = 0x1a976926bF6105Ff6dA1F7b1667bBe825974961E;
 
     // -- RWA015 END --
-    
+
     // -- ChainLink Keeper Network addresses --
     address internal constant CHAINLINK_PAYMENT_ADAPTER  = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
     address internal constant CHAINLINK_TREASURY         = 0xaBAbd5e7d6d05672391aB2A914F57ce343D5CFA6;
@@ -109,7 +109,7 @@ contract DssSpellAction is DssAction {
     address internal constant BANDHAR_WALLET             = 0xE83B6a503A94a5b764CCF00667689B3a522ABc21;
 
     // -- DAI TRANSFERS --
-    address internal constant BLOCKTOWER_WALLET          = 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767;
+    address internal constant BLOCKTOWER_WALLET_2        = 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767;
 
     // Function from https://github.com/makerdao/spells-goerli/blob/7d783931a6799fe8278e416b5ac60d4bb9c20047/archive/2022-11-14-DssSpell/Goerli-DssSpell.sol#L59
     function _updateDoc(bytes32 ilk, string memory doc) internal {
@@ -137,8 +137,8 @@ contract DssSpellAction is DssAction {
         // Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio
         // As we have SF 0 for this deal, this should be equal to ilk DC
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
-                "RWA015-A",
-                 1_280 * MILLION * WAD
+            "RWA015-A",
+            1_280 * MILLION * WAD
         );
         DssExecLib.updateCollateralPrice("RWA015-A");
 
@@ -255,7 +255,7 @@ contract DssSpellAction is DssAction {
         // MIP: https://mips.makerdao.com/mips/details/MIP104#5-2-legal-recourse-asset-budget
 
         // BlockTower Legal Expenses - 133,466 DAI - 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767
-        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER_WALLET, 133_466);
+        DssExecLib.sendPaymentFromSurplusBuffer(BLOCKTOWER_WALLET_2, 133_466);
 
         DssExecLib.setChangelogVersion("1.14.14");
     }
