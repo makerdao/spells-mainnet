@@ -291,15 +291,15 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
+    function testNewChainlogValues() public { // don't disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new chainlog values tests here
-        _checkChainlogKey("XXX");
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT_LEGACY");
 
-        _checkChainlogVersion("1.X.X");
+        _checkChainlogVersion("1.14.14");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
