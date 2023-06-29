@@ -36,40 +36,6 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
-}
-
-interface RwaUrnLike {
-    function can(address) external view returns (uint256);
-    function outputConduit() external view returns (address);
-    function draw(uint256) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
-}
-
-interface RwaOutputConduitLike {
-    function wards(address) external view returns (uint256);
-    function can(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function dai() external view returns (address);
-    function psm() external view returns (address);
-    function gem() external view returns (address);
-    function bud(address) external view returns (uint256);
-    function quitTo() external view returns (address);
-    function pick(address) external;
-    function kiss(address) external;
-    function mate(address) external;
-    function hope(address) external;
-    function push() external;
-    function push(uint256) external;
-    function quit() external;
-}
-
-interface NetworkPaymentAdapterLike {
-    function treasury() external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
