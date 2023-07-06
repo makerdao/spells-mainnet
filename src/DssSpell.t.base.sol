@@ -143,6 +143,19 @@ interface AuthorityLike {
     function authority() external view returns (address);
 }
 
+// TODO: add full interfaces to dss-interfaces and remove from here
+interface FlapUniV2Abstract {
+    function gem() external view returns (address);
+    function hop() external view returns (uint256);
+    function pair() external view returns (address);
+    function pip() external view returns (address);
+    function want() external view returns (uint256);
+}
+
+interface FlapperMomAbstract {
+    function stop() external;
+}
+
 contract DssSpellTestBase is Config, DssTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
@@ -168,12 +181,13 @@ contract DssSpellTestBase is Config, DssTest {
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));
     CureAbstract                    cure = CureAbstract(       addr.addr("MCD_CURE"));
     IlkRegistryAbstract              reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-    FlapAbstract                    flap = FlapAbstract(       addr.addr("MCD_FLAP"));
+    FlapUniV2Abstract               flap = FlapUniV2Abstract(  addr.addr("MCD_FLAP"));
     CropperLike                  cropper = CropperLike(        addr.addr("MCD_CROPPER"));
 
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     FlipperMomAbstract           flipMom = FlipperMomAbstract( addr.addr("FLIPPER_MOM"));
     ClipperMomAbstract           clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
+    FlapperMomAbstract           flapMom = FlapperMomAbstract( addr.addr("FLAPPER_MOM"));
     AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
@@ -464,21 +478,13 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
 
         // flap
-        // check beg value
-        uint256 normalizedTestBeg = (values.flap_beg + 10000)  * 10**14;
-        assertEq(flap.beg(), normalizedTestBeg, "TestError/flap-beg");
-        assertTrue(flap.beg() >= WAD && flap.beg() <= 110 * WAD / 100, "TestError/flap-beg-range"); // gte 0% and lte 10%
-        // Check flap ttl and sanity checks
-        assertEq(flap.ttl(), values.flap_ttl, "TestError/flap-ttl");
-        assertTrue(flap.ttl() > 0 && flap.ttl() < 86400, "TestError/flap-ttl-range"); // gt 0 && lt 1 day
-        // Check flap tau and sanity checks
-        assertEq(flap.tau(), values.flap_tau, "TestError/flap-tau");
-        assertTrue(flap.tau() > 0 && flap.tau() < 2678400, "TestError/flap-tau-range"); // gt 0 && lt 1 month
-        assertTrue(flap.tau() >= flap.ttl(), "TestError/flap-tau-ttl");
-        // Check flap lid and sanity checks
-        uint256 normalizedLid = values.flap_lid * RAD;
-        assertEq(flap.lid(), normalizedLid, "TestError/flap-lid");
-        assertTrue(flap.lid() > 0 && flap.lid() <= MILLION * RAD, "TestError/flap-lid-range");
+        // Check flap hop and sanity checks
+        assertEq(flap.hop(), values.flap_hop, "TestError/flap-hop");
+        assertTrue(flap.hop() > 0 && flap.hop() < 86400, "TestError/flap-hop-range"); // gt 0 && lt 1 day
+        // check want value
+        uint256 normalizedTestWant = values.flap_want * 10**14;
+        assertEq(flap.want(), normalizedTestWant, "TestError/flap-want");
+        assertTrue(flap.want() >= 90 * WAD / 100 && flap.want() <= 110 * WAD / 100, "TestError/flap-want-range"); // gte 90% and lte 110%
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
 
