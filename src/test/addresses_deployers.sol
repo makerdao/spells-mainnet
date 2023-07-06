@@ -42,7 +42,8 @@ contract Deployers {
             0x45Ea4FADf8Db54DF5a96774167547893e0b4D6A5,  // CES from 2022-10-26
             0x5C82d7Eafd66d7f5edC2b844860BfD93C3B0474f,  // CES from 2022-12-09
             0x34DBF275E1Df79D1fC7bf6a37feC56A8b1057490,  // Sidestream from 2023-05-17
-            0xd1236a6A111879d9862f8374BA15344b6B233Fbd   // Phoenix Labs from 2023-05-24
+            0xd1236a6A111879d9862f8374BA15344b6B233Fbd,  // Phoenix Labs from 2023-05-24
+            0xfaAD873aDF27bE64D6E27D40Cf2AF0037d39b2eA   // Deployer of FlapperUniv2
         ];
     }
 
