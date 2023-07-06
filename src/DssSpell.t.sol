@@ -917,13 +917,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testFlapperUniV2() public {
-        // TODO: Remove as soon as MKR oracle has a price
-        vm.store(
-            address(addr.addr("PIP_MKR")),
-            bytes32(uint256(1)),
-            bytes32(uint256(1000 ether))
-        );
-
         address old_flap = chainLog.getAddress("MCD_FLAP");
 
         assertEq(vow.flapper(), old_flap);
@@ -983,13 +976,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testSequencerFlapJob() public {
-        // TODO: Remove as soon as MKR oracle has a price
-        vm.store(
-            address(addr.addr("PIP_MKR")),
-            bytes32(uint256(1)),
-            bytes32(uint256(1000 ether))
-        );
-
         DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
 
         assertTrue(!sequencer.hasJob(addr.addr("CRON_FLAP_JOB")));

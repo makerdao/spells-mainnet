@@ -117,9 +117,9 @@ contract Config {
         afterSpell.vow_wait =              156 hours;               // In seconds
         afterSpell.vow_dump =              250;                     // In whole Dai units
         afterSpell.vow_sump =              50 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_bump =              30 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_hump_min =          250 * MILLION;           // In whole Dai units
-        afterSpell.vow_hump_max =          250 * MILLION;           // In whole Dai units
+        afterSpell.vow_bump =              5 * THOUSAND;            // In whole Dai units
+        afterSpell.vow_hump_min =          50 * MILLION;            // In whole Dai units
+        afterSpell.vow_hump_max =          50 * MILLION;            // In whole Dai units
         afterSpell.flap_hop =              1577 seconds;            // In seconds
         afterSpell.flap_want =             9800;                    // In basis points
         afterSpell.cat_box =               20 * MILLION;            // In whole Dai units
