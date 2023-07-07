@@ -32,6 +32,10 @@ interface GemLike {
     function allowance(address, address) external view returns (uint256);
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -98,6 +102,10 @@ contract DssSpellAction is DssAction {
     GemLike internal immutable MKR                        = GemLike(DssExecLib.mkr());
     VestLike internal immutable MCD_VEST_DAI              = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     VestLike internal immutable MCD_VEST_MKR_TREASURY     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+
+    // Spark
+    address internal immutable SUBPROXY_SPARK              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal immutable SPARK_SPELL                 = 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297;
 
     function actions() public override {
         // ----- Deploy Multiswap Conduit for RWA015-A -----
@@ -285,6 +293,12 @@ contract DssSpellAction is DssAction {
         // yank DAI stream ID 14 to DUX-001
         // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
         MCD_VEST_DAI.yank(14);
+
+        // ----- Trigger Spark Proxy Spell -----
+        // Forum: https://forum.makerdao.com/t/freeze-the-sdai-market-on-spark/21322
+
+        // Trigger Spark Spell at 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297
+        ProxyLike(SUBPROXY_SPARK).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ----- Update ChainLog version -----
         // Justification: The MINOR version is updated as core MCD_FLAP contract is being replaced in the spell
