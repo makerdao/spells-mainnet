@@ -43,6 +43,7 @@ interface DssCronSequencerLike {
 
 interface DssCronJobLike {
     function work(bytes32, bytes calldata) external;
+    function workable(bytes32) external returns (bool, bytes memory);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -977,15 +978,16 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSequencerFlapJob() public {
         DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
+        DssCronJobLike flapJob = DssCronJobLike(addr.addr("CRON_FLAP_JOB"));
 
-        assertTrue(!sequencer.hasJob(addr.addr("CRON_FLAP_JOB")));
+        assertTrue(!sequencer.hasJob(address(flapJob)));
 
         // execute spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertTrue(sequencer.hasJob(addr.addr("CRON_FLAP_JOB")));
+        assertTrue(sequencer.hasJob(address(flapJob)));
 
         address pip = flap.pip();
         address pair = flap.pair();
@@ -999,6 +1001,11 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 mkrAmt = 1_000_000 * WAD * WAD / price;
         GodMode.setBalance(address(gov), address(pair), mkrAmt * 99 / 100); // Leaves just 1% worse price
 
-        DssCronJobLike(addr.addr("CRON_FLAP_JOB")).work(sequencer.getMaster(), abi.encode(vat.sin(address(vow)) - vow.Sin() - vow.Ash()));
+        bytes32 master = sequencer.getMaster();
+        uint256 snapshot = vm.snapshot();
+        (bool ok, bytes memory data) = flapJob.workable(master);
+        vm.revertTo(snapshot);
+        assertTrue(ok);
+        flapJob.work(sequencer.getMaster(), data);
     }
 }
