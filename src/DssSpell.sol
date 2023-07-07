@@ -28,6 +28,8 @@ interface VestLike {
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
+    function approve(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
 }
 
 contract DssSpellAction is DssAction {
@@ -227,6 +229,11 @@ contract DssSpellAction is DssAction {
         );
 
         // ----- Ecosystem Actor MKR Budget Stream -----
+
+        // Increase allowance by new vesting delta
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), (address(MCD_VEST_MKR_TREASURY))) + newVesting);
 
         // Set system-wide cap on maximum vesting speed
         MCD_VEST_MKR_TREASURY.file("cap", 2_220 * WAD / 365 days);

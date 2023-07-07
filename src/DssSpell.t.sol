@@ -539,56 +539,63 @@ contract DssSpellTest is DssSpellTestBase {
         // 2024-12-31 23:59:59 UTC
         uint256 DEC_31_2024 = 1735689599;
 
-        // Store previous amount of streams
         uint256 prevStreamCount = vest.ids();
+        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
         uint256 prevBalance;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // check new allowance
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newVesting, "testVestMKR/invalid-allowance");
+
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
         assertEq(vest.ids(), prevStreamCount + 2, "testVestMKR/invalid-stream-count");
 
-        // check CHRONICLE_LABS stream
-        address chronicleAddress = wallets.addr("CHRONICLE_LABS");
-        uint256 chronicleStreamId = prevStreamCount + 1;
-        uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
-        assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
-        assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
-        assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
-        assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
-        assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
-        assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
-        assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
-        assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-        assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
-        prevBalance = gov.balanceOf(chronicleAddress);
-        GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(chronicleStreamId);
-        vm.warp(chronicleFin);
-        vest.vest(chronicleStreamId);
-        assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+        { // check CHRONICLE_LABS stream
+            address chronicleAddress = wallets.addr("CHRONICLE_LABS");
+            uint256 chronicleStreamId = prevStreamCount + 1;
+            uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
+            assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(chronicleAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(chronicleStreamId);
+            vm.warp(chronicleFin);
+            vest.vest(chronicleStreamId);
+            assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+        }
 
-        // check JETSTREAM stream
-        address jetstreamAddress = wallets.addr("JETSTREAM");
-        uint256 jetstreamStreamId = prevStreamCount + 2;
-        uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
-        assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
-        assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
-        assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
-        assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
-        assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
-        assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
-        assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
-        assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-        assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
-        prevBalance = gov.balanceOf(jetstreamAddress);
-        GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(jetstreamStreamId);
-        vm.warp(jetstreamFin);
-        vest.vest(jetstreamStreamId);
-        assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+        { // check JETSTREAM stream
+            address jetstreamAddress = wallets.addr("JETSTREAM");
+            uint256 jetstreamStreamId = prevStreamCount + 2;
+            uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
+            assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(jetstreamAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(jetstreamStreamId);
+            vm.warp(jetstreamFin);
+            vest.vest(jetstreamStreamId);
+            assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+        }
     }
 
     function testMKRPayments() public { // make public to enable
