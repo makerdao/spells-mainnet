@@ -116,6 +116,8 @@ contract Wallets {
         addr["DEWIZ"]                        = 0xD8665628742cf54BBBB3b00B15d7E7a838a1b53a;
         addr["SIDESTREAM"]                   = 0x87EcaaACEd3A02A37e7075dc45D3fEb49867d135;
         addr["PULLUP_LABS"]                  = 0x42aD911c75d25E21727E45eCa2A9d999D5A7f94c;
+        addr["CHRONICLE_LABS"]               = 0x68D0ca2d5Ac777F6A9b0d1be44332BB3d5981C2f;
+        addr["JETSTREAM"]                    = 0xF478A08C41ad06E8D957d5e6B6Bcde7452cEE962;
 
         // Ecosystem Scope
         addr["ECOSYSTEM_SCOPE_WALLET"]       = 0x6E51E0b5813152880C1389E3e860e69E06aD04D9;
@@ -136,6 +138,10 @@ contract Wallets {
         addr["WBC"]                          = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
         addr["LIBERTAS"]                     = 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f;
         addr["BANDHAR"]                      = 0xE83B6a503A94a5b764CCF00667689B3a522ABc21;
+        addr["PALC"]                         = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
+        addr["HARMONY"]                      = 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2;
+        addr["VOTEWIZARD"]                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+        addr["NAVIGATOR"]                    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;

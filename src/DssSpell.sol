@@ -39,6 +39,23 @@ interface ChainlogLike {
     function removeAddress(bytes32) external;
 }
 
+interface VestLike {
+    function file(bytes32 what, uint256 data) external;
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    function restrict(uint256) external;
+    function yank(uint256) external;
+}
+
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
+    function approve(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
+}
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -59,6 +76,8 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
+    uint256 internal constant WAD       = 10 ** 18;
+
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -70,11 +89,58 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+
     // Operator address
     address internal constant RWA015_A_OPERATOR            = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
     // Custody address
     address internal constant RWA015_A_CUSTODY             = 0x65729807485F6f7695AF863d97D62140B7d69d83;
     address internal constant RWA015_A_OUTPUT_CONDUIT      = 0x1E86CB085f249772f7e7443631a87c6BDba2aCEb;
+
+    uint256 internal constant THREE_PT_ONE_NINE_PCT_RATE  = 1000000000995743377573746041;
+    uint256 internal constant THREE_PT_FOUR_FOUR_PCT_RATE = 1000000001072474267302354182;
+    uint256 internal constant THREE_PT_NINE_FOUR_PCT_RATE = 1000000001225381266358479708;
+    uint256 internal constant FIVE_PT_SIX_NINE_PCT_RATE   = 1000000001754822903403114680;
+    uint256 internal constant SIX_PT_ONE_NINE_PCT_RATE    = 1000000001904482384730282575;
+    uint256 internal constant FIVE_PT_FOUR_FOUR_PCT_RATE  = 1000000001679727448331902751;
+
+    // 2023-06-26 00:00:00 UTC
+    uint256 internal constant JUN_26_2023                 = 1687737600;
+    // 2023-07-01 00:00:00 UTC
+    uint256 internal constant JUL_01_2023                 = 1688169600;
+    // 2024-06-30 23:59:59 UTC
+    uint256 internal constant JUN_30_2024                 = 1719791999;
+    // 2024-12-31 23:59:59 UTC
+    uint256 internal constant DEC_31_2024                 = 1735689599;
+
+    // Delegates
+    address internal constant DEFENSOR                    = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant BONAPUBLICA                 = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant QGOV                        = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
+    address internal constant TRUENAME                    = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant UPMAKER                     = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant VIGILANT                    = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant WBC                         = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant PBG                         = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant BANDHAR                     = 0xE83B6a503A94a5b764CCF00667689B3a522ABc21;
+    address internal constant LIBERTAS                    = 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f;
+    address internal constant PALC                        = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
+    address internal constant HARMONY                     = 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2;
+    address internal constant VOTEWIZARD                  = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+    address internal constant NAVIGATOR                   = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+
+    // Ecosystem actors
+    address internal constant DECO_WALLET                 = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address internal constant DUX_WALLET                  = 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad;
+    address internal constant CHRONICLE_LABS              = 0x68D0ca2d5Ac777F6A9b0d1be44332BB3d5981C2f;
+    address internal constant JETSTREAM                   = 0xF478A08C41ad06E8D957d5e6B6Bcde7452cEE962;
+
+    GemLike internal immutable MKR                        = GemLike(DssExecLib.mkr());
+    VestLike internal immutable MCD_VEST_DAI              = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
+    VestLike internal immutable MCD_VEST_MKR_TREASURY     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
+
+    // Spark
+    address internal immutable SUBPROXY_SPARK              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal immutable SPARK_SPELL                 = 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297;
 
     function actions() public override {
         // ----- Deploy Multiswap Conduit for RWA015-A -----
@@ -121,14 +187,197 @@ contract DssSpellAction is DssAction {
         // ----- Deploy FlapperUniV2 -----
 
         // ----- Scope Defined Parameter Changes -----
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-3/21238/6
+
+        // Reduce DSR by 0.30% from 3.49% to 3.19%
+        DssExecLib.setDSR(THREE_PT_ONE_NINE_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce WSTETH-A Liquidation Ratio by 10% from 160% to 150%
+        DssExecLib.setIlkLiquidationRatio("WSTETH-A", 150_00);
+
+        // Reduce WSTETH-B Liquidation Ratio by 10% from 185% to 175%
+        DssExecLib.setIlkLiquidationRatio("WSTETH-B", 175_00);
+
+        // Reduce RETH-A Liquidation Ratio by 20% from 170% to 150%
+        DssExecLib.setIlkLiquidationRatio("RETH-A", 150_00);
+
+        // Reduce the ETH-A Stability Fee (SF) by 0.30% from 3.74% to 3.44%
+        DssExecLib.setIlkStabilityFee("ETH-A", THREE_PT_FOUR_FOUR_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the ETH-B Stability Fee (SF) by 0.30% from 4.24% to 3.94%
+        DssExecLib.setIlkStabilityFee("ETH-B", THREE_PT_NINE_FOUR_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the ETH-C Stability Fee (SF) by 0.30% from 3.49% to 3.19%
+        DssExecLib.setIlkStabilityFee("ETH-C", THREE_PT_ONE_NINE_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the WSTETH-A Stability Fee (SF) by 0.30% from 3.74% to 3.44%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", THREE_PT_FOUR_FOUR_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the WSTETH-B Stability Fee (SF) by 0.30% from 3.49% to 3.19%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", THREE_PT_ONE_NINE_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the RETH-A Stability Fee (SF) by 0.30% from 3.74% to 3.44%
+        DssExecLib.setIlkStabilityFee("RETH-A", THREE_PT_FOUR_FOUR_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the WBTC-A Stability Fee (SF) by 0.11% from 5.80% to 5.69%
+        DssExecLib.setIlkStabilityFee("WBTC-A", FIVE_PT_SIX_NINE_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the WBTC-B Stability Fee (SF) by 0.11% from 6.30% to 6.19%
+        DssExecLib.setIlkStabilityFee("WBTC-B", SIX_PT_ONE_NINE_PCT_RATE, /* doDrip = */ true);
+
+        // Reduce the WBTC-C Stability Fee (SF) by 0.11% from 5.55% to 5.44%
+        DssExecLib.setIlkStabilityFee("WBTC-C", FIVE_PT_FOUR_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // ----- Delegate Compensation for June 2023 -----
+        // Forum: https://forum.makerdao.com/t/june-2023-aligned-delegate-compensation/21310
+
+        // 0xDefensor  - 29.76 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        MKR.transfer(DEFENSOR,       29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // BONAPUBLICA - 29.76 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA,    29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // QGov        - 29.76 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
+        MKR.transfer(QGOV,           29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // TRUE NAME   - 29.76 MKR - 0x612f7924c367575a0edf21333d96b15f1b345a5d
+        MKR.transfer(TRUENAME,       29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // UPMaker     - 29.76 MKR - 0xbb819df169670dc71a16f58f55956fe642cc6bcd
+        MKR.transfer(UPMAKER,        29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // vigilant    - 29.76 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT,       29.76 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // WBC         - 20.16 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        MKR.transfer(WBC,            20.16 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // PBG         -  9.92 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG,             9.92 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // Bandhar     -  7.68 MKR - 0xE83B6a503A94a5b764CCF00667689B3a522ABc21
+        MKR.transfer(BANDHAR,         7.68 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // Libertas    -  7.04 MKR - 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f
+        MKR.transfer(LIBERTAS,        7.04 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // PALC        -  2.24 MKR - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
+        MKR.transfer(PALC,            2.24 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // Harmony     -  1.92 MKR - 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2
+        MKR.transfer(HARMONY,         1.92 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // VoteWizard  -  1.6  MKR - 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+        MKR.transfer(VOTEWIZARD,      1.6  ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // Navigator   -  0.32 MKR - 0x11406a9CC2e37425F15f920F494A51133ac93072
+        MKR.transfer(NAVIGATOR,       0.32 ether); // note: ether is a keyword helper, only MKR is transferred here
 
         // ----- CRVV1ETHSTETH-A 1st Stage Offboarding -----
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-3/21238/6
+
+        // Set CRVV1ETHSTETH-A Debt Ceiling to 0
+        DssExecLib.setIlkDebtCeiling("CRVV1ETHSTETH-A", 0);
+
+        // Remove CRVV1ETHSTETH-A from autoline
+        DssExecLib.removeIlkFromAutoLine("CRVV1ETHSTETH-A");
 
         // ----- Ecosystem Actor Dai Budget Stream -----
 
+        // Chronicle Labs Auditor Wallet | 2023-07-01 00:00:00 to 2024-06-30 23:59:59 | 3,721,800 DAI | 0x68D0ca2d5Ac777F6A9b0d1be44332BB3d5981C2f
+        // Poll: https://vote.makerdao.com/polling/QmdnSKPu#poll-detail
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                CHRONICLE_LABS,            // usr
+                3_721_800 * WAD,           // tot
+                JUL_01_2023,               // bgn
+                JUN_30_2024 - JUL_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Jetstream Auditor Wallet      | 2023-07-01 00:00:00 to 2024-12-31 23:59:59 | 2,964,006 DAI | 0xF478A08C41ad06E8D957d5e6B6Bcde7452cEE962
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
+        MCD_VEST_DAI.restrict(
+            MCD_VEST_DAI.create(
+                JETSTREAM,                 // usr
+                2_964_006 * WAD,           // tot
+                JUL_01_2023,               // bgn
+                DEC_31_2024 - JUL_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
         // ----- Ecosystem Actor MKR Budget Stream -----
+
+        // Increase allowance by new vesting delta
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), (address(MCD_VEST_MKR_TREASURY))) + newVesting);
+
+        // Set system-wide cap on maximum vesting speed
+        MCD_VEST_MKR_TREASURY.file("cap", 2_220 * WAD / 365 days);
+
+        // Chronicle Labs Auditor Wallet | 2023-07-01 00:00:00 to 2024-06-30 23:59:59 | 2,216.4  MKR | 0x68D0ca2d5Ac777F6A9b0d1be44332BB3d5981C2f
+        // Poll: https://vote.makerdao.com/polling/QmdnSKPu#poll-detail
+        MCD_VEST_MKR_TREASURY.restrict(
+            MCD_VEST_MKR_TREASURY.create(
+                CHRONICLE_LABS,            // usr
+                2_216.4 ether,             // tot; note: ether is a keyword helper, only MKR is transferred here
+                JUL_01_2023,               // bgn
+                JUN_30_2024 - JUL_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Jetstream Auditor Wallet      | 2023-06-26 00:00:00 to 2024-12-31 23:59:59 | 1,619.93 MKR | 0xF478A08C41ad06E8D957d5e6B6Bcde7452cEE962
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
+        MCD_VEST_MKR_TREASURY.restrict(
+            MCD_VEST_MKR_TREASURY.create(
+                JETSTREAM,                 // usr
+                1_619.93 ether,            // tot; note: ether is a keyword helper, only MKR is transferred here
+                JUN_26_2023,               // bgn
+                DEC_31_2024 - JUN_26_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // ----- Ecosystem Actor Dai Transfer -----
+
+        // Jetstream - 494,001 DAI - 0xF478A08C41ad06E8D957d5e6B6Bcde7452cEE962
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
+        DssExecLib.sendPaymentFromSurplusBuffer(JETSTREAM, 494_001);
+
+        // ----- Core Unit MKR Vesting Transfer -----
+
+        // DECO-001 - 125    MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
+        // Mip: https://mips.makerdao.com/mips/details/MIP40c3SP36#mkr-vesting
+        MKR.transfer(DECO_WALLET,    125    ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // DUX-001  -  56.48 MKR - 0x5A994D8428CCEbCC153863CCdA9D2Be6352f89ad
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
+        MKR.transfer(DUX_WALLET,      56.48 ether); // note: ether is a keyword helper, only MKR is transferred here
+
+        // ----- Core Unit DAI Stream Cancel -----
+
+        // yank DAI stream ID 14 to DUX-001
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
+        MCD_VEST_DAI.yank(14);
+
+        // ----- Trigger Spark Proxy Spell -----
+        // Forum: https://forum.makerdao.com/t/freeze-the-sdai-market-on-spark/21322
+
+        // Trigger Spark Spell at 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297
+        ProxyLike(SUBPROXY_SPARK).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+
+        // ----- Update ChainLog version -----
+        // Justification: The MINOR version is updated as core MCD_FLAP contract is being replaced in the spell
+        // See https://github.com/makerdao/pe-checklists/blob/492326ab00b4c400173b7d7d43a79df90c0c6c1d/spell/spell-crafter-goerli-workflow.md?plain=1#L80
+        DssExecLib.setChangelogVersion("1.15.0");
     }
 }
 

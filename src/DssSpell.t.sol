@@ -390,17 +390,17 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
         // $ make time stamp=<STAMP>
-        // 24 May 2023 12:00:00 AM UTC
-        uint256 MAY_24_2023  = 1684886400;
-        // 23 May 2023 11:59:59 PM UTC
-        uint256 MAY_23_2024  = 1716508799;
-        // 23 May 2026 11:59:59 PM UTC
-        uint256 MAY_23_2026  = 1779580799;
+        // 2023-07-01 00:00:00 UTC
+        uint256 JUL_01_2023 = 1688169600;
+        // 2024-06-30 23:59:59 UTC
+        uint256 JUN_30_2024 = 1719791999;
+        // 2024-12-31 23:59:59 UTC
+        uint256 DEC_31_2024 = 1735689599;
 
         uint256 prevBalance;
 
@@ -412,100 +412,52 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check that 4 new streams are added
-        assertEq(vest.ids(), prevStreamCount + 4);
+        // Check that 2 new streams are added
+        assertEq(vest.ids(), prevStreamCount + 2);
 
         // Check the first stream
-        uint256 gelatoStreamId = prevStreamCount + 1;
-        assertTrue(vest.valid(gelatoStreamId)); // check for valid contract
+        uint256 chronicleStreamId = prevStreamCount + 1;
+        assertTrue(vest.valid(chronicleStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      gelatoStreamId,                                 // id
-            _wallet:     wallets.addr("GELATO_PAYMENT_ADAPTER"),         // usr
-            _start:      MAY_24_2023,                                    // bgn
-            _cliff:      MAY_24_2023,                                    // clf
-            _end:        MAY_23_2026,                                    // fin
-            _days:       1096 days,                                      // fin
+            _index:      chronicleStreamId,                              // id
+            _wallet:     wallets.addr("CHRONICLE_LABS"),                 // usr
+            _start:      JUL_01_2023,                                    // bgn
+            _cliff:      JUL_01_2023,                                    // clf
+            _end:        JUN_30_2024,                                    // fin
+            _days:       366 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     1_644_000 * WAD,                                // tot
+            _reward:     3_721_800 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("GELATO_PAYMENT_ADAPTER"));
-        vest.unrestrict(gelatoStreamId);
-        vm.warp(MAY_24_2023 + 1096 days);
-        vest.vest(gelatoStreamId);
-        assertEq(dai.balanceOf(wallets.addr("GELATO_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("CHRONICLE_LABS"));
+        vest.unrestrict(chronicleStreamId);
+        vm.warp(JUL_01_2023 + 366 days);
+        vest.vest(chronicleStreamId);
+        assertEq(dai.balanceOf(wallets.addr("CHRONICLE_LABS")), prevBalance + 3_721_800 * WAD);
 
         // Check the second stream
-        uint256 keeperStreamId = prevStreamCount + 2;
-        assertTrue(vest.valid(keeperStreamId)); // check for valid contract
+        uint256 jetstreamStreamId = prevStreamCount + 2;
+        assertTrue(vest.valid(jetstreamStreamId)); // check for valid contract
         _checkDaiVest({
-            _index:      keeperStreamId,                                 // id
-            _wallet:     wallets.addr("KEEP3R_PAYMENT_ADAPTER"),         // usr
-            _start:      MAY_24_2023,                                    // bgn
-            _cliff:      MAY_24_2023,                                    // clf
-            _end:        MAY_23_2026,                                    // fin
-            _days:       1096 days,                                      // fin
+            _index:      jetstreamStreamId,                              // id
+            _wallet:     wallets.addr("JETSTREAM"),                      // usr
+            _start:      JUL_01_2023,                                    // bgn
+            _cliff:      JUL_01_2023,                                    // clf
+            _end:        DEC_31_2024,                                    // fin
+            _days:       550 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     1_644_000 * WAD,                                // tot
+            _reward:     2_964_006 * WAD,                                // tot
             _claimed:    0                                               // rxd
         });
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("KEEP3R_PAYMENT_ADAPTER"));
-        vest.unrestrict(keeperStreamId);
-        vm.warp(MAY_24_2023 + 1096 days);
-        vest.vest(keeperStreamId);
-        assertEq(dai.balanceOf(wallets.addr("KEEP3R_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
-
-        // Check the third stream
-        uint256 chainlinkStreamId = prevStreamCount + 3;
-        assertTrue(vest.valid(chainlinkStreamId)); // check for valid contract
-        _checkDaiVest({
-            _index:      chainlinkStreamId,                                 // id
-            _wallet:     wallets.addr("CHAINLINK_PAYMENT_ADAPTER"),         // usr
-            _start:      MAY_24_2023,                                    // bgn
-            _cliff:      MAY_24_2023,                                    // clf
-            _end:        MAY_23_2026,                                    // fin
-            _days:       1096 days,                                      // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     1_644_000 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("CHAINLINK_PAYMENT_ADAPTER"));
-        vest.unrestrict(chainlinkStreamId);
-        vm.warp(MAY_24_2023 + 1096 days);
-        vest.vest(chainlinkStreamId);
-        assertEq(dai.balanceOf(wallets.addr("CHAINLINK_PAYMENT_ADAPTER")), prevBalance + 1_644_000 * WAD);
-
-        // Check the fourth stream
-        uint256 techopsStreamId = prevStreamCount + 4;
-        assertTrue(vest.valid(techopsStreamId)); // check for valid contract
-        _checkDaiVest({
-            _index:      techopsStreamId,                                 // id
-            _wallet:     wallets.addr("TECHOPS_VEST_STREAMING"),         // usr
-            _start:      MAY_24_2023,                                    // bgn
-            _cliff:      MAY_24_2023,                                    // clf
-            _end:        MAY_23_2024,                                    // fin
-            _days:       366 days,                                      // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     366_000 * WAD,                                // tot
-            _claimed:    0                                               // rxd
-        });
-        // Give admin powers to Test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("TECHOPS_VEST_STREAMING"));
-        vest.unrestrict(techopsStreamId);
-        vm.warp(MAY_24_2023 + 1096 days);
-        vest.vest(techopsStreamId);
-        assertEq(dai.balanceOf(wallets.addr("TECHOPS_VEST_STREAMING")), prevBalance + 366_000 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("JETSTREAM"));
+        vest.unrestrict(jetstreamStreamId);
+        vm.warp(JUL_01_2023 + 550 days);
+        vest.vest(jetstreamStreamId);
+        assertEq(dai.balanceOf(wallets.addr("JETSTREAM")), prevBalance + 2_964_006 * WAD);
     }
 
     struct Payee {
@@ -513,7 +465,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -521,7 +473,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("BLOCKTOWER_WALLET_2"), 133_466)
+            Payee(wallets.addr("JETSTREAM"), 494_001)
         ];
 
         uint256 prevBalance;
@@ -552,21 +504,23 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() private { // make private to disable
+    function testYankDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
-        // 31 Jul 2023 11:59:59 PM UTC
-        uint256 JUL_31_2023 = 1690847999;
+        // 31 Jan 2024 23:59:59 UTC
+        uint256 JAN_31_2024 = 1706745599;
+        uint256 streamId = 14;
+        address expectedWallet = wallets.addr("DUX_WALLET");
 
-        assertEq(vest.usr(16), wallets.addr("CHAINLINK_AUTOMATION"));
-        assertEq(vest.fin(16), JUL_31_2023);
+        assertEq(vest.usr(streamId), expectedWallet, "testYankDAI/unexpected-address");
+        assertEq(vest.fin(streamId), JAN_31_2024, "testYankDAI/unpected-fin-date");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vest.fin(16), block.timestamp);
+        assertEq(vest.fin(streamId), block.timestamp, "testYankDAI/steam-not-yanked");
     }
 
     function testYankMKR() private { // make private to disable
@@ -595,97 +549,99 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreasury.fin(37), block.timestamp);
     }
 
-    function testVestMKR() private { // make private to disable
+    function testVestMKR() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        assertEq(vest.ids(), 37);
 
+        // 2023-06-26 00:00:00 UTC
+        uint256 JUN_26_2023 = 1687737600;
+        // 2023-07-01 00:00:00 UTC
+        uint256 JUL_01_2023 = 1688169600;
+        // 2024-06-30 23:59:59 UTC
+        uint256 JUN_30_2024 = 1719791999;
+        // 2024-12-31 23:59:59 UTC
+        uint256 DEC_31_2024 = 1735689599;
+
+        uint256 prevStreamCount = vest.ids();
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 prevBalance;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 newAllowance = 986.25 ether; // Phoenix Lab
-               newAllowance += 4_000 ether; // PullUp Labs
+        // check new allowance
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newVesting, "testVestMKR/invalid-allowance");
 
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newAllowance);
+        assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
+        assertEq(vest.ids(), prevStreamCount + 2, "testVestMKR/invalid-stream-count");
 
-        assertEq(vest.cap(), 2_200 * WAD / 365 days);
-        assertEq(vest.ids(), 37 + 2);
+        { // check CHRONICLE_LABS stream
+            address chronicleAddress = wallets.addr("CHRONICLE_LABS");
+            uint256 chronicleStreamId = prevStreamCount + 1;
+            uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
+            assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(chronicleAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(chronicleStreamId);
+            vm.warp(chronicleFin);
+            vest.vest(chronicleStreamId);
+            assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+        }
 
-        // 01 May 2023 12:00:00 AM UTC
-        uint256 MAY_01_2023 = 1682899200;
-        // 30 Apr 2024 11:59:59 PM UTC
-        uint256 APR_30_2024 = 1714521599;
-        // 30 Apr 2025 11:59:59 PM UTC
-        uint256 APR_30_2025 = 1746057599;
-
-
-        uint256 PHOENIX_LABS_FIN  = MAY_01_2023 + (366 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 24
-        uint256 PULLUP_LABS_FIN   = MAY_01_2023 + (366 days + 365 days) - 1; // -1 because we are going to 11:59:59 on Apr 30 25
-
-        assertEq(vest.usr(38), wallets.addr("PHOENIX_LABS_2"));
-        assertEq(vest.bgn(38), MAY_01_2023);
-        assertEq(vest.clf(38), MAY_01_2023);
-        assertEq(vest.fin(38), PHOENIX_LABS_FIN);
-        assertEq(vest.fin(38), APR_30_2024);
-        assertEq(vest.mgr(38), address(0));
-        assertEq(vest.res(38), 1);
-        assertEq(vest.tot(38), 986.25 ether);
-        assertEq(vest.rxd(38), 0);
-
-        assertEq(vest.usr(39), wallets.addr("PULLUP_LABS"));
-        assertEq(vest.bgn(39), MAY_01_2023);
-        assertEq(vest.clf(39), MAY_01_2023);
-        assertEq(vest.fin(39), PULLUP_LABS_FIN);
-        assertEq(vest.fin(39), APR_30_2025);
-        assertEq(vest.mgr(39), wallets.addr("PULLUP_LABS_VEST_MGR"));
-        assertEq(vest.res(39), 1);
-        assertEq(vest.tot(39), 4_000 ether);
-        assertEq(vest.rxd(39), 0);
-
-        uint256 prevBalance0 = gov.balanceOf(wallets.addr("PHOENIX_LABS_2"));
-        uint256 prevBalance1 = gov.balanceOf(wallets.addr("PULLUP_LABS"));
-
-        // Give admin powers to test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(38);
-        vest.unrestrict(39);
-
-        vm.warp(PHOENIX_LABS_FIN);
-
-        vest.vest(38);
-        assertEq(gov.balanceOf(wallets.addr("PHOENIX_LABS_2")), prevBalance0 + 986.25 ether);
-
-        vm.warp(PULLUP_LABS_FIN);
-
-        vest.vest(39);
-        assertEq(gov.balanceOf(wallets.addr("PULLUP_LABS")), prevBalance1 + 4_000 ether);
+        { // check JETSTREAM stream
+            address jetstreamAddress = wallets.addr("JETSTREAM");
+            uint256 jetstreamStreamId = prevStreamCount + 2;
+            uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
+            assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(jetstreamAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(jetstreamStreamId);
+            vm.warp(jetstreamFin);
+            vest.vest(jetstreamStreamId);
+            assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+        }
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[17] memory payees = [
-            Payee(wallets.addr("ORA_WALLET"),       297.3 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("RISK_WALLET_VEST"), 175 ether),    // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("SES_WALLET"),       10.3 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),         29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DEFENSOR"),         29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),      29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("FRONTIERRESEARCH"), 29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("GFXLABS_2"),        29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("QGOV"),             29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),         29.76 ether),  // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),          9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"),              9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("LIBERTAS"),         9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CODEKNIGHT"),       9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),              9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("FLIPFLOPFLAP_2"),   9.92 ether),   // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BANDHAR"),          9.92 ether)    // note: ether is a keyword helper, only MKR is transferred here
+        Payee[16] memory payees = [
+            Payee(wallets.addr("DECO_WALLET"),     125    ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DUX_WALLET"),       56.48 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DEFENSOR"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),      29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("QGOV"),             29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),          29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("WBC"),              20.16 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),               9.92 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BANDHAR"),           7.68 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("LIBERTAS"),          7.04 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PALC"),              2.24 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("HARMONY"),           1.92 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VOTEWIZARD"),        1.6  ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("NAVIGATOR"),         0.32 ether)  // note: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
