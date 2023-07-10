@@ -36,7 +36,7 @@ interface RwaUrnLike {
 }
 
 interface ChainlogLike {
-    function removeAddress(bytes32) external;
+    function removeAddress(bytes32 _key) external;
 }
 
 interface VestLike {
@@ -63,20 +63,24 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-07-12 MakerDAO Executive Spell | Hash: TODO";
 
-    address internal immutable RWA015_A_URN                 = DssExecLib.getChangelogAddress("RWA015_A_URN");
-    address internal immutable RWA015_A_OUTPUT_CONDUIT_PAX  = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
-    address internal immutable RWA015_A_OUTPUT_CONDUIT_USDC = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
-    address internal immutable MCD_PSM_PAX_A                = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
-    address internal immutable MCD_PSM_GUSD_A               = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
-    address internal immutable MCD_PSM_USDC_A               = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
-    address internal immutable MCD_ESM                      = DssExecLib.esm();
-
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return true;
     }
 
-    uint256 internal constant WAD       = 10 ** 18;
+    uint256 internal constant WAD                           = 10 ** 18;
+
+    // New RWA015 output conduit
+    address internal constant RWA015_A_OPERATOR             = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
+    address internal constant RWA015_A_CUSTODY              = 0x65729807485F6f7695AF863d97D62140B7d69d83;
+    address internal constant RWA015_A_OUTPUT_CONDUIT       = 0x1E86CB085f249772f7e7443631a87c6BDba2aCEb;
+    address internal immutable RWA015_A_OUTPUT_CONDUIT_USDC = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
+    address internal immutable RWA015_A_URN                 = DssExecLib.getChangelogAddress("RWA015_A_URN");
+    address internal immutable RWA015_A_OUTPUT_CONDUIT_PAX  = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal immutable MCD_PSM_PAX_A                = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+    address internal immutable MCD_PSM_GUSD_A               = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+    address internal immutable MCD_PSM_USDC_A               = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable MCD_ESM                      = DssExecLib.esm();
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -88,13 +92,6 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE      = ;
-
-
-    // Operator address
-    address internal constant RWA015_A_OPERATOR            = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
-    // Custody address
-    address internal constant RWA015_A_CUSTODY             = 0x65729807485F6f7695AF863d97D62140B7d69d83;
-    address internal constant RWA015_A_OUTPUT_CONDUIT      = 0x1E86CB085f249772f7e7443631a87c6BDba2aCEb;
 
     uint256 internal constant THREE_PT_ONE_NINE_PCT_RATE  = 1000000000995743377573746041;
     uint256 internal constant THREE_PT_FOUR_FOUR_PCT_RATE = 1000000001072474267302354182;
