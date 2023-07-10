@@ -36,6 +36,30 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
+interface RwaUrnLike {
+    function outputConduit() external view returns (address);
+    function can(address) external view returns (uint256);
+    function draw(uint256) external;
+}
+
+interface RwaOutputConduitLike {
+    function wards(address) external view returns (uint256);
+    function can(address) external view returns (uint256);
+    function may(address) external view returns (uint256);
+    function pal(address) external view returns (uint256);
+    function bud(address) external view returns (uint256);
+    function dai() external view returns (address);
+    function gem() external view returns (address);
+    function mate(address) external;
+    function hope(address) external;
+    function kiss(address) external;
+    function hook(address) external;
+    function quitTo() external view returns (address);
+    function pick(address) external;
+    function push(uint256) external;
+    function quit() external;
+}
+
 interface DssCronSequencerLike {
     function getMaster() external view returns (bytes32);
     function hasJob(address) external view returns (bool);
@@ -173,18 +197,18 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() private { // make private to disable
+    function testRemoveChainlogValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // try chainLog.getAddress("RWA007_A_INPUT_CONDUIT_URN") {
-        //     assertTrue(false);
-        // } catch Error(string memory errmsg) {
-        //     assertTrue(cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        // } catch {
-        //     assertTrue(false);
-        // }
+        try chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
     }
 
     function testCollateralIntegrations() private { // make private to disable
@@ -273,6 +297,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Insert new chainlog values tests here
+        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+
         _checkChainlogKey("CRON_SEQUENCER");
         _checkChainlogKey("CRON_AUTOLINE_JOB");
         _checkChainlogKey("CRON_LERP_JOB");
@@ -559,56 +585,63 @@ contract DssSpellTest is DssSpellTestBase {
         // 2024-12-31 23:59:59 UTC
         uint256 DEC_31_2024 = 1735689599;
 
-        // Store previous amount of streams
         uint256 prevStreamCount = vest.ids();
+        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
         uint256 prevBalance;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // check new allowance
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newVesting, "testVestMKR/invalid-allowance");
+
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
         assertEq(vest.ids(), prevStreamCount + 2, "testVestMKR/invalid-stream-count");
 
-        // check CHRONICLE_LABS stream
-        address chronicleAddress = wallets.addr("CHRONICLE_LABS");
-        uint256 chronicleStreamId = prevStreamCount + 1;
-        uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
-        assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
-        assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
-        assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
-        assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
-        assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
-        assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
-        assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
-        assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-        assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
-        prevBalance = gov.balanceOf(chronicleAddress);
-        GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(chronicleStreamId);
-        vm.warp(chronicleFin);
-        vest.vest(chronicleStreamId);
-        assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+        { // check CHRONICLE_LABS stream
+            address chronicleAddress = wallets.addr("CHRONICLE_LABS");
+            uint256 chronicleStreamId = prevStreamCount + 1;
+            uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
+            assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(chronicleAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(chronicleStreamId);
+            vm.warp(chronicleFin);
+            vest.vest(chronicleStreamId);
+            assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+        }
 
-        // check JETSTREAM stream
-        address jetstreamAddress = wallets.addr("JETSTREAM");
-        uint256 jetstreamStreamId = prevStreamCount + 2;
-        uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
-        assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
-        assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
-        assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
-        assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
-        assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
-        assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
-        assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
-        assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-        assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
-        prevBalance = gov.balanceOf(jetstreamAddress);
-        GodMode.setWard(address(vest), address(this), 1);
-        vest.unrestrict(jetstreamStreamId);
-        vm.warp(jetstreamFin);
-        vest.vest(jetstreamStreamId);
-        assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+        { // check JETSTREAM stream
+            address jetstreamAddress = wallets.addr("JETSTREAM");
+            uint256 jetstreamStreamId = prevStreamCount + 2;
+            uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
+            assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(jetstreamAddress);
+            GodMode.setWard(address(vest), address(this), 1);
+            vest.unrestrict(jetstreamStreamId);
+            vm.warp(jetstreamFin);
+            vest.vest(jetstreamStreamId);
+            assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+        }
     }
 
     function testMKRPayments() public { // make public to enable
@@ -865,6 +898,116 @@ contract DssSpellTest is DssSpellTestBase {
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
+
+    // RWA tests
+
+    address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
+    address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
+    address MCD_PSM_PAX_A     = addr.addr("MCD_PSM_PAX_A");
+    address MCD_PSM_GUSD_A    = addr.addr("MCD_PSM_GUSD_A");
+    address MCD_PSM_USDC_A    = addr.addr("MCD_PSM_USDC_A");
+
+    RwaUrnLike               rwa015AUrn             = RwaUrnLike(addr.addr("RWA015_A_URN"));
+    RwaOutputConduitLike     rwa015AOutputConduit   = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
+
+    function testRWA015_OUTPUT_CONDUIT_DEPLOYMENT_SETUP() public {
+        assertEq(rwa015AOutputConduit.dai(), addr.addr("MCD_DAI"),       "output-conduit-dai-not-match");
+    }
+
+    function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(rwa015AUrn.outputConduit(), address(rwa015AOutputConduit), "RwaUrn/urn-outputconduit-not-match");
+
+        assertEq(rwa015AOutputConduit.wards(pauseProxy),      1, "OutputConduit/ward-pause-proxy-not-set");
+        assertEq(rwa015AOutputConduit.wards(address(esm)),    1, "OutputConduit/ward-esm-not-set");
+        assertEq(rwa015AOutputConduit.can(pauseProxy),        0, "OutputConduit/pause-proxy-hoped");
+        assertEq(rwa015AOutputConduit.can(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
+        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-mated");
+        assertEq(rwa015AOutputConduit.may(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
+        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
+        assertEq(rwa015AOutputConduit.pal(MCD_PSM_PAX_A),     1, "OutputConduit/pax-psm-address-not-whitelisted-for-hook");
+        assertEq(rwa015AOutputConduit.pal(MCD_PSM_GUSD_A),    1, "OutputConduit/gusd-a-address-not-whitelisted-for-hook");
+        assertEq(rwa015AOutputConduit.pal(MCD_PSM_USDC_A),    1, "OutputConduit/usdc-psm-address-not-whitelisted-for-hook");
+        assertEq(rwa015AOutputConduit.quitTo(), address(rwa015AUrn), "OutputConduit/quit-to-not-urn");
+    }
+
+    function testRWA015_REVOKE_OLD_CONDUITS_PERMISSIONS() public {
+        address RWA015_OUTPUT_CONDUIT_PAX = chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT");
+        address RWA015_OUTPUT_CONDUIT_USDC = chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).wards(pauseProxy),      0, "OutputConduit/ward-pause-proxy-relied");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).wards(address(esm)),    0, "OutputConduit/ward-esm-relied");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).can(RWA015_A_OPERATOR), 0, "OutputConduit/operator-hoped");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).may(RWA015_A_OPERATOR), 0, "OutputConduit/operator-mated");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).bud(RWA015_A_CUSTODY),  0, "OutputConduit/destination-address-whitelisted-for-pick");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).quitTo(), address(0),      "OutputConduit/quit-to-not-zero");
+
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).wards(pauseProxy),      0, "OutputConduit/ward-pause-proxy-relied");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).wards(address(esm)),    0, "OutputConduit/ward-esm-relied");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).can(RWA015_A_OPERATOR), 0, "OutputConduit/operator-hoped");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).may(RWA015_A_OPERATOR), 0, "OutputConduit/operator-mated");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).bud(RWA015_A_CUSTODY),  0, "OutputConduit/destination-address-whitelisted-for-pick");
+        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).quitTo(), address(0),      "OutputConduit/quit-to-not-zero");
+    }
+
+    function testRWA015_OPERATOR_DRAW_CONDUIT_PUSH() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        uint256 drawAmount = 1_000_000 * WAD;
+
+        // Increas line of RWA015 to be able to draw some DAI
+        (,,,uint256 line,) = vat.ilks("RWA015-A");
+        GodMode.setWard(address(vat), address(this), 1);
+        vat.file("RWA015-A", "line", line + 1_000_000 * RAD);
+
+        // setting address(this) as operator
+        vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
+        assertEq(rwa015AUrn.can(address(this)), 1);
+
+        // 0 DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Dangling Dai in input conduit before draw()");
+
+        // Draw 1m to test output conduit
+        rwa015AUrn.draw(drawAmount);
+
+        // DAI in Output Conduit
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount, "RWA015-A: Dai drawn was not send to the recipient");
+
+        // wards
+        GodMode.setWard(address(rwa015AOutputConduit), address(this), 1);
+        // may
+        rwa015AOutputConduit.mate(address(this));
+        assertEq(rwa015AOutputConduit.may(address(this)), 1);
+        rwa015AOutputConduit.hope(address(this));
+        assertEq(rwa015AOutputConduit.can(address(this)), 1);
+
+        rwa015AOutputConduit.kiss(address(this));
+        assertEq(rwa015AOutputConduit.bud(address(this)), 1);
+        rwa015AOutputConduit.pick(address(this));
+        rwa015AOutputConduit.hook(MCD_PSM_USDC_A);
+
+        GemAbstract psmGem = GemAbstract(rwa015AOutputConduit.gem());
+        uint256 daiPsmGemDiffDecimals = 10**(18 - uint256(psmGem.decimals()));
+
+        uint256 pushAmount = drawAmount;
+        rwa015AOutputConduit.push(pushAmount);
+        rwa015AOutputConduit.quit();
+
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount - pushAmount, "RWA015-A: Dai not sent to destination after push()");
+    }
+
+    // Flapper tests
 
     function testFlapperUniV2() public {
         address old_flap = chainLog.getAddress("MCD_FLAP");

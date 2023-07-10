@@ -25,6 +25,26 @@ interface DssCronSequencerLike {
     function addJob(address) external;
 }
 
+interface RwaOutputConduitLike {
+    function deny(address usr) external;
+    function hope(address usr) external;
+    function nope(address usr) external;
+    function mate(address usr) external;
+    function hate(address usr) external;
+    function kiss(address who) external;
+    function diss(address who) external;
+    function file(bytes32 what, address data) external;
+    function clap(address _psm) external;
+}
+
+interface RwaUrnLike {
+    function file(bytes32 what, address data) external;
+}
+
+interface ChainlogLike {
+    function removeAddress(bytes32 _key) external;
+}
+
 interface VestLike {
     function file(bytes32 what, uint256 data) external;
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
@@ -34,6 +54,12 @@ interface VestLike {
 
 interface GemLike {
     function transfer(address, uint256) external returns (bool);
+    function approve(address, uint256) external returns (bool);
+    function allowance(address, address) external view returns (uint256);
+}
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
 contract DssSpellAction is DssAction {
@@ -53,9 +79,17 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD         = 10 ** 18;
     uint256 internal constant RAD         = 10 ** 45;
 
-    address internal constant MCD_FLAP    = 0x0c10Ae443cCB4604435Ba63DA80CCc63311615Bc;
-    address internal constant FLAPPER_MOM = 0xee2058A11612587Ef6F5470e7776ceB0E4736078;
-    address internal constant PIP_MKR     = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+    // New RWA015 output conduit
+    address internal constant RWA015_A_OPERATOR             = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
+    address internal constant RWA015_A_CUSTODY              = 0x65729807485F6f7695AF863d97D62140B7d69d83;
+    address internal constant RWA015_A_OUTPUT_CONDUIT       = 0x1E86CB085f249772f7e7443631a87c6BDba2aCEb;
+    address internal immutable RWA015_A_OUTPUT_CONDUIT_USDC = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
+    address internal immutable RWA015_A_URN                 = DssExecLib.getChangelogAddress("RWA015_A_URN");
+    address internal immutable RWA015_A_OUTPUT_CONDUIT_PAX  = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal immutable MCD_PSM_PAX_A                = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A");
+    address internal immutable MCD_PSM_GUSD_A               = DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A");
+    address internal immutable MCD_PSM_USDC_A               = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable MCD_ESM                      = DssExecLib.esm();
 
     address internal constant CRON_SEQUENCER       = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
     address internal constant CRON_AUTOLINE_JOB    = 0x67AD4000e73579B9725eE3A149F85C4Af0A61361;
@@ -64,6 +98,10 @@ contract DssSpellAction is DssAction {
     address internal constant CRON_CLIPPER_MOM_JOB = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
     address internal constant CRON_ORACLE_JOB      = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
     address internal constant CRON_FLAP_JOB        = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
+
+    address internal constant MCD_FLAP    = 0x0c10Ae443cCB4604435Ba63DA80CCc63311615Bc;
+    address internal constant FLAPPER_MOM = 0xee2058A11612587Ef6F5470e7776ceB0E4736078;
+    address internal constant PIP_MKR     = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -118,8 +156,51 @@ contract DssSpellAction is DssAction {
     VestLike internal immutable MCD_VEST_DAI              = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     VestLike internal immutable MCD_VEST_MKR_TREASURY     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
+    // Spark
+    address internal immutable SUBPROXY_SPARK              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal immutable SPARK_SPELL                 = 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297;
+
     function actions() public override {
         // ----- Deploy Multiswap Conduit for RWA015-A -----
+
+        // OPERATOR permission on RWA015_A_OUTPUT_CONDUIT
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).hope(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).mate(RWA015_A_OPERATOR);
+        // Custody whitelist for output conduit destination address
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY);
+        // Whitelist PSM's
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).clap(MCD_PSM_PAX_A);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).clap(MCD_PSM_GUSD_A);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).clap(MCD_PSM_USDC_A);
+        // Set "quitTo" address for RWA015_A_OUTPUT_CONDUIT
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).file("quitTo", RWA015_A_URN);
+        // Route URN to new conduit
+        RwaUrnLike(RWA015_A_URN).file("outputConduit", RWA015_A_OUTPUT_CONDUIT);
+        // Additional ESM authorization
+        DssExecLib.authorize(RWA015_A_OUTPUT_CONDUIT, MCD_ESM);
+
+        DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT", RWA015_A_OUTPUT_CONDUIT);
+
+        // Unwind Permissions from old Conduits and remove them from Chainlog
+
+        // Revoke permissions on RWA015_A_OUTPUT_CONDUIT_PAX
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).nope(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).hate(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).diss(RWA015_A_CUSTODY);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).file("quitTo", address(0));
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).deny(MCD_ESM);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).deny(address(this));
+
+        // Revoke permissions on RWA015_A_OUTPUT_CONDUIT_USDC
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).nope(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).hate(RWA015_A_OPERATOR);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).diss(RWA015_A_CUSTODY);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).file("quitTo", address(0));
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).deny(MCD_ESM);
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).deny(address(this));
+
+        // Remove Legacy Conduit From Chainlog
+        ChainlogLike(DssExecLib.LOG).removeAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
 
         // ----- Add Cron Jobs to Chainlog -----
         // Forum: https://forum.makerdao.com/t/dsscron-housekeeping-additions/21292
@@ -290,6 +371,11 @@ contract DssSpellAction is DssAction {
 
         // ----- Ecosystem Actor MKR Budget Stream -----
 
+        // Increase allowance by new vesting delta
+        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), (address(MCD_VEST_MKR_TREASURY))) + newVesting);
+
         // Set system-wide cap on maximum vesting speed
         MCD_VEST_MKR_TREASURY.file("cap", 2_220 * WAD / 365 days);
 
@@ -340,6 +426,12 @@ contract DssSpellAction is DssAction {
         // yank DAI stream ID 14 to DUX-001
         // Forum: https://forum.makerdao.com/t/mip39c3-sp9-removing-dux-001/21306
         MCD_VEST_DAI.yank(14);
+
+        // ----- Trigger Spark Proxy Spell -----
+        // Forum: https://forum.makerdao.com/t/freeze-the-sdai-market-on-spark/21322
+
+        // Trigger Spark Spell at 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297
+        ProxyLike(SUBPROXY_SPARK).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ----- Update ChainLog version -----
         // Justification: The MINOR version is updated as core MCD_FLAP contract is being replaced in the spell
