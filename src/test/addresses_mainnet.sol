@@ -41,7 +41,8 @@ contract Addresses {
         addr["MCD_DOG"]                         = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
         addr["MCD_VOW"]                         = 0xA950524441892A31ebddF91d3cEEFa04Bf454466;
         addr["MCD_JOIN_DAI"]                    = 0x9759A6Ac90977b93B58547b4A71c78317f391A28;
-        addr["MCD_FLAP"]                        = 0xa4f79bC4a5612bdDA35904FDF55Fc4Cb53D1BFf6;
+        addr["MCD_FLAP"]                        = 0x0c10Ae443cCB4604435Ba63DA80CCc63311615Bc;
+        addr["FLAPPER_MOM"]                     = 0xee2058A11612587Ef6F5470e7776ceB0E4736078;
         addr["MCD_FLOP"]                        = 0xA41B6EF151E06da0e34B009B86E828308986736D;
         addr["MCD_PAUSE"]                       = 0xbE286431454714F511008713973d3B053A2d38f3;
         addr["MCD_PAUSE_PROXY"]                 = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
@@ -77,6 +78,7 @@ contract Addresses {
         addr["CDP_REGISTRY"]                    = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
         addr["MCD_CROPPER"]                     = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
         addr["MCD_CROPPER_IMP"]                 = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
+        addr["PIP_MKR"]                         = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
         addr["ETH"]                             = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                         = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                  = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
@@ -466,5 +468,12 @@ contract Addresses {
         addr["MCD_CLIP_GNO_A"]                  = 0xd9e758bd239e5d568f44D0A748633f6a8d52CBbb;
         addr["MCD_CLIP_CALC_GNO_A"]             = 0x17b6D0e4237ea7F880aF5F58257cd232a04171D9;
         addr["SPARK_PROXY"]                     = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+        addr["CRON_SEQUENCER"]                  = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
+        addr["CRON_AUTOLINE_JOB"]               = 0x67AD4000e73579B9725eE3A149F85C4Af0A61361;
+        addr["CRON_LERP_JOB"]                   = 0x8F8f2FC1F0380B9Ff4fE5c3142d0811aC89E32fB;
+        addr["CRON_D3M_JOB"]                    = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
+        addr["CRON_CLIPPER_MOM_JOB"]            = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
+        addr["CRON_ORACLE_JOB"]                 = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
+        addr["CRON_FLAP_JOB"]                   = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
     }
 }

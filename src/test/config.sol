@@ -37,10 +37,8 @@ contract Config {
         uint256 vow_bump;
         uint256 vow_hump_min;
         uint256 vow_hump_max;
-        uint256 flap_beg;
-        uint256 flap_ttl;
-        uint256 flap_tau;
-        uint256 flap_lid;
+        uint256 flap_hop;
+        uint256 flap_want;
         uint256 cat_box;
         uint256 dog_Hole;
         uint256 esm_min;
@@ -119,13 +117,11 @@ contract Config {
         afterSpell.vow_wait =              156 hours;               // In seconds
         afterSpell.vow_dump =              250;                     // In whole Dai units
         afterSpell.vow_sump =              50 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_bump =              30 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_hump_min =          250 * MILLION;           // In whole Dai units
-        afterSpell.vow_hump_max =          250 * MILLION;           // In whole Dai units
-        afterSpell.flap_beg =              400;                     // in basis points
-        afterSpell.flap_ttl =              30 minutes;              // in seconds
-        afterSpell.flap_tau =              72 hours;                // in seconds
-        afterSpell.flap_lid =              30 * THOUSAND;           // in whole Dai units
+        afterSpell.vow_bump =              5 * THOUSAND;            // In whole Dai units
+        afterSpell.vow_hump_min =          50 * MILLION;            // In whole Dai units
+        afterSpell.vow_hump_max =          50 * MILLION;            // In whole Dai units
+        afterSpell.flap_hop =              1577 seconds;            // In seconds
+        afterSpell.flap_want =             9800;                    // In basis points
         afterSpell.cat_box =               20 * MILLION;            // In whole Dai units
         afterSpell.dog_Hole =              70 * MILLION;            // In whole Dai units
         afterSpell.esm_min =               150 * THOUSAND;          // In whole MKR units

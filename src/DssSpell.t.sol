@@ -60,6 +60,16 @@ interface RwaOutputConduitLike {
     function quit() external;
 }
 
+interface DssCronSequencerLike {
+    function getMaster() external view returns (bytes32);
+    function hasJob(address) external view returns (bool);
+}
+
+interface DssCronJobLike {
+    function work(bytes32, bytes calldata) external;
+    function workable(bytes32) external returns (bool, bytes memory);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -288,6 +298,20 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Insert new chainlog values tests here
         _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
+
+        _checkChainlogKey("CRON_SEQUENCER");
+        _checkChainlogKey("CRON_AUTOLINE_JOB");
+        _checkChainlogKey("CRON_LERP_JOB");
+        _checkChainlogKey("CRON_D3M_JOB");
+        _checkChainlogKey("CRON_CLIPPER_MOM_JOB");
+        _checkChainlogKey("CRON_ORACLE_JOB");
+
+        _checkChainlogKey("PIP_MKR");
+        _checkChainlogKey("MCD_FLAP");
+        _checkChainlogKey("FLAPPER_MOM");
+        _checkChainlogKey("CRON_FLAP_JOB");
+
+        _checkChainlogVersion("1.15.0");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -982,5 +1006,98 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
         assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount - pushAmount, "RWA015-A: Dai not sent to destination after push()");
     }
-}
 
+    // Flapper tests
+
+    function testFlapperUniV2() public {
+        address old_flap = chainLog.getAddress("MCD_FLAP");
+
+        assertEq(vow.flapper(), old_flap);
+        assertEq(vat.can(address(vow), old_flap),      1);
+        assertEq(vat.can(address(vow), address(flap)), 0);
+
+        // execute spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vow.flapper(), address(flap));
+        assertEq(vat.can(address(vow), old_flap),      0);
+        assertEq(vat.can(address(vow), address(flap)), 1);
+
+        // Leave surplus buffer ready to be flapped
+        vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
+
+        assertEq(flap.gem(), address(gov));
+        address pip = flap.pip();
+        assertEq(pip, addr.addr("PIP_MKR"));
+        address pair = flap.pair();
+
+        vm.prank(pauseProxy);
+        MedianAbstract(pip).kiss(address(this));
+
+        uint256 price = MedianAbstract(pip).read();
+        uint256 daiAmt = 1_000_000 * WAD;
+        GodMode.setBalance(address(dai), address(pair), daiAmt);
+        uint256 mkrAmt = 1_000_000 * WAD * WAD / price;
+        GodMode.setBalance(address(gov), address(pair), mkrAmt * 97 / 100); // 3% worse price (should fail)
+        vm.expectRevert("FlapperUniV2/insufficient-buy-amount");
+        vow.flap();
+        GodMode.setBalance(address(gov), address(pair), mkrAmt * 99 / 100); // Leaves just 1% worse price
+        //
+
+        uint256 initialLp = GemAbstract(pair).balanceOf(pauseProxy);
+        uint256 initialDaiVow = vat.dai(address(vow));
+        uint256 initialReserveDai = dai.balanceOf(pair);
+        uint256 initialReserveMkr = gov.balanceOf(pair);
+
+        vow.flap();
+
+        assertGt(GemAbstract(pair).balanceOf(pauseProxy), initialLp);
+        assertGt(dai.balanceOf(pair), initialReserveDai);
+        assertEq(gov.balanceOf(pair), initialReserveMkr);
+        assertGt(initialDaiVow - vat.dai(address(vow)), 2 * vow.bump() * 9 / 10);
+        assertLt(initialDaiVow - vat.dai(address(vow)), 2 * vow.bump() * 11 / 10);
+        assertEq(dai.balanceOf(address(flap)), 0);
+        assertEq(gov.balanceOf(address(flap)), 0);
+
+        // Check Mom can increase hop
+        assertEq(flap.hop(), 1577 seconds);
+        vm.prank(chief.hat());
+        flapMom.stop();
+        assertEq(flap.hop(), type(uint256).max);
+    }
+
+    function testSequencerFlapJob() public {
+        DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
+        DssCronJobLike flapJob = DssCronJobLike(addr.addr("CRON_FLAP_JOB"));
+
+        assertTrue(!sequencer.hasJob(address(flapJob)));
+
+        // execute spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertTrue(sequencer.hasJob(address(flapJob)));
+
+        address pip = flap.pip();
+        address pair = flap.pair();
+
+        vm.prank(pauseProxy);
+        MedianAbstract(pip).kiss(address(this));
+
+        uint256 price = MedianAbstract(pip).read();
+        uint256 daiAmt = 1_000_000 * WAD;
+        GodMode.setBalance(address(dai), address(pair), daiAmt);
+        uint256 mkrAmt = 1_000_000 * WAD * WAD / price;
+        GodMode.setBalance(address(gov), address(pair), mkrAmt * 99 / 100); // Leaves just 1% worse price
+
+        bytes32 master = sequencer.getMaster();
+        uint256 snapshot = vm.snapshot();
+        (bool ok, bytes memory data) = flapJob.workable(master);
+        vm.revertTo(snapshot);
+        assertTrue(ok);
+        flapJob.work(sequencer.getMaster(), data);
+    }
+}
