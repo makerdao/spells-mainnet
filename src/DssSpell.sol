@@ -74,10 +74,10 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
-    uint256 internal constant THOUSAND    = 10 **  3;
-    uint256 internal constant MILLION     = 10 **  6;
-    uint256 internal constant WAD         = 10 ** 18;
-    uint256 internal constant RAD         = 10 ** 45;
+    uint256 internal constant THOUSAND                      = 10 **  3;
+    uint256 internal constant MILLION                       = 10 **  6;
+    uint256 internal constant WAD                           = 10 ** 18;
+    uint256 internal constant RAD                           = 10 ** 45;
 
     // New RWA015 output conduit
     address internal constant RWA015_A_OPERATOR             = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
@@ -91,17 +91,23 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PSM_USDC_A               = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
     address internal immutable MCD_ESM                      = DssExecLib.esm();
 
-    address internal constant CRON_SEQUENCER       = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
-    address internal constant CRON_AUTOLINE_JOB    = 0x67AD4000e73579B9725eE3A149F85C4Af0A61361;
-    address internal constant CRON_LERP_JOB        = 0x8F8f2FC1F0380B9Ff4fE5c3142d0811aC89E32fB;
-    address internal constant CRON_D3M_JOB         = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
-    address internal constant CRON_CLIPPER_MOM_JOB = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
-    address internal constant CRON_ORACLE_JOB      = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
-    address internal constant CRON_FLAP_JOB        = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
+    // Spark
+    address internal constant SUBPROXY_SPARK                = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL                   = 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297;
 
-    address internal constant MCD_FLAP    = 0x0c10Ae443cCB4604435Ba63DA80CCc63311615Bc;
-    address internal constant FLAPPER_MOM = 0xee2058A11612587Ef6F5470e7776ceB0E4736078;
-    address internal constant PIP_MKR     = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+    // CRON jobs
+    address internal constant CRON_SEQUENCER                = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
+    address internal constant CRON_AUTOLINE_JOB             = 0x67AD4000e73579B9725eE3A149F85C4Af0A61361;
+    address internal constant CRON_LERP_JOB                 = 0x8F8f2FC1F0380B9Ff4fE5c3142d0811aC89E32fB;
+    address internal constant CRON_D3M_JOB                  = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
+    address internal constant CRON_CLIPPER_MOM_JOB          = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
+    address internal constant CRON_ORACLE_JOB               = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
+    address internal constant CRON_FLAP_JOB                 = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
+
+    // New flapper
+    address internal constant MCD_FLAP                      = 0x0c10Ae443cCB4604435Ba63DA80CCc63311615Bc;
+    address internal constant FLAPPER_MOM                   = 0xee2058A11612587Ef6F5470e7776ceB0E4736078;
+    address internal constant PIP_MKR                       = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -156,17 +162,14 @@ contract DssSpellAction is DssAction {
     VestLike internal immutable MCD_VEST_DAI              = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_DAI"));
     VestLike internal immutable MCD_VEST_MKR_TREASURY     = VestLike(DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY"));
 
-    // Spark
-    address internal immutable SUBPROXY_SPARK              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal immutable SPARK_SPELL                 = 0x843A0539Ca7466Abcb769f1c1d30C8423e13A297;
-
     function actions() public override {
         // ----- Deploy Multiswap Conduit for RWA015-A -----
+        // Forum: http://forum.makerdao.com/t/rwa015-project-andromeda-technical-assessment/20974/11
 
         // OPERATOR permission on RWA015_A_OUTPUT_CONDUIT
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).hope(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).mate(RWA015_A_OPERATOR);
-        // Custody whitelist for output conduit destination address
+        // Whitelist custody for output conduit destination address
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY);
         // Whitelist PSM's
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).clap(MCD_PSM_PAX_A);
@@ -176,14 +179,12 @@ contract DssSpellAction is DssAction {
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).file("quitTo", RWA015_A_URN);
         // Route URN to new conduit
         RwaUrnLike(RWA015_A_URN).file("outputConduit", RWA015_A_OUTPUT_CONDUIT);
-        // Additional ESM authorization
+        // Authorize ESM
         DssExecLib.authorize(RWA015_A_OUTPUT_CONDUIT, MCD_ESM);
-
+        // Update ChainLog address
         DssExecLib.setChangelogAddress("RWA015_A_OUTPUT_CONDUIT", RWA015_A_OUTPUT_CONDUIT);
 
-        // Unwind Permissions from old Conduits and remove them from Chainlog
-
-        // Revoke permissions on RWA015_A_OUTPUT_CONDUIT_PAX
+        // Revoke permissions on the old RWA015_A_OUTPUT_CONDUIT_PAX
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).nope(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).hate(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).diss(RWA015_A_CUSTODY);
@@ -191,7 +192,7 @@ contract DssSpellAction is DssAction {
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).deny(MCD_ESM);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_PAX).deny(address(this));
 
-        // Revoke permissions on RWA015_A_OUTPUT_CONDUIT_USDC
+        // Revoke permissions on the old RWA015_A_OUTPUT_CONDUIT_USDC
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).nope(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).hate(RWA015_A_OPERATOR);
         RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT_USDC).diss(RWA015_A_CUSTODY);
