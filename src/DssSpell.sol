@@ -238,7 +238,7 @@ contract DssSpellAction is DssAction {
         });
 
         FlapperInit.initDirectOracle({
-            flapper : MCD_FLAP
+            flapper: MCD_FLAP
         });
 
         DssExecLib.setChangelogAddress("PIP_MKR", PIP_MKR);

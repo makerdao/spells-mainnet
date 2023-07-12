@@ -93,8 +93,7 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x07D8D43916bc235B71d9683111De7c7c626Bb906);
+        address[] memory prevSpells = new address[](0);
 
         //
         // Values for spell-specific parameters
@@ -112,7 +111,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset =           750 * MILLION;           // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr =               319;                     // In basis points
+        afterSpell.pot_dsr =               3_19;                    // In basis points
         afterSpell.pause_delay =           48 hours;                // In seconds
         afterSpell.vow_wait =              156 hours;               // In seconds
         afterSpell.vow_dump =              250;                     // In whole Dai units
