@@ -22,7 +22,7 @@ import { MCD, DssInstance } from "dss-test/MCD.sol";
 import { FlapperInit, FlapperInstance, FlapperUniV2Config } from "src/dependencies/dss-flappers/FlapperInit.sol";
 
 interface DssCronSequencerLike {
-    function addJob(address) external;
+    function addJob(address job) external;
 }
 
 interface RwaOutputConduitLike {
@@ -47,15 +47,15 @@ interface ChainlogLike {
 
 interface VestLike {
     function file(bytes32 what, uint256 data) external;
-    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    function restrict(uint256) external;
-    function yank(uint256) external;
+    function create(address _usr, uint256 _tot, uint256 _bgn, uint256 _tau, uint256 _eta, address _mgr) external returns (uint256 id);
+    function restrict(uint256 _id) external;
+    function yank(uint256 _id) external;
 }
 
 interface GemLike {
-    function transfer(address, uint256) external returns (bool);
-    function approve(address, uint256) external returns (bool);
-    function allowance(address, address) external view returns (uint256);
+    function transfer(address dst, uint256 wad) external returns (bool);
+    function approve(address guy, uint256 wad) external returns (bool);
+    function allowance(address src, address guy) external view returns (uint256);
 }
 
 interface ProxyLike {
@@ -65,7 +65,7 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-        // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/cb7a1b7e3c5d60f2189d6900c010f2cdb46803c0/governance/votes/Executive%20vote%20-%20July%2012%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/cb7a1b7e3c5d60f2189d6900c010f2cdb46803c0/governance/votes/Executive%20vote%20-%20July%2012%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2023-07-12 MakerDAO Executive Spell | Hash: 0x783c40f81b310f4511604064995ea1b279178c10a0e72aff010e6861efc961a3";
 
@@ -123,9 +123,9 @@ contract DssSpellAction is DssAction {
     uint256 internal constant THREE_PT_ONE_NINE_PCT_RATE  = 1000000000995743377573746041;
     uint256 internal constant THREE_PT_FOUR_FOUR_PCT_RATE = 1000000001072474267302354182;
     uint256 internal constant THREE_PT_NINE_FOUR_PCT_RATE = 1000000001225381266358479708;
+    uint256 internal constant FIVE_PT_FOUR_FOUR_PCT_RATE  = 1000000001679727448331902751;
     uint256 internal constant FIVE_PT_SIX_NINE_PCT_RATE   = 1000000001754822903403114680;
     uint256 internal constant SIX_PT_ONE_NINE_PCT_RATE    = 1000000001904482384730282575;
-    uint256 internal constant FIVE_PT_FOUR_FOUR_PCT_RATE  = 1000000001679727448331902751;
 
     // 2023-06-26 00:00:00 UTC
     uint256 internal constant JUN_26_2023                 = 1687737600;
