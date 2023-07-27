@@ -23,7 +23,7 @@ export FOUNDRY_OPTIMIZER=false
 export FOUNDRY_OPTIMIZER_RUNS=200
 export FOUNDRY_ROOT_CHAINID=1
 
-local TEST_ARGS=''
+TEST_ARGS=''
 
 if [[ -n "$MATCH" ]]; then
     TEST_ARGS="${TEST_ARGS} -vvv --match-test ${MATCH}"
