@@ -23,16 +23,16 @@ export FOUNDRY_OPTIMIZER=false
 export FOUNDRY_OPTIMIZER_RUNS=200
 export FOUNDRY_ROOT_CHAINID=1
 
-EXTRA_ARGS=''
+local TEST_ARGS=''
 
 if [[ -n "$MATCH" ]]; then
-    EXTRA_ARGS="${EXTRA_ARGS} -vvv --match-test ${MATCH}"
+    TEST_ARGS="${TEST_ARGS} -vvv --match-test ${MATCH}"
 elif [[ -n "$NO_MATCH" ]]; then
-    EXTRA_ARGS="${EXTRA_ARGS} -vvv --no-match-test ${NO_MATCH}"
+    TEST_ARGS="${TEST_ARGS} -vvv --no-match-test ${NO_MATCH}"
 fi
 
 if [[ -n "$BLOCK" ]]; then
-    EXTRA_ARGS="${EXTRA_ARGS} --fork-block-number ${BLOCK}"
+    TEST_ARGS="${TEST_ARGS} --fork-block-number ${BLOCK}"
 fi
 
-forge test --fork-url "$ETH_RPC_URL" $EXTRA_ARGS
+forge test --fork-url "$ETH_RPC_URL" $TEST_ARGS
