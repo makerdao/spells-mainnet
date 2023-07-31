@@ -99,11 +99,11 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:                 address(0x402D46A20C849390Da96CeB0C3c04832D29e87d7), // populate with deployed spell if deployed
-            deployed_spell_created:         1689365111,                                          // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:           17693956,                                            // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:                 address(0),         // populate with deployed spell if deployed
+            deployed_spell_created:         0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:           0,                  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:                prevSpells,         // older spells to ensure are executed first
-            office_hours_enabled:           true,               // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:           false,              // true if officehours is expected to be enabled in the spell
             expiration_threshold:           30 days             // Amount of time before spell expires
         });
 
@@ -111,7 +111,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset =           750 * MILLION;           // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr =               3_19;                    // In basis points
+        afterSpell.pot_dsr =               8_00;                    // In basis points
         afterSpell.pause_delay =           48 hours;                // In seconds
         afterSpell.vow_wait =              156 hours;               // In seconds
         afterSpell.vow_dump =              250;                     // In whole Dai units
@@ -1281,7 +1281,7 @@ contract Config {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         7 * MILLION,
+            line:         0,
             dust:         0,
             pct:          700,
             mat:          11000,
@@ -2028,7 +2028,7 @@ contract Config {
         });
         afterSpell.collaterals["DIRECT-SPARK-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      20 * MILLION,
+            aL_line:      200 * MILLION,
             aL_gap:       20 * MILLION,
             aL_ttl:       8 hours,
             line:         0,

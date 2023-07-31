@@ -75,6 +75,18 @@ contract Wallets {
         addr["CONSENSYS"]                    = 0xE78658A8acfE982Fde841abb008e57e6545e38b3;
         addr["HKUSTEPI"]                     = 0x2dA0d746938Efa28C7DC093b1da286b3D8bAC34a;
 
+        // AVCs
+        addr["IAMMEEOH"]                     = 0x47f7A5d8D27f259582097E1eE59a07a816982AE9;
+        addr["ACREDAOS"]                     = 0xBF9226345F601150F64Ea4fEaAE7E40530763cbd;
+        addr["SPACEXPONENTIAL"]              = 0xFF8eEB643C5bfDf6A925f2a5F9aDC9198AF07b78;
+        addr["RES"]                          = 0x8c5c8d76372954922400e4654AF7694e158AB784;
+        addr["LDF"]                          = 0xC322E8Ec33e9b0a34c7cD185C616087D9842ad50;
+        addr["OPENSKY"]                      = 0x8e67eE3BbEb1743dc63093Af493f67C3c23C6f04;
+        addr["DAVIDPHELPS"]                  = 0xd56e3E325133EFEd6B1687C88571b8a91e517ab0;
+        addr["SEEDLATAMETH"]                 = 0x0087a081a9B430fd8f688c6ac5dD24421BfB060D;
+        addr["STABLELAB_2"]                  = 0xbDE65cf2352ed1Dde959f290E973d0fC5cEDFD08;
+        addr["FLIPSIDEGOV"]                  = 0x300901243d6CB2E74c10f8aB4cc89a39cC222a29;
+
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
         addr["GELATO_PAYMENT_ADAPTER"]       = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
@@ -121,6 +133,9 @@ contract Wallets {
 
         // Ecosystem Scope
         addr["ECOSYSTEM_SCOPE_WALLET"]       = 0x6E51E0b5813152880C1389E3e860e69E06aD04D9;
+
+        // Accessibility Scope
+        addr["LAUNCH_PROJECT_FUNDING"]       = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
         // Vest Managers
         addr["PULLUP_LABS_VEST_MGR"]         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;

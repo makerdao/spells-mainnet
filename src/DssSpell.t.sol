@@ -36,38 +36,13 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface RwaUrnLike {
-    function outputConduit() external view returns (address);
-    function can(address) external view returns (uint256);
-    function draw(uint256) external;
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+    function good(bytes32 ilk) external view returns (bool);
 }
 
-interface RwaOutputConduitLike {
-    function wards(address) external view returns (uint256);
-    function can(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function pal(address) external view returns (uint256);
-    function bud(address) external view returns (uint256);
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function mate(address) external;
-    function hope(address) external;
-    function kiss(address) external;
-    function hook(address) external;
-    function quitTo() external view returns (address);
-    function pick(address) external;
-    function push(uint256) external;
-    function quit() external;
-}
-
-interface DssCronSequencerLike {
-    function getMaster() external view returns (bytes32);
-    function hasJob(address) external view returns (bool);
-}
-
-interface DssCronJobLike {
-    function work(bytes32, bytes calldata) external;
-    function workable(bytes32) external returns (bool, bytes memory);
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -197,7 +172,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public { // make private to disable
+    function testRemoveChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -291,7 +266,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -414,7 +389,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() public { // make private to disable
+    function testVestDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
@@ -497,7 +472,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("JETSTREAM"), 494_001)
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 2_000_000)
         ];
 
         uint256 prevBalance;
@@ -528,7 +503,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() public { // make private to disable
+    function testYankDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
@@ -573,7 +548,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreasury.fin(37), block.timestamp);
     }
 
-    function testVestMKR() public { // make private to disable
+    function testVestMKR() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
         // 2023-06-26 00:00:00 UTC
@@ -649,23 +624,17 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[16] memory payees = [
-            Payee(wallets.addr("DECO_WALLET"),     125    ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DUX_WALLET"),       56.48 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DEFENSOR"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),      29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("QGOV"),             29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),          29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),         29.76 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"),              20.16 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),               9.92 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BANDHAR"),           7.68 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("LIBERTAS"),          7.04 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),              2.24 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("HARMONY"),           1.92 ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VOTEWIZARD"),        1.6  ether), // note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),         0.32 ether)  // note: ether is a keyword helper, only MKR is transferred here
+        Payee[10] memory payees = [
+            Payee(wallets.addr("IAMMEEOH"),        14.90 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ACREDAOS"),        14.90 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SPACEXPONENTIAL"), 11.92 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RES"),             14.90 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("LDF"),             11.92 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("OPENSKY"),         14.90 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DAVIDPHELPS"),      8.94 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SEEDLATAMETH"),    11.92 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("STABLELAB_2"),     14.90 ether), // note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("FLIPSIDEGOV"),     14.90 ether)  // note: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
@@ -899,205 +868,46 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    // RWA tests
+    // Spark Tests
 
-    address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
-    address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
-    address MCD_PSM_PAX_A     = addr.addr("MCD_PSM_PAX_A");
-    address MCD_PSM_GUSD_A    = addr.addr("MCD_PSM_GUSD_A");
-    address MCD_PSM_USDC_A    = addr.addr("MCD_PSM_USDC_A");
+    function testSparkSpellIsExecuted() public { // make private to disable
+        address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+        address SPARK_SPELL    = 0x443f3f4328553f5f85dFc0BA3D59969708201E14;
 
-    RwaUrnLike               rwa015AUrn             = RwaUrnLike(addr.addr("RWA015_A_URN"));
-    RwaOutputConduitLike     rwa015AOutputConduit   = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-
-    function testRWA015_OUTPUT_CONDUIT_DEPLOYMENT_SETUP() public {
-        assertEq(rwa015AOutputConduit.dai(), addr.addr("MCD_DAI"),       "output-conduit-dai-not-match");
-    }
-
-    function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(rwa015AUrn.outputConduit(), address(rwa015AOutputConduit), "RwaUrn/urn-outputconduit-not-match");
-
-        assertEq(rwa015AOutputConduit.wards(pauseProxy),      1, "OutputConduit/ward-pause-proxy-not-set");
-        assertEq(rwa015AOutputConduit.wards(address(esm)),    1, "OutputConduit/ward-esm-not-set");
-        assertEq(rwa015AOutputConduit.can(pauseProxy),        0, "OutputConduit/pause-proxy-hoped");
-        assertEq(rwa015AOutputConduit.can(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-hope");
-        assertEq(rwa015AOutputConduit.may(pauseProxy),        0, "OutputConduit/pause-proxy-mated");
-        assertEq(rwa015AOutputConduit.may(RWA015_A_OPERATOR), 1, "OutputConduit/operator-not-mate");
-        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY),  1, "OutputConduit/destination-address-not-whitelisted-for-pick");
-        assertEq(rwa015AOutputConduit.pal(MCD_PSM_PAX_A),     1, "OutputConduit/pax-psm-address-not-whitelisted-for-hook");
-        assertEq(rwa015AOutputConduit.pal(MCD_PSM_GUSD_A),    1, "OutputConduit/gusd-a-address-not-whitelisted-for-hook");
-        assertEq(rwa015AOutputConduit.pal(MCD_PSM_USDC_A),    1, "OutputConduit/usdc-psm-address-not-whitelisted-for-hook");
-        assertEq(rwa015AOutputConduit.quitTo(), address(rwa015AUrn), "OutputConduit/quit-to-not-urn");
-    }
-
-    function testRWA015_REVOKE_OLD_CONDUITS_PERMISSIONS() public {
-        address RWA015_OUTPUT_CONDUIT_PAX = chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT");
-        address RWA015_OUTPUT_CONDUIT_USDC = chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY");
+        vm.expectCall(
+            SUBPROXY_SPARK,
+            /* value = */ 0,
+            abi.encodeCall(
+                ProxyLike(SUBPROXY_SPARK).exec,
+                (SPARK_SPELL, abi.encodeWithSignature("execute()"))
+            )
+        );
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).wards(pauseProxy),      0, "OutputConduit/ward-pause-proxy-relied");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).wards(address(esm)),    0, "OutputConduit/ward-esm-relied");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).can(RWA015_A_OPERATOR), 0, "OutputConduit/operator-hoped");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).may(RWA015_A_OPERATOR), 0, "OutputConduit/operator-mated");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).bud(RWA015_A_CUSTODY),  0, "OutputConduit/destination-address-whitelisted-for-pick");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_PAX).quitTo(), address(0),      "OutputConduit/quit-to-not-zero");
-
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).wards(pauseProxy),      0, "OutputConduit/ward-pause-proxy-relied");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).wards(address(esm)),    0, "OutputConduit/ward-esm-relied");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).can(RWA015_A_OPERATOR), 0, "OutputConduit/operator-hoped");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).may(RWA015_A_OPERATOR), 0, "OutputConduit/operator-mated");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).bud(RWA015_A_CUSTODY),  0, "OutputConduit/destination-address-whitelisted-for-pick");
-        assertEq(RwaOutputConduitLike(RWA015_OUTPUT_CONDUIT_USDC).quitTo(), address(0),      "OutputConduit/quit-to-not-zero");
     }
 
-    function testRWA015_OPERATOR_DRAW_CONDUIT_PUSH() public {
+    // RWA Tests
+
+    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+
+    function testRWA002DocChange() public {
+        string memory OLD_RWA002_DOC = "QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E";
+        string memory NEW_RWA002_DOC = "QmTrrwZpnSZ41rbrpx267R7vfDFktseQe2W5NJ5xB7kkn1";
+
+        _checkRWADocUpdate("RWA002-A", OLD_RWA002_DOC, NEW_RWA002_DOC);
+    }
+
+    function testRWA004OracleTell() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 drawAmount = 1_000_000 * WAD;
+        (, , uint tau, uint toc) = oracle.ilks("RWA004-A");
+        assertGt(toc, 0, "RWA004-A: bad `toc` after `tell()`");
 
-        // Increas line of RWA015 to be able to draw some DAI
-        (,,,uint256 line,) = vat.ilks("RWA015-A");
-        GodMode.setWard(address(vat), address(this), 1);
-        vat.file("RWA015-A", "line", line + 1_000_000 * RAD);
-
-        // setting address(this) as operator
-        vm.store(address(rwa015AUrn), keccak256(abi.encode(address(this), uint256(1))), bytes32(uint256(1)));
-        assertEq(rwa015AUrn.can(address(this)), 1);
-
-        // 0 DAI in Output Conduit
-        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Dangling Dai in input conduit before draw()");
-
-        // Draw 1m to test output conduit
-        rwa015AUrn.draw(drawAmount);
-
-        // DAI in Output Conduit
-        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount, "RWA015-A: Dai drawn was not send to the recipient");
-
-        // wards
-        GodMode.setWard(address(rwa015AOutputConduit), address(this), 1);
-        // may
-        rwa015AOutputConduit.mate(address(this));
-        assertEq(rwa015AOutputConduit.may(address(this)), 1);
-        rwa015AOutputConduit.hope(address(this));
-        assertEq(rwa015AOutputConduit.can(address(this)), 1);
-
-        rwa015AOutputConduit.kiss(address(this));
-        assertEq(rwa015AOutputConduit.bud(address(this)), 1);
-        rwa015AOutputConduit.pick(address(this));
-        rwa015AOutputConduit.hook(MCD_PSM_USDC_A);
-
-        GemAbstract psmGem = GemAbstract(rwa015AOutputConduit.gem());
-        uint256 daiPsmGemDiffDecimals = 10**(18 - uint256(psmGem.decimals()));
-
-        uint256 pushAmount = drawAmount;
-        rwa015AOutputConduit.push(pushAmount);
-        rwa015AOutputConduit.quit();
-
-        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
-        assertEq(psmGem.balanceOf(address(this)), pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
-        assertEq(dai.balanceOf(address(rwa015AOutputConduit)), drawAmount - pushAmount, "RWA015-A: Dai not sent to destination after push()");
-    }
-
-    // Flapper tests
-
-    function testFlapperUniV2() public {
-        address old_flap = chainLog.getAddress("MCD_FLAP");
-
-        assertEq(vow.flapper(), old_flap);
-        assertEq(vat.can(address(vow), old_flap),      1);
-        assertEq(vat.can(address(vow), address(flap)), 0);
-
-        // execute spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vow.flapper(), address(flap));
-        assertEq(vat.can(address(vow), old_flap),      0);
-        assertEq(vat.can(address(vow), address(flap)), 1);
-
-        // Leave surplus buffer ready to be flapped
-        vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
-
-        assertEq(flap.gem(), address(gov));
-        address pip = flap.pip();
-        assertEq(pip, addr.addr("PIP_MKR"));
-        address pair = flap.pair();
-
-        vm.prank(pauseProxy);
-        MedianAbstract(pip).kiss(address(this));
-
-        uint256 price = MedianAbstract(pip).read();
-        uint256 daiAmt = 1_000_000 * WAD;
-        GodMode.setBalance(address(dai), address(pair), daiAmt);
-        uint256 mkrAmt = 1_000_000 * WAD * WAD / price;
-        GodMode.setBalance(address(gov), address(pair), mkrAmt * 97 / 100); // 3% worse price (should fail)
-        vm.expectRevert("FlapperUniV2/insufficient-buy-amount");
-        vow.flap();
-        GodMode.setBalance(address(gov), address(pair), mkrAmt * 99 / 100); // Leaves just 1% worse price
-        //
-
-        uint256 initialLp = GemAbstract(pair).balanceOf(pauseProxy);
-        uint256 initialDaiVow = vat.dai(address(vow));
-        uint256 initialReserveDai = dai.balanceOf(pair);
-        uint256 initialReserveMkr = gov.balanceOf(pair);
-
-        vow.flap();
-
-        assertGt(GemAbstract(pair).balanceOf(pauseProxy), initialLp);
-        assertGt(dai.balanceOf(pair), initialReserveDai);
-        assertEq(gov.balanceOf(pair), initialReserveMkr);
-        assertGt(initialDaiVow - vat.dai(address(vow)), 2 * vow.bump() * 9 / 10);
-        assertLt(initialDaiVow - vat.dai(address(vow)), 2 * vow.bump() * 11 / 10);
-        assertEq(dai.balanceOf(address(flap)), 0);
-        assertEq(gov.balanceOf(address(flap)), 0);
-
-        // Check Mom can increase hop
-        assertEq(flap.hop(), 1577 seconds);
-        vm.prank(chief.hat());
-        flapMom.stop();
-        assertEq(flap.hop(), type(uint256).max);
-    }
-
-    function testSequencerFlapJob() public {
-        DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
-        DssCronJobLike flapJob = DssCronJobLike(addr.addr("CRON_FLAP_JOB"));
-
-        assertTrue(!sequencer.hasJob(address(flapJob)));
-
-        // execute spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertTrue(sequencer.hasJob(address(flapJob)));
-
-        address pip = flap.pip();
-        address pair = flap.pair();
-
-        vm.prank(pauseProxy);
-        MedianAbstract(pip).kiss(address(this));
-
-        uint256 price = MedianAbstract(pip).read();
-        uint256 daiAmt = 1_000_000 * WAD;
-        GodMode.setBalance(address(dai), address(pair), daiAmt);
-        uint256 mkrAmt = 1_000_000 * WAD * WAD / price;
-        GodMode.setBalance(address(gov), address(pair), mkrAmt * 99 / 100); // Leaves just 1% worse price
-
-        bytes32 master = sequencer.getMaster();
-        uint256 snapshot = vm.snapshot();
-        (bool ok, bytes memory data) = flapJob.workable(master);
-        vm.revertTo(snapshot);
-        assertTrue(ok);
-        flapJob.work(sequencer.getMaster(), data);
+        skip(tau);
+        assertEq(oracle.good("RWA004-A"), false, "RWA004-A: still `good` after `tell()` + `tau`");
     }
 }
