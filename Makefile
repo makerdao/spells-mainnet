@@ -1,10 +1,10 @@
 all                  :; DAPP_LIBRARIES=' lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$(shell cat DssExecLib.address)' \
-                         DAPP_BUILD_OPTIMIZE=0 DAPP_BUILD_OPTIMIZE_RUNS=200 \
+                         DAPP_BUILD_OPTIMIZE=1 DAPP_BUILD_OPTIMIZE_RUNS=200 \
                          dapp --use solc:0.8.16 build
 clean                :; forge clean
                         # Usage example: make test match=SpellIsCast
-test                 :; ./scripts/test-dssspell-forge.sh no-match="$(no-match)" match="$(match)" block="$(block)"
-test-forge           :; ./scripts/test-dssspell-forge.sh no-match="$(no-match)" match="$(match)" block="$(block)"
+test                 :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
+test-forge           :; ./scripts/test-dssspell-forge.sh match="$(match)" block="$(block)"
 estimate             :; ./scripts/estimate-deploy-gas.sh
 deploy               :; ./scripts/deploy.sh
 deploy-info          :; ./scripts/get-deploy-info.sh tx=$(tx)
