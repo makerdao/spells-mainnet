@@ -171,7 +171,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmZyFH21
         // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark/21422
 
-        // Trigger Spark Proxy Spell at 0xEd3BF79737d3A469A29a7114cA1084e8340a2f20 (goerli)
+        // Trigger Spark Proxy Spell at 0x443f3f4328553f5f85dFc0BA3D59969708201E14
         ProxyLike(SUBPROXY_SPARK).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
