@@ -44,6 +44,7 @@ contract Deployers {
             0x34DBF275E1Df79D1fC7bf6a37feC56A8b1057490,  // Sidestream from 2023-05-17
             0xd1236a6A111879d9862f8374BA15344b6B233Fbd,  // Phoenix Labs from 2023-05-24
             0xfaAD873aDF27bE64D6E27D40Cf2AF0037d39b2eA   // Deployer of FlapperUniv2
+            // 0x02416B99202081F6b90851e35682Ca90D547054c.  // Deployer for Spark 2023-08-02
         ];
     }
 
