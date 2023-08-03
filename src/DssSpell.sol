@@ -165,7 +165,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468
 
         // Launch Project - 2,000,000 DAI - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
-        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 2_000_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 2 * MILLION);
 
         // ----- Trigger Spark Proxy Spell -----
         // Poll: https://vote.makerdao.com/polling/QmZyFH21
