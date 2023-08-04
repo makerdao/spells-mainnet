@@ -18,6 +18,6 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Run tests
-        run: make test-forge
+        run: make test
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
