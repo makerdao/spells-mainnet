@@ -42,7 +42,33 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    function actions() public override {}
+    function actions() public override {
+        // ---------- EDSR Update ----------
+        // Forum: https://forum.makerdao.com/t/request-for-gov12-1-2-edit-to-the-stability-scope-to-quickly-modify-enhanced-dsr-based-on-observed-data/21581
+
+        // ---------- DSR-based Stability Fee Updates ----------
+        // Forum: https://forum.makerdao.com/t/request-for-gov12-1-2-edit-to-the-stability-scope-to-quickly-modify-enhanced-dsr-based-on-observed-data/21581
+
+        // ---------- Smart Burn Engine Parameter Updates ----------
+        // Poll: https://vote.makerdao.com/polling/QmTRJNNH
+        // Forum: https://forum.makerdao.com/t/smart-burn-engine-parameters-update-1/21545
+
+        // ---------- Non-DSR Related Parameter Changes ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-4/21567
+        // Mip: https://mips.makerdao.com/mips/details/MIP104#14-3-native-vault-engine
+
+        // ---------- CRVV1ETHSTETH-A 2nd Stage Offboarding ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-4/21567#crvv1ethsteth-a-offboarding-parameters-13
+        // Mip: https://mips.makerdao.com/mips/details/MIP104#14-3-native-vault-engine
+        // NOTE: ignore on goerli (since there is no CRVV1ETHSTETH-A there)
+
+        // ---------- Aligned Delegate Compensation for July 2023 ----------
+        // NOTE: ignore on goerli
+
+        // ---------- Old D3M Parameter Housekeeping ----------
+
+        // ---------- Remainder of Spark Admin Transfers ----------
+    }
 }
 
 contract DssSpell is DssExec {
