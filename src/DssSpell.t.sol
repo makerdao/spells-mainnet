@@ -464,7 +464,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -619,7 +619,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // make public to enable
+    function testMKRPayments() private { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -869,10 +869,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // Spark Tests
-
-    function testSparkSpellIsExecuted() public { // make private to disable
+    function testSparkSpellIsExecuted() private { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0x443f3f4328553f5f85dFc0BA3D59969708201E14;
+        address SPARK_SPELL    = address(0); // Insert spell address here
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -886,28 +885,5 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-    }
-
-    // RWA Tests
-
-    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-
-    function testRWA002DocChange() public {
-        string memory OLD_RWA002_DOC = "QmdfuQSLmNFHoxvMjXvv8qbJ2NWprrsvp5L3rGr3JHw18E";
-        string memory NEW_RWA002_DOC = "QmTrrwZpnSZ41rbrpx267R7vfDFktseQe2W5NJ5xB7kkn1";
-
-        _checkRWADocUpdate("RWA002-A", OLD_RWA002_DOC, NEW_RWA002_DOC);
-    }
-
-    function testRWA004OracleTell() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        (, , uint tau, uint toc) = oracle.ilks("RWA004-A");
-        assertGt(toc, 0, "RWA004-A: bad `toc` after `tell()`");
-
-        skip(tau);
-        assertEq(oracle.good("RWA004-A"), false, "RWA004-A: still `good` after `tell()` + `tau`");
     }
 }
