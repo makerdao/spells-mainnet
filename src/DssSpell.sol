@@ -60,14 +60,16 @@ contract DssSpellAction is DssAction {
         // ---------- CRVV1ETHSTETH-A 2nd Stage Offboarding ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-4/21567#crvv1ethsteth-a-offboarding-parameters-13
         // Mip: https://mips.makerdao.com/mips/details/MIP104#14-3-native-vault-engine
-        // NOTE: ignore on goerli (since there is no CRVV1ETHSTETH-A there)
 
         // ---------- Aligned Delegate Compensation for July 2023 ----------
-        // NOTE: ignore on goerli
 
         // ---------- Old D3M Parameter Housekeeping ----------
 
-        // ---------- Remainder of Spark Admin Transfers ----------
+        // ---------- New Silver Parameter Changes ----------
+
+        // ---------- Transfer Spark Proxy Admin Controls ----------
+
+        // ---------- Trigger Spark Proxy Spell ----------
     }
 }
 
