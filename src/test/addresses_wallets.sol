@@ -157,6 +157,9 @@ contract Wallets {
         addr["HARMONY"]                      = 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2;
         addr["VOTEWIZARD"]                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
         addr["NAVIGATOR"]                    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+        addr["JAG"]                          = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
+        addr["CLOAKY"]                       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+        addr["SKYNET"]                       = 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;

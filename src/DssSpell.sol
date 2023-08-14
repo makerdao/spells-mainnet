@@ -20,6 +20,7 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface RwaLiquidationLike {
     function bump(bytes32 ilk, uint256 val) external;
@@ -71,6 +72,25 @@ contract DssSpellAction is DssAction {
     // ---------- CRVV1ETHSTETH-A 2nd Stage Offboarding ----------
     VatAbstract internal immutable vat  = VatAbstract(DssExecLib.vat());
     address internal immutable MCD_SPOT = DssExecLib.spotter();
+
+    // ---------- Aligned Delegate Compensation for July 2023 ----------
+    GemAbstract internal immutable mkr                    = GemAbstract(DssExecLib.mkr());
+    address internal constant DEFENSOR                    = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant BONAPUBLICA                 = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant QGOV                        = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
+    address internal constant TRUENAME                    = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant UPMAKER                     = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant VIGILANT                    = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant WBC                         = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant PALC                        = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
+    address internal constant NAVIGATOR                   = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+    address internal constant PBG                         = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant VOTEWIZARD                  = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+    address internal constant LIBERTAS                    = 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f;
+    address internal constant HARMONY                     = 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2;
+    address internal constant JAG                         = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
+    address internal constant CLOAKY                      = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant SKYNET                      = 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3;
 
     // ---------- New Silver Parameter Changes ----------
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
@@ -164,24 +184,54 @@ contract DssSpellAction is DssAction {
 
         // ---------- Aligned Delegate Compensation for July 2023 ----------
         // Forum: https://forum.makerdao.com/t/july-2023-aligned-delegate-compensation/21632
-        // TODO
 
         // 0xDefensor - 29.76 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        mkr.transfer(DEFENSOR,       29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // BONAPUBLICA - 29.76 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        mkr.transfer(BONAPUBLICA,    29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // QGov - 29.76 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
+        mkr.transfer(QGOV,           29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // TRUE NAME - 29.76 MKR - 0x612f7924c367575a0edf21333d96b15f1b345a5d
+        mkr.transfer(TRUENAME,       29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // UPMaker - 29.76 MKR - 0xbb819df169670dc71a16f58f55956fe642cc6bcd
+        mkr.transfer(UPMAKER,        29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // vigilant - 29.76 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        mkr.transfer(VIGILANT,       29.76 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
+        // WBC - 14.82 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        mkr.transfer(WBC,            14.82 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // PALC - 13.89 MKR - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
+        mkr.transfer(PALC,           13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Navigator - 11.24 MKR - 0x11406a9CC2e37425F15f920F494A51133ac93072
+        mkr.transfer(NAVIGATOR,      11.24 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // PBG - 9.92 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        mkr.transfer(PBG,            9.92 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // VoteWizard - 9.92 MKR - 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+        mkr.transfer(VOTEWIZARD,     9.92 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Libertas - 9.92 MKR - 0xE1eBfFa01883EF2b4A9f59b587fFf1a5B44dbb2f
-        // WBC - 8.14 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        mkr.transfer(LIBERTAS,       9.92 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Harmony - 8.93 MKR - 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2
-        // JAG - 7.61 MKR - 0x58d1ec57e4294e4fe650d1cb12b96ae34349556f
+        mkr.transfer(HARMONY,        8.93 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
+        // JAG - 7.61 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
+        mkr.transfer(JAG,            7.61 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Cloaky - 4.30 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        mkr.transfer(CLOAKY,         4.30 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Skynet - 3.64 MKR - 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3
+        mkr.transfer(SKYNET,         3.64 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // ---------- Old D3M Parameter Housekeeping ----------
         // Forum: https://forum.makerdao.com/t/notice-of-executive-vote-date-change-and-housekeeping-changes/21613
