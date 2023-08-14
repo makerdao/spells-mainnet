@@ -41,6 +41,21 @@ interface RwaLiquidationOracleLike {
     function good(bytes32 ilk) external view returns (bool);
 }
 
+interface RwaUrnLike {
+    function vat() external view returns (address);
+    function jug() external view returns (address);
+    function daiJoin() external view returns (address);
+    function outputConduit() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function hope(address) external;
+    function can(address) external view returns (uint256);
+    function gemJoin() external view returns (address);
+    function lock(uint256) external;
+    function draw(uint256) external;
+    function wipe(uint256) external;
+    function free(uint256) external;
+}
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -872,6 +887,60 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
+    }
+
+    // RWA tests
+    function test_RWA002_Update() public {
+        // Read the pip address
+        (,address pip,,  ) = liquidationOracle.ilks("RWA002-A");
+
+        // Load RWA002-A output conduit address
+        address conduit = addr.addr("RWA002_A_OUTPUT_CONDUIT");
+
+        // Check the conduit balance is 0 before cast
+        assertEq(dai.balanceOf(address(conduit)), 0);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Read the pip address and spot value after cast, as well as Art and rate
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA002-A");
+
+        // Check the pip and spot values after cast
+        assertEq(uint256(DSValueAbstract(pip).read()), 92_899_355_926924134500000000, "RWA002: Bad PIP value after bump()");
+        assertEq(spotAfter, 92_899_355_926924134500000000 * (RAY / WAD), "RWA002: Bad spot value after bump()");
+
+        // Test that a draw() can be performed
+        address urn = addr.addr("RWA002_A_URN");
+        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
+
+        // Calculate how much 'room' we can draw to get close to line
+        uint256 room = line - (Art * rate);
+        uint256 drawAmt = room / RAY;
+
+        // Correct our draw amount if it is too large
+        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
+            drawAmt = (room - rate) / RAY;
+        }
+
+        // Check if RWA002 is locked into the RwaUrn
+        (uint256 ink,) = vat.urns("RWA002-A", urn);
+        assertEq(ink, 1 * WAD, "RWA002: bad ink in RwaUrn");
+
+        // Perform draw()
+        RwaUrnLike(urn).draw(drawAmt);
+
+        // Check the conduit balance after cast
+        assertEq(dai.balanceOf(address(conduit)), drawAmt);
+
+        // Read new Art
+        (Art,,,,) = vat.ilks("RWA002-A");
+
+        // Assert that we are within 2 `rate` of line
+        assertTrue(line - (Art * rate) < (2 * rate));
     }
 
     // Spark Tests
