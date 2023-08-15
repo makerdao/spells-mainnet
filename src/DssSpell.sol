@@ -29,9 +29,9 @@ interface RwaLiquidationLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/15a0474494d97483d0ce3acaa288a0d3ab88d8e0/governance/votes/Executive%20vote%20-%20August%2018%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-08-18 MakerDAO Executive Spell | Hash: TODO";
+        "2023-08-18 MakerDAO Executive Spell | Hash: 0x1b764f7d01469324cbac1379bcd238e56ed26cc4df05380fd154c68a3c265461";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
