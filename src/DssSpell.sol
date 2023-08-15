@@ -47,6 +47,10 @@ interface RwaLiquidationLike {
     function bump(bytes32 ilk, uint256 val) external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -137,6 +141,9 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_POOL_ADDRESS_PROVIDER          = 0x02C3eA4e34C0cBd694D2adFa2c690EECbC1793eE;
     address internal constant SPARK_POOL_ADDRESS_PROVIDER_REGISTRY = 0x03cFa0C4622FF84E50E75062683F44c9587e6Cc1;
     address internal constant SPARK_EMISSION_MANAGER               = 0xf09e48dd4CA8e76F63a57ADd428bB06fee7932a4;
+
+    // ---------- Trigger Spark Proxy Spell ----------
+    address internal constant SPARK_SPELL    = 0x60cC45DaB5F0B17789C77d5FE990f1aD80e9DD65;
 
     function actions() public override {
         // ---------- EDSR Update ----------
@@ -333,6 +340,9 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("RWA002-A");
 
         // ---------- Transfer Spark Proxy Admin Controls ----------
+        // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark-for-august-18th-spell/21612
+        // Poll: https://vote.makerdao.com/polling/Qmc9fd3j
+
         TransferOwnershipLike(SPARK_TREASURY_CONTROLLER).transferOwnership(SPARK_PROXY);
         ChangeAdminLike(SPARK_TREASURY).changeAdmin(SPARK_PROXY);
         ChangeAdminLike(SPARK_TREASURY_DAI).changeAdmin(SPARK_PROXY);
@@ -350,6 +360,10 @@ contract DssSpellAction is DssAction {
         TransferOwnershipLike(SPARK_EMISSION_MANAGER).transferOwnership(SPARK_PROXY);
 
         // ---------- Trigger Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark-for-august-18th-spell/21612
+
+        // Mainnet - 0x60cC45DaB5F0B17789C77d5FE990f1aD80e9DD65
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 

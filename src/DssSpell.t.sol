@@ -963,9 +963,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // Spark Tests
-    function testSparkSpellIsExecuted() private { // make private to disable
+    function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0); // Insert spell address here
+        address SPARK_SPELL    = 0x60cC45DaB5F0B17789C77d5FE990f1aD80e9DD65;
 
         vm.expectCall(
             SUBPROXY_SPARK,
