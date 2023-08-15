@@ -22,6 +22,27 @@ import "dss-exec-lib/DssAction.sol";
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
+interface TransferOwnershipLike {
+    function transferOwnership(address newOwner) external;
+}
+
+interface ChangeAdminLike {
+    function changeAdmin(address newAdmin) external;
+}
+
+interface ACLManagerLike {
+    function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
+    function addEmergencyAdmin(address admin) external;
+    function removeEmergencyAdmin(address admin) external;
+    function removePoolAdmin(address admin) external;
+    function grantRole(bytes32 role, address account) external;
+    function revokeRole(bytes32 role, address account) external;
+}
+
+interface PoolAddressProviderLike {
+    function setACLAdmin(address newAclAdmin) external;
+}
+
 interface RwaLiquidationLike {
     function bump(bytes32 ilk, uint256 val) external;
 }
@@ -102,6 +123,20 @@ contract DssSpellAction is DssAction {
 
     // ---------- New Silver Parameter Changes ----------
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+
+    // Contracts pulled from Spark official deployment repository
+    // https://github.com/marsfoundation/sparklend/blob/ca2b72af7c5fb790cc91eaca5d8d4c83fa37e74b/script/output/1/primary-latest.json
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/ca2b72af7c5fb790cc91eaca5d8d4c83fa37e74b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY                          = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_TREASURY_CONTROLLER            = 0x92eF091C5a1E01b3CE1ba0D0150C84412d818F7a;
+    address internal constant SPARK_TREASURY                       = 0xb137E7d16564c81ae2b0C8ee6B55De81dd46ECe5;
+    address internal constant SPARK_TREASURY_DAI                   = 0x856900aa78e856a5df1a2665eE3a66b2487cD68f;
+    address internal constant SPARK_INCENTIVES                     = 0x4370D3b6C9588E02ce9D22e684387859c7Ff5b34;
+    address internal constant SPARK_WETH_GATEWAY                   = 0xBD7D6a9ad7865463DE44B05F04559f65e3B11704;
+    address internal constant SPARK_ACL_MANAGER                    = 0xdA135Cd78A086025BcdC87B038a1C462032b510C;
+    address internal constant SPARK_POOL_ADDRESS_PROVIDER          = 0x02C3eA4e34C0cBd694D2adFa2c690EECbC1793eE;
+    address internal constant SPARK_POOL_ADDRESS_PROVIDER_REGISTRY = 0x03cFa0C4622FF84E50E75062683F44c9587e6Cc1;
+    address internal constant SPARK_EMISSION_MANAGER               = 0xf09e48dd4CA8e76F63a57ADd428bB06fee7932a4;
 
     function actions() public override {
         // ---------- EDSR Update ----------
@@ -298,6 +333,21 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("RWA002-A");
 
         // ---------- Transfer Spark Proxy Admin Controls ----------
+        TransferOwnershipLike(SPARK_TREASURY_CONTROLLER).transferOwnership(SPARK_PROXY);
+        ChangeAdminLike(SPARK_TREASURY).changeAdmin(SPARK_PROXY);
+        ChangeAdminLike(SPARK_TREASURY_DAI).changeAdmin(SPARK_PROXY);
+        ChangeAdminLike(SPARK_INCENTIVES).changeAdmin(SPARK_PROXY);
+        TransferOwnershipLike(SPARK_WETH_GATEWAY).transferOwnership(SPARK_PROXY);
+        ACLManagerLike(SPARK_ACL_MANAGER).addEmergencyAdmin(SPARK_PROXY);
+        ACLManagerLike(SPARK_ACL_MANAGER).removeEmergencyAdmin(address(this));
+        ACLManagerLike(SPARK_ACL_MANAGER).removePoolAdmin(address(this));
+        bytes32 defaultAdminRole = ACLManagerLike(SPARK_ACL_MANAGER).DEFAULT_ADMIN_ROLE();
+        ACLManagerLike(SPARK_ACL_MANAGER).grantRole(defaultAdminRole, SPARK_PROXY);
+        ACLManagerLike(SPARK_ACL_MANAGER).revokeRole(defaultAdminRole, address(this));
+        PoolAddressProviderLike(SPARK_POOL_ADDRESS_PROVIDER).setACLAdmin(SPARK_PROXY);
+        TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER).transferOwnership(SPARK_PROXY);
+        TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER_REGISTRY).transferOwnership(SPARK_PROXY);
+        TransferOwnershipLike(SPARK_EMISSION_MANAGER).transferOwnership(SPARK_PROXY);
 
         // ---------- Trigger Spark Proxy Spell ----------
     }
