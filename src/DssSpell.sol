@@ -45,6 +45,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-08-30 MakerDAO Executive Spell | Hash: TODO";
 
+    GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
     address internal immutable MCD_ESM                         = DssExecLib.esm();
     address internal immutable MCD_VOW                         = DssExecLib.vow();
     address public immutable MCD_VEST_DAI                      = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -77,7 +78,7 @@ contract DssSpellAction is DssAction {
     address internal constant RWA015_A_INPUT_CONDUIT_JAR_PAX  = 0x79Fc3810735959db3C6D4fc64F7F7b5Ce48d1CEc;
 
     // ---------- Launch Project Transfers ----------
-    GemAbstract internal immutable mkr                        = GemAbstract(DssExecLib.mkr());
+    address internal constant LAUNCH_PROJECT_FUNDING          = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     // Contracts pulled from Spark official deployment repository
     // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/5/primary-sce-latest.json#L2
@@ -91,7 +92,6 @@ contract DssSpellAction is DssAction {
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
 
         DssExecLib.authorize(MCD_VOW, MCD_ESM);
-
 
         // ---------- BlockTower Andromeda Input Conduit Chainlog Additions ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
@@ -132,8 +132,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("RWA015_A_INPUT_CONDUIT_URN_USDC",  RWA015_A_INPUT_CONDUIT_URN_USDC);
         DssExecLib.setChangelogAddress("RWA015_A_INPUT_CONDUIT_JAR_USDC",  RWA015_A_INPUT_CONDUIT_JAR_USDC);
 
-
-
         // ---------- Chainlog Cleanup ----------
         // Discussion: https://github.com/makerdao/spells-mainnet/issues/354
 
@@ -141,21 +139,20 @@ contract DssSpellAction is DssAction {
         ChainlogLike(DssExecLib.LOG).removeAddress("FLIP_FAB");
 
         // ---------- Launch Project Dai Transfer ----------
-        // Discussion: https://github.com/makerdao/spells-mainnet/issues/354
-        // NOTE: Skip for goerli
+        // Discussion: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/4
 
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 941_993);
 
         // ---------- Launch Project MKR Transfer ----------
-        // Discussion: https://github.com/makerdao/spells-mainnet/issues/354
-        // NOTE: Skip for goerli
+        // Discussion: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/4
 
+        MKR.transfer(LAUNCH_PROJECT_FUNDING, 210.83 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Yank GovAlpha Budget Streams ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
 
         DssVestLike(MCD_VEST_DAI).yank(17);
         DssVestLike(MCD_VEST_MKR_TREASURY).yank(34);
-
 
         // ---------- Trigger Spark Proxy Spell - Poll ongoing, can cofirm on 2023-08-24 ----------
         // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark-for-august-18th-spell/21612
