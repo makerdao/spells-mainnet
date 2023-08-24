@@ -52,6 +52,22 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface ERC20Proxy {
+    function erc20Impl() external returns (address);
+
+    function totalSupply() external returns (uint256);
+}
+
+interface ERC20Impl {
+    function erc20Store() external returns (address);
+}
+
+interface ERC20Store {
+    function setTotalSupply(uint256 _newTotalSupply) external;
+
+    function setBalance(address _owner, uint256 _newBalance) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -641,7 +657,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // make public to enable
+    function testMKRPayments() private { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -1001,7 +1017,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 urnBalanceBefore = dai.balanceOf(rwa015AUrn);
         uint256 jarBalanceBefore = dai.balanceOf(rwa015AJar);
 
-        GodMode.setBalance(address(gusd), address(this), 2 * gusdAmt);
+        // Add GUSD blance
+        address impl = ERC20Proxy(address(gusd)).erc20Impl();
+        ERC20Store store = ERC20Store(ERC20Impl(impl).erc20Store());
+
+        vm.startPrank(impl);
+        store.setBalance(address(this), 2 * gusdAmt);
+        store.setTotalSupply(gusd.totalSupply() + 2 * gusdAmt);
+        vm.stopPrank();
+
         GodMode.setBalance(address(pax), address(this), 2 * paxAmt);
 
         // transfer GUSD to input conduit's
