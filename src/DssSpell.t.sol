@@ -916,6 +916,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
 
+    function testVowOsmRely() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vow.wards(address(esm)),      1, "VOW/ward-esm-not-set");
+    } 
+
     // RWA tests
     address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
     address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
@@ -931,22 +939,22 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRWA015_CONTRACT_DEPLOYMENT_SETUP() public {
         assertEq(rwa015AInputConduitUrnGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-gusd-urn-psm-not-match");
-        assertEq(rwa015AInputConduitUrnGUSD.to(),  rwa015AUrn,         "input-conduit-urn-gusd-to-not-match");
+        assertEq(rwa015AInputConduitUrnGUSD.to(),  rwa015AUrn,                  "input-conduit-urn-gusd-to-not-match");
         assertEq(rwa015AInputConduitUrnGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-urn-gusd-dai-not-match");
         assertEq(rwa015AInputConduitUrnGUSD.gem(), addr.addr("GUSD"),           "input-conduit-urn-gusd-gem-not-match");
 
         assertEq(rwa015AInputConduitJarGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-jar-gusd-psm-not-match");
-        assertEq(rwa015AInputConduitJarGUSD.to(),  rwa015AJar,         "input-conduit-jar-gusd-to-not-match");
+        assertEq(rwa015AInputConduitJarGUSD.to(),  rwa015AJar,                  "input-conduit-jar-gusd-to-not-match");
         assertEq(rwa015AInputConduitJarGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-jar-gusd-dai-not-match");
         assertEq(rwa015AInputConduitJarGUSD.gem(), addr.addr("GUSD"),           "input-conduit-jar-gusd-gem-not-match");
 
         assertEq(rwa015AInputConduitUrnPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-urn-pax-psm-not-match");
-        assertEq(rwa015AInputConduitUrnPAX.to(),  rwa015AUrn,          "input-conduit-urn-pax-to-not-match");
+        assertEq(rwa015AInputConduitUrnPAX.to(),  rwa015AUrn,                   "input-conduit-urn-pax-to-not-match");
         assertEq(rwa015AInputConduitUrnPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-urn-pax-dai-not-match");
         assertEq(rwa015AInputConduitUrnPAX.gem(), addr.addr("PAX"),             "input-conduit-urn-pax-gem-not-match");
 
         assertEq(rwa015AInputConduitJarPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-jar-pax-psm-not-match");
-        assertEq(rwa015AInputConduitJarPAX.to(),  rwa015AJar,          "input-conduit-jar-pax-to-not-match");
+        assertEq(rwa015AInputConduitJarPAX.to(),  rwa015AJar,                   "input-conduit-jar-pax-to-not-match");
         assertEq(rwa015AInputConduitJarPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-jar-pax-dai-not-match");
         assertEq(rwa015AInputConduitJarPAX.gem(), addr.addr("PAX"),             "input-conduit-jar-pax-gem-not-match");
     }
