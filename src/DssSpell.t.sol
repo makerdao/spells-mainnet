@@ -36,47 +36,20 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
-    function good(bytes32 ilk) external view returns (bool);
-}
-
-interface RwaUrnLike {
-    function vat() external view returns (address);
-    function jug() external view returns (address);
-    function daiJoin() external view returns (address);
-    function outputConduit() external view returns (address);
+interface RwaInputConduitLike {
+    function dai() external view returns (address);
+    function gem() external view returns (address);
+    function psm() external view returns (address);
+    function to() external view returns (address);
     function wards(address) external view returns (uint256);
-    function hope(address) external;
-    function can(address) external view returns (uint256);
-    function gemJoin() external view returns (address);
-    function lock(uint256) external;
-    function draw(uint256) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
+    function may(address) external view returns (uint256);
+    function quitTo() external view returns (address);
+    function mate(address) external;
+    function push() external;
 }
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
-}
-
-interface TransferOwnershipLike {
-    function owner() external view returns (address);
-}
-
-interface ChangeAdminLike {
-    function admin() external view returns (address);
-}
-
-interface ACLManagerLike {
-    function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
-    function isEmergencyAdmin(address admin) external view returns (bool);
-    function isPoolAdmin(address admin) external view returns (bool);
-    function hasRole(bytes32 role, address account) external view returns (bool);
-}
-
-interface PoolAddressProviderLike {
-    function getACLAdmin() external view returns (address);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -206,12 +179,36 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() private { // make private to disable
+    function testRemoveChainlogValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        try chainLog.getAddress("RWA015_A_OUTPUT_CONDUIT_LEGACY") {
+        try chainLog.getAddress("FLIPPER_MOM") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
+
+        try chainLog.getAddress("FLIP_FAB") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
+
+        try chainLog.getAddress("RWA015_A_INPUT_CONDUIT_URN") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
+        }
+
+        try chainLog.getAddress("RWA015_A_INPUT_CONDUIT_JAR") {
             assertTrue(false);
         } catch Error(string memory errmsg) {
             assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
@@ -300,27 +297,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
+    function testNewChainlogValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Insert new chainlog values tests here
-        _checkChainlogKey("RWA015_A_OUTPUT_CONDUIT");
-
-        _checkChainlogKey("CRON_SEQUENCER");
-        _checkChainlogKey("CRON_AUTOLINE_JOB");
-        _checkChainlogKey("CRON_LERP_JOB");
-        _checkChainlogKey("CRON_D3M_JOB");
-        _checkChainlogKey("CRON_CLIPPER_MOM_JOB");
-        _checkChainlogKey("CRON_ORACLE_JOB");
-
-        _checkChainlogKey("PIP_MKR");
-        _checkChainlogKey("MCD_FLAP");
-        _checkChainlogKey("FLAPPER_MOM");
-        _checkChainlogKey("CRON_FLAP_JOB");
-
-        _checkChainlogVersion("1.15.0");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_GUSD");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_GUSD");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_PAX");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_PAX");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_USDC");
+        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_USDC");
+        _checkChainlogVersion("1.16.0");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -537,17 +525,17 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() private { // make private to disable
+    function testYankDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
-        // 31 Jan 2024 23:59:59 UTC
-        uint256 JAN_31_2024 = 1706745599;
-        uint256 streamId = 14;
-        address expectedWallet = wallets.addr("DUX_WALLET");
+        // 31 Mar 2024 23:59:59 UTC
+        uint256 MARCH_31_2024 = 1711929599;
+        uint256 streamId = 17;
+        address expectedWallet = wallets.addr("GOV_ALPHA");
 
         assertEq(vest.usr(streamId), expectedWallet, "testYankDAI/unexpected-address");
-        assertEq(vest.fin(streamId), JAN_31_2024, "testYankDAI/unpected-fin-date");
+        assertEq(vest.fin(streamId), MARCH_31_2024, "testYankDAI/unpected-fin-date");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -556,30 +544,30 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(streamId), block.timestamp, "testYankDAI/steam-not-yanked");
     }
 
-    function testYankMKR() private { // make private to disable
+    function testYankMKR() public { // make private to disable
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
-        // 01 Apr 2024 11:59:59 PM UTC
-        uint256 APR_1_2024 = 1712015999;
+        // 31 Mar 2024 23:59:59 PM UTC
+        uint256 MAR_31_2024 = 1711929599;
 
-        assertEq(vestTreasury.usr(37), wallets.addr("PHOENIX_LABS_2"));
-        assertEq(vestTreasury.fin(37),  APR_1_2024);
+        assertEq(vestTreasury.usr(34), wallets.addr("GOV_ALPHA"));
+        assertEq(vestTreasury.fin(34),  MAR_31_2024);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vestTreasury.fin(37),  block.timestamp);
+        assertEq(vestTreasury.fin(34),  block.timestamp);
 
         // Give admin powers to test contract address and make the vesting unrestricted for testing
         GodMode.setWard(address(vestTreasury), address(this), 1);
 
-        vestTreasury.unrestrict(37);
+        vestTreasury.unrestrict(34);
 
-        vestTreasury.vest(37);
+        vestTreasury.vest(34);
 
-        assertTrue(!vestTreasury.valid(37));
-        assertEq(vestTreasury.fin(37), block.timestamp);
+        assertTrue(!vestTreasury.valid(34));
+        assertEq(vestTreasury.fin(34), block.timestamp);
     }
 
     function testVestMKR() private { // make private to disable
@@ -908,64 +896,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    // RWA tests
-    function test_RWA002_Update() public {
-        // Read the pip address
-        (,address pip,,  ) = liquidationOracle.ilks("RWA002-A");
-
-        // Load RWA002-A output conduit address
-        address conduit = addr.addr("RWA002_A_OUTPUT_CONDUIT");
-
-        // Check the conduit balance is 0 before cast
-        assertEq(dai.balanceOf(address(conduit)), 0);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Read the pip address and spot value after cast, as well as Art and rate
-        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA002-A");
-
-        // Check the pip and spot values after cast
-        assertEq(uint256(DSValueAbstract(pip).read()), 92_899_355_926924134500000000, "RWA002: Bad PIP value after bump()");
-        assertEq(spotAfter, 92_899_355_926924134500000000 * (RAY / WAD), "RWA002: Bad spot value after bump()");
-
-        // Test that a draw() can be performed
-        address urn = addr.addr("RWA002_A_URN");
-        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
-        GodMode.setWard(urn, address(this), 1);
-        RwaUrnLike(urn).hope(address(this));
-
-        // Calculate how much 'room' we can draw to get close to line
-        uint256 room = line - (Art * rate);
-        uint256 drawAmt = room / RAY;
-
-        // Correct our draw amount if it is too large
-        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
-            drawAmt = (room - rate) / RAY;
-        }
-
-        // Check if RWA002 is locked into the RwaUrn
-        (uint256 ink,) = vat.urns("RWA002-A", urn);
-        assertEq(ink, 1 * WAD, "RWA002: bad ink in RwaUrn");
-
-        // Perform draw()
-        RwaUrnLike(urn).draw(drawAmt);
-
-        // Check the conduit balance after cast
-        assertEq(dai.balanceOf(address(conduit)), drawAmt);
-
-        // Read new Art
-        (Art,,,,) = vat.ilks("RWA002-A");
-
-        // Assert that we are within 2 `rate` of line
-        assertTrue(line - (Art * rate) < (2 * rate));
-    }
-
     // Spark Tests
     function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0x60cC45DaB5F0B17789C77d5FE990f1aD80e9DD65;
+        address SPARK_SPELL    = 0xFBdB6C5596Fc958B432Bf1c99268C72B1515DFf0;
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -981,70 +915,128 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
 
-    function testSparkAdminTransfer() public {
-        address SPARK_PROXY                          = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_TREASURY_CONTROLLER            = 0x92eF091C5a1E01b3CE1ba0D0150C84412d818F7a;
-        address SPARK_TREASURY                       = 0xb137E7d16564c81ae2b0C8ee6B55De81dd46ECe5;
-        address SPARK_TREASURY_DAI                   = 0x856900aa78e856a5df1a2665eE3a66b2487cD68f;
-        address SPARK_INCENTIVES                     = 0x4370D3b6C9588E02ce9D22e684387859c7Ff5b34;
-        address SPARK_WETH_GATEWAY                   = 0xBD7D6a9ad7865463DE44B05F04559f65e3B11704;
-        address SPARK_ACL_MANAGER                    = 0xdA135Cd78A086025BcdC87B038a1C462032b510C;
-        address SPARK_POOL_ADDRESS_PROVIDER          = 0x02C3eA4e34C0cBd694D2adFa2c690EECbC1793eE;
-        address SPARK_POOL_ADDRESS_PROVIDER_REGISTRY = 0x03cFa0C4622FF84E50E75062683F44c9587e6Cc1;
-        address SPARK_EMISSION_MANAGER               = 0xf09e48dd4CA8e76F63a57ADd428bB06fee7932a4;
+    // RWA tests
+    address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
+    address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
 
-        bytes32 defaultAdminRole = ACLManagerLike(SPARK_ACL_MANAGER).DEFAULT_ADMIN_ROLE();
+    address                  rwa015AUrn                 = addr.addr("RWA015_A_URN");
+    address                  rwa015AJar                 = addr.addr("RWA015_A_JAR");
+    RwaInputConduitLike      rwa015AInputConduitUrnGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_GUSD"));
+    RwaInputConduitLike      rwa015AInputConduitJarGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_JAR_GUSD"));
+    RwaInputConduitLike      rwa015AInputConduitUrnPAX  = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_PAX"));
+    RwaInputConduitLike      rwa015AInputConduitJarPAX  = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_JAR_PAX"));
+    GemAbstract              gusd                       = GemAbstract(rwa015AInputConduitUrnGUSD.gem());
+    GemAbstract              pax                        = GemAbstract(rwa015AInputConduitUrnPAX.gem());
 
-        assertEq(TransferOwnershipLike(SPARK_TREASURY_CONTROLLER).owner(), pauseProxy);
+    // Note: This is an exception because of exceeding the `action` size in the spell. Main pattern is to have this checks in the spell itself
+    function testRWA015_CONTRACT_DEPLOYMENT_SETUP() public {
+        assertEq(rwa015AInputConduitUrnGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-gusd-urn-psm-not-match");
+        assertEq(rwa015AInputConduitUrnGUSD.to(),  address(rwa015AUrn),         "input-conduit-urn-gusd-to-not-match");
+        assertEq(rwa015AInputConduitUrnGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-urn-gusd-dai-not-match");
+        assertEq(rwa015AInputConduitUrnGUSD.gem(), addr.addr("GUSD"),           "input-conduit-urn-gusd-gem-not-match");
 
-        // Transparent proxy dictates that admin() function is only exposed to the admin
+        assertEq(rwa015AInputConduitJarGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-jar-gusd-psm-not-match");
+        assertEq(rwa015AInputConduitJarGUSD.to(),  address(rwa015AJar),         "input-conduit-jar-gusd-to-not-match");
+        assertEq(rwa015AInputConduitJarGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-jar-gusd-dai-not-match");
+        assertEq(rwa015AInputConduitJarGUSD.gem(), addr.addr("GUSD"),           "input-conduit-jar-gusd-gem-not-match");
+
+        assertEq(rwa015AInputConduitUrnPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-urn-pax-psm-not-match");
+        assertEq(rwa015AInputConduitUrnPAX.to(),  address(rwa015AUrn),          "input-conduit-urn-pax-to-not-match");
+        assertEq(rwa015AInputConduitUrnPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-urn-pax-dai-not-match");
+        assertEq(rwa015AInputConduitUrnPAX.gem(), addr.addr("PAX"),             "input-conduit-urn-pax-gem-not-match");
+
+        assertEq(rwa015AInputConduitJarPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-jar-pax-psm-not-match");
+        assertEq(rwa015AInputConduitJarPAX.to(),  address(rwa015AJar),          "input-conduit-jar-pax-to-not-match");
+        assertEq(rwa015AInputConduitJarPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-jar-pax-dai-not-match");
+        assertEq(rwa015AInputConduitJarPAX.gem(), addr.addr("PAX"),             "input-conduit-jar-pax-gem-not-match");
+    }
+
+    function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(rwa015AInputConduitUrnGUSD.wards(pauseProxy),      1, "InputConduitUrnGUSD/ward-pause-proxy-not-set");
+        assertEq(rwa015AInputConduitUrnGUSD.wards(address(esm)),    1, "InputConduitUrnGUSD/ward-esm-not-set");
+        assertEq(rwa015AInputConduitUrnGUSD.may(pauseProxy),        0, "InputConduitUrnGUSD/pause-proxy-mated");
+        assertEq(rwa015AInputConduitUrnGUSD.may(RWA015_A_OPERATOR), 1, "InputConduitUrnGUSD/operator-not-mate");
+
+        assertEq(rwa015AInputConduitUrnGUSD.quitTo(), RWA015_A_CUSTODY, "InputConduitUrnGUSD/quit-to-not-set");
+
+        assertEq(rwa015AInputConduitJarGUSD.wards(pauseProxy),      1, "InputConduitJarGUSD/ward-pause-proxy-not-set");
+        assertEq(rwa015AInputConduitJarGUSD.wards(address(esm)),    1, "InputConduitJarGUSD/ward-esm-not-set");
+        assertEq(rwa015AInputConduitJarGUSD.may(pauseProxy),        0, "InputConduitJarGUSD/pause-proxy-mated");
+        assertEq(rwa015AInputConduitJarGUSD.may(RWA015_A_OPERATOR), 1, "InputConduitJarGUSD/operator-not-mate");
+
+        assertEq(rwa015AInputConduitJarGUSD.quitTo(), RWA015_A_CUSTODY, "InputConduitJarGUSD/quit-to-not-set");
+
+        assertEq(rwa015AInputConduitUrnPAX.wards(pauseProxy),      1, "InputConduitUrnPAX/ward-pause-proxy-not-set");
+        assertEq(rwa015AInputConduitUrnPAX.wards(address(esm)),    1, "InputConduitUrnPAX/ward-esm-not-set");
+        assertEq(rwa015AInputConduitUrnPAX.may(pauseProxy),        0, "InputConduitUrnPAX/pause-proxy-mated");
+        assertEq(rwa015AInputConduitUrnPAX.may(RWA015_A_OPERATOR), 1, "InputConduitUrnPAX/operator-not-mate");
+
+        assertEq(rwa015AInputConduitUrnPAX.quitTo(), RWA015_A_CUSTODY, "InputConduitUrnPAX/quit-to-not-set");
+
+        assertEq(rwa015AInputConduitJarPAX.wards(pauseProxy),      1, "InputConduitJarPAX/ward-pause-proxy-not-set");
+        assertEq(rwa015AInputConduitJarPAX.wards(address(esm)),    1, "InputConduitJarPAX/ward-esm-not-set");
+        assertEq(rwa015AInputConduitJarPAX.may(pauseProxy),        0, "InputConduitJarPAX/pause-proxy-mated");
+        assertEq(rwa015AInputConduitJarPAX.may(RWA015_A_OPERATOR), 1, "InputConduitJarPAX/operator-not-mate");
+
+        assertEq(rwa015AInputConduitJarPAX.quitTo(), RWA015_A_CUSTODY, "InputConduitJarPAX/quit-to-not-set");
+    }
+
+    function testRWA015_INPUT_CONDUITS() public {
+        // We set DC to 1b as DC For PAX is currently 0 and for GUSD is maxed
         vm.startPrank(pauseProxy);
-
-        assertEq(ChangeAdminLike(SPARK_TREASURY).admin(),     pauseProxy);
-        assertEq(ChangeAdminLike(SPARK_TREASURY_DAI).admin(), pauseProxy);
-        assertEq(ChangeAdminLike(SPARK_INCENTIVES).admin(),   pauseProxy);
-
+        vat.file("PSM-GUSD-A", "line", 1_000_000_000 * (10**45));
+        vat.file("PSM-PAX-A", "line",  1_000_000_000 * (10**45));
         vm.stopPrank();
-
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).isEmergencyAdmin(pauseProxy));
-        assertTrue(!ACLManagerLike(SPARK_ACL_MANAGER).isEmergencyAdmin(SPARK_PROXY));
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).isPoolAdmin(pauseProxy));
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).isPoolAdmin(SPARK_PROXY));     // Already added from previous spell
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).hasRole(defaultAdminRole, pauseProxy));
-        assertTrue(!ACLManagerLike(SPARK_ACL_MANAGER).hasRole(defaultAdminRole, SPARK_PROXY));
-
-        assertEq(TransferOwnershipLike(SPARK_WETH_GATEWAY).owner(),                   pauseProxy);
-        assertEq(PoolAddressProviderLike(SPARK_POOL_ADDRESS_PROVIDER).getACLAdmin(),  pauseProxy);
-        assertEq(TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER).owner(),          pauseProxy);
-        assertEq(TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER_REGISTRY).owner(), pauseProxy);
-        assertEq(TransferOwnershipLike(SPARK_EMISSION_MANAGER).owner(),               pauseProxy);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(TransferOwnershipLike(SPARK_TREASURY_CONTROLLER).owner(), SPARK_PROXY);
+        uint256 gusdAmt = 1000 * 10**2; 
+        uint256 paxAmt  = 1000 * 10**18; 
+        uint256 urnBalanceBefore = dai.balanceOf(rwa015AUrn);
+        uint256 jarBalanceBefore = dai.balanceOf(rwa015AJar);
 
-        // Transparent proxy dictates that admin() function is only exposed to the admin
-        vm.startPrank(SPARK_PROXY);
+        GodMode.setBalance(address(gusd), address(this), 2 * gusdAmt);
+        GodMode.setBalance(address(pax), address(this), 2 * paxAmt);
 
-        assertEq(ChangeAdminLike(SPARK_TREASURY).admin(), SPARK_PROXY);
-        assertEq(ChangeAdminLike(SPARK_TREASURY_DAI).admin(), SPARK_PROXY);
-        assertEq(ChangeAdminLike(SPARK_INCENTIVES).admin(), SPARK_PROXY);
+        // transfer GUSD to input conduit's
+        gusd.transfer(address(rwa015AInputConduitUrnGUSD), gusdAmt);
+        assertEq(gusd.balanceOf(address(rwa015AInputConduitUrnGUSD)), gusdAmt, "RWA015-A: GUSD not sent to input conduit urn");
 
-        vm.stopPrank();
+        gusd.transfer(address(rwa015AInputConduitJarGUSD), gusdAmt);
+        assertEq(gusd.balanceOf(address(rwa015AInputConduitJarGUSD)), gusdAmt, "RWA015-A: GUSD not sent to input conduit jar");
 
-        assertTrue(!ACLManagerLike(SPARK_ACL_MANAGER).isEmergencyAdmin(pauseProxy));
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).isEmergencyAdmin(SPARK_PROXY));
-        assertTrue(!ACLManagerLike(SPARK_ACL_MANAGER).isPoolAdmin(pauseProxy));
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).isPoolAdmin(SPARK_PROXY));
-        assertTrue(!ACLManagerLike(SPARK_ACL_MANAGER).hasRole(defaultAdminRole, pauseProxy));
-        assertTrue(ACLManagerLike(SPARK_ACL_MANAGER).hasRole(defaultAdminRole, SPARK_PROXY));
+        // input conduit 'push()' to the urn
+        rwa015AInputConduitUrnGUSD.push();
 
-        assertEq(TransferOwnershipLike(SPARK_WETH_GATEWAY).owner(),                   SPARK_PROXY);
-        assertEq(PoolAddressProviderLike(SPARK_POOL_ADDRESS_PROVIDER).getACLAdmin(),  SPARK_PROXY);
-        assertEq(TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER).owner(),          SPARK_PROXY);
-        assertEq(TransferOwnershipLike(SPARK_POOL_ADDRESS_PROVIDER_REGISTRY).owner(), SPARK_PROXY);
-        assertEq(TransferOwnershipLike(SPARK_EMISSION_MANAGER).owner(),               SPARK_PROXY);
+        // input conduit 'push()' to the jar
+        rwa015AInputConduitJarGUSD.push();
+
+        assertEq(dai.balanceOf(address(rwa015AUrn)), urnBalanceBefore + 1000 * 10**18, "GUSD-Input-Conduit/Balance of the URN doesnt match");
+        assertEq(dai.balanceOf(address(rwa015AJar)), jarBalanceBefore + 1000 * 10**18, "GUSD-Input-Conduit/Balance of the JAR doesnt match");
+
+        urnBalanceBefore = dai.balanceOf(rwa015AUrn);
+        jarBalanceBefore = dai.balanceOf(rwa015AJar);
+
+        // transfer PAX to input conduit's
+        pax.transfer(address(rwa015AInputConduitUrnPAX), paxAmt);
+        assertEq(pax.balanceOf(address(rwa015AInputConduitUrnPAX)), paxAmt, "RWA015-A: PAX not sent to input conduit urn");
+
+        pax.transfer(address(rwa015AInputConduitJarPAX), paxAmt);
+        assertEq(pax.balanceOf(address(rwa015AInputConduitJarPAX)), paxAmt, "RWA015-A: PAX not sent to input conduit jar");
+
+        // input conduit 'push()' to the urn
+        rwa015AInputConduitUrnPAX.push();
+
+        // input conduit 'push()' to the jar
+        rwa015AInputConduitJarPAX.push();
+
+        assertEq(dai.balanceOf(address(rwa015AUrn)), urnBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the URN doesnt match");
+        assertEq(dai.balanceOf(address(rwa015AJar)), jarBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the JAR doesnt match");
     }
 }
