@@ -944,25 +944,24 @@ contract DssSpellTest is DssSpellTestBase {
     GemAbstract              gusd                       = GemAbstract(rwa015AInputConduitUrnGUSD.gem());
     GemAbstract              pax                        = GemAbstract(rwa015AInputConduitUrnPAX.gem());
 
-    // Note: This is an exception because of exceeding the `action` size in the spell. Main pattern is to have this checks in the spell itself
     function testRWA015_CONTRACT_DEPLOYMENT_SETUP() public {
         assertEq(rwa015AInputConduitUrnGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-gusd-urn-psm-not-match");
-        assertEq(rwa015AInputConduitUrnGUSD.to(),  address(rwa015AUrn),         "input-conduit-urn-gusd-to-not-match");
+        assertEq(rwa015AInputConduitUrnGUSD.to(),  rwa015AUrn,         "input-conduit-urn-gusd-to-not-match");
         assertEq(rwa015AInputConduitUrnGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-urn-gusd-dai-not-match");
         assertEq(rwa015AInputConduitUrnGUSD.gem(), addr.addr("GUSD"),           "input-conduit-urn-gusd-gem-not-match");
 
         assertEq(rwa015AInputConduitJarGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-jar-gusd-psm-not-match");
-        assertEq(rwa015AInputConduitJarGUSD.to(),  address(rwa015AJar),         "input-conduit-jar-gusd-to-not-match");
+        assertEq(rwa015AInputConduitJarGUSD.to(),  rwa015AJar,         "input-conduit-jar-gusd-to-not-match");
         assertEq(rwa015AInputConduitJarGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-jar-gusd-dai-not-match");
         assertEq(rwa015AInputConduitJarGUSD.gem(), addr.addr("GUSD"),           "input-conduit-jar-gusd-gem-not-match");
 
         assertEq(rwa015AInputConduitUrnPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-urn-pax-psm-not-match");
-        assertEq(rwa015AInputConduitUrnPAX.to(),  address(rwa015AUrn),          "input-conduit-urn-pax-to-not-match");
+        assertEq(rwa015AInputConduitUrnPAX.to(),  rwa015AUrn,          "input-conduit-urn-pax-to-not-match");
         assertEq(rwa015AInputConduitUrnPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-urn-pax-dai-not-match");
         assertEq(rwa015AInputConduitUrnPAX.gem(), addr.addr("PAX"),             "input-conduit-urn-pax-gem-not-match");
 
         assertEq(rwa015AInputConduitJarPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-jar-pax-psm-not-match");
-        assertEq(rwa015AInputConduitJarPAX.to(),  address(rwa015AJar),          "input-conduit-jar-pax-to-not-match");
+        assertEq(rwa015AInputConduitJarPAX.to(),  rwa015AJar,          "input-conduit-jar-pax-to-not-match");
         assertEq(rwa015AInputConduitJarPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-jar-pax-dai-not-match");
         assertEq(rwa015AInputConduitJarPAX.gem(), addr.addr("PAX"),             "input-conduit-jar-pax-gem-not-match");
     }
@@ -1012,8 +1011,8 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        uint256 gusdAmt = 1000 * 10**2; 
-        uint256 paxAmt  = 1000 * 10**18; 
+        uint256 gusdAmt = 1000 * 10**2;
+        uint256 paxAmt  = 1000 * 10**18;
         uint256 urnBalanceBefore = dai.balanceOf(rwa015AUrn);
         uint256 jarBalanceBefore = dai.balanceOf(rwa015AJar);
 

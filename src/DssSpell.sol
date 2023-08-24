@@ -89,13 +89,13 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Auth ESM on the Vow ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
-        
+
         DssExecLib.authorize(MCD_VOW, MCD_ESM);
 
 
         // ---------- BlockTower Andromeda Input Conduit Chainlog Additions ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
-        
+
         // OPERATOR permission on RWA015_A_INPUT_CONDUIT_URN_GUSD
         RwaInputConduitLike(RWA015_A_INPUT_CONDUIT_URN_GUSD).mate(RWA015_A_OPERATOR);
         // Set "quitTo" address for RWA015_A_INPUT_CONDUIT_URN_GUSD
@@ -148,11 +148,11 @@ contract DssSpellAction is DssAction {
         // ---------- Launch Project MKR Transfer ----------
         // Discussion: https://github.com/makerdao/spells-mainnet/issues/354
         // NOTE: Skip for goerli
-        
+
 
         // ---------- Yank GovAlpha Budget Streams ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
-        
+
         DssVestLike(MCD_VEST_DAI).yank(17);
         DssVestLike(MCD_VEST_MKR_TREASURY).yank(34);
 
