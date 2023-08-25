@@ -926,7 +926,16 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vow.wards(address(esm)),      1, "VOW/ward-esm-not-set");
+        assertEq(vow.wards(address(esm)), 1, "VOW/ward-esm-not-set");
+    }
+
+    function testFlliperMomDeauth() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(flipMom.authority(), address(0), "FlliperMom/authority-is-not-zero");
+        assertEq(flipMom.owner(), address(0), "FlliperMom/owner-is-not-zero");
     }
 
     // RWA tests

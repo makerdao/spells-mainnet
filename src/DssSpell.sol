@@ -42,12 +42,16 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface FlliperMomLike {
+    function setOwner(address owner_) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/15a0474494d97483d0ce3acaa288a0d3ab88d8e0/governance/votes/Executive%20vote%20-%20August%2018%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/64b0d8425a316c40d1fc464c084d800e3b17c1f3/governance/votes/Executive%20vote%20-%20August%2030%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-08-30 MakerDAO Executive Spell | Hash: TODO";
+        "2023-08-30 MakerDAO Executive Spell | Hash: 0xd4f061429b564e422f18f0289a0f956f0229edbeead40b51ad69d52b27f7e591";
 
     GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
     address internal immutable MCD_ESM                         = DssExecLib.esm();
@@ -102,7 +106,6 @@ contract DssSpellAction is DssAction {
         // Call tell() on RWALiquidationOracle
         RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).tell("RWA003-A");
 
-
         // ---------- Auth ESM on the Vow ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
 
@@ -149,6 +152,10 @@ contract DssSpellAction is DssAction {
 
         // ---------- Chainlog Cleanup ----------
         // Discussion: https://github.com/makerdao/spells-mainnet/issues/354
+
+        // Deauth FlliperMom
+        DssExecLib.setAuthority(MCD_FLIPPER_MOM, address(0));
+        FlliperMomLike(MCD_FLIPPER_MOM).setOwner(address(0));
 
         ChainlogLike(DssExecLib.LOG).removeAddress("FLIPPER_MOM");
         ChainlogLike(DssExecLib.LOG).removeAddress("FLIP_FAB");
