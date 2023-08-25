@@ -56,6 +56,7 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
     address internal immutable MCD_ESM                         = DssExecLib.esm();
     address internal immutable MCD_VOW                         = DssExecLib.vow();
+    address internal immutable MCD_FLIPPER_MOM                 = DssExecLib.flipperMom();
     address internal immutable MIP21_LIQUIDATION_ORACLE        = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address public immutable MCD_VEST_DAI                      = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     address public immutable MCD_VEST_MKR_TREASURY             = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
