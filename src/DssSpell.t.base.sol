@@ -17,7 +17,7 @@
 pragma solidity 0.8.16;
 
 import "dss-interfaces/Interfaces.sol";
-import {DssTest, GodMode} from "dss-test/DssTest.sol";
+import {DssTest, GodMode, console2} from "dss-test/DssTest.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
@@ -687,6 +687,10 @@ contract DssSpellTestBase is Config, DssTest {
         // Require that debt + (debt that could be drawn) does not exceed Line.
         // TODO: consider a buffer for fee accrual
         assertTrue(vat.debt() + sums[1] <= vat.Line(), "TestError/vat-Line-1");
+
+        console2.logUint(sums[0]);
+        console2.logUint(vat.Line());
+        console2.logUint((sums[0] + 2 * values.line_offset * RAD));
 
         // Enforce the global Line also falls between (sum of lines) + offset and (sum of lines) + 2*offset.
         assertTrue(sums[0] +     values.line_offset * RAD <= vat.Line(), "TestError/vat-Line-2");
