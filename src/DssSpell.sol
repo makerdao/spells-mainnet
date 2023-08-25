@@ -171,6 +171,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Trigger Spark Proxy Spell - Poll ongoing, can cofirm on 2023-08-24 ----------
         // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark-for-august-18th-spell/21612
+        // Vote: https://vote.makerdao.com/polling/QmbMR8PU
 
         // Goerli - 0x13176ad78ec3d2b6e32908b019d0f772ec0b4dfd
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
