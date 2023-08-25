@@ -1251,7 +1251,7 @@ contract Config {
             aL_line:      0 * MILLION,
             aL_gap:       0 * MILLION,
             aL_ttl:       0,
-            line:         2 * MILLION,
+            line:         0,
             dust:         0,
             pct:          600,
             mat:          10500,
