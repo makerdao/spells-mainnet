@@ -36,6 +36,11 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+    function good(bytes32 ilk) external view returns (bool);
+}
+
 interface RwaInputConduitLike {
     function dai() external view returns (address);
     function gem() external view returns (address);
@@ -930,6 +935,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     address                  rwa015AUrn                 = addr.addr("RWA015_A_URN");
     address                  rwa015AJar                 = addr.addr("RWA015_A_JAR");
+    RwaLiquidationOracleLike oracle                     = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
     RwaInputConduitLike      rwa015AInputConduitUrnGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_GUSD"));
     RwaInputConduitLike      rwa015AInputConduitJarGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_JAR_GUSD"));
     RwaInputConduitLike      rwa015AInputConduitUrnPAX  = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_PAX"));
@@ -1054,5 +1060,17 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(dai.balanceOf(address(rwa015AUrn)), urnBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the URN doesnt match");
         assertEq(dai.balanceOf(address(rwa015AJar)), jarBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the JAR doesnt match");
+    }
+
+    function testRWA003OracleTell() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        (, , uint tau, uint toc) = oracle.ilks("RWA003-A");
+        assertGt(toc, 0, "RWA003-A: bad `toc` after `tell()`");
+
+        skip(tau);
+        assertEq(oracle.good("RWA003-A"), false, "RWA003-A: still `good` after `tell()` + `tau`");
     }
 }

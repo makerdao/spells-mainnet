@@ -21,6 +21,10 @@ import "dss-exec-lib/DssAction.sol";
 
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
+interface RwaLiquidationOracleLike {
+    function tell(bytes32 ilk) external;
+}
+
 interface ChainlogLike {
     function removeAddress(bytes32) external;
 }
@@ -48,6 +52,7 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
     address internal immutable MCD_ESM                         = DssExecLib.esm();
     address internal immutable MCD_VOW                         = DssExecLib.vow();
+    address internal immutable MIP21_LIQUIDATION_ORACLE        = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address public immutable MCD_VEST_DAI                      = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     address public immutable MCD_VEST_MKR_TREASURY             = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable RWA015_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_URN");
@@ -88,6 +93,16 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL                     = 0xFBdB6C5596Fc958B432Bf1c99268C72B1515DFf0;
 
     function actions() public override {
+        // ---------- Management of ConsolFreight (RWA003-A) Default ----------
+        // Forum: https://forum.makerdao.com/t/consolfreight-rwa-003-cf4-drop-default/21745
+
+        // Set DC to 0
+        // Note: it was agreed with GovAlpha that there will be no global DC reduction this time.
+        DssExecLib.setIlkDebtCeiling("RWA003-A", 0);
+        // Call tell() on RWALiquidationOracle
+        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).tell("RWA003-A");
+
+
         // ---------- Auth ESM on the Vow ----------
         // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
 
