@@ -58,8 +58,8 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VOW                         = DssExecLib.vow();
     address internal immutable MCD_FLIPPER_MOM                 = DssExecLib.flipperMom();
     address internal immutable MIP21_LIQUIDATION_ORACLE        = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
-    address public immutable MCD_VEST_DAI                      = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-    address public immutable MCD_VEST_MKR_TREASURY             = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    address internal immutable MCD_VEST_DAI                    = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address internal immutable MCD_VEST_MKR_TREASURY           = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable RWA015_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_URN");
     address internal immutable RWA015_A_INPUT_CONDUIT_JAR_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_JAR");
 
