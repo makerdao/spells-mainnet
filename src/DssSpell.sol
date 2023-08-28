@@ -172,7 +172,7 @@ contract DssSpellAction is DssAction {
         MKR.transfer(LAUNCH_PROJECT_FUNDING, 210.83 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Yank GovAlpha Budget Streams ----------
-        // Forum: http://forum.makerdao.com/t/overlooked-vectors-for-post-shutdown-governance-attacks-postmortem/20696/5
+        // Forum: https://forum.makerdao.com/t/spell-contents-2023-08-30/21730
 
         DssVestLike(MCD_VEST_DAI).yank(17);
         DssVestLike(MCD_VEST_MKR_TREASURY).yank(34);
