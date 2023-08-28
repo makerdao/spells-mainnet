@@ -929,7 +929,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vow.wards(address(esm)), 1, "VOW/ward-esm-not-set");
     }
 
-    function testFlliperMomDeauth() public {
+    function testFlipperMomDeauth() public {
+        FlipperMomAbstract flipMom = FlipperMomAbstract(chainLog.getAddress("FLIPPER_MOM"));
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());

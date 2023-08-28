@@ -26,7 +26,6 @@ contract Addresses {
         addr["FAUCET"]                          = 0x0000000000000000000000000000000000000000;
         addr["MCD_DEPLOY"]                      = 0xbaa65281c2FA2baAcb2cb550BA051525A480D3F4;
         addr["JOIN_FAB"]                        = 0xf1738d22140783707Ca71CB3746e0dc7Bf2b0264;
-        addr["FLIP_FAB"]                        = 0x4ACdbe9dd0d00b36eC2050E805012b8Fc9974f2b;
         addr["CLIP_FAB"]                        = 0x0716F25fBaAae9b63803917b6125c10c313dF663;
         addr["CALC_FAB"]                        = 0xE1820A2780193d74939CcA104087CADd6c1aA13A;
         addr["LERP_FAB"]                        = 0x9175561733D138326FDeA86CdFdF53e92b588276;
@@ -61,7 +60,6 @@ contract Addresses {
         addr["GET_CDPS"]                        = 0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573;
         addr["ILK_REGISTRY"]                    = 0x5a464C28D19848f44199D003BeF5ecc87d090F87;
         addr["OSM_MOM"]                         = 0x76416A4d5190d071bfed309861527431304aA14f;
-        addr["FLIPPER_MOM"]                     = 0xc4bE7F74Ee3743bDEd8E0fA218ee5cf06397f472;
         addr["CLIPPER_MOM"]                     = 0x79FBDF16b366DFb14F66cE4Ac2815Ca7296405A0;
         addr["LINE_MOM"]                        = 0x9c257e5Aaf73d964aEBc2140CA38078988fB0C10;
         addr["PROXY_FACTORY"]                   = 0xA26e15C895EFc0616177B7c1e7270A4C7D51C997;
