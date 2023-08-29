@@ -161,6 +161,12 @@ contract DssSpellAction is DssAction {
         ChainlogLike(DssExecLib.LOG).removeAddress("FLIPPER_MOM");
         ChainlogLike(DssExecLib.LOG).removeAddress("FLIP_FAB");
 
+        // ---------- Yank GovAlpha Budget Streams ----------
+        // Forum: https://forum.makerdao.com/t/spell-contents-2023-08-30/21730
+
+        DssVestLike(MCD_VEST_DAI).yank(17);
+        DssVestLike(MCD_VEST_MKR_TREASURY).yank(34);
+
         // ---------- Launch Project Dai Transfer ----------
         // Discussion: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/4
 
@@ -170,12 +176,6 @@ contract DssSpellAction is DssAction {
         // Discussion: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/4
 
         MKR.transfer(LAUNCH_PROJECT_FUNDING, 210.83 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
-
-        // ---------- Yank GovAlpha Budget Streams ----------
-        // Forum: https://forum.makerdao.com/t/spell-contents-2023-08-30/21730
-
-        DssVestLike(MCD_VEST_DAI).yank(17);
-        DssVestLike(MCD_VEST_MKR_TREASURY).yank(34);
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/phoenix-labs-proposed-changes-for-spark-for-august-18th-spell/21612
