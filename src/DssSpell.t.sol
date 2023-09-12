@@ -36,21 +36,8 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
-    function good(bytes32 ilk) external view returns (bool);
-}
-
-interface RwaInputConduitLike {
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function psm() external view returns (address);
-    function to() external view returns (address);
+interface WardsLike {
     function wards(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function quitTo() external view returns (address);
-    function mate(address) external;
-    function push() external;
 }
 
 interface ProxyLike {
@@ -205,31 +192,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        try chainLog.getAddress("FLIPPER_MOM") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
-
-        try chainLog.getAddress("FLIP_FAB") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
-
-        try chainLog.getAddress("RWA015_A_INPUT_CONDUIT_URN") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
-        }
-
-        try chainLog.getAddress("RWA015_A_INPUT_CONDUIT_JAR") {
+        try chainLog.getAddress("MCD_CAT") {
             assertTrue(false);
         } catch Error(string memory errmsg) {
             assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
@@ -323,13 +286,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_GUSD");
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_GUSD");
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_PAX");
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_PAX");
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_URN_USDC");
-        _checkChainlogKey("RWA015_A_INPUT_CONDUIT_JAR_USDC");
-        _checkChainlogVersion("1.16.0");
+        _checkChainlogVersion("1.17.0");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -507,7 +464,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -546,7 +503,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() public { // make private to disable
+    function testYankDAI() private { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
 
@@ -565,7 +522,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.fin(streamId), block.timestamp, "testYankDAI/steam-not-yanked");
     }
 
-    function testYankMKR() public { // make private to disable
+    function testYankMKR() private { // make private to disable
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
         // 31 Mar 2024 23:59:59 PM UTC
@@ -667,8 +624,21 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),   210.83 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[14] memory payees = [
+            Payee(wallets.addr("DEFENSOR"),   41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),   41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),   41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),   41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("NAVIGATOR"),   28.23 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("QGOV"),   20.16 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),   13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PALC"),   13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),   13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"),   7.17 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("WBC"),   6.72 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BLUE"),   1.25 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SES_WALLET"),   34.94 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DECO_WALLET"),   125 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
@@ -905,7 +875,7 @@ contract DssSpellTest is DssSpellTestBase {
     // Spark Tests
     function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0xFBdB6C5596Fc958B432Bf1c99268C72B1515DFf0;
+        address SPARK_SPELL    = 0x95bcf659653d2E0b44851232d61F6F9d2e933fB1;
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -920,168 +890,18 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
     }
-
-    function testVowEsmRely() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vow.wards(address(esm)), 1, "VOW/ward-esm-not-set");
-    }
-
-    function testFlipperMomDeauth() public {
-        FlipperMomAbstract flipMom = FlipperMomAbstract(chainLog.getAddress("FLIPPER_MOM"));
+    function testScuttleMcdCat() public {
+        // MCD_CAT is being removed, so is not present in addresses_goerli file
+        WardsLike cat = WardsLike(chainLog.getAddress("MCD_CAT"));
+        WardsLike vat = WardsLike(addr.addr("MCD_VAT"));
+        assertEq(vat.wards(address(cat)), 1, "cat-not-warded-on-vat");
+        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 1, "pause-proxy-not-warded-on-cat");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(flipMom.authority(), address(0), "FlliperMom/authority-is-not-zero");
-        assertEq(flipMom.owner(), address(0), "FlliperMom/owner-is-not-zero");
-    }
-
-    // RWA tests
-    address RWA015_A_OPERATOR = addr.addr("RWA015_A_OPERATOR");
-    address RWA015_A_CUSTODY  = addr.addr("RWA015_A_CUSTODY");
-
-    address                  rwa015AUrn                 = addr.addr("RWA015_A_URN");
-    address                  rwa015AJar                 = addr.addr("RWA015_A_JAR");
-    RwaLiquidationOracleLike oracle                     = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-    RwaInputConduitLike      rwa015AInputConduitUrnGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_GUSD"));
-    RwaInputConduitLike      rwa015AInputConduitJarGUSD = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_JAR_GUSD"));
-    RwaInputConduitLike      rwa015AInputConduitUrnPAX  = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_URN_PAX"));
-    RwaInputConduitLike      rwa015AInputConduitJarPAX  = RwaInputConduitLike(addr.addr("RWA015_A_INPUT_CONDUIT_JAR_PAX"));
-    GemAbstract              gusd                       = GemAbstract(rwa015AInputConduitUrnGUSD.gem());
-    GemAbstract              pax                        = GemAbstract(rwa015AInputConduitUrnPAX.gem());
-
-    function testRWA015_CONTRACT_DEPLOYMENT_SETUP() public {
-        assertEq(rwa015AInputConduitUrnGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-gusd-urn-psm-not-match");
-        assertEq(rwa015AInputConduitUrnGUSD.to(),  rwa015AUrn,                  "input-conduit-urn-gusd-to-not-match");
-        assertEq(rwa015AInputConduitUrnGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-urn-gusd-dai-not-match");
-        assertEq(rwa015AInputConduitUrnGUSD.gem(), addr.addr("GUSD"),           "input-conduit-urn-gusd-gem-not-match");
-
-        assertEq(rwa015AInputConduitJarGUSD.psm(), addr.addr("MCD_PSM_GUSD_A"), "input-conduit-jar-gusd-psm-not-match");
-        assertEq(rwa015AInputConduitJarGUSD.to(),  rwa015AJar,                  "input-conduit-jar-gusd-to-not-match");
-        assertEq(rwa015AInputConduitJarGUSD.dai(), addr.addr("MCD_DAI"),        "input-conduit-jar-gusd-dai-not-match");
-        assertEq(rwa015AInputConduitJarGUSD.gem(), addr.addr("GUSD"),           "input-conduit-jar-gusd-gem-not-match");
-
-        assertEq(rwa015AInputConduitUrnPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-urn-pax-psm-not-match");
-        assertEq(rwa015AInputConduitUrnPAX.to(),  rwa015AUrn,                   "input-conduit-urn-pax-to-not-match");
-        assertEq(rwa015AInputConduitUrnPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-urn-pax-dai-not-match");
-        assertEq(rwa015AInputConduitUrnPAX.gem(), addr.addr("PAX"),             "input-conduit-urn-pax-gem-not-match");
-
-        assertEq(rwa015AInputConduitJarPAX.psm(), addr.addr("MCD_PSM_PAX_A"),   "input-conduit-jar-pax-psm-not-match");
-        assertEq(rwa015AInputConduitJarPAX.to(),  rwa015AJar,                   "input-conduit-jar-pax-to-not-match");
-        assertEq(rwa015AInputConduitJarPAX.dai(), addr.addr("MCD_DAI"),         "input-conduit-jar-pax-dai-not-match");
-        assertEq(rwa015AInputConduitJarPAX.gem(), addr.addr("PAX"),             "input-conduit-jar-pax-gem-not-match");
-    }
-
-    function testRWA015_INTEGRATION_CONDUITS_SETUP() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(rwa015AInputConduitUrnGUSD.wards(pauseProxy),      1, "InputConduitUrnGUSD/ward-pause-proxy-not-set");
-        assertEq(rwa015AInputConduitUrnGUSD.wards(address(esm)),    1, "InputConduitUrnGUSD/ward-esm-not-set");
-        assertEq(rwa015AInputConduitUrnGUSD.may(pauseProxy),        0, "InputConduitUrnGUSD/pause-proxy-mated");
-        assertEq(rwa015AInputConduitUrnGUSD.may(RWA015_A_OPERATOR), 1, "InputConduitUrnGUSD/operator-not-mate");
-
-        assertEq(rwa015AInputConduitUrnGUSD.quitTo(), RWA015_A_CUSTODY, "InputConduitUrnGUSD/quit-to-not-set");
-
-        assertEq(rwa015AInputConduitJarGUSD.wards(pauseProxy),      1, "InputConduitJarGUSD/ward-pause-proxy-not-set");
-        assertEq(rwa015AInputConduitJarGUSD.wards(address(esm)),    1, "InputConduitJarGUSD/ward-esm-not-set");
-        assertEq(rwa015AInputConduitJarGUSD.may(pauseProxy),        0, "InputConduitJarGUSD/pause-proxy-mated");
-        assertEq(rwa015AInputConduitJarGUSD.may(RWA015_A_OPERATOR), 1, "InputConduitJarGUSD/operator-not-mate");
-
-        assertEq(rwa015AInputConduitJarGUSD.quitTo(), RWA015_A_CUSTODY, "InputConduitJarGUSD/quit-to-not-set");
-
-        assertEq(rwa015AInputConduitUrnPAX.wards(pauseProxy),      1, "InputConduitUrnPAX/ward-pause-proxy-not-set");
-        assertEq(rwa015AInputConduitUrnPAX.wards(address(esm)),    1, "InputConduitUrnPAX/ward-esm-not-set");
-        assertEq(rwa015AInputConduitUrnPAX.may(pauseProxy),        0, "InputConduitUrnPAX/pause-proxy-mated");
-        assertEq(rwa015AInputConduitUrnPAX.may(RWA015_A_OPERATOR), 1, "InputConduitUrnPAX/operator-not-mate");
-
-        assertEq(rwa015AInputConduitUrnPAX.quitTo(), RWA015_A_CUSTODY, "InputConduitUrnPAX/quit-to-not-set");
-
-        assertEq(rwa015AInputConduitJarPAX.wards(pauseProxy),      1, "InputConduitJarPAX/ward-pause-proxy-not-set");
-        assertEq(rwa015AInputConduitJarPAX.wards(address(esm)),    1, "InputConduitJarPAX/ward-esm-not-set");
-        assertEq(rwa015AInputConduitJarPAX.may(pauseProxy),        0, "InputConduitJarPAX/pause-proxy-mated");
-        assertEq(rwa015AInputConduitJarPAX.may(RWA015_A_OPERATOR), 1, "InputConduitJarPAX/operator-not-mate");
-
-        assertEq(rwa015AInputConduitJarPAX.quitTo(), RWA015_A_CUSTODY, "InputConduitJarPAX/quit-to-not-set");
-    }
-
-    function testRWA015_INPUT_CONDUITS() public {
-        // We set DC to 1b as DC For PAX is currently 0 and for GUSD is maxed
-        vm.startPrank(pauseProxy);
-        vat.file("PSM-GUSD-A", "line", 1_000_000_000 * (10**45));
-        vat.file("PSM-PAX-A", "line",  1_000_000_000 * (10**45));
-        vm.stopPrank();
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        uint256 gusdAmt = 1000 * 10**2;
-        uint256 paxAmt  = 1000 * 10**18;
-        uint256 urnBalanceBefore = dai.balanceOf(rwa015AUrn);
-        uint256 jarBalanceBefore = dai.balanceOf(rwa015AJar);
-
-        // Add GUSD blance
-        address impl = ERC20Proxy(address(gusd)).erc20Impl();
-        ERC20Store store = ERC20Store(ERC20Impl(impl).erc20Store());
-
-        vm.startPrank(impl);
-        store.setBalance(address(this), 2 * gusdAmt);
-        store.setTotalSupply(gusd.totalSupply() + 2 * gusdAmt);
-        vm.stopPrank();
-
-        GodMode.setBalance(address(pax), address(this), 2 * paxAmt);
-
-        // transfer GUSD to input conduit's
-        gusd.transfer(address(rwa015AInputConduitUrnGUSD), gusdAmt);
-        assertEq(gusd.balanceOf(address(rwa015AInputConduitUrnGUSD)), gusdAmt, "RWA015-A: GUSD not sent to input conduit urn");
-
-        gusd.transfer(address(rwa015AInputConduitJarGUSD), gusdAmt);
-        assertEq(gusd.balanceOf(address(rwa015AInputConduitJarGUSD)), gusdAmt, "RWA015-A: GUSD not sent to input conduit jar");
-
-        // input conduit 'push()' to the urn
-        rwa015AInputConduitUrnGUSD.push();
-
-        // input conduit 'push()' to the jar
-        rwa015AInputConduitJarGUSD.push();
-
-        assertEq(dai.balanceOf(address(rwa015AUrn)), urnBalanceBefore + 1000 * 10**18, "GUSD-Input-Conduit/Balance of the URN doesnt match");
-        assertEq(dai.balanceOf(address(rwa015AJar)), jarBalanceBefore + 1000 * 10**18, "GUSD-Input-Conduit/Balance of the JAR doesnt match");
-
-        urnBalanceBefore = dai.balanceOf(rwa015AUrn);
-        jarBalanceBefore = dai.balanceOf(rwa015AJar);
-
-        // transfer PAX to input conduit's
-        pax.transfer(address(rwa015AInputConduitUrnPAX), paxAmt);
-        assertEq(pax.balanceOf(address(rwa015AInputConduitUrnPAX)), paxAmt, "RWA015-A: PAX not sent to input conduit urn");
-
-        pax.transfer(address(rwa015AInputConduitJarPAX), paxAmt);
-        assertEq(pax.balanceOf(address(rwa015AInputConduitJarPAX)), paxAmt, "RWA015-A: PAX not sent to input conduit jar");
-
-        // input conduit 'push()' to the urn
-        rwa015AInputConduitUrnPAX.push();
-
-        // input conduit 'push()' to the jar
-        rwa015AInputConduitJarPAX.push();
-
-        assertEq(dai.balanceOf(address(rwa015AUrn)), urnBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the URN doesnt match");
-        assertEq(dai.balanceOf(address(rwa015AJar)), jarBalanceBefore + 1000 * 10**18, "PAX-Input-Conduit/Balance of the JAR doesnt match");
-    }
-
-    function testRWA003OracleTell() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        (, , uint tau, uint toc) = oracle.ilks("RWA003-A");
-        assertGt(toc, 0, "RWA003-A: bad `toc` after `tell()`");
-
-        skip(tau);
-        assertEq(oracle.good("RWA003-A"), false, "RWA003-A: still `good` after `tell()` + `tau`");
+        assertEq(vat.wards(address(cat)), 0, "cat-not-warded-on-vat");
+        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 0, "pause-proxy-not-warded-on-cat");
     }
 }

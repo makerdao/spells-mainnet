@@ -169,7 +169,6 @@ contract DssSpellTestBase is Config, DssTest {
     DSChiefAbstract                chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
     VatAbstract                      vat = VatAbstract(        addr.addr("MCD_VAT"));
     VowAbstract                      vow = VowAbstract(        addr.addr("MCD_VOW"));
-    CatAbstract                      cat = CatAbstract(        addr.addr("MCD_CAT"));
     DogAbstract                      dog = DogAbstract(        addr.addr("MCD_DOG"));
     PotAbstract                      pot = PotAbstract(        addr.addr("MCD_POT"));
     JugAbstract                      jug = JugAbstract(        addr.addr("MCD_JUG"));
@@ -437,13 +436,6 @@ contract DssSpellTestBase is Config, DssTest {
         );
         }
 
-        // box value in RAD
-        {
-            uint256 normalizedBox = values.cat_box * RAD;
-            assertEq(cat.box(), normalizedBox, "TestError/cat-box");
-            assertTrue(cat.box() >= MILLION * RAD && cat.box() <= 50 * MILLION * RAD, "TestError/cat-box-range");
-        }
-
         // Hole value in RAD
         {
             uint256 normalizedHole = values.dog_Hole * RAD;
@@ -556,41 +548,8 @@ contract DssSpellTestBase is Config, DssTest {
             }
 
             if (values.collaterals[ilk].liqType == "flip") {
-                {
-                assertEq(reg.class(ilk), 2, _concat("TestError/reg-class-", ilk));
-                (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("cat()"));
-                assertTrue(ok, _concat("TestError/reg-xlip-cat-", ilk));
-                assertEq(abi.decode(val, (address)), address(cat), _concat("TestError/reg-xlip-cat-", ilk));
-                }
-                {
-                (, uint256 chop, uint256 dunk) = cat.ilks(ilk);
-                // Convert BP to system expected value
-                uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
-                assertEq(chop, normalizedTestChop, _concat("TestError/cat-chop-", ilk));
-                // make sure chop is less than 100%
-                assertTrue(chop >= WAD && chop < 2 * WAD, _concat("TestError/cat-chop-range-", ilk));   // penalty gt eq 0% and lt 100%
-
-                // Convert whole Dai units to expected RAD
-                uint256 normalizedTestDunk = values.collaterals[ilk].cat_dunk * RAD;
-                assertEq(dunk, normalizedTestDunk, _concat("TestError/cat-dunk-", ilk));
-                assertTrue(dunk >= RAD && dunk < MILLION * RAD, _concat("TestError/cat-dunk-range-", ilk));
-
-                (address flipper,,) = cat.ilks(ilk);
-                assertTrue(flipper != address(0), _concat("TestError/invalid-flip-address-", ilk));
-                FlipAbstract flip = FlipAbstract(flipper);
-                // Convert BP to system expected value
-                uint256 normalizedTestBeg = (values.collaterals[ilk].flip_beg + 10000)  * 10**14;
-                assertEq(uint256(flip.beg()), normalizedTestBeg, _concat("TestError/flip-beg-", ilk));
-                assertTrue(flip.beg() >= WAD && flip.beg() <= 110 * WAD / 100, _concat("TestError/flip-beg-range-", ilk)); // gte 0% and lte 10%
-                assertEq(uint256(flip.ttl()), values.collaterals[ilk].flip_ttl, _concat("TestError/flip-ttl-", ilk));
-                assertTrue(flip.ttl() >= 600 && flip.ttl() < 10 hours, _concat("TestError/flip-ttl-range-", ilk));         // gt eq 10 minutes and lt 10 hours
-                assertEq(uint256(flip.tau()), values.collaterals[ilk].flip_tau, _concat("TestError/flip-tau-", ilk));
-                assertTrue(flip.tau() >= 600 && flip.tau() <= 3 days, _concat("TestError/flip-tau-range-", ilk));          // gt eq 10 minutes and lt eq 3 days
-
-                assertEq(flip.wards(address(cat)), values.collaterals[ilk].liqOn ? 1 : 0, _concat("TestError/flip-liqOn-", ilk));
-                assertEq(flip.wards(address(end)), 1, _concat("TestError/flip-end-auth-", ilk));
-                assertEq(flip.wards(address(pauseProxy)), 1, _concat("TestError/flip-pause-proxy-auth-", ilk)); // Check pause_proxy ward
-                }
+                // NOTE: MCD_CAT has been scuttled in the spell on 2023-09-13
+                revert("TestError/flip-deprecated");
             }
             if (values.collaterals[ilk].liqType == "clip") {
                 {
