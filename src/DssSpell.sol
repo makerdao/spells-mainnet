@@ -73,11 +73,11 @@ contract DssSpellAction is DssAction {
     uint256 internal constant THREE_PT_SEVEN_ZERO_PCT_RATE  = 1000000001152077919467240095;
     uint256 internal constant FOUR_PT_TWO_ZERO_PCT_RATE     = 1000000001304602465690389263;
     // ----------- MKR transfer Addresses -----------
-    address internal constant DECO_001 = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
-    address internal constant SES_001  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
+    address internal constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
+    address internal constant SES_WALLET  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
     address internal constant DEFENSOR     = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
-    address internal constant TRUE_NAME    = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant TRUENAME     = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
     address internal constant BONAPUBLICA  = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
     address internal constant VIGILANT     = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
     address internal constant NAVIGATOR    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
@@ -92,8 +92,8 @@ contract DssSpellAction is DssAction {
     //  ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
 
-        // ---------- Spark Proxy ----------
-    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/5/primary-sce-latest.json#L2
+    // ---------- Spark Proxy ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     // ---------- Trigger Spark Proxy Spell ----------
@@ -128,43 +128,42 @@ contract DssSpellAction is DssAction {
 
         // ---------- Aligned Delegate Compensation for August ----------
         // Forum: https://forum.makerdao.com/t/august-2023-aligned-delegate-compensation/21983
-        // NOTE: Skip on goerli
 
         // 0xDefensor - 41.67 - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
-        MKR.transfer(DEFENSOR, 41.67 ether);
+        MKR.transfer(DEFENSOR, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // TRUE NAME - 41.67 - 0x612f7924c367575a0edf21333d96b15f1b345a5d
-        MKR.transfer(TRUE_NAME, 41.67 ether);
+        MKR.transfer(TRUENAME, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // BONAPUBLICA - 41.67 - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
-        MKR.transfer(BONAPUBLICA, 41.67 ether);
+        MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // vigilant - 41.67 - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
-        MKR.transfer(VIGILANT, 41.67 ether);
+        MKR.transfer(VIGILANT, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Navigator - 28.23 - 0x11406a9CC2e37425F15f920F494A51133ac93072
-        MKR.transfer(NAVIGATOR, 28.23 ether);
+        MKR.transfer(NAVIGATOR, 28.23 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // QGov - 20.16 - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
-        MKR.transfer(QGOV, 20.16 ether);
+        MKR.transfer(QGOV, 20.16 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // UPMaker - 13.89 - 0xbb819df169670dc71a16f58f55956fe642cc6bcd
-        MKR.transfer(UPMAKER, 13.89 ether);
+        MKR.transfer(UPMAKER, 13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // PALC - 13.89 - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
-        MKR.transfer(PALC, 13.89 ether);
+        MKR.transfer(PALC, 13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // PBG - 13.89 - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
-        MKR.transfer(PBG, 13.89 ether);
+        MKR.transfer(PBG, 13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Cloaky - 7.17 - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
-        MKR.transfer(CLOAKY, 7.17 ether);
+        MKR.transfer(CLOAKY, 7.17 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // WBC - 6.72 - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
-        MKR.transfer(WBC, 6.72 ether);
+        MKR.transfer(WBC, 6.72 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // BLUE - 1.25 - 0xb6c09680d822f162449cdfb8248a7d3fc26ec9bf
-        MKR.transfer(BLUE, 1.25 ether);
+        MKR.transfer(BLUE, 1.25 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // ---------- Decrease Debt Ceiling for Fortunafi (RWA005-A) to 0 ----------
         // Decrease Debt Ceiling from 15 million DAI to 0 (zero)
@@ -182,11 +181,11 @@ contract DssSpellAction is DssAction {
         // ---------- Core Unit MKR Vesting Transfers ----------
         // DECO-001 - 125 MKR - 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP36#sentence-summary
-        MKR.transfer(DECO_001, 125 ether);
+        MKR.transfer(DECO_WALLET, 125 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // SES-001 - 34.94 MKR - 0x87acdd9208f73bfc9207e1f6f0fde906bca95cc6
         // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP17#sentence-summary
-        MKR.transfer(SES_001, 34.94 ether);
+        MKR.transfer(SES_WALLET, 34.94 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // ---------- Scuttle MCD_CAT ----------
         // Forum: http://forum.makerdao.com/t/proposal-to-scuttle-mcd-cat-upcoming-executive-spell-2023-09-13/21958
