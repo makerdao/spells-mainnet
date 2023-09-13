@@ -77,18 +77,18 @@ contract DssSpellAction is DssAction {
     address internal constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
     address internal constant SES_WALLET  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
 
-    address internal constant DEFENSOR     = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
-    address internal constant TRUENAME     = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
-    address internal constant BONAPUBLICA  = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant VIGILANT     = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
-    address internal constant NAVIGATOR    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
-    address internal constant QGOV         = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
-    address internal constant UPMAKER      = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
-    address internal constant PALC         = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
-    address internal constant PBG          = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
-    address internal constant CLOAKY       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
-    address internal constant WBC          = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
-    address internal constant BLUE         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant DEFENSOR    = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant TRUENAME    = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant BONAPUBLICA = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant VIGILANT    = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant NAVIGATOR   = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+    address internal constant QGOV        = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
+    address internal constant UPMAKER     = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant PALC        = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
+    address internal constant PBG         = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant CLOAKY      = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant WBC         = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant BLUE        = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
 
     //  ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
