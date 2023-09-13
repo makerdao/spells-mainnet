@@ -874,6 +874,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
     }
+
     function testScuttleMcdCat() public {
         // MCD_CAT is being removed, so is not present in addresses_mainnet.sol file
         WardsLike cat = WardsLike(chainLog.getAddress("MCD_CAT"));
