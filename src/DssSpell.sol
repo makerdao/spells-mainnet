@@ -72,6 +72,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant THREE_PT_FOUR_FIVE_PCT_RATE   = 1000000001075539644270067964;
     uint256 internal constant THREE_PT_SEVEN_ZERO_PCT_RATE  = 1000000001152077919467240095;
     uint256 internal constant FOUR_PT_TWO_ZERO_PCT_RATE     = 1000000001304602465690389263;
+
     // ----------- MKR transfer Addresses -----------
     address internal constant DECO_WALLET = 0xF482D1031E5b172D42B2DAA1b6e5Cbf6519596f7;
     address internal constant SES_WALLET  = 0x87AcDD9208f73bFc9207e1f6F0fDE906bcA95cc6;
