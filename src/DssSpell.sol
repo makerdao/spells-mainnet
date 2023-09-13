@@ -40,7 +40,7 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2023-09-13 MakerDAO Executive Spell | Hash: 0x214ab69eb9c381276e409b9c58c74a6e090f1105992fabc8986d88091121765f";
 
-    GemAbstract internal immutable MKR      = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable MKR         = GemAbstract(DssExecLib.mkr());
 
     address internal immutable MCD_VAT         = DssExecLib.vat();
     address internal immutable MCD_CAT         = DssExecLib.cat();
