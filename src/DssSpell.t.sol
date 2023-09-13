@@ -44,22 +44,6 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
-interface ERC20Proxy {
-    function erc20Impl() external returns (address);
-
-    function totalSupply() external returns (uint256);
-}
-
-interface ERC20Impl {
-    function erc20Store() external returns (address);
-}
-
-interface ERC20Store {
-    function setTotalSupply(uint256 _newTotalSupply) external;
-
-    function setBalance(address _owner, uint256 _newBalance) external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -891,7 +875,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
     function testScuttleMcdCat() public {
-        // MCD_CAT is being removed, so is not present in addresses_goerli file
+        // MCD_CAT is being removed, so is not present in addresses_mainnet.sol file
         WardsLike cat = WardsLike(chainLog.getAddress("MCD_CAT"));
         WardsLike vat = WardsLike(addr.addr("MCD_VAT"));
         assertEq(vat.wards(address(cat)), 1, "cat-not-warded-on-vat");
