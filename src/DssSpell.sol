@@ -36,9 +36,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://github.com/makerdao/community/blob/6904c406a88e06094c032a082603a8e7a4ba9717/governance/votes/Executive%20vote%20-%20September%2013%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/ef206389a490089bd06e64c574038f07bfbb7569/governance/votes/Executive%20vote%20-%20September%2013%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-09-13 MakerDAO Executive Spell | Hash: 0x1be6f83b206dc32d345b6f4e9dd346c3fc53693571aa22471a915b404d423f0a";
+        "2023-09-13 MakerDAO Executive Spell | Hash: 0x214ab69eb9c381276e409b9c58c74a6e090f1105992fabc8986d88091121765f";
 
     GemAbstract internal immutable MKR      = GemAbstract(DssExecLib.mkr());
 
