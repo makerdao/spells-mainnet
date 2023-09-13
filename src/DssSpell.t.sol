@@ -885,7 +885,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vat.wards(address(cat)), 0, "cat-not-warded-on-vat");
-        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 0, "pause-proxy-not-warded-on-cat");
+        assertEq(vat.wards(address(cat)), 0, "cat-still-relied-on-vat");
+        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 0, "pause-proxy-still-relied-on-cat");
     }
 }
