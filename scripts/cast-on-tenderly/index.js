@@ -2,7 +2,7 @@ import 'dotenv/config';
 import axios from 'axios';
 import { Contract, ethers } from 'ethers';
 
-const NETWORK_ID = 5;
+const NETWORK_ID = 1;
 const CHAINLOG_ADDRESS = '0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F';
 const CHIEF_HAT_SLOT = 12;
 const DEFAULT_TRANSACTION_PARAMETERS = { gasLimit: 1_000_000_000 };
