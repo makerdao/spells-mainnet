@@ -40,6 +40,11 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface RwaLiquidationOracleLike {
+    function good(bytes32 ilk) external view returns (bool);
+    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -859,7 +864,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0); // TODO
+        address SPARK_SPELL    = 0x9FfFbc278119Ad854b58C3d219212849E8B54eF8;
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -877,4 +882,33 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    // RWA Tests
+
+    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+
+    function testRWA007DocChange() public {
+        string memory OLD_RWA007_DOC = "QmY185L4tuxFkpSQ33cPHUHSNpwy8V6TMXbXvtVraxXtb5";
+        string memory NEW_RWA007_DOC = "QmWo3UVtEDKVwS5k34uLt1J6u9px3rjHYkTLK2rYQ31E3G";
+
+        _checkRWADocUpdate("RWA007-A", OLD_RWA007_DOC, NEW_RWA007_DOC);
+    }
+
+    function testRWA009DocChange() public {
+        string memory OLD_RWA009_DOC = "QmeRrbDF8MVPQfNe83gWf2qV48jApVigm1WyjEtDXCZ5rT";
+        string memory NEW_RWA009_DOC = "QmYjvAZEeGCs8kMuLQz6kU8PWgsbG1i8QWd2jrwkSipcRx";
+
+        _checkRWADocUpdate("RWA009-A", OLD_RWA009_DOC, NEW_RWA009_DOC);
+    }
+
+    function testRWA005OracleTell() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        (, , uint tau, uint toc) = oracle.ilks("RWA005-A");
+        assertGt(toc, 0, "RWA005-A: bad `toc` after `tell()`");
+
+        skip(tau);
+        assertEq(oracle.good("RWA005-A"), false, "RWA005-A: still `good` after `tell()` + `tau`");
+    }
 }
