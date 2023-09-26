@@ -36,10 +36,6 @@ interface BridgeLike {
     function l2TeleportGateway() external view returns (address);
 }
 
-interface WardsLike {
-    function wards(address) external view returns (uint256);
-}
-
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -114,7 +110,67 @@ contract DssSpellTest is DssSpellTestBase {
     function testChainlogVersionBump() public {
         _testChainlogVersionBump();
     }
+
+    // Leave this test public (for now) as this is acting like a config test
+    function testPSMs() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        bytes32 _ilk;
+
+        // USDC
+        _ilk = "PSM-USDC-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
+            addr.addr("PIP_USDC"),
+            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
+            0,   // tin
+            0    // tout
+        );
+
+        // GUSD
+        _ilk = "PSM-GUSD-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_GUSD_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_GUSD"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_GUSD_A"), chainLog.getAddress("MCD_PSM_GUSD_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
+            addr.addr("PIP_GUSD"),
+            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
+            0,  // tin
+            0    // tout
+        );
+
+        // USDP
+        _ilk = "PSM-PAX-A";
+        assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
+        assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
+        assertEq(addr.addr("PIP_PAX"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_PSM_PAX_A"), chainLog.getAddress("MCD_PSM_PAX_A"));
+        _checkPsmIlkIntegration(
+            _ilk,
+            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
+            addr.addr("PIP_PAX"),
+            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
+            0,   // tin
+            0    // tout
+        );
+    }
+
     // END OF TESTS THAT SHOULD BE RUN ON EVERY SPELL
+
+    // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
     function testOsmAuth() private {  // make private to disable
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
@@ -171,7 +227,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public { // make private to disable
+    function testRemoveChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -265,7 +321,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
@@ -312,63 +368,6 @@ contract DssSpellTest is DssSpellTestBase {
         address SET_TOKEN    = address(0);
         address TOKENUSD_MED = OsmAbstract(addr.addr("PIP_TOKEN")).src();
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
-    }
-
-    // Leave this test public (for now) as this is acting like a config test
-    function testPSMs() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        bytes32 _ilk;
-
-        // USDC
-        _ilk = "PSM-USDC-A";
-        assertEq(addr.addr("MCD_JOIN_PSM_USDC_A"), reg.join(_ilk));
-        assertEq(addr.addr("MCD_CLIP_PSM_USDC_A"), reg.xlip(_ilk));
-        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
-        assertEq(addr.addr("MCD_PSM_USDC_A"), chainLog.getAddress("MCD_PSM_USDC_A"));
-        _checkPsmIlkIntegration(
-            _ilk,
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_USDC_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
-            addr.addr("PIP_USDC"),
-            PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
-            0,   // tin
-            0    // tout
-        );
-
-        // GUSD
-        _ilk = "PSM-GUSD-A";
-        assertEq(addr.addr("MCD_JOIN_PSM_GUSD_A"), reg.join(_ilk));
-        assertEq(addr.addr("MCD_CLIP_PSM_GUSD_A"), reg.xlip(_ilk));
-        assertEq(addr.addr("PIP_GUSD"), reg.pip(_ilk));
-        assertEq(addr.addr("MCD_PSM_GUSD_A"), chainLog.getAddress("MCD_PSM_GUSD_A"));
-        _checkPsmIlkIntegration(
-            _ilk,
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_GUSD_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_GUSD_A")),
-            addr.addr("PIP_GUSD"),
-            PsmAbstract(addr.addr("MCD_PSM_GUSD_A")),
-            0,  // tin
-            0    // tout
-        );
-
-        // USDP
-        _ilk = "PSM-PAX-A";
-        assertEq(addr.addr("MCD_JOIN_PSM_PAX_A"), reg.join(_ilk));
-        assertEq(addr.addr("MCD_CLIP_PSM_PAX_A"), reg.xlip(_ilk));
-        assertEq(addr.addr("PIP_PAX"), reg.pip(_ilk));
-        assertEq(addr.addr("MCD_PSM_PAX_A"), chainLog.getAddress("MCD_PSM_PAX_A"));
-        _checkPsmIlkIntegration(
-            _ilk,
-            GemJoinAbstract(addr.addr("MCD_JOIN_PSM_PAX_A")),
-            ClipAbstract(addr.addr("MCD_CLIP_PSM_PAX_A")),
-            addr.addr("PIP_PAX"),
-            PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
-            0,   // tin
-            0    // tout
-        );
     }
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
@@ -603,7 +602,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // make public to enable
+    function testMKRPayments() private { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -856,10 +855,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    // Spark Tests
+    // SPARK TESTS
+
     function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0x95bcf659653d2E0b44851232d61F6F9d2e933fB1;
+        address SPARK_SPELL    = address(0); // TODO
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -875,18 +875,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
     }
 
-    function testScuttleMcdCat() public {
-        // MCD_CAT is being removed, so is not present in addresses_mainnet.sol file
-        WardsLike cat = WardsLike(chainLog.getAddress("MCD_CAT"));
-        WardsLike vat = WardsLike(addr.addr("MCD_VAT"));
-        assertEq(vat.wards(address(cat)), 1, "cat-not-warded-on-vat");
-        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 1, "pause-proxy-not-warded-on-cat");
+    // SPELL-SPECIFIC TESTS GO BELOW
 
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vat.wards(address(cat)), 0, "cat-still-relied-on-vat");
-        assertEq(cat.wards(addr.addr("MCD_PAUSE_PROXY")), 0, "pause-proxy-still-relied-on-cat");
-    }
 }
