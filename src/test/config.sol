@@ -76,9 +76,9 @@ contract Config {
         bool    offboarding;
     }
 
-    uint256 constant private THOUSAND   = 10 ** 3;
-    uint256 constant private MILLION    = 10 ** 6;
-    uint256 constant private BILLION    = 10 ** 9;
+    uint256 constant private THOUSAND = 10 ** 3;
+    uint256 constant private MILLION  = 10 ** 6;
+    uint256 constant private BILLION  = 10 ** 9;
 
     SpellValues  spellValues;
     SystemValues afterSpell;
@@ -103,25 +103,25 @@ contract Config {
         //
         // Values for all system configuration changes
         //
-        afterSpell.line_offset =           680 * MILLION;           // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr =               5_00;                    // In basis points
-        afterSpell.pause_delay =           48 hours;                // In seconds
-        afterSpell.vow_wait =              156 hours;               // In seconds
-        afterSpell.vow_dump =              250;                     // In whole Dai units
-        afterSpell.vow_sump =              50 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_bump =              20 * THOUSAND;           // In whole Dai units
-        afterSpell.vow_hump_min =          50 * MILLION;            // In whole Dai units
-        afterSpell.vow_hump_max =          50 * MILLION;            // In whole Dai units
-        afterSpell.flap_hop =              6308 seconds;            // In seconds
-        afterSpell.flap_want =             9800;                    // In basis points
-        afterSpell.dog_Hole =              70 * MILLION;            // In whole Dai units
-        afterSpell.esm_min =               150 * THOUSAND;          // In whole MKR units
-        afterSpell.pause_authority =       chief;                   // Pause authority
-        afterSpell.osm_mom_authority =     chief;                   // OsmMom authority
-        afterSpell.clipper_mom_authority = chief;                   // ClipperMom authority
-        afterSpell.d3m_mom_authority =     chief;                   // D3MMom authority
-        afterSpell.ilk_count =             64;                      // Num expected in system
-        afterSpell.chainlog_version =      "1.17.0";                // String expected in system
+        afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
+        afterSpell.pot_dsr               = 5_00;           // In basis points
+        afterSpell.pause_delay           = 48 hours;       // In seconds
+        afterSpell.vow_wait              = 156 hours;      // In seconds
+        afterSpell.vow_dump              = 250;            // In whole Dai units
+        afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_bump              = 20 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
+        afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
+        afterSpell.flap_hop              = 6308 seconds;   // In seconds
+        afterSpell.flap_want             = 9800;           // In basis points
+        afterSpell.dog_Hole              = 70 * MILLION;   // In whole Dai units
+        afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
+        afterSpell.pause_authority       = chief;          // Pause authority
+        afterSpell.osm_mom_authority     = chief;          // OsmMom authority
+        afterSpell.clipper_mom_authority = chief;          // ClipperMom authority
+        afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
+        afterSpell.ilk_count             = 64;             // Num expected in system
+        afterSpell.chainlog_version      = "1.17.0";       // String expected in system
 
         //
         // Values for all collateral

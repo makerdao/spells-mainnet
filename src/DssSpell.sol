@@ -32,18 +32,22 @@ interface RwaLiquidationOracleLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/c0eb5feb51cf5a8d0dcdcd4436976d3b4f3da913/governance/votes/Executive%20vote%20-%20September%2027%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-09-30 MakerDAO Executive Spell | Hash: TODO";
+        "2023-09-30 MakerDAO Executive Spell | Hash: 0x3906bcfefa6d515aae83aba7dae150afde5772699e6a0741f3e89d344315aa36";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
-    // ----- Approve HV Bank (RWA009-A) DAO Resolution -----
-    // Forum: http://forum.makerdao.com/t/request-to-poll-offboarding-legacy-legal-recourse-assets/21582
-    // Poll: https://vote.makerdao.com/polling/QmNgKzcG
-    // Approve DAO resolution hash QmXU2TwsRpVevGY74NVFbD9bKwtsw1mSuSce7My1zinD9m
+
+    // -----  RWA007-A (Clydesdale) DAO Resolution -----
+    // Poll: https://vote.makerdao.com/polling/Qmb45PDU
+    // Forum: https://forum.makerdao.com/t/proposal-to-revise-asset-allocation-of-jat1-and-jat2/21718
+    // Approve the DAO Resolution with hash QmZ94FG8YXK4seyBHBi2FfTfW5URtBqbCb7JZAB1HGkTNF
+
+    // Comma-separated list of DAO resolutions IPFS hashes.
+    string public constant dao_resolutions = "QmZ94FG8YXK4seyBHBi2FfTfW5URtBqbCb7JZAB1HGkTNF";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -57,6 +61,8 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE      = ;
 
     //  ---------- Math ----------
+
+    //  ---------- MCD Contracts ----------
 
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
@@ -81,7 +87,6 @@ contract DssSpellAction is DssAction {
     }
 
     function actions() public override {
-
         // ----- RWA007-A (Clydesdale) DAO Resolution -----
         // Poll: https://vote.makerdao.com/polling/Qmb45PDU
         // Forum: https://forum.makerdao.com/t/proposal-to-revise-asset-allocation-of-jat1-and-jat2/21718
@@ -107,7 +112,6 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmVcxd7J
         // Forum: https://forum.makerdao.com/t/proposal-for-activation-of-gnosis-chain-instance/22098/8
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
-
     }
 }
 
