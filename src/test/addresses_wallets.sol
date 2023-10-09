@@ -86,6 +86,8 @@ contract Wallets {
         addr["SEEDLATAMETH"]                 = 0x0087a081a9B430fd8f688c6ac5dD24421BfB060D;
         addr["STABLELAB_2"]                  = 0xbDE65cf2352ed1Dde959f290E973d0fC5cEDFD08;
         addr["FLIPSIDEGOV"]                  = 0x300901243d6CB2E74c10f8aB4cc89a39cC222a29;
+        addr["DAI_VINCI"]                    = 0x9ee47F0f82F1A6F45C4E1D25Ce95C321D8C8356a;
+        addr["HARMONY_2"]                      = 0xE20A2e231215e9b7Aa308463F1A7490b2ECE55D3;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;
@@ -120,6 +122,7 @@ contract Wallets {
         addr["TECH"]                         = 0x2dC0420A736D1F40893B9481D8968E4D7424bC0B;
         addr["STEAKHOUSE"]                   = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
+        addr["JANSKY"]                       = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
 
         // Ecosystem Actors
         addr["PHOENIX_LABS_2"]               = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;

@@ -40,6 +40,21 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface RwaUrnLike {
+    function vat() external view returns (address);
+    function jug() external view returns (address);
+    function daiJoin() external view returns (address);
+    function outputConduit() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function hope(address) external;
+    function can(address) external view returns (uint256);
+    function gemJoin() external view returns (address);
+    function lock(uint256) external;
+    function draw(uint256) external;
+    function wipe(uint256) external;
+    function free(uint256) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -372,17 +387,15 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
 
         // All times in GMT
         // $ make time stamp=<STAMP>
-        // 2023-07-01 00:00:00 UTC
-        uint256 JUL_01_2023 = 1688169600;
-        // 2024-06-30 23:59:59 UTC
-        uint256 JUN_30_2024 = 1719791999;
-        // 2024-12-31 23:59:59 UTC
-        uint256 DEC_31_2024 = 1735689599;
+        // 2023-10-01 00:00:00 UTC
+        uint256 OCT_01_2023       = 1696107600;
+        // 2024-09-30 23:59:59 UTC
+        uint256 SEP_30_2024       = 1727729999;
 
         uint256 prevBalance;
 
@@ -398,48 +411,48 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.ids(), prevStreamCount + 2);
 
         // Check the first stream
-        uint256 chronicleStreamId = prevStreamCount + 1;
-        assertTrue(vest.valid(chronicleStreamId)); // check for valid contract
+        uint256 janskyVestId = prevStreamCount + 1;
+        assertTrue(vest.valid(janskyVestId)); // check for valid contract
         _checkDaiVest({
-            _index:      chronicleStreamId,                              // id
-            _wallet:     wallets.addr("CHRONICLE_LABS"),                 // usr
-            _start:      JUL_01_2023,                                    // bgn
-            _cliff:      JUL_01_2023,                                    // clf
-            _end:        JUN_30_2024,                                    // fin
+            _index:      janskyVestId,                              // id
+            _wallet:     wallets.addr("JANSKY"),                         // usr
+            _start:      OCT_01_2023,                                    // bgn
+            _cliff:      OCT_01_2023,                                    // clf
+            _end:        SEP_30_2024,                                    // fin
             _days:       366 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     3_721_800 * WAD,                                // tot
+            _reward:     504_000 * WAD,                                  // tot
             _claimed:    0                                               // rxd
         });
         GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("CHRONICLE_LABS"));
-        vest.unrestrict(chronicleStreamId);
-        vm.warp(JUL_01_2023 + 366 days);
-        vest.vest(chronicleStreamId);
-        assertEq(dai.balanceOf(wallets.addr("CHRONICLE_LABS")), prevBalance + 3_721_800 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("JANSKY"));
+        vest.unrestrict(janskyVestId);
+        vm.warp(OCT_01_2023 + 366 days);
+        vest.vest(janskyVestId);
+        assertEq(dai.balanceOf(wallets.addr("JANSKY")), prevBalance + 504_000 * WAD);
 
-        // Check the second stream
-        uint256 jetstreamStreamId = prevStreamCount + 2;
-        assertTrue(vest.valid(jetstreamStreamId)); // check for valid contract
+        // Check the first stream
+        uint256 voteWizardVestId = prevStreamCount + 2;
+        assertTrue(vest.valid(voteWizardVestId)); // check for valid contract
         _checkDaiVest({
-            _index:      jetstreamStreamId,                              // id
-            _wallet:     wallets.addr("JETSTREAM"),                      // usr
-            _start:      JUL_01_2023,                                    // bgn
-            _cliff:      JUL_01_2023,                                    // clf
-            _end:        DEC_31_2024,                                    // fin
-            _days:       550 days,                                       // fin
+            _index:      voteWizardVestId,                              // id
+            _wallet:     wallets.addr("VOTEWIZARD"),                     // usr
+            _start:      OCT_01_2023,                                    // bgn
+            _cliff:      OCT_01_2023,                                    // clf
+            _end:        SEP_30_2024,                                    // fin
+            _days:       366 days,                                       // fin
             _manager:    address(0),                                     // mgr
             _restricted: 1,                                              // res
-            _reward:     2_964_006 * WAD,                                // tot
+            _reward:     504_000 * WAD,                                  // tot
             _claimed:    0                                               // rxd
         });
         GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("JETSTREAM"));
-        vest.unrestrict(jetstreamStreamId);
-        vm.warp(JUL_01_2023 + 550 days);
-        vest.vest(jetstreamStreamId);
-        assertEq(dai.balanceOf(wallets.addr("JETSTREAM")), prevBalance + 2_964_006 * WAD);
+        prevBalance = dai.balanceOf(wallets.addr("VOTEWIZARD"));
+        vest.unrestrict(voteWizardVestId);
+        vm.warp(OCT_01_2023 + 366 days);
+        vest.vest(voteWizardVestId);
+        assertEq(dai.balanceOf(wallets.addr("VOTEWIZARD")), prevBalance + 504_000 * WAD);
     }
 
     struct Payee {
@@ -531,17 +544,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vestTreasury.fin(34), block.timestamp);
     }
 
-    function testVestMKR() private { // make private to disable
+    function testVestMKR() public { // make private to disable
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
-        // 2023-06-26 00:00:00 UTC
-        uint256 JUN_26_2023 = 1687737600;
-        // 2023-07-01 00:00:00 UTC
-        uint256 JUL_01_2023 = 1688169600;
-        // 2024-06-30 23:59:59 UTC
-        uint256 JUN_30_2024 = 1719791999;
-        // 2024-12-31 23:59:59 UTC
-        uint256 DEC_31_2024 = 1735689599;
+        // 2023-10-01 00:00:00 UTC
+        uint256 OCT_01_2023       = 1696107600;
+        // 2024-09-30 23:59:59 UTC
+        uint256 SEP_30_2024       = 1727729999;
 
         uint256 prevStreamCount = vest.ids();
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
@@ -552,76 +561,71 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // check new allowance
-        uint256 newVesting = 2_216.4  ether; // CHRONICLE_LABS; note: ether is a keyword helper, only MKR is transferred here
-               newVesting += 1_619.93 ether; // JETSTREAM; note: ether is a keyword helper, only MKR is transferred here
+        uint256 newVesting = 216 ether; // JANSKY; note: ether is a keyword helper, only MKR is transferred here
+               newVesting += 216 ether; // VOTEWIZARD; note: ether is a keyword helper, only MKR is transferred here
         assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newVesting, "testVestMKR/invalid-allowance");
 
+        // Let's move this general check to a separate test case
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
         assertEq(vest.ids(), prevStreamCount + 2, "testVestMKR/invalid-stream-count");
 
-        { // check CHRONICLE_LABS stream
-            address chronicleAddress = wallets.addr("CHRONICLE_LABS");
-            uint256 chronicleStreamId = prevStreamCount + 1;
-            uint256 chronicleFin = JUL_01_2023 + 366 days - 1;
-            assertEq(vest.usr(chronicleStreamId), chronicleAddress, "testVestMKR/invalid-address");
-            assertEq(vest.bgn(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(chronicleStreamId), JUL_01_2023, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(chronicleStreamId), chronicleFin, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(chronicleStreamId), JUN_30_2024, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(chronicleStreamId), address(0), "testVestMKR/invalid-manager");
-            assertEq(vest.res(chronicleStreamId), 1, "testVestMKR/invalid-res");
-            assertEq(vest.tot(chronicleStreamId), 2_216.4 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-            assertEq(vest.rxd(chronicleStreamId), 0, "testVestMKR/invalid-rxd");
-            prevBalance = gov.balanceOf(chronicleAddress);
+        { // check JANSKY stream
+            address janskyAddress = wallets.addr("JANSKY");
+            uint256 janskyStreamId = prevStreamCount + 1;
+            uint256 janskyFin = OCT_01_2023 + 366 days - 1;
+            assertEq(vest.usr(janskyStreamId), janskyAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(janskyStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(janskyStreamId), OCT_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(janskyStreamId), janskyFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(janskyStreamId), SEP_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(janskyStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(janskyStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(janskyStreamId), 216 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(janskyStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(janskyAddress);
             GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(chronicleStreamId);
-            vm.warp(chronicleFin);
-            vest.vest(chronicleStreamId);
-            assertEq(gov.balanceOf(chronicleAddress), prevBalance + 2_216.4 ether, "testVestMKR/invalid-received-amount");
+            vest.unrestrict(janskyStreamId);
+            vm.warp(janskyFin);
+            vest.vest(janskyStreamId);
+            assertEq(gov.balanceOf(janskyAddress), prevBalance + 216 ether, "testVestMKR/invalid-received-amount");
         }
 
-        { // check JETSTREAM stream
-            address jetstreamAddress = wallets.addr("JETSTREAM");
-            uint256 jetstreamStreamId = prevStreamCount + 2;
-            uint256 jetstreamFin = JUN_26_2023 + 6 days + 366 days + 183 days - 1;
-            assertEq(vest.usr(jetstreamStreamId), jetstreamAddress, "testVestMKR/invalid-address");
-            assertEq(vest.bgn(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(jetstreamStreamId), JUN_26_2023, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(jetstreamStreamId), jetstreamFin, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(jetstreamStreamId), DEC_31_2024, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(jetstreamStreamId), address(0), "testVestMKR/invalid-manager");
-            assertEq(vest.res(jetstreamStreamId), 1, "testVestMKR/invalid-res");
-            assertEq(vest.tot(jetstreamStreamId), 1_619.93 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-            assertEq(vest.rxd(jetstreamStreamId), 0, "testVestMKR/invalid-rxd");
-            prevBalance = gov.balanceOf(jetstreamAddress);
+        { // check VOTEWIZARD stream
+            address voteWizardAddress = wallets.addr("VOTEWIZARD");
+            uint256 voteWizardStreamId = prevStreamCount + 2;
+            uint256 voteWizardFin = OCT_01_2023 + 366 days - 1;
+            assertEq(vest.usr(voteWizardStreamId), voteWizardAddress, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(voteWizardStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(voteWizardStreamId), OCT_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(voteWizardStreamId), voteWizardFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(voteWizardStreamId), SEP_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(voteWizardStreamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(voteWizardStreamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(voteWizardStreamId), 216 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
+            assertEq(vest.rxd(voteWizardStreamId), 0, "testVestMKR/invalid-rxd");
+            prevBalance = gov.balanceOf(voteWizardAddress);
             GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(jetstreamStreamId);
-            vm.warp(jetstreamFin);
-            vest.vest(jetstreamStreamId);
-            assertEq(gov.balanceOf(jetstreamAddress), prevBalance + 1_619.93 ether, "testVestMKR/invalid-received-amount");
+            vest.unrestrict(voteWizardStreamId);
+            vm.warp(voteWizardFin);
+            vest.vest(voteWizardStreamId);
+            assertEq(gov.balanceOf(voteWizardAddress), prevBalance + 216 ether, "testVestMKR/invalid-received-amount");
         }
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[14] memory payees = [
-            Payee(wallets.addr("DEFENSOR"),     41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),     41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),  41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),     41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),    28.23 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("QGOV"),         20.16 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),      13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),         13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),          13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"),        7.17 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"),           6.72 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),          1.25 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("SES_WALLET"),   34.94 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DECO_WALLET"), 125    ether)  // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[8] memory payees = [
+            Payee(wallets.addr("RISK_WALLET_VEST"),     175 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("OPENSKY"),      20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DAI_VINCI"),    12.51 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("IAMMEEOH"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ACREDAOS"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("HARMONY_2"),    20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RES"),          20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SEEDLATAMETH"), 20.85 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
@@ -876,4 +880,111 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    // RWA tests
+    function test_RWA015_Update() public {
+        // Read the pip address
+        (,address pip,,  ) = liquidationOracle.ilks("RWA015-A");
+
+        // Load RWA015-A output conduit address
+        address conduit = addr.addr("RWA015_A_OUTPUT_CONDUIT");
+
+        // Check the conduit balance is 0 before cast
+        assertEq(dai.balanceOf(address(conduit)), 0);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Read the pip address and spot value after cast, as well as Art and rate
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA015-A");
+
+        // Check the pip and spot values after cast
+        assertEq(uint256(DSValueAbstract(pip).read()), 3_000_000_000 * WAD, "RWA015: Bad PIP value after bump()");
+        assertEq(spotAfter, 3_000_000_000 * WAD * (RAY / WAD), "RWA015: Bad spot value after bump()");
+
+        // Test that a draw() can be performed
+        address urn = addr.addr("RWA015_A_URN");
+        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
+
+        // Calculate how much 'room' we can draw to get close to line
+        uint256 room = line - (Art * rate);
+        uint256 drawAmt = room / RAY;
+
+        // Correct our draw amount if it is too large
+        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
+            drawAmt = (room - rate) / RAY;
+        }
+
+        // Check if RWA015 is locked into the RwaUrn
+        (uint256 ink,) = vat.urns("RWA015-A", urn);
+        assertEq(ink, 1 * WAD, "RWA015: bad ink in RwaUrn");
+
+        // Perform draw()
+        RwaUrnLike(urn).draw(drawAmt);
+
+        // Check the conduit balance after cast
+        assertEq(dai.balanceOf(address(conduit)), drawAmt);
+
+        // Read new Art
+        (Art,,,,) = vat.ilks("RWA015-A");
+
+        // Assert that we are within 2 `rate` of line
+        assertTrue(line - (Art * rate) < (2 * rate));
+    }
+
+    function test_RWA007_Update() public {
+        // Read the pip address
+        (,address pip,,  ) = liquidationOracle.ilks("RWA007-A");
+
+        // Load RWA007-A output conduit address
+        address conduit = addr.addr("RWA007_A_OUTPUT_CONDUIT");
+
+        // Check the conduit balance is 0 before cast
+        assertEq(dai.balanceOf(address(conduit)), 0);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Read the pip address and spot value after cast, as well as Art and rate
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
+
+        // Check the pip and spot values after cast
+        assertEq(uint256(DSValueAbstract(pip).read()), 3_000_000_000 * WAD, "RWA007: Bad PIP value after bump()");
+        assertEq(spotAfter, 3_000_000_000 * WAD * (RAY / WAD), "RWA007: Bad spot value after bump()");
+
+        // Test that a draw() can be performed
+        address urn = addr.addr("RWA007_A_URN");
+        // Give ourselves operator status, noting that setWard() has replaced giveAuth()
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
+
+        // Calculate how much 'room' we can draw to get close to line
+        uint256 room = line - (Art * rate);
+        uint256 drawAmt = room / RAY;
+
+        // Correct our draw amount if it is too large
+        if ((_divup((drawAmt * RAY), rate) * rate) > room) {
+            drawAmt = (room - rate) / RAY;
+        }
+
+        // Check if RWA007 is locked into the RwaUrn
+        (uint256 ink,) = vat.urns("RWA007-A", urn);
+        assertEq(ink, 1 * WAD, "RWA007: bad ink in RwaUrn");
+
+        // Perform draw()
+        RwaUrnLike(urn).draw(drawAmt);
+
+        // Check the conduit balance after cast
+        assertEq(dai.balanceOf(address(conduit)), drawAmt);
+
+        // Read new Art
+        (Art,,,,) = vat.ilks("RWA007-A");
+
+        // Assert that we are within 2 `rate` of line
+        assertTrue(line - (Art * rate) < (2 * rate));
+    }
 }
