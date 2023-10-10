@@ -861,9 +861,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() private { // make private to disable
+    function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0x9FfFbc278119Ad854b58C3d219212849E8B54eF8;
+        address SPARK_SPELL    = 0xDE7C2758db29B53cbD2898a5584d6A719C17815E;
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -896,6 +896,9 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // This ilk is `AutoLine`d, so we need to extend the acting debt ceiling first
+        autoLine.exec("RWA015-A");
+
         // Read the pip address and spot value after cast, as well as Art and rate
         (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA015-A");
 
@@ -917,6 +920,8 @@ contract DssSpellTest is DssSpellTestBase {
         if ((_divup((drawAmt * RAY), rate) * rate) > room) {
             drawAmt = (room - rate) / RAY;
         }
+
+        assertGt(drawAmt, 0, "RWA015: invalid draw amount");
 
         // Check if RWA015 is locked into the RwaUrn
         (uint256 ink,) = vat.urns("RWA015-A", urn);
@@ -949,6 +954,9 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // This ilk is `AutoLine`d, so we need to extend the acting debt ceiling first
+        autoLine.exec("RWA007-A");
+
         // Read the pip address and spot value after cast, as well as Art and rate
         (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line,) = vat.ilks("RWA007-A");
 
@@ -970,6 +978,8 @@ contract DssSpellTest is DssSpellTestBase {
         if ((_divup((drawAmt * RAY), rate) * rate) > room) {
             drawAmt = (room - rate) / RAY;
         }
+
+        assertGt(drawAmt, 0, "RWA007: invalid draw amount");
 
         // Check if RWA007 is locked into the RwaUrn
         (uint256 ink,) = vat.urns("RWA007-A", urn);

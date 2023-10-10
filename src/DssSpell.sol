@@ -34,6 +34,10 @@ interface RwaLiquidationLike {
     function bump(bytes32 ilk, uint256 val) external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -97,6 +101,13 @@ contract DssSpellAction is DssAction {
     // 2024-09-30 23:59:59 UTC
     uint256 internal constant SEP_30_2024       = 1727729999;
 
+    // ---------- Spark Proxy ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+
+    // ---------- Trigger Spark Proxy Spell ----------
+    address internal constant SPARK_SPELL = 0xDE7C2758db29B53cbD2898a5584d6A719C17815E;
+
     //  ---------- MCD Contracts ----------
     address internal immutable MCD_VAT                  = DssExecLib.vat();
     address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
@@ -149,7 +160,7 @@ contract DssSpellAction is DssAction {
         (,,,uint256 line,) = VatLike(MCD_VAT).ilks("RETH-A");
         DssExecLib.removeIlkFromAutoLine("RETH-A");
         DssExecLib.setValue(MCD_VAT, "RETH-A", "line", 0);
-        // NOTE: decreasing globalline suniglow level API because of precision loss when using DssExec
+        // NOTE: decreasing global line using the low level API because of precision loss when using DssExecLib
         DssExecLib.setValue(MCD_VAT, "Line", VatLike(MCD_VAT).Line() - line);
 
 
@@ -274,6 +285,11 @@ contract DssSpellAction is DssAction {
         MKR.transfer(RES, 20.85 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
         // seedlatam.eth - 20.85 MKR - 0x0087a081a9b430fd8f688c6ac5dd24421bfb060d
         MKR.transfer(SEEDLATAMETH, 20.85 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
+        // ---------- Trigger Spark Proxy Spell ----------
+        // Poll: https://vote.makerdao.com/polling/QmVcxd7J
+        // Forum: https://forum.makerdao.com/t/proposal-for-activation-of-gnosis-chain-instance/22098/8
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
