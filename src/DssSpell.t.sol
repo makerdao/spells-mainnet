@@ -393,9 +393,9 @@ contract DssSpellTest is DssSpellTestBase {
         // All times in GMT
         // $ make time stamp=<STAMP>
         // 2023-10-01 00:00:00 UTC
-        uint256 OCT_01_2023       = 1696107600;
+        uint256 OCT_01_2023       = 1696118400;
         // 2024-09-30 23:59:59 UTC
-        uint256 SEP_30_2024       = 1727729999;
+        uint256 SEP_30_2024       = 1727740799;
 
         uint256 prevBalance;
 
@@ -548,9 +548,9 @@ contract DssSpellTest is DssSpellTestBase {
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
 
         // 2023-10-01 00:00:00 UTC
-        uint256 OCT_01_2023       = 1696107600;
+        uint256 OCT_01_2023       = 1696118400;
         // 2024-09-30 23:59:59 UTC
-        uint256 SEP_30_2024       = 1727729999;
+        uint256 SEP_30_2024       = 1727740799;
 
         uint256 prevStreamCount = vest.ids();
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));

@@ -108,9 +108,9 @@ contract DssSpellAction is DssAction {
     address internal constant VOTEWIZARD        = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
 
     // 2023-10-01 00:00:00 UTC
-    uint256 internal constant OCT_01_2023       = 1696107600;
+    uint256 internal constant OCT_01_2023       = 1696118400;
     // 2024-09-30 23:59:59 UTC
-    uint256 internal constant SEP_30_2024       = 1727729999;
+    uint256 internal constant SEP_30_2024       = 1727740799;
 
     // ---------- Spark Proxy ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
