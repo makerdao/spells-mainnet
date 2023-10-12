@@ -91,6 +91,17 @@ contract DssSpellAction is DssAction {
     address internal constant HARMONY           = 0xE20A2e231215e9b7Aa308463F1A7490b2ECE55D3;
     address internal constant RES               = 0x8c5c8d76372954922400e4654AF7694e158AB784;
     address internal constant SEEDLATAMETH      = 0x0087a081a9B430fd8f688c6ac5dD24421BfB060D;
+    // Delegates
+    address internal constant DEFENSOR          = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant TRUENAME          = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant BONAPUBLICA       = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant NAVIGATOR         = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+    address internal constant VIGILANT          = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant CLOAKY            = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant UPMAKER           = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant PALC              = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
+    address internal constant BLUE              = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant PBG               = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
 
     // ----------- MKR & DAI Payment streams
     address internal constant JANSKY            = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
@@ -285,6 +296,30 @@ contract DssSpellAction is DssAction {
         MKR.transfer(RES, 20.85 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
         // seedlatam.eth - 20.85 MKR - 0x0087a081a9b430fd8f688c6ac5dd24421bfb060d
         MKR.transfer(SEEDLATAMETH, 20.85 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
+        // ---------- Delegate Compensation  ----------
+        // Forum: https://forum.makerdao.com/t/september-2023-aligned-delegate-compensation/22367
+
+        // 0xDefensor - 41.67 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        MKR.transfer(DEFENSOR, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // TRUE NAME - 41.67 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
+        MKR.transfer(TRUENAME, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // Navigator - 41.67 MKR - 0x11406a9CC2e37425F15f920F494A51133ac93072
+        MKR.transfer(NAVIGATOR, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // vigilant - 34.5 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT, 34.55 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // Cloaky - 21.06 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY, 21.06 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // UPMaker - 13.89 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
+        MKR.transfer(UPMAKER, 13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // PALC - 13.89 MKR - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
+        MKR.transfer(PALC, 13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // BLUE - 12.78 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        MKR.transfer(BLUE, 12.78 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+        // PBG - 6.48 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG, 6.48 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Poll: https://vote.makerdao.com/polling/QmVcxd7J
