@@ -572,6 +572,7 @@ contract DssSpellTest is DssSpellTestBase {
         { // check JANSKY stream
             address janskyAddress = wallets.addr("JANSKY");
             uint256 janskyStreamId = prevStreamCount + 1;
+            // NOTE: We are only using 366 days because there's a leap year adjustment in between.
             uint256 janskyFin = OCT_01_2023 + 366 days - 1;
             assertEq(vest.usr(janskyStreamId), janskyAddress, "testVestMKR/invalid-address");
             assertEq(vest.bgn(janskyStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
@@ -593,6 +594,7 @@ contract DssSpellTest is DssSpellTestBase {
         { // check VOTEWIZARD stream
             address voteWizardAddress = wallets.addr("VOTEWIZARD");
             uint256 voteWizardStreamId = prevStreamCount + 2;
+            // NOTE: We are only using 366 days because there's a leap year adjustment in between.
             uint256 voteWizardFin = OCT_01_2023 + 366 days - 1;
             assertEq(vest.usr(voteWizardStreamId), voteWizardAddress, "testVestMKR/invalid-address");
             assertEq(vest.bgn(voteWizardStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
@@ -618,26 +620,27 @@ contract DssSpellTest is DssSpellTestBase {
         //    the amount to be paid
         // Initialize the array with the number of payees
         Payee[18] memory payees = [
+            // BA Labs MKR Distribution
+            Payee(wallets.addr("RISK_WALLET_VEST"), 175 ether),   // NOTE: ether is a keyword helper, only MKR is transferred here
             // AVC's
-            Payee(wallets.addr("RISK_WALLET_VEST"),     175 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("OPENSKY"),      20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DAI_VINCI"),    12.51 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("IAMMEEOH"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ACREDAOS"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("HARMONY_2"),    20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("RES"),          20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("SEEDLATAMETH"), 20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("OPENSKY"),          20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DAI_VINCI"),        12.51 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("IAMMEEOH"),         20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ACREDAOS"),         20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("HARMONY_2"),        20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RES"),              20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SEEDLATAMETH"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             // Delegates
-            Payee(wallets.addr("DEFENSOR"),     41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),     41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),  41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),    41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),     34.55 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"),       21.06 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),      13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),         13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),         12.78 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),          6.48 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DEFENSOR"),         41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),         41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),      41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("NAVIGATOR"),        41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),         34.55 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"),           21.06 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),          13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PALC"),             13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BLUE"),             12.78 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),              6.48 ether)   // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances

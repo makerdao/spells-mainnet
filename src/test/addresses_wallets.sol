@@ -123,6 +123,7 @@ contract Wallets {
         addr["STEAKHOUSE"]                   = 0xf737C76D2B358619f7ef696cf3F94548fEcec379;
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
         addr["JANSKY"]                       = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
+        addr["VOTEWIZARD"]                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
 
         // Ecosystem Actors
         addr["PHOENIX_LABS_2"]               = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
@@ -158,7 +159,6 @@ contract Wallets {
         addr["BANDHAR"]                      = 0xE83B6a503A94a5b764CCF00667689B3a522ABc21;
         addr["PALC"]                         = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
         addr["HARMONY"]                      = 0xF4704Aa4Ad22cAA2A3Dd7A7C529B4C32f7A421F2;
-        addr["VOTEWIZARD"]                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
         addr["NAVIGATOR"]                    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
         addr["JAG"]                          = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
         addr["CLOAKY"]                       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
