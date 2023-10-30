@@ -852,7 +852,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkSpellIsExecuted() private { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0xDE7C2758db29B53cbD2898a5584d6A719C17815E;
+        address SPARK_SPELL    = address(0);
 
         vm.expectCall(
             SUBPROXY_SPARK,
