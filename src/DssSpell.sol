@@ -18,24 +18,9 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
-interface VatLike {
-    function Line() external view returns (uint256);
-    function ilks(bytes32 ilk) external view returns (uint256 Art, uint256 rate, uint256 spot, uint256 line, uint256 dust);
-}
-
-interface VestLike {
-    function create(address _usr, uint256 _tot, uint256 _bgn, uint256 _tau, uint256 _eta, address _mgr) external returns (uint256 id);
-    function restrict(uint256 _id) external;
-}
-
-interface RwaLiquidationLike {
-    function bump(bytes32 ilk, uint256 val) external;
-}
-
-interface ProxyLike {
-    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+interface GemLike {
+    function transfer(address, uint256) external returns (bool);
 }
 
 contract DssSpellAction is DssAction {
@@ -55,7 +40,7 @@ contract DssSpellAction is DssAction {
     // Approve DAO Resolution hash QmWg43PNNGfEyXnTv1qN8dRXFJz5ZchrmZU8qH57Ki6D62
 
     // Comma-separated list of DAO resolutions IPFS hashes.
-    // string public constant dao_resolutions = "";
+    string public constant dao_resolutions = "QmbrCPtpKsCaQ2pKc8qLnkL8TywRYcKHYaX6LEzhhKQqAw";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -68,7 +53,54 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
+    GemLike  internal immutable MKR                        = GemLike(DssExecLib.mkr());
+
+    address internal immutable MCD_ESM                         = DssExecLib.esm();
+
+    address constant internal AAVE_GOVERNANCE_SUPPORT      = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address constant internal IS_WALLET                    = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+
+    address constant internal MCD_PSM_GUSD_A_JAR                = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
+    address constant internal MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR  = 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638;
+    address constant internal MCD_PSM_PAX_A_JAR                 = 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787;
+    address constant internal MCD_PSM_PAX_A_INPUT_CONDUIT_JAR   = 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515;
+
     function actions() public override {
+
+        // ---------- Spark - AAVE Revenue Share Payment ----------
+        // Forum: https://forum.makerdao.com/t/spark-aave-revenue-share-calculation-payment-1-q3-2023/22486
+        // MIP: https://mips.makerdao.com/mips/details/MIP106#9-4-1-spark-protocol-aave-revenue-share
+
+        // Send 2889 DAI from Surplus Buffer to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
+        DssExecLib.sendPaymentFromSurplusBuffer(AAVE_GOVERNANCE_SUPPORT, 2889);
+
+        // ---------- Immunefi CU MKR Vesting Transfer ----------
+        // Immunefi CU - 6.34 MKR - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp13-removing-is-001/22392
+        // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP41#sentence-summary
+        MKR.transfer(IS_WALLET, 6.34 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+        // ---------- Housekeeping - GUSD & USDP - Add Jar & Conduit Contracts to Chainlog ----------
+        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2023-11-01/22477
+
+        // Add `RwaJar` at 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27 as MCD_PSM_GUSD_A_JAR
+        DssExecLib.setChangelogAddress("MCD_PSM_GUSD_A_JAR", MCD_PSM_GUSD_A_JAR);
+
+        // Add `RwaSwapInputOutputConduit2` at 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638 as MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR
+        DssExecLib.setChangelogAddress("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR", MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR);
+
+        // Add `RwaJar` at 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787 as MCD_PSM_PAX_A_JAR
+        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A_JAR", MCD_PSM_PAX_A_JAR);
+
+        // Add `RwaSwapInputConduit2` at 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515 as MCD_PSM_PAX_A_INPUT_CONDUIT_JAR
+        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR", MCD_PSM_PAX_A_INPUT_CONDUIT_JAR);
+
+        // Authorize ESM
+        DssExecLib.authorize(MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR, MCD_ESM);
+        DssExecLib.authorize(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR, MCD_ESM);
+
+        // Bump chainlog as it has been modified.
+        DssExecLib.setChangelogVersion("1.17.1");
     }
 }
 

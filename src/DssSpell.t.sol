@@ -40,6 +40,10 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface WardsLike {
+    function wards(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -321,12 +325,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
+    function testNewChainlogValues() public { // make private to disable
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogVersion("1.17.0");
+        _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
+        _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
+        _checkChainlogKey("MCD_PSM_PAX_A_JAR");
+        _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        _checkChainlogVersion("1.17.1");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -445,7 +454,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
+    function testPayments() public { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -453,7 +462,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 941_993)
+            Payee(wallets.addr("AAVE_GOVERNANCE_SUPPORT"), 2889)
         ];
 
         uint256 prevBalance;
@@ -599,33 +608,13 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[18] memory payees = [
-            // BA Labs MKR Distribution
-            Payee(wallets.addr("RISK_WALLET_VEST"), 175 ether),   // NOTE: ether is a keyword helper, only MKR is transferred here
-            // AVC's
-            Payee(wallets.addr("OPENSKY"),          20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DAI_VINCI"),        12.51 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("IAMMEEOH"),         20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ACREDAOS"),         20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("HARMONY_2"),        20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("RES"),              20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("SEEDLATAMETH"),     20.85 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            // Delegates
-            Payee(wallets.addr("DEFENSOR"),         41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),         41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),      41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),        41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),         34.55 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"),           21.06 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),          13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),             13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),             12.78 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),              6.48 ether)   // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[1] memory payees = [
+            Payee(wallets.addr("IS_WALLET"), 6.34 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
 
         // Calculate and save previous balances
@@ -880,4 +869,12 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testEsmAuth() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(WardsLike(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    1, "InputConduitJarGUSD/ward-esm-not-set");
+        assertEq(WardsLike(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    1, "InputConduitJarPAX/ward-esm-not-set");
+    }
 }
