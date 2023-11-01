@@ -462,7 +462,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("AAVE_GOVERNANCE_SUPPORT"), 2889)
+            Payee(wallets.addr("SPARK_AAVE"), 2889)
         ];
 
         uint256 prevBalance;
@@ -491,6 +491,20 @@ contract DssSpellTest is DssSpellTestBase {
                 payees[i].amount * WAD
             );
         }
+    }
+
+    function testPaymentsSum() public {
+        uint256 sumPayments = 2889;
+
+        _vote(address(spell));
+        spell.schedule();
+        vm.warp(spell.nextCastTime());
+        pot.drip();
+        uint256 prevSin = vat.sin(address(vow));
+        spell.cast();
+        assertTrue(spell.done());
+
+        assertEq(vat.sin(address(vow)) - prevSin, sumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
     }
 
     function testYankDAI() private { // make private to disable
@@ -638,6 +652,19 @@ contract DssSpellTest is DssSpellTestBase {
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
         }
+    }
+
+    function testMKRPaymentsSum() public { // make public to enable
+        uint256 sumPayments = 6.34 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 prevMkrBalance = gov.balanceOf(address(pauseProxy));
+
+        // Cast the spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Check that pause proxy balance has decreased
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - sumPayments);
     }
 
     function testMKRVestFix() private { // make private to disable
@@ -870,6 +897,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
     function testEsmAuth() public {
+        assertEq(WardsLike(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    0, "InputConduitJarGUSD/ward-esm-set");
+        assertEq(WardsLike(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    0, "InputConduitJarPAX/ward-esm-set");
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());

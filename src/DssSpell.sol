@@ -19,25 +19,24 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-interface GemLike {
-    function transfer(address, uint256) external returns (bool);
-}
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/344c183374c0cd9a91ec3537d0bbb0cb0c59945a/governance/votes/Executive%20Vote%20-%20October%2011%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/fcd71d6221c72a162624822ffce18a610c69fc73/governance/votes/Executive%20vote%20-%20November%201%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-11-01 MakerDAO Executive Spell | Hash: TODO";
+        "2023-11-01 MakerDAO Executive Spell | Hash: 0x7bd6e83fdbc0f2eef6beea87f626af067630a8e3a375dca68fb2bf2df19cec62";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
 
-    // ----- USDP-PSM Facilitation Incentives -----
-    // Forum: https://forum.makerdao.com/t/usdp-psm-facilitation-incentives/22331
-    // Approve DAO Resolution hash QmWg43PNNGfEyXnTv1qN8dRXFJz5ZchrmZU8qH57Ki6D62
+    // ----- HV Bank (RWA009-A) - Approve DAO Resolution -----
+    // Forum: http://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/17
+    // Poll: https://vote.makerdao.com/executive/template-executive-vote-stability-scope-parameter-changes-spark-protocol-d3m-parameter-changes-set-fortunafi-debt-ceiling-to-zero-dai-dao-resolution-for-hv-bank-delegate-compensation-and-other-actions-september-13-2023
+    // Approve DAO Resolution hash QmbrCPtpKsCaQ2pKc8qLnkL8TywRYcKHYaX6LEzhhKQqAw
 
     // Comma-separated list of DAO resolutions IPFS hashes.
     string public constant dao_resolutions = "QmbrCPtpKsCaQ2pKc8qLnkL8TywRYcKHYaX6LEzhhKQqAw";
@@ -53,11 +52,11 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    GemLike  internal immutable MKR                        = GemLike(DssExecLib.mkr());
+    GemAbstract internal immutable MKR         = GemAbstract(DssExecLib.mkr());
 
     address internal immutable MCD_ESM                         = DssExecLib.esm();
 
-    address constant internal AAVE_GOVERNANCE_SUPPORT      = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address constant internal SPARK_AAVE      = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
     address constant internal IS_WALLET                    = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
 
     address constant internal MCD_PSM_GUSD_A_JAR                = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
@@ -72,7 +71,7 @@ contract DssSpellAction is DssAction {
         // MIP: https://mips.makerdao.com/mips/details/MIP106#9-4-1-spark-protocol-aave-revenue-share
 
         // Send 2889 DAI from Surplus Buffer to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
-        DssExecLib.sendPaymentFromSurplusBuffer(AAVE_GOVERNANCE_SUPPORT, 2889);
+        DssExecLib.sendPaymentFromSurplusBuffer(SPARK_AAVE, 2889);
 
         // ---------- Immunefi CU MKR Vesting Transfer ----------
         // Immunefi CU - 6.34 MKR - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4
