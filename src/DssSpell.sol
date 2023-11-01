@@ -52,12 +52,12 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    GemAbstract internal immutable MKR         = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
-    address internal immutable MCD_ESM                         = DssExecLib.esm();
+    address internal immutable MCD_ESM = DssExecLib.esm();
 
-    address constant internal SPARK_AAVE      = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
-    address constant internal IS_WALLET                    = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+    address constant internal SPARK_AAVE = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address constant internal IS_WALLET  = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
 
     address constant internal MCD_PSM_GUSD_A_JAR                = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
     address constant internal MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR  = 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638;
