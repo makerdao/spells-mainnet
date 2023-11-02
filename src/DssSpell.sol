@@ -98,7 +98,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.authorize(MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR, MCD_ESM);
         DssExecLib.authorize(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR, MCD_ESM);
 
-        // Bump chainlog as it has been modified.
+        // Bump chainlog version as it has been modified
         DssExecLib.setChangelogVersion("1.17.1");
     }
 }
