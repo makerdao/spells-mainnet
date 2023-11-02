@@ -464,7 +464,7 @@ contract DssSpellTest is DssSpellTestBase {
             // ECOSYSTEM ACTOR DAI TRANSFERS
             Payee(wallets.addr("SPARK_AAVE"), 2889)
         ];
-        uint256 expectedSumPayments = 2889;
+        uint256 expectedSumPayments = 2889; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -618,6 +618,7 @@ contract DssSpellTest is DssSpellTestBase {
         Payee[1] memory payees = [
             Payee(wallets.addr("IS_WALLET"), 6.34 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
+        // Fill the value below with the value from exec doc
         uint256 expectedSumPayments = 6.34 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
