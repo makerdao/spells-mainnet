@@ -462,7 +462,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
             // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("SPARK_AAVE"), 2889)
+            Payee(wallets.addr("AAVE_V3_TREASURY"), 2889)
         ];
         uint256 expectedSumPayments = 2889; // Fill the number with the value from exec doc.
 
