@@ -464,6 +464,7 @@ contract DssSpellTest is DssSpellTestBase {
             // ECOSYSTEM ACTOR DAI TRANSFERS
             Payee(wallets.addr("SPARK_AAVE"), 2889)
         ];
+        uint256 expectedSumPayments = 2889;
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -484,6 +485,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, expectedSumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
 
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(
@@ -491,20 +493,6 @@ contract DssSpellTest is DssSpellTestBase {
                 payees[i].amount * WAD
             );
         }
-    }
-
-    function testPaymentsSum() public {
-        uint256 sumPayments = 2889;
-
-        _vote(address(spell));
-        spell.schedule();
-        vm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
-        assertTrue(spell.done());
-
-        assertEq(vat.sin(address(vow)) - prevSin, sumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
     }
 
     function testYankDAI() private { // make private to disable
@@ -630,6 +618,7 @@ contract DssSpellTest is DssSpellTestBase {
         Payee[1] memory payees = [
             Payee(wallets.addr("IS_WALLET"), 6.34 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
+        uint256 expectedSumPayments = 6.34 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -647,24 +636,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check that pause proxy balance has decreased
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - expectedSumPayments);
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
         }
-    }
-
-    function testMKRPaymentsSum() public { // make public to enable
-        uint256 sumPayments = 6.34 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
-        uint256 prevMkrBalance = gov.balanceOf(address(pauseProxy));
-
-        // Cast the spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Check that pause proxy balance has decreased
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - sumPayments);
     }
 
     function testMKRVestFix() private { // make private to disable
