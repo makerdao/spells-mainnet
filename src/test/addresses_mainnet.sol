@@ -205,6 +205,10 @@ contract Addresses {
         addr["MCD_CLIP_PSM_GUSD_A"]              = 0xf93CC3a50f450ED245e003BFecc8A6Ec1732b0b2;
         addr["MCD_CLIP_CALC_PSM_GUSD_A"]         = 0x7f67a68a0ED74Ea89A82eD9F243C159ed43a502a;
         addr["MCD_PSM_GUSD_A"]                   = 0x204659B2Fd2aD5723975c362Ce2230Fba11d3900;
+        addr["MCD_PSM_GUSD_A_JAR"]               = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
+        addr["MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR"] = 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638;
+        addr["MCD_PSM_PAX_A_JAR"]                = 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787;
+        addr["MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"]  = 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515;
         addr["UNI"]                              = 0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984;
         addr["PIP_UNI"]                          = 0xf363c7e351C96b910b92b45d34190650df4aE8e7;
         addr["MCD_JOIN_UNI_A"]                   = 0x3BC3A58b4FC1CbE7e98bB4aB7c99535e8bA9b8F1;
@@ -476,9 +480,5 @@ contract Addresses {
         addr["CRON_CLIPPER_MOM_JOB"]             = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
         addr["CRON_ORACLE_JOB"]                  = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
         addr["CRON_FLAP_JOB"]                    = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
-        addr["MCD_PSM_GUSD_A_JAR"]               = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
-        addr["MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR"] = 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638;
-        addr["MCD_PSM_PAX_A_JAR"]                = 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787;
-        addr["MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"]  = 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515;
     }
 }
