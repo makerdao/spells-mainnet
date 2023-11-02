@@ -94,7 +94,7 @@ contract DssSpellAction is DssAction {
         // Add `RwaSwapInputConduit2` at 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515 as MCD_PSM_PAX_A_INPUT_CONDUIT_JAR
         DssExecLib.setChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR", MCD_PSM_PAX_A_INPUT_CONDUIT_JAR);
 
-        // Authorize ESM
+        // Call `<conduit>.rely(MCD_ESM)` to allow ESM module to `deny` the pause proxy in SwapInputConduit contracts
         DssExecLib.authorize(MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR, MCD_ESM);
         DssExecLib.authorize(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR, MCD_ESM);
 
