@@ -69,8 +69,25 @@ contract DssSpellAction is DssAction {
     // ---------- Trigger Spark Proxy Spell ----------
     address internal constant SPARK_SPELL            = 0xDa69603384Ef825E52FD5B8bEF656ff62Fe19703;
 
+    // ---------- Whistleblower Bounty ----------
     address internal constant VENICE_TREE            = 0xCDDd2A697d472d1e8a0B1B188646c756d097b058;
+
+    // ---------- Launch Project Funds ----------
     address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
+
+    // ---------- Delegates ----------
+    address internal constant DEFENSOR               = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant TRUENAME               = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant BONAPUBLICA            = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant CLOAKY                 = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant BLUE                   = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant VIGILANT               = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant UPMAKER                = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant PBG                    = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant JAG                    = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
+    address internal constant WBC                    = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant NAVIGATOR              = 0x11406a9CC2e37425F15f920F494A51133ac93072;
+    address internal constant PALC                   = 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A;
 
     function actions() public override {
         // ---------- Spark Proxy-Spell ----------
@@ -113,6 +130,35 @@ contract DssSpellAction is DssAction {
 
         // VeniceTree - 27.78 MKR - 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
         MKR.transfer(VENICE_TREE, 27.78 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+
+        // ---------- October Delegate Compensation  ----------
+        // Forum: https://forum.makerdao.com/t/october-2023-aligned-delegate-compensation/22732
+
+        // 0xDefensor - 41.67 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        MKR.transfer(DEFENSOR,    41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // TRUE NAME - 41.67 MKR - 0x612f7924c367575a0edf21333d96b15f1b345a5d
+        MKR.transfer(TRUENAME,    41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // Cloaky - 41.67 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY,      41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // BLUE - 39.07 MKR - 0xb6c09680d822f162449cdfb8248a7d3fc26ec9bf
+        MKR.transfer(BLUE,        39.07 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT,    13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // "UPMaker - 13.89 MKR - 	0xbb819df169670dc71a16f58f55956fe642cc6bcd"
+        MKR.transfer(UPMAKER,     13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // PBG - 13.89 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG,         13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // JAG - 12.28 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
+        MKR.transfer(JAG,         12.28 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // WBC - 11.43 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        MKR.transfer(WBC,         11.43 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // NAVIGATOR - 20.835 MKR - 0x11406a9CC2e37425F15f920F494A51133ac93072
+        MKR.transfer(NAVIGATOR,   20.835 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // PALC - 6.945 MKR - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
+        MKR.transfer(PALC,        6.945 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
     }
 }
 
