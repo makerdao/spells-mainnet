@@ -325,17 +325,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() public { // make private to disable
+    function testNewChainlogValues() private { // make private to disable
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
-        _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
-        _checkChainlogKey("MCD_PSM_PAX_A_JAR");
-        _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        _checkChainlogVersion("1.17.1");
+        // _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
+        // _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
+        // _checkChainlogKey("MCD_PSM_PAX_A_JAR");
+        // _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        // _checkChainlogVersion("1.17.1");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -461,10 +461,10 @@ contract DssSpellTest is DssSpellTestBase {
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            // ECOSYSTEM ACTOR DAI TRANSFERS
-            Payee(wallets.addr("AAVE_V3_TREASURY"), 2889)
+            // Accessibility Scope Dai Transfer
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 2_200_000)
         ];
-        uint256 expectedSumPayments = 2889; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 2_200_000; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -615,11 +615,12 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("IS_WALLET"), 6.34 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[2] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 500.00 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VENICE_TREE"),             27.78 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 6.34 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 527.78 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -855,9 +856,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() private { // make private to disable
+    function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0);
+        address SPARK_SPELL    = address(0xDa69603384Ef825E52FD5B8bEF656ff62Fe19703);
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -874,15 +875,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    function testEsmAuth() public {
-        assertEq(WardsLike(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    0, "InputConduitJarGUSD/ward-esm-set");
-        assertEq(WardsLike(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    0, "InputConduitJarPAX/ward-esm-set");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(WardsLike(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    1, "InputConduitJarGUSD/ward-esm-not-set");
-        assertEq(WardsLike(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")).wards(address(esm)),    1, "InputConduitJarPAX/ward-esm-not-set");
-    }
 }

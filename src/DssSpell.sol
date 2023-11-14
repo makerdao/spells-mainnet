@@ -21,25 +21,30 @@ import "dss-exec-lib/DssAction.sol";
 
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/fcd71d6221c72a162624822ffce18a610c69fc73/governance/votes/Executive%20vote%20-%20November%201%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-11-01 MakerDAO Executive Spell | Hash: 0x7bd6e83fdbc0f2eef6beea87f626af067630a8e3a375dca68fb2bf2df19cec62";
+        "2023-11-15 MakerDAO Executive Spell | Hash: ";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
 
-    // ----- HV Bank (RWA009-A) - Approve DAO Resolution -----
-    // Forum: http://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/17
-    // Poll: https://vote.makerdao.com/executive/template-executive-vote-stability-scope-parameter-changes-spark-protocol-d3m-parameter-changes-set-fortunafi-debt-ceiling-to-zero-dai-dao-resolution-for-hv-bank-delegate-compensation-and-other-actions-september-13-2023
-    // Approve DAO Resolution hash QmbrCPtpKsCaQ2pKc8qLnkL8TywRYcKHYaX6LEzhhKQqAw
+    // ---------- Pass HVB Resolutions ----------
+    // Forum: https://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/19
+    // Poll: https://vote.makerdao.com/polling/QmNgKzcG
+    // Updated Standing Instructions to Escrow Agent - QmWVWXckY482WLTtCFv3x45DFioV1K8mfRM3FVrodqUDud
+    // Approval of New Payment Instructions to Galaxy Digital Trading Cayman LLC - QmSbwqULr66CiCvNips93vwTrvoTe4i2rJVmho7QfmyqZG
 
     // Comma-separated list of DAO resolutions IPFS hashes.
-    string public constant dao_resolutions = "QmbrCPtpKsCaQ2pKc8qLnkL8TywRYcKHYaX6LEzhhKQqAw";
+    string public constant dao_resolutions = "QmWVWXckY482WLTtCFv3x45DFioV1K8mfRM3FVrodqUDud,QmSbwqULr66CiCvNips93vwTrvoTe4i2rJVmho7QfmyqZG";
 
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -52,54 +57,62 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE      = ;
 
-    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
+    // --- MATH ---
+    uint256 internal constant MILLION                = 10 ** 6;
 
-    address internal immutable MCD_ESM = DssExecLib.esm();
+    GemAbstract internal immutable MKR               = GemAbstract(DssExecLib.mkr());
 
-    address constant internal AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
-    address constant internal IS_WALLET  = 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4;
+    // ---------- Spark Proxy ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/5/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY            = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
-    address constant internal MCD_PSM_GUSD_A_JAR                = 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27;
-    address constant internal MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR  = 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638;
-    address constant internal MCD_PSM_PAX_A_JAR                 = 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787;
-    address constant internal MCD_PSM_PAX_A_INPUT_CONDUIT_JAR   = 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515;
+    // ---------- Trigger Spark Proxy Spell ----------
+    address internal constant SPARK_SPELL            = 0xDa69603384Ef825E52FD5B8bEF656ff62Fe19703;
+
+    address internal constant VENICE_TREE            = 0xCDDd2A697d472d1e8a0B1B188646c756d097b058;
+    address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     function actions() public override {
+        // ---------- Spark Proxy-Spell ----------
+        // Forum: https://forum.makerdao.com/t/proposal-to-adjust-sparklend-parameters/22542
+        // Poll: https://vote.makerdao.com/polling/QmaBLbxP
+        // Poll: https://vote.makerdao.com/polling/QmZwRgr5
+        // Poll: https://vote.makerdao.com/polling/QmQPrHsm
+        // Poll: https://vote.makerdao.com/polling/QmRG9qUp
+        // Poll: https://vote.makerdao.com/polling/QmQjKpbU
 
-        // ---------- Spark - AAVE Revenue Share Payment ----------
-        // Forum: https://forum.makerdao.com/t/spark-aave-revenue-share-calculation-payment-1-q3-2023/22486
-        // MIP: https://mips.makerdao.com/mips/details/MIP106#9-4-1-spark-protocol-aave-revenue-share
+        // Gnosis Chain - Increase wstETH Supply Cap to 10,000 wstETH
+        // Ethereum - Set DAI Market Maximum Loan-to-Value to Zero Percent
+        // Ethereum - Reactivate WBTC and Optimize Parameters for Current Market Conditions
+        // Ethereum - Increase rETH & wstETH Supply Caps
+        // Ethereum & Gnosis Chain - Adjust ETH Market Interest Rate Models
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
-        // Send 2889 DAI from Surplus Buffer to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
-        DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 2889);
 
-        // ---------- Immunefi CU MKR Vesting Transfer ----------
-        // Immunefi CU - 6.34 MKR - 0xd1F2eEf8576736C1EbA36920B957cd2aF07280F4
-        // Forum: https://forum.makerdao.com/t/mip39c3-sp13-removing-is-001/22392
-        // MIP: https://mips.makerdao.com/mips/details/MIP40c3SP41#sentence-summary
-        MKR.transfer(IS_WALLET, 6.34 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // ----- Adjust Spark Protocol D3M Maximum Debt Ceiling -----
+        // Forum: https://forum.makerdao.com/t/proposal-to-adjust-sparklend-parameters/22542
+        // Poll: https://vote.makerdao.com/polling/QmVbrypf#poll-detail
 
-        // ---------- Housekeeping - GUSD & USDP - Add Jar & Conduit Contracts to Chainlog ----------
-        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2023-11-01/22477
+        // Increase the DIRECT-SPARK-DAI Maximum Debt Ceiling from 400 million DAI to 800 million DAI.
+        // Keep gap and ttl at current settings (20 million and  hours respectively)
+        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 800 * MILLION);
 
-        // Add `RwaJar` at 0xf2E7a5B83525c3017383dEEd19Bb05Fe34a62C27 as MCD_PSM_GUSD_A_JAR
-        DssExecLib.setChangelogAddress("MCD_PSM_GUSD_A_JAR", MCD_PSM_GUSD_A_JAR);
 
-        // Add `RwaSwapInputOutputConduit2` at 0x6934218d8B3E9ffCABEE8cd80F4c1C4167Afa638 as MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR
-        DssExecLib.setChangelogAddress("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR", MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR);
+        // ---------- Launch Project Funds Transfer ----------
+        // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/6
 
-        // Add `RwaJar` at 0x8bF8b5C58bb57Ee9C97D0FEA773eeE042B10a787 as MCD_PSM_PAX_A_JAR
-        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A_JAR", MCD_PSM_PAX_A_JAR);
+        // Launch Project - 2200000.00 DAI - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 2_200_000);
+        // Launch Project - 500.00 MKR - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        MKR.transfer(LAUNCH_PROJECT_FUNDING, 500.00 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Add `RwaSwapInputConduit2` at 0xDa276Ab5F1505965e0B6cD1B6da2A18CcBB29515 as MCD_PSM_PAX_A_INPUT_CONDUIT_JAR
-        DssExecLib.setChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR", MCD_PSM_PAX_A_INPUT_CONDUIT_JAR);
 
-        // Call `<conduit>.rely(MCD_ESM)` to allow ESM module to `deny` the pause proxy in SwapInputConduit contracts
-        DssExecLib.authorize(MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR, MCD_ESM);
-        DssExecLib.authorize(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR, MCD_ESM);
+        // ---------- Whistleblower Bounty ----------
+        // Forum: https://forum.makerdao.com/t/ads-derecognition-due-to-operational-security-breach/22532
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-6-aligned-delegate-operational-security
 
-        // Bump chainlog version as it has been modified
-        DssExecLib.setChangelogVersion("1.17.1");
+        // VeniceTree - 27.78 MKR - 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
+        MKR.transfer(VENICE_TREE, 27.78 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
     }
 }
 

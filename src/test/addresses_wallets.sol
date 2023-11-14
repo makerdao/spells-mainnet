@@ -169,5 +169,8 @@ contract Wallets {
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
         addr["MULTICHAIN_ENGINEERING"]       = 0x868B44e8191A2574334deB8E7efA38910df941FA;
+
+        // Whistleblower Bounty
+        addr["VENICE_TREE"]                  = 0xCDDd2A697d472d1e8a0B1B188646c756d097b058;
     }
 }
