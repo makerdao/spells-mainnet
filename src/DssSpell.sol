@@ -28,9 +28,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/fcd71d6221c72a162624822ffce18a610c69fc73/governance/votes/Executive%20vote%20-%20November%201%2C%202023.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/5156da9ff964a917fa90d55413b2ad2f8f8341ac/governance/votes/Executive%20Vote%20-%20November%2015%2C%202023.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2023-11-15 MakerDAO Executive Spell | Hash: ";
+        "2023-11-15 MakerDAO Executive Spell | Hash: 0x5831e082f6599a8bdd8c772f43836bce1170f121e2d47218069a03feb3638ccc";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -144,8 +144,8 @@ contract DssSpellAction is DssAction {
         MKR.transfer(CLOAKY,      41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // Navigator - 40.33 MKR - 0x11406a9CC2e37425F15f920F494A51133ac93072
         MKR.transfer(NAVIGATOR,   40.33 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
-        // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
-        MKR.transfer(VIGILANT,    13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // vigilant - 13.84 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT,    13.84 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // "UPMaker - 13.89 MKR - 	0xbb819df169670dc71a16f58f55956fe642cc6bcd"
         MKR.transfer(UPMAKER,     13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // PBG - 13.89 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
