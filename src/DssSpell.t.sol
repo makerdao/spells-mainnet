@@ -615,7 +615,7 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[14] memory payees = [
+        Payee[13] memory payees = [
             // Launch Project Funds
             Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  500.00 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             // Whistleblower Bounty
@@ -625,17 +625,16 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("TRUENAME"),                41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("BONAPUBLICA"),             41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("CLOAKY"),                  41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),                    39.07 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("NAVIGATOR"),               40.33 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("VIGILANT"),                13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("UPMAKER"),                 13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("PBG"),                     13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JAG"),                     12.28 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"),                     11.43 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),               20.835 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),                    6.945 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PALC"),                    13.44 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BLUE"),                    12.97 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JAG"),                      4.45 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 826.69 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 807.32 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
