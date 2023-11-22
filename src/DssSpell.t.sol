@@ -454,17 +454,16 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testPayments() private { // make private to disable
 
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            // Accessibility Scope Dai Transfer
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 2_200_000)
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 0)
         ];
-        uint256 expectedSumPayments = 2_200_000; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 0; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -610,31 +609,16 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // make public to enable
+    function testMKRPayments() private { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[13] memory payees = [
-            // Launch Project Funds
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  500.00 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            // Whistleblower Bounty
-            Payee(wallets.addr("VENICE_TREE"),             27.78 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            // Delegates
-            Payee(wallets.addr("DEFENSOR"),                41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),                41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"),             41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"),                  41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("NAVIGATOR"),               40.33 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),                13.84 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),                 13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),                     13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PALC"),                    13.44 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),                    12.97 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JAG"),                      4.45 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  0.00 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 807.27 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 0.00 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -870,9 +854,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // make private to disable
+    function testSparkSpellIsExecuted() private { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0xDa69603384Ef825E52FD5B8bEF656ff62Fe19703);
+        address SPARK_SPELL    = address(0);
 
         vm.expectCall(
             SUBPROXY_SPARK,
