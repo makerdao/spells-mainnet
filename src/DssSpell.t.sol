@@ -44,6 +44,10 @@ interface WardsLike {
     function wards(address) external view returns (uint256);
 }
 
+interface SpellActionLike {
+    function dao_resolutions() external view returns (string memory);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -849,6 +853,24 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "PAXUSD-A Art is not 0");
         (Art,,,,) = vat.ilks("GUSD-A");
         assertEq(Art, 0, "GUSD-A Art is not 0");
+    }
+
+    function testDaoResolutions() public { // make private to disable
+        // For each resolution, add IPFS hash as item to the resolutions array
+        // Initialize the array with the number of resolutions
+        string[1] memory resolutions = [
+            "QmPiEHtt8rkVtSibBXMrhEzHUmSriXWz4AL2bjscq8dUvU"
+        ];
+
+        string memory comma_separated_resolutions = "";
+        for (uint256 i = 0; i < resolutions.length; i++) {
+            comma_separated_resolutions = string.concat(comma_separated_resolutions, resolutions[i]);
+            if (i + 1 < resolutions.length) {
+                comma_separated_resolutions = string.concat(comma_separated_resolutions, ",");
+            }
+        }
+
+        assertEq(SpellActionLike(spell.action()).dao_resolutions(), comma_separated_resolutions, "dao_resolutions/invalid-format");
     }
 
     // SPARK TESTS
