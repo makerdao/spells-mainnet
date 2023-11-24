@@ -454,16 +454,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() private { // make private to disable
-
+    function testPayments() public { // make private to disable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 0)
+            Payee(wallets.addr("BLOCKTOWER_WALLET_2"), 201_738)
         ];
-        uint256 expectedSumPayments = 0; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 201_738; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -854,9 +853,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() private { // make private to disable
+    function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0);
+        address SPARK_SPELL    = address(0x68a075249fA77173b8d1B92750c9920423997e2B);
 
         vm.expectCall(
             SUBPROXY_SPARK,

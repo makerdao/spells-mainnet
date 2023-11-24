@@ -109,10 +109,10 @@ contract Config {
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_bump              = 20 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_bump              = 30 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 6308 seconds;   // In seconds
+        afterSpell.flap_hop              = 15_768 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 70 * MILLION;   // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
@@ -284,7 +284,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          5_86,
+            pct:          5_79,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -309,7 +309,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          6_36,
+            pct:          6_29,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -334,7 +334,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          5_61,
+            pct:          5_54,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1332,7 +1332,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         500 * MILLION,
+            line:         1500 * MILLION,
             dust:         0,
             pct:          0,
             mat:          100_00,
@@ -1553,10 +1553,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["PSM-GUSD-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      110 * MILLION,
-            aL_gap:       50 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         0,
             pct:          0,
