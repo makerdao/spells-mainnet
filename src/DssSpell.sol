@@ -101,17 +101,18 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("WBTC-C", FIVE_PT_FIVE_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Reduce PSM-GUSD-A Debt Ceiling ----------
-        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-7/22882#increase-rwa014-a-coinbase-custody-debt-ceiling-9
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-7/22882/2
 
         // Note: record currently set debt ceiling for PSM-GUSD-A
         (,,,uint256 lineReduction,) = vat.ilks("PSM-GUSD-A");
 
-        // Decrease the PSM-GUSD-A DC-IAM LINE (max DC) by 110M DAI, from 110M to 0
-        // Note: it's not possible to set auto-line DC to 0 due to `DssAutoLine/invalid-line`
+        // Remove PSM-GUSD-A from `Autoline`
         DssExecLib.removeIlkFromAutoLine("PSM-GUSD-A");
+
+        // Set PSM-GUSD-A debt ceiling to 0
         DssExecLib.setIlkDebtCeiling("PSM-GUSD-A", 0);
 
-        // Note: decrease Global Debt Ceiling to the decreased amount
+        // Reduce Global Debt Ceiling? Yes
         vat.file("Line", vat.Line() - lineReduction);
 
         // ---------- Increase RWA014-A (Coinbase Custody) Debt Ceiling ----------
