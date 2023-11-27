@@ -48,6 +48,10 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -894,4 +898,20 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    // RWA tests
+    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    function testRWApriceBump() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Get the oracle address
+        (,address pip,,  ) = oracle.ilks("RWA014-A");
+        assertEq(uint256(DSValueAbstract(pip).read()), 1_500_000_000 * WAD, "RWA014: Bad pip value after bump()");
+
+        // Get collateral's parameters
+        (,, uint256 spot,,) = vat.ilks("RWA014-A");
+        assertEq(spot, 1_500_000_000 * RAY, "RWA014: Bad spot value after bump()");
+    }
 }

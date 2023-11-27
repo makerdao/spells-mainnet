@@ -20,6 +20,10 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 
+interface RwaLiquidationOracleLike {
+    function bump(bytes32 ilk, uint256 val) external;
+}
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -60,15 +64,20 @@ contract DssSpellAction is DssAction {
 
     // ---------- Math ----------
     uint256 internal constant THOUSAND = 10 ** 3;
+    uint256 internal constant MILLION  = 10 ** 6;
     uint256 internal constant BILLION  = 10 ** 9;
+    uint256 internal constant WAD      = 10 ** 18;
     uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- SBE parameter changes ----------
     address internal immutable MCD_VOW            = DssExecLib.vow();
     address internal immutable MCD_FLAP           = DssExecLib.flap();
 
-    // ---------- Debt Ceiling ----------
+    // ---------- Reduce PSM-GUSD-A Debt Ceiling ----------
     VatAbstract internal immutable vat            = VatAbstract(DssExecLib.vat());
+
+    // ---------- Increase RWA014-A (Coinbase Custody) Debt Ceiling ----------
+    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
     // ---------- Andromeda Legal Expenses ----------
     address internal constant BLOCKTOWER_WALLET_2 = 0xc4dB894A11B1eACE4CDb794d0753A3cB7A633767;
@@ -110,6 +119,17 @@ contract DssSpellAction is DssAction {
 
         // Increase the RWA014-A (Coinbase Custody) debt ceiling by 1b DAI, from 500M to 1.5b
         DssExecLib.increaseIlkDebtCeiling("RWA014-A", 1 * BILLION, /* global = */ true);
+
+        // Note: we have to bump the oracle price to account for the new DC
+        // Note: the formula is `Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio`
+        // Note: as stability fee is 0 for this deal, this should be equal to ilk DC
+        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).bump(
+            "RWA014-A",
+            1_500 * MILLION * WAD
+        );
+
+        // Note: we have to update collateral price to propagate the changes
+        DssExecLib.updateCollateralPrice("RWA014-A");
 
         // ---------- SBE parameter changes ----------
         // Forum: https://forum.makerdao.com/t/smart-burn-engine-transaction-analysis-parameter-reconfiguration-update-3/22876
