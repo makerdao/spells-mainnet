@@ -19,6 +19,8 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
+import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface RwaLiquidationOracleLike {
     function bump(bytes32 ilk, uint256 val) external;
@@ -87,6 +89,18 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL = 0x68a075249fA77173b8d1B92750c9920423997e2B;
 
+    // ---------- Payment Streams ----------
+    address internal immutable MCD_VEST_DAI          = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    GemAbstract internal immutable MKR               = GemAbstract(DssExecLib.mkr());
+    address internal constant ECOSYSTEM_FACILITATOR  = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
+
+    // ---------- Timestamps ----------
+    // 2023-12-01 00:00:00
+    uint256 public constant DEC_01_2023 = 1701385200;
+    // 2024-11-30 23:59:59
+    uint256 public constant NOV_30_2024 = 1733007599;
+
     function actions() public override {
         // ---------- Stability Fee Changes ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-7/22882#increase-rwa014-a-coinbase-custody-debt-ceiling-9
@@ -152,6 +166,53 @@ contract DssSpellAction is DssAction {
 
         // Mainnet - 0x68a075249fA77173b8d1B92750c9920423997e2B
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+
+        // ---------- Yank Steakhouse and TechOps DSS-Vest Streams ----------
+        // Forum: https://forum.makerdao.com/t/mip102c2-sp20-mip-amendment-subproposal/22334
+        // MIP: https://mips.makerdao.com/mips/details/MIP113#7-1-1-1-1a
+
+        // Yank Steakhouse DAI stream ID 19
+        VestAbstract(MCD_VEST_DAI).yank(19);
+
+        // Yank TechOps DAI stream ID 18
+        VestAbstract(MCD_VEST_DAI).yank(18);
+
+        // Yank Steakhouse MKR stream ID 32
+        VestAbstract(MCD_VEST_MKR_TREASURY).yank(32);
+
+        // Yank TechOps MKR stream ID 33
+        VestAbstract(MCD_VEST_MKR_TREASURY).yank(33);
+
+        // ---------- Set up Ecosystem Facilitator DSS-Vest Streams ----------
+        // Forum: https://forum.makerdao.com/t/mip102c2-sp20-mip-amendment-subproposal/22334
+        // MIP: https://mips.makerdao.com/mips/details/MIP113#7-1-1-1-1a
+
+        // Ecosystem | 2023-12-01 00:00:00 to 2024-11-30 23:59:59 | 504,000.00 DAI | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(
+                ECOSYSTEM_FACILITATOR,     // usr
+                504_000 * WAD,             // tot
+                DEC_01_2023,               // bgn
+                NOV_30_2024 - DEC_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Note: For the MKR stream we need to increase allowance by new vesting delta
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + 216 * WAD);
+
+        // Ecosystem | 2023-12-01 00:00:00 to 2024-11-30 23:59:59 | 216.00 MKR | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+        VestAbstract(MCD_VEST_MKR_TREASURY).restrict(
+            VestAbstract(MCD_VEST_MKR_TREASURY).create(
+                ECOSYSTEM_FACILITATOR,     // usr
+                216 * WAD,                 // tot
+                DEC_01_2023,               // bgn
+                NOV_30_2024 - DEC_01_2023, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
     }
 }
 

@@ -389,17 +389,12 @@ contract DssSpellTest is DssSpellTestBase {
 
     // @dev when testing new vest contracts, use the explicit id when testing to assist in
     //      identifying streams later for modification or removal
-    function testVestDAI() private { // make private to disable
+    function testVestDAI() public { // make private to disable
+        // Provide human-readable names for timestamps
+        uint256 DEC_01_2023 = 1701385200;
+        uint256 NOV_30_2024 = 1733007599;
+
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-
-        // All times in GMT
-        // $ make time stamp=<STAMP>
-        // 2023-10-01 00:00:00 UTC
-        uint256 OCT_01_2023       = 1696118400;
-        // 2024-09-30 23:59:59 UTC
-        uint256 SEP_30_2024       = 1727740799;
-
-        uint256 prevBalance;
 
         // Store previous amount of streams
         uint256 prevStreamCount = vest.ids();
@@ -409,52 +404,35 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check that 2 new streams are added
-        assertEq(vest.ids(), prevStreamCount + 2);
+        // Check that new streams are added
+        assertEq(vest.ids(), prevStreamCount + 1);
 
-        // Check the first stream
-        uint256 janskyVestId = prevStreamCount + 1;
-        assertTrue(vest.valid(janskyVestId)); // check for valid contract
-        _checkDaiVest({
-            _index:      janskyVestId,                              // id
-            _wallet:     wallets.addr("JANSKY"),                         // usr
-            _start:      OCT_01_2023,                                    // bgn
-            _cliff:      OCT_01_2023,                                    // clf
-            _end:        SEP_30_2024,                                    // fin
-            _days:       366 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     504_000 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-        GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("JANSKY"));
-        vest.unrestrict(janskyVestId);
-        vm.warp(OCT_01_2023 + 366 days);
-        vest.vest(janskyVestId);
-        assertEq(dai.balanceOf(wallets.addr("JANSKY")), prevBalance + 504_000 * WAD);
-
-        // Check the first stream
-        uint256 voteWizardVestId = prevStreamCount + 2;
-        assertTrue(vest.valid(voteWizardVestId)); // check for valid contract
-        _checkDaiVest({
-            _index:      voteWizardVestId,                              // id
-            _wallet:     wallets.addr("VOTEWIZARD"),                     // usr
-            _start:      OCT_01_2023,                                    // bgn
-            _cliff:      OCT_01_2023,                                    // clf
-            _end:        SEP_30_2024,                                    // fin
-            _days:       366 days,                                       // fin
-            _manager:    address(0),                                     // mgr
-            _restricted: 1,                                              // res
-            _reward:     504_000 * WAD,                                  // tot
-            _claimed:    0                                               // rxd
-        });
-        GodMode.setWard(address(vest), address(this), 1);
-        prevBalance = dai.balanceOf(wallets.addr("VOTEWIZARD"));
-        vest.unrestrict(voteWizardVestId);
-        vm.warp(OCT_01_2023 + 366 days);
-        vest.vest(voteWizardVestId);
-        assertEq(dai.balanceOf(wallets.addr("VOTEWIZARD")), prevBalance + 504_000 * WAD);
+        { // Check ECOSYSTEM_FACILITATOR stream
+            uint256 streamId = 38;
+            address addr = wallets.addr("ECOSYSTEM_FACILITATOR");
+            uint256 amount = 504_000 * WAD;
+            uint256 calculatedFin = DEC_01_2023 + 366 days - 1; // Note: we're using 366 days because there's a leap year adjustment
+            assertEq(streamId, prevStreamCount + 1, "testVestDAI/invalid-id");
+            assertTrue(vest.valid(streamId)); // check for valid contract
+            _checkDaiVest({
+                _index:      streamId,                                       // id
+                _wallet:     addr,                                           // usr
+                _start:      DEC_01_2023,                                    // bgn
+                _cliff:      DEC_01_2023,                                    // clf
+                _end:        NOV_30_2024,                                    // fin
+                _days:       366 days,                                       // fin
+                _manager:    address(0),                                     // mgr
+                _restricted: 1,                                              // res
+                _reward:     amount,                                         // tot
+                _claimed:    0                                               // rxd
+            });
+            GodMode.setWard(address(vest), address(this), 1);
+            uint256 prevBalance = dai.balanceOf(addr);
+            vest.unrestrict(streamId);
+            vm.warp(calculatedFin);
+            vest.vest(streamId);
+            assertEq(dai.balanceOf(addr), prevBalance + amount, "testVestDAI/invalid-received-amount");
+        }
     }
 
     struct Payee {
@@ -462,7 +440,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testPayments() public { // make private to disable
+    function testDAIPayments() public { // make private to disable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -501,118 +479,123 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAI() private { // make private to disable
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-        // VestAbstract vestLegacy = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
+    struct Yanked {
+        uint256 streamId;
+        address addr;
+        uint256 finPlanned;
+    }
 
-        // 31 Mar 2024 23:59:59 UTC
+    function testYankDAI() public { // make private to disable
+        // Provide human-readable names for timestamps
         uint256 MARCH_31_2024 = 1711929599;
-        uint256 streamId = 17;
-        address expectedWallet = wallets.addr("GOV_ALPHA");
 
-        assertEq(vest.usr(streamId), expectedWallet, "testYankDAI/unexpected-address");
-        assertEq(vest.fin(streamId), MARCH_31_2024, "testYankDAI/unpected-fin-date");
+        // For each yanked stream, provide Yanked object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yanked[2] memory yanks = [
+            Yanked(19, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
+            Yanked(18, wallets.addr("TECH"), MARCH_31_2024)
+        ];
+
+        // Test stream id matches `addr` and `fin`
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI")); // or "MCD_VEST_DAI_LEGACY"
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-
-        assertEq(vest.fin(streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+        }
     }
 
-    function testYankMKR() private { // make private to disable
+    function testYankMKR() public { // make private to disable
+        // Provide human-readable names for timestamps
+        uint256 MARCH_31_2024 = 1711929599;
+
+        // For each yanked stream, provide Yanked object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yanked[2] memory yanks = [
+            Yanked(32, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
+            Yanked(33, wallets.addr("TECH"), MARCH_31_2024)
+        ];
+
+        // Test stream id matches `addr` and `fin`
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-
-        // 31 Mar 2024 23:59:59 PM UTC
-        uint256 MAR_31_2024 = 1711929599;
-
-        assertEq(vestTreasury.usr(34), wallets.addr("GOV_ALPHA"));
-        assertEq(vestTreasury.fin(34),  MAR_31_2024);
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
+            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
 
-        assertEq(vestTreasury.fin(34),  block.timestamp);
+            // Give admin powers to test contract address and make the vesting unrestricted for testing
+            GodMode.setWard(address(vestTreasury), address(this), 1);
 
-        // Give admin powers to test contract address and make the vesting unrestricted for testing
-        GodMode.setWard(address(vestTreasury), address(this), 1);
-
-        vestTreasury.unrestrict(34);
-
-        vestTreasury.vest(34);
-
-        assertTrue(!vestTreasury.valid(34));
-        assertEq(vestTreasury.fin(34), block.timestamp);
+            // Test vest can still be called, making stream "invalid" and not changing `fin` timestamp
+            vestTreasury.unrestrict(yanks[i].streamId);
+            vestTreasury.vest(yanks[i].streamId);
+            assertTrue(!vestTreasury.valid(yanks[i].streamId));
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-fin-changed");
+        }
     }
 
-    function testVestMKR() private { // make private to disable
+    function testVestMKR() public { // make private to disable
+        // Provide human-readable names for timestamps
+        uint256 DEC_01_2023 = 1701385200;
+        uint256 NOV_30_2024 = 1733007599;
+
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-
-        // 2023-10-01 00:00:00 UTC
-        uint256 OCT_01_2023       = 1696118400;
-        // 2024-09-30 23:59:59 UTC
-        uint256 SEP_30_2024       = 1727740799;
-
         uint256 prevStreamCount = vest.ids();
         uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
-        uint256 prevBalance;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
         // check new allowance
-        uint256 newVesting = 216 ether; // JANSKY; note: ether is a keyword helper, only MKR is transferred here
-               newVesting += 216 ether; // VOTEWIZARD; note: ether is a keyword helper, only MKR is transferred here
+        uint256 newVesting = 216 ether; // Note: ether is a keyword helper, only MKR is transferred here
         assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + newVesting, "testVestMKR/invalid-allowance");
 
         // Let's move this general check to a separate test case
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
-        assertEq(vest.ids(), prevStreamCount + 2, "testVestMKR/invalid-stream-count");
+        assertEq(vest.ids(), prevStreamCount + 1, "testVestMKR/invalid-stream-count");
 
-        { // check JANSKY stream
-            address janskyAddress = wallets.addr("JANSKY");
-            uint256 janskyStreamId = prevStreamCount + 1;
-            // NOTE: We are only using 366 days because there's a leap year adjustment in between.
-            uint256 janskyFin = OCT_01_2023 + 366 days - 1;
-            assertEq(vest.usr(janskyStreamId), janskyAddress, "testVestMKR/invalid-address");
-            assertEq(vest.bgn(janskyStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(janskyStreamId), OCT_01_2023, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(janskyStreamId), janskyFin, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(janskyStreamId), SEP_30_2024, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(janskyStreamId), address(0), "testVestMKR/invalid-manager");
-            assertEq(vest.res(janskyStreamId), 1, "testVestMKR/invalid-res");
-            assertEq(vest.tot(janskyStreamId), 216 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-            assertEq(vest.rxd(janskyStreamId), 0, "testVestMKR/invalid-rxd");
-            prevBalance = gov.balanceOf(janskyAddress);
+        { // Check ECOSYSTEM_FACILITATOR stream
+            uint256 streamId = 44;
+            address addr = wallets.addr("ECOSYSTEM_FACILITATOR");
+            uint256 amount = 216 ether; // Note: ether is a keyword helper, only MKR is transferred here
+            uint256 calculatedFin = DEC_01_2023 + 366 days - 1; // Note: we're using 366 days because there's a leap year adjustment
+            assertEq(streamId, prevStreamCount + 1, "testVestMKR/invalid-id");
+            assertEq(vest.usr(streamId), addr, "testVestMKR/invalid-address");
+            assertEq(vest.bgn(streamId), DEC_01_2023, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(streamId), DEC_01_2023, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(streamId), calculatedFin, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(streamId), NOV_30_2024, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(streamId), address(0), "testVestMKR/invalid-manager");
+            assertEq(vest.res(streamId), 1, "testVestMKR/invalid-res");
+            assertEq(vest.tot(streamId), amount, "testVestMKR/invalid-total");
+            assertEq(vest.rxd(streamId), 0, "testVestMKR/invalid-rxd");
+            uint256 prevBalance = gov.balanceOf(addr);
             GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(janskyStreamId);
-            vm.warp(janskyFin);
-            vest.vest(janskyStreamId);
-            assertEq(gov.balanceOf(janskyAddress), prevBalance + 216 ether, "testVestMKR/invalid-received-amount");
-        }
-
-        { // check VOTEWIZARD stream
-            address voteWizardAddress = wallets.addr("VOTEWIZARD");
-            uint256 voteWizardStreamId = prevStreamCount + 2;
-            // NOTE: We are only using 366 days because there's a leap year adjustment in between.
-            uint256 voteWizardFin = OCT_01_2023 + 366 days - 1;
-            assertEq(vest.usr(voteWizardStreamId), voteWizardAddress, "testVestMKR/invalid-address");
-            assertEq(vest.bgn(voteWizardStreamId), OCT_01_2023, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(voteWizardStreamId), OCT_01_2023, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(voteWizardStreamId), voteWizardFin, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(voteWizardStreamId), SEP_30_2024, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(voteWizardStreamId), address(0), "testVestMKR/invalid-manager");
-            assertEq(vest.res(voteWizardStreamId), 1, "testVestMKR/invalid-res");
-            assertEq(vest.tot(voteWizardStreamId), 216 ether, "testVestMKR/invalid-total"); // note: ether is a keyword helper, only MKR is transferred here
-            assertEq(vest.rxd(voteWizardStreamId), 0, "testVestMKR/invalid-rxd");
-            prevBalance = gov.balanceOf(voteWizardAddress);
-            GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(voteWizardStreamId);
-            vm.warp(voteWizardFin);
-            vest.vest(voteWizardStreamId);
-            assertEq(gov.balanceOf(voteWizardAddress), prevBalance + 216 ether, "testVestMKR/invalid-received-amount");
+            vest.unrestrict(streamId);
+            vm.warp(calculatedFin);
+            vest.vest(streamId);
+            assertEq(gov.balanceOf(addr), prevBalance + amount, "testVestMKR/invalid-received-amount");
         }
     }
 
@@ -649,25 +632,6 @@ contract DssSpellTest is DssSpellTestBase {
         for (uint256 i = 0; i < payees.length; i++) {
             assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
         }
-    }
-
-    function testMKRVestFix() private { // make private to disable
-        // uint256 prevMkrPause  = gov.balanceOf(address(pauseProxy));
-        // VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-
-        // address usr = vest.usr(2);
-        // assertEq(usr, pauseProxy, "usr of id 2 is pause proxy");
-
-        // uint256 unpaid = vest.unpaid(2);
-        // assertEq(unpaid, 63180000000000000000, "amount doesn't match expectation");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // unpaid = vest.unpaid(2);
-        // assertEq(unpaid, 0, "vest still has a balance");
-        // assertEq(gov.balanceOf(address(pauseProxy)), prevMkrPause);
     }
 
     function _setupRootDomain() internal {

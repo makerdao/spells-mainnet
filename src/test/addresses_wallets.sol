@@ -125,6 +125,7 @@ contract Wallets {
         addr["BA_LABS"]                      = 0xDfe08A40054685E205Ed527014899d1EDe49B892;
         addr["JANSKY"]                       = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
         addr["VOTEWIZARD"]                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+        addr["ECOSYSTEM_FACILITATOR"]        = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
 
         // Ecosystem Actors
         addr["PHOENIX_LABS_2"]               = 0x115F76A98C2268DaE6c1421eb6B08e4e1dF525dA;
