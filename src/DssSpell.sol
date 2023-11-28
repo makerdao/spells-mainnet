@@ -97,9 +97,9 @@ contract DssSpellAction is DssAction {
 
     // ---------- Timestamps ----------
     // 2023-12-01 00:00:00
-    uint256 public constant DEC_01_2023 = 1701385200;
+    uint256 internal constant DEC_01_2023 = 1701385200;
     // 2024-11-30 23:59:59
-    uint256 public constant NOV_30_2024 = 1733007599;
+    uint256 internal constant NOV_30_2024 = 1733007599;
 
     function actions() public override {
         // ---------- Stability Fee Changes ----------
