@@ -387,49 +387,77 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    function testVestDAI() public { // make private to disable
+    struct Stream {
+        uint256 streamId;
+        address wallet;
+        uint256 rewardAmount;
+        uint256 start;
+        uint256 cliff;
+        uint256 end;
+        uint256 durationDays;
+        address manager;
+        uint256 isRestricted;
+        uint256 claimedAmount;
+    }
+
+    function testVestDAI() public {
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
         uint256 NOV_30_2024 = 1733007599;
 
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
+        // For each new stream, provide Stream object
+        // and initialize the array with the corrent number of new streams
+        Stream[1] memory streams = [
+            Stream({
+                streamId:      38,
+                wallet:        wallets.addr("ECOSYSTEM_FACILITATOR"),
+                rewardAmount:  504_000 * WAD,
+                start:         DEC_01_2023,
+                cliff:         DEC_01_2023,
+                end:           NOV_30_2024,
+                durationDays:  366 days,
+                manager:       address(0),
+                isRestricted:  1,
+                claimedAmount: 0
+            })
+        ];
 
-        // Store previous amount of streams
+        // Record previous values for the reference
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
         uint256 prevStreamCount = vest.ids();
 
-        // Cast the spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Check that new streams are added
-        assertEq(vest.ids(), prevStreamCount + 1);
+        // Check maximum vesting rate (Note: this should eventually be moved to _testGeneral)
+        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days, "testVestDAI/invalid-cap");
 
-        { // Check ECOSYSTEM_FACILITATOR stream
-            uint256 streamId = 38;
-            address addr = wallets.addr("ECOSYSTEM_FACILITATOR");
-            uint256 amount = 504_000 * WAD;
-            uint256 calculatedFin = DEC_01_2023 + 366 days - 1; // Note: we're using 366 days because there's a leap year adjustment
-            assertEq(streamId, prevStreamCount + 1, "testVestDAI/invalid-id");
-            assertTrue(vest.valid(streamId)); // check for valid contract
-            _checkDaiVest({
-                _index:      streamId,                                       // id
-                _wallet:     addr,                                           // usr
-                _start:      DEC_01_2023,                                    // bgn
-                _cliff:      DEC_01_2023,                                    // clf
-                _end:        NOV_30_2024,                                    // fin
-                _days:       366 days,                                       // fin
-                _manager:    address(0),                                     // mgr
-                _restricted: 1,                                              // res
-                _reward:     amount,                                         // tot
-                _claimed:    0                                               // rxd
-            });
+        // Check that all streams added in this spell are tested
+        assertEq(vest.ids(), prevStreamCount + streams.length, "testVestDAI/not-all-streams-tested");
+
+        for (uint256 i = 0; i < streams.length; i++) {
+            uint256 streamId = prevStreamCount + i + 1;
+
+            // Check values of the each stream
+            assertEq(streamId, streams[i].streamId, "testVestDAI/invalid-id");
+            assertEq(vest.usr(streamId), streams[i].wallet, "testVestDAI/invalid-address");
+            assertEq(vest.tot(streamId), streams[i].rewardAmount, "testVestDAI/invalid-total");
+            assertEq(vest.bgn(streamId), streams[i].start, "testVestDAI/invalid-bgn");
+            assertEq(vest.clf(streamId), streams[i].cliff, "testVestDAI/invalid-clif");
+            assertEq(vest.fin(streamId), streams[i].start + streams[i].durationDays - 1, "testVestDAI/invalid-calculated-fin");
+            assertEq(vest.fin(streamId), streams[i].end, "testVestDAI/invalid-fin-variable");
+            assertEq(vest.mgr(streamId), streams[i].manager, "testVestDAI/invalid-manager");
+            assertEq(vest.res(streamId), streams[i].isRestricted, "testVestDAI/invalid-res");
+            assertEq(vest.rxd(streamId), streams[i].claimedAmount, "testVestDAI/invalid-rxd");
+
+            // Check each new stream is payable in the future
+            uint256 prevWalletBalance = dai.balanceOf(streams[i].wallet);
             GodMode.setWard(address(vest), address(this), 1);
-            uint256 prevBalance = dai.balanceOf(addr);
             vest.unrestrict(streamId);
-            vm.warp(calculatedFin);
+            vm.warp(streams[i].end);
             vest.vest(streamId);
-            assertEq(dai.balanceOf(addr), prevBalance + amount, "testVestDAI/invalid-received-amount");
+            assertEq(dai.balanceOf(streams[i].wallet), prevWalletBalance + streams[i].rewardAmount, "testVestDAI/invalid-received-amount");
         }
     }
 
@@ -552,19 +580,6 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    struct Stream {
-        uint256 streamId;
-        address wallet;
-        uint256 rewardAmount;
-        uint256 start;
-        uint256 cliff;
-        uint256 end;
-        uint256 durationDays;
-        address manager;
-        uint256 isRestricted;
-        uint256 claimedAmount;
-    }
-
     function testVestMKR() public {
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
@@ -603,7 +618,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
         assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + totalRewardAmount, "testVestMKR/invalid-allowance");
 
-        // Check general vesting values
+        // Check maximum vesting rate (Note: this should eventually be moved to _testGeneral)
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
 
         // Check that all streams added in this spell are tested
