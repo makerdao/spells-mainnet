@@ -12,12 +12,12 @@ parser.add_argument("stamp", help="Converts timestamp to UTC date")
 parsed=parser.parse_args()
 
 # Cleanup positional arguments
-date = parsed.date.replace("date=", "").replace(" UTC", "")
+date = parsed.date.replace("date=", "").upper().replace(" UTC", "")
 stamp = parsed.stamp.replace("stamp=", "")
 
 # Convert provided input in UTC format into desired output in UTC as well
 if date:
-    utc_date = datetime.strptime(date, DATE_FORMAT).replace(tzinfo=timezone.utc)
+    utc_date = datetime.fromisoformat(date).replace(tzinfo=timezone.utc)
     print(utc_date)
     print(int(utc_date.timestamp()))
 if stamp:
