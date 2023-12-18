@@ -103,14 +103,6 @@ contract DssSpellTest is DssSpellTestBase {
         _testUseEta();
     }
 
-    function testAuth() public {
-        _checkAuth(false);
-    }
-
-    function testAuthInSources() public {
-        _checkAuth(true);
-    }
-
     function testBytecodeMatches() public {
         _testBytecodeMatches();
     }
@@ -184,47 +176,21 @@ contract DssSpellTest is DssSpellTestBase {
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
+    function testAuth() private {  // make private to disable
+        bytes32[] memory keys = new bytes32[](2);
+        keys[0] = "MCD_JOIN_TOKEN_X";
+        keys[1] = "MCD_CLIP_TOKEN_X";
+
+        _checkAuth(keys);
+    }
+
     function testOsmAuth() private {  // make private to disable
-        // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
+        bytes32[] memory keys = new bytes32[](3);
+        keys[0] = "PIP_XXX";
+        keys[1] = "PIP_YYY";
+        keys[2] = "PIP_ZZZ";
 
-        // validate the spell does what we told it to
-        //bytes32[] memory ilks = reg.list();
-
-        //for(uint256 i = 0; i < ilks.length; i++) {
-        //    uint256 class = reg.class(ilks[i]);
-        //    if (class != 1) { continue; }
-
-        //    address pip = reg.pip(ilks[i]);
-        //    // skip USDC, TUSD, PAXUSD, GUSD
-        //    if (pip == 0x838212865E2c2f4F7226fCc0A3EFc3EB139eC661 ||
-        //        pip == 0x0ce19eA2C568890e63083652f205554C927a0caa ||
-        //        pip == 0xdF8474337c9D3f66C0b71d31C7D3596E4F517457 ||
-        //        pip == 0x57A00620Ba1f5f81F20565ce72df4Ad695B389d7) {
-        //        continue;
-        //    }
-
-        //    assertEq(OsmAbstract(pip).wards(ORACLE_WALLET01), 0);
-        //}
-
-        //_vote(address(spell));
-        //_scheduleWaitAndCast(address(spell));
-        //assertTrue(spell.done());
-
-        //for(uint256 i = 0; i < ilks.length; i++) {
-        //    uint256 class = reg.class(ilks[i]);
-        //    if (class != 1) { continue; }
-
-        //    address pip = reg.pip(ilks[i]);
-        //    // skip USDC, TUSD, PAXUSD, GUSD
-        //    if (pip == 0x838212865E2c2f4F7226fCc0A3EFc3EB139eC661 ||
-        //        pip == 0x0ce19eA2C568890e63083652f205554C927a0caa ||
-        //        pip == 0xdF8474337c9D3f66C0b71d31C7D3596E4F517457 ||
-        //        pip == 0x57A00620Ba1f5f81F20565ce72df4Ad695B389d7) {
-        //        continue;
-        //    }
-
-        //    assertEq(OsmAbstract(pip).wards(ORACLE_WALLET01), 1);
-        //}
+        _checkOsmAuth(keys);
     }
 
     function testOracleList() private {  // make private to disable

@@ -1483,54 +1483,67 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
-    function _skipWards(address target, address deployer) internal pure returns (bool) {
-        // Kept for consistency but in general we don't want to skip checking wards on mainnet
-        target; deployer;
-        return false;
-    }
-
+    /**
+     * @dev Checks if the deployer of a contract has not kept `wards` access to the contract.
+     * Notice that it depends on `deployers` being kept up-to-date.
+     */
     function _checkWards(address _addr, string memory contractName) internal {
         for (uint256 i = 0; i < deployers.count(); i ++) {
             address deployer = deployers.addr(i);
-            (bool ok, bytes memory data) = _addr.call(
-                abi.encodeWithSignature("wards(address)", deployer)
-            );
+            (bool ok, bytes memory data) = _addr.call(abi.encodeWithSignature("wards(address)", deployer));
             if (!ok || data.length != 32) return;
+
             uint256 ward = abi.decode(data, (uint256));
             if (ward > 0) {
-                if (_skipWards(_addr, deployer)) continue;
-                emit log("Error: Bad Auth");
                 emit log_named_address("   Deployer Address", deployer);
                 emit log_named_string("  Affected Contract", contractName);
-                fail();
+                fail("Error: Bad Auth");
             }
         }
     }
 
-    function _checkSource(address _addr, string memory contractName) internal {
-        (bool ok, bytes memory data) =
-            _addr.call(abi.encodeWithSignature("src()"));
+    /**
+     * @dev Same as `_checkWards`, but for OSMs' underlying Median contracts.
+     */
+    function _checkOsmSrcWards(address _addr, string memory contractName) internal {
+        (bool ok, bytes memory data) = _addr.call(abi.encodeWithSignature("src()"));
         if (!ok || data.length != 32) return;
+
         address source = abi.decode(data, (address));
-        string memory sourceName = string(
-            abi.encodePacked("source of ", contractName)
-        );
+        string memory sourceName = string(abi.encodePacked("src of ", contractName));
         _checkWards(source, sourceName);
     }
 
-    function _checkAuth(bool onlySource) internal {
+    /**
+     * @notice Checks if the deployer of contracts being added to the chainlog has not kept `wards` access to it.
+     * @dev Reverts if any non-existent keys are present the list.
+     * @param keys A list of chainlog keys.
+     */
+    function _checkAuth(bytes32[] memory keys) internal {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        bytes32[] memory contractNames = chainLog.list();
-        for(uint256 i = 0; i < contractNames.length; i++) {
-            address _addr = chainLog.getAddress(contractNames[i]);
-            string memory contractName = string(
-                abi.encodePacked(contractNames[i])
-            );
-            if (onlySource) _checkSource(_addr, contractName);
-            else _checkWards(_addr, contractName);
+        for(uint256 i = 0; i < keys.length; i++) {
+            _checkWards(chainLog.getAddress(keys[i]), string(abi.encodePacked(keys[i])));
+        }
+    }
+
+    /**
+     * @notice Same as `_checkAuth`, but specific for OSMs.
+     * @dev Reverts if any non-existent keys are present the list.
+     * @param keys A list of chainlog keys for OSMs.
+     */
+    function _checkOsmAuth(bytes32[] memory keys) internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < keys.length; i++) {
+            address _addr = chainLog.getAddress(keys[i]);
+            string memory _key = string(abi.encodePacked(keys[i]));
+            _checkWards(_addr, _key);
+            _checkOsmSrcWards(_addr, _key);
         }
     }
 
