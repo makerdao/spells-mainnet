@@ -104,6 +104,12 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAuth() public {
+        _skipTest(
+            chainlogAdds.length == 0 &&
+            chainlogRemoves.length == 0 &&
+            chainlogUpdates.length == 0
+        );
+
         _checkAuth(false);
     }
 
@@ -120,6 +126,12 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testChainlogVersionBump() public {
+        _skipTest(
+            chainlogAdds.length == 0 &&
+            chainlogRemoves.length == 0 &&
+            chainlogUpdates.length == 0
+        );
+
         _testChainlogVersionBump();
     }
 
@@ -239,17 +251,21 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() private { // make private to disable
+    function testRemoveChainlogValues() public {
+        _skipTest(chainlogRemoves.length == 0);
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        try chainLog.getAddress("MCD_CAT") {
-            assertTrue(false);
-        } catch Error(string memory errmsg) {
-            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
-        } catch {
-            assertTrue(false);
+        for(uint256 _i; _i < chainlogRemoves.length; _i++) {
+            try chainLog.getAddress(chainlogRemoves[_i].name) {
+                assertTrue(false);
+            } catch Error(string memory errmsg) {
+                assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+            } catch {
+                assertTrue(false);
+            }
         }
     }
 
