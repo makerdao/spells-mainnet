@@ -23,6 +23,7 @@ import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
+import "./test/actions.sol";
 import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
@@ -156,7 +157,7 @@ interface FlapperMomAbstract {
     function stop() external;
 }
 
-contract DssSpellTestBase is Config, DssTest {
+contract DssSpellTestBase is Config, Actions, DssTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
     Deployers deployers = new Deployers();
@@ -328,6 +329,7 @@ contract DssSpellTestBase is Config, DssTest {
             // even if mainnet has already scheduled/cast the spell
             vm.makePersistent(address(rates));
             vm.makePersistent(address(addr));
+            vm.makePersistent(address(wallets));
             vm.makePersistent(address(deployers));
             vm.rollFork(spellValues.deployed_spell_block);
 
@@ -1987,6 +1989,12 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function _skipTest(bool _skip) internal {
+        // NOTE: Using low-level calls until vm supports skip(bool) method
+        (bool success, ) = address(vm).call(abi.encodeWithSignature("skip(bool)", _skip));
+        success;
     }
 
 }

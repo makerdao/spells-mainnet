@@ -387,40 +387,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    struct Stream {
-        uint256 streamId;
-        address wallet;
-        uint256 rewardAmount;
-        uint256 start;
-        uint256 cliff;
-        uint256 end;
-        uint256 durationDays;
-        address manager;
-        uint256 isRestricted;
-        uint256 claimedAmount;
-    }
-
     function testVestDAI() public {
-        // Provide human-readable names for timestamps
-        uint256 DEC_01_2023 = 1701385200;
-        uint256 NOV_30_2024 = 1733007599;
-
-        // For each new stream, provide Stream object
-        // and initialize the array with the corrent number of new streams
-        Stream[1] memory streams = [
-            Stream({
-                streamId:      38,
-                wallet:        wallets.addr("ECOSYSTEM_FACILITATOR"),
-                rewardAmount:  504_000 * WAD,
-                start:         DEC_01_2023,
-                cliff:         DEC_01_2023,
-                end:           NOV_30_2024,
-                durationDays:  366 days,
-                manager:       address(0),
-                isRestricted:  1,
-                claimedAmount: 0
-            })
-        ];
+        assertEq(DAI_STREAMS_COUNT, daiStreams.length, "testVestDAI/invalid-streams-count");
+        _skipTest(DAI_STREAMS_COUNT == 0); // skip if there are no streams
 
         // Record previous values for the reference
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
@@ -434,55 +403,45 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days, "testVestDAI/invalid-cap");
 
         // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + streams.length, "testVestDAI/not-all-streams-tested");
+        assertEq(vest.ids(), prevStreamCount + daiStreams.length, "testVestDAI/not-all-streams-tested");
 
-        for (uint256 i = 0; i < streams.length; i++) {
+        for (uint256 i = 0; i < daiStreams.length; i++) {
             uint256 streamId = prevStreamCount + i + 1;
+            address wallet = wallets.addr(daiStreams[i].wallet);
 
             // Check values of the each stream
-            assertEq(streamId, streams[i].streamId, "testVestDAI/invalid-id");
-            assertEq(vest.usr(streamId), streams[i].wallet, "testVestDAI/invalid-address");
-            assertEq(vest.tot(streamId), streams[i].rewardAmount, "testVestDAI/invalid-total");
-            assertEq(vest.bgn(streamId), streams[i].start, "testVestDAI/invalid-bgn");
-            assertEq(vest.clf(streamId), streams[i].cliff, "testVestDAI/invalid-clif");
-            assertEq(vest.fin(streamId), streams[i].start + streams[i].durationDays - 1, "testVestDAI/invalid-calculated-fin");
-            assertEq(vest.fin(streamId), streams[i].end, "testVestDAI/invalid-fin-variable");
-            assertEq(vest.mgr(streamId), streams[i].manager, "testVestDAI/invalid-manager");
-            assertEq(vest.res(streamId), streams[i].isRestricted, "testVestDAI/invalid-res");
-            assertEq(vest.rxd(streamId), streams[i].claimedAmount, "testVestDAI/invalid-rxd");
+            assertEq(streamId, daiStreams[i].streamId, "testVestDAI/invalid-id");
+            assertEq(vest.usr(streamId), wallet, "testVestDAI/invalid-address");
+            assertEq(vest.tot(streamId), daiStreams[i].rewardAmount * WAD, "testVestDAI/invalid-total");
+            assertEq(vest.bgn(streamId), daiStreams[i].start, "testVestDAI/invalid-bgn");
+            assertEq(vest.clf(streamId), daiStreams[i].cliff, "testVestDAI/invalid-clif");
+            assertEq(vest.fin(streamId), daiStreams[i].start + daiStreams[i].durationDays - 1, "testVestDAI/invalid-calculated-fin");
+            assertEq(vest.fin(streamId), daiStreams[i].end, "testVestDAI/invalid-fin-variable");
+            assertEq(vest.mgr(streamId), daiStreams[i].manager, "testVestDAI/invalid-manager");
+            assertEq(vest.res(streamId), daiStreams[i].isRestricted, "testVestDAI/invalid-res");
+            assertEq(vest.rxd(streamId), daiStreams[i].claimedAmount, "testVestDAI/invalid-rxd");
 
             // Check each new stream is payable in the future
-            uint256 prevWalletBalance = dai.balanceOf(streams[i].wallet);
+            uint256 prevWalletBalance = dai.balanceOf(wallet);
             GodMode.setWard(address(vest), address(this), 1);
             vest.unrestrict(streamId);
-            vm.warp(streams[i].end);
+            vm.warp(daiStreams[i].end);
             vest.vest(streamId);
-            assertEq(dai.balanceOf(streams[i].wallet), prevWalletBalance + streams[i].rewardAmount, "testVestDAI/invalid-received-amount");
+            assertEq(dai.balanceOf(wallet), prevWalletBalance + daiStreams[i].rewardAmount * WAD, "testVestDAI/invalid-received-amount");
         }
     }
 
-    struct Payee {
-        address addr;
-        uint256 amount;
-    }
-
-    function testDAIPayments() public { // make private to disable
-        // For each payment, create a Payee object with
-        //    the Payee address,
-        //    the amount to be paid in whole Dai units
-        // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("BLOCKTOWER_WALLET_2"), 201_738)
-        ];
-        uint256 expectedSumPayments = 201_738; // Fill the number with the value from exec doc.
+    function testDAIPayments() public {
+        assertEq(DAI_PAYEES_COUNT, daiPayees.length, "testDAIPayments/invalid-payees-count");
+        _skipTest(DAI_PAYEES_COUNT == 0); // skip if there are no payments
 
         uint256 prevBalance;
         uint256 totAmount;
-        uint256[] memory prevAmounts = new uint256[](payees.length);
+        uint256[] memory prevAmounts = new uint256[](DAI_PAYEES_COUNT);
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            totAmount += payees[i].amount;
-            prevAmounts[i] = dai.balanceOf(payees[i].addr);
+        for (uint256 i = 0; i < DAI_PAYEES_COUNT; i++) {
+            totAmount += daiPayees[i].amount;
+            prevAmounts[i] = dai.balanceOf(wallets.addr(daiPayees[i].wallet));
             prevBalance += prevAmounts[i];
         }
 
@@ -495,112 +454,68 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
-        assertEq(vat.sin(address(vow)) - prevSin, expectedSumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, DAI_SUM_PAYMENTS * RAD, "testPaymentsSum/vat-sin-mismatch");
 
-        for (uint256 i = 0; i < payees.length; i++) {
+        for (uint256 i = 0; i < DAI_PAYEES_COUNT; i++) {
             assertEq(
-                dai.balanceOf(payees[i].addr) - prevAmounts[i],
-                payees[i].amount * WAD
+                dai.balanceOf(wallets.addr(daiPayees[i].wallet)) - prevAmounts[i],
+                daiPayees[i].amount * WAD
             );
         }
     }
 
-    struct Yank {
-        uint256 streamId;
-        address addr;
-        uint256 finPlanned;
-    }
-
-    function testYankDAI() public { // make private to disable
-        // Provide human-readable names for timestamps
-        uint256 MARCH_31_2024 = 1711929599;
-
-        // For each yanked stream, provide Yank object with:
-        //   the stream id
-        //   the address of the stream
-        //   the planned fin of the stream (via variable defined above)
-        // Initialize the array with the corrent number of yanks
-        Yank[2] memory yanks = [
-            Yank(19, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
-            Yank(18, wallets.addr("TECH"), MARCH_31_2024)
-        ];
+    function testYankDAI() public {
+        assertEq(DAI_YANKS_COUNT, daiYanks.length, "testYankDAI/invalid-yanks-count");
+        _skipTest(DAI_YANKS_COUNT == 0); // skip if there are no yanks
 
         // Test stream id matches `addr` and `fin`
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI")); // or "MCD_VEST_DAI_LEGACY"
-        for (uint256 i = 0; i < yanks.length; i++) {
-            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
-            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        for (uint256 i = 0; i < DAI_YANKS_COUNT; i++) {
+            assertEq(vest.usr(daiYanks[i].streamId), wallets.addr(daiYanks[i].wallet), "testYankDAI/unexpected-address");
+            assertEq(vest.fin(daiYanks[i].streamId), daiYanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-        for (uint256 i = 0; i < yanks.length; i++) {
+        for (uint256 i = 0; i < DAI_YANKS_COUNT; i++) {
             // Test stream.fin is set to the current block after the spell
-            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+            assertEq(vest.fin(daiYanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
         }
     }
 
-    function testYankMKR() public { // make private to disable
-        // Provide human-readable names for timestamps
-        uint256 MARCH_31_2024 = 1711929599;
-
-        // For each yanked stream, provide Yank object with:
-        //   the stream id
-        //   the address of the stream
-        //   the planned fin of the stream (via variable defined above)
-        // Initialize the array with the corrent number of yanks
-        Yank[2] memory yanks = [
-            Yank(32, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
-            Yank(33, wallets.addr("TECH"), MARCH_31_2024)
-        ];
+    function testYankMKR() public {
+        assertEq(MKR_YANKS_COUNT, mkrYanks.length, "testYankMKR/invalid-yanks-count");
+        _skipTest(MKR_YANKS_COUNT == 0); // skip if there are no yanks
 
         // Test stream id matches `addr` and `fin`
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        for (uint256 i = 0; i < yanks.length; i++) {
-            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
-            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        for (uint256 i = 0; i < MKR_YANKS_COUNT; i++) {
+            assertEq(vestTreasury.usr(mkrYanks[i].streamId), wallets.addr(mkrYanks[i].wallet), "testYankDAI/unexpected-address");
+            assertEq(vestTreasury.fin(mkrYanks[i].streamId), mkrYanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-        for (uint256 i = 0; i < yanks.length; i++) {
+        for (uint256 i = 0; i < MKR_YANKS_COUNT; i++) {
             // Test stream.fin is set to the current block after the spell
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+            assertEq(vestTreasury.fin(mkrYanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
 
             // Give admin powers to test contract address and make the vesting unrestricted for testing
             GodMode.setWard(address(vestTreasury), address(this), 1);
 
             // Test vest can still be called, making stream "invalid" and not changing `fin` timestamp
-            vestTreasury.unrestrict(yanks[i].streamId);
-            vestTreasury.vest(yanks[i].streamId);
-            assertTrue(!vestTreasury.valid(yanks[i].streamId));
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-fin-changed");
+            vestTreasury.unrestrict(mkrYanks[i].streamId);
+            vestTreasury.vest(mkrYanks[i].streamId);
+            assertTrue(!vestTreasury.valid(mkrYanks[i].streamId));
+            assertEq(vestTreasury.fin(mkrYanks[i].streamId), block.timestamp, "testYankDAI/steam-fin-changed");
         }
     }
 
     function testVestMKR() public {
-        // Provide human-readable names for timestamps
-        uint256 DEC_01_2023 = 1701385200;
-        uint256 NOV_30_2024 = 1733007599;
-
-        // For each new stream, provide Stream object
-        // and initialize the array with the corrent number of new streams
-        Stream[1] memory streams = [
-            Stream({
-                streamId:      44,
-                wallet:        wallets.addr("ECOSYSTEM_FACILITATOR"),
-                rewardAmount:  216 * WAD,
-                start:         DEC_01_2023,
-                cliff:         DEC_01_2023,
-                end:           NOV_30_2024,
-                durationDays:  366 days,
-                manager:       address(0),
-                isRestricted:  1,
-                claimedAmount: 0
-            })
-        ];
+        assertEq(MKR_STREAMS_COUNT, mkrStreams.length, "testVestMKR/invalid-streams-count");
+        _skipTest(MKR_STREAMS_COUNT == 0); // skip if there are no streams
 
         // Record previous values for the reference
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
@@ -613,8 +528,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check allowance was increased according to the streams
         uint256 totalRewardAmount = 0;
-        for (uint256 i = 0; i < streams.length; i++) {
-            totalRewardAmount = totalRewardAmount + streams[i].rewardAmount;
+        for (uint256 i = 0; i < MKR_STREAMS_COUNT; i++) {
+            totalRewardAmount = totalRewardAmount + mkrStreams[i].rewardAmount * WAD;
         }
         assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + totalRewardAmount, "testVestMKR/invalid-allowance");
 
@@ -622,51 +537,45 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
 
         // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + streams.length, "testVestMKR/not-all-streams-tested");
+        assertEq(vest.ids(), prevStreamCount + MKR_STREAMS_COUNT, "testVestMKR/not-all-streams-tested");
 
-        for (uint256 i = 0; i < streams.length; i++) {
+        for (uint256 i = 0; i < MKR_STREAMS_COUNT; i++) {
             uint256 streamId = prevStreamCount + i + 1;
+            address wallet = wallets.addr(mkrStreams[i].wallet);
 
             // Check values of the each stream
-            assertEq(streamId, streams[i].streamId, "testVestMKR/invalid-id");
-            assertEq(vest.usr(streamId), streams[i].wallet, "testVestMKR/invalid-address");
-            assertEq(vest.tot(streamId), streams[i].rewardAmount, "testVestMKR/invalid-total");
-            assertEq(vest.bgn(streamId), streams[i].start, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(streamId), streams[i].cliff, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(streamId), streams[i].start + streams[i].durationDays - 1, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(streamId), streams[i].end, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(streamId), streams[i].manager, "testVestMKR/invalid-manager");
-            assertEq(vest.res(streamId), streams[i].isRestricted, "testVestMKR/invalid-res");
-            assertEq(vest.rxd(streamId), streams[i].claimedAmount, "testVestMKR/invalid-rxd");
+            assertEq(streamId, mkrStreams[i].streamId, "testVestMKR/invalid-id");
+            assertEq(vest.usr(streamId), wallet, "testVestMKR/invalid-address");
+            assertEq(vest.tot(streamId), mkrStreams[i].rewardAmount * WAD, "testVestMKR/invalid-total");
+            assertEq(vest.bgn(streamId), mkrStreams[i].start, "testVestMKR/invalid-bgn");
+            assertEq(vest.clf(streamId), mkrStreams[i].cliff, "testVestMKR/invalid-clif");
+            assertEq(vest.fin(streamId), mkrStreams[i].start + mkrStreams[i].durationDays - 1, "testVestMKR/invalid-calculated-fin");
+            assertEq(vest.fin(streamId), mkrStreams[i].end, "testVestMKR/invalid-fin-variable");
+            assertEq(vest.mgr(streamId), mkrStreams[i].manager, "testVestMKR/invalid-manager");
+            assertEq(vest.res(streamId), mkrStreams[i].isRestricted, "testVestMKR/invalid-res");
+            assertEq(vest.rxd(streamId), mkrStreams[i].claimedAmount, "testVestMKR/invalid-rxd");
 
             // Check each new stream is payable in the future
-            uint256 prevWalletBalance = gov.balanceOf(streams[i].wallet);
+            uint256 prevWalletBalance = gov.balanceOf(wallet);
             GodMode.setWard(address(vest), address(this), 1);
             vest.unrestrict(streamId);
-            vm.warp(streams[i].end);
+            vm.warp(mkrStreams[i].end);
             vest.vest(streamId);
-            assertEq(gov.balanceOf(streams[i].wallet), prevWalletBalance + streams[i].rewardAmount, "testVestMKR/invalid-received-amount");
+            assertEq(gov.balanceOf(wallet), prevWalletBalance + mkrStreams[i].rewardAmount * WAD, "testVestMKR/invalid-received-amount");
         }
     }
 
-    function testMKRPayments() private { // make public to enable
-        // For each payment, create a Payee object with
-        //    the Payee address,
-        //    the amount to be paid
-        // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  0.00 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
-        ];
-        // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 0.00 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+    function testMKRPayments() public {
+        assertEq(MKR_PAYEES_COUNT, mkrPayees.length, "testMKRPayments/invalid-payees-count");
+        _skipTest(MKR_PAYEES_COUNT == 0); // skip if there are no payments
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
-        uint256[] memory prevBalances = new uint256[](payees.length);
+        uint256[] memory prevBalances = new uint256[](MKR_PAYEES_COUNT);
         uint256 prevMkrBalance       = gov.balanceOf(address(pauseProxy));
-        for (uint256 i = 0; i < payees.length; i++) {
-            totalAmountToTransfer += payees[i].amount;
-            prevBalances[i] = gov.balanceOf(payees[i].addr);
+        for (uint256 i = 0; i < MKR_PAYEES_COUNT; i++) {
+            totalAmountToTransfer += mkrPayees[i].amount;
+            prevBalances[i] = gov.balanceOf(wallets.addr(mkrPayees[i].wallet));
         }
 
         // Cast the spell
@@ -676,11 +585,11 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check that pause proxy balance has decreased
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer);
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - expectedSumPayments);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - MKR_SUM_PAYMENTS * WAD);
 
         // Check that payees received their payments
-        for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
+        for (uint256 i = 0; i < MKR_PAYEES_COUNT; i++) {
+            assertEq(gov.balanceOf(wallets.addr(mkrPayees[i].wallet)) - prevBalances[i], mkrPayees[i].amount * WAD);
         }
     }
 
