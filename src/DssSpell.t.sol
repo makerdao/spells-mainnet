@@ -52,7 +52,7 @@ interface RwaLiquidationOracleLike {
     function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
 }
 
-contract DssSpellTest is DssSpellTestBase {
+abstract contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
     OptimismDomain optimismDomain;
@@ -103,16 +103,12 @@ contract DssSpellTest is DssSpellTestBase {
         _testUseEta();
     }
 
-    function testAuth() public {
+    function testAuth() private { // NOTE: disabling for performance reasons #374
         _checkAuth(false);
     }
 
-    function testAuthInSources() public {
+    function testAuthInSources() private { // NOTE: disabling for performance reasons #374
         _checkAuth(true);
-    }
-
-    function testBytecodeMatches() public {
-        _testBytecodeMatches();
     }
 
     function testChainlogValues() public {
@@ -929,3 +925,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(spot, 1_500_000_000 * RAY, "RWA014: Bad spot value after bump()");
     }
 }
+
+contract DssSpellTestDeployed is DssSpellTest, DssSpellTestDeployedBase {  // NOTE: make abstract to disable
+
+    // NOTE: moving test to be only run on forked scope
+    function testBytecodeMatches() public {
+        _testBytecodeMatches();
+    }
+
+}
+
+contract DssSpellTestCodebase is DssSpellTest, DssSpellTestCodebaseBase {} // NOTE: make abstract to disable

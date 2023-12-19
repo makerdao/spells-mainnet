@@ -156,7 +156,7 @@ interface FlapperMomAbstract {
     function stop() external;
 }
 
-contract DssSpellTestBase is Config, DssTest {
+abstract contract DssSpellTestBase is Config, DssTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
     Deployers deployers = new Deployers();
@@ -310,37 +310,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
-    function setUp() public {
-        setValues(address(chief));
-        _castPreviousSpell();
-
-        spellValues.deployed_spell_created = spellValues.deployed_spell != address(0)
-            ? spellValues.deployed_spell_created
-            : block.timestamp;
-        spell = spellValues.deployed_spell != address(0)
-            ?  DssSpell(spellValues.deployed_spell)
-            : new DssSpell();
-
-        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
-            // if we have a deployed spell in the config
-            // we want to roll our fork to the block where it was deployed
-            // this means the test suite will continue to accurately pass/fail
-            // even if mainnet has already scheduled/cast the spell
-            vm.makePersistent(address(rates));
-            vm.makePersistent(address(addr));
-            vm.makePersistent(address(deployers));
-            vm.rollFork(spellValues.deployed_spell_block);
-
-            // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
-            // This is a workaround for the issue described here:
-            // @see { https://github.com/foundry-rs/foundry/issues/5739 }
-            vm.store(
-                address(spell),
-                bytes32(0),
-                bytes32(0)
-            );
-        }
-    }
+    function setUp() virtual public;
 
     function _vote(address spell_) internal {
         if (chief.hat() != spell_) {
@@ -1989,4 +1959,71 @@ contract DssSpellTestBase is Config, DssTest {
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
 
+}
+
+contract DssSpellTestCodebaseBase is DssSpellTestBase {
+    function setUp() public override {
+        setValues(address(chief));
+        _castPreviousSpell();
+
+        spellValues.deployed_spell_created = spellValues.deployed_spell != address(0)
+            ? spellValues.deployed_spell_created
+            : block.timestamp;
+        spell = new DssSpell();
+
+        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
+            // if we have a deployed spell in the config
+            // we want to roll our fork to the block where it was deployed
+            // this means the test suite will continue to accurately pass/fail
+            // even if mainnet has already scheduled/cast the spell
+            vm.makePersistent(address(rates));
+            vm.makePersistent(address(addr));
+            // NOTE: adding fix presented in #377
+            vm.makePersistent(address(wallets));
+            vm.makePersistent(address(deployers));
+            vm.rollFork(spellValues.deployed_spell_block);
+
+            // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
+            // This is a workaround for the issue described here:
+            // @see { https://github.com/foundry-rs/foundry/issues/5739 }
+            vm.store(
+                address(spell),
+                bytes32(0),
+                bytes32(0)
+            );
+        }
+    }
+}
+
+contract DssSpellTestDeployedBase is DssSpellTestBase {
+    function setUp() public override {
+        setValues(address(chief));
+        _castPreviousSpell();
+
+        if (spellValues.deployed_spell == address(0)
+            || spellValues.deployed_spell_block == 0
+            || spellValues.deployed_spell_created == 0) revert("TestError/spell-not-deployed");
+
+        spell = DssSpell(spellValues.deployed_spell);
+
+        // if we have a deployed spell in the config
+        // we want to roll our fork to the block where it was deployed
+        // this means the test suite will continue to accurately pass/fail
+        // even if mainnet has already scheduled/cast the spell
+        vm.makePersistent(address(rates));
+        vm.makePersistent(address(addr));
+        // NOTE: adding fix presented in #377
+        vm.makePersistent(address(wallets));
+        vm.makePersistent(address(deployers));
+        vm.rollFork(spellValues.deployed_spell_block);
+
+        // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
+        // This is a workaround for the issue described here:
+        // @see { https://github.com/foundry-rs/foundry/issues/5739 }
+        vm.store(
+            address(spell),
+            bytes32(0),
+            bytes32(0)
+        );
+    }
 }
