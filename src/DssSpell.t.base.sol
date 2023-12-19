@@ -272,6 +272,11 @@ contract DssSpellTestBase is Config, Actions, DssTest {
         return string(bytesArray);
     }
 
+    function _skipTest(bool _skip) internal {
+        (bool success, ) = address(vm).call(abi.encodeWithSignature("skip(bool)", _skip));
+        success;
+    }
+
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
@@ -1989,12 +1994,6 @@ contract DssSpellTestBase is Config, Actions, DssTest {
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
-    }
-
-    function _skipTest(bool _skip) internal {
-        // NOTE: Using low-level calls until vm supports skip(bool) method
-        (bool success, ) = address(vm).call(abi.encodeWithSignature("skip(bool)", _skip));
-        success;
     }
 
 }
