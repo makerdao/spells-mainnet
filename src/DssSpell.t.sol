@@ -403,9 +403,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days, "testVestDAI/invalid-cap");
 
         // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + daiStreams.length, "testVestDAI/not-all-streams-tested");
+        assertEq(vest.ids(), prevStreamCount + DAI_STREAMS_COUNT, "testVestDAI/not-all-streams-tested");
 
-        for (uint256 i = 0; i < daiStreams.length; i++) {
+        for (uint256 i = 0; i < DAI_STREAMS_COUNT; i++) {
             uint256 streamId = prevStreamCount + i + 1;
             address wallet = wallets.addr(daiStreams[i].wallet);
 
