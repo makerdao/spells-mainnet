@@ -329,6 +329,7 @@ contract DssSpellTestBase is Config, DssTest {
             vm.makePersistent(address(rates));
             vm.makePersistent(address(addr));
             vm.makePersistent(address(deployers));
+            vm.makePersistent(address(wallets));
             vm.rollFork(spellValues.deployed_spell_block);
 
             // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
