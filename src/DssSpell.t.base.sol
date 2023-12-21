@@ -23,6 +23,7 @@ import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
+import "./test/actions.sol";
 import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
@@ -156,7 +157,7 @@ interface FlapperMomAbstract {
     function stop() external;
 }
 
-contract DssSpellTestBase is Config, DssTest {
+contract DssSpellTestBase is Config, Actions, DssTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
     Deployers deployers = new Deployers();
@@ -271,6 +272,11 @@ contract DssSpellTestBase is Config, DssTest {
         return string(bytesArray);
     }
 
+    function _skipTest(bool _skip) internal {
+        (bool success, ) = address(vm).call(abi.encodeWithSignature("skip(bool)", _skip));
+        success;
+    }
+
     // 10^-5 (tenth of a basis point) as a RAY
     uint256 TOLERANCE = 10 ** 22;
 
@@ -328,6 +334,7 @@ contract DssSpellTestBase is Config, DssTest {
             // even if mainnet has already scheduled/cast the spell
             vm.makePersistent(address(rates));
             vm.makePersistent(address(addr));
+            vm.makePersistent(address(wallets));
             vm.makePersistent(address(deployers));
             vm.makePersistent(address(wallets));
             vm.rollFork(spellValues.deployed_spell_block);
