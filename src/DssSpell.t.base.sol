@@ -1516,40 +1516,24 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     /**
-     * @notice Checks if the deployer of contracts being added to the chainlog has not kept `wards` access to it.
-     * @dev Reverts if any non-existent keys are present the list.
-     * @param keys A list of chainlog keys.
+     * @notice Checks if the the deployer of a contract the chainlog has not kept `wards` access to it.
+     * @dev Reverts if `key` is not in the chainlog.
      */
-    function _checkAuth(bytes32[] memory keys) internal {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+    function _checkAuth(bytes32 key) internal {
+        address _addr = chainLog.getAddress(key);
+        string memory contractName = string(abi.encodePacked(key));
 
-        for(uint256 i = 0; i < keys.length; i++) {
-            _checkWards(chainLog.getAddress(keys[i]), string(abi.encodePacked(keys[i])));
-        }
+        _checkWards(_addr, contractName);
+        _checkOsmSrcWards(_addr, contractName);
     }
 
-    /**
-     * @notice Same as `_checkAuth`, but specific for OSMs.
-     * @dev Reverts if any non-existent keys are present the list.
-     * @param keys A list of chainlog keys for OSMs.
-     */
-    function _checkOsmAuth(bytes32[] memory keys) internal {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for(uint256 i = 0; i < keys.length; i++) {
-            address _addr = chainLog.getAddress(keys[i]);
-            string memory _key = string(abi.encodePacked(keys[i]));
-            _checkWards(_addr, _key);
-            _checkOsmSrcWards(_addr, _key);
-        }
+    function _checkMatchingKeyAddresses(bytes32 key) internal {
+        assertEq(chainLog.getAddress(key), addr.addr(key), _concat("TestError/Chainlog-key-mismatch-", key));
     }
 
     function _checkChainlogKey(bytes32 key) internal {
-        assertEq(chainLog.getAddress(key), addr.addr(key), _concat("TestError/Chainlog-key-mismatch-", key));
+        _checkMatchingKeyAddresses(key);
+        _checkAuth(key);
     }
 
     function _checkChainlogVersion(string memory key) internal {

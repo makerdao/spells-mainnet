@@ -176,23 +176,6 @@ contract DssSpellTest is DssSpellTestBase {
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
-    function testAuth() private {  // make private to disable
-        bytes32[] memory keys = new bytes32[](2);
-        keys[0] = "MCD_JOIN_TOKEN_X";
-        keys[1] = "MCD_CLIP_TOKEN_X";
-
-        _checkAuth(keys);
-    }
-
-    function testOsmAuth() private {  // make private to disable
-        bytes32[] memory keys = new bytes32[](3);
-        keys[0] = "PIP_XXX";
-        keys[1] = "PIP_YYY";
-        keys[2] = "PIP_ZZZ";
-
-        _checkOsmAuth(keys);
-    }
-
     function testOracleList() private {  // make private to disable
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
 
@@ -300,16 +283,15 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testNewChainlogValues() private { // make private to disable
-
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
-        // _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogKey("MCD_PSM_PAX_A_JAR");
-        // _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogVersion("1.17.1");
+        _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
+        _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
+        _checkChainlogKey("MCD_PSM_PAX_A_JAR");
+        _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        _checkChainlogVersion("1.17.1");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
