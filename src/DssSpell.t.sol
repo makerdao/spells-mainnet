@@ -287,7 +287,7 @@ contract DssSpellTest is DssSpellTestBase {
             "MCD_PSM_GUSD_A_JAR",
             "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR",
             "MCD_PSM_PAX_A_JAR",
-            "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR",
+            "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"
         ]);
     }
 
