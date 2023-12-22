@@ -260,15 +260,25 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _concat(string memory a, bytes32 b) internal pure returns (string memory) {
-        return string.concat(a, _bytes32ToStr(b));
+        return string.concat(a, _bytes32ToString(b));
     }
 
-    function _bytes32ToStr(bytes32 _bytes32) internal pure returns (string memory) {
-        bytes memory bytesArray = new bytes(32);
-        for (uint256 i; i < 32; i++) {
+    function _bytes32ToString(bytes32 _bytes32) internal pure returns (string memory) {
+        uint256 charCount = 0;
+        while(charCount < 32 && _bytes32[charCount] != 0) {
+            charCount++;
+        }
+        bytes memory bytesArray = new bytes(charCount);
+        for (uint256 i = 0; i < charCount; i++) {
             bytesArray[i] = _bytes32[i];
         }
         return string(bytesArray);
+    }
+
+    function _stringToBytes32(string memory source) internal pure returns (bytes32 result) {
+        assembly {
+            result := mload(add(source, 32))
+        }
     }
 
     // 10^-5 (tenth of a basis point) as a RAY
@@ -367,12 +377,6 @@ contract DssSpellTestBase is Config, DssTest {
         vm.warp(DssSpell(spell_).nextCastTime());
 
         DssSpell(spell_).cast();
-    }
-
-    function _stringToBytes32(string memory source) internal pure returns (bytes32 result) {
-        assembly {
-            result := mload(add(source, 32))
-        }
     }
 
     function _checkSystemValues(SystemValues storage values) internal {
@@ -1511,7 +1515,7 @@ contract DssSpellTestBase is Config, DssTest {
         if (!ok || data.length != 32) return;
 
         address source = abi.decode(data, (address));
-        string memory sourceName = string(abi.encodePacked("src of ", contractName));
+        string memory sourceName = _concat("src of ", contractName);
         _checkWards(source, sourceName);
     }
 
@@ -1521,23 +1525,10 @@ contract DssSpellTestBase is Config, DssTest {
      */
     function _checkAuth(bytes32 key) internal {
         address _addr = chainLog.getAddress(key);
-        string memory contractName = string(abi.encodePacked(key));
+        string memory contractName = _bytes32ToString(key);
 
         _checkWards(_addr, contractName);
         _checkOsmSrcWards(_addr, contractName);
-    }
-
-    function _checkMatchingKeyAddresses(bytes32 key) internal {
-        assertEq(chainLog.getAddress(key), addr.addr(key), _concat("TestError/Chainlog-key-mismatch-", key));
-    }
-
-    function _checkChainlogKey(bytes32 key) internal {
-        _checkMatchingKeyAddresses(key);
-        _checkAuth(key);
-    }
-
-    function _checkChainlogVersion(string memory key) internal {
-        assertEq(chainLog.version(), key, _concat("TestError/Chainlog-version-mismatch-", key));
     }
 
     function _checkRWADocUpdate(bytes32 ilk, string memory currentDoc, string memory newDoc) internal {
@@ -1823,46 +1814,173 @@ contract DssSpellTestBase is Config, DssTest {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        for(uint256 i = 0; i < chainLog.count(); i++) {
-            (bytes32 _key, address _val) = chainLog.get(i);
-            assertEq(_val, addr.addr(_key), _concat("TestError/chainlog-addr-mismatch-", _key));
+        bytes32[] memory keys = chainLog.list();
+        for(uint256 i = 0; i < keys.length; i++) {
+            assertEq(
+                chainLog.getAddress(keys[i]),
+                addr.addr(keys[i]),
+                _concat("TestError/chainlog-vs-harness-key-mismatch: ", _bytes32ToString(keys[i]))
+            );
         }
 
-        _checkChainlogVersion(afterSpell.chainlog_version);
+        assertEq(chainLog.version(), afterSpell.chainlog_version, "TestError/chainlog-version-mismatch");
     }
 
     // Ensure version is updated if chainlog changes
     function _testChainlogVersionBump() internal {
-        uint256                   _count = chainLog.count();
-        string    memory        _version = chainLog.version();
-        address[] memory _chainlog_addrs = new address[](_count);
+        string memory pversion = chainLog.version();
+        bytes32[] memory pkeys = chainLog.list();
+        uint256 pcount = pkeys.length;
+        address[] memory pvalues = new address[](pcount);
 
-        for(uint256 i = 0; i < _count; i++) {
-            (, address _val) = chainLog.get(i);
-            _chainlog_addrs[i] = _val;
+        for(uint256 i = 0; i < pcount; i++) {
+            pvalues[i] = chainLog.getAddress(pkeys[i]);
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        if (keccak256(abi.encodePacked(_version)) == keccak256(abi.encodePacked(chainLog.version()))) {
+        if (keccak256(abi.encodePacked(pversion)) == keccak256(abi.encodePacked(chainLog.version()))) {
+            bytes32[] memory keys = chainLog.list();
+            uint256 count = keys.length;
+            address[] memory values = new address[](count);
+
             // Fail if the version is not updated and the chainlog count has changed
-            if (_count != chainLog.count()) {
-                emit log_named_string("Error", _concat("TestError/chainlog-version-not-updated-count-change-", _version));
-                fail();
-                return;
-            }
-            // Fail if the chainlog is the same size but local keys don't match the chainlog.
-            for(uint256 i = 0; i < _count; i++) {
-                (, address _val) = chainLog.get(i);
-                if (_chainlog_addrs[i] != _val) {
-                    emit log_named_string("Error", _concat("TestError/chainlog-version-not-updated-address-change-", _version));
-                    fail();
-                    return;
-                }
+            assertEq(count, pcount, "TestError/chainlog-version-not-updated-count-change");
+
+            for(uint256 i = 0; i < count; i++) {
+                values[i] = chainLog.getAddress(keys[i]);
+                // Fail if the chainlog is the same size, but any address or their order changed.
+                assertEq(
+                    values[i],
+                    pvalues[i],
+                    _concat("TestError/chainlog-version-not-updated-address-change: ", _bytes32ToString(keys[i]))
+                );
             }
         }
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[] memory keys) internal {
+        // `setAddress` must have being called `keys.length` times.
+        vm.expectCall(
+            address(chainLog),
+            abi.encodeWithSelector(chainLog.setAddress.selector),
+            uint64(keys.length)
+        );
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        for (uint256 i = 0; i < keys.length; i++) {
+            _checkAuth(_stringToBytes32(keys[i]));
+        }
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[1] memory keys) internal {
+        string[] memory dkeys = new string[](1);
+        dkeys[0] = keys[0];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[2] memory keys) internal {
+        string[] memory dkeys = new string[](2);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[3] memory keys) internal {
+        string[] memory dkeys = new string[](3);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[4] memory keys) internal {
+        string[] memory dkeys = new string[](4);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[5] memory keys) internal {
+        string[] memory dkeys = new string[](5);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[6] memory keys) internal {
+        string[] memory dkeys = new string[](6);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        dkeys[5] = keys[5];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[7] memory keys) internal {
+        string[] memory dkeys = new string[](7);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        dkeys[5] = keys[5];
+        dkeys[6] = keys[6];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[8] memory keys) internal {
+        string[] memory dkeys = new string[](8);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        dkeys[5] = keys[5];
+        dkeys[6] = keys[6];
+        dkeys[7] = keys[7];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[9] memory keys) internal {
+        string[] memory dkeys = new string[](9);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        dkeys[5] = keys[5];
+        dkeys[6] = keys[6];
+        dkeys[7] = keys[7];
+        dkeys[8] = keys[8];
+        _testNewOrUpdatedChainlogValues(dkeys);
+    }
+
+    function _testNewOrUpdatedChainlogValues(string[10] memory keys) internal {
+        string[] memory dkeys = new string[](10);
+        dkeys[0] = keys[0];
+        dkeys[1] = keys[1];
+        dkeys[2] = keys[2];
+        dkeys[3] = keys[3];
+        dkeys[4] = keys[4];
+        dkeys[5] = keys[5];
+        dkeys[6] = keys[6];
+        dkeys[7] = keys[7];
+        dkeys[8] = keys[8];
+        dkeys[9] = keys[9];
+        _testNewOrUpdatedChainlogValues(dkeys);
     }
 
     function _checkCropCRVLPIntegration(
@@ -1986,5 +2104,4 @@ contract DssSpellTestBase is Config, DssTest {
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
     }
-
 }

@@ -282,16 +282,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
-        _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
-        _checkChainlogKey("MCD_PSM_PAX_A_JAR");
-        _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        _checkChainlogVersion("1.17.1");
+    function testNewOrUpdatedChainlogValues() private { // make private to disable
+        _testNewOrUpdatedChainlogValues([
+            "MCD_PSM_GUSD_A_JAR",
+            "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR",
+            "MCD_PSM_PAX_A_JAR",
+            "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR",
+        ]);
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
