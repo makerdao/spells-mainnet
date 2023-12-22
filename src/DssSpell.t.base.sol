@@ -1819,7 +1819,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(
                 chainLog.getAddress(keys[i]),
                 addr.addr(keys[i]),
-                _concat("TestError/chainlog-vs-harness-key-mismatch: ", _bytes32ToString(keys[i]))
+                _concat("TestError/chainlog-vs-harness-key-mismatch: ", keys[i])
             );
         }
 
@@ -1855,7 +1855,7 @@ contract DssSpellTestBase is Config, DssTest {
                 assertEq(
                     values[i],
                     pvalues[i],
-                    _concat("TestError/chainlog-version-not-updated-address-change: ", _bytes32ToString(keys[i]))
+                    _concat("TestError/chainlog-version-not-updated-address-change: ", keys[i])
                 );
             }
         }
