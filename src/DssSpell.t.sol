@@ -462,15 +462,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() private { // make private to disable
+    function testDAIPayments() public { // make private to disable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            Payee(wallets.addr("BLOCKTOWER_WALLET_2"), 201_738)
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 4_500_000)
         ];
-        uint256 expectedSumPayments = 201_738; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 4_500_000; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -507,7 +507,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 finPlanned;
     }
 
-    function testYankDAI() private { // make private to disable
+    function testYankDAI() public { // make private to disable
         // Provide human-readable names for timestamps
         uint256 MARCH_31_2024 = 1711929599;
 
@@ -517,8 +517,8 @@ contract DssSpellTest is DssSpellTestBase {
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
         Yank[2] memory yanks = [
-            Yank(19, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
-            Yank(18, wallets.addr("TECH"), MARCH_31_2024)
+            Yank(21, wallets.addr("DECO_WALLET"), MARCH_31_2024),
+            Yank(15, wallets.addr("SES_WALLET"), MARCH_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
@@ -645,16 +645,30 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  0.00 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[15] memory payees = [
+            Payee(wallets.addr("DEFENSOR"),  41.67 ether + 41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),  41.67 ether + 41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"),  41.67 ether + 41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),  41.67 ether + 41.67 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BLUE"),  13.95 ether + 39.20 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),  13.89 ether + 13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),  13.89 ether + 13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JAG"),  13.02 ether + 12.95 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),  0.45 ether + 13.89 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("WBC"),  11.28 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("NAVIGATOR"),  20.84 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PALC"),  6.95 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RISK_WALLET_VEST"),  175.00 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SES_WALLET"),  508.55 ether), // NOTE: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),  820.00 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 0.00 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 2025.00 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -891,7 +905,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0x68a075249fA77173b8d1B92750c9920423997e2B);
+        address SPARK_SPELL    = address(0x7E73CCAA4977A5429fD1815130804769EcAad4a7);
 
         vm.expectCall(
             SUBPROXY_SPARK,
@@ -909,4 +923,10 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    function testRWA009DocChange() public {
+        string memory OLD_RWA009_DOC = "QmYjvAZEeGCs8kMuLQz6kU8PWgsbG1i8QWd2jrwkSipcRx";
+        string memory NEW_RWA009_DOC = "QmfEgZuiw6wsTRUYerdPZNUrqDXSGM6Nm4fM3nG7nNbEjT";
+
+        _checkRWADocUpdate("RWA009-A", OLD_RWA009_DOC, NEW_RWA009_DOC);
+    }
 }
