@@ -85,6 +85,7 @@ contract DssSpellAction is DssAction {
     address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address internal immutable MCD_VEST_DAI_LEGACY      = DssExecLib.getChangelogAddress("MCD_VEST_DAI_LEGACY");
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     GemAbstract internal immutable MKR                  = GemAbstract(DssExecLib.mkr());
 
@@ -110,7 +111,7 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x7E73CCAA4977A5429fD1815130804769EcAad4a7;
 
     function actions() public override {
-        
+
         // ---------- November Delegate Compensation ----------
         // Forum: https://forum.makerdao.com/t/november-2023-aligned-delegate-compensation/23351
 
@@ -156,7 +157,6 @@ contract DssSpellAction is DssAction {
         MKR.transfer(JAG, 12.95 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
         // WBC - 11.28 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
         MKR.transfer(WBC, 11.28 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
-        
 
         // ---------- Offboarded Delegate Buffer Payments ----------
         // Forum: https://forum.makerdao.com/t/october-2023-aligned-delegate-compensation/22732#october-compensation-2
@@ -171,7 +171,7 @@ contract DssSpellAction is DssAction {
 
         // yank Dai stream 21 - DECO
         // Forum: https://forum.makerdao.com/t/mip39c3-sp12-core-unit-offboarding-deco/22333
-        VestLike(MCD_VEST_DAI).yank(21);
+        VestLike(MCD_VEST_DAI_LEGACY).yank(21);
 
         // yank Dai stream 15 - SES
         // Forum: https://forum.makerdao.com/t/mip39c3-sp11-core-unit-offboarding-ses/22332
@@ -198,7 +198,7 @@ contract DssSpellAction is DssAction {
 
         // Update HVBank (RWA009-A) doc to QmfEgZuiw6wsTRUYerdPZNUrqDXSGM6Nm4fM3nG7nNbEjT
         _updateDoc("RWA009-A", "QmfEgZuiw6wsTRUYerdPZNUrqDXSGM6Nm4fM3nG7nNbEjT");
-                            
+
         // ---------- Spark D3M line increase ----------
         // Forum: https://forum.makerdao.com/t/spark-spell-proposed-changes/23298
         // Poll: https://vote.makerdao.com/polling/QmdQSuAc#poll-detail
@@ -207,7 +207,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 1200 * MILLION);
 
         // ---------- Trigger Spark Proxy Spell ----------
-        
+
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
     }

@@ -509,7 +509,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testYankDAI() public { // make private to disable
         // Provide human-readable names for timestamps
-        uint256 MARCH_31_2024 = 1711929599;
+        uint256 JANUARY_31_2024 = 1706745599;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
@@ -517,7 +517,7 @@ contract DssSpellTest is DssSpellTestBase {
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
         Yank[1] memory yanks = [
-            Yank(15, wallets.addr("SES_WALLET"), MARCH_31_2024)
+            Yank(15, wallets.addr("SES_WALLET"), JANUARY_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
@@ -538,7 +538,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testYankDAILegacy() public { // make private to disable
         // Provide human-readable names for timestamps
-        uint256 MARCH_31_2024 = 1711929599;
+        uint256 SEPTEMBER_01_2024 = 1725148800;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
@@ -546,7 +546,7 @@ contract DssSpellTest is DssSpellTestBase {
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
         Yank[1] memory yanks = [
-            Yank(21, wallets.addr("DECO_WALLET"), MARCH_31_2024)
+            Yank(21, wallets.addr("DECO_WALLET"), SEPTEMBER_01_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
