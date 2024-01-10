@@ -516,13 +516,41 @@ contract DssSpellTest is DssSpellTestBase {
         //   the address of the stream
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
-        Yank[2] memory yanks = [
-            Yank(21, wallets.addr("DECO_WALLET"), MARCH_31_2024),
+        Yank[1] memory yanks = [
             Yank(15, wallets.addr("SES_WALLET"), MARCH_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI")); // or "MCD_VEST_DAI_LEGACY"
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+        }
+    }
+
+    function testYankDAILegacy() public { // make private to disable
+        // Provide human-readable names for timestamps
+        uint256 MARCH_31_2024 = 1711929599;
+
+        // For each yanked stream, provide Yank object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yank[1] memory yanks = [
+            Yank(21, wallets.addr("DECO_WALLET"), MARCH_31_2024)
+        ];
+
+        // Test stream id matches `addr` and `fin`
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
         for (uint256 i = 0; i < yanks.length; i++) {
             assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
             assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
