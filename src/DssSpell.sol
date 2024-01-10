@@ -27,7 +27,6 @@ interface ProxyLike {
 interface RwaLiquidationLike {
     function ilks(bytes32) external view returns (string memory, address, uint48, uint48);
     function init(bytes32, uint256, string calldata, uint48) external;
-    function bump(bytes32 ilk, uint256 val) external;
 }
 
 interface VestLike {
@@ -169,12 +168,13 @@ contract DssSpellAction is DssAction {
 
 
         // ---------- yank Dai streams ----------
-        // Forum: https://forum.makerdao.com/t/mip39c3-sp11-core-unit-offboarding-ses/22332
-        // Forum: https://forum.makerdao.com/t/mip39c3-sp12-core-unit-offboarding-deco/22333
 
         // yank Dai stream 21 - DECO
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp12-core-unit-offboarding-deco/22333
         VestLike(MCD_VEST_DAI).yank(21);
+
         // yank Dai stream 15 - SES
+        // Forum: https://forum.makerdao.com/t/mip39c3-sp11-core-unit-offboarding-ses/22332
         VestLike(MCD_VEST_DAI).yank(15);
 
         // ---------- CU MKR payments ----------
@@ -192,11 +192,6 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 4_500_000);
         // Launch Project - 820.00 MKR - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         MKR.transfer(LAUNCH_PROJECT_FUNDING, 820.00 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
-
-
-        // checksums
-        // 4,500,000.00 DAI
-        // 2025.00 MKR
 
         // ---------- Update doc parameter ----------
         // Forum: https://forum.makerdao.com/t/rwa009-hvbank-mip21-token-ces-domain-team-assessment/15861/14
