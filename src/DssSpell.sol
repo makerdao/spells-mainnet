@@ -58,7 +58,7 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Math ----------
-    uint256 constant internal MILLION  = 10 **  6;
+    uint256 constant internal MILLION = 10 ** 6;
 
     // ----------- MKR transfer Addresses -----------
 
@@ -207,7 +207,9 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 1200 * MILLION);
 
         // ---------- Trigger Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/spark-spell-proposed-changes/23298
 
+        // Address - 0x7E73CCAA4977A5429fD1815130804769EcAad4a7
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
     }
