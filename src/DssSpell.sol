@@ -36,9 +36,9 @@ interface VestLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/9b10a257a1197dc5cdcdbaf639de765e033de780/governance/votes/Executive%20vote%20-%20January%2012%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-01-12 MakerDAO Executive Spell | Hash: TODO";
+        "2024-01-12 MakerDAO Executive Spell | Hash: 0xaee451ca379ba032ce5e632ec8d7520b4ed4bcdd6de3e3d9c64cc057647c8f72";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -106,7 +106,7 @@ contract DssSpellAction is DssAction {
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x7E73CCAA4977A5429fD1815130804769EcAad4a7;
+    address internal constant SPARK_SPELL = 0x2f2c514137173bc98B3699A0d291f7593637c596;
 
     function actions() public override {
 
@@ -198,16 +198,22 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark D3M line increase ----------
         // Forum: https://forum.makerdao.com/t/spark-spell-proposed-changes/23298
-        // Poll: https://vote.makerdao.com/polling/QmdQSuAc#poll-detail
+        // Poll: https://vote.makerdao.com/polling/QmdQSuAc
 
         // Increase the line by 400 million from 800 million to 1.2 billion Dai
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 1200 * MILLION);
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/spark-spell-proposed-changes/23298
-        // Address - 0x7E73CCAA4977A5429fD1815130804769EcAad4a7
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Forum: https://forum.makerdao.com/t/jan-11th-2024-expedited-inclusion-of-a-patch-to-spark-pool-implementation/23393
+        // Poll: https://vote.makerdao.com/polling/QmdVy1Uk
+        // Poll: https://vote.makerdao.com/polling/QmeWioX1
+        // Poll: https://vote.makerdao.com/polling/QmRdew4b
+        // Poll: https://vote.makerdao.com/polling/QmXtvu32
+        // Poll: https://vote.makerdao.com/polling/QmRKkMnx
 
+        // Activate Spark Proxy Spell - 0x2f2c514137173bc98B3699A0d291f7593637c596
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
