@@ -44,10 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32) external view returns (string memory, address, uint48 toc, uint48 tau);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
