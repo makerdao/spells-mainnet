@@ -106,8 +106,6 @@ contract DssSpellAction is DssAction {
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-
-    // ---------- Trigger Spark Proxy Spell ----------
     address internal constant SPARK_SPELL = 0x7E73CCAA4977A5429fD1815130804769EcAad4a7;
 
     function actions() public override {
@@ -166,7 +164,6 @@ contract DssSpellAction is DssAction {
         // PALC - 6.95 MKR - 0x78Deac4F87BD8007b9cb56B8d53889ed5374e83A
         MKR.transfer(PALC, 6.95 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
 
-
         // ---------- yank Dai streams ----------
 
         // yank Dai stream 21 - DECO
@@ -208,7 +205,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/spark-spell-proposed-changes/23298
-
         // Address - 0x7E73CCAA4977A5429fD1815130804769EcAad4a7
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
