@@ -1861,7 +1861,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
-    function _testNewOrUpdatedChainlogValues(string[] memory keys) internal {
+    function _testNewOrUpdatedChainlogValues(bytes32[] memory keys) internal {
         // `setAddress` must have being called `keys.length` times.
         vm.expectCall(
             address(chainLog),
@@ -1874,113 +1874,8 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(spell.done());
 
         for (uint256 i = 0; i < keys.length; i++) {
-            _checkAuth(_stringToBytes32(keys[i]));
+            _checkAuth(keys[i]);
         }
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[1] memory keys) internal {
-        string[] memory dkeys = new string[](1);
-        dkeys[0] = keys[0];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[2] memory keys) internal {
-        string[] memory dkeys = new string[](2);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[3] memory keys) internal {
-        string[] memory dkeys = new string[](3);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[4] memory keys) internal {
-        string[] memory dkeys = new string[](4);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[5] memory keys) internal {
-        string[] memory dkeys = new string[](5);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[6] memory keys) internal {
-        string[] memory dkeys = new string[](6);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        dkeys[5] = keys[5];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[7] memory keys) internal {
-        string[] memory dkeys = new string[](7);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        dkeys[5] = keys[5];
-        dkeys[6] = keys[6];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[8] memory keys) internal {
-        string[] memory dkeys = new string[](8);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        dkeys[5] = keys[5];
-        dkeys[6] = keys[6];
-        dkeys[7] = keys[7];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[9] memory keys) internal {
-        string[] memory dkeys = new string[](9);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        dkeys[5] = keys[5];
-        dkeys[6] = keys[6];
-        dkeys[7] = keys[7];
-        dkeys[8] = keys[8];
-        _testNewOrUpdatedChainlogValues(dkeys);
-    }
-
-    function _testNewOrUpdatedChainlogValues(string[10] memory keys) internal {
-        string[] memory dkeys = new string[](10);
-        dkeys[0] = keys[0];
-        dkeys[1] = keys[1];
-        dkeys[2] = keys[2];
-        dkeys[3] = keys[3];
-        dkeys[4] = keys[4];
-        dkeys[5] = keys[5];
-        dkeys[6] = keys[6];
-        dkeys[7] = keys[7];
-        dkeys[8] = keys[8];
-        dkeys[9] = keys[9];
-        _testNewOrUpdatedChainlogValues(dkeys);
     }
 
     function _checkCropCRVLPIntegration(

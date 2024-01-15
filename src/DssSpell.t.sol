@@ -283,12 +283,13 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testNewOrUpdatedChainlogValues() private { // make private to disable
-        _testNewOrUpdatedChainlogValues([
-            "MCD_PSM_GUSD_A_JAR",
-            "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR",
-            "MCD_PSM_PAX_A_JAR",
-            "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"
-        ]);
+        bytes32[] memory keys = new bytes32[](4);
+        keys[0] = "MCD_PSM_GUSD_A_JAR";
+        keys[1] = "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR";
+        keys[2] = "MCD_PSM_PAX_A_JAR";
+        keys[3] = "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR";
+
+        _testNewOrUpdatedChainlogValues(keys);
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
