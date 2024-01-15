@@ -95,6 +95,14 @@ contract DssSpellTest is DssSpellTestBase {
         _testUseEta();
     }
 
+    function testAuth() public {
+        _checkAuth(false);
+    }
+
+    function testAuthInSources() public {
+        _checkAuth(true);
+    }
+
     function testBytecodeMatches() public {
         _testBytecodeMatches();
     }
@@ -167,6 +175,49 @@ contract DssSpellTest is DssSpellTestBase {
     // END OF TESTS THAT SHOULD BE RUN ON EVERY SPELL
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
+
+    function testOsmAuth() private {  // make private to disable
+        // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
+
+        // validate the spell does what we told it to
+        //bytes32[] memory ilks = reg.list();
+
+        //for(uint256 i = 0; i < ilks.length; i++) {
+        //    uint256 class = reg.class(ilks[i]);
+        //    if (class != 1) { continue; }
+
+        //    address pip = reg.pip(ilks[i]);
+        //    // skip USDC, TUSD, PAXUSD, GUSD
+        //    if (pip == 0x838212865E2c2f4F7226fCc0A3EFc3EB139eC661 ||
+        //        pip == 0x0ce19eA2C568890e63083652f205554C927a0caa ||
+        //        pip == 0xdF8474337c9D3f66C0b71d31C7D3596E4F517457 ||
+        //        pip == 0x57A00620Ba1f5f81F20565ce72df4Ad695B389d7) {
+        //        continue;
+        //    }
+
+        //    assertEq(OsmAbstract(pip).wards(ORACLE_WALLET01), 0);
+        //}
+
+        //_vote(address(spell));
+        //_scheduleWaitAndCast(address(spell));
+        //assertTrue(spell.done());
+
+        //for(uint256 i = 0; i < ilks.length; i++) {
+        //    uint256 class = reg.class(ilks[i]);
+        //    if (class != 1) { continue; }
+
+        //    address pip = reg.pip(ilks[i]);
+        //    // skip USDC, TUSD, PAXUSD, GUSD
+        //    if (pip == 0x838212865E2c2f4F7226fCc0A3EFc3EB139eC661 ||
+        //        pip == 0x0ce19eA2C568890e63083652f205554C927a0caa ||
+        //        pip == 0xdF8474337c9D3f66C0b71d31C7D3596E4F517457 ||
+        //        pip == 0x57A00620Ba1f5f81F20565ce72df4Ad695B389d7) {
+        //        continue;
+        //    }
+
+        //    assertEq(OsmAbstract(pip).wards(ORACLE_WALLET01), 1);
+        //}
+    }
 
     function testOracleList() private {  // make private to disable
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
@@ -274,14 +325,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewOrUpdatedChainlogValues() private { // make private to disable
-        bytes32[] memory keys = new bytes32[](4);
-        keys[0] = "MCD_PSM_GUSD_A_JAR";
-        keys[1] = "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR";
-        keys[2] = "MCD_PSM_PAX_A_JAR";
-        keys[3] = "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR";
+    function testNewChainlogValues() private { // make private to disable
 
-        _testNewOrUpdatedChainlogValues(keys);
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
+        // _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
+        // _checkChainlogKey("MCD_PSM_PAX_A_JAR");
+        // _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        // _checkChainlogVersion("1.17.1");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
