@@ -99,12 +99,12 @@ contract DssSpellTest is DssSpellTestBase {
         _testBytecodeMatches();
     }
 
-    function testChainlogValues() public {
-        _testChainlogValues();
+    function testChainlogIntegrity() public {
+        _testChainlogIntegrity();
     }
 
-    function testChainlogVersionBump() public {
-        _testChainlogVersionBump();
+    function testChainlogValues() public {
+        _testChainlogValues();
     }
 
     // Leave this test public (for now) as this is acting like a config test
@@ -272,16 +272,6 @@ contract DssSpellTest is DssSpellTestBase {
         lerp.tick();
         assertEq(vow.hump(), 90 * MILLION * RAD);
         assertTrue(lerp.done());
-    }
-
-    function testNewOrUpdatedChainlogValues() private { // make private to disable
-        bytes32[] memory keys = new bytes32[](4);
-        keys[0] = "MCD_PSM_GUSD_A_JAR";
-        keys[1] = "MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR";
-        keys[2] = "MCD_PSM_PAX_A_JAR";
-        keys[3] = "MCD_PSM_PAX_A_INPUT_CONDUIT_JAR";
-
-        _testNewOrUpdatedChainlogValues(keys);
     }
 
     function testNewIlkRegistryValues() private { // make private to disable

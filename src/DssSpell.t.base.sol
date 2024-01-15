@@ -1808,6 +1808,154 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(actualHash, expectedHash);
     }
 
+    struct ChainlogCache {
+        bytes32 versionHash;
+        bytes32 contentHash;
+        uint256 count;
+        bytes32[] keys;
+        address[] values;
+    }
+
+    /**
+     * @dev Checks the integrity of the chainlog.
+     *      This test case is able to catch the following spell issues:
+
+     *      1. Modifications without version bump:
+     *        a. Removing a key.
+     *        b. Updating a key.
+     *        c. Adding a key.
+     *        d. Removing a key and adding it back (this can change the order of the list).
+     *      2. Version bumping without modifications.
+     *      3. Dangling wards on new or updated keys.
+     *
+     *      When adding or updating a key, the test will automatically check for dangling wards if applicable.
+     *      Notice that when a key is removed, if it is not the last one, there is a side-effect of moving
+     *      the last key to the position of the removed one (well-known Solidity iterability pattern).
+     *      This will generate a false-positive that will cause the test to re-check wards for the moved key.
+     */
+    function _testChainlogIntegrity() internal {
+        ChainlogCache memory cacheBefore = ChainlogCache({
+            count: chainLog.count(),
+            keys: chainLog.list(),
+            versionHash: keccak256(abi.encodePacked("")),
+            contentHash: keccak256(abi.encode(new bytes32[](0), new address[](0))),
+            values: new address[](0)
+        });
+
+        cacheBefore.values = new address[](cacheBefore.count);
+        for(uint256 i = 0; i < cacheBefore.count; i++) {
+            cacheBefore.values[i] = chainLog.getAddress(cacheBefore.keys[i]);
+        }
+
+        cacheBefore.versionHash = keccak256(abi.encodePacked(chainLog.version()));
+        // Using `abi.encode` to prevent ambiguous encoding
+        cacheBefore.contentHash = keccak256(abi.encode(cacheBefore.keys, cacheBefore.values));
+
+        //////////////////////////////////////////
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        //////////////////////////////////////////
+
+        ChainlogCache memory cacheAfter = ChainlogCache({
+            count: chainLog.count(),
+            keys: chainLog.list(),
+            versionHash: keccak256(abi.encodePacked("")),
+            contentHash: keccak256(abi.encode(new bytes32[](0), new address[](0))),
+            values: new address[](0)
+        });
+
+        cacheAfter.values = new address[](cacheAfter.count);
+        for(uint256 i = 0; i < cacheAfter.count; i++) {
+            cacheAfter.values[i] = chainLog.getAddress(cacheAfter.keys[i]);
+        }
+
+        cacheAfter.versionHash = keccak256(abi.encodePacked(chainLog.version()));
+        // Using `abi.encode` to prevent ambiguous encoding
+        cacheAfter.contentHash = keccak256(abi.encode(cacheAfter.keys, cacheAfter.values));
+
+        //////////////////////////////////////////
+
+        // If the version is the same, the content should not have changed
+        if (cacheAfter.versionHash == cacheBefore.versionHash) {
+            assertEq(cacheBefore.count, cacheAfter.count, "TestError/chainlog-version-not-updated-length-change");
+
+            // Add explicit check otherwise this would fail with an array-out-of-bounds error,
+            // since Foundry does not halt the execution when an assertion fails.
+            if (cacheBefore.count == cacheAfter.count) {
+                // Fail if the chainlog is the same size, but order of keys changed
+                for (uint256 i = 0; i < cacheAfter.count; i++) {
+                    assertEq(
+                        cacheBefore.values[i],
+                        cacheAfter.values[i],
+                        _concat(
+                            "TestError/chainlog-version-not-updated-value-change: ",
+                            _concat(
+                                _concat("+ ", cacheAfter.keys[i]),
+                                _concat(" | - ", cacheBefore.keys[i])
+                            )
+                        )
+                    );
+                }
+            }
+        } else {
+            // If the version changed, the content should have changed
+            assertTrue(cacheAfter.contentHash != cacheBefore.contentHash, "TestError/chainlog-version-updated-no-content-change");
+        }
+
+        // If the content has changed, we look into the diff
+        if (cacheAfter.contentHash != cacheBefore.contentHash) {
+            uint256 diffCount;
+            // Iteration must stop at the shorter array length
+            uint256 maxIters = cacheAfter.count > cacheBefore.count ? cacheBefore.count : cacheAfter.count;
+
+            // Look for changes in existing keys
+            for (uint256 i = 0; i < maxIters; i++) {
+                if (cacheAfter.keys[i] != cacheBefore.keys[i]) {
+                    // Change in order
+                    diffCount += 1;
+                } else if (cacheAfter.values[i] != cacheBefore.values[i]) {
+                    // Change in value
+                    diffCount += 1;
+                }
+            }
+
+            // Account for new keys
+            // Notice: we don't care about removed keys
+            if (cacheAfter.count > cacheBefore.count) {
+                diffCount += (cacheAfter.count - cacheBefore.count);
+            }
+
+            ////////////////////////////////////////
+
+            bytes32[] memory diffKeys = new bytes32[](diffCount);
+            uint256 j = 0;
+
+            for (uint256 i = 0; i < maxIters; i++) {
+                if (cacheAfter.keys[i] != cacheBefore.keys[i]) {
+                    // Mark keys whose order has changed
+                    diffKeys[j++] = cacheAfter.keys[i];
+                } else if (cacheAfter.values[i] != cacheBefore.values[i]) {
+                    // Mark changed values
+                    diffKeys[j++] = cacheAfter.keys[i];
+                }
+            }
+
+            // Mark new keys
+            if (cacheAfter.count > cacheBefore.count) {
+                for (uint256 i = cacheBefore.count; i < cacheAfter.count; i++) {
+                    diffKeys[j++] = cacheAfter.keys[i];
+                }
+            }
+
+            for (uint256 i = 0; i < diffKeys.length; i++) {
+                _checkAuth(diffKeys[i]);
+            }
+        }
+    }
+
     // Validate addresses in test harness match chainlog
     function _testChainlogValues() internal {
         _vote(address(spell));
@@ -1815,7 +1963,7 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(spell.done());
 
         bytes32[] memory keys = chainLog.list();
-        for(uint256 i = 0; i < keys.length; i++) {
+        for (uint256 i = 0; i < keys.length; i++) {
             assertEq(
                 chainLog.getAddress(keys[i]),
                 addr.addr(keys[i]),
@@ -1824,58 +1972,6 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         assertEq(chainLog.version(), afterSpell.chainlog_version, "TestError/chainlog-version-mismatch");
-    }
-
-    // Ensure version is updated if chainlog changes
-    function _testChainlogVersionBump() internal {
-        string memory pversion = chainLog.version();
-        bytes32[] memory pkeys = chainLog.list();
-        uint256 pcount = pkeys.length;
-        address[] memory pvalues = new address[](pcount);
-
-        for(uint256 i = 0; i < pcount; i++) {
-            pvalues[i] = chainLog.getAddress(pkeys[i]);
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        if (keccak256(abi.encodePacked(pversion)) == keccak256(abi.encodePacked(chainLog.version()))) {
-            bytes32[] memory keys = chainLog.list();
-            uint256 count = keys.length;
-            address[] memory values = new address[](count);
-
-            // Fail if the version is not updated and the chainlog count has changed
-            assertEq(count, pcount, "TestError/chainlog-version-not-updated-count-change");
-
-            for(uint256 i = 0; i < count; i++) {
-                values[i] = chainLog.getAddress(keys[i]);
-                // Fail if the chainlog is the same size, but any address or their order changed.
-                assertEq(
-                    values[i],
-                    pvalues[i],
-                    _concat("TestError/chainlog-version-not-updated-address-change: ", keys[i])
-                );
-            }
-        }
-    }
-
-    function _testNewOrUpdatedChainlogValues(bytes32[] memory keys) internal {
-        // `setAddress` must have being called `keys.length` times.
-        vm.expectCall(
-            address(chainLog),
-            abi.encodeWithSelector(chainLog.setAddress.selector),
-            uint64(keys.length)
-        );
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        for (uint256 i = 0; i < keys.length; i++) {
-            _checkAuth(keys[i]);
-        }
     }
 
     function _checkCropCRVLPIntegration(
