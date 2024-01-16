@@ -1820,7 +1820,7 @@ contract DssSpellTestBase is Config, DssTest {
      * @dev Checks the integrity of the chainlog.
      *      This test case is able to catch the following spell issues:
 
-     *      1. Modifications without version bump:
+     *      1. Modifications without version bumping:
      *        a. Removing a key.
      *        b. Updating a key.
      *        c. Adding a key.
