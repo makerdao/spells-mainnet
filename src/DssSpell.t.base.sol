@@ -1909,6 +1909,9 @@ contract DssSpellTestBase is Config, DssTest {
 
         // If the content has changed, we look into the diff
         if (cacheAfter.contentHash != cacheBefore.contentHash) {
+            // If the content changed, the version should have changed
+            assertTrue(cacheAfter.versionHash != cacheBefore.versionHash, "TestError/chainlog-content-updated-no-version-change");
+
             uint256 diffCount;
             // Iteration must stop at the shorter array length
             uint256 maxIters = cacheAfter.count > cacheBefore.count ? cacheBefore.count : cacheAfter.count;
