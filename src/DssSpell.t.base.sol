@@ -1885,7 +1885,9 @@ contract DssSpellTestBase is Config, DssTest {
             // Add explicit check otherwise this would fail with an array-out-of-bounds error,
             // since Foundry does not halt the execution when an assertion fails.
             if (cacheBefore.count == cacheAfter.count) {
-                // Fail if the chainlog is the same size, but order of keys changed
+                // Fail if the chainlog is the same size, but EITHER:
+                //   1. The value for a specific key changed
+                //   2. The order of keys changed
                 for (uint256 i = 0; i < cacheAfter.count; i++) {
                     assertEq(
                         cacheBefore.values[i],
