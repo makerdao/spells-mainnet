@@ -99,6 +99,58 @@ contract DssSpellTest is DssSpellTestBase {
         _checkAuth(false);
     }
 
+    event LogNote(
+        bytes4   indexed  sig,
+        address  indexed  usr,
+        bytes32  indexed  arg1,
+        bytes32  indexed  arg2,
+        bytes             data
+    ) anonymous;
+
+    /**
+     * NOTE: this test PoC will detect if the spell is making a `rely` call
+     * - needs to be disabled when actually wanting to make a `rely` call
+     * - foundry doesn't admit `expectEmit(n)`
+     * - should add a test for Rely(address) event (new contracts design)
+     * - should add same mechanics for `deny` calls
+     */
+    function testFailAuthCalls() public { // to be run when NO rely calls are expected
+        _vote(address(spell));
+        spell.schedule();
+        vm.warp(spell.nextCastTime());
+
+        // this test should be disabled when making a `rely` call
+        // the crafter will then need to enable the following test and declare all rely calls
+        // either this or the following tests must be run
+        // cannot join 2 tests because this one requires `testFail` and the following `test`
+        vm.expectEmit(false, false, false, false);
+        // 0x65fae35e is signature for "rely(address)"
+        emit LogNote(hex"65fae35e", address(0), bytes32(0), bytes32(0), "");
+
+        spell.cast();
+        assertTrue(spell.done(), "TestError/spell-not-done");
+    }
+
+    function testAuthCalls() public { // to be run when rely calls are expected, doesn't fail w/ alien calls
+        _vote(address(spell));
+        spell.schedule();
+        vm.warp(spell.nextCastTime());
+
+        // when this test is run, a checklist item "check logs bloom for rely(address)" should be added
+        // the crafter needs to declare here all the addresses expected to be called with rely(address)
+        // the reviewer will check the logs bloom and verify that there is not an alien address
+        vm.expectEmit(true, false, false, false, address(69));
+        // `rely(address)` topic: 0x65fae35e00000000000000000000000000000000000000000000000000000000
+        emit LogNote(hex"65fae35e", address(420), bytes32(0), bytes32(0), "");
+
+        spell.cast();
+        assertTrue(spell.done(), "TestError/spell-not-done");
+    }
+
+    function testFailAlienAuthCalls() private {
+        // not possible w/o `expectEmit(n)` or generic target `vm.expectCall(n)` for now
+    }
+
     function testAuthInSources() public {
         _checkAuth(true);
     }
