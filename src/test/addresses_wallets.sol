@@ -82,12 +82,15 @@ contract Wallets {
         addr["RES"]                          = 0x8c5c8d76372954922400e4654AF7694e158AB784;
         addr["LDF"]                          = 0xC322E8Ec33e9b0a34c7cD185C616087D9842ad50;
         addr["OPENSKY"]                      = 0x8e67eE3BbEb1743dc63093Af493f67C3c23C6f04;
+        addr["OPENSKY_2"]                    = 0xf44f97f4113759E0a57756bE49C0655d490Cf19F;
         addr["DAVIDPHELPS"]                  = 0xd56e3E325133EFEd6B1687C88571b8a91e517ab0;
         addr["SEEDLATAMETH"]                 = 0x0087a081a9B430fd8f688c6ac5dD24421BfB060D;
         addr["STABLELAB_2"]                  = 0xbDE65cf2352ed1Dde959f290E973d0fC5cEDFD08;
         addr["FLIPSIDEGOV"]                  = 0x300901243d6CB2E74c10f8aB4cc89a39cC222a29;
         addr["DAI_VINCI"]                    = 0x9ee47F0f82F1A6F45C4E1D25Ce95C321D8C8356a;
-        addr["HARMONY_2"]                      = 0xE20A2e231215e9b7Aa308463F1A7490b2ECE55D3;
+        addr["HARMONY_2"]                    = 0xE20A2e231215e9b7Aa308463F1A7490b2ECE55D3;
+        addr["FHOMONEYETH"]                  = 0xdbD5651F71ce83d1f0eD275aC456241890a53C74;
+        addr["ROOT"]                         = 0xC74392777443a11Dc26Ce8A3D934370514F38A91;
 
         // MIP-63 Keeper Network
         addr["GELATO_VEST_STREAMING"]        = 0x478c7Ce3e1df09130f8D65a23AD80e05b352af62;

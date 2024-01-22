@@ -96,7 +96,7 @@ contract Config {
             deployed_spell_created: 0, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:   0,  // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   true,      // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -109,10 +109,10 @@ contract Config {
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_bump              = 30 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_bump              = 50 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 15_768 seconds; // In seconds
+        afterSpell.flap_hop              = 26_280 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 70 * MILLION;   // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
@@ -121,7 +121,7 @@ contract Config {
         afterSpell.clipper_mom_authority = chief;          // ClipperMom authority
         afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
         afterSpell.ilk_count             = 64;             // Num expected in system
-        afterSpell.chainlog_version      = "1.17.1";       // String expected in system
+        afterSpell.chainlog_version      = "1.17.2";       // String expected in system
 
         //
         // Values for all collateral
@@ -134,7 +134,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          5_25,            // In basis points
+            pct:          6_74,            // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -159,7 +159,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          5_75,
+            pct:          7_24,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -184,7 +184,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          5_00,
+            pct:          6_49,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -284,7 +284,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          5_79,
+            pct:          6_70,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -309,7 +309,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          6_29,
+            pct:          7_20,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -334,7 +334,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          5_54,
+            pct:          6_45,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1403,10 +1403,10 @@ contract Config {
             offboarding:  true
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      120 * MILLION,
-            aL_gap:       50 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         0,
             pct:          0,
@@ -1459,7 +1459,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          5_25,
+            pct:          7_16,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1484,7 +1484,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          5_00,
+            pct:          6_91,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1660,22 +1660,22 @@ contract Config {
             line:         0,
             dust:         7_500,
             pct:          5_25,
-            mat:          150_00,
+            mat:          10000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         13_00,
+            chop:         0,
             dog_hole:     2 * MILLION,
             clip_buf:     110_00,
             clip_tail:    120 minutes,
             clip_cusp:    45_00,
-            clip_chip:    10,
-            clip_tip:     250,
+            clip_chip:    0,
+            clip_tip:     0,
             clipper_mom:  1,
             cm_tolerance: 50_00,
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     99_00,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["GNO-A"] = CollateralValues({
             aL_enabled:   false,

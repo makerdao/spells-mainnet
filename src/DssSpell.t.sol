@@ -262,47 +262,19 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testIlkClipper() private { // make public to enable
-        _castPreviousSpell();
+    function testIlkClipper() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // _checkIlkClipper(
-        //     "LINK-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_LINK_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_LINK_A")),
-        //     addr.addr("MCD_CLIP_CALC_LINK_A"),
-        //     OsmAbstract(addr.addr("PIP_LINK")),
-        //     1_000_000 * WAD
-        // );
-
-        // _checkIlkClipper(
-        //     "MATIC-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_MATIC_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_MATIC_A")),
-        //     addr.addr("MCD_CLIP_CALC_MATIC_A"),
-        //     OsmAbstract(addr.addr("PIP_MATIC")),
-        //     10_000_000 * WAD
-        // );
-
-        // _checkIlkClipper(
-        //     "YFI-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_YFI_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_YFI_A")),
-        //     addr.addr("MCD_CLIP_CALC_YFI_A"),
-        //     OsmAbstract(addr.addr("PIP_YFI")),
-        //     1_000 * WAD
-        // );
-
-        // _checkIlkClipper(
-        //     "UNIV2USDCETH-A",
-        //     GemJoinAbstract(addr.addr("MCD_JOIN_UNIV2USDCETH_A")),
-        //     ClipAbstract(addr.addr("MCD_CLIP_UNIV2USDCETH_A")),
-        //     addr.addr("MCD_CLIP_CALC_UNIV2USDCETH_A"),
-        //     OsmAbstract(addr.addr("PIP_UNIV2USDCETH")),
-        //     1 * WAD
-        // );
+        _checkIlkClipper(
+            "RETH-A",
+            GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
+            ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
+            addr.addr("MCD_CLIP_CALC_RETH_A"),
+            OsmAbstract(addr.addr("PIP_RETH")),
+            1_000 * WAD
+        );
     }
 
     function testLerpSurplusBuffer() private { // make private to disable
@@ -325,17 +297,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewChainlogValues() private { // make private to disable
-
+    function testNewChainlogValues() public { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // _checkChainlogKey("MCD_PSM_GUSD_A_JAR");
-        // _checkChainlogKey("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogKey("MCD_PSM_PAX_A_JAR");
-        // _checkChainlogKey("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        // _checkChainlogVersion("1.17.1");
+        _checkChainlogKey("RWA009_A_INPUT_CONDUIT_URN_USDC");
+
+        _checkChainlogVersion("1.17.2");
     }
 
     function testNewIlkRegistryValues() private { // make private to disable
@@ -669,16 +638,25 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() private { // make public to enable
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("DEFENSOR"),  0 ether) // NOTE: ether is a keyword helper, only MKR is transferred here
+        Payee[10] memory payees = [
+            Payee(wallets.addr("IAMMEEOH"),     20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DAI_VINCI"),    20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("OPENSKY_2"),    20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ACREDAOS"),     20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("FHOMONEYETH"),  20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("RES"),          20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("HARMONY_2"),    20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("LIBERTAS"),     20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("SEEDLATAMETH"), 20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ROOT"),         20.85 ether)  // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 0.00 ether; // NOTE: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 208.50 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -695,12 +673,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         // Check that pause proxy balance has decreased
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer);
-        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - expectedSumPayments);
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer, "testMKRPayments/invalid-total");
+        assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - expectedSumPayments, "testMKRPayments/invalid-sum");
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount);
+            assertEq(gov.balanceOf(payees[i].addr) - prevBalances[i], payees[i].amount, "testMKRPayments/invalid-balance");
         }
     }
 
@@ -893,11 +871,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() private { // make private to disable
+    function testDaoResolutions() public { // make private to disable
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmPiEHtt8rkVtSibBXMrhEzHUmSriXWz4AL2bjscq8dUvU"
+            "QmVtqkYtx61wEeM5Hb92dGA3TMZ9F1Z5WDSNwcszqxiF1w"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -913,9 +891,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() private { // make private to disable
+    function testSparkSpellIsExecuted() public { // make private to disable
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0);
+        address SPARK_SPELL    = address(0xa3836fEF1D314d4c081C2707a7664c3375F29b61);
 
         vm.expectCall(
             SUBPROXY_SPARK,
