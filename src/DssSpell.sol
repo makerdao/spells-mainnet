@@ -97,6 +97,7 @@ contract DssSpellAction is DssAction {
     address internal constant ROOT              = 0xC74392777443a11Dc26Ce8A3D934370514F38A91;
 
     // ---------- Trigger Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL = 0xa3836fEF1D314d4c081C2707a7664c3375F29b61;
 
@@ -105,28 +106,28 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-8/23445
 
         // Increase the ETH-A Stability Fee (SF) by 1.49%, from 5.25% to 6.74%.
-        DssExecLib.setIlkStabilityFee("ETH-A", SIX_PT_SEVEN_FOUR_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("ETH-A", SIX_PT_SEVEN_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-B Stability Fee (SF) by 1.49%, from 5.75% to 7.24%.
-        DssExecLib.setIlkStabilityFee("ETH-B", SEVEN_PT_TWO_FOUR_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("ETH-B", SEVEN_PT_TWO_FOUR_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-C Stability Fee (SF) by 1.49%, from 5.00% to 6.49%.
-        DssExecLib.setIlkStabilityFee("ETH-C", SIX_PT_FOUR_NINE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("ETH-C", SIX_PT_FOUR_NINE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WSTETH-A Stability Fee (SF) by 1.91%, from 5.25% to 7.16%.
-        DssExecLib.setIlkStabilityFee("WSTETH-A", SEVEN_PT_ONE_SIX_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("WSTETH-A", SEVEN_PT_ONE_SIX_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WSTETH-B Stability Fee (SF) by 1.91%, from 5.00% to 6.91%.
-        DssExecLib.setIlkStabilityFee("WSTETH-B", SIX_PT_NINE_ONE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("WSTETH-B", SIX_PT_NINE_ONE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-A Stability Fee (SF) by 0.91%, from 5.79% to 6.70%.
-        DssExecLib.setIlkStabilityFee("WBTC-A", SIX_PT_SEVEN_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("WBTC-A", SIX_PT_SEVEN_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-B Stability Fee (SF) by 0.91%, from 6.29% to 7.20%.
-        DssExecLib.setIlkStabilityFee("WBTC-B", SEVEN_PT_TWO_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("WBTC-B", SEVEN_PT_TWO_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-C Stability Fee (SF) by 0.91%, from 5.54% to 6.45%.
-        DssExecLib.setIlkStabilityFee("WBTC-C", SIX_PT_FOUR_FIVE_PCT_RATE, true);
+        DssExecLib.setIlkStabilityFee("WBTC-C", SIX_PT_FOUR_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Reduce PSM-PAX-A Debt Ceiling & Disable DC-IAM ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-8/23445
