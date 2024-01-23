@@ -910,4 +910,27 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testEsmAuth() public {
+        string[1] memory esmAuthorisedContractKeys = [
+            "RWA009_A_INPUT_CONDUIT_URN_USDC"
+        ];
+
+        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
+            assertEq(
+                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
+                0,
+                _concat("testEsmAuth/ward-esm-not-0/", esmAuthorisedContractKeys[i])
+            );
+        }
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
+            assertEq(
+                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
+                1,
+                _concat("testEsmAuth/ward-esm-not-1/", esmAuthorisedContractKeys[i])
+            );
+        }
+    }
 }
