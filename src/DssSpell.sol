@@ -182,12 +182,6 @@ contract DssSpellAction is DssAction {
         // Call <conduit>.rely(MCD_ESM) to allow ESM module to deny the pause proxy in SwapInputConduit contracts
         DssExecLib.authorize(RWA009_A_INPUT_CONDUIT_URN_USDC, MCD_ESM);
 
-        // Goerli - Add RWA009_A_INPUT_CONDUIT_URN_USDC deployed at 0xddd021b7e3Bfbad19c7D455EB7976DCe51180141  to the chainlog
-        // Note: skipped on mainnet as instructed
-
-        // Goerli - Call <conduit>.rely(MCD_ESM) to allow ESM module to deny the pause proxy in SwapInputConduit contracts
-        // Note: skipped on mainnet as instructed
-
         // Note: bump chainlog version, due to the added key
         DssExecLib.setChangelogVersion("1.17.2");
 
