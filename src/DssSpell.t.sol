@@ -190,7 +190,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
             try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
