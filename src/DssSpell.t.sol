@@ -160,7 +160,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
-    function testOracleList() private {
+    function testOracleList() private { // TODO: check if this test can be removed for good.
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
 
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 0);
@@ -253,6 +253,32 @@ contract DssSpellTest is DssSpellTestBase {
              true,
              false
         );
+    }
+
+    function testEsmAuth() public { // add the `skipTest` modifier to skip
+        string[1] memory esmAuthorisedContractKeys = [
+            "RWA009_A_INPUT_CONDUIT_URN_USDC"
+        ];
+
+        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
+            assertEq(
+                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
+                0,
+                _concat("TestError/esm-is-ward-before-spell: ", esmAuthorisedContractKeys[i])
+            );
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
+            assertEq(
+                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
+                1,
+                _concat("TestError/esm-is-not-ward-after-spell: ", esmAuthorisedContractKeys[i])
+            );
+        }
     }
 
     function testOSMs() public skipTest { // add the `skipTest` modifier to skip
@@ -841,27 +867,5 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    function testEsmAuth() public {
-        string[1] memory esmAuthorisedContractKeys = [
-            "RWA009_A_INPUT_CONDUIT_URN_USDC"
-        ];
 
-        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
-            assertEq(
-                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
-                0,
-                _concat("testEsmAuth/ward-esm-not-0/", esmAuthorisedContractKeys[i])
-            );
-        }
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
-            assertEq(
-                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
-                1,
-                _concat("testEsmAuth/ward-esm-not-1/", esmAuthorisedContractKeys[i])
-            );
-        }
-    }
 }
