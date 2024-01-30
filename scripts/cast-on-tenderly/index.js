@@ -8,7 +8,7 @@ const CHIEF_HAT_SLOT = 12;
 const DEFAULT_TRANSACTION_PARAMETERS = { gasLimit: 1_000_000_000 };
 
 // check env vars
-const REQUIRED_ENV_VARS = ['TENDERLY_USER', 'TENDERLY_PROJECT', 'TENDERLY_ACCESS_KEY'];
+const REQUIRED_ENV_VARS = ['ETH_RPC_URL', 'TENDERLY_USER', 'TENDERLY_PROJECT', 'TENDERLY_ACCESS_KEY'];
 if (REQUIRED_ENV_VARS.some(varName => !process.env[varName])) {
     throw new Error(`Please provide all required env variables: ${REQUIRED_ENV_VARS.join(', ')}`);
 }
@@ -19,33 +19,75 @@ if (!SPELL_ADDRESS) {
     throw new Error('Please provide address of the spell, e.g.: `node index.js 0x...`');
 }
 
-const makeTenderlyApiRequest = async function (path) {
-    const API_BASE = `https://api.tenderly.co/api/v1/account/${process.env.TENDERLY_USER}/project/${process.env.TENDERLY_PROJECT}`;
-    return await axios.post(
-        `${API_BASE}${path}`,
-        { network_id: NETWORK_ID },
-        { headers: { 'X-Access-Key': process.env.TENDERLY_ACCESS_KEY } }
+const getSpellName = async function () {
+    const provider = new ethers.providers.JsonRpcProvider(process.env.ETH_RPC_URL);
+    const spell = new Contract(
+        SPELL_ADDRESS,
+        ['function description() external view returns (string memory)'],
+        provider
     );
+    const description = await spell.description();
+    return description.split('|')[0].trim();
 };
 
-const createTenderlyFork = async function () {
-    const response = await makeTenderlyApiRequest('/fork');
-    const forkId = response.data.simulation_fork.id;
-    const rpcUrl = `https://rpc.tenderly.co/fork/${forkId}`;
-    const forkUrl = `https://dashboard.tenderly.co/${process.env.TENDERLY_USER}/${process.env.TENDERLY_PROJECT}/fork/${forkId}`;
-    return { forkId, forkUrl, rpcUrl };
+const makeTenderlyApiRequest = async function ({ path, body }) {
+    const API_BASE = `https://api.tenderly.co/api/v1/account/${process.env.TENDERLY_USER}/project/${process.env.TENDERLY_PROJECT}`;
+    try {
+        return await axios.post(`${API_BASE}${path}`, body, {
+            headers: {
+                'content-type': 'application/json',
+                accept: 'application/json, text/plain, */*',
+                'X-Access-Key': process.env.TENDERLY_ACCESS_KEY,
+            },
+        });
+    } catch (error) {
+        throw new Error(`tenderly request failed with: ${error.code}`);
+    }
 };
 
-const publishTenderlyTransaction = async function (forkId, transactionId) {
-    await makeTenderlyApiRequest(`/fork/${forkId}/transaction/${transactionId}/share`);
-    return `https://dashboard.tenderly.co/shared/fork/simulation/${transactionId}`;
+const createTenderlyTestnet = async function (spellName) {
+    const response = await makeTenderlyApiRequest({
+        path: '/testnet/container',
+        body: {
+            slug: spellName.replace(/\s+/g, '-').toLowerCase(),
+            displayName: spellName,
+            description: '',
+            networkConfig: {
+                network_id: NETWORK_ID,
+                blockNumber: 19077397, // TODO replace with 'latest'
+                baseFeePerGas: '1',
+                chainConfig: {
+                    chainId: NETWORK_ID,
+                },
+            },
+            explorerPage: 'DISABLED',
+            syncState: true,
+        },
+    });
+    const testnetId = response.data.container.id;
+    const rpcEndpointPublic = response.data.container.connectivityConfig.endpoints.find(
+        endpoint => endpoint.displayName === 'testnet'
+    );
+    const rpcEndpointPrivate = response.data.container.connectivityConfig.endpoints.find(
+        endpoint => endpoint.displayName === 'unlocked'
+    );
+    const explorerUrlPublic = `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`;
+    return {
+        testnetId,
+        explorerUrlPublic,
+        rpcUrlPublic: rpcEndpointPublic.uri,
+        rpcUrlPrivate: rpcEndpointPrivate.uri,
+    };
 };
 
 const runSpell = async function () {
-    const { forkId, forkUrl, rpcUrl } = await createTenderlyFork();
-    console.info('private tenderly fork is created', forkUrl);
+    const spellName = await getSpellName(SPELL_ADDRESS);
+    console.info(`preparing to execute spell ${SPELL_ADDRESS} with name "${spellName}"`);
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const { rpcUrlPrivate, explorerUrlPublic } = await createTenderlyTestnet(spellName);
+    console.info('tenderly testnet is created', explorerUrlPublic);
+
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
     const signer = provider.getSigner();
 
     console.info('fetching the chief address from chainlog...');
@@ -102,10 +144,6 @@ const runSpell = async function () {
     } catch (error) {
         console.error('casting failed', error);
     }
-
-    const lastTransactionId = await provider.send('evm_getLatest', []);
-    const publicTransactionUrl = await publishTenderlyTransaction(forkId, lastTransactionId);
-    console.info('publicly sharable transaction url', publicTransactionUrl);
 };
 
 runSpell();
