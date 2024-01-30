@@ -72,7 +72,11 @@ const runSpell = async function () {
 
     const spell = new Contract(
         SPELL_ADDRESS,
-        ['function schedule() external', 'function cast() external', 'function eta() external view returns (uint256)'],
+        [
+            'function schedule() external',
+            'function cast() external',
+            'function nextCastTime() external view returns (uint256)',
+        ],
         signer
     );
     console.info('scheduling spell on a fork...');
@@ -84,16 +88,13 @@ const runSpell = async function () {
     }
 
     console.info('fetching timestamp when the spell will be castable...');
-    const eta = await spell.eta();
+    const nextCastTime = await spell.nextCastTime();
+    console.info(`nextCastTime is "${nextCastTime}"`, new Date(nextCastTime.toNumber() * 1000));
 
-    console.info(`warping the time to "${eta}"...`);
-    const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-    if (currentUnixTimestamp < eta) {
-        const timestampDifference = eta - currentUnixTimestamp + 1;
-        await provider.send('evm_increaseTime', [ethers.utils.hexValue(timestampDifference)]);
-    }
+    console.info(`warping the time to "${nextCastTime}"...`);
+    await provider.send('evm_setNextBlockTimestamp', [ethers.utils.hexValue(nextCastTime)]);
 
-    console.info('casting spell on a fork...');
+    console.info('casting spell...');
     try {
         const castTx = await spell.cast(DEFAULT_TRANSACTION_PARAMETERS);
         await castTx.wait();
