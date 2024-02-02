@@ -114,7 +114,7 @@ contract Config {
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
         afterSpell.flap_hop              = 26_280 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
-        afterSpell.dog_Hole              = 70 * MILLION;   // In whole Dai units
+        afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
         afterSpell.pause_authority       = chief;          // Pause authority
         afterSpell.osm_mom_authority     = chief;          // OsmMom authority
@@ -289,7 +289,7 @@ contract Config {
             liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            dog_hole:     30 * MILLION,
+            dog_hole:     10 * MILLION,
             clip_buf:     110_00,
             clip_tail:    7_200,
             clip_cusp:    45_00,
@@ -314,7 +314,7 @@ contract Config {
             liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            dog_hole:     10 * MILLION,
+            dog_hole:     5 * MILLION,
             clip_buf:     110_00,
             clip_tail:    4_800,
             clip_cusp:    45_00,
@@ -339,7 +339,7 @@ contract Config {
             liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            dog_hole:     20 * MILLION,
+            dog_hole:     10 * MILLION,
             clip_buf:     110_00,
             clip_tail:    7_200,
             clip_cusp:    45_00,
@@ -1464,7 +1464,7 @@ contract Config {
             liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            dog_hole:     15 * MILLION,
+            dog_hole:     30 * MILLION,
             clip_buf:     110_00,
             clip_tail:    7_200,
             clip_cusp:    45_00,
@@ -1489,7 +1489,7 @@ contract Config {
             liqType:      "clip",
             liqOn:        true,
             chop:         1300,
-            dog_hole:     10 * MILLION,
+            dog_hole:     20 * MILLION,
             clip_buf:     110_00,
             clip_tail:    7_200,
             clip_cusp:    45_00,
