@@ -858,7 +858,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPushGUSDOutInputConduit() public {
         uint256 prevDai = vat.dai(address(vow));
-        DSTokenAbstract gem = DSTokenAbstract(0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd); // GUSD
+        DSTokenAbstract gem = DSTokenAbstract(addr.addr("GUSD"));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
