@@ -42,7 +42,7 @@ contract DssSpellAction is DssAction {
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // ---------- Rates ----------
@@ -145,7 +145,7 @@ contract DssSpellAction is DssAction {
         _updateDoc("RWA009-A", "QmPzuLuJ5Xq6k6Hbop1W5s4V9ksvafYoqcW9sU5QRwz5h1");
 
         // ---------- Delegate Compensation ----------
-        // Forum: TODO
+        // Forum: https://forum.makerdao.com/t/january-2024-aligned-delegate-compensation/23604
 
         // 0xDefensor - 41.67 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
         MKR.transfer(DEFENSOR, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
