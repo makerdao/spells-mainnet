@@ -74,12 +74,16 @@ module = 'contract'
 action = 'verifysourcecode'
 code_format = 'solidity-single-file'
 
-flatten = subprocess.run([
+flatten_output_path = 'out/flat.sol'
+subprocess.run([
     'forge',
     'flatten',
-    contract_path
-], capture_output=True)
-code = flatten.stdout.decode('utf-8')
+    contract_path,
+    '--output',
+    flatten_output_path
+])
+with open(flatten_output_path, 'r', encoding='utf-8') as code_file:
+    code = code_file.read()
 
 def get_block(signature, code, with_frame=False):
     block_and_tail = code[code.find(signature) :]
