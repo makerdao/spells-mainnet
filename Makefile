@@ -9,7 +9,7 @@ estimate             :; ./scripts/estimate-deploy-gas.sh
 deploy               :; ./scripts/deploy.sh
 deploy-info          :; ./scripts/get-deploy-info.sh tx=$(tx)
 verify               :; ./scripts/verify.py DssSpell $(addr)
-flatten              :; hevm flatten --source-file "src/DssSpell.sol" > out/flat.sol
+flatten              :; forge flatten src/DssSpell.sol > out/flat.sol
 diff-deployed-spell  :; ./scripts/diff-deployed-dssspell.sh $(spell)
 check-deployed-spell :; ./scripts/check-deployed-dssspell.sh
 cast-on-tenderly     :; cd ./scripts/cast-on-tenderly/ && npm i && npm start -- $(spell); cd -

@@ -53,8 +53,8 @@ if contract_path == '':
     exit('contract name not found.')
 
 print('Obtaining chain... ')
-seth_chain = subprocess.run(['seth', 'chain'], capture_output=True)
-chain = seth_chain.stdout.decode('ascii').replace('\n', '')
+cast_chain = subprocess.run(['cast', 'chain'], capture_output=True)
+chain = cast_chain.stdout.decode('ascii').replace('\n', '')
 print(chain)
 
 text_metadata = content['contracts'][contract_path][contract_name]['metadata']
@@ -75,9 +75,8 @@ action = 'verifysourcecode'
 code_format = 'solidity-single-file'
 
 flatten = subprocess.run([
-    'hevm',
+    'forge',
     'flatten',
-    '--source-file',
     contract_path
 ], capture_output=True)
 code = flatten.stdout.decode('utf-8')
