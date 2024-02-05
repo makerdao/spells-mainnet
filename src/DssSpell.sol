@@ -100,6 +100,7 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Auction Parameter Updates ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-auction-parameters-changes-1-liquidation-throughput-limit/23508
+        // Vote: https://vote.makerdao.com/polling/QmWLyYW7#poll-detail
 
         // Increase the WSTETH-A Local Liquidation Limit (ilk.hole) by 15 million DAI from 15 million DAI to 30 million DAI.
         DssExecLib.setIlkMaxLiquidationAmount("WSTETH-A", 30 * MILLION);
