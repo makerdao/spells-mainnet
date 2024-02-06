@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import axios from 'axios';
 import { Contract, ethers } from 'ethers';
+import { randomUUID } from 'crypto';
 
-const NETWORK_ID = 1;
+const NETWORK_ID = '1';
 const CHAINLOG_ADDRESS = '0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F';
 const CHIEF_HAT_SLOT = 12;
 const DEFAULT_TRANSACTION_PARAMETERS = { gasLimit: 1_000_000_000 };
@@ -41,27 +42,29 @@ const makeTenderlyApiRequest = async function ({ path, body }) {
             },
         });
     } catch (error) {
+        console.error('makeTenderlyApiRequest error', error.response);
         throw new Error(`tenderly request failed with: ${error.code}`);
     }
 };
 
 const createTenderlyTestnet = async function (spellName) {
+    const slug = `${spellName.replace(/\s+/g, '-').toLowerCase()}-${randomUUID()}`;
     const response = await makeTenderlyApiRequest({
         path: '/testnet/container',
         body: {
-            slug: spellName.replace(/\s+/g, '-').toLowerCase(),
+            slug,
             displayName: spellName,
-            description: '',
+            description: spellName,
             networkConfig: {
-                network_id: NETWORK_ID,
-                blockNumber: 19077397, // TODO replace with 'latest'
+                networkId: NETWORK_ID,
+                blockNumber: '19077397', // TODO replace with 'latest'
                 baseFeePerGas: '1',
                 chainConfig: {
                     chainId: NETWORK_ID,
                 },
             },
             explorerPage: 'DISABLED',
-            syncState: true,
+            syncState: false,
         },
     });
     const testnetId = response.data.container.id;
@@ -108,7 +111,7 @@ const runSpell = async function () {
     console.info('checking the hat...');
     const chief = new Contract(chiefAddress, ['function hat() external view returns (address)'], signer);
     const hatAddress = await chief.hat();
-    if (hatAddress !== SPELL_ADDRESS) {
+    if (hatAddress.toLowerCase() !== SPELL_ADDRESS.toLowerCase()) {
         throw new Error('spell does not have the hat');
     }
 
