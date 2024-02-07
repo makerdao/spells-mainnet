@@ -57,14 +57,14 @@ const createTenderlyTestnet = async function (spellName) {
             description: spellName,
             networkConfig: {
                 networkId: NETWORK_ID,
-                blockNumber: '19077397', // TODO replace with 'latest'
+                blockNumber: 'latest',
                 baseFeePerGas: '1',
                 chainConfig: {
                     chainId: NETWORK_ID,
                 },
             },
-            explorerPage: 'DISABLED',
-            syncState: false,
+            explorerPage: 'ENABLED',
+            syncState: true,
         },
     });
     const testnetId = response.data.container.id;
