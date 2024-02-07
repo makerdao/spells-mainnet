@@ -57,7 +57,7 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
-    // ----------- MKR transfer Addresses -----------
+    // ----------- Payment Addresses -----------
 
     // Delegates
     address internal constant DEFENSOR          = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
