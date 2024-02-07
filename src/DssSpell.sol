@@ -87,7 +87,7 @@ contract DssSpellAction is DssAction {
     // Note: Function from https://github.com/makerdao/spells-mainnet/blob/cd870e3d0a58718de96267b653b8e9b820d673df/archive/2022-11-16-DssSpell/DssSpell.sol#L61C5-L72C6
     function _updateDoc(bytes32 ilk, string memory doc) internal {
         ( , address pip, uint48 tau, ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
-        require(pip != address(0), "DssSpell/unexisting-rwa-ilk");
+        require(pip != address(0), "DssSpell/nonexistent-rwa-ilk");
 
         // Init the RwaLiquidationOracle to reset the doc
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).init(
