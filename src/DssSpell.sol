@@ -83,7 +83,7 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable MKR                                      = GemAbstract(DssExecLib.mkr());
     address internal immutable MIP21_LIQUIDATION_ORACLE                     = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
-    // Note: Function from https://github.com/makerdao/spells-goerli/blob/cd91b3e0ce234038d2e0ae047261177afac6f03c/archive/2024-01-12-DssSpell/DssSpell.sol#L54
+    // Note: Function from https://github.com/makerdao/spells-mainnet/blob/cd870e3d0a58718de96267b653b8e9b820d673df/archive/2022-11-16-DssSpell/DssSpell.sol#L61C5-L72C6
     function _updateDoc(bytes32 ilk, string memory doc) internal {
         ( , address pip, uint48 tau, ) = RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).ilks(ilk);
         require(pip != address(0), "DssSpell/unexisting-rwa-ilk");
