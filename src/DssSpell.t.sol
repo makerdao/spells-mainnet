@@ -75,15 +75,15 @@ contract DssSpellTest is DssSpellTestBase {
         _testUseEta();
     }
 
-    function testContractSize() public skipWhenDeployed {
+    function testContractSize() public skippedWhenDeployed {
         _testContractSize();
     }
 
-    function testDeployCost() public skipWhenDeployed {
+    function testDeployCost() public skippedWhenDeployed {
         _testDeployCost();
     }
 
-    function testBytecodeMatches() public skipWhenNotDeployed {
+    function testBytecodeMatches() public skippedWhenNotDeployed {
         _testBytecodeMatches();
     }
 
@@ -172,7 +172,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipTest { // add the `skipTest` modifier to skip
+    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -186,7 +186,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testCollateralIntegrations() public skipTest { // add the `skipTest` modifier to skip
+    function testCollateralIntegrations() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -203,7 +203,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testIlkClipper() public skipTest { // add the `skipTest` modifier to skip
+    function testIlkClipper() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -218,7 +218,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLerpSurplusBuffer() public skipTest { // add the `skipTest` modifier to skip
+    function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -238,7 +238,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewIlkRegistryValues() public skipTest { // add the `skipTest` modifier to skip
+    function testNewIlkRegistryValues() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -255,7 +255,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testEsmAuth() public { // add the `skipTest` modifier to skip
+    function testEsmAuth() public { // add the `skipped` modifier to skip
         string[1] memory esmAuthorisedContractKeys = [
             "RWA009_A_INPUT_CONDUIT_URN_USDC"
         ];
@@ -281,7 +281,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOSMs() public skipTest { // add the `skipTest` modifier to skip
+    function testOSMs() public skipped { // add the `skipped` modifier to skip
         address READER = address(0);
 
         // Track OSM authorizations here
@@ -294,7 +294,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() public skipTest { // add the `skipTest` modifier to skip
+    function testMedianizers() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -318,7 +318,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 claimedAmount;
     }
 
-    function testVestDAI() public skipTest { // add the `skipTest` modifier to skip
+    function testVestDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
         uint256 NOV_30_2024 = 1733007599;
@@ -384,7 +384,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipTest` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -429,7 +429,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 finPlanned;
     }
 
-    function testYankDAI() public skipTest { // add the `skipTest` modifier to skip
+    function testYankDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 JANUARY_31_2024 = 1706745599;
 
@@ -487,7 +487,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankMKR() public skipTest { // add the `skipTest` modifier to skip
+    function testYankMKR() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 MARCH_31_2024 = 1711929599;
 
@@ -526,7 +526,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testVestMKR() public skipTest { // add the `skipTest` modifier to skip
+    function testVestMKR() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
         uint256 NOV_30_2024 = 1733007599;
@@ -724,7 +724,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
-    function testOffboardings() public skipTest { // add the `skipTest` modifier to skip
+    function testOffboardings() public skipped { // add the `skipped` modifier to skip
         uint256 Art;
         (Art,,,,) = vat.ilks("USDC-A");
         assertGt(Art, 0);
@@ -828,7 +828,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipTest { // add the `skipTest` modifier to skip
+    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -848,7 +848,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public skipTest { // add the `skipTest` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
         address SPARK_SPELL    = address(0xa3836fEF1D314d4c081C2707a7664c3375F29b61);
 

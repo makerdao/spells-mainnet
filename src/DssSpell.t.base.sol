@@ -286,19 +286,19 @@ contract DssSpellTestBase is Config, DssTest {
      *      It will still show in the test report, but with a `[SKIP]` label added to it.
      *      This is meant to be used for tests that need to be enabled/disabled on-demand.
      */
-    modifier skipTest() {
+    modifier skipped() {
         vm.skip(true);
         _;
     }
 
-    modifier skipWhenDeployed() {
+    modifier skippedWhenDeployed() {
         if (spellValues.deployed_spell != address(0)) {
             vm.skip(true);
         }
         _;
     }
 
-    modifier skipWhenNotDeployed() {
+    modifier skippedWhenNotDeployed() {
         if (spellValues.deployed_spell == address(0)) {
             vm.skip(true);
         }
