@@ -74,14 +74,15 @@ contract DssSpellAction is DssAction {
     // AAVE
     address constant internal AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
 
+    // ---------- Contract addresses ----------
+    InputConduitJarLike internal immutable MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR = InputConduitJarLike(DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR"));
+    JarLike internal immutable MCD_PSM_GUSD_A_JAR                           = JarLike(DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A_JAR"));
+    address internal immutable MIP21_LIQUIDATION_ORACLE                     = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    GemAbstract internal immutable MKR                                      = GemAbstract(DssExecLib.mkr());
+
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant HUNDRED = 10 ** 2;
-
-    InputConduitJarLike internal immutable MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR = InputConduitJarLike(DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR"));
-    JarLike internal immutable MCD_PSM_GUSD_A_JAR                           = JarLike(DssExecLib.getChangelogAddress("MCD_PSM_GUSD_A_JAR"));
-    GemAbstract internal immutable MKR                                      = GemAbstract(DssExecLib.mkr());
-    address internal immutable MIP21_LIQUIDATION_ORACLE                     = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
 
     // Note: Function from https://github.com/makerdao/spells-mainnet/blob/cd870e3d0a58718de96267b653b8e9b820d673df/archive/2022-11-16-DssSpell/DssSpell.sol#L61C5-L72C6
     function _updateDoc(bytes32 ilk, string memory doc) internal {
