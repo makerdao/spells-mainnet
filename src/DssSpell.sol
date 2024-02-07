@@ -123,6 +123,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Push GUSD out of input conduit ----------
         // Forum: https://forum.makerdao.com/t/executive-spell-gusd-input-conduit-management/23597
+
         // Raise PSM-GUSD-A DC to 597,660 DAI
         DssExecLib.setIlkDebtCeiling("PSM-GUSD-A", 597_660);
 
@@ -137,6 +138,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Aave SparkLend Revenue Share ----------
         // Forum: https://forum.makerdao.com/t/spark-aave-revenue-share-calculation-payment-2-q4-2023/23593
+
         // Transfer 100,603 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 100_603);
 
@@ -151,22 +153,31 @@ contract DssSpellAction is DssAction {
 
         // 0xDefensor - 41.67 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
         MKR.transfer(DEFENSOR,    41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // BLUE - 41.67 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         MKR.transfer(BLUE,        41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
         MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // Cloaky - 41.67 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
         MKR.transfer(CLOAKY,      41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // TRUE NAME - 41.67 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
         MKR.transfer(TRUENAME,    41.67 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // PBG - 13.89 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
         MKR.transfer(PBG,         13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // UPMaker - 13.89 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
         MKR.transfer(UPMAKER,     13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
         MKR.transfer(VIGILANT,    13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // WBC - 13.89 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
         MKR.transfer(WBC,         13.89 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
+
         // JAG - 13.71 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
         MKR.transfer(JAG,         13.71 ether); // NOTE: ether is a keyword helper, only MKR is transferred here
     }
