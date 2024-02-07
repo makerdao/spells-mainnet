@@ -88,7 +88,7 @@ const runSpell = async function () {
     console.info(`preparing to execute spell ${SPELL_ADDRESS} with name "${spellName}"`);
 
     const { rpcUrlPrivate, explorerUrlPublic } = await createTenderlyTestnet(spellName);
-    console.info('tenderly testnet is created', explorerUrlPublic);
+    console.info('tenderly testnet is created: public explorer url', explorerUrlPublic);
 
     const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
     const signer = provider.getSigner();
