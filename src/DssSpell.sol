@@ -26,7 +26,7 @@ interface RwaLiquidationLike {
 }
 
 interface InputConduitJarLike {
-    function push(uint) external;
+    function push(uint256) external;
 }
 
 interface JarLike {
