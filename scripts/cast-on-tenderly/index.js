@@ -100,7 +100,7 @@ const publishTenderlyTestnet = async function (testnetId) {
     return { rpcUrlPrivate: rpcEndpointPublic.uri, explorerUrlPublic };
 };
 
-const makeSpellTheHat = async function (spellAddress, provider) {
+const giveTheHatToSpell = async function (spellAddress, provider) {
     console.info('fetching the chief address from chainlog...');
     const chainlog = new Contract(
         CHAINLOG_ADDRESS,
@@ -169,7 +169,7 @@ const castOnTenderly = async function (spellAddress) {
 
     const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
 
-    await makeSpellTheHat(spellAddress, provider);
+    await giveTheHatToSpell(spellAddress, provider);
 
     await sheduleWarpAndCastSpell(spellAddress, provider);
 
