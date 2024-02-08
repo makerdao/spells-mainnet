@@ -20,10 +20,10 @@ if (!SPELL_ADDRESS) {
     throw new Error('Please provide address of the spell, e.g.: `node index.js 0x...`');
 }
 
-const getSpellName = async function () {
+const getSpellName = async function (spellAddress) {
     const provider = new ethers.providers.JsonRpcProvider(process.env.ETH_RPC_URL);
     const spell = new Contract(
-        SPELL_ADDRESS,
+        spellAddress,
         ['function description() external view returns (string memory)'],
         provider
     );
@@ -31,10 +31,10 @@ const getSpellName = async function () {
     return description.split('|')[0].trim();
 };
 
-const makeTenderlyApiRequest = async function ({ path, body }) {
+const makeTenderlyApiRequest = async function ({ method, path, body }) {
     const API_BASE = `https://api.tenderly.co/api/v1/account/${process.env.TENDERLY_USER}/project/${process.env.TENDERLY_PROJECT}`;
     try {
-        return await axios.post(`${API_BASE}${path}`, body, {
+        return await axios[method](`${API_BASE}${path}`, body, {
             headers: {
                 'content-type': 'application/json',
                 accept: 'application/json, text/plain, */*',
@@ -50,6 +50,7 @@ const makeTenderlyApiRequest = async function ({ path, body }) {
 const createTenderlyTestnet = async function (spellName) {
     const slug = `${spellName.replace(/\s+/g, '-').toLowerCase()}-${randomUUID()}`;
     const response = await makeTenderlyApiRequest({
+        method: 'post',
         path: '/testnet/container',
         body: {
             slug,
@@ -63,7 +64,7 @@ const createTenderlyTestnet = async function (spellName) {
                     chainId: NETWORK_ID,
                 },
             },
-            explorerPage: 'ENABLED',
+            explorerPage: 'DISABLED',
             syncState: true,
         },
     });
@@ -83,12 +84,25 @@ const createTenderlyTestnet = async function (spellName) {
     };
 };
 
-const runSpell = async function () {
-    const spellName = await getSpellName(SPELL_ADDRESS);
-    console.info(`preparing to execute spell ${SPELL_ADDRESS} with name "${spellName}"`);
+const publishTenderlyTestnet = async function (testnetId) {
+    const response = await makeTenderlyApiRequest({
+        method: 'put',
+        path: `/testnet/container/${testnetId}`,
+        body: {
+            explorerPage: 'ENABLED',
+        },
+    });
+    if (response.data?.container?.explorer_page !== 'ENABLED') {
+        throw new Error('failed to publish testnet');
+    }
+};
 
-    const { rpcUrlPrivate, explorerUrlPublic } = await createTenderlyTestnet(spellName);
-    console.info('tenderly testnet is created: public explorer url', explorerUrlPublic);
+const runSpell = async function (spellAddress) {
+    const spellName = await getSpellName(spellAddress);
+    console.info(`preparing to execute spell ${spellAddress} with name "${spellName}"`);
+
+    const { testnetId, explorerUrlPublic, rpcUrlPrivate } = await createTenderlyTestnet(spellName);
+    console.info(`tenderly testnet "${testnetId}" is created`);
 
     const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
     const signer = provider.getSigner();
@@ -105,18 +119,18 @@ const runSpell = async function () {
     await provider.send('tenderly_setStorageAt', [
         chiefAddress,
         ethers.utils.hexZeroPad(ethers.utils.hexValue(CHIEF_HAT_SLOT), 32),
-        ethers.utils.hexZeroPad(SPELL_ADDRESS, 32),
+        ethers.utils.hexZeroPad(spellAddress, 32),
     ]);
 
     console.info('checking the hat...');
     const chief = new Contract(chiefAddress, ['function hat() external view returns (address)'], signer);
     const hatAddress = await chief.hat();
-    if (hatAddress.toLowerCase() !== SPELL_ADDRESS.toLowerCase()) {
+    if (hatAddress.toLowerCase() !== spellAddress.toLowerCase()) {
         throw new Error('spell does not have the hat');
     }
 
     const spell = new Contract(
-        SPELL_ADDRESS,
+        spellAddress,
         [
             'function schedule() external',
             'function cast() external',
@@ -124,7 +138,8 @@ const runSpell = async function () {
         ],
         signer
     );
-    console.info('scheduling spell on a fork...');
+
+    console.info('scheduling spell...');
     try {
         const scheduleTx = await spell.schedule(DEFAULT_TRANSACTION_PARAMETERS);
         await scheduleTx.wait();
@@ -147,6 +162,11 @@ const runSpell = async function () {
     } catch (error) {
         console.error('casting failed', error);
     }
+
+    console.info(`making tenderly testnet "${testnetId}" public...`);
+    await publishTenderlyTestnet(testnetId);
+    console.info(`tenderly testnet is now public and discoverable`);
+    console.info(`public explorer url: ${explorerUrlPublic}`);
 };
 
-runSpell();
+runSpell(SPELL_ADDRESS);
