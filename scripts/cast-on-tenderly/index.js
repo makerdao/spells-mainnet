@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { Contract, ethers } from 'ethers';
+import { Contract, ethers, utils } from 'ethers';
 import { randomUUID } from 'crypto';
 
 const NETWORK_ID = '1';
@@ -69,22 +69,18 @@ const createTenderlyTestnet = async function (spellName) {
         },
     });
     const testnetId = response.data.container.id;
-    const rpcEndpointPublic = response.data.container.connectivityConfig.endpoints.find(
-        endpoint => endpoint.displayName === 'testnet'
-    );
     const rpcEndpointPrivate = response.data.container.connectivityConfig.endpoints.find(
         endpoint => endpoint.displayName === 'unlocked'
     );
-    const explorerUrlPublic = `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`;
+    console.info(`tenderly testnet "${testnetId}" is created`);
     return {
         testnetId,
-        explorerUrlPublic,
-        rpcUrlPublic: rpcEndpointPublic.uri,
         rpcUrlPrivate: rpcEndpointPrivate.uri,
     };
 };
 
 const publishTenderlyTestnet = async function (testnetId) {
+    console.info(`making tenderly testnet "${testnetId}" public...`);
     const response = await makeTenderlyApiRequest({
         method: 'put',
         path: `/testnet/container/${testnetId}`,
@@ -95,23 +91,21 @@ const publishTenderlyTestnet = async function (testnetId) {
     if (response.data?.container?.explorer_page !== 'ENABLED') {
         throw new Error('failed to publish testnet');
     }
+    console.info(`tenderly testnet is now public and discoverable`);
+    const rpcEndpointPublic = response.data.container.connectivityConfig.endpoints.find(
+        endpoint => endpoint.displayName === 'testnet'
+    );
+    const explorerUrlPublic = `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`;
+    console.info(`public explorer url: ${explorerUrlPublic}`);
+    return { rpcUrlPrivate: rpcEndpointPublic.uri, explorerUrlPublic };
 };
 
-const runSpell = async function (spellAddress) {
-    const spellName = await getSpellName(spellAddress);
-    console.info(`preparing to execute spell ${spellAddress} with name "${spellName}"`);
-
-    const { testnetId, explorerUrlPublic, rpcUrlPrivate } = await createTenderlyTestnet(spellName);
-    console.info(`tenderly testnet "${testnetId}" is created`);
-
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
-    const signer = provider.getSigner();
-
+const makeSpellTheHat = async function (spellAddress, provider) {
     console.info('fetching the chief address from chainlog...');
     const chainlog = new Contract(
         CHAINLOG_ADDRESS,
         ['function getAddress(bytes32) external view returns (address)'],
-        signer
+        provider.getSigner()
     );
     const chiefAddress = await chainlog.getAddress(ethers.utils.formatBytes32String('MCD_ADM'));
 
@@ -123,12 +117,15 @@ const runSpell = async function (spellAddress) {
     ]);
 
     console.info('checking the hat...');
-    const chief = new Contract(chiefAddress, ['function hat() external view returns (address)'], signer);
+    const chief = new Contract(chiefAddress, ['function hat() external view returns (address)'], provider.getSigner());
     const hatAddress = await chief.hat();
-    if (hatAddress.toLowerCase() !== spellAddress.toLowerCase()) {
+    if (hatAddress !== spellAddress) {
         throw new Error('spell does not have the hat');
     }
+    console.info('spell have the hat...');
+};
 
+const sheduleWarpAndCastSpell = async function (spellAddress, provider) {
     const spell = new Contract(
         spellAddress,
         [
@@ -136,10 +133,10 @@ const runSpell = async function (spellAddress) {
             'function cast() external',
             'function nextCastTime() external view returns (uint256)',
         ],
-        signer
+        provider.getSigner()
     );
 
-    console.info('scheduling spell...');
+    console.info('scheduling the spell...');
     try {
         const scheduleTx = await spell.schedule(DEFAULT_TRANSACTION_PARAMETERS);
         await scheduleTx.wait();
@@ -162,11 +159,21 @@ const runSpell = async function (spellAddress) {
     } catch (error) {
         console.error('casting failed', error);
     }
-
-    console.info(`making tenderly testnet "${testnetId}" public...`);
-    await publishTenderlyTestnet(testnetId);
-    console.info(`tenderly testnet is now public and discoverable`);
-    console.info(`public explorer url: ${explorerUrlPublic}`);
 };
 
-runSpell(SPELL_ADDRESS);
+const castOnTenderly = async function (spellAddress) {
+    const spellName = await getSpellName(spellAddress);
+    console.info(`preparing to cast spell "${spellAddress}" with name "${spellName}"...`);
+
+    const { testnetId, rpcUrlPrivate } = await createTenderlyTestnet(spellName);
+
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
+
+    await makeSpellTheHat(spellAddress, provider);
+
+    await sheduleWarpAndCastSpell(spellAddress, provider);
+
+    await publishTenderlyTestnet(testnetId);
+};
+
+castOnTenderly(utils.getAddress(SPELL_ADDRESS));
