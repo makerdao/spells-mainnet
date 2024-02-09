@@ -160,7 +160,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
-    function testOracleList() private { // TODO: check if this test can be removed for good.
+    function testOracleList() public skipped { // TODO: check if this test can be removed for good.
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
 
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 0);
@@ -458,7 +458,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankDAILegacy() private { // TODO: check if this test can be removed for good.
+    function testYankDAILegacy() public skipped { // TODO: check if this test can be removed for good.
         // Provide human-readable names for timestamps
         uint256 SEPTEMBER_01_2024 = 1725148800;
 
@@ -648,7 +648,7 @@ contract DssSpellTest is DssSpellTestBase {
         rootDomain = new RootDomain(config, getRelativeChain("mainnet"));
     }
 
-    function testL2OptimismSpell() private { // TODO: check if this test can be removed for good.
+    function testL2OptimismSpell() public skipped { // TODO: check if this test can be removed for good.
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("OPTIMISM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
@@ -684,7 +684,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(optimismGateway.validDomains(optDstDomain), 0, "l2-optimism-invalid-dst-domain");
     }
 
-    function testL2ArbitrumSpell() private { // TODO: check if this test can be removed for good.
+    function testL2ArbitrumSpell() public skipped { // TODO: check if this test can be removed for good.
         // Ensure the Arbitrum Gov Relay has some ETH to pay for the Arbitrum spell
         assertGt(chainLog.getAddress("ARBITRUM_GOV_RELAY").balance, 0);
 
