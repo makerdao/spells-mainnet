@@ -384,7 +384,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipped` modifier to skip
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -566,7 +566,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // make public to enable
+    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -839,22 +839,4 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    string RWA009_OLDDOC = "QmfEgZuiw6wsTRUYerdPZNUrqDXSGM6Nm4fM3nG7nNbEjT";
-    string RWA009_NEWDOC = "QmPzuLuJ5Xq6k6Hbop1W5s4V9ksvafYoqcW9sU5QRwz5h1";
-
-    function testRWA009DocChange() public {
-        _checkRWADocUpdate("RWA009-A", RWA009_OLDDOC, RWA009_NEWDOC);
-    }
-
-    function testPushGUSDOutInputConduit() public {
-        uint256 prevDai = vat.dai(address(vow));
-        DSTokenAbstract gem = DSTokenAbstract(addr.addr("GUSD"));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(vat.dai(address(vow)), prevDai + 597_659 * RAD);
-        assertEq(gem.balanceOf(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")), 0);
-    }
 }
