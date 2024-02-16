@@ -44,7 +44,79 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     function actions() public override {
+        // ---------- Stability Fee Changes ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-9/23688
 
+        // Decrease the ETH-A Stability Fee (SF) by 0.33 percentage points, from 6.74% to 6.41%.
+        // TODO
+
+        // Decrease the ETH-B Stability Fee (SF) by 0.33 percentage points, from 7.24% to 6.91%.
+        // TODO
+
+        // Decrease the ETH-C Stability Fee (SF) by 0.33 percentage points, from 6.49% to 6.16%.
+        // TODO
+
+        // Decrease the WSTETH-A Stability Fee (SF) by 0.51 percentage points, from 7.16% to 6.65%.
+        // TODO
+
+        // Decrease the WSTETH-B Stability Fee (SF) by 0.51 percentage points, from 6.91% to 6.40%.
+        // TODO
+
+        // Decrease the WBTC-A Stability Fee (SF) by 0.02 percentage points, from 6.70% to 6.68%.
+        // TODO
+
+        // Decrease the WBTC-B Stability Fee (SF) by 0.02 percentage points, from 7.20% to 7.18%.
+        // TODO
+
+        // Decrease the WBTC-C Stability Fee (SF) by 0.02 percentage points, from 6.45% to 6.43%.
+        // TODO
+
+        // ---------- Spark Protocol DC-IAM Parameter Changes (main spell) ----------
+        // Forum: https://forum.makerdao.com/t/feb-9-2024-proposed-changes-to-sparklend-for-upcoming-spell/23656
+        // Poll: https://vote.makerdao.com/polling/QmS8ch8r
+
+        // Increase the DIRECT-SPARK-DAI Maximum Debt Ceiling (line) by 300 million DAI from 1.2 billion DAI to 1.5 billion DAI.
+        // TODO
+
+        // Increase the DIRECT-SPARK-DAI Target Available Debt (gap) by 20 million DAI from 20 million DAI to 40 million DAI.
+        // TODO
+
+        // Increase the DIRECT-SPARK-DAI Ceiling Increase Cooldown (ttl) by 12 hours from 12 hours to 24 hours.
+        // TODO
+
+        // Increase the DIRECT-SPARK-DAI buffer by 20 million DAI from 30 million DAI to 50 million DAI.
+        // TODO
+
+        // ---------- Push USDP out of input conduit ----------
+
+        // Raise PSM-PAX-A DC to 1,000,000 DAI
+        // TODO
+
+        // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 527,109.44 USDP
+        // TODO
+
+        // Call void() on MCD_PSM_PAX_A_JAR
+        // TODO
+
+        // Set PSM-PAX-A DC to 0 DAI
+        // TODO
+
+        // ---------- yank vest streams ----------
+
+        // yank BA Labs DAI stream 20
+        // TODO
+
+        // yank BA Labs DAI stream 21
+        // TODO
+
+        // yank BA Labs MKR stream 35
+        // TODO
+
+        // ---------- Trigger Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/feb-14-2024-proposed-changes-to-sparklend-for-upcoming-spell/23684
+
+        // Activate Spark Proxy Spell - TBD
+        // TODO
     }
 }
 
