@@ -857,17 +857,19 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testPushPAXOutInputConduit() public {
-        uint256 prevDai = vat.dai(address(vow));
         DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
-        uint256 prevGemBalance = gem.balanceOf(address(this));
+        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        uint256 prevDai = vat.dai(address(vow));
+        uint256 prevGemBalance = gem.balanceOf(address(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR));
+        uint256 gemBalanceToPush = 527_109_44; // 2 decimal places
 
-        assertGe(gem.balanceOf(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")) * 100, 527_109_44, "testPushPAXOutInputConduit/balance-too-low");
+        assertGe(prevGemBalance, gemBalanceToPush * WAD / 100);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertGe(vat.dai(address(vow)), prevDai + 527_109_44 * RAD / 100);
-        assertEq(gem.balanceOf(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")), prevGemBalance * 100 - 527_109_44, "testPushPAXOutInputConduit/balance-not-match");
+        assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAD / 100);
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), prevGemBalance - gemBalanceToPush * WAD / 100);
     }
 }
