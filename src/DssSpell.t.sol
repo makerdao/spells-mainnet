@@ -869,6 +869,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
+        // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
         assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAD / 100);
         assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), prevGemBalance - gemBalanceToPush * WAD / 100);
     }
