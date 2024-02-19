@@ -44,6 +44,10 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface DirectSparkDaiPlanLike {
+    function buffer() external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -429,17 +433,19 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 finPlanned;
     }
 
-    function testYankDAI() public skipped { // add the `skipped` modifier to skip
+    function testYankDAI() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 JANUARY_31_2024 = 1706745599;
+        uint256 FEB_29_2024 = 1709251199;
+        uint256 MAR_31_2024 = 1711929599;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
         //   the address of the stream
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
-        Yank[1] memory yanks = [
-            Yank(15, wallets.addr("SES_WALLET"), JANUARY_31_2024)
+        Yank[2] memory yanks = [
+            Yank(20, wallets.addr("BA_LABS"), FEB_29_2024),
+            Yank(21, wallets.addr("BA_LABS"), MAR_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
@@ -458,25 +464,24 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankMKR() public skipped { // add the `skipped` modifier to skip
+    function testYankMKR() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 MARCH_31_2024 = 1711929599;
+        uint256 MAR_31_2024 = 1711929599;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
         //   the address of the stream
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
-        Yank[2] memory yanks = [
-            Yank(32, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
-            Yank(33, wallets.addr("TECH"), MARCH_31_2024)
+        Yank[1] memory yanks = [
+            Yank(35, wallets.addr("BA_LABS"), MAR_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         for (uint256 i = 0; i < yanks.length; i++) {
-            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
-            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankMKR/unexpected-address");
+            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankMKR/unexpected-fin-date");
         }
 
         _vote(address(spell));
@@ -484,7 +489,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
         for (uint256 i = 0; i < yanks.length; i++) {
             // Test stream.fin is set to the current block after the spell
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankMKR/steam-not-yanked");
 
             // Give admin powers to test contract address and make the vesting unrestricted for testing
             GodMode.setWard(address(vestTreasury), address(this), 1);
@@ -493,7 +498,7 @@ contract DssSpellTest is DssSpellTestBase {
             vestTreasury.unrestrict(yanks[i].streamId);
             vestTreasury.vest(yanks[i].streamId);
             assertTrue(!vestTreasury.valid(yanks[i].streamId));
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-fin-changed");
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankMKR/steam-fin-changed");
         }
     }
 
@@ -839,4 +844,30 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    function testDIRECTSPARKDAIBuffer() public {
+        DirectSparkDaiPlanLike DIRECT_SPARK_DAI_PLAN = DirectSparkDaiPlanLike(addr.addr("DIRECT_SPARK_DAI_PLAN"));
+
+        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 30 * MILLION * WAD);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 50 * MILLION * WAD);
+    }
+
+    function testPushPAXOutInputConduit() public {
+        uint256 prevDai = vat.dai(address(vow));
+        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
+        uint256 prevGemBalance = gem.balanceOf(address(this));
+
+        assertGe(gem.balanceOf(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")) * 100, 527_109_44, "testPushPAXOutInputConduit/balance-too-low");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertGe(vat.dai(address(vow)), prevDai + 527_109_44 * RAD / 100);
+        assertEq(gem.balanceOf(addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR")), prevGemBalance * 100 - 527_109_44, "testPushPAXOutInputConduit/balance-not-match");
+    }
 }
