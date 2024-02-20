@@ -1,0 +1,5 @@
+ds-test/=lib/dss-test/lib/forge-std/lib/ds-test/src/
+dss-exec-lib/=lib/dss-exec-lib/src/
+dss-interfaces/=lib/dss-test/lib/dss-interfaces/src/
+dss-test/=lib/dss-test/src/
+forge-std/=lib/dss-test/lib/forge-std/src/
