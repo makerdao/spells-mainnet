@@ -862,7 +862,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 prevDai = vat.dai(address(vow));
         uint256 gemBalanceToPush = 754_598_72; // 2 decimal places
 
-        assertGe(gem.balanceOf(address(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR)), gemBalanceToPush * WAD / 100);
+        assertGe(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush * WAD / 100);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
