@@ -860,10 +860,9 @@ contract DssSpellTest is DssSpellTestBase {
         DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
         address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
         uint256 prevDai = vat.dai(address(vow));
-        uint256 prevGemBalance = gem.balanceOf(address(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR));
-        uint256 gemBalanceToPush = 527_109_44; // 2 decimal places
+        uint256 gemBalanceToPush = 754_598_72; // 2 decimal places
 
-        assertGe(prevGemBalance, gemBalanceToPush * WAD / 100);
+        assertGe(gem.balanceOf(address(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR)), gemBalanceToPush * WAD / 100);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -871,6 +870,6 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
         assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAD / 100);
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), prevGemBalance - gemBalanceToPush * WAD / 100);
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
     }
 }

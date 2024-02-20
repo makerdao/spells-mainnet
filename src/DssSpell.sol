@@ -117,8 +117,8 @@ contract DssSpellAction is DssAction {
         // Raise PSM-PAX-A DC to 1,000,000 DAI
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", MILLION);
 
-        // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 527,109.44 USDP
-        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(527_109_44 * WAD / 100); // Note: adjusting value to WAD and decimal in the amount
+        // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 754,598.72 USDP
+        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(754_598_72 * WAD / 100); // Note: adjusting value to WAD and decimal in the amount
 
         // Call void() on MCD_PSM_PAX_A_JAR
         MCD_PSM_PAX_A_JAR.void();
