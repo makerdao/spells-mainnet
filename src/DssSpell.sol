@@ -28,12 +28,16 @@ interface JarLike {
     function void() external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/ab5af3e3179d17d7a91a97ac0fec234bec0e26bb/governance/votes/Executive%20vote%20-%20February%2022%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-02-22 MakerDAO Executive Spell | Hash: TODO";
+        "2024-02-22 MakerDAO Executive Spell | Hash: 0xfbaf5ce577a6f054a014681eacff991c409f625b8146e8f8bdcd4f8f58ab386d";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -70,6 +74,11 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_MKR_TREASURY                       = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     InputConduitJarLike internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = InputConduitJarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"));
     JarLike internal immutable MCD_PSM_PAX_A_JAR                           = JarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR"));
+
+    // ---------- Trigger Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
 
     function actions() public override {
         // ---------- Stability Fee Changes ----------
@@ -141,8 +150,8 @@ contract DssSpellAction is DssAction {
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/feb-14-2024-proposed-changes-to-sparklend-for-upcoming-spell/23684
 
-        // Activate Spark Proxy Spell - TBD
-        // TODO
+        // Activate Spark Proxy Spell - 0x5D9406F377e6aFebAE18552806EA327eC7B10000
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 

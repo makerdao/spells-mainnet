@@ -824,9 +824,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = address(0xa3836fEF1D314d4c081C2707a7664c3375F29b61);
+        address SPARK_SPELL    = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
 
         vm.expectCall(
             SUBPROXY_SPARK,
