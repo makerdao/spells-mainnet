@@ -825,14 +825,14 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
 
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
-        address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-        address SPARK_SPELL    = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
+        address SPARK_PROXY = addr.addr('SPARK_PROXY');
+        address SPARK_SPELL = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
 
         vm.expectCall(
-            SUBPROXY_SPARK,
+            SPARK_PROXY,
             /* value = */ 0,
             abi.encodeCall(
-                ProxyLike(SUBPROXY_SPARK).exec,
+                ProxyLike(SPARK_PROXY).exec,
                 (SPARK_SPELL, abi.encodeWithSignature("execute()"))
             )
         );
