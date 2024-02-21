@@ -127,7 +127,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", MILLION);
 
         // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 754,598.72 USDP
-        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(754_598_72 * WAD / 100); // Note: adjusting value to WAD and decimal in the amount
+        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(754_598.72 ether); // Note: `ether` is only a keyword helper
 
         // Call void() on MCD_PSM_PAX_A_JAR
         MCD_PSM_PAX_A_JAR.void();
