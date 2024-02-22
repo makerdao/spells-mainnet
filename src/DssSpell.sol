@@ -149,6 +149,8 @@ contract DssSpellAction is DssAction {
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/feb-14-2024-proposed-changes-to-sparklend-for-upcoming-spell/23684
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-9/23688#stability-fee-changes-8
+        // Poll: https://vote.makerdao.com/polling/QmQC1UXZ
 
         // Activate Spark Proxy Spell - 0x5D9406F377e6aFebAE18552806EA327eC7B10000
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
