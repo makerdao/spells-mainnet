@@ -169,6 +169,7 @@ contract Wallets {
         addr["CLOAKY"]                       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
         addr["SKYNET"]                       = 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3;
         addr["BLUE"]                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+        addr["PIPKIN"]                       = 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;

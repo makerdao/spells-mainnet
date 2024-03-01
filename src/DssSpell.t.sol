@@ -44,10 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface DirectSparkDaiPlanLike {
-    function buffer() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -388,15 +384,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            Payee(wallets.addr("AAVE_V3_TREASURY"), 100_603)
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 3_000_000)
         ];
-        uint256 expectedSumPayments = 100_603; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 3_000_000; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -433,7 +429,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 finPlanned;
     }
 
-    function testYankDAI() public { // add the `skipped` modifier to skip
+    function testYankDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 FEB_29_2024 = 1709251199;
         uint256 MAR_31_2024 = 1711929599;
@@ -464,7 +460,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankMKR() public { // add the `skipped` modifier to skip
+    function testYankMKR() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 MAR_31_2024 = 1711929599;
 
@@ -571,25 +567,29 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
+    function testMKRPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[10] memory payees = [
-            Payee(wallets.addr("DEFENSOR"),    41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BLUE"),        41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"),      41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("TRUENAME"),    41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"),         13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"),     13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"),    13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"),         13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JAG"),         13.71 ether)  // Note: ether is a keyword helper, only MKR is transferred here
+        Payee[14] memory payees = [
+            Payee(wallets.addr("BLUE"),                           41.67 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BONAPUBLICA"),                    41.67 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"),                         41.67 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("TRUENAME"),                       41.67 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("DEFENSOR"),                       23.705 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JAG"),                            13.89 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("UPMAKER"),                        13.89 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VIGILANT"),                       13.89 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"),                            13.44 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PIPKIN"),                         5.82 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("QGOV"),                           4.48 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("WBC"),                            4.03 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"),         500 ether),  // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("VENICE_TREE"),                    20.835 ether)  // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 277.62 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 780.66 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -826,7 +826,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
+        address SPARK_SPELL = address(0);
 
         vm.expectCall(
             SPARK_PROXY,
@@ -843,33 +843,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testDIRECTSPARKDAIBuffer() public {
-        DirectSparkDaiPlanLike DIRECT_SPARK_DAI_PLAN = DirectSparkDaiPlanLike(addr.addr("DIRECT_SPARK_DAI_PLAN"));
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 30 * MILLION * WAD);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 50 * MILLION * WAD);
-    }
-
-    function testPushPAXOutInputConduit() public {
-        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
-        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        uint256 prevDai = vat.dai(address(vow));
-        uint256 gemBalanceToPush = 754_598.72 ether; // `ether` is only a keyword helper
-
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
-        assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAY);
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
-    }
 }

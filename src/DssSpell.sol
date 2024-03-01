@@ -18,15 +18,7 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
-
-interface InputConduitJarLike {
-    function push(uint256) external;
-}
-
-interface JarLike {
-    function void() external;
-}
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
@@ -35,14 +27,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/ab5af3e3179d17d7a91a97ac0fec234bec0e26bb/governance/votes/Executive%20vote%20-%20February%2022%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-02-22 MakerDAO Executive Spell | Hash: 0xfbaf5ce577a6f054a014681eacff991c409f625b8146e8f8bdcd4f8f58ab386d";
-
-    // Set office hours according to the summary
-    function officeHours() public pure override returns (bool) {
-        return false;
-    }
+        "2024-02-22 MakerDAO Executive Spell | Hash: TODO";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -55,104 +42,109 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant SIX_PT_ONE_SIX_PCT_RATE     = 1000000001895522707144698926;
-    uint256 internal constant SIX_PT_FOUR_PCT_RATE        = 1000000001967129343622160710;
-    uint256 internal constant SIX_PT_FOUR_ONE_PCT_RATE    = 1000000001970109447195256751;
-    uint256 internal constant SIX_PT_FOUR_THREE_PCT_RATE  = 1000000001976068814257775407;
-    uint256 internal constant SIX_PT_SIX_FIVE_PCT_RATE    = 1000000002041548040175924154;
-    uint256 internal constant SIX_PT_SIX_EIGHT_PCT_RATE   = 1000000002050466558600245373;
-    uint256 internal constant SIX_PT_NINE_ONE_PCT_RATE    = 1000000002118758660201099744;
-    uint256 internal constant SEVEN_PT_ONE_EIGHT_PCT_RATE = 1000000002198740428552847104;
 
     //  ---------- Math ----------
-    uint256 internal constant WAD      = 10 ** 18;
-    uint256 internal constant MILLION  = 10 ** 6;
+    uint256 internal constant MILLION                = 10 ** 6;
 
     // ---------- Contract addresses ----------
-    address internal immutable DIRECT_SPARK_DAI_PLAN                       = DssExecLib.getChangelogAddress("DIRECT_SPARK_DAI_PLAN");
-    address internal immutable MCD_VEST_DAI                                = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
-    address internal immutable MCD_VEST_MKR_TREASURY                       = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
-    InputConduitJarLike internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = InputConduitJarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"));
-    JarLike internal immutable MCD_PSM_PAX_A_JAR                           = JarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR"));
+    GemAbstract internal immutable MKR               = GemAbstract(DssExecLib.mkr());
+    address internal immutable MCD_FLAP              = DssExecLib.flap();
+
+    // ---------- Launch Project Funds ----------
+    address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
+
+    // ---------- Whistleblower Bounty ----------
+    address internal constant VENICE_TREE            = 0xCDDd2A697d472d1e8a0B1B188646c756d097b058;
+
+    // ---------- Delegate Compensation ----------
+    address internal constant BLUE                   = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BONAPUBLICA            = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant CLOAKY                 = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant TRUENAME               = 0x612F7924c367575a0Edf21333D96b15F1B345A5d;
+    address internal constant DEFENSOR               = 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9;
+    address internal constant JAG                    = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
+    address internal constant UPMAKER                = 0xbB819DF169670DC71A16F58F55956FE642cc6BcD;
+    address internal constant VIGILANT               = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant PBG                    = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant PIPKIN                 = 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7;
+    address internal constant QGOV                   = 0xB0524D8707F76c681901b782372EbeD2d4bA28a6;
+    address internal constant WBC                    = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
 
     // ---------- Trigger Spark Proxy Spell ----------
-    // Spark Proxy: https://github.com/marsfoundation/sparklend/blob/d42587ba36523dcff24a4c827dc29ab71cd0808b/script/output/1/primary-sce-latest.json#L2
-    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY            = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL            = address(0);
 
     function actions() public override {
-        // ---------- Stability Fee Changes ----------
-        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-9/23688
+        // ---------- Delegate Compensation for February 2024 ----------
+        // Forum: https://forum.makerdao.com/t/february-2024-aligned-delegate-compensation/23766
 
-        // Decrease the ETH-A Stability Fee (SF) by 0.33 percentage points, from 6.74% to 6.41%.
-        DssExecLib.setIlkStabilityFee("ETH-A", SIX_PT_FOUR_ONE_PCT_RATE, true);
+        // BLUE - 41.67 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        MKR.transfer(BLUE, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // Cloaky - 41.67 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // TRUE NAME - 41.67 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
+        MKR.transfer(TRUENAME, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // 0xDefensor - 23.705 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        MKR.transfer(DEFENSOR, 23.705 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // JAG - 13.89 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
+        MKR.transfer(JAG, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // UPMaker - 13.89 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
+        MKR.transfer(UPMAKER, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // PBG - 13.44 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG, 13.44 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // Pipkin - 5.82 MKR - 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7
+        MKR.transfer(PIPKIN, 5.82 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // QGov - 4.48 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
+        MKR.transfer(QGOV, 4.48 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // WBC - 4.03 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        MKR.transfer(WBC, 4.03 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Decrease the ETH-B Stability Fee (SF) by 0.33 percentage points, from 7.24% to 6.91%.
-        DssExecLib.setIlkStabilityFee("ETH-B", SIX_PT_NINE_ONE_PCT_RATE, true);
+        // ---------- Smart Burn Engine `hop` Update ----------
+        // Forum: https://forum.makerdao.com/t/smart-burn-engine-the-rate-of-mkr-accumulation-reconfiguration-and-transaction-analysis-parameter-reconfiguration-update-5/23737
+        // Poll: https://vote.makerdao.com/polling/Qmat6oFs
 
-        // Decrease the ETH-C Stability Fee (SF) by 0.33 percentage points, from 6.49% to 6.16%.
-        DssExecLib.setIlkStabilityFee("ETH-C", SIX_PT_ONE_SIX_PCT_RATE, true);
+        // Decrease the hop by 6,570 seconds from 26,280 seconds to 19,710 seconds.
+        DssExecLib.setValue(MCD_FLAP, "hop", 19_710);
 
-        // Decrease the WSTETH-A Stability Fee (SF) by 0.51 percentage points, from 7.16% to 6.65%.
-        DssExecLib.setIlkStabilityFee("WSTETH-A", SIX_PT_SIX_FIVE_PCT_RATE, true);
 
-        // Decrease the WSTETH-B Stability Fee (SF) by 0.51 percentage points, from 6.91% to 6.40%.
-        DssExecLib.setIlkStabilityFee("WSTETH-B", SIX_PT_FOUR_PCT_RATE, true);
+        // ---------- Launch Project Funding ----------
+        // Forum: http://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/12
+        // MIP: https://mips.makerdao.com/mips/details/MIP108#9-launch-project
 
-        // Decrease the WBTC-A Stability Fee (SF) by 0.02 percentage points, from 6.70% to 6.68%.
-        DssExecLib.setIlkStabilityFee("WBTC-A", SIX_PT_SIX_EIGHT_PCT_RATE, true);
+        // Transfer 3,000,000 DAI to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 3_000_000);
+        // Transfer 500 MKR to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        MKR.transfer(LAUNCH_PROJECT_FUNDING, 500.00 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Decrease the WBTC-B Stability Fee (SF) by 0.02 percentage points, from 7.20% to 7.18%.
-        DssExecLib.setIlkStabilityFee("WBTC-B", SEVEN_PT_ONE_EIGHT_PCT_RATE, true);
 
-        // Decrease the WBTC-C Stability Fee (SF) by 0.02 percentage points, from 6.45% to 6.43%.
-        DssExecLib.setIlkStabilityFee("WBTC-C", SIX_PT_FOUR_THREE_PCT_RATE, true);
+        // ---------- Whistleblower Bounty Payment ----------
+        // Forum: http://forum.makerdao.com/t/ad-derecognition-due-to-operational-security-breach-02-02-2024/23619/10
 
-        // ---------- Spark Protocol DC-IAM Parameter Changes (main spell) ----------
-        // Forum: https://forum.makerdao.com/t/feb-9-2024-proposed-changes-to-sparklend-for-upcoming-spell/23656
-        // Poll: https://vote.makerdao.com/polling/QmS8ch8r
+        // Transfer 20.835 MKR to whistelblower at 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
+        MKR.transfer(VENICE_TREE, 20.835 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Increase the DIRECT-SPARK-DAI Maximum Debt Ceiling (line) by 300 million DAI from 1.2 billion DAI to 1.5 billion DAI.
-        // Increase the DIRECT-SPARK-DAI Target Available Debt (gap) by 20 million DAI from 20 million DAI to 40 million DAI.
-        // Increase the DIRECT-SPARK-DAI Ceiling Increase Cooldown (ttl) by 12 hours from 12 hours to 24 hours.
-        DssExecLib.setIlkAutoLineParameters("DIRECT-SPARK-DAI", /* line = */ 1500 * MILLION, /* gap = */ 40 * MILLION, /* ttl = */ 24 hours);
 
-        // Increase the DIRECT-SPARK-DAI buffer by 20 million DAI from 30 million DAI to 50 million DAI.
-        DssExecLib.setValue(DIRECT_SPARK_DAI_PLAN, "buffer", 50 * MILLION * WAD); // NOTE: adjusting DIRECT_SPARK_DAI_PLAN.buffer value to WAD
+        // ---------- WBTC vault gap Changes ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-10-wbtc-a-c-dc-iam-gap/23765
+        // Forum: http://forum.makerdao.com/t/stability-scope-parameter-changes-10-wbtc-a-c-dc-iam-gap/23765/2
 
-        // ---------- Push USDP out of input conduit ----------
-        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-02-22/23697
+        // Increase the WBTC-A gap by 2 million DAI from 2 million DAI to 4 million DAI
+        DssExecLib.setIlkAutoLineParameters("WBTC-A", /* line = */ 500 * MILLION, /* gap = */ 4 * MILLION, /* ttl = */ 24 hours);
 
-        // Raise PSM-PAX-A DC to 1,000,000 DAI
-        DssExecLib.setIlkDebtCeiling("PSM-PAX-A", MILLION);
+        // Increase the WBTC-C gap by 6 million DAI from 2 million DAI to 8 million DAI
+        DssExecLib.setIlkAutoLineParameters("WBTC-C", /* line = */ 500 * MILLION, /* gap = */ 8 * MILLION, /* ttl = */ 24 hours);
 
-        // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 754,598.72 USDP
-        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(754_598.72 ether); // Note: `ether` is only a keyword helper
-
-        // Call void() on MCD_PSM_PAX_A_JAR
-        MCD_PSM_PAX_A_JAR.void();
-
-        // Set PSM-PAX-A DC to 0 DAI
-        DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
-
-        // ---------- yank vest streams ----------
-        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-02-22/23697
-
-        // yank BA Labs DAI stream 20
-        VestAbstract(MCD_VEST_DAI).yank(20);
-
-        // yank BA Labs DAI stream 21
-        VestAbstract(MCD_VEST_DAI).yank(21);
-
-        // yank BA Labs MKR stream 35
-        VestAbstract(MCD_VEST_MKR_TREASURY).yank(35);
 
         // ---------- Trigger Spark Proxy Spell ----------
-        // Forum: https://forum.makerdao.com/t/feb-14-2024-proposed-changes-to-sparklend-for-upcoming-spell/23684
-        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-9/23688#stability-fee-changes-8
-        // Poll: https://vote.makerdao.com/polling/QmQC1UXZ
+        // Forum: TODO
+        // Poll: TODO
 
-        // Activate Spark Proxy Spell - 0x5D9406F377e6aFebAE18552806EA327eC7B10000
+        // Activate Spark Proxy Spell - TODO
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
