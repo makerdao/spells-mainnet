@@ -87,8 +87,8 @@ contract DssSpellAction is DssAction {
         MKR.transfer(CLOAKY, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // TRUE NAME - 41.67 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
         MKR.transfer(TRUENAME, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
-        // 0xDefensor - 23.705 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
-        MKR.transfer(DEFENSOR, 23.705 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // 0xDefensor - 23.71 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
+        MKR.transfer(DEFENSOR, 23.71 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // JAG - 13.89 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
         MKR.transfer(JAG, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
         // UPMaker - 13.89 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
