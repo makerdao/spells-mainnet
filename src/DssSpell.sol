@@ -27,9 +27,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/94c78956105c9ff0cb5aa3662e371f75bfb4fa5f/governance/votes/Executive%20Vote%20-%20March%206%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-02-22 MakerDAO Executive Spell | Hash: TODO";
+        "2024-02-22 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -73,7 +73,7 @@ contract DssSpellAction is DssAction {
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY            = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL            = address(0);
+    address internal constant SPARK_SPELL            = 0xf3449d6D5827F0F6e0eE4a941f058307056D3736;
 
     function actions() public override {
         // ---------- Delegate Compensation for February 2024 ----------
@@ -113,7 +113,7 @@ contract DssSpellAction is DssAction {
 
 
         // ---------- Launch Project Funding ----------
-        // Forum: http://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/12
+        // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/12
         // MIP: https://mips.makerdao.com/mips/details/MIP108#9-launch-project
 
         // Transfer 3,000,000 DAI to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
@@ -123,7 +123,7 @@ contract DssSpellAction is DssAction {
 
 
         // ---------- Whistleblower Bounty Payment ----------
-        // Forum: http://forum.makerdao.com/t/ad-derecognition-due-to-operational-security-breach-02-02-2024/23619/10
+        // Forum: https://forum.makerdao.com/t/ad-derecognition-due-to-operational-security-breach-02-02-2024/23619/10
 
         // Transfer 20.84 MKR to whistelblower at 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
         MKR.transfer(VENICE_TREE, 20.84 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
@@ -131,7 +131,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- WBTC vault gap Changes ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-10-wbtc-a-c-dc-iam-gap/23765
-        // Forum: http://forum.makerdao.com/t/stability-scope-parameter-changes-10-wbtc-a-c-dc-iam-gap/23765/2
 
         // Increase the WBTC-A gap by 2 million DAI from 2 million DAI to 4 million DAI
         DssExecLib.setIlkAutoLineParameters("WBTC-A", /* line = */ 500 * MILLION, /* gap = */ 4 * MILLION, /* ttl = */ 24 hours);
@@ -140,11 +139,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("WBTC-C", /* line = */ 500 * MILLION, /* gap = */ 8 * MILLION, /* ttl = */ 24 hours);
 
 
-        // ---------- Trigger Spark Proxy Spell ----------
-        // Forum: TODO
-        // Poll: TODO
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/feb-22-2024-proposed-changes-to-sparklend-for-upcoming-spell/23739
+        // Poll: https://vote.makerdao.com/polling/QmUE5xr8
 
-        // Activate Spark Proxy Spell - TODO
+        // Trigger Spark Proxy Spell at 0xf3449d6D5827F0F6e0eE4a941f058307056D3736
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
