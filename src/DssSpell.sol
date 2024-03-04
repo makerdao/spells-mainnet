@@ -125,7 +125,7 @@ contract DssSpellAction is DssAction {
         // ---------- Whistleblower Bounty Payment ----------
         // Forum: https://forum.makerdao.com/t/ad-derecognition-due-to-operational-security-breach-02-02-2024/23619/10
 
-        // Transfer 20.84 MKR to whistelblower at 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
+        // Transfer 20.84 MKR to whistleblower at 0xCDDd2A697d472d1e8a0B1B188646c756d097b058
         MKR.transfer(VENICE_TREE, 20.84 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
 
