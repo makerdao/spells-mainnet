@@ -29,7 +29,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/94c78956105c9ff0cb5aa3662e371f75bfb4fa5f/governance/votes/Executive%20Vote%20-%20March%206%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-02-22 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2024-03-06 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -81,28 +81,40 @@ contract DssSpellAction is DssAction {
 
         // BLUE - 41.67 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         MKR.transfer(BLUE, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
         MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // Cloaky - 41.67 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
         MKR.transfer(CLOAKY, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // TRUE NAME - 41.67 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
         MKR.transfer(TRUENAME, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // 0xDefensor - 23.71 MKR - 0x9542b441d65B6BF4dDdd3d4D2a66D8dCB9EE07a9
         MKR.transfer(DEFENSOR, 23.71 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // JAG - 13.89 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
         MKR.transfer(JAG, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // UPMaker - 13.89 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
         MKR.transfer(UPMAKER, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
         MKR.transfer(VIGILANT, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // PBG - 13.44 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
         MKR.transfer(PBG, 13.44 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // Pipkin - 5.82 MKR - 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7
         MKR.transfer(PIPKIN, 5.82 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // QGov - 4.48 MKR - 0xB0524D8707F76c681901b782372EbeD2d4bA28a6
         MKR.transfer(QGOV, 4.48 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
         // WBC - 4.03 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
         MKR.transfer(WBC, 4.03 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
 
         // ---------- Smart Burn Engine `hop` Update ----------
         // Forum: https://forum.makerdao.com/t/smart-burn-engine-the-rate-of-mkr-accumulation-reconfiguration-and-transaction-analysis-parameter-reconfiguration-update-5/23737
@@ -118,6 +130,7 @@ contract DssSpellAction is DssAction {
 
         // Transfer 3,000,000 DAI to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 3_000_000);
+
         // Transfer 500 MKR to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         MKR.transfer(LAUNCH_PROJECT_FUNDING, 500.00 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
