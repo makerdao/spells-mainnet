@@ -29,7 +29,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/94c78956105c9ff0cb5aa3662e371f75bfb4fa5f/governance/votes/Executive%20Vote%20-%20March%206%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-03-06 MakerDAO Executive Spell | Hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+        "2024-03-06 MakerDAO Executive Spell | Hash: 0x58137ea863fa6ff936cfa4aa430826c5c548b1e863acf4da8df0cdc465f7090c";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
