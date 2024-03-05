@@ -31,6 +31,11 @@ contract DssSpellAction is DssAction {
     string public constant override description =
         "2024-03-06 MakerDAO Executive Spell | Hash: 0x58137ea863fa6ff936cfa4aa430826c5c548b1e863acf4da8df0cdc465f7090c";
 
+    // Set office hours according to the summary
+    function officeHours() public pure override returns (bool) {
+        return true;
+    }
+
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -43,7 +48,7 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
-    //  ---------- Math ----------
+    // ---------- Math ----------
     uint256 internal constant MILLION                = 10 ** 6;
 
     // ---------- Contract addresses ----------
