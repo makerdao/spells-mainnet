@@ -92,9 +92,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0xdB2C426173e5a9c10af3CD834B87DEAad40525Ff), // populate with deployed spell if deployed
-            deployed_spell_created: 1708606967, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   19283319,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0x0E9AB92e3Fad77eE35a5f702Ac56c48bAAB7B0eE), // populate with deployed spell if deployed
+            deployed_spell_created: 1707320663, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   19177287,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
             office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
@@ -134,7 +134,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          6_41,            // In basis points
+            pct:          6_74,            // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -159,7 +159,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          6_91,
+            pct:          7_24,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -184,7 +184,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_16,
+            pct:          6_49,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -284,7 +284,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          6_68,
+            pct:          6_70,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -309,7 +309,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          7_18,
+            pct:          7_20,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -334,7 +334,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_43,
+            pct:          6_45,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1459,7 +1459,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          6_65,
+            pct:          7_16,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1484,7 +1484,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_40,
+            pct:          6_91,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1704,9 +1704,9 @@ contract Config {
         });
         afterSpell.collaterals["DIRECT-SPARK-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1500 * MILLION,
-            aL_gap:       40 * MILLION,
-            aL_ttl:       24 hours,
+            aL_line:      1200 * MILLION,
+            aL_gap:       20 * MILLION,
+            aL_ttl:       12 hours,
             line:         0,
             dust:         0,
             pct:          0,

@@ -44,10 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface DirectSparkDaiPlanLike {
-    function buffer() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -59,40 +55,48 @@ contract DssSpellTest is DssSpellTestBase {
         _testGeneral();
     }
 
-    function testOfficeHours() public {
-        _testOfficeHours();
+    function testFailWrongDay() public {
+        _testFailWrongDay();
     }
 
-    function testCastOnTime() public {
-        _testCastOnTime();
+    function testFailTooEarly() public {
+        _testFailTooEarly();
+    }
+
+    function testFailTooLate() public {
+        _testFailTooLate();
+    }
+
+    function testOnTime() public {
+        _testOnTime();
+    }
+
+    function testCastCost() public {
+        _testCastCost();
+    }
+
+    function testDeployCost() public {
+        _testDeployCost();
+    }
+
+    function testContractSize() public {
+        _testContractSize();
     }
 
     function testNextCastTime() public {
         _testNextCastTime();
     }
 
-    function testRevertIfNotScheduled() public {
-        _testRevertIfNotScheduled();
+    function testFailNotScheduled() public view {
+        _testFailNotScheduled();
     }
 
     function testUseEta() public {
         _testUseEta();
     }
 
-    function testContractSize() public skippedWhenDeployed {
-        _testContractSize();
-    }
-
-    function testDeployCost() public skippedWhenDeployed {
-        _testDeployCost();
-    }
-
-    function testBytecodeMatches() public skippedWhenNotDeployed {
+    function testBytecodeMatches() public {
         _testBytecodeMatches();
-    }
-
-    function testCastCost() public {
-        _testCastCost();
     }
 
     function testChainlogIntegrity() public {
@@ -107,7 +111,7 @@ contract DssSpellTest is DssSpellTestBase {
     function testPSMs() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         bytes32 _ilk;
 
@@ -164,7 +168,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // TESTS BELOW CAN BE ENABLED/DISABLED ON DEMAND
 
-    function testOracleList() public skipped { // TODO: check if this test can be removed for good.
+    function testOracleList() private {  // make private to disable
         // address ORACLE_WALLET01 = 0x4D6fbF888c374D7964D56144dE0C0cFBd49750D3;
 
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 0);
@@ -176,44 +180,24 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
-        string[1] memory removedKeys = [
-            "MCD_CAT"
-        ];
-
-        for (uint256 i = 0; i < removedKeys.length; i++) {
-            try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
-            } catch Error(string memory errmsg) {
-                if (_cmpStr(errmsg, "dss-chain-log/invalid-key")) {
-                    fail(_concat("TestError/key-to-remove-does-not-exist: ", removedKeys[i]));
-                } else {
-                    fail(errmsg);
-                }
-            }
-        }
-
+    function testRemoveChainlogValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
-        for (uint256 i = 0; i < removedKeys.length; i++) {
-            try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
-                fail(_concat("TestError/key-not-removed: ", removedKeys[i]));
-            } catch Error(string memory errmsg) {
-                assertTrue(
-                    _cmpStr(errmsg, "dss-chain-log/invalid-key"),
-                    _concat("TestError/key-not-removed: ", removedKeys[i])
-                );
-            } catch {
-                fail(_concat("TestError/unknown-reason: ", removedKeys[i]));
-            }
+        try chainLog.getAddress("MCD_CAT") {
+            assertTrue(false);
+        } catch Error(string memory errmsg) {
+            assertTrue(_cmpStr(errmsg, "dss-chain-log/invalid-key"));
+        } catch {
+            assertTrue(false);
         }
     }
 
-    function testCollateralIntegrations() public skipped { // add the `skipped` modifier to skip
+    function testCollateralIntegrations() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Insert new collateral tests here
         _checkIlkIntegration(
@@ -227,10 +211,10 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testIlkClipper() public skipped { // add the `skipped` modifier to skip
+    function testIlkClipper() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         _checkIlkClipper(
             "RETH-A",
@@ -242,10 +226,10 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
+    function testLerpSurplusBuffer() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Insert new SB lerp tests here
 
@@ -262,10 +246,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(lerp.done());
     }
 
-    function testNewIlkRegistryValues() public skipped { // add the `skipped` modifier to skip
+    function testNewIlkRegistryValues() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Insert new ilk registry values tests here
         _checkIlkIntegration(
@@ -279,33 +263,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testEsmAuth() public skipped { // add the `skipped` modifier to skip
-        string[1] memory esmAuthorisedContractKeys = [
-            "RWA009_A_INPUT_CONDUIT_URN_USDC"
-        ];
-
-        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
-            assertEq(
-                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
-                0,
-                _concat("TestError/esm-is-ward-before-spell: ", esmAuthorisedContractKeys[i])
-            );
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {
-            assertEq(
-                WardsAbstract(addr.addr(_stringToBytes32(esmAuthorisedContractKeys[i]))).wards(address(esm)),
-                1,
-                _concat("TestError/esm-is-not-ward-after-spell: ", esmAuthorisedContractKeys[i])
-            );
-        }
-    }
-
-    function testOSMs() public skipped { // add the `skipped` modifier to skip
+    function testOSMs() private { // make private to disable
         address READER = address(0);
 
         // Track OSM authorizations here
@@ -313,15 +271,15 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
     }
 
-    function testMedianizers() public skipped { // add the `skipped` modifier to skip
+    function testMedianizers() private { // make private to disable
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Track Median authorizations here
         address SET_TOKEN    = address(0);
@@ -342,7 +300,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 claimedAmount;
     }
 
-    function testVestDAI() public skipped { // add the `skipped` modifier to skip
+    function testVestDAI() private {
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
         uint256 NOV_30_2024 = 1733007599;
@@ -370,7 +328,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Check maximum vesting rate (Note: this should eventually be moved to _testGeneral)
         assertEq(vest.cap(), 1 * MILLION * WAD / 30 days, "testVestDAI/invalid-cap");
@@ -408,7 +366,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // make private to disable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -434,7 +392,7 @@ contract DssSpellTest is DssSpellTestBase {
         pot.drip();
         uint256 prevSin = vat.sin(address(vow));
         spell.cast();
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
         assertEq(vat.sin(address(vow)) - prevSin, expectedSumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
@@ -453,19 +411,17 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 finPlanned;
     }
 
-    function testYankDAI() public { // add the `skipped` modifier to skip
+    function testYankDAI() private { // make private to disable
         // Provide human-readable names for timestamps
-        uint256 FEB_29_2024 = 1709251199;
-        uint256 MAR_31_2024 = 1711929599;
+        uint256 JANUARY_31_2024 = 1706745599;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
         //   the address of the stream
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
-        Yank[2] memory yanks = [
-            Yank(20, wallets.addr("BA_LABS"), FEB_29_2024),
-            Yank(21, wallets.addr("BA_LABS"), MAR_31_2024)
+        Yank[1] memory yanks = [
+            Yank(15, wallets.addr("SES_WALLET"), JANUARY_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
@@ -477,16 +433,16 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
         for (uint256 i = 0; i < yanks.length; i++) {
             // Test stream.fin is set to the current block after the spell
             assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
         }
     }
 
-    function testYankMKR() public { // add the `skipped` modifier to skip
+    function testYankDAILegacy() private { // make private to disable
         // Provide human-readable names for timestamps
-        uint256 MAR_31_2024 = 1711929599;
+        uint256 SEPTEMBER_01_2024 = 1725148800;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
@@ -494,22 +450,52 @@ contract DssSpellTest is DssSpellTestBase {
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
         Yank[1] memory yanks = [
-            Yank(35, wallets.addr("BA_LABS"), MAR_31_2024)
+            Yank(21, wallets.addr("DECO_WALLET"), SEPTEMBER_01_2024)
+        ];
+
+        // Test stream id matches `addr` and `fin`
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI_LEGACY"));
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
+        }
+    }
+
+    function testYankMKR() private { // make private to disable
+        // Provide human-readable names for timestamps
+        uint256 MARCH_31_2024 = 1711929599;
+
+        // For each yanked stream, provide Yank object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yank[2] memory yanks = [
+            Yank(32, wallets.addr("STEAKHOUSE"), MARCH_31_2024),
+            Yank(33, wallets.addr("TECH"), MARCH_31_2024)
         ];
 
         // Test stream id matches `addr` and `fin`
         VestAbstract vestTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         for (uint256 i = 0; i < yanks.length; i++) {
-            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankMKR/unexpected-address");
-            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankMKR/unexpected-fin-date");
+            assertEq(vestTreasury.usr(yanks[i].streamId), yanks[i].addr, "testYankDAI/unexpected-address");
+            assertEq(vestTreasury.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankDAI/unexpected-fin-date");
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
         for (uint256 i = 0; i < yanks.length; i++) {
             // Test stream.fin is set to the current block after the spell
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankMKR/steam-not-yanked");
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-not-yanked");
 
             // Give admin powers to test contract address and make the vesting unrestricted for testing
             GodMode.setWard(address(vestTreasury), address(this), 1);
@@ -518,11 +504,11 @@ contract DssSpellTest is DssSpellTestBase {
             vestTreasury.unrestrict(yanks[i].streamId);
             vestTreasury.vest(yanks[i].streamId);
             assertTrue(!vestTreasury.valid(yanks[i].streamId));
-            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankMKR/steam-fin-changed");
+            assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankDAI/steam-fin-changed");
         }
     }
 
-    function testVestMKR() public skipped { // add the `skipped` modifier to skip
+    function testVestMKR() private {
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
         uint256 NOV_30_2024 = 1733007599;
@@ -551,7 +537,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Check allowance was increased according to the streams
         uint256 totalRewardAmount = 0;
@@ -591,7 +577,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
+    function testMKRPayments() public { // make public to enable
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -623,7 +609,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Cast the spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // Check that pause proxy balance has decreased
         assertEq(gov.balanceOf(address(pauseProxy)), prevMkrBalance - totalAmountToTransfer, "testMKRPayments/invalid-total");
@@ -644,7 +630,7 @@ contract DssSpellTest is DssSpellTestBase {
         rootDomain = new RootDomain(config, getRelativeChain("mainnet"));
     }
 
-    function testL2OptimismSpell() public skipped { // TODO: check if this test can be removed for good.
+    function testL2OptimismSpell() private {
         address l2TeleportGateway = BridgeLike(
             chainLog.getAddress("OPTIMISM_TELEPORT_BRIDGE")
         ).l2TeleportGateway();
@@ -670,7 +656,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // switch to Optimism domain and relay the spell from L1
         // the `true` keeps us on Optimism rather than `rootDomain.selectFork()
@@ -680,7 +666,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(optimismGateway.validDomains(optDstDomain), 0, "l2-optimism-invalid-dst-domain");
     }
 
-    function testL2ArbitrumSpell() public skipped { // TODO: check if this test can be removed for good.
+    function testL2ArbitrumSpell() private {
         // Ensure the Arbitrum Gov Relay has some ETH to pay for the Arbitrum spell
         assertGt(chainLog.getAddress("ARBITRUM_GOV_RELAY").balance, 0);
 
@@ -710,7 +696,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         // switch to Arbitrum domain and relay the spell from L1
         // the `true` keeps us on Arbitrum rather than `rootDomain.selectFork()
@@ -720,7 +706,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(arbitrumGateway.validDomains(arbDstDomain), 0, "l2-arbitrum-invalid-dst-domain");
     }
 
-    function testOffboardings() public skipped { // add the `skipped` modifier to skip
+    function testOffboardings() private {
         uint256 Art;
         (Art,,,,) = vat.ilks("USDC-A");
         assertGt(Art, 0);
@@ -731,7 +717,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
 
         DssCdpManagerAbstract cdpManager = DssCdpManagerAbstract(addr.addr("CDP_MANAGER"));
 
@@ -824,7 +810,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() private { // make private to disable
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -844,52 +830,41 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
-        address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x5D9406F377e6aFebAE18552806EA327eC7B10000;
+    function testSparkSpellIsExecuted() private { // make private to disable
+        address SUBPROXY_SPARK = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+        address SPARK_SPELL    = address(0xa3836fEF1D314d4c081C2707a7664c3375F29b61);
 
         vm.expectCall(
-            SPARK_PROXY,
+            SUBPROXY_SPARK,
             /* value = */ 0,
             abi.encodeCall(
-                ProxyLike(SPARK_PROXY).exec,
+                ProxyLike(SUBPROXY_SPARK).exec,
                 (SPARK_SPELL, abi.encodeWithSignature("execute()"))
             )
         );
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        assertTrue(spell.done());
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    string RWA009_OLDDOC = "QmfEgZuiw6wsTRUYerdPZNUrqDXSGM6Nm4fM3nG7nNbEjT";
+    string RWA009_NEWDOC = "QmPzuLuJ5Xq6k6Hbop1W5s4V9ksvafYoqcW9sU5QRwz5h1";
 
-    function testDIRECTSPARKDAIBuffer() public {
-        DirectSparkDaiPlanLike DIRECT_SPARK_DAI_PLAN = DirectSparkDaiPlanLike(addr.addr("DIRECT_SPARK_DAI_PLAN"));
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 30 * MILLION * WAD);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 50 * MILLION * WAD);
+    function testRWA009DocChange() public {
+        _checkRWADocUpdate("RWA009-A", RWA009_OLDDOC, RWA009_NEWDOC);
     }
 
-    function testPushPAXOutInputConduit() public {
-        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
-        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+    function testPushGUSDOutInputConduit() public {
         uint256 prevDai = vat.dai(address(vow));
-        uint256 gemBalanceToPush = 754_598.72 ether; // `ether` is only a keyword helper
-
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush);
+        DSTokenAbstract gem = DSTokenAbstract(addr.addr("GUSD"));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
-        assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAY);
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
+        assertEq(vat.dai(address(vow)), prevDai + 597_659 * RAD);
+        assertEq(gem.balanceOf(addr.addr("MCD_PSM_GUSD_A_INPUT_CONDUIT_JAR")), 0);
     }
 }
