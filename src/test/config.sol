@@ -92,11 +92,11 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0xD8D60b7A9998098261DF5175B5b0Fb567CD0Fb1A), // populate with deployed spell if deployed
-            deployed_spell_created: 1709721947, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   19375620,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0), // populate with deployed spell if deployed
+            deployed_spell_created: 0, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   0,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   true,      // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -104,15 +104,15 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr               = 5_00;           // In basis points
-        afterSpell.pause_delay           = 48 hours;       // In seconds
+        afterSpell.pot_dsr               = 15_00;          // In basis points
+        afterSpell.pause_delay           = 16 hours;       // In seconds
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
         afterSpell.vow_bump              = 50 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 19_710 seconds; // In seconds
+        afterSpell.flap_hop              = 26_280 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
@@ -134,7 +134,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          6_41,            // In basis points
+            pct:          15_25,           // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -159,7 +159,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          6_91,
+            pct:          15_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -184,7 +184,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_16,
+            pct:          15_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -280,11 +280,11 @@ contract Config {
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       4 * MILLION,
+            aL_gap:       2 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          6_68,
+            pct:          16_75,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -309,7 +309,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          7_18,
+            pct:          17_25,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -330,11 +330,11 @@ contract Config {
         afterSpell.collaterals["WBTC-C"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       8 * MILLION,
+            aL_gap:       2 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_43,
+            pct:          16_50,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -756,7 +756,7 @@ contract Config {
             aL_enabled:   true,
             aL_line:      10 * BILLION,
             aL_gap:       400 * MILLION,
-            aL_ttl:       24 hours,
+            aL_ttl:       12 hours,
             line:         0,
             dust:         0,
             pct:          0,
@@ -1459,7 +1459,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          6_65,
+            pct:          16_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1484,7 +1484,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          6_40,
+            pct:          16_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
