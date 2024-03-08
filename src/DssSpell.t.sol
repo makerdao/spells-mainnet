@@ -44,16 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface D3MHubLike {
-    function exec(bytes32) external;
-}
-interface D3MSparkPlan {
-    function active() external view returns (bool);
-}
-interface D3MSparkPool {
-    function redeemable() external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
