@@ -50,14 +50,14 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant FIFTEEN_PCT               = 1000000004431822129783699001;
-    uint256 internal constant FIFTEEN_PT_TWO_FIVE_PCT   = 1000000004500681640286189459;
-    uint256 internal constant FIFTEEN_PT_SEVEN_FIVE_PCT = 1000000004637953682059597074;
-    uint256 internal constant SIXTEEN_PCT               = 1000000004706367499604668374;
-    uint256 internal constant SIXTEEN_PT_TWO_FIVE_PCT   = 1000000004774634032180348552;
-    uint256 internal constant SIXTEEN_PT_FIVE_PCT       = 1000000004842753912590664903;
-    uint256 internal constant SIXTEEN_PT_SEVEN_FIVE_PCT = 1000000004910727769570159235;
-    uint256 internal constant SEVENTEEN_PT_TWO_FIVE_PCT = 1000000005046239908035965222;
+    uint256 internal constant FIFTEEN_PCT_RATE               = 1000000004431822129783699001;
+    uint256 internal constant FIFTEEN_PT_TWO_FIVE_PCT_RATE   = 1000000004500681640286189459;
+    uint256 internal constant FIFTEEN_PT_SEVEN_FIVE_PCT_RATE = 1000000004637953682059597074;
+    uint256 internal constant SIXTEEN_PCT_RATE               = 1000000004706367499604668374;
+    uint256 internal constant SIXTEEN_PT_TWO_FIVE_PCT_RATE   = 1000000004774634032180348552;
+    uint256 internal constant SIXTEEN_PT_FIVE_PCT_RATE       = 1000000004842753912590664903;
+    uint256 internal constant SIXTEEN_PT_SEVEN_FIVE_PCT_RATE = 1000000004910727769570159235;
+    uint256 internal constant SEVENTEEN_PT_TWO_FIVE_PCT_RATE = 1000000005046239908035965222;
 
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
@@ -76,34 +76,34 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Increase the DSR by 10% from 5% to 15%
-        DssExecLib.setDSR(FIFTEEN_PCT, /* doDrip = */ true);
+        DssExecLib.setDSR(FIFTEEN_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Stability Fee Changes ----------
         // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Increase the ETH-A Stability Fee by 8.84% from 6.41% to 15.25%
-        DssExecLib.setIlkStabilityFee("ETH-A", FIFTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-A", FIFTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-B Stability Fee by 8.84% from 6.91% to 15.75%
-        DssExecLib.setIlkStabilityFee("ETH-B", FIFTEEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-B", FIFTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the ETH-C Stability Fee by 8.84% from 6.16% to 15%
-        DssExecLib.setIlkStabilityFee("ETH-C", FIFTEEN_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-C", FIFTEEN_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WSTETH-A Stability Fee by 9.6% from 6.65% to 16.25%
-        DssExecLib.setIlkStabilityFee("WSTETH-A", SIXTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WSTETH-A", SIXTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WSTETH-B Stability Fee by 9.6% from 6.4% to 16%
-        DssExecLib.setIlkStabilityFee("WSTETH-B", SIXTEEN_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WSTETH-B", SIXTEEN_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-A Stability Fee by 10.07% from 6.68% to 16.75%
-        DssExecLib.setIlkStabilityFee("WBTC-A", SIXTEEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-A", SIXTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-B Stability Fee by 10.07% from 7.18% to 17.25%
-        DssExecLib.setIlkStabilityFee("WBTC-B", SEVENTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-B", SEVENTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Increase the WBTC-C Stability Fee by 10.07% from 6.43% to 16.5%
-        DssExecLib.setIlkStabilityFee("WBTC-C", SIXTEEN_PT_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-C", SIXTEEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // ---------- GSM Change ----------
         // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
