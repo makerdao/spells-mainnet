@@ -73,11 +73,13 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- DSR Change ----------
+        // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Increase the DSR by 10% from 5% to 15%
         DssExecLib.setDSR(FIFTEEN_PCT, /* doDrip = */ true);
 
         // ---------- Stability Fee Changes ----------
+        // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Increase the ETH-A Stability Fee by 8.84% from 6.41% to 15.25%
         DssExecLib.setIlkStabilityFee("ETH-A", FIFTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
@@ -104,16 +106,19 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkStabilityFee("WBTC-C", SIXTEEN_PT_FIVE_PCT, /* doDrip = */ true);
 
         // ---------- GSM Change ----------
+        // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Decrease the GSM Delay by 32 hours from 48 hours to 16 hours
         PauseLike(MCD_PAUSE).setDelay(16 hours);
 
         // ---------- USDC PSM ttl Change ----------
+        // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Decrease the ttl by 12 hours from 24 hours to 12 hours
         DssExecLib.setIlkAutoLineParameters("PSM-USDC-A", 10 * BILLION, 400 * MILLION, 12 hours);
 
         // ---------- Trigger Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/accelerated-proposal-rate-system-gsm-delay-psm-usdc-a-ttl-changes/23824
 
         // Trigger Spark Proxy Spell at 0xFc72De9b361dB85F1d126De9cac51A1aEe8Ce126
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
