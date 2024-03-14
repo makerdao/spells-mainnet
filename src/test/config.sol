@@ -86,7 +86,8 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](0);
+        address[] memory prevSpells = new address[](1);
+        prevSpells[0] = 0xD8D60b7A9998098261DF5175B5b0Fb567CD0Fb1A; // 2024-03-06 spell
 
         //
         // Values for spell-specific parameters
@@ -112,7 +113,7 @@ contract Config {
         afterSpell.vow_bump              = 50 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 26_280 seconds; // In seconds
+        afterSpell.flap_hop              = 19_710 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
@@ -280,7 +281,7 @@ contract Config {
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       2 * MILLION,
+            aL_gap:       4 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
@@ -330,7 +331,7 @@ contract Config {
         afterSpell.collaterals["WBTC-C"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      500 * MILLION,
-            aL_gap:       2 * MILLION,
+            aL_gap:       8 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
