@@ -105,15 +105,15 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr               = 15_00;          // In basis points
+        afterSpell.pot_dsr               = 13_00;          // In basis points
         afterSpell.pause_delay           = 16 hours;       // In seconds
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_bump              = 50 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_bump              = 75 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 50 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 50 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 19_710 seconds; // In seconds
+        afterSpell.flap_hop              = 11_826 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
@@ -135,7 +135,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          15_25,           // In basis points
+            pct:          13_25,           // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -160,7 +160,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          15_75,
+            pct:          13_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -185,7 +185,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          15_00,
+            pct:          13_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -285,7 +285,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          16_75,
+            pct:          14_75,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -310,7 +310,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          17_25,
+            pct:          15_25,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -335,7 +335,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          16_50,
+            pct:          14_50,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1460,7 +1460,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          16_25,
+            pct:          14_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1485,7 +1485,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          16_00,
+            pct:          14_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1705,7 +1705,7 @@ contract Config {
         });
         afterSpell.collaterals["DIRECT-SPARK-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1500 * MILLION,
+            aL_line:      2500 * MILLION,
             aL_gap:       40 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
