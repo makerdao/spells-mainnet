@@ -80,7 +80,7 @@ contract DssSpellAction is DssAction {
     address internal constant MORPHO_D3M_PLAN          = 0x374b5f915aaED790CBdd341E6f406910d648fD39;
     address internal constant MORPHO_D3M_POOL          = 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E;
     address internal constant MORPHO_D3M_ORACLE        = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
-    address internal constant MORPHO_D3M_OPERATOR      = address(0); // TODO: add actual operator address
+    address internal constant MORPHO_D3M_OPERATOR      = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
     address internal constant SPARK_MORPHO_VAULT       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
 
     address internal immutable RWA015_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
@@ -131,10 +131,12 @@ contract DssSpellAction is DssAction {
         // line: 100 million DAI
         // gap: 100 million DAI
         // ttl: 24 hours
+        // tau: 7 days
         // D3M Addresses:
         // oracle: 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af
         // plan: 0x374b5f915aaED790CBdd341E6f406910d648fD39
         // pool: 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E
+        // operator: 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5
 
         // Note: The following dependencies are copied from the original repository at
         // https://github.com/makerdao/dss-direct-deposit/tree/13916d8f7c0b88ca094ab6a31c1261ce27b98a7c/src/deploy
@@ -154,7 +156,7 @@ contract DssSpellAction is DssAction {
             maxLine:     100 * MILLION * RAD, // Set line to 100 million DAI
             gap:         100 * MILLION * RAD, // Set gap to 100 million DAI
             ttl:         24 hours,            // Set ttl to 24 hours
-            tau:         7 days               // TODO: update tau value to the one provided by the governance
+            tau:         7 days               // Set tau to 7 days
         });
         D3M4626PoolConfig memory erc4626Cfg = D3M4626PoolConfig({
             vault: SPARK_MORPHO_VAULT
