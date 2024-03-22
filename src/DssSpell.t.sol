@@ -44,6 +44,34 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface D3MHubLike {
+    function end() external view returns (address);
+    function exec(bytes32 ilk) external;
+    function ilks(bytes32)
+        external
+        view
+        returns (address pool, address plan, uint256 tau, uint256 culled, uint256 tic);
+    function vow() external view returns (address);
+}
+interface D3MMomLike {
+    function authority() external view returns (address);
+    function disable(address who) external;
+}
+interface D3M4626PoolLike {
+    function redeemable() external view returns (address);
+    function vault() external view returns (address);
+}
+interface D3MOracleLike {
+    function hub() external view returns (address);
+}
+interface D3MOperatorPlanLike {
+    function active() external view returns (bool);
+    function operator() external view returns (address);
+    function setTargetAssets(uint256 value) external;
+    function targetAssets() external view returns (uint256);
+    function wards(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -860,6 +888,61 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testDirectSparkMorphoIntegration() public {
+        bytes32 ilk         = "DIRECT-SPARK-MORPHO-DAI";
+        address vault       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
+        address operator    = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
+        uint256 debtCeiling = 100 * MILLION * WAD;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        D3M4626PoolLike pool = D3M4626PoolLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_POOL"));
+        D3MOperatorPlanLike plan = D3MOperatorPlanLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_PLAN"));
+        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_ORACLE"));
+
+        { // Do a bunch of sanity checks of the values that were set in the spell
+            (address _pool, address _plan, uint256 tau, uint256 _culled,) = hub.ilks(ilk);
+            assertEq(_pool, address(pool));
+            assertEq(_plan, address(plan));
+            assertEq(tau, 7 days);
+            assertEq(_culled, 0);
+            assertEq(hub.vow(), address(vow));
+            assertEq(hub.end(), address(end));
+            assertEq(mom.authority(), address(chief));
+            assertEq(pool.vault(), vault);
+            assertEq(pool.redeemable(), vault);
+            assertEq(plan.operator(), operator);
+            assertEq(plan.wards(address(mom)), 1);
+            assertEq(plan.active(), true);
+            assertEq(oracle.hub(), address(hub));
+            (address pip,) = spotter.ilks(ilk);
+            assertEq(pip, address(oracle));
+            assertEq(vat.wards(address(hub)), 1);
+        }
+
+        // Adjust debt
+        vm.prank(operator); plan.setTargetAssets(debtCeiling);
+        assertEq(plan.targetAssets(), debtCeiling, 'TestError/targetAssets-not-set');
+
+        // Adjust liquidity
+        GodMode.setBalance(vault, address(pool), debtCeiling);
+
+        // Fill by the line
+        hub.exec(ilk);
+        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+        assertEq(ink, debtCeiling, "TestError/unexpected-postexec-ink");
+        assertEq(art, debtCeiling, "TestError/unexpected-postexec-art");
+
+        // De-activate the D3M via mom
+        vm.prank(DSChiefAbstract(chief).hat());
+        mom.disable(address(plan));
+        assertEq(plan.active(), false, "TestError/unexpected-postdisable-active");
+    }
 
     function testRWA015newBud() public {
         address NEW_BUD = addr.addr("RWA015_A_CUSTODY_TACO");
