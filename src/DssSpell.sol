@@ -20,11 +20,15 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { DssInstance, MCD } from "dss-test/MCD.sol";
-import { D3MInit, D3MCommonConfig, D3M4626PoolConfig, D3M4626PoolLike, D3MOperatorPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
+import { D3MInit, D3MCommonConfig, D3M4626PoolConfig, D3MOperatorPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
 import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
 
 interface RwaOutputConduitLike {
     function kiss(address) external;
+}
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
 contract DssSpellAction is DssAction {
@@ -70,15 +74,20 @@ contract DssSpellAction is DssAction {
     // ---------- Addesses ----------
     address internal immutable MCD_VOW                 = DssExecLib.vow();
     address internal immutable MCD_FLAP                = DssExecLib.flap();
+
     address internal immutable D3M_HUB                 = DssExecLib.getChangelogAddress("DIRECT_HUB");
     address internal immutable D3M_MOM                 = DssExecLib.getChangelogAddress("DIRECT_MOM");
     address internal constant MORPHO_D3M_PLAN          = 0x374b5f915aaED790CBdd341E6f406910d648fD39;
     address internal constant MORPHO_D3M_POOL          = 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E;
     address internal constant MORPHO_D3M_ORACLE        = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
     address internal constant MORPHO_D3M_OPERATOR      = address(0); // TODO: add actual operator address
+    address internal constant SPARK_MORPHO_VAULT       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
+
     address internal immutable RWA015_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
     address internal constant RWA015_A_CUSTODY_TACO    = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
+
     address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL              = 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d;
 
     function actions() public override {
         // ---------- Stability Fee Updates ----------
@@ -148,12 +157,11 @@ contract DssSpellAction is DssAction {
             tau:         7 days               // TODO: update tau value to the one provided by the governance
         });
         D3M4626PoolConfig memory erc4626Cfg = D3M4626PoolConfig({
-            vault: D3M4626PoolLike(d3m.pool).vault()
+            vault: SPARK_MORPHO_VAULT
         });
         D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
             operator: MORPHO_D3M_OPERATOR
         });
-
         D3MInit.initCommon({
             dss:     dss,
             d3m:     d3m,
@@ -207,8 +215,8 @@ contract DssSpellAction is DssAction {
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/mar-6-2024-proposed-changes-to-sparklend-for-upcoming-spell/23791/
 
-        // Trigger Spark Proxy Spell at TBD
-        // TODO
+        // Trigger Spark Proxy Spell at 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- Chainlog bump ----------
         // Note: we need to increase chainlog version as D3MInit.initCommon added new keys
