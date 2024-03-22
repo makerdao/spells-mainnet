@@ -942,6 +942,11 @@ contract DssSpellTest is DssSpellTestBase {
         vm.prank(DSChiefAbstract(chief).hat());
         mom.disable(address(plan));
         assertEq(plan.active(), false, "TestError/unexpected-postdisable-active");
+
+        hub.exec(ilk);
+        (ink, art) = vat.urns(ilk, address(pool));
+        assertLt(ink, WAD, "TestError/unexpected-postdisable-ink"); // Less than some dust amount is fine (1 DAI)
+        assertLt(art, WAD, "TestError/unexpected-postdisable-art");
     }
 
     function testRWA015newBud() public {
