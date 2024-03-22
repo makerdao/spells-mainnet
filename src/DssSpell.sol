@@ -23,6 +23,10 @@ import { DssInstance, MCD } from "dss-test/MCD.sol";
 import { D3MInit, D3MCommonConfig, D3M4626PoolConfig, D3M4626PoolLike, D3MOperatorPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
 import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
 
+interface RwaOutputConduitLike {
+    function kiss(address) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -35,16 +39,6 @@ contract DssSpellAction is DssAction {
         return false;
     }
 
-    // ---------- Approve TACO Dao Resolution ----------
-    // Forum: https://forum.makerdao.com/t/project-ethena-proposal-enacting-dao-resolutions/23923
-
-    // Approve TACO Dao Resolution with IPFS hash Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
-    // Note: see dao_resolutions variable below
-
-    // ---------- Approve HVBank (RWA009-A) Dao Resolution ----------
-    // Forum: https://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/24
-
-    // Approve HVBank (RWA009-A) Dao Resolution with IPFS hash QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf
     // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
     string public constant dao_resolutions = "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB,QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf";
 
@@ -74,15 +68,17 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- Addesses ----------
-    address internal immutable MCD_VOW            = DssExecLib.vow();
-    address internal immutable MCD_FLAP           = DssExecLib.flap();
-    address internal immutable D3M_HUB            = DssExecLib.getChangelogAddress("DIRECT_HUB");
-    address internal immutable D3M_MOM            = DssExecLib.getChangelogAddress("DIRECT_MOM");
-    address internal constant MORPHO_D3M_PLAN     = 0x374b5f915aaED790CBdd341E6f406910d648fD39;
-    address internal constant MORPHO_D3M_POOL     = 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E;
-    address internal constant MORPHO_D3M_ORACLE   = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
-    address internal constant MORPHO_D3M_OPERATOR = address(0); // TODO add actual operator address
-    address internal constant SPARK_PROXY         = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal immutable MCD_VOW                 = DssExecLib.vow();
+    address internal immutable MCD_FLAP                = DssExecLib.flap();
+    address internal immutable D3M_HUB                 = DssExecLib.getChangelogAddress("DIRECT_HUB");
+    address internal immutable D3M_MOM                 = DssExecLib.getChangelogAddress("DIRECT_MOM");
+    address internal constant MORPHO_D3M_PLAN          = 0x374b5f915aaED790CBdd341E6f406910d648fD39;
+    address internal constant MORPHO_D3M_POOL          = 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E;
+    address internal constant MORPHO_D3M_ORACLE        = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
+    address internal constant MORPHO_D3M_OPERATOR      = address(0); // TODO: add actual operator address
+    address internal immutable RWA015_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal constant RWA015_A_CUSTODY_TACO    = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
+    address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     function actions() public override {
         // ---------- Stability Fee Updates ----------
@@ -133,6 +129,7 @@ contract DssSpellAction is DssAction {
 
         // Note: The following dependencies are copied from the original repository at
         // https://github.com/makerdao/dss-direct-deposit/tree/13916d8f7c0b88ca094ab6a31c1261ce27b98a7c/src/deploy
+        // TODO: update commit hash when the PR is merged
 
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
         D3MInstance memory d3m = D3MInstance({
@@ -175,7 +172,7 @@ contract DssSpellAction is DssAction {
 
         // Additional actions:
         // Expand DIRECT_MOM breaker to also include Morpho D3M
-        // Note: this is done within D3MInit.sol line 209
+        // Note: this is already done within D3MInit.sol line 209
 
         // ---------- DSR Change ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-11-under-sta-article-3-3/23910
@@ -191,6 +188,21 @@ contract DssSpellAction is DssAction {
 
         // Increase the bump parameter for 25,000 DAI from 50,000 DAI to 75,000 DAI.
         DssExecLib.setValue(MCD_VOW, "bump", 75 * THOUSAND * RAD);
+
+        // ---------- Approve TACO Dao Resolution ----------
+        // Forum: https://forum.makerdao.com/t/project-ethena-proposal-enacting-dao-resolutions/23923
+
+        // Approve TACO Dao Resolution with IPFS hash Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
+        // Note: see `dao_resolutions` variable declared above
+
+        // kiss 0x6759610547a36E9597Ef452aa0B9cace91291a2f address in the RWA015-A output conduit
+        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY_TACO);
+
+        // ---------- Approve HVBank (RWA009-A) Dao Resolution ----------
+        // Forum: https://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/24
+
+        // Approve HVBank (RWA009-A) Dao Resolution with IPFS hash QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf
+        // Note: see `dao_resolutions` variable declared above
 
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/mar-6-2024-proposed-changes-to-sparklend-for-upcoming-spell/23791/
