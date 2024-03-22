@@ -121,8 +121,8 @@ contract Config {
         afterSpell.osm_mom_authority     = chief;          // OsmMom authority
         afterSpell.clipper_mom_authority = chief;          // ClipperMom authority
         afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
-        afterSpell.ilk_count             = 64;             // Num expected in system
-        afterSpell.chainlog_version      = "1.17.2";       // String expected in system
+        afterSpell.ilk_count             = 65;             // Num expected in system
+        afterSpell.chainlog_version      = "1.17.3";       // String expected in system
 
         //
         // Values for all collateral
@@ -1707,6 +1707,31 @@ contract Config {
             aL_enabled:   true,
             aL_line:      2500 * MILLION,
             aL_gap:       40 * MILLION,
+            aL_ttl:       24 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          10000,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
+            offboarding:  false
+        });
+        afterSpell.collaterals["DIRECT-SPARK-MORPHO-DAI"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      100 * MILLION,
+            aL_gap:       100 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,

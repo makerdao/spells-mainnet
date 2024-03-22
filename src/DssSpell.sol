@@ -19,6 +19,10 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { DssInstance, MCD } from "dss-test/MCD.sol";
+import { D3MInit, D3MCommonConfig, D3M4626PoolConfig, D3M4626PoolLike, D3MOperatorPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
+import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -70,8 +74,15 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- Addesses ----------
-    address internal immutable MCD_VOW  = DssExecLib.vow();
-    address internal immutable MCD_FLAP = DssExecLib.flap();
+    address internal immutable MCD_VOW            = DssExecLib.vow();
+    address internal immutable MCD_FLAP           = DssExecLib.flap();
+    address internal immutable D3M_HUB            = DssExecLib.getChangelogAddress("DIRECT_HUB");
+    address internal immutable D3M_MOM            = DssExecLib.getChangelogAddress("DIRECT_MOM");
+    address internal constant MORPHO_D3M_PLAN     = 0x374b5f915aaED790CBdd341E6f406910d648fD39;
+    address internal constant MORPHO_D3M_POOL     = 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E;
+    address internal constant MORPHO_D3M_ORACLE   = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
+    address internal constant MORPHO_D3M_OPERATOR = address(0); // TODO add actual operator address
+    address internal constant SPARK_PROXY         = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     function actions() public override {
         // ---------- Stability Fee Updates ----------
@@ -111,10 +122,60 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/introduction-and-initial-parameters-for-ddm-overcollateralized-spark-metamorpho-ethena-vault/23925
 
         // Deploy DDM to Spark DAI Morpho Vault at 0x73e65DBD630f90604062f6E02fAb9138e713edD9
-        // DDM DC-IAM Parameters:
+        // D3M DC-IAM Parameters:
         // line: 100 million DAI
         // gap: 100 million DAI
         // ttl: 24 hours
+        // D3M Addresses:
+        // oracle: 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af
+        // plan: 0x374b5f915aaED790CBdd341E6f406910d648fD39
+        // pool: 0x9C259F14E5d9F35A0434cD3C4abbbcaA2f1f7f7E
+
+        // Note: The following dependencies are copied from the original repository at
+        // https://github.com/makerdao/dss-direct-deposit/tree/13916d8f7c0b88ca094ab6a31c1261ce27b98a7c/src/deploy
+
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+        D3MInstance memory d3m = D3MInstance({
+            plan:   MORPHO_D3M_PLAN,
+            pool:   MORPHO_D3M_POOL,
+            oracle: MORPHO_D3M_ORACLE
+        });
+        D3MCommonConfig memory cfg = D3MCommonConfig({
+            hub:         D3M_HUB,
+            mom:         D3M_MOM,
+            ilk:         "DIRECT-SPARK-MORPHO-DAI",
+            existingIlk: false,
+            maxLine:     100 * MILLION * RAD, // Set line to 100 million DAI
+            gap:         100 * MILLION * RAD, // Set gap to 100 million DAI
+            ttl:         24 hours,            // Set ttl to 24 hours
+            tau:         7 days               // TODO: update tau value to the one provided by the governance
+        });
+        D3M4626PoolConfig memory erc4626Cfg = D3M4626PoolConfig({
+            vault: D3M4626PoolLike(d3m.pool).vault()
+        });
+        D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
+            operator: MORPHO_D3M_OPERATOR
+        });
+
+        D3MInit.initCommon({
+            dss:     dss,
+            d3m:     d3m,
+            cfg:     cfg
+        });
+        D3MInit.init4626Pool(
+            dss,
+            d3m,
+            cfg,
+            erc4626Cfg
+        );
+        D3MInit.initOperatorPlan(
+            d3m,
+            operatorCfg
+        );
+
+        // Additional actions:
+        // Expand DIRECT_MOM breaker to also include Morpho D3M
+        // Note: this is done within D3MInit.sol line 209
 
         // ---------- DSR Change ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-11-under-sta-article-3-3/23910
@@ -136,6 +197,10 @@ contract DssSpellAction is DssAction {
 
         // Trigger Spark Proxy Spell at TBD
         // TODO
+
+        // ---------- Chainlog bump ----------
+        // Note: we need to increase chainlog version as D3MInit.initCommon added new keys
+        DssExecLib.setChangelogVersion("1.17.3");
     }
 }
 
