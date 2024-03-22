@@ -823,7 +823,8 @@ contract DssSpellTest is DssSpellTestBase {
     function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
-        string[1] memory resolutions = [
+        string[2] memory resolutions = [
+            "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB",
             "QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf"
         ];
 

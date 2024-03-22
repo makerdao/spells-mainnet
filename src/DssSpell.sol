@@ -31,17 +31,18 @@ contract DssSpellAction is DssAction {
         return false;
     }
 
+    // ---------- Approve TACO Dao Resolution ----------
+    // Forum: https://forum.makerdao.com/t/project-ethena-proposal-enacting-dao-resolutions/23923
+
+    // Approve TACO Dao Resolution with IPFS hash Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
+    // Note: see dao_resolutions variable below
+
     // ---------- Approve HVBank (RWA009-A) Dao Resolution ----------
     // Forum: https://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/24
 
     // Approve HVBank (RWA009-A) Dao Resolution with IPFS hash QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf
-    // Note: see dao_resolutions variable below
-
-    // ---------- Approve TACO Dao Resolution ----------
-    // Approve TACO Dao Resolution with IPFS hash TBD
-
     // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf";
+    string public constant dao_resolutions = "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB,QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -107,10 +108,16 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 2_500 * MILLION);
 
         // ---------- Morpho D3M setup ----------
-        // TODO
+        // Forum: https://forum.makerdao.com/t/introduction-and-initial-parameters-for-ddm-overcollateralized-spark-metamorpho-ethena-vault/23925
+
+        // Deploy DDM to Spark DAI Morpho Vault at 0x73e65DBD630f90604062f6E02fAb9138e713edD9
+        // DDM DC-IAM Parameters:
+        // line: 100 million DAI
+        // gap: 100 million DAI
+        // ttl: 24 hours
 
         // ---------- DSR Change ----------
-        // Forum: TODO
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-11-under-sta-article-3-3/23910
 
         // DSR: Decrease the Dai Savings Rate by 2 percentage points from 15.00% to 13.00%
         DssExecLib.setDSR(THIRTEEN_PCT_RATE, /* doDrip = */ true);
