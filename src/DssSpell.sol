@@ -123,7 +123,7 @@ contract DssSpellAction is DssAction {
         // Increase the SparkLend D3M Maximum Debt Ceiling by 1.0 billion DAI from 1.5 billion DAI to 2.5 billion DAI.
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 2_500 * MILLION);
 
-        // ---------- Morpho D3M setup ----------
+        // ---------- D3M to Spark DAI Morpho Vault (DIRECT-SPARK-MORPHO-DAI) ----------
         // Forum: https://forum.makerdao.com/t/introduction-and-initial-parameters-for-ddm-overcollateralized-spark-metamorpho-ethena-vault/23925
 
         // Deploy DDM to Spark DAI Morpho Vault at 0x73e65DBD630f90604062f6E02fAb9138e713edD9
