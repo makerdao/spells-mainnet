@@ -119,6 +119,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- SparkLend D3M update ----------
         // Forum: https://forum.makerdao.com/t/mar-6-2024-proposed-changes-to-sparklend-for-upcoming-spell/23791/
+        // Poll: https://vote.makerdao.com/polling/QmVGDsvm#poll-detail
 
         // Increase the SparkLend D3M Maximum Debt Ceiling by 1.0 billion DAI from 1.5 billion DAI to 2.5 billion DAI.
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-DAI", 2_500 * MILLION);
@@ -216,6 +217,9 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/mar-6-2024-proposed-changes-to-sparklend-for-upcoming-spell/23791/
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-11-under-sta-article-3-3/23910
+        // Poll: https://vote.makerdao.com/polling/QmQAtb17
+        // Poll: https://vote.makerdao.com/polling/QmYYoAMe
 
         // Trigger Spark Proxy Spell at 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
