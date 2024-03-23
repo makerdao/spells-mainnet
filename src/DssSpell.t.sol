@@ -71,6 +71,9 @@ interface D3MOperatorPlanLike {
     function targetAssets() external view returns (uint256);
     function wards(address) external view returns (uint256);
 }
+interface IMetaMorpho {
+    function setSupplyQueue(bytes32[] calldata newSupplyQueue) external;
+}
 
 contract DssSpellTest is DssSpellTestBase {
     string         config;
@@ -925,12 +928,14 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(vat.wards(address(hub)), 1);
         }
 
+        // Set supply queue
+        bytes32[] memory newSupplyQueue = new bytes32[](1);
+        newSupplyQueue[0] = 0x57f4e42c0707d3ae0ae39c9343dcba78ff79fa663da040eca45717a9b0b0557f; // Idle DAI market
+        vm.prank(operator); IMetaMorpho(vault).setSupplyQueue(newSupplyQueue);
+
         // Adjust debt
         vm.prank(operator); plan.setTargetAssets(debtCeiling);
         assertEq(plan.targetAssets(), debtCeiling, 'TestError/targetAssets-not-set');
-
-        // Adjust liquidity
-        GodMode.setBalance(vault, address(pool), debtCeiling);
 
         // Fill by the line
         hub.exec(ilk);
