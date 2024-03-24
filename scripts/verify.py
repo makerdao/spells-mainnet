@@ -53,8 +53,8 @@ if contract_path == '':
     exit('contract name not found.')
 
 print('Obtaining chain... ')
-seth_chain = subprocess.run(['seth', 'chain'], capture_output=True)
-chain = seth_chain.stdout.decode('ascii').replace('\n', '')
+cast_chain = subprocess.run(['cast', 'chain'], capture_output=True)
+chain = cast_chain.stdout.decode('ascii').replace('\n', '')
 print(chain)
 
 text_metadata = content['contracts'][contract_path][contract_name]['metadata']
@@ -74,13 +74,16 @@ module = 'contract'
 action = 'verifysourcecode'
 code_format = 'solidity-single-file'
 
-flatten = subprocess.run([
-    'hevm',
+flatten_output_path = 'out/flat.sol'
+subprocess.run([
+    'forge',
     'flatten',
-    '--source-file',
-    contract_path
-], capture_output=True)
-code = flatten.stdout.decode('utf-8')
+    contract_path,
+    '--output',
+    flatten_output_path
+])
+with open(flatten_output_path, 'r', encoding='utf-8') as code_file:
+    code = code_file.read()
 
 def get_block(signature, code, with_frame=False):
     block_and_tail = code[code.find(signature) :]
