@@ -44,7 +44,7 @@ contract DssSpellAction is DssAction {
     }
 
     // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB,QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf";
+    string public constant dao_resolutions = "QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -199,15 +199,6 @@ contract DssSpellAction is DssAction {
 
         // Increase the bump parameter for 25,000 DAI from 50,000 DAI to 75,000 DAI.
         DssExecLib.setValue(MCD_VOW, "bump", 75 * THOUSAND * RAD);
-
-        // ---------- Approve TACO Dao Resolution ----------
-        // Forum: https://forum.makerdao.com/t/project-ethena-proposal-enacting-dao-resolutions/23923
-
-        // Approve TACO Dao Resolution with IPFS hash Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
-        // Note: see `dao_resolutions` variable declared above
-
-        // kiss 0x6759610547a36E9597Ef452aa0B9cace91291a2f address in the RWA015-A output conduit
-        RwaOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).kiss(RWA015_A_CUSTODY_TACO);
 
         // ---------- Approve HVBank (RWA009-A) Dao Resolution ----------
         // Forum: https://forum.makerdao.com/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/24

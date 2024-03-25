@@ -872,8 +872,7 @@ contract DssSpellTest is DssSpellTestBase {
     function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
-        string[2] memory resolutions = [
-            "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB",
+        string[1] memory resolutions = [
             "QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf"
         ];
 
@@ -970,61 +969,5 @@ contract DssSpellTest is DssSpellTestBase {
         (ink, art) = vat.urns(ilk, address(pool));
         assertLt(ink, WAD, "TestError/unexpected-postdisable-ink"); // Less than some dust amount is fine (1 DAI)
         assertLt(art, WAD, "TestError/unexpected-postdisable-art");
-    }
-
-    function testRWA015newBud() public {
-        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_TACO");
-
-        RwaOutputConduitAbstract rwa015AOutputConduit = RwaOutputConduitAbstract(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-        assertEq(rwa015AOutputConduit.bud(NEW_BUD), 0, 'TestError/already-bud');
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(rwa015AOutputConduit.bud(NEW_BUD), 1, 'TestError/not-bud-after-cast');
-    }
-
-    function testRWA015outputConduitPush(uint80 pushAmount, address condiutOperator) public {
-        address              NEW_BUD       = addr.addr("RWA015_A_CUSTODY_TACO");
-        RwaOutputConduitLike outputConduit = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-        address              psm           = addr.addr("MCD_PSM_USDC_A");
-        GemAbstract          psmGem        = GemAbstract(addr.addr("USDC"));
-
-        // Calculate difference of decimals
-        uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
-
-        // Ensure pushAmount is bigger than 0 in gem decimals
-        vm.assume(pushAmount > daiPsmGemDiffDecimals);
-
-        // Record psmGem balance before push
-        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Setup DAI in Output Conduit
-        GodMode.setBalance(address(dai), address(outputConduit), pushAmount);
-
-        // Setup operator for OutputConduit
-        GodMode.setWard(address(outputConduit), address(this), 1);
-        outputConduit.hope(condiutOperator);
-        outputConduit.mate(condiutOperator);
-
-        vm.startPrank(condiutOperator);
-        {
-            // Prepare for the push
-            outputConduit.pick(NEW_BUD);
-            outputConduit.hook(psm);
-
-            // Push and quit
-            outputConduit.push(pushAmount);
-            outputConduit.quit();
-        }
-        vm.stopPrank();
-
-        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
-        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
     }
 }
