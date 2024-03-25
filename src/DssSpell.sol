@@ -141,7 +141,6 @@ contract DssSpellAction is DssAction {
 
         // Note: The following dependencies are copied from the original repository at
         // https://github.com/makerdao/dss-direct-deposit/tree/13916d8f7c0b88ca094ab6a31c1261ce27b98a7c/src/deploy
-        // TODO: update commit hash when the PR is merged
 
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
         D3MInstance memory d3m = D3MInstance({
