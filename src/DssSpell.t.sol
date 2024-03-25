@@ -75,6 +75,24 @@ interface IMetaMorpho {
     function setSupplyQueue(bytes32[] calldata newSupplyQueue) external;
 }
 
+interface RwaOutputConduitLike {
+    function wards(address) external view returns (uint256);
+    function can(address) external view returns (uint256);
+    function may(address) external view returns (uint256);
+    function pal(address) external view returns (uint256);
+    function bud(address) external view returns (uint256);
+    function dai() external view returns (address);
+    function gem() external view returns (address);
+    function mate(address) external;
+    function hope(address) external;
+    function kiss(address) external;
+    function hook(address) external;
+    function quitTo() external view returns (address);
+    function pick(address) external;
+    function push(uint256) external;
+    function quit() external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -965,5 +983,48 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         assertEq(rwa015AOutputConduit.bud(NEW_BUD), 1, 'TestError/not-bud-after-cast');
+    }
+
+    function testRWA015outputConduitPush(uint80 pushAmount, address condiutOperator) public {
+        address              NEW_BUD       = addr.addr("RWA015_A_CUSTODY_TACO");
+        RwaOutputConduitLike outputConduit = RwaOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
+        address              psm           = addr.addr("MCD_PSM_USDC_A");
+        GemAbstract          psmGem        = GemAbstract(addr.addr("USDC"));
+
+        // Calculate difference of decimals
+        uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
+
+        // Ensure pushAmount is bigger than 0 in gem decimals
+        vm.assume(pushAmount > daiPsmGemDiffDecimals);
+
+        // Record psmGem balance before push
+        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Setup DAI in Output Conduit
+        GodMode.setBalance(address(dai), address(outputConduit), pushAmount);
+
+        // Setup operator for OutputConduit
+        GodMode.setWard(address(outputConduit), address(this), 1);
+        outputConduit.hope(condiutOperator);
+        outputConduit.mate(condiutOperator);
+
+        vm.startPrank(condiutOperator);
+        {
+            // Prepare for the push
+            outputConduit.pick(NEW_BUD);
+            outputConduit.hook(psm);
+
+            // Push and quit
+            outputConduit.push(pushAmount);
+            outputConduit.quit();
+        }
+        vm.stopPrank();
+
+        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, pushAmount / daiPsmGemDiffDecimals, "RWA015-A: Psm GEM not sent to destination after push()");
     }
 }
