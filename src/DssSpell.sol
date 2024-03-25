@@ -23,10 +23,6 @@ import { DssInstance, MCD } from "dss-test/MCD.sol";
 import { D3MInit, D3MCommonConfig, D3M4626PoolConfig, D3MOperatorPlanConfig } from "src/dependencies/dss-direct-deposit/D3MInit.sol";
 import { D3MInstance } from "src/dependencies/dss-direct-deposit/D3MInstance.sol";
 
-interface RwaOutputConduitLike {
-    function kiss(address) external;
-}
-
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -82,9 +78,6 @@ contract DssSpellAction is DssAction {
     address internal constant MORPHO_D3M_ORACLE        = 0xA5AA14DEE8c8204e424A55776E53bfff413b02Af;
     address internal constant MORPHO_D3M_OPERATOR      = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
     address internal constant SPARK_MORPHO_VAULT       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
-
-    address internal immutable RWA015_A_OUTPUT_CONDUIT = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
-    address internal constant RWA015_A_CUSTODY_TACO    = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
 
     address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL              = 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d;

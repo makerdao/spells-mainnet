@@ -75,24 +75,6 @@ interface IMetaMorpho {
     function setSupplyQueue(bytes32[] calldata newSupplyQueue) external;
 }
 
-interface RwaOutputConduitLike {
-    function wards(address) external view returns (uint256);
-    function can(address) external view returns (uint256);
-    function may(address) external view returns (uint256);
-    function pal(address) external view returns (uint256);
-    function bud(address) external view returns (uint256);
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function mate(address) external;
-    function hope(address) external;
-    function kiss(address) external;
-    function hook(address) external;
-    function quitTo() external view returns (address);
-    function pick(address) external;
-    function push(uint256) external;
-    function quit() external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
