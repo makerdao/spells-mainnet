@@ -929,6 +929,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Set supply queue
         bytes32[] memory newSupplyQueue = new bytes32[](1);
+        // Note: the market id below is created via https://etherscan.io/tx/0x37d381d56f280ce046e285b54db947068bd0220ff483175fb921b3ecec0a09ea
         newSupplyQueue[0] = 0x57f4e42c0707d3ae0ae39c9343dcba78ff79fa663da040eca45717a9b0b0557f; // Idle DAI market
         vm.prank(operator); IMetaMorpho(vault).setSupplyQueue(newSupplyQueue);
 
@@ -969,6 +970,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Set supply queue
         bytes32[] memory newSupplyQueue = new bytes32[](1);
+        // Note: the market id below is created via https://etherscan.io/tx/0x37d381d56f280ce046e285b54db947068bd0220ff483175fb921b3ecec0a09ea
         newSupplyQueue[0] = 0x57f4e42c0707d3ae0ae39c9343dcba78ff79fa663da040eca45717a9b0b0557f; // Idle DAI market
         vm.prank(operator); IMetaMorpho(vault).setSupplyQueue(newSupplyQueue);
 
