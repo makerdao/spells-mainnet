@@ -44,37 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface D3MHubLike {
-    function end() external view returns (address);
-    function exec(bytes32 ilk) external;
-    function ilks(bytes32)
-        external
-        view
-        returns (address pool, address plan, uint256 tau, uint256 culled, uint256 tic);
-    function vow() external view returns (address);
-}
-interface D3MMomLike {
-    function authority() external view returns (address);
-    function disable(address who) external;
-}
-interface D3M4626PoolLike {
-    function redeemable() external view returns (address);
-    function vault() external view returns (address);
-}
-interface D3MOracleLike {
-    function hub() external view returns (address);
-}
-interface D3MOperatorPlanLike {
-    function active() external view returns (bool);
-    function operator() external view returns (address);
-    function setTargetAssets(uint256 value) external;
-    function targetAssets() external view returns (uint256);
-    function wards(address) external view returns (uint256);
-}
-interface IMetaMorpho {
-    function setSupplyQueue(bytes32[] calldata newSupplyQueue) external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -851,7 +820,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public { // add the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -871,7 +840,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d);
 
@@ -890,130 +859,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testDirectSparkMorphoIntegration() public {
-        bytes32 ilk         = "DIRECT-SPARK-MORPHO-DAI";
-        address vault       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
-        address operator    = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
-        uint256 debtCeiling = 100 * MILLION * WAD;
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
-        D3M4626PoolLike pool = D3M4626PoolLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_POOL"));
-        D3MOperatorPlanLike plan = D3MOperatorPlanLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_PLAN"));
-        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_ORACLE"));
-
-        { // Do a bunch of sanity checks of the values that were set in the spell
-            (address _pool, address _plan, uint256 tau, uint256 _culled,) = hub.ilks(ilk);
-            assertEq(_pool, address(pool));
-            assertEq(_plan, address(plan));
-            assertEq(tau, 7 days);
-            assertEq(_culled, 0);
-            assertEq(hub.vow(), address(vow));
-            assertEq(hub.end(), address(end));
-            assertEq(mom.authority(), address(chief));
-            assertEq(pool.vault(), vault);
-            assertEq(pool.redeemable(), vault);
-            assertEq(plan.operator(), operator);
-            assertEq(plan.wards(address(mom)), 1);
-            assertEq(plan.active(), true);
-            assertEq(oracle.hub(), address(hub));
-            (address pip,) = spotter.ilks(ilk);
-            assertEq(pip, address(oracle));
-            assertEq(vat.wards(address(hub)), 1);
-        }
-
-        // Set supply queue
-        bytes32[] memory newSupplyQueue = new bytes32[](1);
-        // Note: the market id below is created via https://etherscan.io/tx/0x37d381d56f280ce046e285b54db947068bd0220ff483175fb921b3ecec0a09ea
-        newSupplyQueue[0] = 0x57f4e42c0707d3ae0ae39c9343dcba78ff79fa663da040eca45717a9b0b0557f; // Idle DAI market
-        vm.prank(operator); IMetaMorpho(vault).setSupplyQueue(newSupplyQueue);
-
-        // Adjust debt
-        vm.prank(operator); plan.setTargetAssets(debtCeiling);
-        assertEq(plan.targetAssets(), debtCeiling, 'TestError/targetAssets-not-set');
-
-        // Fill by the line
-        hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        assertEq(ink, debtCeiling, "TestError/unexpected-postexec-ink");
-        assertEq(art, debtCeiling, "TestError/unexpected-postexec-art");
-
-        // De-activate the D3M via mom
-        vm.prank(DSChiefAbstract(chief).hat());
-        mom.disable(address(plan));
-        assertEq(plan.active(), false, "TestError/unexpected-postdisable-active");
-
-        hub.exec(ilk);
-        (ink, art) = vat.urns(ilk, address(pool));
-        assertLt(ink, WAD, "TestError/unexpected-postdisable-ink"); // Less than some dust amount is fine (1 DAI)
-        assertLt(art, WAD, "TestError/unexpected-postdisable-art");
-    }
-
-    function testDirectSparkMorphoCage() public {
-        bytes32 ilk         = "DIRECT-SPARK-MORPHO-DAI";
-        address vault       = 0x73e65DBD630f90604062f6E02fAb9138e713edD9;
-        address operator    = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
-        uint256 debtCeiling = 100 * MILLION * WAD;
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
-        D3M4626PoolLike pool = D3M4626PoolLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_POOL"));
-        D3MOperatorPlanLike plan = D3MOperatorPlanLike(addr.addr("DIRECT_SPARK_MORPHO_DAI_PLAN"));
-
-        // Set supply queue
-        bytes32[] memory newSupplyQueue = new bytes32[](1);
-        // Note: the market id below is created via https://etherscan.io/tx/0x37d381d56f280ce046e285b54db947068bd0220ff483175fb921b3ecec0a09ea
-        newSupplyQueue[0] = 0x57f4e42c0707d3ae0ae39c9343dcba78ff79fa663da040eca45717a9b0b0557f; // Idle DAI market
-        vm.prank(operator); IMetaMorpho(vault).setSupplyQueue(newSupplyQueue);
-
-        // Adjust debt
-        vm.prank(operator); plan.setTargetAssets(debtCeiling);
-        assertEq(plan.targetAssets(), debtCeiling, 'TestError/targetAssets-not-set');
-
-        // Fill by the line
-        hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        assertEq(ink, debtCeiling, "TestError/unexpected-postexec-ink");
-        assertEq(art, debtCeiling, "TestError/unexpected-postexec-art");
-
-        // Trigger END
-        vm.prank(pauseProxy); end.cage();
-        end.cage(ilk);
-        end.skim(ilk, address(pool));
-        (ink, art) = vat.urns(ilk, address(pool));
-        assertEq(ink, 0, "TestError/wrong ink in urn after skim");
-        assertEq(art, 0, "TestError/wrong art in urn after skim");
-
-        // Remove surplus and warp to allow continuing the execution
-        vm.store(
-            address(vat),
-            keccak256(abi.encode(address(vow), uint256(5))),
-            bytes32(uint256(0))
-        );
-        vm.warp(block.timestamp + end.wait());
-
-        end.thaw();
-        end.flow(ilk);
-
-        GodMode.setBalance(address(dai), address(this), debtCeiling);
-        dai.approve(address(daiJoin), debtCeiling);
-        daiJoin.join(address(this), debtCeiling);
-        vat.hope(address(end));
-        end.pack(debtCeiling);
-
-        // Check DAI redemption after "cage()"
-        assertEq(vat.gem(ilk, address(this)), 0, "TestError/wrong vat gem");
-        assertEq(GemAbstract(vault).balanceOf(address(this)), 0, "TestError/wrong gem balance");
-        end.cash(ilk, debtCeiling);
-        assertGt(vat.gem(ilk, address(this)), 0, "TestError/wrong vat gem after cash");
-        assertEq(GemAbstract(vault).balanceOf(address(this)), 0, "TestError/wrong gem balance after cash");
-    }
 }

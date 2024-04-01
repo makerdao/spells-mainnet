@@ -86,18 +86,18 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = 0xD8D60b7A9998098261DF5175B5b0Fb567CD0Fb1A; // 2024-03-06 spell
+        address[] memory prevSpells = new address[](0);
+        // prevSpells[0] = address(0);
 
         //
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0xcD672aCc9885796a19b4bAf03Dba46c8cdB0882B), // populate with deployed spell if deployed
-            deployed_spell_created: 1711471547, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   19519874,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0), // populate with deployed spell if deployed
+            deployed_spell_created: 0, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   0,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   true,      // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -106,7 +106,7 @@ contract Config {
         //
         afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
         afterSpell.pot_dsr               = 13_00;          // In basis points
-        afterSpell.pause_delay           = 16 hours;       // In seconds
+        afterSpell.pause_delay           = 30 hours;       // In seconds
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
