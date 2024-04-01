@@ -23,6 +23,10 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface PauseLike {
+    function setDelay(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -51,11 +55,18 @@ contract DssSpellAction is DssAction {
 
     // ---------- Addesses ----------
 
+    address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
+
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL = address(0); // TODO
 
     function actions() public override {
-        // ---------- TODO ----------
+        // ---------- Increase the GSM Pause Delay ----------
+        // Forum: TODO
+        // Poll: TODO
+
+        // ----- Increase the GSM Pause Delay by 14 hours, from 16 hours to 30 hours -----
+        PauseLike(MCD_PAUSE).setDelay(30 hours);
 
         // ---------- Spark Proxy Spell ----------
         // Forum: TODO
