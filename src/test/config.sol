@@ -1730,7 +1730,7 @@ contract Config {
         });
         afterSpell.collaterals["DIRECT-SPARK-MORPHO-DAI"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      100 * MILLION,
+            aL_line:      1 * BILLION,
             aL_gap:       100 * MILLION,
             aL_ttl:       24 hours,
             line:         0,

@@ -59,6 +59,8 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Math ----------
+    uint256 internal constant MILLION = 10**6;
+    uint256 internal constant BILLION = 10**9;
 
     // ---------- Addesses ----------
 
@@ -96,6 +98,13 @@ contract DssSpellAction is DssAction {
         LineMomLike(LINE_MOM).addIlk("WBTC-B");
         // WBTC-C
         LineMomLike(LINE_MOM).addIlk("WBTC-C");
+
+        // ---------- Spark MetaMorpho Vault Parameters ----------
+        // Forum: TODO
+        // Poll: TODO
+
+        // DDM DC-IAM Parameters: line: 1 billion DAI
+        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-MORPHO-DAI", 1 * BILLION);
 
         // ---------- Approve TACO Resolution ----------
         // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
