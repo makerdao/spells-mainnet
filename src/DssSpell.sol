@@ -102,7 +102,7 @@ contract DssSpellAction is DssAction {
         // Forum: TODO
         // Poll: TODO
 
-        // DDM DC-IAM Parameters: line: 1 billion DAI | gap: 100 million DAI | ttl: 24 hours
+        // DDM DC-IAM Parameters: line: 1 billion DAI
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-MORPHO-DAI", 1 * BILLION);
 
         // ---------- Approve TACO Resolution ----------
