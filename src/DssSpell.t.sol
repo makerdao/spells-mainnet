@@ -44,6 +44,10 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface LineMomLike {
+    function ilks(bytes32) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -820,11 +824,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmStrc9kMCmgzh2EVunjJkPsJLhsVRYyrNFBXBbJAJMrrf"
+            "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -840,9 +844,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d);
+        address SPARK_SPELL = address(0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2);
 
         vm.expectCall(
             SPARK_PROXY,
@@ -859,4 +863,32 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testLineMomAddedIlks() public { // add the `skipped` modifier to skip
+        LineMomLike lineMom = LineMomLike(chainLog.getAddress("LINE_MOM"));
+        string[8] memory addedIlks = [
+            "ETH-A",
+            "ETH-B",
+            "ETH-C",
+            "WSTETH-A",
+            "WSTETH-B",
+            "WBTC-A",
+            "WBTC-B",
+            "WBTC-C"
+        ];
+
+        for (uint256 i = 0; i < addedIlks.length; i++) {
+            uint256 exists = lineMom.ilks(_stringToBytes32(addedIlks[i]));
+            require(exists == 0, _concat("TestError/ilk-already-in-line-mom: ", addedIlks[i]));
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < addedIlks.length; i++) {
+            uint256 exists = lineMom.ilks(_stringToBytes32(addedIlks[i]));
+            require(exists == 1, _concat("TestError/ilk-not-added-to-line-mom: ", addedIlks[i]));
+        }
+    }
 }

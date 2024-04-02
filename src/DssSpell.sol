@@ -27,6 +27,10 @@ interface PauseLike {
     function setDelay(uint256) external;
 }
 
+interface LineMomLike {
+    function addIlk(bytes32 ilk) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -38,6 +42,9 @@ contract DssSpellAction is DssAction {
     function officeHours() public pure override returns (bool) {
         return false;
     }
+
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -56,24 +63,55 @@ contract DssSpellAction is DssAction {
     // ---------- Addesses ----------
 
     address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
+    address internal immutable LINE_MOM  = DssExecLib.getChangelogAddress("LINE_MOM");
 
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0); // TODO
+    address internal constant SPARK_SPELL = 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2;
 
     function actions() public override {
         // ---------- Increase the GSM Pause Delay ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.makerdao.com/t/gsm-pause-delay-increase-proposal/23929
+        // Poll: https://vote.makerdao.com/polling/QmcLsYwj
 
-        // ----- Increase the GSM Pause Delay by 14 hours, from 16 hours to 30 hours -----
+        // Increase the GSM Pause Delay by 14 hours, from 16 hours to 30 hours -----
         PauseLike(MCD_PAUSE).setDelay(30 hours);
 
+        // ---------- Add the following ilks to LINE_MOM ----------
+        // Forum: https://forum.makerdao.com/t/gov12-1-2-bootstrapping-edit-proposal-gov10-2-3-1a-edit/24005
+        // Poll: https://vote.makerdao.com/polling/QmZsAM36
+
+        // ETH-A
+        LineMomLike(LINE_MOM).addIlk("ETH-A");
+        // ETH-B
+        LineMomLike(LINE_MOM).addIlk("ETH-B");
+        // ETH-C
+        LineMomLike(LINE_MOM).addIlk("ETH-C");
+        // WSTETH-A
+        LineMomLike(LINE_MOM).addIlk("WSTETH-A");
+        // WSTETH-B
+        LineMomLike(LINE_MOM).addIlk("WSTETH-B");
+        // WBTC-A
+        LineMomLike(LINE_MOM).addIlk("WBTC-A");
+        // WBTC-B
+        LineMomLike(LINE_MOM).addIlk("WBTC-B");
+        // WBTC-C
+        LineMomLike(LINE_MOM).addIlk("WBTC-C");
+
+        // ---------- Approve TACO Resolution ----------
+        // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
+
+        // Approve IPFS Resolutions: Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
+        // Note: see `dao_resolutions` variable declared above
+
         // ---------- Spark Proxy Spell ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.makerdao.com/t/mar-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/23918
+        // Poll: https://vote.makerdao.com/polling/QmdjqTvL
+        // Poll: https://vote.makerdao.com/polling/QmaEqEav
+        // Poll: https://vote.makerdao.com/polling/QmaEqEav
+        // Poll: https://vote.makerdao.com/polling/QmbCWUAP
 
         // Trigger Spark Proxy Spell at 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d
-        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
