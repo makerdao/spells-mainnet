@@ -59,7 +59,6 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Math ----------
-    uint256 internal constant MILLION = 10**6;
     uint256 internal constant BILLION = 10**9;
 
     // ---------- Addesses ----------
@@ -103,7 +102,7 @@ contract DssSpellAction is DssAction {
         // Forum: TODO
         // Poll: TODO
 
-        // DDM DC-IAM Parameters: line: 1 billion DAI
+        // DDM DC-IAM Parameters: line: 1 billion DAI | gap: 100 million DAI | ttl: 24 hours
         DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-MORPHO-DAI", 1 * BILLION);
 
         // ---------- Approve TACO Resolution ----------
