@@ -59,11 +59,9 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Math ----------
-
     uint256 internal constant BILLION = 10 ** 9;
 
     // ---------- Addesses ----------
-
     address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable LINE_MOM  = DssExecLib.getChangelogAddress("LINE_MOM");
 
