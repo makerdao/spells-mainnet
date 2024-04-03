@@ -864,7 +864,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    function testLineMomAddedIlks() public { // add the `skipped` modifier to skip
+    function testLineMomAddedIlks() public {
         LineMomLike lineMom = LineMomLike(chainLog.getAddress("LINE_MOM"));
         string[8] memory addedIlks = [
             "ETH-A",
