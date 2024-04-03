@@ -187,6 +187,7 @@ contract DssSpellTestBase is Config, DssTest {
     ClipperMomAbstract           clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
     FlapperMomAbstract           flapMom = FlapperMomAbstract( addr.addr("FLAPPER_MOM"));
     AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
+    AuthorityLike                lineMom = AuthorityLike(      addr.addr("LINE_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
@@ -500,6 +501,9 @@ contract DssSpellTestBase is Config, DssTest {
 
         // check D3MMom authority
         assertEq(d3mMom.authority(), values.d3m_mom_authority, "TestError/d3mMom-authority");
+
+        // check LineMom authority
+        assertEq(lineMom.authority(), values.line_mom_authority, "TestError/d3mMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");

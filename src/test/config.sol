@@ -45,6 +45,7 @@ contract Config {
         address osm_mom_authority;
         address clipper_mom_authority;
         address d3m_mom_authority;
+        address line_mom_authority;
         uint256 ilk_count;
         string  chainlog_version;
         mapping (bytes32 => CollateralValues) collaterals;
@@ -121,6 +122,7 @@ contract Config {
         afterSpell.osm_mom_authority     = chief;          // OsmMom authority
         afterSpell.clipper_mom_authority = chief;          // ClipperMom authority
         afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
+        afterSpell.line_mom_authority    = chief;          // LineMom authority
         afterSpell.ilk_count             = 65;             // Num expected in system
         afterSpell.chainlog_version      = "1.17.3";       // String expected in system
 
