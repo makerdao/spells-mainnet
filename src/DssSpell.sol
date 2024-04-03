@@ -117,13 +117,13 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmaEqEav
         // Poll: https://vote.makerdao.com/polling/QmbCWUAP
 
-        // Pass Spark Proxy Spell at 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2
+        // Trigger Spark Proxy Spell at 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- Approve TACO Resolution ----------
         // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
 
-        // Approve IPFS Resolutions: Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
+        // Approve IPFS Resolutions: QmUarSLBgfvCK5Mco2QS8UraSqwxWtK5jKiEbxDYxE1C4A
         // Note: see `dao_resolutions` variable declared above
     }
 }
