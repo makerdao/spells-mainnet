@@ -503,7 +503,7 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(d3mMom.authority(), values.d3m_mom_authority, "TestError/d3mMom-authority");
 
         // check LineMom authority
-        assertEq(lineMom.authority(), values.line_mom_authority, "TestError/d3mMom-authority");
+        assertEq(lineMom.authority(), values.line_mom_authority, "TestError/lineMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
