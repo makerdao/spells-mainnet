@@ -114,7 +114,6 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/mar-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/23918
         // Poll: https://vote.makerdao.com/polling/QmdjqTvL
         // Poll: https://vote.makerdao.com/polling/QmaEqEav
-        // Poll: https://vote.makerdao.com/polling/QmaEqEav
         // Poll: https://vote.makerdao.com/polling/QmbCWUAP
 
         // Trigger Spark Proxy Spell at 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d
