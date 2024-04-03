@@ -111,12 +111,6 @@ contract DssSpellAction is DssAction {
         // WBTC-C
         LineMomLike(LINE_MOM).addIlk("WBTC-C");
 
-        // ---------- Approve TACO Resolution ----------
-        // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
-
-        // Approve IPFS Resolutions: Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
-        // Note: see `dao_resolutions` variable declared above
-
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/mar-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/23918
         // Poll: https://vote.makerdao.com/polling/QmdjqTvL
@@ -125,6 +119,12 @@ contract DssSpellAction is DssAction {
 
         // Pass Spark Proxy Spell at 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+
+        // ---------- Approve TACO Resolution ----------
+        // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
+
+        // Approve IPFS Resolutions: Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB
+        // Note: see `dao_resolutions` variable declared above
     }
 }
 
