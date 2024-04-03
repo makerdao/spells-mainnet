@@ -76,33 +76,40 @@ contract DssSpellAction is DssAction {
         // Increase the GSM Pause Delay by 14 hours, from 16 hours to 30 hours -----
         PauseLike(MCD_PAUSE).setDelay(30 hours);
 
+        // ---------- Spark MetaMorpho Vault DDM ----------
+        // Forum: https://forum.makerdao.com/t/morpho-spark-dai-vault-update-1-april-2024/24006
+        // Forum: https://forum.makerdao.com/t/morpho-spark-dai-vault-update-1-april-2024/24006/8
+
+        // DDM DC-IAM Parameters: line: 1 billion DAI
+        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-MORPHO-DAI", 1 * BILLION);
+
         // ---------- Add the following ilks to LINE_MOM ----------
         // Forum: https://forum.makerdao.com/t/gov12-1-2-bootstrapping-edit-proposal-gov10-2-3-1a-edit/24005
         // Poll: https://vote.makerdao.com/polling/QmZsAM36
 
         // ETH-A
         LineMomLike(LINE_MOM).addIlk("ETH-A");
+
         // ETH-B
         LineMomLike(LINE_MOM).addIlk("ETH-B");
+
         // ETH-C
         LineMomLike(LINE_MOM).addIlk("ETH-C");
+
         // WSTETH-A
         LineMomLike(LINE_MOM).addIlk("WSTETH-A");
+
         // WSTETH-B
         LineMomLike(LINE_MOM).addIlk("WSTETH-B");
+
         // WBTC-A
         LineMomLike(LINE_MOM).addIlk("WBTC-A");
+
         // WBTC-B
         LineMomLike(LINE_MOM).addIlk("WBTC-B");
+
         // WBTC-C
         LineMomLike(LINE_MOM).addIlk("WBTC-C");
-
-        // ---------- Spark MetaMorpho Vault Parameters ----------
-        // Forum: https://forum.makerdao.com/t/morpho-spark-dai-vault-update-1-april-2024/24006
-        // Forum: https://forum.makerdao.com/t/morpho-spark-dai-vault-update-1-april-2024/24006/8
-
-        // DDM DC-IAM Parameters: line: 1 billion DAI
-        DssExecLib.setIlkAutoLineDebtCeiling("DIRECT-SPARK-MORPHO-DAI", 1 * BILLION);
 
         // ---------- Approve TACO Resolution ----------
         // Forum: https://forum.makerdao.com/t/bt-project-ethena-risk-legal-assessment/23978
@@ -116,7 +123,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmaEqEav
         // Poll: https://vote.makerdao.com/polling/QmbCWUAP
 
-        // Trigger Spark Proxy Spell at 0x210DF2e1764Eb5491d41A62E296Ea39Ab56F9B6d
+        // Pass Spark Proxy Spell at 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
