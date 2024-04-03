@@ -60,7 +60,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Math ----------
 
-    uint256 internal constant BILLION = 10**9;
+    uint256 internal constant BILLION = 10 ** 9;
 
     // ---------- Addesses ----------
 
