@@ -44,7 +44,7 @@ contract DssSpellAction is DssAction {
     }
 
     // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB";
+    string public constant dao_resolutions = "QmUarSLBgfvCK5Mco2QS8UraSqwxWtK5jKiEbxDYxE1C4A";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator

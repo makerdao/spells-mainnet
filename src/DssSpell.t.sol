@@ -828,7 +828,7 @@ contract DssSpellTest is DssSpellTestBase {
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "Qmf8Nv4HnTFNDwRgcLzRgBdtVsVVfKY2FppaBimLK9XhxB"
+            "QmUarSLBgfvCK5Mco2QS8UraSqwxWtK5jKiEbxDYxE1C4A"
         ];
 
         string memory comma_separated_resolutions = "";
