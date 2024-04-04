@@ -34,9 +34,9 @@ interface LineMomLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/a90e4c4e5c44163fb78597f5d55690753e071711/governance/votes/Executive%20vote%20-%20March%2026%2C%202024.md -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/a43b05a2151bf57812341e230ec97fc29a9dab0c/governance/votes/Executive%20Vote%20-%20April%204%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-04-04 MakerDAO Executive Spell | Hash: TODO";
+        "2024-04-04 MakerDAO Executive Spell | Hash: 0xf89486dc0cdc9f3e9f6e328a5ba779dd5a23aa592e1c9901d7b91973e8bb3773";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -113,6 +113,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/mar-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/23918
+        // Forum: https://forum.makerdao.com/t/morpho-spark-dai-vault-update-1-april-2024/24006
         // Poll: https://vote.makerdao.com/polling/QmdjqTvL
         // Poll: https://vote.makerdao.com/polling/QmaEqEav
         // Poll: https://vote.makerdao.com/polling/QmbCWUAP
