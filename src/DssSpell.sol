@@ -34,9 +34,9 @@ interface LineMomLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/a43b05a2151bf57812341e230ec97fc29a9dab0c/governance/votes/Executive%20Vote%20-%20April%204%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/c72ec9c04e022f1767b032025f1bfafe15490857/governance/votes/Executive%20Vote%20-%20April%204%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-04-04 MakerDAO Executive Spell | Hash: 0xf89486dc0cdc9f3e9f6e328a5ba779dd5a23aa592e1c9901d7b91973e8bb3773";
+        "2024-04-04 MakerDAO Executive Spell | Hash: 0x6f8008ad08179d706d4ee801490b61ad5de8f4d4290dcbda9c028376d74ffca4";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
