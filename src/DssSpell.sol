@@ -40,7 +40,7 @@ contract DssSpellAction is DssAction {
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
