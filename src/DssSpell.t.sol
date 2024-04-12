@@ -404,15 +404,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            Payee(wallets.addr("AAVE_V3_TREASURY"), 100_603)
+            Payee(wallets.addr("AAVE_V3_TREASURY"), 238_339)
         ];
-        uint256 expectedSumPayments = 100_603; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 238_339; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -840,9 +840,10 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x7748C5E6EEda836247F2AfCd5a7c0dA3c5de9Da2;
+        // TODO: Update with the correct spell address
+        address SPARK_SPELL = address(0);
 
         vm.expectCall(
             SPARK_PROXY,
@@ -860,4 +861,20 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    function testPushPAXOutInputConduit() public {
+        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
+        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        uint256 prevDai = vat.dai(address(vow));
+        uint256 gemBalanceToPush = 84_211.27 ether; // `ether` is only a keyword helper
+
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
+        assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAY);
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
+    }
 }
