@@ -44,7 +44,41 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     function actions() public override {
+        // ---------- AD Compensation ----------
+        // Forum: TODO
 
+        // TBD
+
+        // ---------- AVC Member Compensation ----------
+        // Forum: TODO
+
+        // TBD
+
+        // ---------- Aave Revenue Share ----------
+        // Forum: https://forum.makerdao.com/t/spark-aave-revenue-share-calculation-payment-3-q1-2024/24014
+
+        // Transfer 238,339 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
+
+        // ---------- Whitelist new address in the RWA015-A output conduit ----------
+        // Forum: TODO
+
+        // TBD
+
+        // ---------- Push USDP out of input conduit ----------
+        // Forum: TODO
+
+        // Raise PSM-PAX-A DC to 100,000 DAI
+
+        // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 84,210.26 USDP
+
+        // Call void() on MCD_PSM_PAX_A_JAR
+
+        // Set PSM-PAX-A DC to 0 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
+
+        // ---------- Spark Proxy Spell ----------
+        // Forum: TODO
+
+        // Trigger Spark Proxy Spell at TBD
     }
 }
 
