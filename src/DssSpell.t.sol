@@ -44,6 +44,16 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface RwaSwapOutputConduitLike {
+    function bud(address) external view returns (uint256);
+    function mate(address) external;
+    function hope(address) external;
+    function hook(address) external;
+    function pick(address) external;
+    function push(uint256) external;
+    function quit() external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -870,8 +880,8 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRWA015NewBud() public {
         address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
+        RwaSwapOutputConduitLike rwa015AOutputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
 
-        RwaOutputConduitAbstract rwa015AOutputConduit = RwaOutputConduitAbstract(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
         assertEq(rwa015AOutputConduit.bud(NEW_BUD), 0, 'TestError/already-bud');
 
         _vote(address(spell));
@@ -879,6 +889,44 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done());
 
         assertEq(rwa015AOutputConduit.bud(NEW_BUD), 1, 'TestError/not-bud-after-cast');
+    }
+
+    function testRWA015OutputConduitPushWithNewBud() public {
+        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
+        RwaSwapOutputConduitLike outputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
+        address psm = addr.addr("MCD_PSM_USDC_A");
+        GemAbstract psmGem = GemAbstract(addr.addr("USDC"));
+
+        // Calculate difference of decimals
+        uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
+
+        // Record psmGem balance before push
+        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
+
+        uint256 amountToPush = 3;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Setup DAI in Output Conduit
+        GodMode.setBalance(address(dai), address(outputConduit), amountToPush * daiPsmGemDiffDecimals);
+
+        // Setup operator for OutputConduit
+        GodMode.setWard(address(outputConduit), address(this), 1);
+        outputConduit.hope(address(this));
+        outputConduit.mate(address(this));
+
+        // Prepare for the push
+        outputConduit.pick(NEW_BUD);
+        outputConduit.hook(psm);
+
+        // Push and quit
+        outputConduit.push(amountToPush * daiPsmGemDiffDecimals);
+        outputConduit.quit();
+
+        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, amountToPush, "RWA015-A: Psm GEM not sent to destination after push()");
     }
 
     function testPushPAXOutInputConduit() public {
