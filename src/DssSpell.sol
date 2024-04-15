@@ -89,7 +89,7 @@ contract DssSpellAction is DssAction {
     address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
 
     // ---------- Whitelist new address in the RWA015-A output conduit ----------
-    address internal constant RWA015_A_CUSTODY_TACO                 = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
+    address internal constant RWA015_A_CUSTODY_2                 = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
     RwaOutputConduitLike internal immutable RWA015_A_OUTPUT_CONDUIT = RwaOutputConduitLike(DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT"));
 
     // ---------- Trigger Spark Proxy Spell ----------
@@ -168,7 +168,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
 
         // Call kiss on RWA015_A_OUTPUT_CONDUIT with address 0x6759610547a36E9597Ef452aa0B9cace91291a2f
-        RWA015_A_OUTPUT_CONDUIT.kiss(RWA015_A_CUSTODY_TACO);
+        RWA015_A_OUTPUT_CONDUIT.kiss(RWA015_A_CUSTODY_2);
 
         // ---------- Push USDP out of input conduit ----------
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
@@ -182,7 +182,7 @@ contract DssSpellAction is DssAction {
         // Call void() on MCD_PSM_PAX_A_JAR
         MCD_PSM_PAX_A_JAR.void();
 
-        // Set PSM-PAX-A DC to 0 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
+        // Set PSM-PAX-A DC to 0 DAI
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
 
         // ---------- Spark Proxy Spell ----------

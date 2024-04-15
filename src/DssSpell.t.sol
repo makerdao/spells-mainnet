@@ -869,7 +869,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPELL-SPECIFIC TESTS GO BELOW
 
     function testRWA015NewBud() public {
-        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_TACO");
+        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
 
         RwaOutputConduitAbstract rwa015AOutputConduit = RwaOutputConduitAbstract(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
         assertEq(rwa015AOutputConduit.bud(NEW_BUD), 0, 'TestError/already-bud');
