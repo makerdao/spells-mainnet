@@ -101,6 +101,7 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- AD Compensation ----------
         // Forum: https://forum.makerdao.com/t/march-2024-aligned-delegate-compensation/24088
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-income-and-participation-requirements
 
         // BONAPUBLICA - 41.67 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
         MKR.transfer(BONAPUBLICA, 41.67 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
@@ -128,6 +129,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- AVC Member Compensation ----------
         // Forum: https://forum.makerdao.com/t/avc-member-participation-rewards-q1-2024/24083
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-5-10-avc-member-participation-rewards
 
         // IamMeeoh - 20.85 MKR - 0x47f7A5d8D27f259582097E1eE59a07a816982AE9
         MKR.transfer(IAMMEEOH, 20.85 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
