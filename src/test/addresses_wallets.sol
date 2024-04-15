@@ -85,6 +85,7 @@ contract Wallets {
         addr["OPENSKY_2"]                    = 0xf44f97f4113759E0a57756bE49C0655d490Cf19F;
         addr["DAVIDPHELPS"]                  = 0xd56e3E325133EFEd6B1687C88571b8a91e517ab0;
         addr["SEEDLATAMETH"]                 = 0x0087a081a9B430fd8f688c6ac5dD24421BfB060D;
+        addr["SEEDLATAMETH_2"]               = 0xd43b89621fFd48A8A51704f85fd0C87CbC0EB299;
         addr["STABLELAB_2"]                  = 0xbDE65cf2352ed1Dde959f290E973d0fC5cEDFD08;
         addr["FLIPSIDEGOV"]                  = 0x300901243d6CB2E74c10f8aB4cc89a39cC222a29;
         addr["DAI_VINCI"]                    = 0x9ee47F0f82F1A6F45C4E1D25Ce95C321D8C8356a;
