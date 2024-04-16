@@ -28,10 +28,6 @@ interface JarLike {
     function void() external;
 }
 
-interface RwaOutputConduitLike {
-    function kiss(address) external;
-}
-
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
