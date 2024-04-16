@@ -609,7 +609,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("BLUE"),           39.75 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("VIGILANT"),       13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("PIPKIN"),         13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JAG"),            13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JAG"),            9.08 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("UPMAKER"),        12.93 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("IAMMEEOH"),       20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("DAI_VINCI"),      20.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
@@ -622,7 +622,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("ROOT"),           8.34 ether)  // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 394.5 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 389.69 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -879,20 +879,20 @@ contract DssSpellTest is DssSpellTestBase {
     // SPELL-SPECIFIC TESTS GO BELOW
 
     function testRWA015NewBud() public {
-        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
+        address RWA015_A_CUSTODY_2 = addr.addr("RWA015_A_CUSTODY_2");
         RwaSwapOutputConduitLike rwa015AOutputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
 
-        assertEq(rwa015AOutputConduit.bud(NEW_BUD), 0, 'TestError/already-bud');
+        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 0, 'TestError/already-bud');
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(rwa015AOutputConduit.bud(NEW_BUD), 1, 'TestError/not-bud-after-cast');
+        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 1, 'TestError/not-bud-after-cast');
     }
 
     function testRWA015OutputConduitPushWithNewBud() public {
-        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
+        address RWA015_A_CUSTODY_2 = addr.addr("RWA015_A_CUSTODY_2");
         RwaSwapOutputConduitLike outputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
         address psm = addr.addr("MCD_PSM_USDC_A");
         GemAbstract psmGem = GemAbstract(addr.addr("USDC"));
@@ -901,7 +901,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
 
         // Record psmGem balance before push
-        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
+        uint256 psmBalanceBeforePush = psmGem.balanceOf(RWA015_A_CUSTODY_2);
 
         uint256 amountToPush = 3;
 
@@ -912,21 +912,21 @@ contract DssSpellTest is DssSpellTestBase {
         // Setup DAI in Output Conduit
         GodMode.setBalance(address(dai), address(outputConduit), amountToPush * daiPsmGemDiffDecimals);
 
-        // Setup operator for OutputConduit
+        // Setup OutputConduit
         GodMode.setWard(address(outputConduit), address(this), 1);
         outputConduit.hope(address(this));
         outputConduit.mate(address(this));
 
         // Prepare for the push
-        outputConduit.pick(NEW_BUD);
+        outputConduit.pick(RWA015_A_CUSTODY_2);
         outputConduit.hook(psm);
 
         // Push and quit
         outputConduit.push(amountToPush * daiPsmGemDiffDecimals);
         outputConduit.quit();
 
-        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015-A: Output conduit still holds Dai after quit()");
-        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, amountToPush, "RWA015-A: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015_A_CUSTODY_2: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(RWA015_A_CUSTODY_2) - psmBalanceBeforePush, amountToPush, "RWA015_A_CUSTODY_2: Psm GEM not sent to destination after push()");
     }
 
     function testPushPAXOutInputConduit() public {

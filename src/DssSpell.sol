@@ -121,8 +121,8 @@ contract DssSpellAction is DssAction {
         // Pipkin - 13.89 MKR - 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7
         MKR.transfer(PIPKIN, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // JAG - 13.89 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
-        MKR.transfer(JAG, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // JAG - 9.08 MKR - 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f
+        MKR.transfer(JAG, 9.08 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // UPMaker - 12.93 MKR - 0xbB819DF169670DC71A16F58F55956FE642cc6BcD
         MKR.transfer(UPMAKER, 12.93 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
