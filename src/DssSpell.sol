@@ -88,10 +88,6 @@ contract DssSpellAction is DssAction {
 
     address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
 
-    // ---------- Whitelist new address in the RWA015-A output conduit ----------
-    address internal constant RWA015_A_CUSTODY_2                 = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
-    RwaOutputConduitLike internal immutable RWA015_A_OUTPUT_CONDUIT = RwaOutputConduitLike(DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT"));
-
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
@@ -162,12 +158,6 @@ contract DssSpellAction is DssAction {
 
         // Transfer 238,339 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 238_339);
-
-        // ---------- Whitelist new address in the RWA015-A output conduit ----------
-        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
-
-        // Call kiss on RWA015_A_OUTPUT_CONDUIT with address 0x6759610547a36E9597Ef452aa0B9cace91291a2f
-        RWA015_A_OUTPUT_CONDUIT.kiss(RWA015_A_CUSTODY_2);
 
         // ---------- Push USDP out of input conduit ----------
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
