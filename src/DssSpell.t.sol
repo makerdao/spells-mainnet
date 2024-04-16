@@ -891,8 +891,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 1, 'TestError/not-bud-after-cast');
     }
 
-    function testRWA015OutputConduitPushWithNewBud() public {
-        address RWA015_A_CUSTODY_2 = addr.addr("RWA015_A_CUSTODY_2");
+    function testRWA015OutputConduitPushWithNewBud(address condiutOperator) public {
+        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
         RwaSwapOutputConduitLike outputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
         address psm = addr.addr("MCD_PSM_USDC_A");
         GemAbstract psmGem = GemAbstract(addr.addr("USDC"));
@@ -901,7 +901,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
 
         // Record psmGem balance before push
-        uint256 psmBalanceBeforePush = psmGem.balanceOf(RWA015_A_CUSTODY_2);
+        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
 
         uint256 amountToPush = 3;
 
@@ -912,21 +912,25 @@ contract DssSpellTest is DssSpellTestBase {
         // Setup DAI in Output Conduit
         GodMode.setBalance(address(dai), address(outputConduit), amountToPush * daiPsmGemDiffDecimals);
 
-        // Setup OutputConduit
+        // Setup condiutOperator for OutputConduit
         GodMode.setWard(address(outputConduit), address(this), 1);
-        outputConduit.hope(address(this));
-        outputConduit.mate(address(this));
+        outputConduit.hope(condiutOperator);
+        outputConduit.mate(condiutOperator);
 
-        // Prepare for the push
-        outputConduit.pick(RWA015_A_CUSTODY_2);
-        outputConduit.hook(psm);
+        vm.startPrank(condiutOperator);
+        {
+            // Prepare for the push
+            outputConduit.pick(NEW_BUD);
+            outputConduit.hook(psm);
 
-        // Push and quit
-        outputConduit.push(amountToPush * daiPsmGemDiffDecimals);
-        outputConduit.quit();
+            // Push and quit
+            outputConduit.push(amountToPush * daiPsmGemDiffDecimals);
+            outputConduit.quit();
+        }
+        vm.stopPrank();
 
-        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015_A_CUSTODY_2: Output conduit still holds Dai after quit()");
-        assertEq(psmGem.balanceOf(RWA015_A_CUSTODY_2) - psmBalanceBeforePush, amountToPush, "RWA015_A_CUSTODY_2: Psm GEM not sent to destination after push()");
+        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015_A: Output conduit still holds Dai after quit()");
+        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, amountToPush, "RWA015_A: Psm GEM not sent to destination after push()");
     }
 
     function testPushPAXOutInputConduit() public {
