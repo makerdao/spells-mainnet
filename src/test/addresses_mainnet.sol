@@ -413,6 +413,7 @@ contract Addresses {
         addr["RWA015_A_OUTPUT_CONDUIT"]          = 0x1E86CB085f249772f7e7443631a87c6BDba2aCEb;
         addr["RWA015_A_OPERATOR"]                = 0x23a10f09Fac6CCDbfb6d9f0215C795F9591D7476;
         addr["RWA015_A_CUSTODY"]                 = 0x65729807485F6f7695AF863d97D62140B7d69d83;
+        addr["RWA015_A_CUSTODY_2"]               = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
         addr["GUNIV3DAIUSDC1"]                   = 0xAbDDAfB225e10B90D798bB8A886238Fb835e2053;
         addr["PIP_GUNIV3DAIUSDC1"]               = 0x7F6d78CC0040c87943a0e0c140De3F77a273bd58;
         addr["MCD_JOIN_GUNIV3DAIUSDC1_A"]        = 0xbFD445A97e7459b0eBb34cfbd3245750Dba4d7a4;

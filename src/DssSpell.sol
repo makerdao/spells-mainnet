@@ -28,6 +28,10 @@ interface JarLike {
     function void() external;
 }
 
+interface RwaOutputConduitLike {
+    function kiss(address) external;
+}
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -35,9 +39,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/5af6ec64b9e0ff080ecd80a85d0a7d6bc3bd3406/governance/votes/Executive%20vote%20-%20April%2018%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-04-18 MakerDAO Executive Spell | Hash: TODO";
+        "2024-04-18 MakerDAO Executive Spell | Hash: 0x71efd61f3800b237e562b1ad518d90b9a155fa6565c98c1cd8d383afcc69b146";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -83,6 +87,10 @@ contract DssSpellAction is DssAction {
     address internal constant ROOT           = 0xC74392777443a11Dc26Ce8A3D934370514F38A91;
 
     address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+
+    // ---------- Whitelist new address in the RWA015-A output conduit ----------
+    address internal constant RWA015_A_CUSTODY_2                 = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
+    RwaOutputConduitLike internal immutable RWA015_A_OUTPUT_CONDUIT = RwaOutputConduitLike(DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT"));
 
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -154,6 +162,12 @@ contract DssSpellAction is DssAction {
 
         // Transfer 238,339 DAI to 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 238_339);
+
+        // ---------- Whitelist new address in the RWA015-A output conduit ----------
+        // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
+
+        // Call kiss on RWA015_A_OUTPUT_CONDUIT with address 0x6759610547a36E9597Ef452aa0B9cace91291a2f
+        RWA015_A_OUTPUT_CONDUIT.kiss(RWA015_A_CUSTODY_2);
 
         // ---------- Push USDP out of input conduit ----------
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084
