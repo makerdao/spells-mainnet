@@ -63,8 +63,8 @@ contract DssSpellAction is DssAction {
     // ---------- Contract addresses ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
-    InputConduitJarLike internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = InputConduitJarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR"));
-    JarLike internal immutable MCD_PSM_PAX_A_JAR                           = JarLike(DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR"));
+    address internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+    address internal immutable MCD_PSM_PAX_A_JAR               = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR");
 
     // ----------- Payment addresses -----------
     address internal constant BONAPUBLICA = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
@@ -177,10 +177,10 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 100_000);
 
         // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 84,211.27 USDP
-        MCD_PSM_PAX_A_INPUT_CONDUIT_JAR.push(84_211.27 ether); // Note: `ether` is only a keyword helper
+        InputConduitJarLike(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR).push(84_211.27 ether); // Note: `ether` is only a keyword helper
 
         // Call void() on MCD_PSM_PAX_A_JAR
-        MCD_PSM_PAX_A_JAR.void();
+        JarLike(MCD_PSM_PAX_A_JAR).void();
 
         // Set PSM-PAX-A DC to 0 DAI
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
