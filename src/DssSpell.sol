@@ -90,7 +90,8 @@ contract DssSpellAction is DssAction {
 
     // ---------- Whitelist new address in the RWA015-A output conduit ----------
     address internal constant RWA015_A_CUSTODY_2                 = 0x6759610547a36E9597Ef452aa0B9cace91291a2f;
-    address internal constant RWA015_A_OUTPUT_CONDUIT            = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal immutable RWA015_A_OUTPUT_CONDUIT            = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+
 
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
