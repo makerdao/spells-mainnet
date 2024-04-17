@@ -46,8 +46,6 @@ interface SpellActionLike {
 
 interface RwaSwapOutputConduitLike {
     function bud(address) external view returns (uint256);
-    function mate(address) external;
-    function hope(address) external;
     function hook(address) external;
     function pick(address) external;
     function push(uint256) external;
@@ -890,8 +888,9 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 1, 'TestError/not-bud-after-cast');
     }
 
-    function testRWA015OutputConduitPushWithNewBud(address condiutOperator) public {
+    function testRWA015OutputConduitPushWithNewBud() public {
         address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
+        address condiutOperator = addr.addr("RWA015_A_OPERATOR");
         RwaSwapOutputConduitLike outputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
         address psm = addr.addr("MCD_PSM_USDC_A");
         GemAbstract psmGem = GemAbstract(addr.addr("USDC"));
@@ -908,13 +907,8 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // Setup DAI in Output Conduit
+        // Set outputConduit balance
         GodMode.setBalance(address(dai), address(outputConduit), amountToPush * daiPsmGemDiffDecimals);
-
-        // Setup condiutOperator for OutputConduit
-        GodMode.setWard(address(outputConduit), address(this), 1);
-        outputConduit.hope(condiutOperator);
-        outputConduit.mate(condiutOperator);
 
         vm.startPrank(condiutOperator);
         {
