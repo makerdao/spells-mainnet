@@ -39,6 +39,7 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
+    // TODO: update the hash after update the content in exec doc
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/17bde44a63e34418b201a0a3fdbe4a53c7388407/governance/votes/Executive%20vote%20-%20April%2018%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2024-04-18 MakerDAO Executive Spell | Hash: 0x02a4122befd8f49787e5c08ef21fa4e205e234b29c54d9e47586ccc2f9eaaaab";
@@ -59,6 +60,14 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant ELEVEN_PCT_RATE               = 1000000003309234382829738808;
+    uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000003380572527855758393;
+    uint256 internal constant ELEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000003522769143241571114;
+    uint256 internal constant TWELVE_PCT_RATE               = 1000000003593629043335673582;
+    uint256 internal constant TWELVE_PT_TWO_FIVE_PCT_RATE   = 1000000003664330950215446102;
+    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE       = 1000000003734875566854894261;
+    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE = 1000000003805263591546724039;
+    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE = 1000000003945572635100236468;
 
     // ---------- Contract addresses ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
@@ -184,6 +193,30 @@ contract DssSpellAction is DssAction {
 
         // Set PSM-PAX-A DC to 0 DAI
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
+
+        // ---------- TODO: Stability Fee Changes ----------
+        // Forum: TODO
+
+        DssExecLib.setIlkStabilityFee("ETH-A", ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("ETH-B", ELEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("ETH-C", ELEVEN_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("WSTETH-A", TWELVE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("WSTETH-B", TWELVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("WBTC-A", TWELVE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("WBTC-B", THIRTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        DssExecLib.setIlkStabilityFee("WBTC-C", TWELVE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ---------- TODO: DSR Change ----------
+        // Forum: TODO
+
+        DssExecLib.setDSR(ELEVEN_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/apr-4-2024-proposed-changes-to-sparklend-for-upcoming-spell/24033
