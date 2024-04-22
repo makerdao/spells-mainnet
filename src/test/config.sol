@@ -137,7 +137,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          11_25,           // In basis points
+            pct:          10_25,           // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -162,7 +162,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          11_75,
+            pct:          10_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -187,7 +187,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          11_00,
+            pct:          10_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -287,7 +287,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          12_75,
+            pct:          11_75,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -312,7 +312,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          13_25,
+            pct:          12_25,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -337,7 +337,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          12_50,
+            pct:          11_50,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1462,7 +1462,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          12_25,
+            pct:          11_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1487,7 +1487,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          12_00,
+            pct:          11_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,

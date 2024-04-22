@@ -39,10 +39,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // TODO: update the hash after update the content in exec doc
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/17bde44a63e34418b201a0a3fdbe4a53c7388407/governance/votes/Executive%20vote%20-%20April%2018%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/66aa0bcc2522ef68cd07404a220f3d0ceed66ff6/governance/votes/Executive%20vote%20-%20April%2022%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-04-18 MakerDAO Executive Spell | Hash: 0x02a4122befd8f49787e5c08ef21fa4e205e234b29c54d9e47586ccc2f9eaaaab";
+        "2024-04-18 MakerDAO Executive Spell | Hash: 0x795156c619f653246521bff408f49666bc1a13c626ff197e84973974782d60a7";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -59,15 +58,15 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    // uint256 internal constant X_PCT_RATE = ;
+    // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
+    uint256 internal constant TEN_PCT_RATE                  = 1000000003022265980097387650;
+    uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE      = 1000000003094251918120023627;
+    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE    = 1000000003237735385034516037;
     uint256 internal constant ELEVEN_PCT_RATE               = 1000000003309234382829738808;
     uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000003380572527855758393;
+    uint256 internal constant ELEVEN_PT_FIVE_PCT_RATE       = 1000000003451750542235895695;
     uint256 internal constant ELEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000003522769143241571114;
-    uint256 internal constant TWELVE_PCT_RATE               = 1000000003593629043335673582;
     uint256 internal constant TWELVE_PT_TWO_FIVE_PCT_RATE   = 1000000003664330950215446102;
-    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE       = 1000000003734875566854894261;
-    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE = 1000000003805263591546724039;
-    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE = 1000000003945572635100236468;
 
     // ---------- Contract addresses ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
@@ -105,9 +104,42 @@ contract DssSpellAction is DssAction {
     // ---------- Trigger Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x3d1DD14Fa08163E7f64b0abf0F514f6276f50882;
+    address internal constant SPARK_SPELL = 0x151D5fA7B3eD50098fFfDd61DB29cB928aE04C0e;
 
     function actions() public override {
+        // ---------- Stability Fee Updates ----------
+        // Forum: http://forum.makerdao.com/t/stability-scope-parameter-changes-12-under-sta-article-3-3/24132
+
+        // ETH-A: Decrease the Stability Fee by 3 percentage points from 13.25% to 10.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", TEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ETH-B: Decrease the Stability Fee by 3 percentage points from 13.75% to 10.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", TEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ETH-C: Decrease the Stability Fee by 3 percentage points from 13.00% to 10.00%
+        DssExecLib.setIlkStabilityFee("ETH-C", TEN_PCT_RATE, /* doDrip = */ true);
+
+        // WSTETH-A: Decrease the Stability Fee by 3 percentage points from 14.25% to 11.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WSTETH-B: Decrease the Stability Fee by 3 percentage points from 14.00% to 11.00%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", ELEVEN_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-A: Decrease the Stability Fee by 3 percentage points from 14.75% to 11.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", ELEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-B: Decrease the Stability Fee by 3 percentage points from 15.25% to 12.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", TWELVE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-C: Decrease the Stability Fee by 3 percentage points from 14.50% to 11.50%
+        DssExecLib.setIlkStabilityFee("WBTC-C", ELEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ---------- DSR Change ----------
+        // Forum: http://forum.makerdao.com/t/stability-scope-parameter-changes-12-under-sta-article-3-3/24132
+
+        // DSR: Decrease the Dai Savings Rate by 3 percentage points from 13.00% to 10.00%
+        DssExecLib.setDSR(TEN_PCT_RATE, /* doDrip = */ true);
+
         // ---------- AD Compensation ----------
         // Forum: https://forum.makerdao.com/t/march-2024-aligned-delegate-compensation/24088
         // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-income-and-participation-requirements
@@ -194,30 +226,6 @@ contract DssSpellAction is DssAction {
         // Set PSM-PAX-A DC to 0 DAI
         DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
 
-        // ---------- TODO: Stability Fee Changes ----------
-        // Forum: TODO
-
-        DssExecLib.setIlkStabilityFee("ETH-A", ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("ETH-B", ELEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("ETH-C", ELEVEN_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("WSTETH-A", TWELVE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("WSTETH-B", TWELVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("WBTC-A", TWELVE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("WBTC-B", THIRTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        DssExecLib.setIlkStabilityFee("WBTC-C", TWELVE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
-
-        // ---------- TODO: DSR Change ----------
-        // Forum: TODO
-
-        DssExecLib.setDSR(ELEVEN_PCT_RATE, /* doDrip = */ true);
-
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/apr-4-2024-proposed-changes-to-sparklend-for-upcoming-spell/24033
         // Poll: https://vote.makerdao.com/polling/QmZND8WW
@@ -229,8 +237,9 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmVsKsGa
         // Forum: https://forum.makerdao.com/t/sparklend-external-security-access-multisig-for-freezer-mom/24070
         // Poll: https://vote.makerdao.com/polling/QmVXriiT
+        // Forum: http://forum.makerdao.com/t/stability-scope-parameter-changes-12-under-sta-article-3-3/24132
 
-        // Trigger Spark Proxy Spell at 0x3d1DD14Fa08163E7f64b0abf0F514f6276f50882
+        // Trigger Spark Proxy Spell at 0x151D5fA7B3eD50098fFfDd61DB29cB928aE04C0e
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
