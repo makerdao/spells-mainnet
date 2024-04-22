@@ -41,7 +41,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/66aa0bcc2522ef68cd07404a220f3d0ceed66ff6/governance/votes/Executive%20vote%20-%20April%2022%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-04-18 MakerDAO Executive Spell | Hash: 0x795156c619f653246521bff408f49666bc1a13c626ff197e84973974782d60a7";
+        "2024-04-22 MakerDAO Executive Spell | Hash: 0x795156c619f653246521bff408f49666bc1a13c626ff197e84973974782d60a7";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
