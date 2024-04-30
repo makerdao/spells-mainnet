@@ -70,7 +70,7 @@ const createTenderlyTestnet = async function (spellName) {
     });
     const testnetId = response.data.container.id;
     const rpcEndpointPrivate = response.data.container.connectivityConfig.endpoints.find(
-        endpoint => endpoint.displayName === 'unlocked'
+        endpoint => endpoint.private === true
     );
     console.info(`tenderly testnet "${testnetId}" is created`);
     return {
@@ -93,7 +93,7 @@ const publishTenderlyTestnet = async function (testnetId) {
     }
     console.info(`tenderly testnet is now public and discoverable`);
     const rpcEndpointPublic = response.data.container.connectivityConfig.endpoints.find(
-        endpoint => endpoint.displayName === 'testnet'
+        endpoint => endpoint.private === false
     );
     const explorerUrlPublic = `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`;
     console.info(`public explorer url: ${explorerUrlPublic}`);
