@@ -31,6 +31,9 @@ contract DssSpellAction is DssAction {
         return false;
     }
 
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "QmbyXH3z74wQqTDPNFKseLbVAJwKmHwp23AQZPppNZfkaD";
+
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -46,8 +49,11 @@ contract DssSpellAction is DssAction {
     // ---------- Contract addresses ----------
 
     function actions() public override {
-        // ---------- TODO ----------
-        // Forum: TODO
+        // ---------- Approve Coinbase Custody (RWA014-A) Dao Resolution ----------
+        // Forum: https://forum.makerdao.com/t/proposal-to-extend-coinbase-custody-rewards/24198
+
+        // Approve Coinbase Custody (RWA014-A) Dao Resolution with IPFS hash QmbyXH3z74wQqTDPNFKseLbVAJwKmHwp23AQZPppNZfkaD
+        // Note: see `dao_resolutions` variable declared above
     }
 }
 
