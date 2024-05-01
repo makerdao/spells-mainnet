@@ -412,7 +412,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipped` modifier to skip
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -595,7 +595,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // add the `skipped` modifier to skip
+    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -855,7 +855,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = 0x151D5fA7B3eD50098fFfDd61DB29cB928aE04C0e;
 
@@ -874,72 +874,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testRWA015NewBud() public {
-        address RWA015_A_CUSTODY_2 = addr.addr("RWA015_A_CUSTODY_2");
-        RwaSwapOutputConduitLike rwa015AOutputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-
-        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 0, 'TestError/already-bud');
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertEq(rwa015AOutputConduit.bud(RWA015_A_CUSTODY_2), 1, 'TestError/not-bud-after-cast');
-    }
-
-    function testRWA015OutputConduitPushWithNewBud() public {
-        address NEW_BUD = addr.addr("RWA015_A_CUSTODY_2");
-        address condiutOperator = addr.addr("RWA015_A_OPERATOR");
-        RwaSwapOutputConduitLike outputConduit = RwaSwapOutputConduitLike(addr.addr("RWA015_A_OUTPUT_CONDUIT"));
-        address psm = addr.addr("MCD_PSM_USDC_A");
-        GemAbstract psmGem = GemAbstract(addr.addr("USDC"));
-
-        // Calculate difference of decimals
-        uint256 daiPsmGemDiffDecimals = 10 ** (18 - uint256(psmGem.decimals()));
-
-        // Record psmGem balance before push
-        uint256 psmBalanceBeforePush = psmGem.balanceOf(NEW_BUD);
-
-        uint256 amountToPush = 3;
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Set outputConduit balance
-        GodMode.setBalance(address(dai), address(outputConduit), amountToPush * daiPsmGemDiffDecimals);
-
-        vm.startPrank(condiutOperator);
-        {
-            // Prepare for the push
-            outputConduit.pick(NEW_BUD);
-            outputConduit.hook(psm);
-
-            // Push and quit
-            outputConduit.push(amountToPush * daiPsmGemDiffDecimals);
-            outputConduit.quit();
-        }
-        vm.stopPrank();
-
-        assertEq(dai.balanceOf(address(outputConduit)), 0, "RWA015_A: Output conduit still holds Dai after quit()");
-        assertEq(psmGem.balanceOf(NEW_BUD) - psmBalanceBeforePush, amountToPush, "RWA015_A: Psm GEM not sent to destination after push()");
-    }
-
-    function testPushPAXOutInputConduit() public {
-        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
-        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
-        uint256 prevDai = vat.dai(address(vow));
-        uint256 gemBalanceToPush = 84_211.27 ether; // Note: `ether` is only a keyword helper
-
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Note: other actions in the spell call drip under the hood, therefore asserting complete equality is not possible
-        assertGe(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAY);
-        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
-    }
 }
