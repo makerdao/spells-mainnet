@@ -50,7 +50,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- Approve Coinbase Custody (RWA014-A) Dao Resolution ----------
-        // Forum: https://forum.makerdao.com/t/proposal-to-extend-coinbase-custody-rewards/24198
+        // Forum: https://forum.makerdao.com/t/proposal-to-extend-coinbase-custody-rewards/24198/4
 
         // Approve Coinbase Custody (RWA014-A) Dao Resolution with IPFS hash QmbyXH3z74wQqTDPNFKseLbVAJwKmHwp23AQZPppNZfkaD
         // Note: see `dao_resolutions` variable declared above
