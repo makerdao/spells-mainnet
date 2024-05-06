@@ -22,9 +22,9 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/66aa0bcc2522ef68cd07404a220f3d0ceed66ff6/governance/votes/Executive%20vote%20-%20April%2022%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/00004b1953dde1f56cc29524b9545a8b84600dd0/governance/votes/Executive%20vote%20-%20May%2006%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-05-06 MakerDAO Executive Spell | Hash: TODO";
+        "2024-05-06 MakerDAO Executive Spell | Hash: 0x8f7a9272969cd40df959c70acaa5205edd339294bd96007d95776ac897fca331";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
