@@ -52,6 +52,12 @@ interface RwaSwapOutputConduitLike {
     function quit() external;
 }
 
+interface DssCronSequencerLike {
+    function hasJob(address job) external view returns (bool);
+    function numJobs() external view returns (uint256);
+    function jobAt(uint256 index) external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -874,4 +880,36 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testOldCronD3MJobRemovedFromSequencer() public {
+        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
+        address OLD_D3M_JOB = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
+
+        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(OLD_D3M_JOB) , true, "TestError/job-not-present-in-sequencer");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(OLD_D3M_JOB), false, "TestError/job-not-removed-from-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
+    }
+
+    function testNewCronD3MJobAddedToSequencer() public {
+        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
+        address NEW_D3M_JOB = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
+
+        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(NEW_D3M_JOB), false, "TestError/job-already-present-in-sequencer");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(NEW_D3M_JOB), true, "TestError/job-not-added-to-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
+    }
 }

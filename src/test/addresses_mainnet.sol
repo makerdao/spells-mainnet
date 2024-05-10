@@ -481,7 +481,7 @@ contract Addresses {
         addr["CRON_SEQUENCER"]                   = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
         addr["CRON_AUTOLINE_JOB"]                = 0x67AD4000e73579B9725eE3A149F85C4Af0A61361;
         addr["CRON_LERP_JOB"]                    = 0x8F8f2FC1F0380B9Ff4fE5c3142d0811aC89E32fB;
-        addr["CRON_D3M_JOB"]                     = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
+        addr["CRON_D3M_JOB"]                     = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
         addr["CRON_CLIPPER_MOM_JOB"]             = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
         addr["CRON_ORACLE_JOB"]                  = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
         addr["CRON_FLAP_JOB"]                    = 0xc32506E9bB590971671b649d9B8e18CB6260559F;

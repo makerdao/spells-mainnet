@@ -124,7 +124,7 @@ contract Config {
         afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
         afterSpell.line_mom_authority    = chief;          // LineMom authority
         afterSpell.ilk_count             = 65;             // Num expected in system
-        afterSpell.chainlog_version      = "1.17.3";       // String expected in system
+        afterSpell.chainlog_version      = "1.17.4";       // String expected in system
 
         //
         // Values for all collateral
