@@ -22,17 +22,14 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/00004b1953dde1f56cc29524b9545a8b84600dd0/governance/votes/Executive%20vote%20-%20May%2006%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-05-06 MakerDAO Executive Spell | Hash: 0x8f7a9272969cd40df959c70acaa5205edd339294bd96007d95776ac897fca331";
+        "TODO MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
-
-    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "QmUvqDK4EgGFw6dUqmdhcoZiSBLFuhf2e6k63WwrauRUx9";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -49,12 +46,6 @@ contract DssSpellAction is DssAction {
     // ---------- Contract addresses ----------
 
     function actions() public override {
-        // ---------- Approve Coinbase Custody (RWA014-A) Dao Resolution ----------
-        // Forum: https://forum.makerdao.com/t/proposal-to-extend-coinbase-custody-rewards/24198
-        // Forum: https://forum.makerdao.com/t/proposal-to-extend-coinbase-custody-rewards/24198/4
-
-        // Approve Coinbase Custody (RWA014-A) Dao Resolution with IPFS hash QmUvqDK4EgGFw6dUqmdhcoZiSBLFuhf2e6k63WwrauRUx9
-        // Note: see `dao_resolutions` variable declared above
     }
 }
 
