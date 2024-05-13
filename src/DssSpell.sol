@@ -48,7 +48,14 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
-    uint256 internal
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
+    uint256 internal constant EIGHT_PCT_RATE                = 1000000002440418608258400030;
+    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE     = 1000000002805322428706865331;
+    uint256 internal constant NINE_PCT_RATE                 = 1000000002732676825177582095;
+    uint256 internal constant NINE_PT_SEVEN_FIVE_PCT_RATE   = 1000000002950116251408586949;
+    uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE      = 1000000003094251918120023627;
+    uint256 internal constant NINE_PT_FIVE_PCT_RATE         = 1000000002877801985002875644;
 
     // ---------- Contract addresses ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
@@ -102,24 +109,33 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-13-under-sta-article-3-3/24250
 
         // ETH-A: Decrease the Stability Fee by 2 percentage points from 10.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // ETH-B: Decrease the Stability Fee by 2 percentage points from 10.75% to 8.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", EIGHT_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // ETH-C: Decrease the Stability Fee by 2 percentage points from 10.00% to 8.00%
+        DssExecLib.setIlkStabilityFee("ETH-C", EIGHT_PCT_RATE, /* doDrip = */ true);
 
         // WSTETH-A: Decrease the Stability Fee by 2 percentage points from 11.25% to 9.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", NINE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // WSTETH-B: Decrease the Stability Fee by 2 percentage points from 11.00% to 9.00%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", NINE_PCT_RATE, /* doDrip = */ true);
 
         // WBTC-A: Decrease the Stability Fee by 2 percentage points from 11.75% to 9.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", NINE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // WBTC-B: Decrease the Stability Fee by 2 percentage points from 12.25% to 10.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", TEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // WBTC-C: Decrease the Stability Fee by 2 percentage points from 11.50% to 9.50%
+        DssExecLib.setIlkStabilityFee("WBTC-C", NINE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Spark: Decrease the Effective DAI Borrow Rate by 2 percentage points from 11.00% to 9.00%
 
         // DSR: Decrease the Dai Savings Rate by 2 percentage points from 10.00% to 8.00%
+        DssExecLib.setDSR(EIGHT_PCT_RATE, /* doDrip = */ true);
 
         // Note: bump chainlog version due to the updated CRON_D3M_JOB address
         DssExecLib.setChangelogVersion("1.17.4");
