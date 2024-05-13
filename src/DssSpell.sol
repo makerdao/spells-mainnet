@@ -48,6 +48,7 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
+    uint256 internal
 
     // ---------- Contract addresses ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
@@ -66,18 +67,17 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- Dss-Cron Update ----------
-        // sequencer.removeJob(0x1Bb799509b0B039345f910dfFb71eEfAc7022323);
-        // sequencer.addJob(0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF);
 
         // Update D3MJob in the sequencer (0x238b4E35dAed6100C6162fAE4510261f88996EC9)
+
+        // sequencer.removeJob(0x1Bb799509b0B039345f910dfFb71eEfAc7022323);
         DssCronSequencerLike(CRON_SEQUENCER).removeJob(CRON_D3M_JOB);
+
+        // sequencer.addJob(0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF);
         DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_D3M_JOB_NEW);
 
         // Note: update CRON_D3M_JOB address in the chainlog
         DssExecLib.setChangelogAddress("CRON_D3M_JOB", CRON_D3M_JOB_NEW);
-
-        // Note: bump chainlog version due to the updated CRON_D3M_JOB address
-        DssExecLib.setChangelogVersion("1.17.4");
 
         // ---------- Launch Funding Transfers ----------
         // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/16
@@ -98,6 +98,31 @@ contract DssSpellAction is DssAction {
         // Bug Bounty  - 50000 DAI - 0xa24EC79bdF03bB325F36878573B13AedFEd0717f
         DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_WALLET, 50_000);
 
+        // ---------- Stability Scope Parameter Changes ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-13-under-sta-article-3-3/24250
+
+        // ETH-A: Decrease the Stability Fee by 2 percentage points from 10.25% to 8.25%
+
+        // ETH-B: Decrease the Stability Fee by 2 percentage points from 10.75% to 8.75%
+
+        // ETH-C: Decrease the Stability Fee by 2 percentage points from 10.00% to 8.00%
+
+        // WSTETH-A: Decrease the Stability Fee by 2 percentage points from 11.25% to 9.25%
+
+        // WSTETH-B: Decrease the Stability Fee by 2 percentage points from 11.00% to 9.00%
+
+        // WBTC-A: Decrease the Stability Fee by 2 percentage points from 11.75% to 9.75%
+
+        // WBTC-B: Decrease the Stability Fee by 2 percentage points from 12.25% to 10.25%
+
+        // WBTC-C: Decrease the Stability Fee by 2 percentage points from 11.50% to 9.50%
+
+        // Spark: Decrease the Effective DAI Borrow Rate by 2 percentage points from 11.00% to 9.00%
+
+        // DSR: Decrease the Dai Savings Rate by 2 percentage points from 10.00% to 8.00%
+
+        // Note: bump chainlog version due to the updated CRON_D3M_JOB address
+        DssExecLib.setChangelogVersion("1.17.4");
     }
 }
 

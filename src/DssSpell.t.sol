@@ -872,20 +872,20 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testCronSequencerD3MJobReplaced() public {
         address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
-        address OLD_D3M_JOB = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
-        address NEW_D3M_JOB = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
+        address CRON_D3M_JOB = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
+        address CRON_D3M_JOB_NEW = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
 
         uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
 
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(OLD_D3M_JOB) , true, "TestError/old-job-not-present-in-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(NEW_D3M_JOB), false, "TestError/new-job-already-present-in-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB) , true, "TestError/old-job-not-present-in-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB_NEW), false, "TestError/new-job-already-present-in-sequencer");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(OLD_D3M_JOB), false, "TestError/old-job-not-removed-from-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(NEW_D3M_JOB), true, "TestError/new-job-not-added-to-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB), false, "TestError/old-job-not-removed-from-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB_NEW), true, "TestError/new-job-not-added-to-sequencer");
         assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
     }
 }
