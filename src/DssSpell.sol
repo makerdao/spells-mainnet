@@ -18,6 +18,7 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface DssCronSequencerLike {
     function addJob(address job) external;
@@ -49,11 +50,19 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
     // ---------- Contract addresses ----------
+    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
     // ---------- Dss-Cron Update ----------
-    address internal immutable CRON_SEQUENCER       = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
-    address internal immutable CRON_D3M_JOB         = DssExecLib.getChangelogAddress("CRON_D3M_JOB");
-    address internal constant CRON_D3M_JOB_NEW      = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
+    address internal immutable CRON_SEQUENCER               = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
+    address internal immutable CRON_D3M_JOB                 = DssExecLib.getChangelogAddress("CRON_D3M_JOB");
+    address internal constant CRON_D3M_JOB_NEW              = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
+
+    // ---------- Launch Funding Transfers ----------
+    address internal constant LAUNCH_PROJECT_FUNDING        = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
+
+    // ---------- Bug Bounty Payouts ----------
+    address internal constant IMMUNEFI_BOUNTY_PAYOUT_WALLET = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+    address internal constant BUG_BOUNTY_PAYOUT_WALLET      = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
 
     function actions() public override {
         // ---------- Dss-Cron Update ----------
@@ -69,6 +78,26 @@ contract DssSpellAction is DssAction {
 
         // Note: bump chainlog version due to the updated CRON_D3M_JOB address
         DssExecLib.setChangelogVersion("1.17.4");
+
+        // ---------- Launch Funding Transfers ----------
+        // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/16
+        // MIP: https://mips.makerdao.com/mips/details/MIP108#9-1-launch-project-budget
+
+        // Launch Project - 5358006.99 DAI - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 5_358_007); // TODO value
+
+        // Launch Project - 1969.17 MKR - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        MKR.transfer(LAUNCH_PROJECT_FUNDING, 1969.17 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+
+        // ---------- Bug Bounty Payouts ----------
+        // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-29806/24240
+
+        // Immunefi Bounty - 5000 DAI - 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18
+        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_BOUNTY_PAYOUT_WALLET, 5_000);
+
+        // Bug Bounty  - 50000 DAI - 0xa24EC79bdF03bB325F36878573B13AedFEd0717f
+        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_WALLET, 50_000);
+
     }
 }
 
