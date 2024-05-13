@@ -132,8 +132,6 @@ contract DssSpellAction is DssAction {
         // WBTC-C: Decrease the Stability Fee by 2 percentage points from 11.50% to 9.50%
         DssExecLib.setIlkStabilityFee("WBTC-C", NINE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Spark: Decrease the Effective DAI Borrow Rate by 2 percentage points from 11.00% to 9.00%
-
         // DSR: Decrease the Dai Savings Rate by 2 percentage points from 10.00% to 8.00%
         DssExecLib.setDSR(EIGHT_PCT_RATE, /* doDrip = */ true);
 
