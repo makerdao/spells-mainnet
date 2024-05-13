@@ -51,23 +51,24 @@ contract DssSpellAction is DssAction {
     // ---------- Contract addresses ----------
 
     // ---------- Dss-Cron Update ----------
-    address internal constant CRON_SEQUENCER                = 0x238b4E35dAed6100C6162fAE4510261f88996EC9;
-    address internal constant CRON_D3M_JOB                  = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
-    address internal constant CRON_D3M_JOB_NEW              = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
+    address internal immutable CRON_SEQUENCER       = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
+    address internal immutable CRON_D3M_JOB         = DssExecLib.getChangelogAddress("CRON_D3M_JOB");
+    address internal constant CRON_D3M_JOB_NEW      = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
 
     function actions() public override {
         // ---------- Dss-Cron Update ----------
+        // sequencer.removeJob(0x1Bb799509b0B039345f910dfFb71eEfAc7022323);
+        // sequencer.addJob(0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF);
 
         // Update D3MJob in the sequencer (0x238b4E35dAed6100C6162fAE4510261f88996EC9)
         DssCronSequencerLike(CRON_SEQUENCER).removeJob(CRON_D3M_JOB);
         DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_D3M_JOB_NEW);
 
-        // Note: overwrite the old address with the new address in the chainlog
+        // Note: update CRON_D3M_JOB address in the chainlog
         DssExecLib.setChangelogAddress("CRON_D3M_JOB", CRON_D3M_JOB_NEW);
 
-        // Note: bump chainlog version due to the changed key
+        // Note: bump chainlog version due to the updated CRON_D3M_JOB address
         DssExecLib.setChangelogVersion("1.17.4");
-
     }
 }
 
