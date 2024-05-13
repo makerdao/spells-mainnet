@@ -419,8 +419,8 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testDAIPayments() public { // add the `skipped` modifier to skip
-        address IMMUNEFI_BOUNTY_PAYOUT_WALLET = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
-        address BUG_BOUNTY_PAYOUT_WALLET      = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
+        address BUG_BOUNTY_PAYOUT_IMMUNEFI  = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+        address BUG_BOUNTY_PAYOUT_USER      = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
 
         // For each payment, create a Payee object with
         //    the Payee address,
@@ -428,10 +428,11 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[3] memory payees = [
             Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_358_007),
-            Payee(IMMUNEFI_BOUNTY_PAYOUT_WALLET, 5_000),
-            Payee(BUG_BOUNTY_PAYOUT_WALLET, 50_000)
+            Payee(BUG_BOUNTY_PAYOUT_IMMUNEFI, 5_000),
+            Payee(BUG_BOUNTY_PAYOUT_USER, 50_000)
         ];
-        uint256 expectedSumPayments = 5_413_007; // Fill the number with the value from exec doc.
+        // TODO: Fill the value below once launch project value issue is resolved
+        uint256 expectedSumPayments = 0; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;

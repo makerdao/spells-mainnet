@@ -30,7 +30,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "TODO MakerDAO Executive Spell | Hash: TODO";
+        "2024-05-16 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -69,13 +69,14 @@ contract DssSpellAction is DssAction {
     address internal constant LAUNCH_PROJECT_FUNDING        = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     // ---------- Bug Bounty Payouts ----------
-    address internal constant IMMUNEFI_BOUNTY_PAYOUT_WALLET = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
-    address internal constant BUG_BOUNTY_PAYOUT_WALLET      = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
+    address internal constant BUG_BOUNTY_PAYOUT_IMMUNEFI    = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+    address internal constant BUG_BOUNTY_PAYOUT_USER        = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
 
     function actions() public override {
         // ---------- Dss-Cron Update ----------
 
         // Update D3MJob in the sequencer (0x238b4E35dAed6100C6162fAE4510261f88996EC9)
+        // Note: This action is done in the following two steps
 
         // sequencer.removeJob(0x1Bb799509b0B039345f910dfFb71eEfAc7022323);
         DssCronSequencerLike(CRON_SEQUENCER).removeJob(CRON_D3M_JOB);
@@ -100,10 +101,10 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-29806/24240
 
         // Immunefi Bounty - 5000 DAI - 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18
-        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_BOUNTY_PAYOUT_WALLET, 5_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_IMMUNEFI, 5_000);
 
         // Bug Bounty  - 50000 DAI - 0xa24EC79bdF03bB325F36878573B13AedFEd0717f
-        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_WALLET, 50_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_USER, 50_000);
 
         // ---------- Stability Scope Parameter Changes ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-13-under-sta-article-3-3/24250
