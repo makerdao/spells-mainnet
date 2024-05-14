@@ -171,6 +171,8 @@ contract Wallets {
         addr["SKYNET"]                       = 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3;
         addr["BLUE"]                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
         addr["PIPKIN"]                       = 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7;
+        addr["JULIACHANG"]                   = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+        addr["BYTERON"]                      = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
@@ -178,5 +180,10 @@ contract Wallets {
 
         // Whistleblower Bounty
         addr["VENICE_TREE"]                  = 0xCDDd2A697d472d1e8a0B1B188646c756d097b058;
+        addr["COMPACTER"]                    = 0xbbd4bC3FE72691663c6ffE984Bcdb6C6E6b3a8Dd;
+
+        // Bug Bounty
+        addr["BUG_BOUNTY_PAYOUT_IMMUNEFI"]   = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+        addr["BUG_BOUNTY_PAYOUT_USER"]       = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
     }
 }
