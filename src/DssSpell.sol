@@ -53,12 +53,12 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
     uint256 internal constant EIGHT_PCT_RATE               = 1000000002440418608258400030;
-    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE = 1000000002659864411854984565;
     uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE = 1000000002659864411854984565;
     uint256 internal constant NINE_PCT_RATE                = 1000000002732676825177582095;
+    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE    = 1000000002805322428706865331;
     uint256 internal constant NINE_PT_FIVE_PCT_RATE        = 1000000002877801985002875644;
     uint256 internal constant NINE_PT_SEVEN_FIVE_PCT_RATE  = 1000000002950116251408586949;
-    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE    = 1000000002805322428706865331;
     uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE     = 1000000003094251918120023627;
 
     // ---------- Contract addresses ----------
