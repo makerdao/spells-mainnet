@@ -74,7 +74,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Bug Bounty Payouts ----------
     address internal constant BUG_BOUNTY_PAYOUT_IMMUNEFI = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
-    address internal constant BUG_BOUNTY_PAYOUT_USER = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
+    address internal constant BUG_BOUNTY_PAYOUT_USER     = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
 
     // ---------- Whistle-blower Bounty Payout ----------
     address internal constant COMPACTER = 0xbbd4bC3FE72691663c6ffE984Bcdb6C6E6b3a8Dd;
