@@ -203,6 +203,7 @@ contract DssSpellAction is DssAction {
         MKR.transfer(UPMAKER, 3.58 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Spark Spell ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-13-under-sta-article-3-3/24250
 
         // Trigger Spark Proxy Spell at 0x901E4450f01ae1A2615E384b9104888Cb9Cb02FF
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
