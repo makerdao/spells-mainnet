@@ -184,8 +184,8 @@ contract DssSpellAction is DssAction {
         // TRUE NAME - 27.52 MKR - 0x612F7924c367575a0Edf21333D96b15F1B345A5d
         MKR.transfer(TRUENAME, 27.52 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
-        // JuliaChang - 24.200 MKR - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
-        MKR.transfer(JULIACHANG, 24.200 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
+        // JuliaChang - 24.20 MKR - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        MKR.transfer(JULIACHANG, 24.20 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
 
         // vigilant - 13.89 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
         MKR.transfer(VIGILANT, 13.89 ether); // NOTE: 'ether' is a keyword helper, only MKR is transferred here
@@ -204,10 +204,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Spell ----------
 
-        // Spark: Decrease the Effective DAI Borrow Rate by 2 percentage points from 11.00% to 9.00%
-        // Note: This action is performed by the spark spell
-
-        // Spark Spell Address: 0x901E4450f01ae1A2615E384b9104888Cb9Cb02FF
+        // Trigger Spark Proxy Spell at 0x901E4450f01ae1A2615E384b9104888Cb9Cb02FF
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // Note: bump chainlog version due to the updated CRON_D3M_JOB address
