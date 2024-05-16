@@ -73,8 +73,8 @@ contract DssSpellAction is DssAction {
     address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     // ---------- Bug Bounty Payouts ----------
-    address internal constant BUG_BOUNTY_PAYOUT_IMMUNEFI = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
-    address internal constant BUG_BOUNTY_PAYOUT_USER     = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
+    address internal constant IMMUNEFI_COMISSION = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+    address internal constant IMMUNEFI_USER_PAYOUT_2024_05_16     = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
 
     // ---------- Whistle-blower Bounty Payout ----------
     address internal constant COMPACTER = 0xbbd4bC3FE72691663c6ffE984Bcdb6C6E6b3a8Dd;
@@ -126,10 +126,10 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-29806/24240
 
         // Immunefi Bounty - 5000 DAI - 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18
-        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_IMMUNEFI, 5_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_COMISSION, 5_000);
 
         // Bug Bounty  - 50000 DAI - 0xa24EC79bdF03bB325F36878573B13AedFEd0717f
-        DssExecLib.sendPaymentFromSurplusBuffer(BUG_BOUNTY_PAYOUT_USER, 50_000);
+        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_USER_PAYOUT_2024_05_16, 50_000);
 
         // ---------- Whistle-blower Bounty Payout ----------
         // Forum: https://forum.makerdao.com/t/ad-derecognition-due-to-operational-security-breach-april-5-2024/24043/5

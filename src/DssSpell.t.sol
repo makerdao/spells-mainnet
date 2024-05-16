@@ -425,8 +425,8 @@ contract DssSpellTest is DssSpellTestBase {
         // Initialize the array with the number of payees
         Payee[3] memory payees = [
             Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_358_007),
-            Payee(wallets.addr("BUG_BOUNTY_PAYOUT_IMMUNEFI"), 5_000),
-            Payee(wallets.addr("BUG_BOUNTY_PAYOUT_USER"), 50_000)
+            Payee(wallets.addr("IMMUNEFI_COMISSION"), 5_000),
+            Payee(wallets.addr("IMMUNEFI_USER_PAYOUT_2024_05_16"), 50_000)
         ];
         uint256 expectedSumPayments = 5_413_007; // Fill the number with the value from exec doc.
 
