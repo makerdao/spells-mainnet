@@ -838,11 +838,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
-        string[1] memory resolutions = [
-            "QmUvqDK4EgGFw6dUqmdhcoZiSBLFuhf2e6k63WwrauRUx9"
+        string[2] memory resolutions = [
+            "Qmb8vLDH6wT4Y2axnJX1JSKVKHTG3jzX3U3novw886H8UR",
+            "QmUiYTRy4BkV681tfFe3Ksj6gdLEq27w34MqLw5LvRaBoD"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -858,9 +859,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x901E4450f01ae1A2615E384b9104888Cb9Cb02FF;
+        address SPARK_SPELL = address(0);
 
         vm.expectCall(
             SPARK_PROXY,
