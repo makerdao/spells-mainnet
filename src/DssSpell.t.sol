@@ -418,7 +418,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipped` modifier to skip
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -603,7 +603,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // add the `skipped` modifier to skip
+    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -858,7 +858,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = 0x901E4450f01ae1A2615E384b9104888Cb9Cb02FF;
 
@@ -878,22 +878,4 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    function testCronSequencerD3MJobReplaced() public {
-        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
-        address CRON_D3M_JOB = 0x1Bb799509b0B039345f910dfFb71eEfAc7022323;
-        address CRON_D3M_JOB_NEW = 0x2Ea4aDE144485895B923466B4521F5ebC03a0AeF;
-
-        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
-
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB) , true, "TestError/old-job-not-present-in-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB_NEW), false, "TestError/new-job-already-present-in-sequencer");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB), false, "TestError/old-job-not-removed-from-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_D3M_JOB_NEW), true, "TestError/new-job-not-added-to-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
-    }
 }
