@@ -67,7 +67,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/smart-burn-engine-vow-hump-surplus-buffer-upper-limit-reconfiguration-update-7/24348
 
         //Increase vow.hump by 5 million DAI from 50 million DAI to 55 million DAI
-        DssExecLib.setValue(MCD_VOW, "bump", 55 * MILLION * RAD);
+        DssExecLib.setValue(MCD_VOW, "hump", 55 * MILLION * RAD);
 
         // ---------- RWAF DAO Resolution ----------
         // Forum: https://forum.makerdao.com/t/dao-resolution-banking-setup-for-rwa-foundation/24362
