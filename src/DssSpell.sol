@@ -26,9 +26,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/907dc444bc87c98bbc089c1eb8509a3c9781a11d/governance/votes/Executive%20vote%20-%20May%2030%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-05-30 MakerDAO Executive Spell | Hash: TODO";
+        "2024-05-30 MakerDAO Executive Spell | Hash: 0xc9c33a5946b4845d25097514e691b1398933e21103cd5264ed3bcef547515c15";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -60,7 +60,7 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0); // TBD
+    address internal constant SPARK_SPELL = 0x7bcDd1c8641F8a0Ef98572427FDdD8c26D642256;
 
     function actions() public override {
         // ---------- SBE Surplus Buffer Upper Limit Update ----------
