@@ -66,25 +66,25 @@ contract DssSpellAction is DssAction {
         // ---------- SBE Surplus Buffer Upper Limit Update ----------
         // Forum: https://forum.makerdao.com/t/smart-burn-engine-vow-hump-surplus-buffer-upper-limit-reconfiguration-update-7/24348
 
-        //Increase vow.hump by 5 million DAI from 50 million DAI to 55 million DAI
+        // Increase vow.hump by 5 million DAI from 50 million DAI to 55 million DAI
         DssExecLib.setValue(MCD_VOW, "hump", 55 * MILLION * RAD);
 
         // ---------- RWAF DAO Resolution ----------
         // Forum: https://forum.makerdao.com/t/dao-resolution-banking-setup-for-rwa-foundation/24362
 
-        //Approve RWAF Dao Resolution with IPFS hash Qmb8vLDH6wT4Y2axnJX1JSKVKHTG3jzX3U3novw886H8UR
+        // Approve RWAF Dao Resolution with IPFS hash Qmb8vLDH6wT4Y2axnJX1JSKVKHTG3jzX3U3novw886H8UR
         // Note: see `dao_resolutions` variable declared above
 
         // ---------- RWA004-A DAO Resolution ----------
         // Forum: https://forum.makerdao.com/t/harbor-trade-credit-workout-process/24367
 
-        //Approve RWA004-A Dao Resolution with IPFS hash QmUiYTRy4BkV681tfFe3Ksj6gdLEq27w34MqLw5LvRaBoD
+        // Approve RWA004-A Dao Resolution with IPFS hash QmUiYTRy4BkV681tfFe3Ksj6gdLEq27w34MqLw5LvRaBoD
         // Note: see `dao_resolutions` variable declared above
 
         // ---------- Spark Spell ----------
-        // Forum: https://forum.makerdao.com/t/may-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/24327/3
+        // Forum: https://forum.makerdao.com/t/may-21-2024-proposed-changes-to-sparklend-for-upcoming-spell/24327
 
-        //Trigger Spark Proxy Spell at 0x7bcDd1c8641F8a0Ef98572427FDdD8c26D642256
+        // Trigger Spark Proxy Spell at 0x7bcDd1c8641F8a0Ef98572427FDdD8c26D642256
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }

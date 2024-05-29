@@ -52,12 +52,6 @@ interface RwaSwapOutputConduitLike {
     function quit() external;
 }
 
-interface DssCronSequencerLike {
-    function hasJob(address job) external view returns (bool);
-    function numJobs() external view returns (uint256);
-    function jobAt(uint256 index) external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
