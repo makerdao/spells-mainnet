@@ -44,14 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface RwaSwapOutputConduitLike {
-    function bud(address) external view returns (uint256);
-    function hook(address) external;
-    function pick(address) external;
-    function push(uint256) external;
-    function quit() external;
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
