@@ -173,6 +173,7 @@ contract Wallets {
         addr["PIPKIN"]                       = 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7;
         addr["JULIACHANG"]                   = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
         addr["BYTERON"]                      = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+        addr["ROCKY"]                        = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;

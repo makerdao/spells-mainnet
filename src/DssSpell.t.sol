@@ -44,6 +44,10 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface StarknetDaiBridgeLike {
+    function isOpen() external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -865,4 +869,14 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    function testStarknetClose() public {
+        address STARKNET_DAI_BRIDGE = addr.addr("STARKNET_DAI_BRIDGE");
+        assertEq(StarknetDaiBridgeLike(STARKNET_DAI_BRIDGE).isOpen(), 1, "TestError/starknet-already-closed");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(StarknetDaiBridgeLike(STARKNET_DAI_BRIDGE).isOpen(), 0, "TestError/starknet-not-closed");
+    }
 }

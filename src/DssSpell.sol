@@ -19,6 +19,10 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface StarknetDaiBridgeLike {
+    function close() external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -43,12 +47,15 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
+    // ---------- Contracts ----------
+    address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+
     function actions() public override {
         // ---------- Starknet DAI Bridge Handover ----------
         // Forum: https://forum.makerdao.com/t/starknet-dai-handover/22033/12
 
         // Call close on STARKNET_DAI_BRIDGE
-        // TODO
+        StarknetDaiBridgeLike(STARKNET_DAI_BRIDGE).close();
 
         // ---------- May 2024 AD Compensation ----------
         // Forum: https://forum.makerdao.com/t/may-2024-aligned-delegate-compensation/24441
