@@ -150,7 +150,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/17
 
         // Transfer 5,000,000 DAI to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
-        // TODO
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 5_000_000);
 
         // Transfer 450.00 MKR to the Launch Project at 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         MKR.transfer(LAUNCH_PROJECT_FUNDING, 450.00 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here

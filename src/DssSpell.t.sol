@@ -408,17 +408,15 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[3] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_358_007),
-            Payee(wallets.addr("IMMUNEFI_COMISSION"), 5_000),
-            Payee(wallets.addr("IMMUNEFI_USER_PAYOUT_2024_05_16"), 50_000)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000)
         ];
-        uint256 expectedSumPayments = 5_413_007; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 5_000_000; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
