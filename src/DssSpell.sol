@@ -25,6 +25,14 @@ interface StarknetDaiBridgeLike {
     function close() external;
 }
 
+interface InputConduitJarLike {
+    function push(uint256) external;
+}
+
+interface JarLike {
+    function void() external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -72,8 +80,10 @@ contract DssSpellAction is DssAction {
     address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     // ---------- Contracts ----------
-    address internal immutable STARKNET_DAI_BRIDGE = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
-    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
+    address internal immutable STARKNET_DAI_BRIDGE             = DssExecLib.getChangelogAddress("STARKNET_DAI_BRIDGE");
+    address internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+    address internal immutable MCD_PSM_PAX_A_JAR               = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR");
+    GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
 
     function actions() public override {
         // ---------- Starknet DAI Bridge Handover ----------
@@ -166,16 +176,16 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084/4
 
         // Raise PSM-PAX-A DC to 2,000 DAI
-        // TODO
+        DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 2_000);
 
         // Call push() on MCD_PSM_PAX_A_INPUT_CONDUIT_JAR (use push(uint256 amt)) to push 1,159 USDP
-        // TODO
+        InputConduitJarLike(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR).push(1_159 ether); // Note: `ether` is only a keyword helper
 
         // Call void() on MCD_PSM_PAX_A_JAR
-        // TODO
+        JarLike(MCD_PSM_PAX_A_JAR).void();
 
         // Set PSM-PAX-A DC to 0 DAI
-        // TODO
+        DssExecLib.setIlkDebtCeiling("PSM-PAX-A", 0);
     }
 }
 

@@ -885,4 +885,21 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(StarknetDaiBridgeLike(STARKNET_DAI_BRIDGE).isOpen(), 0, "TestError/starknet-not-closed");
     }
+
+    function testPushPAXOutInputConduit() public {
+        uint256 gemBalanceToPush = 1_159 ether; // Note: `ether` is only a keyword helper
+
+        DSTokenAbstract gem = DSTokenAbstract(addr.addr("PAX"));
+        address MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = addr.addr("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
+        uint256 prevDai = vat.dai(address(vow));
+
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), gemBalanceToPush);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(vat.dai(address(vow)), prevDai + gemBalanceToPush * RAY);
+        assertEq(gem.balanceOf(MCD_PSM_PAX_A_INPUT_CONDUIT_JAR), 0);
+    }
 }
