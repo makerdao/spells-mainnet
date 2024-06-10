@@ -875,7 +875,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    function testStarknetClose() public {
+    function testStarknetDaiBridgeClose() public {
         address STARKNET_DAI_BRIDGE = addr.addr("STARKNET_DAI_BRIDGE");
         assertEq(StarknetDaiBridgeLike(STARKNET_DAI_BRIDGE).isOpen(), 1, "TestError/starknet-already-closed");
 
