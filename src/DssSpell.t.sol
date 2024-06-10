@@ -824,7 +824,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public { // add the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[2] memory resolutions = [
@@ -845,9 +845,9 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x7bcDd1c8641F8a0Ef98572427FDdD8c26D642256;
+        address SPARK_SPELL = address(0); // TODO add actual address
 
         vm.expectCall(
             SPARK_PROXY,
