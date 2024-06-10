@@ -33,6 +33,10 @@ interface JarLike {
     function void() external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -84,6 +88,11 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PSM_PAX_A_INPUT_CONDUIT_JAR = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_INPUT_CONDUIT_JAR");
     address internal immutable MCD_PSM_PAX_A_JAR               = DssExecLib.getChangelogAddress("MCD_PSM_PAX_A_JAR");
     GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
+
+    // ---------- Spark Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x258FD2E6b5C155aa5f3e84326A622288bd70f376;
 
     function actions() public override {
         // ---------- Starknet DAI Bridge Handover ----------
@@ -169,8 +178,8 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/may-31-2024-proposed-changes-to-sparklend-for-upcoming-spell/24413
         // Vote: https://vote.makerdao.com/polling/QmPmVeDx
 
-        // Trigger Spark Proxy Spell at ???
-        // TODO
+        // Trigger Spark Proxy Spell at 0x258FD2E6b5C155aa5f3e84326A622288bd70f376
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- USDP Jar Housekeeping ----------
         // Forum: https://forum.makerdao.com/t/proposed-housekeeping-items-upcoming-executive-spell-2024-04-18/24084/4
