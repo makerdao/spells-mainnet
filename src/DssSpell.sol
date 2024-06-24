@@ -49,18 +49,48 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
+    // ---------- Math ----------
+    uint256 internal constant THOUSAND = 10 ** 3;
+    uint256 internal constant RAD      = 10 ** 45;
+
     // ---------- Payment addresses ----------
+    address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
     // ---------- Contracts ----------
-    GemAbstract internal immutable MKR                         = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable MKR               = GemAbstract(DssExecLib.mkr());
+    address internal immutable MCD_VOW               = DssExecLib.vow();
+    address internal immutable MCD_FLAP              = DssExecLib.flap();
 
     // ---------- Spark Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    // address internal constant SPARK_SPELL = 0x258FD2E6b5C155aa5f3e84326A622288bd70f376;
+    address internal constant SPARK_SPELL = 0xc96420Dbe9568e2a65DD57daAD069FDEd37265fa;
 
     function actions() public override {
+        // ---------- SBE Parameter Updates ----------
+        // Forum: http://forum.makerdao.com/t/smart-burn-engine-transaction-analysis-parameter-reconfiguration-update-8/24531/
 
+        // Decrease the hop parameter for 1,577 seconds from 11,826 seconds to 10,249 seconds.
+        DssExecLib.setValue(MCD_FLAP, "hop", 10_249);
+
+        // Decrease the bump parameter for 10,000 DAI from 75,000 DAI to 65,000 DAI.
+        DssExecLib.setValue(MCD_VOW, "bump", 65 * THOUSAND * RAD);
+
+        // ---------- Launch Funding Transfers ----------
+        // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/18
+        // MIP: https://mips.makerdao.com/mips/details/MIP108#9-1-launch-project-budget
+
+        // Launch Project - 4,500,000 DAI - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        DssExecLib.sendPaymentFromSurplusBuffer(LAUNCH_PROJECT_FUNDING, 4_500_000);
+
+        // Launch Project - 1,300.00 MKR - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        MKR.transfer(LAUNCH_PROJECT_FUNDING, 1300.00 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // ---------- Spark Spell ----------
+        // Forum: https://forum.makerdao.com/t/jun-12-2024-proposed-changes-to-sparklend-for-upcoming-spell/24489
+
+        // Trigger Spark Proxy Spell at 0xc96420Dbe9568e2a65DD57daAD069FDEd37265fa
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 

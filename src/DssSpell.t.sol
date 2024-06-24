@@ -414,9 +414,9 @@ contract DssSpellTest is DssSpellTestBase {
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
         Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000)
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 4_500_000)
         ];
-        uint256 expectedSumPayments = 5_000_000; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 4_500_000; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -596,30 +596,11 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[20] memory payees = [
-            Payee(wallets.addr("BLUE"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JULIACHANG"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PIPKIN"), 34.26 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BYTERON"), 12.50 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"), 11.11 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"), 11.11 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"), 8.49 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ROCKY"), 3.70 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"), 2.78 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("UPMAKER"), 1.85 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("IAMMEEOH"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("DAI_VINCI"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("OPENSKY_2"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("RES"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("HARMONY_2"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("LIBERTAS"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("SEEDLATAMETH_2"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ROOT"), 12.51 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 450.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 1300.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 760.89 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 1300 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -857,7 +838,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x258FD2E6b5C155aa5f3e84326A622288bd70f376);
+        address SPARK_SPELL = address(0xc96420Dbe9568e2a65DD57daAD069FDEd37265fa);
 
         vm.expectCall(
             SPARK_PROXY,

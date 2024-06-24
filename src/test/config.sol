@@ -111,10 +111,10 @@ contract Config {
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_bump              = 75 * THOUSAND;  // In whole Dai units
+        afterSpell.vow_bump              = 65 * THOUSAND;  // In whole Dai units
         afterSpell.vow_hump_min          = 55 * MILLION;   // In whole Dai units
         afterSpell.vow_hump_max          = 55 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop              = 11_826 seconds; // In seconds
+        afterSpell.flap_hop              = 10_249 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
         afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
