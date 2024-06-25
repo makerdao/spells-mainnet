@@ -49,10 +49,6 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
-    // ---------- Math ----------
-    uint256 internal constant THOUSAND = 10 ** 3;
-    uint256 internal constant RAD      = 10 ** 45;
-
     // ---------- Payment addresses ----------
     address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
@@ -74,7 +70,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(MCD_FLAP, "hop", 10_249);
 
         // Decrease the bump parameter for 10,000 DAI from 75,000 DAI to 65,000 DAI.
-        DssExecLib.setValue(MCD_VOW, "bump", 65 * THOUSAND * RAD);
+        DssExecLib.setSurplusAuctionAmount(65_000);
 
         // ---------- Launch Funding Transfers ----------
         // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/18
