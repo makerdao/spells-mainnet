@@ -54,7 +54,6 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     GemAbstract internal immutable MKR               = GemAbstract(DssExecLib.mkr());
-    address internal immutable MCD_VOW               = DssExecLib.vow();
     address internal immutable MCD_FLAP              = DssExecLib.flap();
 
     // ---------- Spark Spell ----------
