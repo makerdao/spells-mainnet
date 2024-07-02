@@ -46,7 +46,13 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
-    function actions() public override {}
+    function actions() public override {
+        // ----- LITE-PSM-USDC-A DAO Resolution -----
+        // Forum: https://forum.makerdao.com/t/coinbase-web3-wallet-legal-overview/24577
+
+        // Approve LITE-PSM-USDC-A Dao Resolution with IPFS hash QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA
+        // Note: see `dao_resolutions` variable declared above
+    }
 }
 
 contract DssSpell is DssExec {
