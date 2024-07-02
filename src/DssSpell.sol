@@ -31,6 +31,9 @@ contract DssSpellAction is DssAction {
         return false;
     }
 
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA";
+
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
