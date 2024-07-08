@@ -58,7 +58,7 @@ contract DssSpellAction is DssAction {
     // ---------- Payment addresses ----------
     address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
 
-    // ---------- TODO Chainlink Automation Upgrade to V2.1 ----------
+    // ---------- Update Chainlink Keeper Network Treasury Address ----------
     address internal constant CHAINLINK_PAYMENT_ADAPTER = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
     address internal constant CHAINLINK_TREASURY_NEW = 0xBE1cE564574377Acb17C2b7628E4F6dd38067a55;
 
@@ -74,43 +74,51 @@ contract DssSpellAction is DssAction {
         // AAVE - 219125 DAI - 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 219_125);
 
-        // ---------- TODO Chainlink Automation Upgrade to V2.1 ----------
+        // ---------- Update Chainlink Keeper Network Treasury Address ----------
+        // Forum: https://forum.makerdao.com/t/amend-keeper-network-chainlink-automation-v2-1/24593
 
-        // TODO instruction to set treasury to new address
+        // DssExecLib.setContract(CHAINLINK_PAYMENT_ADAPTER, "treasury", 0xBE1cE564574377Acb17C2b7628E4F6dd38067a55);
         DssExecLib.setContract(CHAINLINK_PAYMENT_ADAPTER, 'treasury', CHAINLINK_TREASURY_NEW);
 
-        // ---------- TODO Rate changes ----------
+        // ---------- Stability Scope Parameter Changes ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-14/24594/1
 
-        // TODO ETH-A: Decrease the Stability Fee by 1 percentage point from 8.25% to 7.25%
+        // Stability Fee (SF) changes:
+        // Note: only heading, changes follow
+
+        // ETH-A: Decrease by 1 percentage point, from 8.25% to 7.25%
         DssExecLib.setIlkStabilityFee("ETH-A", SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO ETH-B: Decrease the Stability Fee by 1 percentage point from 8.75% to 7.75%
+        // ETH-B: Decrease by 1 percentage point, from 8.75% to 7.75%
         DssExecLib.setIlkStabilityFee("ETH-B", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO ETH-C: Decrease the Stability Fee by 1 percentage point from 8.00% to 7.00%
+        // ETH-C: Decrease by 1 percentage point, from 8% to 7%
         DssExecLib.setIlkStabilityFee("ETH-C", SEVEN_PCT_RATE, /* doDrip = */ true);
 
-        // TODO WSTETH-A: Decrease the Stability Fee by 1 percentage point from 9.25% to 8.25%
+        // WSTETH-A: Decrease by 1 percentage point, from 9.25% to 8.25%
         DssExecLib.setIlkStabilityFee("WSTETH-A", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO WSTETH-B: Decrease the Stability Fee by 1 percentage point from 9.00% to 8.00%
+        // WSTETH-B: Decrease by 1 percentage point, from 9% to 8%
         DssExecLib.setIlkStabilityFee("WSTETH-B", EIGHT_PCT_RATE, /* doDrip = */ true);
 
-        // TODO WBTC-A: Decrease the Stability Fee by 1 percentage point from 9.75% to 8.75%
+        // WBTC-A: Decrease by 1 percentage point, from 9.75% to 8.75%
         DssExecLib.setIlkStabilityFee("WBTC-A", EIGHT_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO WBTC-B: Decrease the Stability Fee by 1 percentage point from 10.25% to 9.25%
+        // WBTC-B: Decrease by 1 percentage point, from 10.25% to 9.25%
         DssExecLib.setIlkStabilityFee("WBTC-B", NINE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO WBTC-C: Decrease the Stability Fee by 1 percentage point from 9.50% to 8.50%
+        // WBTC-C: Decrease by 1 percentage point, from 9.5% to 8.5%
         DssExecLib.setIlkStabilityFee("WBTC-C", EIGHT_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // TODO DSR: Decrease the Dai Savings Rate by 1 percentage points from 8.00% to 7.00%
+        // Dai Savings Rate:
+        // Note: only heading, changes follow
+
+        // DSR: Decrease by 1 percentage point, from 8% to 7%
         DssExecLib.setDSR(SEVEN_PCT_RATE, /* doDrip = */ true);
 
-        // ---------- TODO Spark Spell ----------
+        // ---------- Spark Spell ----------
 
-        // TODO instruction for trigger
+        // TODO Trigger Spark Proxy Spell at TBD
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
