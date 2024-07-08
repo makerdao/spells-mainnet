@@ -65,7 +65,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Update Chainlink Keeper Network Treasury Address ----------
     address internal constant CHAINLINK_PAYMENT_ADAPTER = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
-    address internal constant CHAINLINK_TREASURY_NEW = 0xBE1cE564574377Acb17C2b7628E4F6dd38067a55;
+    address internal constant CHAINLINK_TREASURY_NEW    = 0xBE1cE564574377Acb17C2b7628E4F6dd38067a55;
 
     // ---------- Spark Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
