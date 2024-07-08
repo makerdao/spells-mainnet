@@ -416,7 +416,7 @@ contract DssSpellTest is DssSpellTestBase {
         Payee[1] memory payees = [
             Payee(wallets.addr("AAVE_V3_TREASURY"), 219_125)
         ];
-        uint256 expectedSumPayments = 219_125; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 0; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
