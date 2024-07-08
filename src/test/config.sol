@@ -98,7 +98,7 @@ contract Config {
             deployed_spell_created: 0, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:   0,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   false,       // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -106,7 +106,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr               = 8_00;           // In basis points
+        afterSpell.pot_dsr               = 7_00;           // In basis points
         afterSpell.pause_delay           = 30 hours;       // In seconds
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
@@ -137,7 +137,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          8_25,           // In basis points
+            pct:          7_25,           // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -162,7 +162,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          8_75,
+            pct:          7_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -187,7 +187,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          8_00,
+            pct:          7_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -287,7 +287,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         7_500,
-            pct:          9_75,
+            pct:          8_75,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -312,7 +312,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          10_25,
+            pct:          9_25,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -337,7 +337,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         3_500,
-            pct:          9_50,
+            pct:          8_50,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1462,7 +1462,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          9_25,
+            pct:          8_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1487,7 +1487,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          9_00,
+            pct:          8_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
