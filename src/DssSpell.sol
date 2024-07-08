@@ -118,7 +118,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Spell ----------
 
-        // TODO Trigger Spark Proxy Spell at TBD
+        // Trigger Spark Proxy Spell at 0x91824fa4fd51E8440a122ffDd49C701F5C56D58e
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
