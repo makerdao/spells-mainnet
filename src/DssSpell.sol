@@ -116,7 +116,14 @@ contract DssSpellAction is DssAction {
         // DSR: Decrease by 1 percentage point, from 8% to 7%
         DssExecLib.setDSR(SEVEN_PCT_RATE, /* doDrip = */ true);
 
+        // ---------- Delegate Compensation ----------
+
+        // TODO
+
         // ---------- Spark Spell ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-14/24594/1
+        // Forum: https://forum.makerdao.com/t/jun-27-2024-proposed-changes-to-spark-for-upcoming-spell/24552
+        // Poll: https://vote.makerdao.com/polling/QmTBsxR5
 
         // Trigger Spark Proxy Spell at 0x91824fa4fd51E8440a122ffDd49C701F5C56D58e
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
