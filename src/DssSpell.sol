@@ -22,17 +22,14 @@ import "dss-exec-lib/DssAction.sol";
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/f35481c2da8d264546dd8cdc6e333ce42a0a09c2/governance/votes/Executive%20vote%20-%20July%204%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-07-04 MakerDAO Executive Spell | Hash: 0xfc135415c8b1a0ec3b0e61640dee560866d7ea331267a65e9801e125f0214d5e";
+        "2024-07-11 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
-
-    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -47,11 +44,7 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
     function actions() public override {
-        // ----- LITE-PSM-USDC-A DAO Resolution -----
-        // Forum: https://forum.makerdao.com/t/coinbase-web3-wallet-legal-overview/24577
 
-        // Approve LITE-PSM-USDC-A Dao Resolution with IPFS hash QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA
-        // Note: see `dao_resolutions` variable declared above
     }
 }
 
