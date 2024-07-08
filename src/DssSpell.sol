@@ -19,6 +19,8 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -46,14 +48,17 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
-    uint256 internal constant SEVEN_PCT_RATE = 1000000002145441671308778766;
-    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE = 1000000002219443553326580536;
-    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
-    uint256 internal constant EIGHT_PCT_RATE = 1000000002440418608258400030;
-    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE = 1000000002513736079215619839;
-    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE = 1000000002586884420913935572;
-    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE = 1000000002659864411854984565;
-    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE = 1000000002805322428706865331;
+    uint256 internal constant SEVEN_PCT_RATE                = 1000000002145441671308778766;
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE    = 1000000002219443553326580536;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PCT_RATE                = 1000000002440418608258400030;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
+    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE        = 1000000002586884420913935572;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
+    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE     = 1000000002805322428706865331;
+
+    // ---------- Contracts ----------
+    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
     // ---------- Payment addresses ----------
     address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
