@@ -83,7 +83,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/amend-keeper-network-chainlink-automation-v2-1/24593
 
         // DssExecLib.setContract(CHAINLINK_PAYMENT_ADAPTER, "treasury", 0xBE1cE564574377Acb17C2b7628E4F6dd38067a55);
-        DssExecLib.setContract(CHAINLINK_PAYMENT_ADAPTER, 'treasury', CHAINLINK_TREASURY_NEW);
+        DssExecLib.setContract(CHAINLINK_PAYMENT_ADAPTER, "treasury", CHAINLINK_TREASURY_NEW);
 
         // ---------- Stability Scope Parameter Changes ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-14/24594/1

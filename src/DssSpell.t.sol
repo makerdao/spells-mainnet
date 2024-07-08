@@ -858,7 +858,7 @@ contract DssSpellTest is DssSpellTestBase {
     function testChainlinkPaymentAdapterNewTreasury() public {
         address CHAINLINK_PAYMENT_ADAPTER = wallets.addr("CHAINLINK_PAYMENT_ADAPTER");
         address CHAINLINK_TREASURY_NEW = wallets.addr("CHAINLINK_TREASURY");
-        address CHAINLINK_TREASURY_OLD = address(0xaBAbd5e7d6d05672391aB2A914F57ce343D5CFA6);
+        address CHAINLINK_TREASURY_OLD = 0xaBAbd5e7d6d05672391aB2A914F57ce343D5CFA6;
 
         assertTrue(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).treasury() == CHAINLINK_TREASURY_OLD, "ChainLink/incorrect-treasury");
 
