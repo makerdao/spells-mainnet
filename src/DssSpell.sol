@@ -133,6 +133,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setDSR(SEVEN_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Delegate Compensation ----------
+        // Forum: https://forum.makerdao.com/t/june-2024-aligned-delegate-compensation/24617
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-aligned-delegates-ads-gov6
 
         // BLUE - 41.67 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         MKR.transfer(BLUE, 41.67 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
@@ -168,6 +170,7 @@ contract DssSpellAction is DssAction {
         MKR.transfer(WBC, 1.34 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Spark Spell ----------
+        // Forum: https://forum.makerdao.com/t/may-31-2024-proposed-changes-to-sparklend-for-upcoming-spell/24413
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-14/24594/1
         // Forum: https://forum.makerdao.com/t/jun-27-2024-proposed-changes-to-spark-for-upcoming-spell/24552
         // Poll: https://vote.makerdao.com/polling/QmTBsxR5
