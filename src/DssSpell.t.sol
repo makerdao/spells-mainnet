@@ -605,8 +605,8 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(wallets.addr("BONAPUBLICA"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("ROCKY"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("VIGILANT"), 12.55 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_ENNOIA"), 4.1 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_KOHLA"), 4.1 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY_ENNOIA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY_KOHLA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
             Payee(wallets.addr("WBC"), 1.34 ether) // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc

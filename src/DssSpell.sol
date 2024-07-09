@@ -160,11 +160,11 @@ contract DssSpellAction is DssAction {
         // vigilant - 12.55 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
         MKR.transfer(VIGILANT, 12.55 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Ennoia (Cloaky) - 4.1 MKR - 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b
-        MKR.transfer(CLOAKY_ENNOIA, 4.1 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+        // Ennoia (Cloaky) - 4.10 MKR - 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b
+        MKR.transfer(CLOAKY_ENNOIA, 4.10 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Kohla (Cloaky) - 4.1 MKR - 0xA9D43465B43ab95050140668c87A2106C73CA811
-        MKR.transfer(CLOAKY_KOHLA, 4.1 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+        // Kohla (Cloaky) - 4.10 MKR - 0xA9D43465B43ab95050140668c87A2106C73CA811
+        MKR.transfer(CLOAKY_KOHLA, 4.10 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // WBC - 1.34 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
         MKR.transfer(WBC, 1.34 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
