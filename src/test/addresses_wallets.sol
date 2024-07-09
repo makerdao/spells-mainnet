@@ -174,6 +174,8 @@ contract Wallets {
         addr["JULIACHANG"]                   = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
         addr["BYTERON"]                      = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
         addr["ROCKY"]                        = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+        addr["CLOAKY_KOHLA"]                 = 0xA9D43465B43ab95050140668c87A2106C73CA811;
+        addr["CLOAKY_ENNOIA"]                = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;

@@ -61,7 +61,18 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
     // ---------- Payment addresses ----------
-    address internal constant AAVE_V3_TREASURY = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address internal constant AAVE_V3_TREASURY  = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address internal constant BLUE              = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant JULIACHANG        = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant BYTERON           = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant CLOAKY            = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant PBG               = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant BONAPUBLICA       = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant ROCKY             = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+    address internal constant VIGILANT          = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant CLOAKY_KOHLA      = 0xA9D43465B43ab95050140668c87A2106C73CA811;
+    address internal constant CLOAKY_ENNOIA     = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+    address internal constant WBC               = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
 
     // ---------- Update Chainlink Keeper Network Treasury Address ----------
     address internal constant CHAINLINK_PAYMENT_ADAPTER = 0xfB5e1D841BDA584Af789bDFABe3c6419140EC065;
@@ -123,7 +134,38 @@ contract DssSpellAction is DssAction {
 
         // ---------- Delegate Compensation ----------
 
-        // TODO
+        // BLUE - 41.67 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        MKR.transfer(BLUE, 41.67 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // JuliaChang - 41.67 MKR - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        MKR.transfer(JULIACHANG, 41.67 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Byteron - 38.98 MKR - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        MKR.transfer(BYTERON, 38.98 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Cloaky - 20.40 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY, 20.40 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // PBG - 16.58 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG, 16.58 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // BONAPUBLICA - 13.89 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA, 13.89 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Rocky - 13.89 MKR - 0xC31637BDA32a0811E39456A59022D2C386cb2C85
+        MKR.transfer(ROCKY, 13.89 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // vigilant - 12.55 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT, 12.55 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Ennoia (Cloaky) - 4.1 MKR - 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b
+        MKR.transfer(CLOAKY_ENNOIA, 4.1 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Kohla (Cloaky) - 4.1 MKR - 0xA9D43465B43ab95050140668c87A2106C73CA811
+        MKR.transfer(CLOAKY_KOHLA, 4.1 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // WBC - 1.34 MKR - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        MKR.transfer(WBC, 1.34 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Spark Spell ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-14/24594/1
