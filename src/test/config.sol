@@ -107,7 +107,7 @@ contract Config {
         //
         afterSpell.line_offset           = 680 * MILLION;  // Offset between the global line against the sum of local lines
         afterSpell.pot_dsr               = 7_00;           // In basis points
-        afterSpell.pause_delay           = 30 hours;       // In seconds
+        afterSpell.pause_delay           = 16 hours;       // In seconds
         afterSpell.vow_wait              = 156 hours;      // In seconds
         afterSpell.vow_dump              = 250;            // In whole Dai units
         afterSpell.vow_sump              = 50 * THOUSAND;  // In whole Dai units
@@ -117,14 +117,14 @@ contract Config {
         afterSpell.flap_hop              = 10_249 seconds; // In seconds
         afterSpell.flap_want             = 9800;           // In basis points
         afterSpell.dog_Hole              = 150 * MILLION;  // In whole Dai units
-        afterSpell.esm_min               = 150 * THOUSAND; // In whole MKR units
+        afterSpell.esm_min               = 300 * THOUSAND; // In whole MKR units
         afterSpell.pause_authority       = chief;          // Pause authority
         afterSpell.osm_mom_authority     = chief;          // OsmMom authority
         afterSpell.clipper_mom_authority = chief;          // ClipperMom authority
         afterSpell.d3m_mom_authority     = chief;          // D3MMom authority
         afterSpell.line_mom_authority    = chief;          // LineMom authority
-        afterSpell.ilk_count             = 65;             // Num expected in system
-        afterSpell.chainlog_version      = "1.17.4";       // String expected in system
+        afterSpell.ilk_count             = 66;             // Num expected in system
+        afterSpell.chainlog_version      = "1.17.5";       // String expected in system
 
         //
         // Values for all collateral
@@ -758,7 +758,7 @@ contract Config {
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      10 * BILLION,
-            aL_gap:       400 * MILLION,
+            aL_gap:       380 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         0,
@@ -778,6 +778,31 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
+            offboarding:  false
+        });
+        afterSpell.collaterals["LITE-PSM-USDC-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      50 * MILLION,
+            aL_gap:       20 * MILLION,
+            aL_ttl:       12 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          100_00,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2WBTCETH-A"] = CollateralValues({

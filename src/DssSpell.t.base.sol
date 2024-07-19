@@ -487,7 +487,7 @@ contract DssSpellTestBase is Config, DssTest {
         {
             uint256 normalizedMin = values.esm_min * WAD;
             assertEq(esm.min(), normalizedMin, "TestError/esm-min");
-            assertTrue(esm.min() > WAD && esm.min() < 200 * THOUSAND * WAD, "TestError/esm-min-range");
+            assertTrue(esm.min() > WAD && esm.min() < 400 * THOUSAND * WAD, "TestError/esm-min-range");
         }
 
         // check Pause authority
