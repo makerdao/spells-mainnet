@@ -44,8 +44,34 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface NetworkPaymentAdapterLike {
-    function treasury() external view returns (address);
+interface DssCronSequencerLike {
+    function hasJob(address) external view returns (bool);
+}
+
+interface LitePsmJobLike {
+    function rushThreshold() external view returns (uint256);
+    function gushThreshold() external view returns (uint256);
+    function cutThreshold() external view returns (uint256);
+}
+
+interface PsmLike {
+    function gemJoin() external view returns (address);
+    function tin() external view returns (uint256);
+    function tout() external view returns (uint256);
+    function vow() external view returns (address);
+}
+
+interface LitePsmLike {
+    function buf() external view returns (uint256);
+    function vow() external view returns (address);
+    function to18ConversionFactor() external view returns (uint256);
+}
+
+interface GemLike {
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+    function decimals() external view returns (uint256);
+    function balanceOf(address) external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -864,4 +890,118 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testSequencerAddLitePsmJob() public {
+        DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
+        LitePsmJobLike litePsmJob      = LitePsmJobLike(      addr.addr("CRON_LITE_PSM_JOB"));
+
+        // Sanity checks
+        // fill: Set threshold at 15M DAI
+        assertEq(litePsmJob.rushThreshold(), 15_000_000 * WAD, "invalid rush threshold");
+        // trim: Set threshold at 30M DAI
+        assertEq(litePsmJob.gushThreshold(), 30_000_000 * WAD, "invalid rush threshold");
+        // chug: Set threshold at 300k DAI
+        assertEq(litePsmJob.cutThreshold(),     300_000 * WAD, "invalid rush threshold");
+
+        assertTrue(!sequencer.hasJob(address(litePsmJob)));
+
+        // execute spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertTrue(sequencer.hasJob(address(litePsmJob)));
+    }
+
+    uint256 constant REG_CLASS_JOINLESS = 6;
+    bytes32 constant SRC_ILK            = "PSM-USDC-A";
+    bytes32 constant DST_ILK            = "LITE-PSM-USDC-A";
+    PsmLike immutable srcPsm            = PsmLike(    addr.addr("MCD_PSM_USDC_A"));
+    LitePsmLike immutable dstPsm        = LitePsmLike(addr.addr("MCD_LITE_PSM_USDC_A"));
+    address immutable pocket            =             addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
+    GemLike immutable gem               = GemLike(    addr.addr("USDC"));
+    address immutable pip               =             addr.addr("PIP_USDC");
+    uint256 constant dstWant            = 20_000_000 * WAD;
+    uint256 constant dstBuf             = 20_000_000 * WAD;
+
+    function testLitePsmMigrationPhase1() public {
+        (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
+        uint256 psrcTin                    = srcPsm.tin();
+        uint256 psrcTout                   = srcPsm.tout();
+        uint256 psrcVatGem                 = vat.gem(SRC_ILK, address(srcPsm));
+        uint256 psrcGemBalance             = gem.balanceOf(srcPsm.gemJoin());
+        uint256 pdstVatGem                 = vat.gem(DST_ILK, address(dstPsm));
+        uint256 ppauseProxyVatSin          = vat.sin(address(pauseProxy));
+
+        // Pre-conditions
+        {
+            (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
+            assertGt(psrcIlkArt, 0, "before: src ilk Art is zero");
+            assertGt(psrcLine,   0, "before: src line is zero");
+            assertGt(psrcArt,    0, "before: src art is zero");
+            assertGt(psrcInk,    0, "before: src ink is zero");
+        }
+
+        // execute spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Sanity checks
+        assertEq(srcPsm.tin(),  psrcTin,      "after: unexpected src tin update");
+        assertEq(srcPsm.tout(), psrcTout,     "after: unexpected src tout update");
+        assertEq(srcPsm.vow(),  address(vow), "after: unexpected src vow update");
+
+        assertEq(dstPsm.buf(),  dstBuf,       "after: invalid dst buf");
+        assertEq(dstPsm.vow(),  address(vow), "after: unexpected dst vow update");
+
+        // Old PSM state is set correctly
+        {
+            (uint256 srcInk, uint256 srcArt) = vat.urns(SRC_ILK, address(srcPsm));
+            assertEq(srcInk, psrcInk - dstWant, "after: src ink is not decreased by dst want");
+            assertEq(srcArt, psrcArt - dstWant, "after: src art is not decreased by dst want");
+
+            assertEq(vat.gem(SRC_ILK, address(srcPsm)), psrcVatGem,                          "after: unexpected src vat gem change");
+            assertEq(gem.balanceOf(srcPsm.gemJoin()),   psrcGemBalance - _wadToAmt(dstWant), "after: src gem-join balance is not decreased by dst want");
+        }
+
+        // New PSM state is set correctly
+        assertEq(dai.balanceOf(address(dstPsm)),            dstBuf,     "after: invalid dst psm dai balance");
+        assertEq(vat.gem(DST_ILK, address(dstPsm)),         pdstVatGem, "after: unexpected dst vat gem change");
+        assertEq(_amtToWad(gem.balanceOf(address(pocket))), dstWant,    "after: invalid gem balance for dst pocket");
+
+        // New PSM info is added to IlkRegistry
+        {
+            (
+                string memory name,
+                string memory symbol,
+                uint256 _class,
+                uint256 decimals,
+                address _gem,
+                address _pip,
+                address gemJoin,
+                address clip
+            ) = reg.info(DST_ILK);
+
+            assertEq(name,     gem.name(),         "after: reg name mismatch");
+            assertEq(symbol,   gem.symbol(),       "after: reg symbol mismatch");
+            assertEq(_class,   REG_CLASS_JOINLESS, "after: reg class mismatch");
+            assertEq(decimals, gem.decimals(),     "after: reg dec mismatch");
+            assertEq(_gem,     address(gem),       "after: reg gem mismatch");
+            assertEq(_pip,     pip,                "after: reg pip mismatch");
+            assertEq(gemJoin,  address(0),         "after: invalid reg gemJoin");
+            assertEq(clip,     address(0),         "after: invalid reg xlip");
+        }
+
+        // Vat sin for MCD_PAUSE_PROXY has not changed
+        assertEq(vat.sin(address(pauseProxy)), ppauseProxyVatSin, "after: unexpected vat sin change for pause proxy");
+    }
+
+    function _amtToWad(uint256 amt) internal view returns (uint256) {
+        return amt * dstPsm.to18ConversionFactor();
+    }
+
+    function _wadToAmt(uint256 wad) internal view returns (uint256) {
+        return wad / dstPsm.to18ConversionFactor();
+    }
 }
