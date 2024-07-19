@@ -408,7 +408,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipped` modifier to skip
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -591,7 +591,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // add the `skipped` modifier to skip
+    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -845,7 +845,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPARK TESTS
 
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0x91824fa4fd51E8440a122ffDd49C701F5C56D58e);
 
@@ -864,18 +864,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testChainlinkPaymentAdapterNewTreasury() public {
-        address CHAINLINK_PAYMENT_ADAPTER = wallets.addr("CHAINLINK_PAYMENT_ADAPTER");
-        address CHAINLINK_TREASURY_NEW = wallets.addr("CHAINLINK_TREASURY");
-        address CHAINLINK_TREASURY_OLD = 0xaBAbd5e7d6d05672391aB2A914F57ce343D5CFA6;
-
-        assertTrue(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).treasury() == CHAINLINK_TREASURY_OLD, "ChainLink/incorrect-treasury");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        assertTrue(NetworkPaymentAdapterLike(CHAINLINK_PAYMENT_ADAPTER).treasury() == CHAINLINK_TREASURY_NEW, "ChainLink/treasury-not-updated");
-    }
 }
