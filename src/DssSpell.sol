@@ -72,9 +72,9 @@ contract DssSpellAction is DssAction {
     address internal immutable PIP_USDC                      = DssExecLib.getChangelogAddress("PIP_USDC");
     address internal constant MCD_LITE_PSM_USDC_A            = 0xf6e72Db5454dd049d0788e411b06CfAF16853042;
     address internal constant MCD_LITE_PSM_USDC_A_POCKET     = 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341;
-    address internal constant MCD_LITE_PSM_MOM               = 0x467b32b0407Ad764f56304420Cddaa563bDab425;
+    address internal constant LITE_PSM_MOM               = 0x467b32b0407Ad764f56304420Cddaa563bDab425;
     address internal constant MCD_LITE_PSM_USDC_A_JAR        = 0x69cA348Bd928A158ADe7aa193C133f315803b06e;
-    address internal constant MCD_LITE_PSM_USDC_A_IN_CON_JAR = 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d;
+    address internal constant MCD_LITE_PSM_USDC_A_IN_CDT_JAR = 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d;
 
     // ---------- Deploy LitePSM keeper network job ----------
     address internal immutable CRON_SEQUENCER   = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
@@ -110,7 +110,7 @@ contract DssSpellAction is DssAction {
             // ---------- LITE-PSM-USDC-A Phase 1 ----------
             // Onboard MCD_LITE_PSM_USDC_A at 0xf6e72Db5454dd049d0788e411b06CfAF16853042
             litePsm: MCD_LITE_PSM_USDC_A,
-            mom:     MCD_LITE_PSM_MOM
+            mom:     LITE_PSM_MOM
         });
         DssLitePsmMigrationConfigPhase1 memory cfg = DssLitePsmMigrationConfigPhase1({
             dstPip:       PIP_USDC,
@@ -120,7 +120,7 @@ contract DssSpellAction is DssAction {
             // ---------- Chainlog additions ----------
 
             // Add 0x467b32b0407Ad764f56304420Cddaa563bDab425 as LITE_PSM_MOM
-            psmMomKey:    "MCD_LITE_PSM_MOM",
+            psmMomKey:    "LITE_PSM_MOM",
             // Add 0xf6e72Db5454dd049d0788e411b06CfAF16853042 as MCD_LITE_PSM_USDC_A
             dstPsmKey:    "MCD_LITE_PSM_USDC_A",
             // Add 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341 as MCD_LITE_PSM_USDC_A_POCKET
@@ -184,8 +184,8 @@ contract DssSpellAction is DssAction {
 
         // Add 0x69cA348Bd928A158ADe7aa193C133f315803b06e as MCD_LITE_PSM_USDC_A_JAR
         DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_JAR", MCD_LITE_PSM_USDC_A_JAR);
-        // Add 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d as MCD_LITE_PSM_USDC_A_IN_CON_JAR
-        DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_IN_CON_JAR", MCD_LITE_PSM_USDC_A_IN_CON_JAR);
+        // Add 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d as MCD_LITE_PSM_USDC_A_IN_CDT_JAR
+        DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_IN_CDT_JAR", MCD_LITE_PSM_USDC_A_IN_CDT_JAR);
 
         DssExecLib.setChangelogVersion("1.17.5");
 

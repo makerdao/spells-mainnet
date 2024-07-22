@@ -113,9 +113,9 @@ contract Addresses {
         addr["MCD_PSM_USDC_A"]                   = 0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A;
         addr["MCD_LITE_PSM_USDC_A"]              = 0xf6e72Db5454dd049d0788e411b06CfAF16853042;
         addr["MCD_LITE_PSM_USDC_A_POCKET"]       = 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341;
-        addr["MCD_LITE_PSM_MOM"]                 = 0x467b32b0407Ad764f56304420Cddaa563bDab425;
         addr["MCD_LITE_PSM_USDC_A_JAR"]          = 0x69cA348Bd928A158ADe7aa193C133f315803b06e;
-        addr["MCD_LITE_PSM_USDC_A_IN_CON_JAR"]   = 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d;
+        addr["MCD_LITE_PSM_USDC_A_IN_CDT_JAR"]   = 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d;
+        addr["LITE_PSM_MOM"]                     = 0x467b32b0407Ad764f56304420Cddaa563bDab425;
         addr["WBTC"]                             = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
         addr["PIP_WBTC"]                         = 0xf185d0682d50819263941e5f4EacC763CC5C6C42;
         addr["MCD_JOIN_WBTC_A"]                  = 0xBF72Da2Bd84c5170618Fbe5914B0ECA9638d5eb5;
