@@ -149,8 +149,7 @@ contract DssSpellAction is DssAction {
             // Add 0xf6e72Db5454dd049d0788e411b06CfAF16853042 as MCD_LITE_PSM_USDC_A
             dstPsmKey:    "MCD_LITE_PSM_USDC_A",
             // Add 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341 as MCD_LITE_PSM_USDC_A_POCKET
-            dstPocketKey: "MCD_LITE_PSM_USDC_A_POCKET",
-
+            dstPocketKey: "MCD_LITE_PSM_USDC_A_POCKET"
         });
         DssLitePsmMigrationPhase1.initAndMigrate(dss, inst, cfg);
 
