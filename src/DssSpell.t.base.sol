@@ -156,6 +156,37 @@ interface FlapperMomAbstract {
     function stop() external;
 }
 
+interface LitePsmLike {
+    function bud(address) external view returns (uint256);
+    function buf() external view returns (uint256);
+    function buyGem(address usr, uint256 gemAmt) external returns (uint256 daiInWad);
+    function buyGemNoFee(address usr, uint256 gemAmt) external returns (uint256 daiInWad);
+    function chug() external returns (uint256 wad);
+    function cut() external view returns (uint256 wad);
+    function daiJoin() external view returns (address);
+    function file(bytes32 what, uint256 data) external;
+    function fill() external returns (uint256 wad);
+    function gem() external view returns (address);
+    function gemJoin() external view returns (address);
+    function gush() external view returns (uint256 wad);
+    function ilk() external view returns (bytes32);
+    function kiss(address usr) external;
+    function pocket() external view returns (address);
+    function rush() external view returns (uint256 wad);
+    function sellGem(address usr, uint256 gemAmt) external returns (uint256 daiOutWad);
+    function sellGemNoFee(address usr, uint256 gemAmt) external returns (uint256 daiOutWad);
+    function tin() external view returns (uint256);
+    function to18ConversionFactor() external view returns (uint256);
+    function tout() external view returns (uint256);
+    function trim() external returns (uint256 wad);
+    function vow() external view returns (address);
+    function wards(address) external view returns (uint256);
+}
+
+interface LitePsmMomLike is AuthorityLike {
+    function halt(address, uint8) external;
+}
+
 contract DssSpellTestBase is Config, DssTest {
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
@@ -188,6 +219,7 @@ contract DssSpellTestBase is Config, DssTest {
     FlapperMomAbstract           flapMom = FlapperMomAbstract( addr.addr("FLAPPER_MOM"));
     AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     AuthorityLike                lineMom = AuthorityLike(      addr.addr("LINE_MOM"));
+    AuthorityLike             litePsmMom = AuthorityLike(      addr.addr("LITE_PSM_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
@@ -504,6 +536,9 @@ contract DssSpellTestBase is Config, DssTest {
 
         // check LineMom authority
         assertEq(lineMom.authority(), values.line_mom_authority, "TestError/lineMom-authority");
+
+        // check LitePsmMom authority
+        assertEq(litePsmMom.authority(), values.lite_psm_mom_authority, "TestError/linePsmMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
@@ -1153,7 +1188,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // Scale up `amount` to the correct Gem decimals value (buyGem and sellGem both use Gem decimals for precision)
-        amount = amount * (10 ** uint256(token.decimals()));
+        amount = amount * WAD / _to18ConversionFactor(psm);
         _giveTokens(address(token), amount);
 
         // Approvals
@@ -1185,6 +1220,203 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Dump all dai for next run
         dai.transfer(address(0x0), dai.balanceOf(address(this)));
+    }
+
+    struct PsmIlkIntegrationParams {
+        bytes32 ilk;
+        address pip;
+        address litePsm;
+        address pocket;
+        uint256 bufUnits; // `buf` as whole units
+        uint256 tinBps;   // tin as bps
+        uint256 toutBps;  // tout as bps
+    }
+
+    function _checkLitePsmIlkIntegration(PsmIlkIntegrationParams memory p) internal {
+        uint256 tin  = p.tinBps  * WAD / 100_00;
+        uint256 tout = p.toutBps * WAD / 100_00;
+        LitePsmLike litePsm = LitePsmLike(p.litePsm);
+        GemAbstract token = GemAbstract(litePsm.gem());
+
+        // Authorization (check wards)
+        assertEq(litePsm.wards(address(pauseProxy)), 1, _concat("checkLitePsmIlkIntegration/pauseProxy-not-ward-", p.ilk));
+        // pauseProxy can execute swaps with no fees
+        assertEq(litePsm.bud(address(pauseProxy)),   1, _concat("checkLitePsmIlkIntegration/pauseProxy-not-bud-",  p.ilk));
+
+        // litePsm params are properly set
+        assertEq(litePsm.vow(),     address(vow),     _concat("checkLitePsmIlkIntegration/incorrect-vow-",     p.ilk));
+        assertEq(litePsm.daiJoin(), address(daiJoin), _concat("checkLitePsmIlkIntegration/incorrect-daiJoin-", p.ilk));
+        assertEq(litePsm.pocket(),  p.pocket,         _concat("checkLitePsmIlkIntegration/incorrect-pocket-",  p.ilk));
+        assertEq(litePsm.buf(),     p.bufUnits * WAD, _concat("checkLitePsmIlkIntegration/incorrect-buf-",     p.ilk));
+        assertEq(litePsm.tin(),     tin,              _concat("checkLitePsmIlkIntegration/incorrect-tin-",     p.ilk));
+        assertEq(litePsm.tout(),    tout,             _concat("checkLitePsmIlkIntegration/incorrect-tout-",    p.ilk));
+
+
+        // Vat is properly initialized
+        {
+            // litePsm is given "unlimited" ink
+            (uint256 ink, ) = vat.urns(p.ilk, address(litePsm));
+            assertEq(ink, type(uint256).max / RAY, _concat("checkLitePsmIlkIntegration/incorrect-vat-ink-", p.ilk));
+        }
+
+        // Spotter is properly initialized
+        {
+            (address pip,) = spotter.ilks(p.ilk);
+            assertEq(pip, p.pip, _concat("checkLitePsmIlkIntegration/incorrect-spot-pip-", p.ilk));
+        }
+
+        // Update price (poke spotter)
+        spotter.poke(p.ilk);
+
+        // New PSM info is added to IlkRegistry
+        {
+            (
+                string memory name,
+                string memory symbol,
+                uint256 _class,
+                uint256 decimals,
+                address gem,
+                address pip,
+                address gemJoin,
+                address clip
+            ) = reg.info(p.ilk);
+
+            assertEq(name,     token.name(),               "checkLitePsmIlkIntegration/incorrect-reg-name");
+            assertEq(symbol,   token.symbol(),             "checkLitePsmIlkIntegration/incorrect-reg-symbol");
+            assertEq(_class,   6 /* REG_CLASS_JOINLESS */, "checkLitePsmIlkIntegration/incorrect-reg-class");
+            assertEq(decimals, token.decimals(),           "checkLitePsmIlkIntegration/incorrect-reg-dec");
+            assertEq(gem,      address(token),             "checkLitePsmIlkIntegration/incorrect-reg-gem");
+            assertEq(pip,      p.pip,                      "checkLitePsmIlkIntegration/incorrect-reg-pip");
+            assertEq(gemJoin,  address(0),                 "checkLitePsmIlkIntegration/incorrect-reg-gemJoin");
+            assertEq(clip,     address(0),                 "checkLitePsmIlkIntegration/incorrect-reg-xlip");
+        }
+
+        // ------ Test swap flows ------
+
+        // Arbitrary amount of TOKEN to test PSM sellGem and buyGem with (in whole units)
+        // `amount` is the amount of _TOKEN_ we are selling/buying (NOT measured in Dai)
+        uint256 amount = 100_000;
+        // Amount should be more than 10,000 as `tin` and `tout` are basis point measurements
+        require(amount >= 10_000, "checkLitePsmIlkIntegration/amount-too-low-for-precision-checks");
+
+        // Increase line where necessary to allow for coverage for both `buyGem` and `sellGem`
+        {
+            // Get the Art (current debt) and line (debt ceiling) for this PSM
+            (uint256 Art ,,, uint256 line,) = vat.ilks(p.ilk);
+            // Normalize values to whole units so we can compare them
+            Art  = Art  / WAD; // `rate` is 1 * RAY for all PSMs
+            line = line / RAD;
+
+            // If not enough room below line (e.g. Maxed out PSM)
+            if (Art + amount > line) {
+                _setIlkLine(p.ilk, (Art + amount + 1) * RAD); // Increase `line` to `Art`+`amount`
+            }
+
+            // If required, add pre-minted Dai to litePsm
+            if (litePsm.rush() > 0) {
+                litePsm.fill();
+            }
+        }
+
+        // Allow the test contract to sell or buy gems with no fees
+        GodMode.setWard(address(litePsm), address(this), 1);
+        litePsm.kiss(address(this));
+
+        // Approvals
+        token.approve(address(litePsm), type(uint256).max);
+        dai.approve(address(litePsm), type(uint256).max);
+
+        // Scale up `amount` to the correct Gem decimals value (buyGem and sellGem both use Gem decimals for precision)
+        uint256 snapshot = vm.snapshot();
+
+        // Sell TOKEN _to_ the PSM for DAI (increases debt)
+        {
+            uint256 sellWadOut  = amount * WAD;           // Scale to Dai decimals (18) for Dai balance check
+            sellWadOut         -= sellWadOut * tin / WAD; // Subtract `tin` fee (was deducted by PSM)
+
+            uint256 sellAmt = amount * WAD / _to18ConversionFactor(litePsm);
+            _giveTokens(address(token), sellAmt);
+            litePsm.sellGem(address(this), sellAmt);
+
+            assertEq(token.balanceOf(address(this)), 0,          _concat("checkLitePsmIlkIntegration/sellGem-token-balance-", p.ilk));
+            assertEq(dai.balanceOf(address(this)),   sellWadOut, _concat("checkLitePsmIlkIntegration/sellGem-dai-balance-",   p.ilk));
+
+            vm.revertTo(snapshot);
+        }
+
+        // Sell TOKEN _to_ the PSM for DAI with no fees (increases debt)
+        {
+            litePsm.file("tin", 0.01 ether); // Force fee
+            uint256 sellWadOut = amount * WAD; // Scale to Dai decimals (18) for Dai balance check
+
+            uint256 sellAmt = amount * WAD / _to18ConversionFactor(litePsm);
+            _giveTokens(address(token), sellAmt);
+            litePsm.sellGemNoFee(address(this), sellAmt);
+
+            assertEq(token.balanceOf(address(this)), 0,          _concat("checkLitePsmIlkIntegration/sellGemNoFee-token-balance-", p.ilk));
+            assertEq(dai.balanceOf(address(this)),   sellWadOut, _concat("checkLitePsmIlkIntegration/sellGemNoFee-dai-balance-",   p.ilk));
+
+            vm.revertTo(snapshot);
+        }
+
+        // For `sellGem` we had `amount` TOKENS, so there is no issue calling it
+        // For `buyGem` we have `amount` Dai, but `buyGem` takes `gemAmt` as TOKENS
+        // So we need to calculate the `gemAmt` of TOKEN we want to buy (i.e. subtract `tout` in advance)
+
+        // Buy TOKEN _from_ the PSM for DAI (decreases debt)
+        {
+            uint256 buyWadIn  = amount * WAD;                 // Scale to Dai decimals (18) for Dai balance check
+            buyWadIn         += _divup(buyWadIn * tout, WAD); // Add `tout` fee
+            _giveTokens(address(dai), buyWadIn);              // Mints Dai into the test contract
+
+            uint256 buyAmt = amount * WAD / _to18ConversionFactor(litePsm); // Scale to Gem decimals for `buyGem()`
+            litePsm.buyGem(address(this), buyAmt);
+
+            // There may be some Dai dust left over depending on tout and decimals
+            // This should always be less than some dust limit
+            assertLe(dai.balanceOf(address(this)),   tout,   _concat("checkLitePsmIlkIntegration/buyGem-dai-balance-",   p.ilk));
+            assertEq(token.balanceOf(address(this)), buyAmt, _concat("checkLitePsmIlkIntegration/buyGem-token-balance-", p.ilk));
+
+            vm.revertTo(snapshot);
+        }
+
+        // Buy TOKEN _from_ the PSM for DAI with no fees (decreases debt)
+        {
+            litePsm.file("tout", 0.01 ether); // Force fee
+
+            uint256 buyWadIn = amount * WAD; // Scale to Dai decimals (18) for Dai balance check
+            _giveTokens(address(dai), buyWadIn); // Mints Dai into the test contract
+
+            uint256 buyAmt = amount * WAD / _to18ConversionFactor(litePsm); // Scale to Gem decimals for `buyGem()`
+            litePsm.buyGemNoFee(address(this), buyAmt);
+
+            // There may be some Dai dust left over depending on tout and decimals
+            // This should always be less than some dust limit
+            assertLe(dai.balanceOf(address(this)),   tout,   _concat("checkLitePsmIlkIntegration/buyGemNoFee-dai-balance-",   p.ilk));
+            assertEq(token.balanceOf(address(this)), buyAmt, _concat("checkLitePsmIlkIntegration/buyGemNoFee-token-balance-", p.ilk));
+
+            vm.revertTo(snapshot);
+        }
+
+        // ----- LitePsmMom can halt swaps -----
+
+        // LitePsmMom can halt litePSM
+        assertEq(litePsm.wards(address(litePsmMom)), 1, _concat("checkLitePsmIlkIntegration/litePsmMom-not-ward-", p.ilk));
+
+        // Gives the hat to the test contract, so it can invoke LitePsmMom
+        vm.store(address(chief), bytes32(uint256(0x0c)) /* `hat` slot */, bytes32(uint256(uint160(address(this)))));
+        LitePsmMomLike(address(litePsmMom)).halt(address(litePsm), 2 /* = BOTH */);
+
+        assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
+        assertEq(litePsm.tout(), type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tout-", p.ilk));
+    }
+
+    function _to18ConversionFactor(LitePsmLike litePsm) internal view returns (uint256) {
+        return litePsm.to18ConversionFactor();
+    }
+
+    function _to18ConversionFactor(PsmAbstract psm) internal view returns (uint256) {
+        return 10 ** (18 - GemJoinAbstract(psm.gemJoin()).dec());
     }
 
     function _checkDirectIlkIntegration(

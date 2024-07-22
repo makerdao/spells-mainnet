@@ -44,7 +44,8 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface DssCronSequencerLike {
+interface CronSequencerLike {
+    function getMaster() external view returns (bytes32);
     function hasJob(address) external view returns (bool);
 }
 
@@ -54,10 +55,8 @@ interface LitePsmJobLike {
     function litePsm() external view returns (address);
     function rushThreshold() external view returns (uint256);
     function sequencer() external view returns (address);
-}
-
-interface LitePsmMomLike {
-    function authority() external view returns (address);
+    function work(bytes32, bytes calldata) external;
+    function workable(bytes32) external view returns (bool, bytes memory);
 }
 
 interface PsmLike {
@@ -67,19 +66,8 @@ interface PsmLike {
     function vow() external view returns (address);
 }
 
-interface LitePsmLike {
-    function bud(address) external view returns (uint256);
-    function buf() external view returns (uint256);
-    function pocket() external view returns (address);
-    function to18ConversionFactor() external view returns (uint256);
-    function vow() external view returns (address);
-    function wards(address) external view returns (uint256);
-}
-
 interface GemLike {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    function decimals() external view returns (uint256);
+    function approve(address, uint256) external;
     function balanceOf(address) external view returns (uint256);
 }
 
@@ -192,6 +180,30 @@ contract DssSpellTest is DssSpellTestBase {
             PsmAbstract(addr.addr("MCD_PSM_PAX_A")),
             0,   // tin
             0    // tout
+        );
+    }
+
+    function testLitePSMs() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        bytes32 _ilk;
+
+        // USDC
+        _ilk = "LITE-PSM-USDC-A";
+        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("MCD_LITE_PSM_USDC_A"), chainLog.getAddress("MCD_LITE_PSM_USDC_A"));
+        _checkLitePsmIlkIntegration(
+            PsmIlkIntegrationParams({
+                ilk: _ilk,
+                pip: addr.addr("PIP_USDC"),
+                litePsm: addr.addr("MCD_LITE_PSM_USDC_A"),
+                pocket: addr.addr("MCD_LITE_PSM_USDC_A_POCKET"),
+                bufUnits: 20_000_000,
+                tinBps: 0,
+                toutBps: 0
+            })
         );
     }
 
@@ -900,115 +912,157 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    function testLitePsmJob() public {
-        DssCronSequencerLike sequencer = DssCronSequencerLike(addr.addr("CRON_SEQUENCER"));
-        LitePsmJobLike litePsmJob      = LitePsmJobLike(      addr.addr("CRON_LITE_PSM_JOB"));
+    bytes32           constant  SRC_ILK       = "PSM-USDC-A";
+    bytes32           constant  DST_ILK       = "LITE-PSM-USDC-A";
+    PsmLike           immutable srcPsm        = PsmLike(          addr.addr("MCD_PSM_USDC_A"));
+    LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
+    address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
+    GemLike           immutable gem           = GemLike(          addr.addr("USDC"));
+    address           immutable pip           =                   addr.addr("PIP_USDC");
+    CronSequencerLike immutable sequencer     = CronSequencerLike(addr.addr("CRON_SEQUENCER"));
+    LitePsmJobLike    immutable litePsmJob    = LitePsmJobLike(   addr.addr("CRON_LITE_PSM_JOB"));
+    uint256           constant  dstBuf        = 20_000_000 * WAD;
+    uint256           constant  dstWant       = 20_000_000 * WAD;
+    uint256           constant  srcKeep       = 200_000_000 * WAD;
+    uint256           constant  rushThreshold = 15_000_000 * WAD;
+    uint256           constant  gushThreshold = 30_000_000 * WAD;
+    uint256           constant  cutThreshold  = 300_000 * WAD;
 
-        // Sanity checks
+    function test_LITE_PSM_USDC_A_CronJob() public {
+        // ----- Pre-spell sanity checks -----
+
+        assertFalse(sequencer.hasJob(address(litePsmJob)));
+
         // Sequencer matches
-        assertEq(litePsmJob.sequencer(), addr.addr("CRON_SEQUENCER"), "invalid sequencer");
+        assertEq(litePsmJob.sequencer(),     address(sequencer), "invalid sequencer");
         // LitePsm matches
-        assertEq(litePsmJob.litePsm(), addr.addr("MCD_LITE_PSM_USDC_A"), "invalid litePsm");
+        assertEq(litePsmJob.litePsm(),       address(dstPsm),    "invalid litePsm");
         // fill: Set threshold at 15M DAI
-        assertEq(litePsmJob.rushThreshold(), 15_000_000 * WAD, "invalid rush threshold");
+        assertEq(litePsmJob.rushThreshold(), rushThreshold,      "invalid rush threshold");
         // trim: Set threshold at 30M DAI
-        assertEq(litePsmJob.gushThreshold(), 30_000_000 * WAD, "invalid rush threshold");
+        assertEq(litePsmJob.gushThreshold(), gushThreshold,      "invalid rush threshold");
         // chug: Set threshold at 300k DAI
-        assertEq(litePsmJob.cutThreshold(),     300_000 * WAD, "invalid rush threshold");
+        assertEq(litePsmJob.cutThreshold(),  cutThreshold,       "invalid rush threshold");
 
-        assertTrue(!sequencer.hasJob(address(litePsmJob)));
+        // ----- Execute spell -----
 
-        // execute spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+
+        // ----- Post-spell sanity checks -----
 
         assertTrue(sequencer.hasJob(address(litePsmJob)));
+
+        // ----- E2E tests -----
+
+        bytes32 master = sequencer.getMaster();
+
+        // Base state
+        {
+            (bool ok, ) = litePsmJob.workable(master);
+            assertFalse(ok, "invalid workable ok - no changes");
+        }
+
+        // Modify local `line` so it is not a limiting factor
+        GodMode.setWard(address(vat), address(this), 1);
+        vat.file(DST_ILK, "line", type(uint256).max);
+
+        // Allow the test contract to swap with no fees
+        GodMode.setWard(address(dstPsm), address(this), 1);
+        dstPsm.kiss(address(this));
+
+        // Approvals
+        gem.approve(address(dstPsm), type(uint256).max);
+        dai.approve(address(dstPsm), type(uint256).max);
+
+        uint256 snapshot = vm.snapshot();
+
+        // Sell gems to require a fill
+        {
+            uint256 wadOut = rushThreshold + (1 * WAD); // Must be > rushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            assertGt(dstPsm.rush(), rushThreshold, "invalid rush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "invalid workable ok - expected true for fill");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.fill.selector, "invalid data - expected fill.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // Buy gems to require a trim
+        {
+            // Before buying gems, we need to sell more gems into it to ensure the threshold will be met
+            uint256 wadOut = gushThreshold + (1 * WAD); // Must be > gushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            // Selling gem is limited by `buf`, so we might need to split it into several parts
+            uint256 wadAcc = 0;
+            do {
+                if (dstPsm.rush() > 0) dstPsm.fill();
+                uint256 wadDelta = _min(dai.balanceOf(address(dstPsm)), wadOut - wadAcc);
+                dstPsm.sellGemNoFee(address(this), _wadToAmt(wadDelta));
+                wadAcc += wadDelta;
+            } while (wadAcc < wadOut);
+
+            // Buy the max amount of gems
+            uint256 wadIn = _amtToWad(gem.balanceOf(pocket));
+            _giveTokens(address(dai), wadIn);
+            uint256 amtOut = _wadToAmt(wadIn);
+            dstPsm.buyGemNoFee(address(this), amtOut);
+
+            assertGt(dstPsm.gush(), gushThreshold, "Invalid gush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "invalid workable ok - expected true for trim");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.trim.selector, "invalid data - expected trim.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // Donate Dai to require a chug
+        {
+            // Donating Dai has the same effect as accumulating swap fees
+            uint256 wadDonation = cutThreshold + (1 * WAD); // Must be > cutThreshold
+            _giveTokens(address(dai), wadDonation);
+            dai.transfer(address(dstPsm), wadDonation);
+
+            assertGt(dstPsm.cut(), cutThreshold, "Invalid cut");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "invalid workable ok - expected true for chug");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.chug.selector, "invalid data - expected chug.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
     }
 
-    uint256 constant REG_CLASS_JOINLESS = 6;
-    bytes32 constant SRC_ILK            = "PSM-USDC-A";
-    bytes32 constant DST_ILK            = "LITE-PSM-USDC-A";
-    LitePsmMomLike immutable litePsmMom = LitePsmMomLike(addr.addr("LITE_PSM_MOM"));
-    PsmLike immutable srcPsm            = PsmLike(       addr.addr("MCD_PSM_USDC_A"));
-    LitePsmLike immutable dstPsm        = LitePsmLike(   addr.addr("MCD_LITE_PSM_USDC_A"));
-    address immutable pocket            =                addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
-    GemLike immutable gem               = GemLike(       addr.addr("USDC"));
-    address immutable pip               =                addr.addr("PIP_USDC");
-    uint256 constant dstBuf             =  20_000_000 * WAD;
-    uint256 constant dstWant            =  20_000_000 * WAD;
-    uint256 constant srcKeep            = 200_000_000 * WAD;
-
-    function testLitePsmInit() public {
-        // execute spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // dstPsm params are properly set
-        assertEq(dstPsm.pocket(), pocket,       "after: invalid dst pocket");
-        assertEq(dstPsm.buf(),    dstBuf,       "after: invalid dst buf");
-        assertEq(dstPsm.vow(),    address(vow), "after: unexpected dst vow value");
-
-        // pauseProxy can execute swaps with no fees
-        assertEq(dstPsm.bud(address(pauseProxy)), 1, "after: MCD_PAUSE_PROXY not kissed in dstPsm");
-
-        // Mom is authed in dstPsm
-        assertEq(dstPsm.wards(address(litePsmMom)), 1, "after: LITE_PSM_MOM not authed in dstPsm");
-
-        // Mom authority is set to the Chief
-        assertEq(litePsmMom.authority(), address(chief), "after: chief not set as the authority of LITE_PSM_MOM");
-
-        // Vat is properly initialized
-        {
-            // litePsm is given "unlimited" ink
-            (uint256 dstInk, ) = vat.urns(DST_ILK, address(dstPsm));
-            assertEq(dstInk, type(uint256).max / RAY, "after: vat ink for dstPsm not properly set");
-        }
-
-        // Spotter is properly initialized
-        {
-            (address _pip,) = spotter.ilks(DST_ILK);
-            assertEq(_pip, pip, "after: spotter pip for DST_ILK not properly set");
-        }
-
-        // New PSM info is added to IlkRegistry
-        {
-            (
-                string memory name,
-                string memory symbol,
-                uint256 _class,
-                uint256 decimals,
-                address _gem,
-                address _pip,
-                address gemJoin,
-                address clip
-            ) = reg.info(DST_ILK);
-
-            assertEq(name,     gem.name(),         "after: reg name mismatch");
-            assertEq(symbol,   gem.symbol(),       "after: reg symbol mismatch");
-            assertEq(_class,   REG_CLASS_JOINLESS, "after: reg class mismatch");
-            assertEq(decimals, gem.decimals(),     "after: reg dec mismatch");
-            assertEq(_gem,     address(gem),       "after: reg gem mismatch");
-            assertEq(_pip,     pip,                "after: reg pip mismatch");
-            assertEq(gemJoin,  address(0),         "after: invalid reg gemJoin");
-            assertEq(clip,     address(0),         "after: invalid reg xlip");
-        }
-    }
-
-    function testLitePsmMigrationPhase1() public {
+    function test_LITE_PSM_USDC_A_MigrationPhase1() public {
         (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
         (, uint256 pdstArt)                = vat.urns(DST_ILK, address(dstPsm));
         uint256 psrcTin                    = srcPsm.tin();
         uint256 psrcTout                   = srcPsm.tout();
         uint256 psrcGemBalance             = gem.balanceOf(srcPsm.gemJoin());
-        uint256 pdstGemBalance             = gem.balanceOf(dstPsm.pocket());
+        uint256 pdstGemBalance             = gem.balanceOf(pocket);
         uint256 pvatSinPauseProxy          = vat.sin(address(pauseProxy));
         uint256 pvice                      = vat.vice();
 
         uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
 
-        // Pre-conditions
+        // ----- Pre-spell sanity checks -----
         {
             (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
             assertGt(psrcIlkArt, 0, "before: src ilk Art is zero");
@@ -1017,10 +1071,13 @@ contract DssSpellTest is DssSpellTestBase {
             assertGt(psrcInk,    0, "before: src ink is zero");
         }
 
-        // execute spell
+        // ----- Execute spell -----
+
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
+
+        // ----- Post-spell state checks -----
 
         // Old PSM state is set correctly
         {
