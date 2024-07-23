@@ -18,7 +18,7 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { MCD, DssInstance } from "dss-test/MCD.sol";
+import { MCD } from "dss-test/MCD.sol";
 import { DssLitePsmInstance } from "./dependencies/dss-lite-psm/DssLitePsmInstance.sol";
 import { DssLitePsmMigrationPhase1, DssLitePsmMigrationConfigPhase1 } from "./dependencies/dss-lite-psm/phase-1/DssLitePsmMigrationPhase1.sol";
 
@@ -86,72 +86,106 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x18427dB17D3113309a0406284aC738f4E649613B;
 
     function actions() public override {
-        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
-        DssLitePsmInstance memory inst = DssLitePsmInstance({
-            // ---------- LITE-PSM-USDC-A Phase 1 ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // ---------- LITE-PSM-USDC-A Phase 1 ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
-            // Onboard MCD_LITE_PSM_USDC_A at 0xf6e72Db5454dd049d0788e411b06CfAF16853042
-            litePsm: MCD_LITE_PSM_USDC_A,
+        // Onboard MCD_LITE_PSM_USDC_A at 0xf6e72Db5454dd049d0788e411b06CfAF16853042
+        // Note: see code below
 
-            // ---------- PSM_MOM GSM Delay Exception ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Onboard MCD_LITE_PSM_USDC_A_POCKET at 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341
+        // Note: see code below
 
-            // Activate PSM_MOM GSM Delay Exception at 0x467b32b0407Ad764f56304420Cddaa563bDab425
-            mom:     LITE_PSM_MOM
-        });
-        DssLitePsmMigrationConfigPhase1 memory cfg = DssLitePsmMigrationConfigPhase1({
-            // ---------- LITE-PSM-USDC-A Phase 1 ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // buf: Set to 20M
+        // Note: see code below
 
-            dstPip:       PIP_USDC,
-            dstGem:       USDC,
-            dstIlk:       "LITE-PSM-USDC-A",
-            srcPsmKey:    "MCD_PSM_USDC_A",
-            // Onboard MCD_LITE_PSM_USDC_A_POCKET at 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341
-            dstPocket:    MCD_LITE_PSM_USDC_A_POCKET,
-            // buf: Set to 20M
-            dstBuf:       20 * MILLION * WAD,
+        // ----------Update PSM-USDC-A DC-IAM ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
-            // ---------- Update PSM-USDC-A DC-IAM ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // DC-IAM line: 10B (Unchanged)
+        // Note: see code below
 
-            // DC-IAM line: Set to 50M
-            dstMaxLine:   50 * MILLION * RAD,
-            // DC-IAM gap: Set to 20M
-            dstGap:       20 * MILLION * RAD,
-            // DC-IAM ttl: Set to 12h
-            dstTtl:       12 hours,
+        // DC-IAM gap: Decrease for 20M from 400M to 380M
+        // Note: see code below
 
-            // ---------- Set up LITE-PSM-USDC-A DC-IAM ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // DC-IAM ttl: 12h (Unchanged)
+        // Note: see code below
 
-            // DC-IAM line: 10B (Unchanged)
-            srcMaxLine:   10 * BILLION * RAD,
-            // DC-IAM gap: Decrease for 20M from 400M to 380M
-            srcGap:       380 * MILLION * RAD,
-            // DC-IAM ttl: 12h (Unchanged)
-            srcTtl:       12 hours,
+        // ---------- Set up LITE-PSM-USDC-A DC-IAM ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
-            // ---------- Initial USDC Migration from PSM-USDC-A to LitePSM ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // DC-IAM line: Set to 50M
+        // Note: see code below
 
-            // Migrate 20 million USDC from PSM-USDC-A to LITE-PSM-USDC-A
-            dstWant:      20 * MILLION * WAD,
-            // Leave at least 200M USDC reserves in PSM-USDC-A
-            srcKeep:      200 * MILLION * WAD,
+        // DC-IAM gap: Set to 20M
+        // Note: see code below
 
-            // ---------- Chainlog additions ----------
-            // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // DC-IAM ttl: Set to 12h
+        // Note: see code below
 
-            // Add 0x467b32b0407Ad764f56304420Cddaa563bDab425 as LITE_PSM_MOM
-            psmMomKey:    "LITE_PSM_MOM",
-            // Add 0xf6e72Db5454dd049d0788e411b06CfAF16853042 as MCD_LITE_PSM_USDC_A
-            dstPsmKey:    "MCD_LITE_PSM_USDC_A",
-            // Add 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341 as MCD_LITE_PSM_USDC_A_POCKET
-            dstPocketKey: "MCD_LITE_PSM_USDC_A_POCKET"
-        });
-        DssLitePsmMigrationPhase1.initAndMigrate(dss, inst, cfg);
+        // ---------- Add GSM Delay Exception ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+
+        // Activate LITE_PSM_MOM GSM Delay Exception at 0x467b32b0407Ad764f56304420Cddaa563bDab425
+        // Note: see code below
+
+        // ---------- Initial USDC Migration from PSM-USDC-A to LitePSM ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+
+        // Migrate 20 million USDC from PSM-USDC-A to LITE-PSM-USDC-A
+        // Note: see code below
+
+        // Leave at least 200M USDC reserves in PSM-USDC-A
+        // Note: see code below
+
+        // ---------- Chainlog additions ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644/5
+
+        // Add 0xf6e72Db5454dd049d0788e411b06CfAF16853042 as MCD_LITE_PSM_USDC_A
+        // Note: see code below
+
+        // Add 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341 as MCD_LITE_PSM_USDC_A_POCKET
+        // Note: see code below
+
+        // Add 0x467b32b0407Ad764f56304420Cddaa563bDab425 as LITE_PSM_MOM
+        // Note: see code below
+
+        // Note: LitePSM initialization and migration was extracted into a
+        //       library, and implemented as part of the LitePSM module.
+        DssLitePsmMigrationPhase1.initAndMigrate(
+            // Note: load the MCD contracts depencencies
+            MCD.loadFromChainlog(DssExecLib.LOG),
+            // Note: the LitePSM instance
+            DssLitePsmInstance({
+                litePsm: MCD_LITE_PSM_USDC_A,
+                mom: LITE_PSM_MOM
+            }),
+            // Note: the init and migration config
+            DssLitePsmMigrationConfigPhase1({
+                dstGem:       USDC,
+                dstPip:       PIP_USDC,
+                psmMomKey:    "LITE_PSM_MOM",
+                dstPocketKey: "MCD_LITE_PSM_USDC_A_POCKET",
+                dstPsmKey:    "MCD_LITE_PSM_USDC_A",
+                dstIlk:       "LITE-PSM-USDC-A",
+                dstPocket:    MCD_LITE_PSM_USDC_A_POCKET,
+                dstBuf:       20 * MILLION * WAD,
+                dstMaxLine:   50 * MILLION * RAD,
+                dstGap:       20 * MILLION * RAD,
+                dstTtl:       12 hours,
+                dstWant:      20 * MILLION * WAD,
+                srcPsmKey:    "MCD_PSM_USDC_A",
+                srcMaxLine:   10 * BILLION * RAD,
+                srcGap:       380 * MILLION * RAD,
+                srcTtl:       12 hours,
+                srcKeep:      200 * MILLION * WAD
+            })
+        );
+
 
         // ---------- GSM Delay Update ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
@@ -161,14 +195,20 @@ contract DssSpellAction is DssAction {
 
         // ---------- Emergency Shutdown Module Minimum Threshold Update ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
         // Increase the ESM (Emergency Shutdown Module) minimum threshold by 150k MKR from 150k MKR to 300k MKR
         DssExecLib.setValue(MCD_ESM, "min", 300 * THOUSAND * WAD);
 
         // ---------- Add LitePSM keeper network job ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
         // sequencer.addJob(0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be)
+        // Note: the parameters below are set in `CRON_LITE_PSM_JOB` constructor
+        // fill: Set threshold at 15M DAI
+        // trim: Set threshold at 30M DAI
+        // chug: Set threshold at 300k DAI
         DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_LITE_PSM_JOB);
 
         // ---------- Chainlog additions ----------
@@ -176,9 +216,14 @@ contract DssSpellAction is DssAction {
 
         // Add 0x69cA348Bd928A158ADe7aa193C133f315803b06e as MCD_LITE_PSM_USDC_A_JAR
         DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_JAR", MCD_LITE_PSM_USDC_A_JAR);
+
         // Add 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d as MCD_LITE_PSM_USDC_A_IN_CDT_JAR
         DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_IN_CDT_JAR", MCD_LITE_PSM_USDC_A_IN_CDT_JAR);
 
+        // Add 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be as CRON_LITE_PSM_JOB
+        DssExecLib.setChangelogAddress("CRON_LITE_PSM_JOB", CRON_LITE_PSM_JOB);
+
+        // Note: bumping patch version because the spell adds new items
         DssExecLib.setChangelogVersion("1.17.5");
 
         // ---------- Spark Spell ----------
