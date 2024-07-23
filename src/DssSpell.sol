@@ -59,11 +59,11 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
 
     // --- Math ---
-    uint256 constant THOUSAND = 10 ** 3;
-    uint256 constant MILLION  = 10 ** 6;
-    uint256 constant BILLION  = 10 ** 9;
-    uint256 constant WAD      = 10 ** 18;
-    uint256 constant RAD      = 10 ** 45;
+    uint256 internal constant THOUSAND = 10 ** 3;
+    uint256 internal constant MILLION  = 10 ** 6;
+    uint256 internal constant BILLION  = 10 ** 9;
+    uint256 internal constant WAD      = 10 ** 18;
+    uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- LITE-PSM-USDC-A Phase 1 ----------
     address internal immutable MCD_PAUSE                      = DssExecLib.getChangelogAddress("MCD_PAUSE");
@@ -90,7 +90,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
-        // ----------Update PSM-USDC-A DC-IAM ----------
+        // ---------- Update PSM-USDC-A DC-IAM ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
