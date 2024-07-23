@@ -86,7 +86,7 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x18427dB17D3113309a0406284aC738f4E649613B;
 
     function actions() public override {
-        // ---------- LITE-PSM-USDC-A Phase 1 ----------
+        // ---------- LITE-PSM-USDC-A Onboarding ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
@@ -102,7 +102,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
-        // ---------- Initial USDC Migration from PSM-USDC-A to LitePSM ----------
+        // ---------- Phase 1 USDC Migration from PSM-USDC-A to LitePSM ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
 
@@ -129,34 +129,33 @@ contract DssSpellAction is DssAction {
             // Note: pip is not listed in the exec, but it is implicitly derived
             dstPip:       PIP_USDC,
 
-            // Note: value listed in a section header above (LITE-PSM-USDC-A Phase 1)
+            // Note: value listed in a section header above (LITE-PSM-USDC-A Onboarding)
             dstIlk:       "LITE-PSM-USDC-A",
 
             // Onboard MCD_LITE_PSM_USDC_A_POCKET at 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341
             dstPocket:    MCD_LITE_PSM_USDC_A_POCKET,
-
-            // buf: Set to 20M
+            // Set MCD_LITE_PSM_USDC_A buf to 20M
             dstBuf:       20 * MILLION * WAD,
 
-            // DC-IAM line: Set to 50M
+            // Set LITE-PSM-USDC-A DC-IAM line: Set to 50M
             dstMaxLine:   50 * MILLION * RAD,
 
-            // DC-IAM gap: Set to 20M
+            // Set LITE-PSM-USDC-A DC-IAM gap: Set to 20M
             dstGap:       20 * MILLION * RAD,
 
-            // DC-IAM ttl: Set to 12h
+            // Set LITE-PSM-USDC-A DC-IAM ttl: Set to 12h
             dstTtl:       12 hours,
 
             // Note: chainlog key for PSM-USDC-A
             srcPsmKey:    "MCD_PSM_USDC_A",
 
-            // DC-IAM line: 10B (Unchanged)
+            // Set PSM-USDC-A DC-IAM DC-IAM line: 10B (Unchanged)
             srcMaxLine:   10 * BILLION * RAD,
 
-            // DC-IAM gap: Decrease for 20M from 400M to 380M
+            // Set PSM-USDC-A DC-IAM DC-IAM gap: Decrease for 20M from 400M to 380M
             srcGap:       380 * MILLION * RAD,
 
-            // DC-IAM ttl: 12h (Unchanged)
+            // Set PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
             srcTtl:       12 hours,
 
             // Migrate 20 million USDC from PSM-USDC-A to LITE-PSM-USDC-A
