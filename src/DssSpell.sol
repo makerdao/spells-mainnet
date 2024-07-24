@@ -37,9 +37,9 @@ interface DssCronSequencerLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/7dea36a997198c0b4348e8ca9e37dcb896785cd0/governance/votes/Executive%20vote%20-%20July%2025%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-07-25 MakerDAO Executive Spell | Hash: TODO";
+        "2024-07-25 MakerDAO Executive Spell | Hash: 0x434004820168dfce595861581ed0cf22f2e36fafb236b59a3d6019c78751be14";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
