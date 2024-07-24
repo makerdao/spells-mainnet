@@ -134,6 +134,7 @@ contract DssSpellAction is DssAction {
 
             // Onboard MCD_LITE_PSM_USDC_A_POCKET at 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341
             dstPocket:    MCD_LITE_PSM_USDC_A_POCKET,
+
             // Set MCD_LITE_PSM_USDC_A buf to 20M
             dstBuf:       20 * MILLION * WAD,
 
