@@ -190,17 +190,17 @@ contract DssSpellTest is DssSpellTestBase {
 
         // USDC
         _ilk = "LITE-PSM-USDC-A";
-        assertEq(addr.addr("PIP_USDC"), reg.pip(_ilk));
+        assertEq(addr.addr("PIP_USDC"),            reg.pip(_ilk));
         assertEq(addr.addr("MCD_LITE_PSM_USDC_A"), chainLog.getAddress("MCD_LITE_PSM_USDC_A"));
         _checkLitePsmIlkIntegration(
-            PsmIlkIntegrationParams({
-                ilk: _ilk,
-                pip: addr.addr("PIP_USDC"),
-                litePsm: addr.addr("MCD_LITE_PSM_USDC_A"),
-                pocket: addr.addr("MCD_LITE_PSM_USDC_A_POCKET"),
+            LitePsmIlkIntegrationParams({
+                ilk:      _ilk,
+                pip:      addr.addr("PIP_USDC"),
+                litePsm:  addr.addr("MCD_LITE_PSM_USDC_A"),
+                pocket:   addr.addr("MCD_LITE_PSM_USDC_A_POCKET"),
                 bufUnits: 20_000_000,
-                tinBps: 0,
-                toutBps: 0
+                tinBps:            0,
+                toutBps:           0
             })
         );
     }

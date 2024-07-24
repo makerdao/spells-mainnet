@@ -1222,7 +1222,7 @@ contract DssSpellTestBase is Config, DssTest {
         dai.transfer(address(0x0), dai.balanceOf(address(this)));
     }
 
-    struct PsmIlkIntegrationParams {
+    struct LitePsmIlkIntegrationParams {
         bytes32 ilk;
         address pip;
         address litePsm;
@@ -1232,11 +1232,11 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 toutBps;  // tout as bps
     }
 
-    function _checkLitePsmIlkIntegration(PsmIlkIntegrationParams memory p) internal {
-        uint256 tin  = p.tinBps  * WAD / 100_00;
-        uint256 tout = p.toutBps * WAD / 100_00;
+    function _checkLitePsmIlkIntegration(LitePsmIlkIntegrationParams memory p) internal {
+        uint256 tin         = p.tinBps  * WAD / 100_00;
+        uint256 tout        = p.toutBps * WAD / 100_00;
         LitePsmLike litePsm = LitePsmLike(p.litePsm);
-        GemAbstract token = GemAbstract(litePsm.gem());
+        GemAbstract token   = GemAbstract(litePsm.gem());
 
         // Authorization (check wards)
         assertEq(litePsm.wards(address(pauseProxy)), 1, _concat("checkLitePsmIlkIntegration/pauseProxy-not-ward-", p.ilk));
