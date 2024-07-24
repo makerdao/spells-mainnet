@@ -59,16 +59,14 @@ interface LitePsmJobLike {
     function workable(bytes32) external view returns (bool, bytes memory);
 }
 
-interface PsmLike {
-    function gemJoin() external view returns (address);
-    function tin() external view returns (uint256);
-    function tout() external view returns (uint256);
-    function vow() external view returns (address);
+interface JarLike {
+    function void() external;
+    function daiJoin() external view returns (address);
 }
 
-interface GemLike {
-    function approve(address, uint256) external;
-    function balanceOf(address) external view returns (uint256);
+interface InputConduitLike {
+    function push() external;
+    function to() external view returns (address);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -914,10 +912,12 @@ contract DssSpellTest is DssSpellTestBase {
 
     bytes32           constant  SRC_ILK       = "PSM-USDC-A";
     bytes32           constant  DST_ILK       = "LITE-PSM-USDC-A";
-    PsmLike           immutable srcPsm        = PsmLike(          addr.addr("MCD_PSM_USDC_A"));
+    PsmAbstract       immutable srcPsm        = PsmAbstract(      addr.addr("MCD_PSM_USDC_A"));
     LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
     address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
-    GemLike           immutable gem           = GemLike(          addr.addr("USDC"));
+    JarLike           immutable jar           = JarLike(          addr.addr("MCD_LITE_PSM_USDC_A_JAR"));
+    InputConduitLike  immutable inputConduit  = InputConduitLike( addr.addr("MCD_LITE_PSM_USDC_A_IN_CDT_JAR"));
+    GemAbstract           immutable gem           = GemAbstract(          addr.addr("USDC"));
     address           immutable pip           =                   addr.addr("PIP_USDC");
     CronSequencerLike immutable sequencer     = CronSequencerLike(addr.addr("CRON_SEQUENCER"));
     LitePsmJobLike    immutable litePsmJob    = LitePsmJobLike(   addr.addr("CRON_LITE_PSM_JOB"));
@@ -1115,6 +1115,31 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.sin(address(pauseProxy)), pvatSinPauseProxy, "after: unexpected vat sin change for pause proxy");
         // Vat vice has not changed
         assertEq(vat.vice(), pvice, "after: unexpected vat vice change");
+    }
+
+    function test_LITE_PSM_USDC_A_JAR() public {
+        // ----- Execute spell -----
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Sanity checks
+        assertEq(inputConduit.to(), address(jar),     "input conduit: invalid to");
+        assertEq(jar.daiJoin(),     address(daiJoin), "jar: invalid daiJoi");
+
+        uint256 amtIn = _wadToAmt(30_000 * WAD);
+        _giveTokens(address(gem),           amtIn);
+        gem.transfer(address(inputConduit), amtIn);
+
+        uint256 pgemBalancePocket = gem.balanceOf(pocket);
+        uint256 pdaiVow           = vat.dai(address(vow));
+
+        inputConduit.push();
+        jar.void();
+
+        assertEq(gem.balanceOf(pocket), pgemBalancePocket + amtIn,          "invalid pocket gem balance after push");
+        assertEq(vat.dai(address(vow)), pdaiVow + (_amtToWad(amtIn) * RAY), "invalid vow dai after void");
     }
 
     function _amtToWad(uint256 amt) internal view returns (uint256) {

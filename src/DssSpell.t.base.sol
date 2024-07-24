@@ -1251,7 +1251,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(litePsm.tin(),     tin,              _concat("checkLitePsmIlkIntegration/incorrect-tin-",     p.ilk));
         assertEq(litePsm.tout(),    tout,             _concat("checkLitePsmIlkIntegration/incorrect-tout-",    p.ilk));
 
-
         // Vat is properly initialized
         {
             // litePsm is given "unlimited" ink
@@ -1281,14 +1280,14 @@ contract DssSpellTestBase is Config, DssTest {
                 address clip
             ) = reg.info(p.ilk);
 
-            assertEq(name,     token.name(),               "checkLitePsmIlkIntegration/incorrect-reg-name");
-            assertEq(symbol,   token.symbol(),             "checkLitePsmIlkIntegration/incorrect-reg-symbol");
-            assertEq(_class,   6 /* REG_CLASS_JOINLESS */, "checkLitePsmIlkIntegration/incorrect-reg-class");
-            assertEq(decimals, token.decimals(),           "checkLitePsmIlkIntegration/incorrect-reg-dec");
-            assertEq(gem,      address(token),             "checkLitePsmIlkIntegration/incorrect-reg-gem");
-            assertEq(pip,      p.pip,                      "checkLitePsmIlkIntegration/incorrect-reg-pip");
-            assertEq(gemJoin,  address(0),                 "checkLitePsmIlkIntegration/incorrect-reg-gemJoin");
-            assertEq(clip,     address(0),                 "checkLitePsmIlkIntegration/incorrect-reg-xlip");
+            assertEq(name,     token.name(),     "checkLitePsmIlkIntegration/incorrect-reg-name");
+            assertEq(symbol,   token.symbol(),   "checkLitePsmIlkIntegration/incorrect-reg-symbol");
+            assertEq(_class,   6,                "checkLitePsmIlkIntegration/incorrect-reg-class"); // REG_CLASS_JOINLESS
+            assertEq(decimals, token.decimals(), "checkLitePsmIlkIntegration/incorrect-reg-dec");
+            assertEq(gem,      address(token),   "checkLitePsmIlkIntegration/incorrect-reg-gem");
+            assertEq(pip,      p.pip,            "checkLitePsmIlkIntegration/incorrect-reg-pip");
+            assertEq(gemJoin,  address(0),       "checkLitePsmIlkIntegration/incorrect-reg-gemJoin");
+            assertEq(clip,     address(0),       "checkLitePsmIlkIntegration/incorrect-reg-xlip");
         }
 
         // ------ Test swap flows ------
