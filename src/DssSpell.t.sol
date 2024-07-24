@@ -324,9 +324,9 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testEsmAuth() public skipped { // add the `skipped` modifier to skip
+    function testEsmAuth() public { // add the `skipped` modifier to skip
         string[1] memory esmAuthorisedContractKeys = [
-            "RWA009_A_INPUT_CONDUIT_URN_USDC"
+            "MCD_LITE_PSM_USDC_A_IN_CDT_JAR"
         ];
 
         for (uint256 i = 0; i < esmAuthorisedContractKeys.length; i++) {

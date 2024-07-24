@@ -192,6 +192,15 @@ contract DssSpellAction is DssAction {
         // Increase the ESM (Emergency Shutdown Module) minimum threshold by 150k MKR from 150k MKR to 300k MKR
         DssExecLib.setValue(MCD_ESM, "min", 300 * THOUSAND * WAD);
 
+        // ---------- ESM Authorizations ----------
+        // Forum: http://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644/9
+        // Note: in practice this spell disables Emergency Shutdown by setting the threshold very high.
+        //       However the active bug bounty programs still need to be updated to reflect that,
+        //       so we are authorizing the ESM on the relevant components.
+
+        // Auth ESM on MCD_LITE_PSM_USDC_A_IN_CDT_JAR
+        DssExecLib.authorize(MCD_LITE_PSM_USDC_A_IN_CDT_JAR, MCD_ESM);
+
         // ---------- Add LitePSM keeper network job ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
         // Poll: https://vote.makerdao.com/polling/QmdcHXHy
