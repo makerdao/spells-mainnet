@@ -917,16 +917,16 @@ contract DssSpellTest is DssSpellTestBase {
     address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
     JarLike           immutable jar           = JarLike(          addr.addr("MCD_LITE_PSM_USDC_A_JAR"));
     InputConduitLike  immutable inputConduit  = InputConduitLike( addr.addr("MCD_LITE_PSM_USDC_A_IN_CDT_JAR"));
-    GemAbstract           immutable gem           = GemAbstract(          addr.addr("USDC"));
+    GemAbstract       immutable gem           = GemAbstract(      addr.addr("USDC"));
     address           immutable pip           =                   addr.addr("PIP_USDC");
     CronSequencerLike immutable sequencer     = CronSequencerLike(addr.addr("CRON_SEQUENCER"));
     LitePsmJobLike    immutable litePsmJob    = LitePsmJobLike(   addr.addr("CRON_LITE_PSM_JOB"));
-    uint256           constant  dstBuf        = 20_000_000 * WAD;
-    uint256           constant  dstWant       = 20_000_000 * WAD;
+    uint256           constant  dstBuf        =  20_000_000 * WAD;
+    uint256           constant  dstWant       =  20_000_000 * WAD;
     uint256           constant  srcKeep       = 200_000_000 * WAD;
-    uint256           constant  rushThreshold = 15_000_000 * WAD;
-    uint256           constant  gushThreshold = 30_000_000 * WAD;
-    uint256           constant  cutThreshold  = 300_000 * WAD;
+    uint256           constant  rushThreshold =  15_000_000 * WAD;
+    uint256           constant  gushThreshold =  30_000_000 * WAD;
+    uint256           constant  cutThreshold  =     300_000 * WAD;
 
     function test_LITE_PSM_USDC_A_CronJob() public {
         // ----- Pre-spell sanity checks -----
