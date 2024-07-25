@@ -928,7 +928,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256           constant  gushThreshold =  30_000_000 * WAD;
     uint256           constant  cutThreshold  =     300_000 * WAD;
 
-    function test_LITE_PSM_USDC_A_CronJob() public {
+    function test_CRON_LITE_PSM_JOB() public {
         // ----- Pre-spell sanity checks -----
 
         assertFalse(sequencer.hasJob(address(litePsmJob)));
@@ -962,6 +962,15 @@ contract DssSpellTest is DssSpellTestBase {
         {
             (bool ok, ) = litePsmJob.workable(master);
             assertFalse(ok, "invalid workable ok - no changes");
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.fill.selector));
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.trim.selector));
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.chug.selector));
         }
 
         // Modify local `line` so it is not a limiting factor
@@ -978,29 +987,49 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 snapshot = vm.snapshot();
 
-        // Sell gems to require a fill
+        // --- rushThreshold is breached ---
         {
-            uint256 wadOut = rushThreshold + (1 * WAD); // Must be > rushThreshold
+            uint256 wadOut = rushThreshold; // Must be >= rushThreshold
             uint256 amtIn = _wadToAmt(wadOut);
             _giveTokens(address(gem), amtIn);
             dstPsm.sellGemNoFee(address(this), amtIn);
 
-            assertGt(dstPsm.rush(), rushThreshold, "invalid rush");
+            assertGe(dstPsm.rush(), rushThreshold, "fill: invalid rush");
 
             (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "invalid workable ok - expected true for fill");
+            assertTrue(ok, "fill: invalid workable ok");
             (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.fill.selector, "invalid data - expected fill.selector");
+            assertEq(fn, dstPsm.fill.selector, "fill: invalid data - expected fill.selector");
 
             litePsmJob.work(master, args);
 
             vm.revertTo(snapshot);
         }
 
-        // Buy gems to require a trim
+        // --- rushThreshold is not breached ---
+        {
+            uint256 wadOut = rushThreshold / 2; // Must be < rushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            assertGt(dstPsm.rush(), 0, "no fill: invalid rush");
+            assertLt(dstPsm.rush(), rushThreshold, "no fill: invalid rush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no fill: invalid workable ok");
+            assertEq(args, bytes("No work to do"), "no fill: invalid data");
+
+            vm.expectRevert();
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- gushThreshold is breached ---
         {
             // Before buying gems, we need to sell more gems into it to ensure the threshold will be met
-            uint256 wadOut = gushThreshold + (1 * WAD); // Must be > gushThreshold
+            uint256 wadOut = gushThreshold; // Must be >= gushThreshold
             uint256 amtIn = _wadToAmt(wadOut);
             _giveTokens(address(gem), amtIn);
             // Selling gem is limited by `buf`, so we might need to split it into several parts
@@ -1018,32 +1047,78 @@ contract DssSpellTest is DssSpellTestBase {
             uint256 amtOut = _wadToAmt(wadIn);
             dstPsm.buyGemNoFee(address(this), amtOut);
 
-            assertGt(dstPsm.gush(), gushThreshold, "Invalid gush");
+            assertGe(dstPsm.gush(), gushThreshold, "trim: nvalid gush");
 
             (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "invalid workable ok - expected true for trim");
+            assertTrue(ok, "trim: invalid workable ok");
             (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.trim.selector, "invalid data - expected trim.selector");
+            assertEq(fn, dstPsm.trim.selector, "trim: invalid data - expected trim.selector");
 
             litePsmJob.work(master, args);
 
             vm.revertTo(snapshot);
         }
 
-        // Donate Dai to require a chug
+        // --- gushThreshold is not breached ---
+        {
+            // Before buying gems, we need to sell more gems into it
+            uint256 wadOut = _min(dai.balanceOf(address(dstPsm)), gushThreshold / 10); // Must be < gushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            // Buy the max amount of gems
+            uint256 wadIn = _amtToWad(gem.balanceOf(pocket));
+            _giveTokens(address(dai), wadIn);
+            uint256 amtOut = _wadToAmt(wadIn);
+            dstPsm.buyGemNoFee(address(this), amtOut);
+
+            assertGt(dstPsm.gush(), 0, "no trim: invalid gush");
+            assertLt(dstPsm.gush(), gushThreshold, "no trim: invalid gush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no trim: invalid workable ok - expected false");
+            assertEq(args, bytes("No work to do"), "no trim: invalid data");
+
+            vm.expectRevert();
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- chugThreshold is breached ---
         {
             // Donating Dai has the same effect as accumulating swap fees
-            uint256 wadDonation = cutThreshold + (1 * WAD); // Must be > cutThreshold
+            uint256 wadDonation = cutThreshold; // Must be >= cutThreshold
             _giveTokens(address(dai), wadDonation);
             dai.transfer(address(dstPsm), wadDonation);
 
-            assertGt(dstPsm.cut(), cutThreshold, "Invalid cut");
+            assertGe(dstPsm.cut(), cutThreshold, "chug: invalid cut");
 
             (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "invalid workable ok - expected true for chug");
+            assertTrue(ok, "chug: invalid workable ok");
             (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.chug.selector, "invalid data - expected chug.selector");
+            assertEq(fn, dstPsm.chug.selector, "chug: invalid data - expected chug.selector");
 
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- chugThreshold is not breached ---
+        {
+            uint256 wadDonation = cutThreshold / 5; // Must be < cutThreshold
+            _giveTokens(address(dai), wadDonation);
+            dai.transfer(address(dstPsm), wadDonation);
+
+            assertGt(dstPsm.cut(), 0, "no chug: invalid cut");
+            assertLt(dstPsm.cut(), cutThreshold, "no chug: invalid cut");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no chug: invalid workable ok");
+            assertEq(args, bytes("No work to do"), "no chug: invalid data");
+
+            vm.expectRevert();
             litePsmJob.work(master, args);
 
             vm.revertTo(snapshot);
