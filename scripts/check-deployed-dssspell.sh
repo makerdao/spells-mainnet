@@ -29,9 +29,9 @@ LICENSE="GNU AGPLv3"
 SOLC="v0.8.16+commit.07a7930e"
 
 # Read spell address, block number, and timestamp from config.sol
-deployed_spell_address=$(grep -oE 'deployed_spell:\s+address\((0x[a-fA-F0-9]+)\)' $CONFIG_PATH | sed -E 's/^.*\((.*)\)/\1/')
-deployed_spell_block=$(grep -oE 'deployed_spell_block\s*:\s*[0-9]+' $CONFIG_PATH | sed -E 's/.*:\s*//')
-deployed_spell_timestamp=$(grep -oE 'deployed_spell_created\s*:\s*[0-9]+' $CONFIG_PATH | sed -E 's/.*:\s*//')
+deployed_spell_address=$(grep -oE 'deployed_spell:\s+address\((0x[a-fA-F0-9]+)\)' $CONFIG_PATH | grep -o '0x[a-fA-F0-9]\+')
+deployed_spell_block=$(grep -oE 'deployed_spell_block\s*:\s*[0-9]+' $CONFIG_PATH | grep -o '[0-9]\+')
+deployed_spell_timestamp=$(grep -oE 'deployed_spell_created\s*:\s*[0-9]+' $CONFIG_PATH | grep -o '[0-9]\+')
 
 # Check if spell address, block number, and timestamp are zero
 if [[ "$deployed_spell_address" =~ ^(address\(0\)|0)$ ]] || [[ "$deployed_spell_block" = "0" ]] || [[ "$deployed_spell_timestamp" = "0" ]]; then
