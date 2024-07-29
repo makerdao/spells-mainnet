@@ -19,7 +19,7 @@ function error_check() {
 [[ "$ETHERSCAN_API_KEY" ]] || { echo -e "Please set ETHERSCAN_API_KEY"; exit 1; }
 
 # Etherscan API endpoint
-ETHERSCAN_API="https://api.etherscan.io/api"
+ETHERSCAN_API="https://api.etherscan.io/api?apikey=$ETHERSCAN_API_KEY"
 
 # Path to config.sol file
 CONFIG_PATH="src/test/config.sol"
@@ -40,7 +40,7 @@ if [[ "$deployed_spell_address" =~ ^(address\(0\)|0)$ ]] || [[ "$deployed_spell_
 fi
 
 # Get spell verification information
-verified_spell_info=$(curl -s "$ETHERSCAN_API?module=contract&action=getsourcecode&address=$deployed_spell_address" | jq -r .result[0])
+verified_spell_info=$(curl -s "$ETHERSCAN_API&module=contract&action=getsourcecode&address=$deployed_spell_address" | jq -r .result[0])
 
 # Check spell verification status
 verified=$(echo "$verified_spell_info" | jq -r '.SourceCode != null')
@@ -84,7 +84,7 @@ else
 fi
 
 # Retrieve transaction hash
-tx_hash=$(curl -s "$ETHERSCAN_API?module=account&action=txlistinternal&address=$deployed_spell_address&startblock=0&endblock=99999999&sort=asc&apikey=$ETHERSCAN_API_KEY" | jq -r ".result[0].hash")
+tx_hash=$(curl -s "$ETHERSCAN_API&module=account&action=txlistinternal&address=$deployed_spell_address&startblock=0&endblock=99999999&sort=asc" | jq -r ".result[0].hash")
 
 # Retrieve deployed spell timestamp and block number info
 timestamp=$(cast block "$(cast tx "${tx_hash}"|grep blockNumber|awk '{print $2}')"|grep timestamp|awk '{print $2}')
