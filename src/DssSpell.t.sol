@@ -44,6 +44,22 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface DssCronSequencerLike {
+    function hasJob(address job) external view returns (bool);
+    function numJobs() external view returns (uint256);
+}
+
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+}
+
+interface RwaUrnLike {
+    function hope(address) external;
+    function wipe(uint256) external;
+    function free(uint256) external;
+}
+
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -428,15 +444,25 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("AAVE_V3_TREASURY"), 219_125)
+        Payee[10] memory payees = [
+            Payee(wallets.addr("IMMUNEFI_USER_PAYOUT_2024_08_08"), 100_000),
+            Payee(wallets.addr("IMMUNEFI_COMISSION"), 10_000),
+            Payee(wallets.addr("BLUE"), 54_167),
+            Payee(wallets.addr("CLOAKY"), 20_417),
+            Payee(wallets.addr("CLOAKY_KOHLA_2"), 14_172),
+            Payee(wallets.addr("CLOAKY_ENNOIA"), 9_083),
+            Payee(wallets.addr("BYTERON"), 8_333),
+            Payee(wallets.addr("JULIACHANG"), 8_333),
+            Payee(wallets.addr("ROCKY"), 7_500),
+            Payee(wallets.addr("PBG"), 6_667)
         ];
-        uint256 expectedSumPayments = 219_125; // Fill the number with the value from exec doc.
+
+        uint256 expectedSumPayments = 238_672; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -616,21 +642,16 @@ contract DssSpellTest is DssSpellTestBase {
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[11] memory payees = [
-            Payee(wallets.addr("BLUE"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JULIACHANG"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BYTERON"), 38.98 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"), 20.40 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"), 16.58 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ROCKY"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"), 12.55 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_ENNOIA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_KOHLA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"), 1.34 ether) // Note: ether is a keyword helper, only MKR is transferred here
+        Payee[6] memory payees = [
+            Payee(wallets.addr("BLUE"), 13.75 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BYTERON"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ROCKY"), 1.13 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"), 1.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 209.17 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 30.38 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -845,11 +866,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA"
+            "QmaYKt61v6aCTNTYjuHm1Wjpe6JWBzCW2ZHR4XDEJhjm1R"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -864,10 +885,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x18427dB17D3113309a0406284aC738f4E649613B);
+        address SPARK_SPELL = address(0xAFDf518d97DEA3420f007Deea2F9fBa0a28B3227);
 
         vm.expectCall(
             SPARK_PROXY,
@@ -884,5 +904,62 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testCronSequencerClipperMomJobReplaced() public {
+        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
+        address CRON_CLIPPER_MOM_JOB = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
+        address CRON_CLIPPER_MOM_JOB_NEW = 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF;
 
+        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB) , true, "TestError/old-job-not-present-in-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), false, "TestError/new-job-already-present-in-sequencer");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB), false, "TestError/old-job-not-removed-from-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), true, "TestError/new-job-not-added-to-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
+    }
+
+    // RWA tests
+    function testRWA001Update() public {
+        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        GemAbstract rwa001 = GemAbstract(addr.addr("RWA001"));
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Get the oracle address
+        (,address pip,,  ) = oracle.ilks("RWA001-A");
+        assertEq(uint256(DSValueAbstract(pip).read()), 16_315_294_289387650080000000, "RWA001: Bad pip value after bump()");
+
+        // Get collateral's parameters
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line, ) = vat.ilks("RWA001-A");
+
+        assertEq(spotAfter, 16_315_294_289387650080000000 * (RAY / WAD), "RWA001: Bad spot value after bump()");
+
+        // No more room for new debt
+        assertGt(Art * rate, line, "RWA001: No more room for new debt");
+
+        // Repay debt and free the collateral
+        address urn = addr.addr("RWA001_A_URN");
+        (, uint256 art) = vat.urns("RWA001-A", urn);
+        assertGe(art, 0, "RWA001: No debt in the urn");
+
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
+
+        uint256 daiToPay = (art * rate) / RAY + 1; // extra wei rounding
+        GodMode.setBalance(dai, address(urn), daiToPay);
+
+        RwaUrnLike(urn).wipe(daiToPay);
+        (, uint256 afterArt) = vat.urns("RWA001-A", urn);
+        assertEq(afterArt, 0, "RWA001: Bad art value after wipe()");
+
+        RwaUrnLike(urn).free(WAD);
+        assertEq(rwa001.balanceOf(address(this)), WAD, "RWA001: Bad conduit balance after free()");
+    }
 }

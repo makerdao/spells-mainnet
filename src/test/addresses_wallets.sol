@@ -176,6 +176,7 @@ contract Wallets {
         addr["ROCKY"]                        = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
         addr["CLOAKY_KOHLA"]                 = 0xA9D43465B43ab95050140668c87A2106C73CA811;
         addr["CLOAKY_ENNOIA"]                = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+        addr["CLOAKY_KOHLA_2"]               = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
@@ -188,5 +189,6 @@ contract Wallets {
         // Bug Bounty
         addr["IMMUNEFI_COMISSION"]   = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
         addr["IMMUNEFI_USER_PAYOUT_2024_05_16"]       = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
+        addr["IMMUNEFI_USER_PAYOUT_2024_08_08"]       = 0xA4a6B5f005cBd2eD38f49ac496d86d3528C7a1aa;
     }
 }
