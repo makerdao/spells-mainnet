@@ -637,7 +637,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
+    function testMKRPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -959,6 +959,7 @@ contract DssSpellTest is DssSpellTestBase {
         (, uint256 afterArt) = vat.urns("RWA001-A", urn);
         assertEq(afterArt, 0, "RWA001: Bad art value after wipe()");
 
+        assertEq(rwa001.balanceOf(address(this)), 0, "RWA001: Unexpected balance before free()");
         RwaUrnLike(urn).free(WAD);
         assertEq(rwa001.balanceOf(address(this)), WAD, "RWA001: Bad conduit balance after free()");
     }
