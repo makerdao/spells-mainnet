@@ -175,11 +175,11 @@ contract DssSpellAction is DssAction {
 
         // Note: Bump Oracle price to account for new SF
         // Note: the formula is `Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio`
-        // Since RWA001-A Termination Date is `July 2025`, and spell execution time is `2024-08-08`, the distance is `356` days
-        // bc -l <<< 'scale=18; 15000000 * e(l(1.09) * (356/365)) * 1.00' | cast --to-wei
+        // Since RWA001-A Termination Date is `July 29, 2025`, and spell execution time is `2024-08-12`, the distance is `356` days
+        // bc -l <<< 'scale=18; 15000000 * e(l(1.09) * (352/365)) * 1.00' | cast --to-wei
         RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
             "RWA001-A",
-            16_315_294_289387650080000000
+            16_299_893_185222593795000000
         );
 
         // Note: Update collateral price to propagate the changes

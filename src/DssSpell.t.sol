@@ -934,12 +934,12 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Get the oracle address
         (,address pip,,  ) = oracle.ilks("RWA001-A");
-        assertEq(uint256(DSValueAbstract(pip).read()), 16_315_294_289387650080000000, "RWA001: Bad pip value after bump()");
+        assertEq(uint256(DSValueAbstract(pip).read()), 16_299_893_185222593795000000, "RWA001: Bad pip value after bump()");
 
         // Get collateral's parameters
         (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line, ) = vat.ilks("RWA001-A");
 
-        assertEq(spotAfter, 16_315_294_289387650080000000 * (RAY / WAD), "RWA001: Bad spot value after bump()");
+        assertEq(spotAfter, 16_299_893_185222593795000000 * (RAY / WAD), "RWA001: Bad spot value after bump()");
 
         // No more room for new debt
         assertGt(Art * rate, line, "RWA001: No more room for new debt");
@@ -953,7 +953,7 @@ contract DssSpellTest is DssSpellTestBase {
         RwaUrnLike(urn).hope(address(this));
 
         uint256 daiToPay = (art * rate) / RAY + 1; // extra wei rounding
-        GodMode.setBalance(dai, address(urn), daiToPay);
+        GodMode.setBalance(dai, urn, daiToPay);
 
         RwaUrnLike(urn).wipe(daiToPay);
         (, uint256 afterArt) = vat.urns("RWA001-A", urn);
