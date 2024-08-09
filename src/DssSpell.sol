@@ -38,7 +38,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-08-08 MakerDAO Executive Spell | Hash: TODO";
+        "2024-08-12 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -59,7 +59,15 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant NINE_PCT_RATE = 1000000002732676825177582095;
+    uint256 internal constant SIX_PT_TWO_FIVE_PCT_RATE     = 1000000001922394148741344865;
+    uint256 internal constant SIX_PT_SEVEN_FIVE_PCT_RATE   = 1000000002071266685321207000;
+    uint256 internal constant SIX_PCT_RATE                 = 1000000001847694957439350562;
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
+    uint256 internal constant SEVEN_PCT_RATE               = 1000000002145441671308778766;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
+    uint256 internal constant NINE_PCT_RATE                = 1000000002732676825177582095;
 
     // ---------- Contracts ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
@@ -92,6 +100,33 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0xAFDf518d97DEA3420f007Deea2F9fBa0a28B3227;
 
     function actions() public override {
+        // ---------- Stability Fee Reductions ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
+
+        // ETH-A: Decrease SF by 1 percentage point, from 7.25% to 6.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", SIX_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ETH-B: Decrease SF by 1 percentage point, from 7.75% to 6.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", SIX_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // ETH-C: Decrease SF by 1 percentage point, from 7% to 6%
+        DssExecLib.setIlkStabilityFee("ETH-C", SIX_PCT_RATE, /* doDrip = */ true);
+
+        // WSTETH-A: Decrease SF by 1 percentage point, from 8.25% to 7.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WSTETH-B: Decrease SF by 1 percentage point, from 8% to 7%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", SEVEN_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-A: Decrease SF by 1 percentage point, from 8.75% to 7.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-B: Decrease SF by 1 percentage point, from 9.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // WBTC-C: Decrease SF by 1 percentage point, from 8.5% to 7.5%
+        DssExecLib.setIlkStabilityFee("WBTC-C", SEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+
         // ---------- Bug Bounty Payout ----------
         // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-32005/24605
         // MIP: https://mips.makerdao.com/mips/details/MIP106#13-1-bug-bounty-program-for-makerdao-critical-infrastructure
