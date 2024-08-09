@@ -127,6 +127,12 @@ contract DssSpellAction is DssAction {
         // WBTC-C: Decrease SF by 1 percentage point, from 8.5% to 7.5%
         DssExecLib.setIlkStabilityFee("WBTC-C", SEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
+        // ---------- DSR Reduction ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
+
+        // DSR: Decrease DSR by 1 percentage point, from 7% to 6%
+        DssExecLib.setDSR(SIX_PCT_RATE, /* doDrip = */ true);
+
         // ---------- Bug Bounty Payout ----------
         // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-32005/24605
         // MIP: https://mips.makerdao.com/mips/details/MIP106#13-1-bug-bounty-program-for-makerdao-critical-infrastructure
