@@ -18,33 +18,35 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import { MCD, DssInstance } from "dss-test/MCD.sol";
-import { DssLitePsmInstance } from "./dependencies/dss-lite-psm/DssLitePsmInstance.sol";
-import { DssLitePsmMigrationPhase1, DssLitePsmMigrationConfigPhase1 } from "./dependencies/dss-lite-psm/phase-1/DssLitePsmMigrationPhase1.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+
+interface DssCronSequencerLike {
+    function addJob(address job) external;
+    function removeJob(address job) external;
+}
+
+interface RwaLiquidationLike {
+    function bump(bytes32 ilk, uint256 val) external;
+}
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
-interface PauseLike {
-    function setDelay(uint256 delay_) external;
-}
-
-interface DssCronSequencerLike {
-    function addJob(address job) external;
-}
-
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/7dea36a997198c0b4348e8ca9e37dcb896785cd0/governance/votes/Executive%20vote%20-%20July%2025%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-07-25 MakerDAO Executive Spell | Hash: 0x434004820168dfce595861581ed0cf22f2e36fafb236b59a3d6019c78751be14";
+        "2024-08-12 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
+
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "QmaYKt61v6aCTNTYjuHm1Wjpe6JWBzCW2ZHR4XDEJhjm1R";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -56,181 +58,185 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    // uint256 internal constant X_PCT_1000000003022265980097387650RATE = ;
+    // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant SIX_PT_TWO_FIVE_PCT_RATE     = 1000000001922394148741344865;
+    uint256 internal constant SIX_PT_SEVEN_FIVE_PCT_RATE   = 1000000002071266685321207000;
+    uint256 internal constant SIX_PCT_RATE                 = 1000000001847694957439350562;
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
+    uint256 internal constant SEVEN_PCT_RATE               = 1000000002145441671308778766;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
+    uint256 internal constant NINE_PCT_RATE                = 1000000002732676825177582095;
 
-    // --- Math ---
-    uint256 internal constant THOUSAND = 10 ** 3;
-    uint256 internal constant MILLION  = 10 ** 6;
-    uint256 internal constant BILLION  = 10 ** 9;
-    uint256 internal constant WAD      = 10 ** 18;
-    uint256 internal constant RAD      = 10 ** 45;
+    // ---------- Contracts ----------
+    GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
 
-    // ---------- LITE-PSM-USDC-A Phase 1 ----------
-    address internal immutable MCD_PAUSE                      = DssExecLib.getChangelogAddress("MCD_PAUSE");
-    address internal immutable MCD_ESM                        = DssExecLib.getChangelogAddress("MCD_ESM");
-    address internal immutable USDC                           = DssExecLib.getChangelogAddress("USDC");
-    address internal immutable PIP_USDC                       = DssExecLib.getChangelogAddress("PIP_USDC");
-    address internal constant  MCD_LITE_PSM_USDC_A            = 0xf6e72Db5454dd049d0788e411b06CfAF16853042;
-    address internal constant  MCD_LITE_PSM_USDC_A_POCKET     = 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341;
-    address internal constant  LITE_PSM_MOM                   = 0x467b32b0407Ad764f56304420Cddaa563bDab425;
-    address internal constant  MCD_LITE_PSM_USDC_A_JAR        = 0x69cA348Bd928A158ADe7aa193C133f315803b06e;
-    address internal constant  MCD_LITE_PSM_USDC_A_IN_CDT_JAR = 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d;
+    // ---------- Bug Bounty Payout ----------
+    address internal constant IMMUNEFI_COMISSION              = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+    address internal constant IMMUNEFI_USER_PAYOUT_2024_08_08 = 0xA4a6B5f005cBd2eD38f49ac496d86d3528C7a1aa;
 
-    // ---------- Add LitePSM keeper network job ----------
-    address internal immutable CRON_SEQUENCER    = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
-    address internal constant  CRON_LITE_PSM_JOB = 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be;
+    // ---------- Update ClipperMomJob ----------
+    address internal immutable CRON_SEQUENCER          = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
+    address internal immutable CRON_CLIPPER_MOM_JOB    = DssExecLib.getChangelogAddress("CRON_CLIPPER_MOM_JOB");
+    address internal constant CRON_CLIPPER_MOM_JOB_NEW = 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF;
 
-    // ---------- Spark Spell ----------
+    // ---------- Aligned Delegate Compensation ----------
+    address internal constant BLUE           = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant CLOAKY         = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant BYTERON        = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant JULIACHANG     = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant ROCKY          = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+    address internal constant PBG            = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant CLOAKY_KOHLA_2 = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+    address internal constant CLOAKY_ENNOIA  = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+
+    // ---------- RWA001-A Stability Fee Increase ----------
+    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+
+    // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x18427dB17D3113309a0406284aC738f4E649613B;
+    address internal constant SPARK_SPELL = 0xAFDf518d97DEA3420f007Deea2F9fBa0a28B3227;
 
     function actions() public override {
-        // ---------- LITE-PSM-USDC-A Onboarding ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // ---------- Stability Fee Reductions ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
 
-        // ---------- Update PSM-USDC-A DC-IAM ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // ETH-A: Decrease SF by 1 percentage point, from 7.25% to 6.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", SIX_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // ---------- Set up LITE-PSM-USDC-A DC-IAM ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // ETH-B: Decrease SF by 1 percentage point, from 7.75% to 6.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", SIX_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // ---------- Add GSM Delay Exception ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // ETH-C: Decrease SF by 1 percentage point, from 7% to 6%
+        DssExecLib.setIlkStabilityFee("ETH-C", SIX_PCT_RATE, /* doDrip = */ true);
 
-        // ---------- Phase 1 USDC Migration from PSM-USDC-A to LitePSM ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // WSTETH-A: Decrease SF by 1 percentage point, from 8.25% to 7.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // ---------- Chainlog additions ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644/5
+        // WSTETH-B: Decrease SF by 1 percentage point, from 8% to 7%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", SEVEN_PCT_RATE, /* doDrip = */ true);
 
-        // Note: load the MCD contracts depencencies
-        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+        // WBTC-A: Decrease SF by 1 percentage point, from 8.75% to 7.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Note: load the LitePSM module contracts
-        DssLitePsmInstance memory inst = DssLitePsmInstance({
-            // Onboard MCD_LITE_PSM_USDC_A at 0xf6e72Db5454dd049d0788e411b06CfAF16853042
-            litePsm: MCD_LITE_PSM_USDC_A,
+        // WBTC-B: Decrease SF by 1 percentage point, from 9.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-            // Activate LITE_PSM_MOM GSM Delay Exception at 0x467b32b0407Ad764f56304420Cddaa563bDab425
-            mom: LITE_PSM_MOM
-        });
+        // WBTC-C: Decrease SF by 1 percentage point, from 8.5% to 7.5%
+        DssExecLib.setIlkStabilityFee("WBTC-C", SEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Note: specify the init and migration config
-        DssLitePsmMigrationConfigPhase1 memory cfg = DssLitePsmMigrationConfigPhase1({
-            // Note: gem is not listed in the exec, but it is implicitly derived
-            dstGem:       USDC,
+        // ---------- DSR Reduction ----------
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
 
-            // Note: pip is not listed in the exec, but it is implicitly derived
-            dstPip:       PIP_USDC,
+        // DSR: Decrease DSR by 1 percentage point, from 7% to 6%
+        DssExecLib.setDSR(SIX_PCT_RATE, /* doDrip = */ true);
 
-            // Note: value listed in a section header above (LITE-PSM-USDC-A Onboarding)
-            dstIlk:       "LITE-PSM-USDC-A",
+        // ---------- Bug Bounty Payout ----------
+        // Forum: https://forum.makerdao.com/t/bounty-payout-request-for-immunefi-bug-32005/24605
+        // MIP: https://mips.makerdao.com/mips/details/MIP106#13-1-bug-bounty-program-for-makerdao-critical-infrastructure
 
-            // Onboard MCD_LITE_PSM_USDC_A_POCKET at 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341
-            dstPocket:    MCD_LITE_PSM_USDC_A_POCKET,
+        // Transfer 100,000 DAI to bug reporter at 0xA4a6B5f005cBd2eD38f49ac496d86d3528C7a1aa
+        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_USER_PAYOUT_2024_08_08, 100_000);
 
-            // Set MCD_LITE_PSM_USDC_A buf to 20M
-            dstBuf:       20 * MILLION * WAD,
+        // Transfer 10,000 DAI to Immunefi at 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18
+        DssExecLib.sendPaymentFromSurplusBuffer(IMMUNEFI_COMISSION, 10_000);
 
-            // Set LITE-PSM-USDC-A DC-IAM line: Set to 50M
-            dstMaxLine:   50 * MILLION * RAD,
+        // ---------- Update ClipperMomJob ----------
+        // Forum: https://forum.makerdao.com/t/executive-inclusion-clippermomjob-update/24774
 
-            // Set LITE-PSM-USDC-A DC-IAM gap: Set to 20M
-            dstGap:       20 * MILLION * RAD,
+        // remove the old ClipperMomJob from the CronSequencer
+        DssCronSequencerLike(CRON_SEQUENCER).removeJob(CRON_CLIPPER_MOM_JOB);
 
-            // Set LITE-PSM-USDC-A DC-IAM ttl: Set to 12h
-            dstTtl:       12 hours,
+        // add the new ClipperMomJob (0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF) to the Cron Sequencer
+        DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_CLIPPER_MOM_JOB_NEW);
 
-            // Note: chainlog key for PSM-USDC-A
-            srcPsmKey:    "MCD_PSM_USDC_A",
+        // Update CRON_CLIPPER_MOM_JOB to 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF in the Chainlog
+        DssExecLib.setChangelogAddress("CRON_CLIPPER_MOM_JOB", CRON_CLIPPER_MOM_JOB_NEW);
 
-            // Set PSM-USDC-A DC-IAM DC-IAM line: 10B (Unchanged)
-            srcMaxLine:   10 * BILLION * RAD,
+        // Note: bump chainlog version due to the updated CRON_CLIPPER_MOM_JOB address
+        DssExecLib.setChangelogVersion("1.17.6");
 
-            // Set PSM-USDC-A DC-IAM DC-IAM gap: Decrease for 20M from 400M to 380M
-            srcGap:       380 * MILLION * RAD,
+        // ---------- Aligned Delegate MKR Compensation ----------
+        // Forum: https://forum.makerdao.com/t/july-2024-aligned-delegate-payment-requests/24794
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-budget-and-participation-requirements
 
-            // Set PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
-            srcTtl:       12 hours,
+        // BLUE - 13.75 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        MKR.transfer(BLUE, 13.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-            // Migrate 20 million USDC from PSM-USDC-A to LITE-PSM-USDC-A
-            dstWant:      20 * MILLION * WAD,
+        // Cloaky - 12.00 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY, 12.00 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-            // Leave at least 200M USDC reserves in PSM-USDC-A
-            srcKeep:      200 * MILLION * WAD,
+        // Byteron - 1.25 MKR - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        MKR.transfer(BYTERON, 1.25 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-            // Add 0x467b32b0407Ad764f56304420Cddaa563bDab425 as LITE_PSM_MOM
-            psmMomKey:    "LITE_PSM_MOM",
+        // JuliaChang - 1.25 MKR - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        MKR.transfer(JULIACHANG, 1.25 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-            // Add 0xf6e72Db5454dd049d0788e411b06CfAF16853042 as MCD_LITE_PSM_USDC_A
-            dstPsmKey:    "MCD_LITE_PSM_USDC_A",
+        // Rocky - 1.13 MKR - 0xC31637BDA32a0811E39456A59022D2C386cb2C85
+        MKR.transfer(ROCKY, 1.13 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-            // Add 0x37305B1cD40574E4C5Ce33f8e8306Be057fD7341 as MCD_LITE_PSM_USDC_A_POCKET
-            dstPocketKey: "MCD_LITE_PSM_USDC_A_POCKET"
-        });
+        // PBG - 1.00 MKR - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        MKR.transfer(PBG, 1.00 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
-        // Note: LitePSM init and migration was extracted into a library,
-        //       and implemented as part of the LitePSM module.
-        DssLitePsmMigrationPhase1.initAndMigrate(dss, inst, cfg);
+        // ---------- Aligned Delegate DAI Compensation ----------
+        // Forum: https://forum.makerdao.com/t/july-2024-aligned-delegate-payment-requests/24794
+        // MIP: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-budget-and-participation-requirements
 
-        // ---------- GSM Delay Update ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // BLUE - 54167 DAI - 0xb6c09680d822f162449cdfb8248a7d3fc26ec9bf
+        DssExecLib.sendPaymentFromSurplusBuffer(BLUE, 54_167);
 
-        // Decrease the GSM Pause Delay by 14h, from 30h to 16h
-        PauseLike(MCD_PAUSE).setDelay(16 hours);
+        // Cloaky - 20417 DAI - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY, 20_417);
 
-        // ---------- Emergency Shutdown Module Minimum Threshold Update ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // Kohla (Cloaky) [NEW ADDRESS] - 14172 DAI - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY_KOHLA_2, 14_172);
 
-        // Increase the ESM (Emergency Shutdown Module) minimum threshold by 150k MKR from 150k MKR to 300k MKR
-        DssExecLib.setValue(MCD_ESM, "min", 300 * THOUSAND * WAD);
+        // Ennoia (Cloaky) - 9083 DAI - 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY_ENNOIA, 9_083);
 
-        // ---------- ESM Authorizations ----------
-        // Forum: http://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644/9
-        // Note: in practice this spell disables Emergency Shutdown by setting the threshold very high.
-        //       However the active bug bounty programs still need to be updated to reflect that,
-        //       so we are authorizing the ESM on the relevant components.
+        // Byteron - 8333 DAI - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        DssExecLib.sendPaymentFromSurplusBuffer(BYTERON, 8_333);
 
-        // Auth ESM on MCD_LITE_PSM_USDC_A_IN_CDT_JAR
-        DssExecLib.authorize(MCD_LITE_PSM_USDC_A_IN_CDT_JAR, MCD_ESM);
+        // JuliaChang - 8333 DAI - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        DssExecLib.sendPaymentFromSurplusBuffer(JULIACHANG, 8_333);
 
-        // ---------- Add LitePSM keeper network job ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
-        // Poll: https://vote.makerdao.com/polling/QmdcHXHy
+        // Rocky - 7500 DAI - 0xC31637BDA32a0811E39456A59022D2C386cb2C85
+        DssExecLib.sendPaymentFromSurplusBuffer(ROCKY, 7_500);
 
-        // sequencer.addJob( 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be )
-        // Note: the parameters below are set in `CRON_LITE_PSM_JOB` constructor
-        // fill: Set threshold at 15M DAI
-        // trim: Set threshold at 30M DAI
-        // chug: Set threshold at 300k DAI
-        DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_LITE_PSM_JOB);
+        // PBG - 6667 DAI - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        DssExecLib.sendPaymentFromSurplusBuffer(PBG, 6_667);
 
-        // ---------- Chainlog additions ----------
-        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-1-test-period-proposed-parameters/24644
+        // ---------- RWA001-A Stability Fee Increase ----------
+        // Forum: https://forum.makerdao.com/t/rwa-001-6s-capital-update-and-stability-fee-proposal/24624
 
-        // Add 0x69cA348Bd928A158ADe7aa193C133f315803b06e as MCD_LITE_PSM_USDC_A_JAR
-        DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_JAR", MCD_LITE_PSM_USDC_A_JAR);
+        // Increase the RWA001-A Stability Fee by 6 percentage points from 3% to 9%
+        DssExecLib.setIlkStabilityFee("RWA001-A", NINE_PCT_RATE, /* doDrip = */ true);
 
-        // Add 0x5eeB3D8D60B06a44f6124a84EeE7ec0bB747BE6d as MCD_LITE_PSM_USDC_A_IN_CDT_JAR
-        DssExecLib.setChangelogAddress("MCD_LITE_PSM_USDC_A_IN_CDT_JAR", MCD_LITE_PSM_USDC_A_IN_CDT_JAR);
+        // Note: Bump Oracle price to account for new SF
+        // Note: the formula is `Debt ceiling * [ (1 + RWA stability fee ) ^ (minimum deal duration in years) ] * liquidation ratio`
+        // Since RWA001-A Termination Date is `July 29, 2025`, and spell execution time is `2024-08-12`, the distance is `356` days
+        // bc -l <<< 'scale=18; 15000000 * e(l(1.09) * (352/365)) * 1.00' | cast --to-wei
+        RwaLiquidationLike(MIP21_LIQUIDATION_ORACLE).bump(
+            "RWA001-A",
+            16_299_893_185222593795000000
+        );
 
-        // Add 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be as CRON_LITE_PSM_JOB
-        DssExecLib.setChangelogAddress("CRON_LITE_PSM_JOB", CRON_LITE_PSM_JOB);
+        // Note: Update collateral price to propagate the changes
+        DssExecLib.updateCollateralPrice("RWA001-A");
 
-        // Note: bumping patch version because the spell adds new items
-        DssExecLib.setChangelogVersion("1.17.5");
+        // ---------- Monetalis Clydesdale DAO Resolution ----------
+        // Forum: https://forum.makerdao.com/t/clydesdale-vault-hq/17923/88
 
-        // ---------- Spark Spell ----------
-        // Forum: https://forum.makerdao.com/t/jul-12-2024-proposed-changes-to-spark-for-upcoming-spell/24635
+        // Approve DAO Resolution at QmaYKt61v6aCTNTYjuHm1Wjpe6JWBzCW2ZHR4XDEJhjm1R
+        // Note: see `dao_resolutions` variable declared above
 
-        // Trigger Spark Proxy Spell at 0x18427dB17D3113309a0406284aC738f4E649613B
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/jul-27-2024-proposed-changes-to-spark-for-upcoming-spell/24755
+        // Poll: https://vote.makerdao.com/polling/QmdFCRfK#poll-detail
+
+        // Trigger Spark Proxy Spell at 0xAFDf518d97DEA3420f007Deea2F9fBa0a28B3227
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }

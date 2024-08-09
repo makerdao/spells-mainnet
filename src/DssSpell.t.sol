@@ -44,30 +44,21 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface CronSequencerLike {
-    function getMaster() external view returns (bytes32);
-    function hasJob(address) external view returns (bool);
+interface DssCronSequencerLike {
+    function hasJob(address job) external view returns (bool);
+    function numJobs() external view returns (uint256);
 }
 
-interface LitePsmJobLike {
-    function cutThreshold() external view returns (uint256);
-    function gushThreshold() external view returns (uint256);
-    function litePsm() external view returns (address);
-    function rushThreshold() external view returns (uint256);
-    function sequencer() external view returns (address);
-    function work(bytes32, bytes calldata) external;
-    function workable(bytes32) external view returns (bool, bytes memory);
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
 }
 
-interface JarLike {
-    function void() external;
-    function daiJoin() external view returns (address);
+interface RwaUrnLike {
+    function hope(address) external;
+    function wipe(uint256) external;
+    function free(uint256) external;
 }
 
-interface InputConduitLike {
-    function push() external;
-    function to() external view returns (address);
-}
 
 contract DssSpellTest is DssSpellTestBase {
     string         config;
@@ -324,7 +315,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testEsmAuth() public { // add the `skipped` modifier to skip
+    function testEsmAuth() public skipped { // add the `skipped` modifier to skip
         string[1] memory esmAuthorisedContractKeys = [
             "MCD_LITE_PSM_USDC_A_IN_CDT_JAR"
         ];
@@ -453,15 +444,25 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("AAVE_V3_TREASURY"), 219_125)
+        Payee[10] memory payees = [
+            Payee(wallets.addr("IMMUNEFI_USER_PAYOUT_2024_08_08"), 100_000),
+            Payee(wallets.addr("IMMUNEFI_COMISSION"), 10_000),
+            Payee(wallets.addr("BLUE"), 54_167),
+            Payee(wallets.addr("CLOAKY"), 20_417),
+            Payee(wallets.addr("CLOAKY_KOHLA_2"), 14_172),
+            Payee(wallets.addr("CLOAKY_ENNOIA"), 9_083),
+            Payee(wallets.addr("BYTERON"), 8_333),
+            Payee(wallets.addr("JULIACHANG"), 8_333),
+            Payee(wallets.addr("ROCKY"), 7_500),
+            Payee(wallets.addr("PBG"), 6_667)
         ];
-        uint256 expectedSumPayments = 219_125; // Fill the number with the value from exec doc.
+
+        uint256 expectedSumPayments = 238_672; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -636,26 +637,21 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
+    function testMKRPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[11] memory payees = [
-            Payee(wallets.addr("BLUE"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JULIACHANG"), 41.67 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BYTERON"), 38.98 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"), 20.40 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"), 16.58 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BONAPUBLICA"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ROCKY"), 13.89 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("VIGILANT"), 12.55 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_ENNOIA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY_KOHLA"), 4.10 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("WBC"), 1.34 ether) // Note: ether is a keyword helper, only MKR is transferred here
+        Payee[6] memory payees = [
+            Payee(wallets.addr("BLUE"), 13.75 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("BYTERON"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("ROCKY"), 1.13 ether), // Note: ether is a keyword helper, only MKR is transferred here
+            Payee(wallets.addr("PBG"), 1.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 209.17 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 30.38 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -870,11 +866,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmX2CnZcsZJtgJUdkpwsAd1bXEaFuxFUaXkqgDkZa79idA"
+            "QmaYKt61v6aCTNTYjuHm1Wjpe6JWBzCW2ZHR4XDEJhjm1R"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -889,10 +885,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x18427dB17D3113309a0406284aC738f4E649613B);
+        address SPARK_SPELL = address(0xAFDf518d97DEA3420f007Deea2F9fBa0a28B3227);
 
         vm.expectCall(
             SPARK_PROXY,
@@ -909,327 +904,63 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testCronSequencerClipperMomJobReplaced() public {
+        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
+        address CRON_CLIPPER_MOM_JOB = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
+        address CRON_CLIPPER_MOM_JOB_NEW = 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF;
 
-    bytes32           constant  SRC_ILK       = "PSM-USDC-A";
-    bytes32           constant  DST_ILK       = "LITE-PSM-USDC-A";
-    PsmAbstract       immutable srcPsm        = PsmAbstract(      addr.addr("MCD_PSM_USDC_A"));
-    LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
-    address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
-    JarLike           immutable jar           = JarLike(          addr.addr("MCD_LITE_PSM_USDC_A_JAR"));
-    InputConduitLike  immutable inputConduit  = InputConduitLike( addr.addr("MCD_LITE_PSM_USDC_A_IN_CDT_JAR"));
-    GemAbstract       immutable gem           = GemAbstract(      addr.addr("USDC"));
-    address           immutable pip           =                   addr.addr("PIP_USDC");
-    CronSequencerLike immutable sequencer     = CronSequencerLike(addr.addr("CRON_SEQUENCER"));
-    LitePsmJobLike    immutable litePsmJob    = LitePsmJobLike(   addr.addr("CRON_LITE_PSM_JOB"));
-    uint256           constant  dstBuf        =  20_000_000 * WAD;
-    uint256           constant  dstWant       =  20_000_000 * WAD;
-    uint256           constant  srcKeep       = 200_000_000 * WAD;
-    uint256           constant  rushThreshold =  15_000_000 * WAD;
-    uint256           constant  gushThreshold =  30_000_000 * WAD;
-    uint256           constant  cutThreshold  =     300_000 * WAD;
+        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
 
-    function test_CRON_LITE_PSM_JOB() public {
-        // ----- Pre-spell sanity checks -----
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB) , true, "TestError/old-job-not-present-in-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), false, "TestError/new-job-already-present-in-sequencer");
 
-        assertFalse(sequencer.hasJob(address(litePsmJob)));
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
-        // Sequencer matches
-        assertEq(litePsmJob.sequencer(),     address(sequencer), "invalid sequencer");
-        // LitePsm matches
-        assertEq(litePsmJob.litePsm(),       address(dstPsm),    "invalid litePsm");
-        // fill: Set threshold at 15M DAI
-        assertEq(litePsmJob.rushThreshold(), rushThreshold,      "invalid rush threshold");
-        // trim: Set threshold at 30M DAI
-        assertEq(litePsmJob.gushThreshold(), gushThreshold,      "invalid rush threshold");
-        // chug: Set threshold at 300k DAI
-        assertEq(litePsmJob.cutThreshold(),  cutThreshold,       "invalid rush threshold");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB), false, "TestError/old-job-not-removed-from-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), true, "TestError/new-job-not-added-to-sequencer");
+        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
+    }
 
-        // ----- Execute spell -----
+    // RWA tests
+    function testRWA001Update() public {
+        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        GemAbstract rwa001 = GemAbstract(addr.addr("RWA001"));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // ----- Post-spell sanity checks -----
+        // Get the oracle address
+        (,address pip,,  ) = oracle.ilks("RWA001-A");
+        assertEq(uint256(DSValueAbstract(pip).read()), 16_299_893_185222593795000000, "RWA001: Bad pip value after bump()");
 
-        assertTrue(sequencer.hasJob(address(litePsmJob)));
+        // Get collateral's parameters
+        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line, ) = vat.ilks("RWA001-A");
 
-        // ----- E2E tests -----
+        assertEq(spotAfter, 16_299_893_185222593795000000 * (RAY / WAD), "RWA001: Bad spot value after bump()");
 
-        bytes32 master = sequencer.getMaster();
+        // No more room for new debt
+        assertGt(Art * rate, line, "RWA001: No more room for new debt");
 
-        // Base state
-        {
-            (bool ok, ) = litePsmJob.workable(master);
-            assertFalse(ok, "invalid workable ok - no changes");
+        // Repay debt and free the collateral
+        address urn = addr.addr("RWA001_A_URN");
+        (, uint256 art) = vat.urns("RWA001-A", urn);
+        assertGe(art, 0, "RWA001: No debt in the urn");
 
-            vm.expectRevert();
-            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.fill.selector));
+        GodMode.setWard(urn, address(this), 1);
+        RwaUrnLike(urn).hope(address(this));
 
-            vm.expectRevert();
-            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.trim.selector));
+        uint256 daiToPay = (art * rate) / RAY + 1; // extra wei rounding
+        GodMode.setBalance(dai, urn, daiToPay);
 
-            vm.expectRevert();
-            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.chug.selector));
-        }
+        RwaUrnLike(urn).wipe(daiToPay);
+        (, uint256 afterArt) = vat.urns("RWA001-A", urn);
+        assertEq(afterArt, 0, "RWA001: Bad art value after wipe()");
 
-        // Modify local `line` so it is not a limiting factor
-        GodMode.setWard(address(vat), address(this), 1);
-        vat.file(DST_ILK, "line", type(uint256).max);
-
-        // Allow the test contract to swap with no fees
-        GodMode.setWard(address(dstPsm), address(this), 1);
-        dstPsm.kiss(address(this));
-
-        // Approvals
-        gem.approve(address(dstPsm), type(uint256).max);
-        dai.approve(address(dstPsm), type(uint256).max);
-
-        uint256 snapshot = vm.snapshot();
-
-        // --- rushThreshold is breached ---
-        {
-            uint256 wadOut = rushThreshold; // Must be >= rushThreshold
-            uint256 amtIn = _wadToAmt(wadOut);
-            _giveTokens(address(gem), amtIn);
-            dstPsm.sellGemNoFee(address(this), amtIn);
-
-            assertGe(dstPsm.rush(), rushThreshold, "fill: invalid rush");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "fill: invalid workable ok");
-            (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.fill.selector, "fill: invalid data - expected fill.selector");
-
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-
-        // --- rushThreshold is not breached ---
-        {
-            uint256 wadOut = rushThreshold / 2; // Must be < rushThreshold
-            uint256 amtIn = _wadToAmt(wadOut);
-            _giveTokens(address(gem), amtIn);
-            dstPsm.sellGemNoFee(address(this), amtIn);
-
-            assertGt(dstPsm.rush(), 0, "no fill: invalid rush");
-            assertLt(dstPsm.rush(), rushThreshold, "no fill: invalid rush");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertFalse(ok, "no fill: invalid workable ok");
-            assertEq(args, bytes("No work to do"), "no fill: invalid data");
-
-            vm.expectRevert();
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-
-        // --- gushThreshold is breached ---
-        {
-            // Before buying gems, we need to sell more gems into it to ensure the threshold will be met
-            uint256 wadOut = gushThreshold; // Must be >= gushThreshold
-            uint256 amtIn = _wadToAmt(wadOut);
-            _giveTokens(address(gem), amtIn);
-            // Selling gem is limited by `buf`, so we might need to split it into several parts
-            uint256 wadAcc = 0;
-            do {
-                if (dstPsm.rush() > 0) dstPsm.fill();
-                uint256 wadDelta = _min(dai.balanceOf(address(dstPsm)), wadOut - wadAcc);
-                dstPsm.sellGemNoFee(address(this), _wadToAmt(wadDelta));
-                wadAcc += wadDelta;
-            } while (wadAcc < wadOut);
-
-            // Buy the max amount of gems
-            uint256 wadIn = _amtToWad(gem.balanceOf(pocket));
-            _giveTokens(address(dai), wadIn);
-            uint256 amtOut = _wadToAmt(wadIn);
-            dstPsm.buyGemNoFee(address(this), amtOut);
-
-            assertGe(dstPsm.gush(), gushThreshold, "trim: nvalid gush");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "trim: invalid workable ok");
-            (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.trim.selector, "trim: invalid data - expected trim.selector");
-
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-
-        // --- gushThreshold is not breached ---
-        {
-            // Before buying gems, we need to sell more gems into it
-            uint256 wadOut = _min(dai.balanceOf(address(dstPsm)), gushThreshold / 10); // Must be < gushThreshold
-            uint256 amtIn = _wadToAmt(wadOut);
-            _giveTokens(address(gem), amtIn);
-            dstPsm.sellGemNoFee(address(this), amtIn);
-
-            // Buy the max amount of gems
-            uint256 wadIn = _amtToWad(gem.balanceOf(pocket));
-            _giveTokens(address(dai), wadIn);
-            uint256 amtOut = _wadToAmt(wadIn);
-            dstPsm.buyGemNoFee(address(this), amtOut);
-
-            assertGt(dstPsm.gush(), 0, "no trim: invalid gush");
-            assertLt(dstPsm.gush(), gushThreshold, "no trim: invalid gush");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertFalse(ok, "no trim: invalid workable ok - expected false");
-            assertEq(args, bytes("No work to do"), "no trim: invalid data");
-
-            vm.expectRevert();
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-
-        // --- chugThreshold is breached ---
-        {
-            // Donating Dai has the same effect as accumulating swap fees
-            uint256 wadDonation = cutThreshold; // Must be >= cutThreshold
-            _giveTokens(address(dai), wadDonation);
-            dai.transfer(address(dstPsm), wadDonation);
-
-            assertGe(dstPsm.cut(), cutThreshold, "chug: invalid cut");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertTrue(ok, "chug: invalid workable ok");
-            (bytes4 fn) = abi.decode(args, (bytes4));
-            assertEq(fn, dstPsm.chug.selector, "chug: invalid data - expected chug.selector");
-
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-
-        // --- chugThreshold is not breached ---
-        {
-            uint256 wadDonation = cutThreshold / 5; // Must be < cutThreshold
-            _giveTokens(address(dai), wadDonation);
-            dai.transfer(address(dstPsm), wadDonation);
-
-            assertGt(dstPsm.cut(), 0, "no chug: invalid cut");
-            assertLt(dstPsm.cut(), cutThreshold, "no chug: invalid cut");
-
-            (bool ok, bytes memory args) = litePsmJob.workable(master);
-            assertFalse(ok, "no chug: invalid workable ok");
-            assertEq(args, bytes("No work to do"), "no chug: invalid data");
-
-            vm.expectRevert();
-            litePsmJob.work(master, args);
-
-            vm.revertTo(snapshot);
-        }
-    }
-
-    function test_LITE_PSM_USDC_A_MigrationPhase1() public {
-        (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
-        (, uint256 pdstArt)                = vat.urns(DST_ILK, address(dstPsm));
-        uint256 psrcTin                    = srcPsm.tin();
-        uint256 psrcTout                   = srcPsm.tout();
-        uint256 psrcGemBalance             = gem.balanceOf(srcPsm.gemJoin());
-        uint256 pdstGemBalance             = gem.balanceOf(pocket);
-        uint256 pvatSinPauseProxy          = vat.sin(address(pauseProxy));
-        uint256 pvice                      = vat.vice();
-
-        uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
-
-        // ----- Pre-spell sanity checks -----
-        {
-            (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
-            assertGt(psrcIlkArt, 0, "before: src ilk Art is zero");
-            assertGt(psrcLine,   0, "before: src line is zero");
-            assertGt(psrcArt,    0, "before: src art is zero");
-            assertGt(psrcInk,    0, "before: src ink is zero");
-        }
-
-        // ----- Execute spell -----
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // ----- Post-spell state checks -----
-
-        // Old PSM state is set correctly
-        {
-            (uint256 srcInk, uint256 srcArt) = vat.urns(SRC_ILK, address(srcPsm));
-            assertEq(srcInk, psrcInk - expectedMoveWad, "after: src ink is not decreased by dst want");
-            assertEq(srcArt, psrcArt - expectedMoveWad, "after: src art is not decreased by dst want");
-
-            assertEq(
-                gem.balanceOf(srcPsm.gemJoin()),
-                psrcGemBalance - _wadToAmt(expectedMoveWad),
-                "after: src gem-join balance is not decreased by dst want"
-            );
-
-            // srcPsm sanity checks
-            assertEq(srcPsm.tin(),  psrcTin,      "after: unexpected src tin update");
-            assertEq(srcPsm.tout(), psrcTout,     "after: unexpected src tout update");
-            assertEq(srcPsm.vow(),  address(vow), "after: unexpected src vow update");
-        }
-
-        // New PSM state is set correctly
-        {
-            (, uint256 dstArt) = vat.urns(DST_ILK, address(dstPsm));
-            // There might be extra `art` because of the calls to `fill`.
-            assertGe(dstArt, pdstArt + expectedMoveWad, "after: dst art is not increased at least by the moved amount");
-
-            assertEq(
-                _amtToWad(gem.balanceOf(address(pocket))),
-                _amtToWad(pdstGemBalance) + expectedMoveWad,
-                "after: invalid gem balance for dst pocket"
-            );
-            assertEq(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
-        }
-
-        // Vat sin for MCD_PAUSE_PROXY has not changed
-        assertEq(vat.sin(address(pauseProxy)), pvatSinPauseProxy, "after: unexpected vat sin change for pause proxy");
-        // Vat vice has not changed
-        assertEq(vat.vice(), pvice, "after: unexpected vat vice change");
-    }
-
-    function test_LITE_PSM_USDC_A_JAR() public {
-        // ----- Execute spell -----
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Sanity checks
-        assertEq(inputConduit.to(), address(jar),     "input conduit: invalid to");
-        assertEq(jar.daiJoin(),     address(daiJoin), "jar: invalid daiJoi");
-
-        uint256 amtIn = _wadToAmt(30_000 * WAD);
-        _giveTokens(address(gem),           amtIn);
-        gem.transfer(address(inputConduit), amtIn);
-
-        uint256 pgemBalancePocket = gem.balanceOf(pocket);
-        uint256 pdaiVow           = vat.dai(address(vow));
-
-        inputConduit.push();
-        jar.void();
-
-        assertEq(gem.balanceOf(pocket), pgemBalancePocket + amtIn,          "invalid pocket gem balance after push");
-        assertEq(vat.dai(address(vow)), pdaiVow + (_amtToWad(amtIn) * RAY), "invalid vow dai after void");
-    }
-
-    function _amtToWad(uint256 amt) internal view returns (uint256) {
-        return amt * dstPsm.to18ConversionFactor();
-    }
-
-    function _wadToAmt(uint256 wad) internal view returns (uint256) {
-        return wad / dstPsm.to18ConversionFactor();
-    }
-
-    function _min(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x < y ? x : y;
-    }
-
-    function _subcap(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x < y ? 0 : x - y;
+        assertEq(rwa001.balanceOf(address(this)), 0, "RWA001: Unexpected balance before free()");
+        RwaUrnLike(urn).free(WAD);
+        assertEq(rwa001.balanceOf(address(this)), WAD, "RWA001: Bad conduit balance after free()");
     }
 }
