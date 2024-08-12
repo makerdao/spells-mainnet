@@ -19,6 +19,7 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 
 interface DssCronSequencerLike {
     function addJob(address job) external;
@@ -36,9 +37,9 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/81851b65806c93723ce7e7d99e16743f1c27b208/governance/votes/Executive%20vote%20-%20August%2012%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-08-12 MakerDAO Executive Spell | Hash: 0x71c95e9513001aa8b04767c08fa807b71ca2bf15df6000e5026b03987d2645ac";
+        "2024-08-12 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -71,6 +72,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     GemAbstract internal immutable MKR = GemAbstract(DssExecLib.mkr());
+    VatAbstract internal immutable vat  = VatAbstract(DssExecLib.vat());
 
     // ---------- Bug Bounty Payout ----------
     address internal constant IMMUNEFI_COMISSION              = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
@@ -97,9 +99,43 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x4622245a1aaf0fb752F9cAC0A29616792b33F089;
+    address internal constant SPARK_SPELL = 0x85042d44894E08f81D70A2Ae568C09f907297dcb;
 
     function actions() public override {
+        // ---------- WBTC Vault Maximum Debt Ceiling Reductions ----------
+        // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844
+
+        // Note: Variables to calculate decrease of the global debt ceiling
+        uint256 line;
+        uint256 globalLineReduction = 0;
+
+        // Remove WBTC-A from Autoline
+        DssExecLib.removeIlkFromAutoLine("WBTC-A");
+
+        // Set WBTC-A Debt Ceiling to 0
+        (,,,line,) = vat.ilks("WBTC-A");
+        globalLineReduction += line;
+        DssExecLib.setIlkDebtCeiling("WBTC-A", 0);
+
+        // Remove WBTC-B from Autoline
+        DssExecLib.removeIlkFromAutoLine("WBTC-B");
+
+        // Set WBTC-B Debt Ceiling to 0
+        (,,,line,) = vat.ilks("WBTC-B");
+        globalLineReduction += line;
+        DssExecLib.setIlkDebtCeiling("WBTC-B", 0);
+
+        // Remove WBTC-C from Autoline
+        DssExecLib.removeIlkFromAutoLine("WBTC-C");
+
+        // Set WBTC-C Debt Ceiling to 0
+        (,,,line,) = vat.ilks("WBTC-C");
+        globalLineReduction += line;
+        DssExecLib.setIlkDebtCeiling("WBTC-C", 0);
+
+        // Global Debt Ceiling reduction? Yes
+        vat.file("Line", vat.Line() - globalLineReduction);
+
         // ---------- Stability Fee Reductions ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
 
@@ -236,7 +272,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/jul-27-2024-proposed-changes-to-spark-for-upcoming-spell/24755
         // Poll: https://vote.makerdao.com/polling/QmdFCRfK#poll-detail
 
-        // Trigger Spark Proxy Spell at 0x4622245a1aaf0fb752F9cAC0A29616792b33F089
+        // Trigger Spark Proxy Spell at 0x85042d44894E08f81D70A2Ae568C09f907297dcb
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }

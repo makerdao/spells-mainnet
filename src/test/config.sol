@@ -283,10 +283,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      500 * MILLION,
-            aL_gap:       4 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         7_500,
             pct:          7_75,
@@ -308,10 +308,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-B"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      250 * MILLION,
-            aL_gap:       2 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         25 * THOUSAND,
             pct:          8_25,
@@ -333,10 +333,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-C"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      500 * MILLION,
-            aL_gap:       8 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         3_500,
             pct:          7_50,
