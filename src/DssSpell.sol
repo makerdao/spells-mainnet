@@ -60,14 +60,14 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant SIX_PCT_RATE                 = 1000000001847694957439350562;
     uint256 internal constant SIX_PT_TWO_FIVE_PCT_RATE     = 1000000001922394148741344865;
     uint256 internal constant SIX_PT_SEVEN_FIVE_PCT_RATE   = 1000000002071266685321207000;
-    uint256 internal constant SIX_PCT_RATE                 = 1000000001847694957439350562;
-    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
     uint256 internal constant SEVEN_PCT_RATE               = 1000000002145441671308778766;
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
     uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
     uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
-    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
     uint256 internal constant NINE_PCT_RATE                = 1000000002732676825177582095;
 
     // ---------- Contracts ----------
@@ -271,6 +271,8 @@ contract DssSpellAction is DssAction {
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.makerdao.com/t/jul-27-2024-proposed-changes-to-spark-for-upcoming-spell/24755
         // Poll: https://vote.makerdao.com/polling/QmdFCRfK#poll-detail
+        // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-15-sfs-dsr-spark-effective-dai-borrow-rate-reduction/24834
+        // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844
 
         // Trigger Spark Proxy Spell at 0x85042d44894E08f81D70A2Ae568C09f907297dcb
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
