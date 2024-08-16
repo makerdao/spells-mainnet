@@ -45,6 +45,91 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
+        // ----- Update PSM state variable in the conduit contracts to MCD_LITE_PSM_USDC_A -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // RWA014_A_INPUT_CONDUIT_URN
+
+        // RWA014_A_INPUT_CONDUIT_JAR
+
+        // RWA014_A_OUTPUT_CONDUIT
+
+        // RWA007_A_JAR_INPUT_CONDUIT
+
+        // RWA007_A_INPUT_CONDUIT
+
+        // RWA007_A_OUTPUT_CONDUIT
+
+        // RWA015_A_INPUT_CONDUIT_JAR_USDC
+
+        // RWA015_A_INPUT_CONDUIT_URN_USDC
+
+        // RWA015_A_OUTPUT_CONDUIT
+
+        // RWA009_A_INPUT_CONDUIT_URN_USDC
+
+        // ----- Phase 2 USDC Migration from PSM-USDC-A to LITE-PSM-USDC-A -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // Migrate all but 200 million USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A
+
+        // ----- Update PSM-USDC-A Fees -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
+
+        // PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
+
+        // ----- Update PSM-USDC-A DC-IAM -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
+
+        // PSM-USDC-A DC-IAM DC-IAM gap: Decrease by 180 million DAI, from 380 million DAI to 200 million DAI.
+
+        // PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
+
+        // ----- Update MCD_LITE_PSM_USDC_A Buf -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
+
+        // ----- Update LITE-PSM-USDC-A DC-IAM -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // LITE-PSM-USDC-A DC-IAM line: Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
+
+        // LITE-PSM-USDC-A DC-IAM gap: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
+
+        // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
+
+        // ----- GSM Delay Update -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // Increase the GSM Pause Delay by 14h, from 16h to 30h
+
+        // ----- Update LitePSM Keeper Network Job -----
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
+        // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
+
+        // Remove the old LitePSMJob (0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be) from the CronSequencer
+
+        // Add the new LitePSMJob (0x0c86162ba3e507592fc8282b07cf18c7f902c401) to the Cron Sequencer
+
+        // fill: Set the rushThreshold to 20 million DAI
+
+        // trim: Set the gushThreshold to 20 million DAI
+
+        // chug: Set the cutThreshold to 300,000 DAI (Unchanged)
+
+        // Update CRON_LITE_PSM_JOB to 0x0c86162ba3e507592fc8282b07cf18c7f902c401 in the Chainlog
     }
 }
 
