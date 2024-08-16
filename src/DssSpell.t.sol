@@ -44,22 +44,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface DssCronSequencerLike {
-    function hasJob(address job) external view returns (bool);
-    function numJobs() external view returns (uint256);
-}
-
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32 ilk) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
-}
-
-interface RwaUrnLike {
-    function hope(address) external;
-    function wipe(uint256) external;
-    function free(uint256) external;
-}
-
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -444,7 +428,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public { // add the `skipped` modifier to skip
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
@@ -637,7 +621,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public { // add the `skipped` modifier to skip
+    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
@@ -866,7 +850,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public { // add the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -885,82 +869,5 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
-        address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x85042d44894E08f81D70A2Ae568C09f907297dcb;
 
-        vm.expectCall(
-            SPARK_PROXY,
-            /* value = */ 0,
-            abi.encodeCall(
-                ProxyLike(SPARK_PROXY).exec,
-                (SPARK_SPELL, abi.encodeWithSignature("execute()"))
-            )
-        );
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-    }
-
-    // SPELL-SPECIFIC TESTS GO BELOW
-    function testCronSequencerClipperMomJobReplaced() public {
-        address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
-        address CRON_CLIPPER_MOM_JOB = 0xc3A76B34CFBdA7A3a5215629a0B937CBDEC7C71a;
-        address CRON_CLIPPER_MOM_JOB_NEW = 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF;
-
-        uint256 numJobs = DssCronSequencerLike(CRON_SEQUENCER).numJobs();
-
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB) , true, "TestError/old-job-not-present-in-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), false, "TestError/new-job-already-present-in-sequencer");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB), false, "TestError/old-job-not-removed-from-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).hasJob(CRON_CLIPPER_MOM_JOB_NEW), true, "TestError/new-job-not-added-to-sequencer");
-        assertEq(DssCronSequencerLike(CRON_SEQUENCER).numJobs(), numJobs, "TestError/job-amount-changed");
-    }
-
-    // RWA tests
-    function testRWA001Update() public {
-        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-        GemAbstract rwa001 = GemAbstract(addr.addr("RWA001"));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        // Get the oracle address
-        (,address pip,,  ) = oracle.ilks("RWA001-A");
-        assertEq(uint256(DSValueAbstract(pip).read()), 16_299_893_185222593795000000, "RWA001: Bad pip value after bump()");
-
-        // Get collateral's parameters
-        (uint256 Art, uint256 rate, uint256 spotAfter, uint256 line, ) = vat.ilks("RWA001-A");
-
-        assertEq(spotAfter, 16_299_893_185222593795000000 * (RAY / WAD), "RWA001: Bad spot value after bump()");
-
-        // No more room for new debt
-        assertGt(Art * rate, line, "RWA001: No more room for new debt");
-
-        // Repay debt and free the collateral
-        address urn = addr.addr("RWA001_A_URN");
-        (, uint256 art) = vat.urns("RWA001-A", urn);
-        assertGe(art, 0, "RWA001: No debt in the urn");
-
-        GodMode.setWard(urn, address(this), 1);
-        RwaUrnLike(urn).hope(address(this));
-
-        uint256 daiToPay = (art * rate) / RAY + 1; // extra wei rounding
-        GodMode.setBalance(dai, urn, daiToPay);
-
-        RwaUrnLike(urn).wipe(daiToPay);
-        (, uint256 afterArt) = vat.urns("RWA001-A", urn);
-        assertEq(afterArt, 0, "RWA001: Bad art value after wipe()");
-
-        assertEq(rwa001.balanceOf(address(this)), 0, "RWA001: Unexpected balance before free()");
-        RwaUrnLike(urn).free(WAD);
-        assertEq(rwa001.balanceOf(address(this)), WAD, "RWA001: Bad conduit balance after free()");
-    }
 }
