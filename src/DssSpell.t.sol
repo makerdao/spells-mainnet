@@ -869,5 +869,21 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+        address SPARK_PROXY = addr.addr('SPARK_PROXY');
+        address SPARK_SPELL = 0x85042d44894E08f81D70A2Ae568C09f907297dcb;
 
+        vm.expectCall(
+            SPARK_PROXY,
+            /* value = */ 0,
+            abi.encodeCall(
+                ProxyLike(SPARK_PROXY).exec,
+                (SPARK_SPELL, abi.encodeWithSignature("execute()"))
+            )
+        );
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+    }
 }
