@@ -19,6 +19,11 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+interface RwaMultiSwapOutputConduitLike {
+    function clap(address) external;
+    function slap(address) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -43,6 +48,20 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
+    // ---------- LITE-PSM-USDC-A Phase 1 ----------
+    address internal immutable MCD_PSM_USDC_A                  = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable MCD_LITE_PSM_USDC_A             = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
+    address internal immutable RWA014_A_INPUT_CONDUIT_URN      = DssExecLib.getChangelogAddress("RWA014_A_INPUT_CONDUIT_URN");
+    address internal immutable RWA014_A_INPUT_CONDUIT_JAR      = DssExecLib.getChangelogAddress("RWA014_A_INPUT_CONDUIT_JAR");
+    address internal immutable RWA014_A_OUTPUT_CONDUIT         = DssExecLib.getChangelogAddress("RWA014_A_OUTPUT_CONDUIT");
+    address internal immutable RWA007_A_JAR_INPUT_CONDUIT      = DssExecLib.getChangelogAddress("RWA007_A_JAR_INPUT_CONDUIT");
+    address internal immutable RWA007_A_INPUT_CONDUIT          = DssExecLib.getChangelogAddress("RWA007_A_INPUT_CONDUIT");
+    address internal immutable RWA007_A_OUTPUT_CONDUIT         = DssExecLib.getChangelogAddress("RWA007_A_OUTPUT_CONDUIT");
+    address internal immutable RWA015_A_INPUT_CONDUIT_JAR_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_JAR_USDC");
+    address internal immutable RWA015_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_URN_USDC");
+    address internal immutable RWA015_A_OUTPUT_CONDUIT         = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
+    address internal immutable RWA009_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA009_A_INPUT_CONDUIT_URN_USDC");
+
     function actions() public override {
 
         // ----- Update PSM state variable in the conduit contracts to MCD_LITE_PSM_USDC_A -----
@@ -50,24 +69,40 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
         // RWA014_A_INPUT_CONDUIT_URN
+        DssExecLib.setContract(RWA014_A_INPUT_CONDUIT_URN , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA014_A_INPUT_CONDUIT_JAR
+        DssExecLib.setContract(RWA014_A_INPUT_CONDUIT_JAR , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA014_A_OUTPUT_CONDUIT
+        DssExecLib.setContract(RWA014_A_OUTPUT_CONDUIT , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA007_A_JAR_INPUT_CONDUIT
+        DssExecLib.setContract(RWA007_A_JAR_INPUT_CONDUIT , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA007_A_INPUT_CONDUIT
+        DssExecLib.setContract(RWA007_A_INPUT_CONDUIT , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA007_A_OUTPUT_CONDUIT
+        DssExecLib.setContract(RWA007_A_OUTPUT_CONDUIT , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA015_A_INPUT_CONDUIT_JAR_USDC
+        DssExecLib.setContract(RWA015_A_INPUT_CONDUIT_JAR_USDC , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA015_A_INPUT_CONDUIT_URN_USDC
+        DssExecLib.setContract(RWA015_A_INPUT_CONDUIT_URN_USDC , "psm", MCD_LITE_PSM_USDC_A);
 
         // RWA015_A_OUTPUT_CONDUIT
+        // Note: This contract does not have a single `psm` state variable, it relies on the mapping `pal` instead
+
+        // Note: remove MCD_PSM_USDC_A
+        RwaMultiSwapOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).slap(MCD_PSM_USDC_A);
+
+        // Note: add MCD_LITE_PSM_USDC_A
+        RwaMultiSwapOutputConduitLike(RWA015_A_OUTPUT_CONDUIT).clap(MCD_LITE_PSM_USDC_A);
 
         // RWA009_A_INPUT_CONDUIT_URN_USDC
+        DssExecLib.setContract(RWA009_A_INPUT_CONDUIT_URN_USDC , "psm", MCD_LITE_PSM_USDC_A);
 
         // ----- Phase 2 USDC Migration from PSM-USDC-A to LITE-PSM-USDC-A -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839

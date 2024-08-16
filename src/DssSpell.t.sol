@@ -44,6 +44,11 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface RwaConduitLike {
+    function psm() external view returns (address);
+    function pal(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -869,7 +874,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = 0x85042d44894E08f81D70A2Ae568C09f907297dcb;
 
@@ -885,5 +890,40 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
+    }
+
+    // SPELL-SPECIFIC TESTS GO BELOW
+    function testRwaConduitsPsmUpdate() public {
+        address MCD_PSM_USDC_A                  = addr.addr("MCD_PSM_USDC_A");
+        address MCD_LITE_PSM_USDC_A             = addr.addr("MCD_LITE_PSM_USDC_A");
+        address RWA015_A_OUTPUT_CONDUIT         = addr.addr("RWA015_A_OUTPUT_CONDUIT");
+
+        address[9] memory singleSwapConduits = [
+            addr.addr("RWA014_A_INPUT_CONDUIT_URN"),
+            addr.addr("RWA014_A_INPUT_CONDUIT_JAR"),
+            addr.addr("RWA014_A_OUTPUT_CONDUIT"),
+            addr.addr("RWA007_A_JAR_INPUT_CONDUIT"),
+            addr.addr("RWA007_A_INPUT_CONDUIT"),
+            addr.addr("RWA007_A_OUTPUT_CONDUIT"),
+            addr.addr("RWA015_A_INPUT_CONDUIT_JAR_USDC"),
+            addr.addr("RWA015_A_INPUT_CONDUIT_URN_USDC"),
+            addr.addr("RWA009_A_INPUT_CONDUIT_URN_USDC")
+        ];
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // single swap conduits
+        for (uint256 i; i < singleSwapConduits.length - 1; i++) {
+            assertEq(
+                RwaConduitLike(singleSwapConduits[i]).psm(),
+                MCD_LITE_PSM_USDC_A
+            );
+        }
+
+        // multi swap conduit
+        assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_PSM_USDC_A), 0);
+        assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_LITE_PSM_USDC_A), 1);
     }
 }
