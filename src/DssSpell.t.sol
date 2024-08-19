@@ -49,6 +49,21 @@ interface RwaConduitLike {
     function pal(address) external view returns (uint256);
 }
 
+interface CronSequencerLike {
+    function getMaster() external view returns (bytes32);
+    function hasJob(address) external view returns (bool);
+}
+
+interface LitePsmJobLike {
+    function cutThreshold() external view returns (uint256);
+    function gushThreshold() external view returns (uint256);
+    function litePsm() external view returns (address);
+    function rushThreshold() external view returns (uint256);
+    function sequencer() external view returns (address);
+    function work(bytes32, bytes calldata) external;
+    function workable(bytes32) external view returns (bool, bytes memory);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -899,7 +914,21 @@ contract DssSpellTest is DssSpellTestBase {
     LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
     address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
     GemAbstract       immutable gem           = GemAbstract(      addr.addr("USDC"));
+    CronSequencerLike immutable sequencer     = CronSequencerLike(addr.addr("CRON_SEQUENCER"));
+    LitePsmJobLike    immutable litePsmJob    = LitePsmJobLike(  0x0C86162ba3E507592fC8282b07cF18c7F902C401);
     uint256           constant  srcKeep       = 200_000_000 * WAD;
+    uint256           constant  srcTin        = 0.0001 ether;
+    uint256           constant  srcTout       = 0.0001 ether;
+    uint256           constant  srcMaxLine    = 2_500 * MILLION * RAD;
+    uint256           constant  srcGap        = 200 * MILLION * RAD;
+    uint256           constant  srcTtl        = 12 hours;
+    uint256           constant  dstBuf        = 200 * MILLION * WAD;
+    uint256           constant  dstMaxLine    = 7_500 * MILLION * RAD;
+    uint256           constant  dstGap        = 200 * MILLION * RAD;
+    uint256           constant  dstTtl        = 12 hours;
+    uint256           constant  rushThreshold = 20_000_000 * WAD;
+    uint256           constant  gushThreshold = 20_000_000 * WAD;
+    uint256           constant  cutThreshold  = 300_000 * WAD;
 
     function testRwaConduitsPsmUpdate() public {
         address MCD_PSM_USDC_A                  = addr.addr("MCD_PSM_USDC_A");
@@ -954,18 +983,18 @@ contract DssSpellTest is DssSpellTestBase {
         // ----- Post-spell state checks -----
 
         // Sanity checks
-        assertEq(srcPsm.tin(), 0.0001 ether, "after: invalid src tin");
-        assertEq(srcPsm.tout(), 0.0001 ether, "after: invalid src tout");
+        assertEq(srcPsm.tin(), srcTin, "after: invalid src tin");
+        assertEq(srcPsm.tout(), srcTout, "after: invalid src tout");
         assertEq(srcPsm.vow(), address(vow), "after: unexpected src vow update");
 
-        assertEq(dstPsm.buf(),  200 * MILLION * WAD, "after: invalid dst buf");
+        assertEq(dstPsm.buf(),  dstBuf, "after: invalid dst buf");
         assertEq(dstPsm.vow(), address(vow), "after: unexpected dst vow update");
 
         // Old PSM state is set correctly
         {
             (uint256 srcInk, uint256 srcArt) = vat.urns(SRC_ILK, address(srcPsm));
             assertEq(srcInk, psrcInk - expectedMoveWad, "after: src ink is not decreased by the moved amount");
-            assertEq(srcInk, 200 * MILLION * WAD, "after: src ink is different from src keep");
+            assertEq(srcInk, srcKeep, "after: src ink is different from src keep");
             assertEq(srcArt, psrcArt - expectedMoveWad, "after: src art is not decreased by the moved amount");
             assertEq(vat.gem(SRC_ILK, address(srcPsm)), psrcVatGem, "after: unexpected src vat gem change");
             assertEq(
@@ -978,9 +1007,9 @@ contract DssSpellTest is DssSpellTestBase {
         // Old PSM is properly configured on AutoLine
         {
             (uint256 maxLine, uint256 gap, uint48 ttl, uint256 last,) = autoLine.ilks(SRC_ILK);
-            assertEq(maxLine, 2_500 * MILLION * RAD, "after: AutoLine invalid maxLine");
-            assertEq(gap, 200 * MILLION * RAD, "after: AutoLine invalid gap");
-            assertEq(ttl, uint48(12 hours), "after: AutoLine invalid ttl");
+            assertEq(maxLine, srcMaxLine, "after: AutoLine invalid maxLine");
+            assertEq(gap, srcGap, "after: AutoLine invalid gap");
+            assertEq(ttl, srcTtl, "after: AutoLine invalid ttl");
             assertEq(last, block.number, "after: AutoLine invalid last");
         }
 
@@ -991,7 +1020,7 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(dstInk, pdstInk, "after: unexpected dst ink chagne");
             // There might be extra `art` because of the calls to `fill`.
             assertGe(dstArt, pdstArt + expectedMoveWad, "after: dst art is not increased at least by the moved amount");
-            assertEq(dai.balanceOf(address(dstPsm)), 200 * MILLION * WAD, "after: invalid dst psm dai balance");
+            assertEq(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
             assertEq(vat.gem(DST_ILK, address(dstPsm)), pdstVatGem, "after: unexpected dst vat gem change");
             assertEq(
                 _amtToWad(gem.balanceOf(address(pocket))),
@@ -1003,12 +1032,215 @@ contract DssSpellTest is DssSpellTestBase {
         // New PSM is properly configured on AutoLine
         {
             (uint256 maxLine, uint256 gap, uint48 ttl, uint256 last, uint256 lastInc) = autoLine.ilks(DST_ILK);
-            assertEq(maxLine, 7_500 * MILLION * RAD, "after: AutoLine invalid maxLine");
-            assertEq(gap, 200 * MILLION * RAD, "after: AutoLine invalid gap");
-            assertEq(ttl, uint48(12 hours), "after: AutoLine invalid ttl");
+            assertEq(maxLine, dstMaxLine, "after: AutoLine invalid maxLine");
+            assertEq(gap, dstGap, "after: AutoLine invalid gap");
+            assertEq(ttl, uint48(dstTtl), "after: AutoLine invalid ttl");
             assertEq(last, block.number, "after: AutoLine invalid last");
             assertEq(lastInc, block.timestamp, "after: AutoLine invalid lastInc");
         }
+    }
+
+    function test_CRON_LITE_PSM_JOB() public {
+        // ----- Pre-spell sanity checks -----
+
+        // Sequencer matches
+        assertEq(litePsmJob.sequencer(),     address(sequencer), "invalid sequencer");
+        // LitePsm matches
+        assertEq(litePsmJob.litePsm(),       address(dstPsm),    "invalid litePsm");
+        // fill: Set threshold at 15M DAI
+        assertEq(litePsmJob.rushThreshold(), rushThreshold,      "invalid rush threshold");
+        // trim: Set threshold at 30M DAI
+        assertEq(litePsmJob.gushThreshold(), gushThreshold,      "invalid rush threshold");
+        // chug: Set threshold at 300k DAI
+        assertEq(litePsmJob.cutThreshold(),  cutThreshold,       "invalid rush threshold");
+
+        // // ----- Execute spell -----
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // // ----- Post-spell sanity checks -----
+
+        assertTrue(sequencer.hasJob(address(litePsmJob)));
+
+        // // ----- E2E tests -----
+
+        bytes32 master = sequencer.getMaster();
+
+        // Base state
+        {
+            (bool ok, ) = litePsmJob.workable(master);
+            assertFalse(ok, "invalid workable ok - no changes");
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.fill.selector));
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.trim.selector));
+
+            vm.expectRevert();
+            litePsmJob.work(master, abi.encodeWithSelector(dstPsm.chug.selector));
+        }
+
+        // Modify local `line` so it is not a limiting factor
+        GodMode.setWard(address(vat), address(this), 1);
+        vat.file(DST_ILK, "line", type(uint256).max);
+
+        // Allow the test contract to swap with no fees
+        GodMode.setWard(address(dstPsm), address(this), 1);
+        dstPsm.kiss(address(this));
+
+        // Approvals
+        gem.approve(address(dstPsm), type(uint256).max);
+        dai.approve(address(dstPsm), type(uint256).max);
+
+        uint256 snapshot = vm.snapshot();
+
+        // --- rushThreshold is breached ---
+        {
+            uint256 wadOut = rushThreshold; // Must be >= rushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            assertGe(dstPsm.rush(), rushThreshold, "fill: invalid rush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "fill: invalid workable ok");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.fill.selector, "fill: invalid data - expected fill.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- rushThreshold is not breached ---
+        {
+            uint256 wadOut = rushThreshold / 2; // Must be < rushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            assertGt(dstPsm.rush(), 0, "no fill: invalid rush");
+            assertLt(dstPsm.rush(), rushThreshold, "no fill: invalid rush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no fill: invalid workable ok");
+            assertEq(args, bytes("No work to do"), "no fill: invalid data");
+
+            vm.expectRevert();
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- gushThreshold is breached ---
+        {
+            // Before buying gems, we need to sell more gems into it to ensure the threshold will be met
+            uint256 wadOut = gushThreshold; // Must be >= gushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            // Selling gem is limited by `buf`, so we might need to split it into several parts
+            uint256 wadAcc = 0;
+            do {
+                if (dstPsm.rush() > 0) dstPsm.fill();
+                uint256 wadDelta = _min(dai.balanceOf(address(dstPsm)), wadOut - wadAcc);
+                dstPsm.sellGemNoFee(address(this), _wadToAmt(wadDelta));
+                wadAcc += wadDelta;
+            } while (wadAcc < wadOut);
+
+            // Buy the max amount of gems
+            uint256 wadIn = _amtToWad(gem.balanceOf(pocket));
+            _giveTokens(address(dai), wadIn);
+            uint256 amtOut = _wadToAmt(wadIn);
+            dstPsm.buyGemNoFee(address(this), amtOut);
+
+            assertGe(dstPsm.gush(), gushThreshold, "trim: nvalid gush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "trim: invalid workable ok");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.trim.selector, "trim: invalid data - expected trim.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- gushThreshold is not breached ---
+        {
+            // Before buying gems, we need to sell more gems into it
+            uint256 wadOut = _min(dai.balanceOf(address(dstPsm)), gushThreshold / 10); // Must be < gushThreshold
+            uint256 amtIn = _wadToAmt(wadOut);
+            _giveTokens(address(gem), amtIn);
+            dstPsm.sellGemNoFee(address(this), amtIn);
+
+            // Buy the max amount of gems within threshold
+            uint256 wadIn = gushThreshold;
+            _giveTokens(address(dai), wadIn);
+            uint256 amtOut = _wadToAmt(wadIn);
+            dstPsm.buyGemNoFee(address(this), amtOut);
+
+            assertGt(dstPsm.gush(), 0, "no trim: invalid gush");
+            assertLt(dstPsm.gush(), gushThreshold, "no trim: invalid gush");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no trim: invalid workable ok - expected false");
+            assertEq(args, bytes("No work to do"), "no trim: invalid data");
+
+            vm.expectRevert();
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- chugThreshold is breached ---
+        {
+            // Donating Dai has the same effect as accumulating swap fees
+            uint256 wadDonation = cutThreshold; // Must be >= cutThreshold
+            _giveTokens(address(dai), wadDonation);
+            dai.transfer(address(dstPsm), wadDonation);
+
+            assertGe(dstPsm.cut(), cutThreshold, "chug: invalid cut");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertTrue(ok, "chug: invalid workable ok");
+            (bytes4 fn) = abi.decode(args, (bytes4));
+            assertEq(fn, dstPsm.chug.selector, "chug: invalid data - expected chug.selector");
+
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+
+        // --- chugThreshold is not breached ---
+        {
+            uint256 wadDonation = cutThreshold / 5; // Must be < cutThreshold
+            _giveTokens(address(dai), wadDonation);
+            dai.transfer(address(dstPsm), wadDonation);
+
+            assertGt(dstPsm.cut(), 0, "no chug: invalid cut");
+            assertLt(dstPsm.cut(), cutThreshold, "no chug: invalid cut");
+
+            (bool ok, bytes memory args) = litePsmJob.workable(master);
+            assertFalse(ok, "no chug: invalid workable ok");
+            assertEq(args, bytes("No work to do"), "no chug: invalid data");
+
+            vm.expectRevert();
+            litePsmJob.work(master, args);
+
+            vm.revertTo(snapshot);
+        }
+    }
+
+    function _amtToWad(uint256 amt) internal view returns (uint256) {
+        return amt * dstPsm.to18ConversionFactor();
+    }
+
+    function _wadToAmt(uint256 wad) internal view returns (uint256) {
+        return wad / dstPsm.to18ConversionFactor();
     }
 
     function _min(uint256 x, uint256 y) internal pure returns (uint256 z) {
@@ -1017,9 +1249,5 @@ contract DssSpellTest is DssSpellTestBase {
 
     function _subcap(uint256 x, uint256 y) internal pure returns (uint256 z) {
         z = x < y ? 0 : x - y;
-    }
-
-    function _amtToWad(uint256 amt) internal view returns (uint256) {
-        return amt * dstPsm.to18ConversionFactor();
     }
 }

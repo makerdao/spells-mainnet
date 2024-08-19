@@ -30,6 +30,11 @@ interface PauseLike {
     function setDelay(uint256 delay_) external;
 }
 
+interface DssCronSequencerLike {
+    function addJob(address job) external;
+    function removeJob(address job) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -73,6 +78,12 @@ contract DssSpellAction is DssAction {
     address internal immutable RWA015_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA015_A_INPUT_CONDUIT_URN_USDC");
     address internal immutable RWA015_A_OUTPUT_CONDUIT         = DssExecLib.getChangelogAddress("RWA015_A_OUTPUT_CONDUIT");
     address internal immutable RWA009_A_INPUT_CONDUIT_URN_USDC = DssExecLib.getChangelogAddress("RWA009_A_INPUT_CONDUIT_URN_USDC");
+
+    // ---------- Add LitePSM keeper network job ----------
+    address internal immutable CRON_SEQUENCER                  = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
+    address internal constant  CRON_LITE_PSM_JOB               = 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be;
+    address internal constant  CRON_LITE_PSM_JOB_NEW           = 0x0C86162ba3E507592fC8282b07cF18c7F902C401;
+
 
     function actions() public override {
 
@@ -180,10 +191,10 @@ contract DssSpellAction is DssAction {
             srcPsmKey:  "MCD_PSM_USDC_A",
 
             // Note: PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
-            srcTin:     0.0001 ether, // note: ether is a keyword helper, no transfers are made here
+            srcTin:     0.0001 ether, // Note: ether is a keyword helper, no transfers are made here
 
             // Note: PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
-            srcTout:    0.0001 ether, // note: ether is a keyword helper, no transfers are made here
+            srcTout:    0.0001 ether, // Note: ether is a keyword helper, no transfers are made here
 
             // Note: PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
             srcMaxLine: 2_500 * MILLION * RAD,
@@ -214,14 +225,19 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
         // Remove the old LitePSMJob (0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be) from the CronSequencer
+        DssCronSequencerLike(CRON_SEQUENCER).removeJob(CRON_LITE_PSM_JOB);
 
         // Add the new LitePSMJob (0x0c86162ba3e507592fc8282b07cf18c7f902c401) to the Cron Sequencer
+        DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_LITE_PSM_JOB_NEW);
 
         // fill: Set the rushThreshold to 20 million DAI
+        // Note: Value already set at target contract, cannot be changed
 
         // trim: Set the gushThreshold to 20 million DAI
+        // Note: Value already set at target contract, cannot be changed
 
         // chug: Set the cutThreshold to 300,000 DAI (Unchanged)
+        // Note: Value already set at target contract, cannot be changed
 
         // Update CRON_LITE_PSM_JOB to 0x0c86162ba3e507592fc8282b07cf18c7f902c401 in the Chainlog
     }
