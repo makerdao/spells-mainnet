@@ -38,9 +38,9 @@ interface DssCronSequencerLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/8d95eaf1c9eb6722008172504df88bc27f91ed3c/governance/votes/Executive%20vote%20-%20August%2022%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-08-12 MakerDAO Executive Spell | Hash: TODO";
+        "2024-08-12 MakerDAO Executive Spell | Hash: 0xe3794c8152d2a1de72080b1fc7d8429a979015b3f41cbe2c26f755724c70951d";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -83,7 +83,6 @@ contract DssSpellAction is DssAction {
     address internal immutable CRON_SEQUENCER                  = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
     address internal immutable CRON_LITE_PSM_JOB               = DssExecLib.getChangelogAddress("CRON_LITE_PSM_JOB");
     address internal constant  CRON_LITE_PSM_JOB_NEW           = 0x0C86162ba3E507592fC8282b07cF18c7F902C401;
-
 
     function actions() public override {
 
