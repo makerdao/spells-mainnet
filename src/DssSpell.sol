@@ -26,6 +26,10 @@ interface RwaMultiSwapOutputConduitLike {
     function slap(address) external;
 }
 
+interface PauseLike {
+    function setDelay(uint256 delay_) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -56,6 +60,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- LITE-PSM-USDC-A Phase 1 ----------
+    address internal immutable MCD_PAUSE                       = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable MCD_PSM_USDC_A                  = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
     address internal immutable MCD_LITE_PSM_USDC_A             = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
     address internal immutable RWA014_A_INPUT_CONDUIT_URN      = DssExecLib.getChangelogAddress("RWA014_A_INPUT_CONDUIT_URN");
@@ -202,6 +207,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
         // Increase the GSM Pause Delay by 14h, from 16h to 30h
+        PauseLike(MCD_PAUSE).setDelay(30 hours);
 
         // ----- Update LitePSM Keeper Network Job -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
