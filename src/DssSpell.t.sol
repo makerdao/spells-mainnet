@@ -947,21 +947,35 @@ contract DssSpellTest is DssSpellTestBase {
             addr.addr("RWA009_A_INPUT_CONDUIT_URN_USDC")
         ];
 
+        // ----- Pre-spell sanity checks -----
+        // single swap conduits
+        _testSingleSwapRwaConduits(singleSwapConduits, MCD_PSM_USDC_A);
+
+        // multi swap conduit
+        assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_PSM_USDC_A), 1);
+        assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_LITE_PSM_USDC_A), 0);
+
+        // ----- Execute spell -----
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
+        // ----- Post-spell state checks -----
         // single swap conduits
-        for (uint256 i; i < singleSwapConduits.length - 1; i++) {
-            assertEq(
-                RwaConduitLike(singleSwapConduits[i]).psm(),
-                MCD_LITE_PSM_USDC_A
-            );
-        }
+        _testSingleSwapRwaConduits(singleSwapConduits, MCD_LITE_PSM_USDC_A);
 
         // multi swap conduit
         assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_PSM_USDC_A), 0);
         assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_LITE_PSM_USDC_A), 1);
+    }
+
+    function _testSingleSwapRwaConduits(address[9] memory conduits, address psm) internal {
+        for (uint256 i; i < conduits.length - 1; i++) {
+            assertEq(
+                RwaConduitLike(conduits[i]).psm(),
+                psm
+            );
+        }
     }
 
     function test_LITE_PSM_USDC_A_MigrationPhase2() public {
@@ -974,8 +988,16 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 expectedMoveWad = _min(psrcInk, _subcap(psrcInk, srcKeep));
 
-        // ----- Execute spell -----
+        // ----- Pre-spell sanity checks -----
+        {
+            (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
+            assertGt(psrcIlkArt, 0, "before: src ilk Art is zero");
+            assertGt(psrcLine,   0, "before: src line is zero");
+            assertGt(psrcArt,    0, "before: src art is zero");
+            assertGt(psrcInk,    0, "before: src ink is zero");
+        }
 
+        // ----- Execute spell -----
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
