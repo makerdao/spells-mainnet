@@ -1054,17 +1054,17 @@ contract DssSpellTest is DssSpellTestBase {
         // chug: Set threshold at 300k DAI
         assertEq(litePsmJob.cutThreshold(),  cutThreshold,       "invalid rush threshold");
 
-        // // ----- Execute spell -----
+        // ----- Execute spell -----
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // // ----- Post-spell sanity checks -----
+        // ----- Post-spell sanity checks -----
 
         assertTrue(sequencer.hasJob(address(litePsmJob)));
 
-        // // ----- E2E tests -----
+        // ----- E2E tests -----
 
         bytes32 master = sequencer.getMaster();
 
