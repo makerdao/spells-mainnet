@@ -211,13 +211,13 @@ contract DssSpellAction is DssAction {
         DssCronSequencerLike(CRON_SEQUENCER).addJob(CRON_LITE_PSM_JOB_NEW);
 
         // fill: Set the rushThreshold to 20 million DAI
-        // Note: Value already set at target contract, cannot be changed
+        // Note: The value is already set in CRON_LITE_PSM_JOB_NEW
 
         // trim: Set the gushThreshold to 20 million DAI
-        // Note: Value already set at target contract, cannot be changed
+        // Note: The value is already set in CRON_LITE_PSM_JOB_NEW
 
         // chug: Set the cutThreshold to 300,000 DAI (Unchanged)
-        // Note: Value already set at target contract, cannot be changed
+        // Note: The value is already set in CRON_LITE_PSM_JOB_NEW
 
         // Update CRON_LITE_PSM_JOB to 0x0c86162ba3e507592fc8282b07cf18c7f902c401 in the Chainlog
         DssExecLib.setChangelogAddress("CRON_LITE_PSM_JOB", CRON_LITE_PSM_JOB_NEW);
