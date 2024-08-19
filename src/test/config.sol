@@ -759,8 +759,8 @@ contract Config {
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * BILLION,
-            aL_gap:       380 * MILLION,
+            aL_line:      2_500 * MILLION,
+            aL_gap:       200 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         0,
@@ -784,8 +784,8 @@ contract Config {
         });
         afterSpell.collaterals["LITE-PSM-USDC-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      50 * MILLION,
-            aL_gap:       20 * MILLION,
+            aL_line:      7_500 * MILLION,
+            aL_gap:       200 * MILLION,
             aL_ttl:       12 hours,
             line:         0,
             dust:         0,

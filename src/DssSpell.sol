@@ -18,6 +18,8 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import { MCD, DssInstance } from "dss-test/MCD.sol";
+import { DssLitePsmMigrationPhase2, DssLitePsmMigrationConfigPhase2 } from "./dependencies/dss-lite-psm/phase-2/DssLitePsmMigrationPhase2.sol";
 
 interface RwaMultiSwapOutputConduitLike {
     function clap(address) external;
@@ -47,6 +49,11 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+
+    // --- Math ---
+    uint256 internal constant MILLION  = 10 ** 6;
+    uint256 internal constant WAD      = 10 ** 18;
+    uint256 internal constant RAD      = 10 ** 45;
 
     // ---------- LITE-PSM-USDC-A Phase 1 ----------
     address internal immutable MCD_PSM_USDC_A                  = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
@@ -143,6 +150,52 @@ contract DssSpellAction is DssAction {
         // LITE-PSM-USDC-A DC-IAM gap: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
 
         // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
+
+        // Note: load the MCD contracts depencencies
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
+        // Note: specify the init and migration config
+        DssLitePsmMigrationConfigPhase2 memory cfg = DssLitePsmMigrationConfigPhase2({
+            // Note: chainlog key of new psm lite
+            dstPsmKey:  "MCD_LITE_PSM_USDC_A",
+
+            // Note: MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
+            dstBuf:     200 * MILLION * WAD,
+
+            // Note: Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
+            dstMaxLine: 7_500 * MILLION * RAD,
+
+            // Note: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
+            dstGap:     200 * MILLION * RAD,
+
+            // Note: LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
+            dstTtl:     12 hours,
+
+            // Note: chainlog key of old psm
+            srcPsmKey:  "MCD_PSM_USDC_A",
+
+            // Note: PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
+            srcTin:     0.0001 ether, // note: ether is a keyword helper, no transfers are made here
+
+            // Note: PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
+            srcTout:    0.0001 ether, // note: ether is a keyword helper, no transfers are made here
+
+            // Note: PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
+            srcMaxLine: 2_500 * MILLION * RAD,
+
+            // Note: PSM-USDC-A DC-IAM DC-IAM gap: Decrease by 180 million DAI, from 380 million DAI to 200 million DAI.
+            srcGap:     200 * MILLION * RAD,
+
+            // Note: PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
+            srcTtl:     12 hours,
+
+            // Note: Migrate all but 200 million USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A
+            srcKeep:    200 * MILLION * WAD
+        });
+
+        // Note: LitePSM migration was extracted into a library,
+        //       and implemented as part of the LitePSM module.
+        DssLitePsmMigrationPhase2.migrate(dss, cfg);
 
         // ----- GSM Delay Update -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
