@@ -64,7 +64,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD      = 10 ** 18;
     uint256 internal constant RAD      = 10 ** 45;
 
-    // ---------- LITE-PSM-USDC-A Phase 1 ----------
+    // ---------- LITE-PSM-USDC-A Phase 2 ----------
     address internal immutable MCD_PAUSE                       = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable MCD_PSM_USDC_A                  = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
     address internal immutable MCD_LITE_PSM_USDC_A             = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
