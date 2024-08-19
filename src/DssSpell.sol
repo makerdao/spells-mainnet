@@ -131,41 +131,21 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
-        // Migrate all but 200 million USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A
-
         // ----- Update PSM-USDC-A Fees -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
-
-        // PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
-
-        // PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
 
         // ----- Update PSM-USDC-A DC-IAM -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
-        // PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
-
-        // PSM-USDC-A DC-IAM DC-IAM gap: Decrease by 180 million DAI, from 380 million DAI to 200 million DAI.
-
-        // PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
-
         // ----- Update MCD_LITE_PSM_USDC_A Buf -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
 
-        // MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
-
         // ----- Update LITE-PSM-USDC-A DC-IAM -----
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-2-major-migration-proposed-parameters/24839
         // Poll: https://vote.makerdao.com/polling/QmU7XJ6X
-
-        // LITE-PSM-USDC-A DC-IAM line: Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
-
-        // LITE-PSM-USDC-A DC-IAM gap: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
-
-        // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
 
         // Note: load the MCD contracts depencencies
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
@@ -175,37 +155,37 @@ contract DssSpellAction is DssAction {
             // Note: chainlog key of new psm lite
             dstPsmKey:  "MCD_LITE_PSM_USDC_A",
 
-            // Note: MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
+            // MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
             dstBuf:     200 * MILLION * WAD,
 
-            // Note: Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
+            // Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
             dstMaxLine: 7_500 * MILLION * RAD,
 
-            // Note: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
+            // Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
             dstGap:     200 * MILLION * RAD,
 
-            // Note: LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
+            // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
             dstTtl:     12 hours,
 
             // Note: chainlog key of old psm
             srcPsmKey:  "MCD_PSM_USDC_A",
 
-            // Note: PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
+            // PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
             srcTin:     0.0001 ether, // Note: ether is a keyword helper, no transfers are made here
 
-            // Note: PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
+            // PSM-USDC-A tout: Increase by 0.01 percentage points, from 0% to 0.01%
             srcTout:    0.0001 ether, // Note: ether is a keyword helper, no transfers are made here
 
-            // Note: PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
+            // PSM-USDC-A DC-IAM DC-IAM line: Decrease by 7,500 million DAI, from 10,000 million DAI to 2,500 million DAI.
             srcMaxLine: 2_500 * MILLION * RAD,
 
-            // Note: PSM-USDC-A DC-IAM DC-IAM gap: Decrease by 180 million DAI, from 380 million DAI to 200 million DAI.
+            // PSM-USDC-A DC-IAM DC-IAM gap: Decrease by 180 million DAI, from 380 million DAI to 200 million DAI.
             srcGap:     200 * MILLION * RAD,
 
-            // Note: PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
+            // PSM-USDC-A DC-IAM DC-IAM ttl: 12h (Unchanged)
             srcTtl:     12 hours,
 
-            // Note: Migrate all but 200 million USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A
+            // Migrate all but 200 million USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A
             srcKeep:    200 * MILLION * WAD
         });
 
