@@ -81,7 +81,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Add LitePSM keeper network job ----------
     address internal immutable CRON_SEQUENCER                  = DssExecLib.getChangelogAddress("CRON_SEQUENCER");
-    address internal constant  CRON_LITE_PSM_JOB               = 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be;
+    address internal immutable CRON_LITE_PSM_JOB               = DssExecLib.getChangelogAddress("CRON_LITE_PSM_JOB");
     address internal constant  CRON_LITE_PSM_JOB_NEW           = 0x0C86162ba3E507592fC8282b07cF18c7F902C401;
 
 
@@ -170,7 +170,7 @@ contract DssSpellAction is DssAction {
         // Note: load the MCD contracts depencencies
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
-        // Note: specify the init and migration config
+        // Note: specify the migration config
         DssLitePsmMigrationConfigPhase2 memory cfg = DssLitePsmMigrationConfigPhase2({
             // Note: chainlog key of new psm lite
             dstPsmKey:  "MCD_LITE_PSM_USDC_A",
@@ -240,6 +240,10 @@ contract DssSpellAction is DssAction {
         // Note: Value already set at target contract, cannot be changed
 
         // Update CRON_LITE_PSM_JOB to 0x0c86162ba3e507592fc8282b07cf18c7f902c401 in the Chainlog
+        DssExecLib.setChangelogAddress("CRON_LITE_PSM_JOB", CRON_LITE_PSM_JOB_NEW);
+
+        // Note: bump chainlog version due to the updated CRON_LITE_PSM_JOB address
+        DssExecLib.setChangelogVersion("1.17.7");
     }
 }
 

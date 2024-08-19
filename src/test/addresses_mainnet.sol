@@ -490,6 +490,6 @@ contract Addresses {
         addr["CRON_CLIPPER_MOM_JOB"]             = 0x7E93C4f61C8E8874e7366cDbfeFF934Ed089f9fF;
         addr["CRON_ORACLE_JOB"]                  = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
         addr["CRON_FLAP_JOB"]                    = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
-        addr["CRON_LITE_PSM_JOB"]                = 0x689cE517a4DfCf0C5eC466F2757D324fc292C8Be;
+        addr["CRON_LITE_PSM_JOB"]                = 0x0C86162ba3E507592fC8282b07cF18c7F902C401;
     }
 }

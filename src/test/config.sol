@@ -126,7 +126,7 @@ contract Config {
         afterSpell.line_mom_authority     = chief;          // LineMom authority
         afterSpell.lite_psm_mom_authority = chief;          // LitePsmMom authority
         afterSpell.ilk_count              = 66;             // Num expected in system
-        afterSpell.chainlog_version       = "1.17.6";       // String expected in system
+        afterSpell.chainlog_version       = "1.17.7";       // String expected in system
 
         //
         // Values for all collateral
