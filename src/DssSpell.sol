@@ -60,9 +60,9 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // --- Math ---
-    uint256 internal constant MILLION  = 10 ** 6;
-    uint256 internal constant WAD      = 10 ** 18;
-    uint256 internal constant RAD      = 10 ** 45;
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant RAD     = 10 ** 45;
 
     // ---------- LITE-PSM-USDC-A Phase 2 ----------
     address internal immutable MCD_PAUSE                       = DssExecLib.getChangelogAddress("MCD_PAUSE");
