@@ -949,7 +949,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // ----- Pre-spell sanity checks -----
         // single swap conduits
-        _testSingleSwapRwaConduits(singleSwapConduits, MCD_PSM_USDC_A);
+        _checkSingleSwapRwaConduits(singleSwapConduits, MCD_PSM_USDC_A);
 
         // multi swap conduit
         assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_PSM_USDC_A), 1);
@@ -962,14 +962,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         // ----- Post-spell state checks -----
         // single swap conduits
-        _testSingleSwapRwaConduits(singleSwapConduits, MCD_LITE_PSM_USDC_A);
+        _checkSingleSwapRwaConduits(singleSwapConduits, MCD_LITE_PSM_USDC_A);
 
         // multi swap conduit
         assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_PSM_USDC_A), 0);
         assertEq (RwaConduitLike(RWA015_A_OUTPUT_CONDUIT).pal(MCD_LITE_PSM_USDC_A), 1);
     }
 
-    function _testSingleSwapRwaConduits(address[9] memory conduits, address psm) internal {
+    function _checkSingleSwapRwaConduits(address[9] memory conduits, address psm) internal {
         for (uint256 i; i < conduits.length - 1; i++) {
             assertEq(
                 RwaConduitLike(conduits[i]).psm(),
