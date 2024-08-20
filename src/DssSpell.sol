@@ -166,7 +166,7 @@ contract DssSpellAction is DssAction {
             // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
             dstTtl:     12 hours,
 
-            // Note: chainlog key of old psm
+            // Note: chainlog key of PSM-USDC-A
             srcPsmKey:  "MCD_PSM_USDC_A",
 
             // PSM-USDC-A tin: Increase by 0.01 percentage points, from 0% to 0.01%
