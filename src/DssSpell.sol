@@ -157,10 +157,10 @@ contract DssSpellAction is DssAction {
             // MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
             dstBuf:     200 * MILLION * WAD,
 
-            // Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
+            // LITE-PSM-USDC-A DC-IAM line: Increase by 7,450 million DAI, from 50 million DAI to 7,500 million DAI.
             dstMaxLine: 7_500 * MILLION * RAD,
 
-            // Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
+            // LITE-PSM-USDC-A DC-IAM gap: Increase by 180 million DAI, from 20 million DAI to 200 million DAI.
             dstGap:     200 * MILLION * RAD,
 
             // LITE-PSM-USDC-A DC-IAM ttl: 12h (Unchanged)
