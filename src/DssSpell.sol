@@ -151,7 +151,7 @@ contract DssSpellAction is DssAction {
 
         // Note: specify the migration config
         DssLitePsmMigrationConfigPhase2 memory cfg = DssLitePsmMigrationConfigPhase2({
-            // Note: chainlog key of new psm lite
+            // Note: chainlog key of LITE-PSM-USDC-A
             dstPsmKey:  "MCD_LITE_PSM_USDC_A",
 
             // MCD_LITE_PSM_USDC_A buf: Increase by 180 million DAI, from 20 million DAI to 200 million DAI
