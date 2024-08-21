@@ -1066,6 +1066,8 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function test_CRON_LITE_PSM_JOB() public {
+        address CRON_LITE_PSM_JOB_OLD = chainLog.getAddress("CRON_LITE_PSM_JOB");
+
         // ----- Pre-spell sanity checks -----
 
         // Sequencer matches
@@ -1078,6 +1080,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(litePsmJob.gushThreshold(), gushThreshold,      "invalid rush threshold");
         // chug: Set threshold at 300k DAI
         assertEq(litePsmJob.cutThreshold(),  cutThreshold,       "invalid rush threshold");
+        // old litePsmJob is active on sequencer
+        assertTrue(sequencer.hasJob(CRON_LITE_PSM_JOB_OLD));
+        // new litePsmJob is inactive on the sequencer
+        assertFalse(sequencer.hasJob(address(litePsmJob)));
 
         // ----- Execute spell -----
 
@@ -1088,6 +1094,7 @@ contract DssSpellTest is DssSpellTestBase {
         // ----- Post-spell sanity checks -----
 
         assertTrue(sequencer.hasJob(address(litePsmJob)));
+        assertFalse(sequencer.hasJob(CRON_LITE_PSM_JOB_OLD));
 
         // ----- E2E tests -----
 
