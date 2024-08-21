@@ -1022,7 +1022,7 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(
                 _amtToWad(gem.balanceOf(address(srcPsm.gemJoin()))),
                 _amtToWad(psrcGemBalance) - expectedMoveWad,
-                "after: invalid gem balance for src pocket"
+                "after: invalid gem balance for src gemJoin"
             );
         }
 
