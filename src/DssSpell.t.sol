@@ -991,10 +991,13 @@ contract DssSpellTest is DssSpellTestBase {
         // ----- Pre-spell sanity checks -----
         {
             (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
-            assertGt(psrcIlkArt, 0, "before: src ilk Art is zero");
-            assertGt(psrcLine,   0, "before: src line is zero");
-            assertGt(psrcArt,    0, "before: src art is zero");
-            assertGt(psrcInk,    0, "before: src ink is zero");
+            assertGt(psrcIlkArt,    0,                  "before: src ilk Art is zero");
+            assertGt(psrcLine,      0,                  "before: src line is zero");
+            assertGt(psrcArt,       0,                  "before: src art is zero");
+            assertGt(psrcInk,       0,                  "before: src ink is zero");
+            assertEq(srcPsm.tin(),  0,                  "before: src tin is not zero");
+            assertEq(srcPsm.tout(), 0,                  "before: src tout is not zero");
+            assertEq(dstPsm.buf(),  20 * MILLION * WAD, "before: dst buf does not match");
         }
 
         // ----- Execute spell -----
