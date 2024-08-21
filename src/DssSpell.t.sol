@@ -985,6 +985,8 @@ contract DssSpellTest is DssSpellTestBase {
         (uint256 pdstInk, uint256 pdstArt) = vat.urns(DST_ILK, address(dstPsm));
         uint256 pdstVatGem = vat.gem(DST_ILK, address(dstPsm));
         uint256 pdstGemBalance = gem.balanceOf(address(pocket));
+        uint256 pvice = vat.vice();
+        uint256 ppauseSin = vat.sin(pauseProxy);
 
         uint256 expectedMoveWad = _min(psrcInk, _subcap(psrcInk, srcKeep));
 
@@ -1014,6 +1016,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(dstPsm.buf(),  dstBuf, "after: invalid dst buf");
         assertEq(dstPsm.vow(), address(vow), "after: unexpected dst vow update");
+
+        // No bad debt is left behind
+        assertEq(vat.vice(), pvice);
+        assertEq(vat.sin(pauseProxy), ppauseSin);
 
         // Old PSM state is set correctly
         {
