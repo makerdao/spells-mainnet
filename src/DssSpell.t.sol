@@ -428,25 +428,16 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+    function testDAIPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid in whole Dai units
         // Initialize the array with the number of payees
-        Payee[10] memory payees = [
-            Payee(wallets.addr("IMMUNEFI_USER_PAYOUT_2024_08_08"), 100_000),
-            Payee(wallets.addr("IMMUNEFI_COMISSION"), 10_000),
-            Payee(wallets.addr("BLUE"), 54_167),
-            Payee(wallets.addr("CLOAKY"), 20_417),
-            Payee(wallets.addr("CLOAKY_KOHLA_2"), 14_172),
-            Payee(wallets.addr("CLOAKY_ENNOIA"), 9_083),
-            Payee(wallets.addr("BYTERON"), 8_333),
-            Payee(wallets.addr("JULIACHANG"), 8_333),
-            Payee(wallets.addr("ROCKY"), 7_500),
-            Payee(wallets.addr("PBG"), 6_667)
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 9_535_993)
         ];
 
-        uint256 expectedSumPayments = 238_672; // Fill the number with the value from exec doc.
+        uint256 expectedSumPayments = 9_535_993; // Fill the number with the value from exec doc.
 
         uint256 prevBalance;
         uint256 totAmount;
@@ -621,21 +612,16 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMKRPayments() public skipped { // add the `skipped` modifier to skip
+    function testMKRPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with
         //    the Payee address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[6] memory payees = [
-            Payee(wallets.addr("BLUE"), 13.75 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("BYTERON"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("ROCKY"), 1.13 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(wallets.addr("PBG"), 1.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 2630.00 ether) // Note: ether is a keyword helper, only MKR is transferred here
         ];
         // Fill the value below with the value from exec doc
-        uint256 expectedSumPayments = 30.38 ether; // Note: ether is a keyword helper, only MKR is transferred here
+        uint256 expectedSumPayments = 2630.00 ether; // Note: ether is a keyword helper, only MKR is transferred here
 
         // Calculate and save previous balances
         uint256 totalAmountToTransfer = 0; // Increment in the loop below
@@ -869,9 +855,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0x85042d44894E08f81D70A2Ae568C09f907297dcb;
+        address SPARK_SPELL = 0x668C84584Ef8EeEd6BFb4FFB2a4Fa03231F8b241;
 
         vm.expectCall(
             SPARK_PROXY,
