@@ -44,7 +44,20 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     function actions() public override {
+        // ---------- Launch Project Funding ----------
+        // Forum: https://forum.makerdao.com/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/22
+        // MIP: https://mips.makerdao.com/mips/details/MIP108#9-1-launch-project-budget
 
+        // Launch Project - 9535993 DAI - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+
+        // Launch Project - 2630.00 MKR - 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.makerdao.com/t/aug-23-2024-proposal-changes-to-spark-for-upcoming-spell/24940
+        // Poll: https://vote.makerdao.com/polling/QmW55juU
+        // Poll: https://vote.makerdao.com/polling/QmQa73Cc
+
+        // Trigger Spark Proxy Spell at 0x668C84584Ef8EeEd6BFb4FFB2a4Fa03231F8b241
     }
 }
 
