@@ -4,9 +4,13 @@ import argparse
 from datetime import datetime
 import requests
 import subprocess
+import locale
 
 INPUT_DATE_FORMAT="%Y-%m-%d"
 REPO_URL = "/makerdao/community"
+
+# Set locale to en_US.UTF-8 to ensure consistent formatting
+locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 def get_executive_by_title (exec_title):
     base_git_api_url = f"https://api.github.com/repos{REPO_URL}/commits"
@@ -69,8 +73,9 @@ def main():
     POSSIBLE_EXEC_TITLES = [
         f"Executive%20vote%20-%20{date.strftime('%B %d, %Y')}.md",
         f"Executive%20Vote%20-%20{date.strftime('%B %d, %Y')}.md",
-        f"Executive%20vote%20-%20{date.strftime('%B %-d, %Y')}.md",
-        f"Executive%20Vote%20-%20{date.strftime('%B %-d, %Y')}.md"
+        # Remove leading 0 in day
+        f"Executive%20vote%20-%20{date.strftime('%B %d, %Y').replace(' 0', ' ')}.md",
+        f"Executive%20Vote%20-%20{date.strftime('%B %d, %Y').replace(' 0', ' ')}.md"
     ]
     executive_content, executive_url, commit_hash = None, None, None
     for exec_title in POSSIBLE_EXEC_TITLES:
