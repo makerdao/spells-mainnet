@@ -31,6 +31,17 @@ import { SkyInstance } from "./dependencies/03-sky/SkyInstance.sol";
 
 import { UniV2PoolMigratorInit } from "./dependencies/04-univ2-pool-migrator/UniV2PoolMigratorInit.sol";
 
+import { FlapperInit, SplitterConfig, FlapperUniV2Config } from "./dependencies/05-flapper/FlapperInit.sol";
+import { SplitterInstance } from "./dependencies/05-flapper/SplitterInstance.sol";
+
+import { UsdsSkyFarmingInit, UsdsSkyFarmingInitParams } from "./dependencies/06-farm/phase-1b/UsdsSkyFarmingInit.sol";
+
+import {
+    VestedRewardsDistributionJobInit,
+    VestedRewardsDistributionJobInitConfig,
+    VestedRewardsDistributionJobSetDistConfig
+} from "./dependencies/07-cron/VestedRewardsDistributionJobInit.sol";
+
 interface PauseLike {
     function delay() external view returns (uint256);
     function plot(address, bytes32, bytes calldata, uint256) external;
@@ -45,6 +56,10 @@ interface SpellActionLike {
     function officeHours() external view returns (bool);
     function description() external view returns (string memory);
     function nextCastTime(uint256) external view returns (uint256);
+}
+
+interface VestedRewardsDistributionLike {
+    function distribute() external;
 }
 
 contract DssExec {
@@ -92,7 +107,9 @@ contract DssExec {
     function schedule() public {
         require(block.timestamp <= expiration, "This contract has expired");
         require(eta == 0, "This spell has already been scheduled");
-        // Even if the spell gathers enough support too fast, we do not allow it to be executed before MIN_ETA.
+        // Set earliest execution date September 17, 12:00 UTC
+        // Note: In case the spell is scheduled later than planned, we have to switch back to the regular logic to
+        //       respect GSM delay enforced by MCD_PAUSE
         eta = _max(block.timestamp + PauseLike(pause).delay(), MIN_ETA);
         pause.plot(action, tag, sig, eta);
     }
@@ -113,7 +130,7 @@ contract DssSpellAction is DssAction {
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/3c1ea8b373f3fc30885619ddcc8ee7aa2be0030a/governance/votes/Executive%20vote%20-%20September%205%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-09-17 MakerDAO Executive Spell | Hash: TODO";
+        "2024-09-13 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -133,21 +150,41 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
     uint256 internal constant SIX_PT_TWO_FIVE_PCT_RATE = 1000000001922394148741344865;
 
+    // ---------- Math ----------
+    uint256 internal constant THOUSAND = 10**3;
+    uint256 internal constant MILLION  = 10**6;
+    uint256 internal constant BILLION  = 10**9;
+    uint256 internal constant WAD      = 10**18;
+    uint256 internal constant RAY      = 10**27;
+    uint256 internal constant RAD      = 10**45;
+
     // ---------- Phase 1b Addresses ----------
 
-    address internal constant USDS          = 0xdC035D45d973E3EC169d2276DDab16f1e407384F;
-    address internal constant USDS_IMP      = 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102;
-    address internal constant USDS_JOIN     = 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB;
-    address internal constant DAI_USDS      = 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A;
+    address internal constant USDS                  = 0xdC035D45d973E3EC169d2276DDab16f1e407384F;
+    address internal constant USDS_IMP              = 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102;
+    address internal constant USDS_JOIN             = 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB;
+    address internal constant DAI_USDS              = 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A;
 
-    address internal constant SUSDS         = 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
-    address internal constant SUSDS_IMP     = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
+    address internal constant SUSDS                 = 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
+    address internal constant SUSDS_IMP             = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
 
-    address internal constant SKY           = 0x56072C95FAA701256059aa122697B133aDEd9279;
-    address internal constant MKR_SKY       = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
+    address internal constant SKY                   = 0x56072C95FAA701256059aa122697B133aDEd9279;
+    address internal constant MKR_SKY               = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
 
-    address internal constant PAIR_DAI_MKR  = 0x517F9dD285e75b599234F7221227339478d0FcC8;
-    address internal constant PAIR_USDS_SKY = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+    address internal constant PAIR_DAI_MKR          = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+    address internal constant PAIR_USDS_SKY         = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+
+    address internal constant MCD_SPLIT             = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
+    address internal constant SPLITTER_MOM          = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
+    address internal constant MCD_FLAP              = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
+    address internal constant FLAP_SKY_ORACLE       = 0x38e8c1D443f546Dc014D7756ec63116161CB7B25;
+
+    address internal constant MCD_VEST_SKY          = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
+
+    address internal constant REWARDS_USDS_SKY      = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
+    address internal constant REWARDS_DIST_USDS_SKY = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
+
+    address internal constant CRON_REWARDS_DIST_JOB = 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5;
 
     function actions() public override {
 
@@ -216,6 +253,137 @@ contract DssSpellAction is DssAction {
             PAIR_DAI_MKR,
             PAIR_USDS_SKY
         );
+
+        // Init Splitter by calling FlapperInit.initSplitter with the following parameters:
+        // Init Splitter with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
+        // Init Splitter with mom parameter being 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e
+        // Init Splitter with hump parameter being 55M DAI/SKY
+        // Init Splitter with bump parameter being 65,000 DAI/SKY
+        // Init Splitter with hop parameter being 10,249 seconds
+        // Init Splitter with burn parameter being 100% (1 * WAD)
+        // Init Splitter with usdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
+        // Init Splitter with splitterChainlogKey parameter being MCD_SPLIT
+        // Init Splitter with prevMomChainlogKey parameter being FLAPPER_MOM
+        // Init Splitter with momChainlogKey parameter being SPLITTER_MOM
+        FlapperInit.initSplitter(
+            dss,
+            SplitterInstance({
+                splitter: MCD_SPLIT,
+                mom: SPLITTER_MOM
+            }),
+            SplitterConfig({
+                hump: 55 * MILLION * RAD,
+                bump: 65 * THOUSAND * RAD,
+                hop: 10_249,
+                burn: 1 * WAD,
+                usdsJoin: USDS_JOIN,
+                splitterChainlogKey: "MCD_SPLIT",
+                prevMomChainlogKey: "FLAPPER_MOM",
+                momChainlogKey: "SPLITTER_MOM"
+            })
+        );
+
+        // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
+        // Init new Flapper with flapper_ parameter being 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355
+        // Init new Flapper with want parameter being 98% (98 * WAD / 100)
+        // Init new Flapper with pip parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
+        // Init new Flapper with pair parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
+        // Init new Flapper with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
+        // Init new Flapper with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
+        // Init new Flapper with prevChainlogKey parameter being MCD_FLAP
+        // Init new Flapper with chainlogKey parameter being MCD_FLAP
+        FlapperInit.initFlapperUniV2(
+            dss,
+            MCD_FLAP,
+            FlapperUniV2Config({
+                want: 98 * WAD / 100,
+                pip: FLAP_SKY_ORACLE,
+                pair: PAIR_USDS_SKY,
+                usds: USDS,
+                splitter: MCD_SPLIT,
+                prevChainlogKey: "MCD_FLAP",
+                chainlogKey: "MCD_FLAP"
+            })
+        );
+
+        // Init new Oracle by calling FlapperInit.initOracleWrapper with the following parameters:
+        // Init new Oracle with wrapper_ parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
+        // Init new Oracle with divisor parameter being 24,000
+        // Init new Oracle with clKey parameter being FLAP_SKY_ORACLE
+        FlapperInit.initOracleWrapper(
+            dss,
+            FLAP_SKY_ORACLE,
+            24_000,
+            "FLAP_SKY_ORACLE"
+        );
+
+
+        // ---------- Setup DssVestMintable for SKY ----------
+
+        // Authorize DssVestMintable on SKY by calling DssExecLib.authorize with the following parameters:
+        // Authorize DssVestMintable on SKY with _base parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
+        // Authorize DssVestMintable on SKY with _ward parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
+        DssExecLib.authorize(SKY, MCD_VEST_SKY);
+
+        // Set DssVestMintable max rate (cap) by calling DssExecLib.setValue with the following parameters:
+        // Set DssVestMintable max rate (cap) with _base parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
+        // Set DssVestMintable max rate (cap) with _what parameter being "cap"
+        // Set DssVestMintable max rate (cap) with _amt parameter being 799,999,999.999999999985808000 Sky per year (800M * WAD / 365 days )
+        DssExecLib.setValue(MCD_VEST_SKY, "cap", 800 * MILLION * WAD / 365 days);
+
+        // Add DssVestMintable to Chainlog by calling DssExecLib.setChangelogAddress with the following parameters:
+        // Add DssVestMintable to Chainlog with _key parameter being MCD_VEST_SKY
+        // Add DssVestMintable to Chainlog with _val parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
+        DssExecLib.setChangelogAddress("MCD_VEST_SKY", MCD_VEST_SKY);
+
+        // ---------- USDS => SKY Farm Setup ----------
+
+        // Init USDS -> SKY rewards by calling UsdsSkyFarmingInit.init with the following parameters:
+        // Init USDS -> SKY rewards with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
+        // Init USDS -> SKY rewards with sky parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
+        // Init USDS -> SKY rewards with rewards parameter being 0x0650CAF159C5A49f711e8169D4336ECB9b950275
+        // Init USDS -> SKY rewards with rewardsKey parameter being REWARDS_USDS_SKY
+        // Init USDS -> SKY rewards with dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
+        // Init USDS -> SKY rewards with distKey parameter being REWARDS_DIST_USDS_SKY
+        // Init USDS -> SKY rewards with vest parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
+        // Init USDS -> SKY rewards with vestTot parameter being 600M * WAD
+        // Init USDS -> SKY rewards with vestBgn parameter being block.timestamp - 7 days
+        // Init USDS -> SKY rewards with vestTau parameter being 365 days
+        UsdsSkyFarmingInit.init(UsdsSkyFarmingInitParams({
+            usds: USDS,
+            sky: SKY,
+            rewards: REWARDS_USDS_SKY,
+            rewardsKey: "REWARDS_USDS_SKY",
+            dist: REWARDS_DIST_USDS_SKY,
+            distKey: "REWARDS_DIST_USDS_SKY",
+            vest: MCD_VEST_SKY,
+            vestTot: 600 * MILLION * WAD,
+            vestBgn: block.timestamp - 7 days,
+            vestTau: 365 days
+        }));
+
+        // Call distribute() in VestedRewardsDistribution contract in the spell execution
+        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
+
+        // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
+        // Initialize cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
+        // Initialize cron job with cfg.jobKey parameter being CRON_REWARDS_DIST_JOB
+        VestedRewardsDistributionJobInit.init(
+            CRON_REWARDS_DIST_JOB,
+            VestedRewardsDistributionJobInitConfig({
+                jobKey: "CRON_REWARDS_DIST_JOB"
+            })
+        );
+
+        // Add VestedRewardsDistribution to the new cron job by calling VestedRewardsDistributionJobInit.setDist with the following parameters:
+        // Add VestedRewardsDistribution to the new cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
+        // Add VestedRewardsDistribution to the new cron job with cfg.dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
+        // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days
+
+        VestedRewardsDistributionJobInit.setDist(CRON_REWARDS_DIST_JOB, VestedRewardsDistributionJobSetDistConfig({
+            dist: REWARDS_DIST_USDS_SKY,
+            interval: 7 days
+        }));
     }
 }
 
