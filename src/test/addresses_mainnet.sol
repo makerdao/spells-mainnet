@@ -491,5 +491,25 @@ contract Addresses {
         addr["CRON_ORACLE_JOB"]                  = 0xe717Ec34b2707fc8c226b34be5eae8482d06ED03;
         addr["CRON_FLAP_JOB"]                    = 0xc32506E9bB590971671b649d9B8e18CB6260559F;
         addr["CRON_LITE_PSM_JOB"]                = 0x0C86162ba3E507592fC8282b07cF18c7F902C401;
+        addr["USDS"]                             = 0xdC035D45d973E3EC169d2276DDab16f1e407384F;
+        addr["USDS_IMP"]                         = 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102;
+        addr["USDS_JOIN"]                        = 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB;
+        addr["DAI_USDS"]                         = 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A;
+        addr["SUSDS"]                            = 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
+        addr["SUSDS_IMP"]                        = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
+        addr["SKY"]                              = 0x56072C95FAA701256059aa122697B133aDEd9279;
+        addr["MKR_SKY"]                          = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
+        addr["PAIR_DAI_MKR"]                     = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+        addr["PAIR_USDS_SKY"]                    = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+        addr["MCD_SPLIT"]                        = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
+        addr["SPLITTER_MOM"]                     = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
+        addr["MCD_FLAP"]                         = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
+        addr["FLAP_SKY_ORACLE"]                  = 0x38e8c1D443f546Dc014D7756ec63116161CB7B25;
+        addr["MCD_VEST_SKY"]                     = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
+        addr["REWARDS_USDS_SKY"]                 = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
+        addr["REWARDS_DIST_USDS_SKY"]            = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
+        addr["REWARDS_USDS_01"]                  = 0x10ab606B067C9C461d8893c47C7512472E19e2Ce;
+        addr["CRON_REWARDS_DIST_JOB"]            = 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5;
+        addr["WRAPPER_USDS_LITE_PSM_USDC_A"]     = 0xA188EEC8F81263234dA3622A406892F3D630f98c;
     }
 }

@@ -35,6 +35,7 @@ import { FlapperInit, SplitterConfig, FlapperUniV2Config } from "./dependencies/
 import { SplitterInstance } from "./dependencies/05-flapper/SplitterInstance.sol";
 
 import { UsdsSkyFarmingInit, UsdsSkyFarmingInitParams } from "./dependencies/06-farm/phase-1b/UsdsSkyFarmingInit.sol";
+import { Usds01PreFarmingInit, Usds01PreFarmingInitParams } from "./dependencies/06-farm/phase-1b/Usds01PreFarmingInit.sol";
 
 import {
     VestedRewardsDistributionJobInit,
@@ -44,8 +45,9 @@ import {
 
 interface PauseLike {
     function delay() external view returns (uint256);
-    function plot(address, bytes32, bytes calldata, uint256) external;
     function exec(address, bytes32, bytes calldata, uint256) external returns (bytes memory);
+    function plot(address, bytes32, bytes calldata, uint256) external;
+    function setDelay(uint256) external;
 }
 
 interface ChainlogLike {
@@ -63,16 +65,17 @@ interface VestedRewardsDistributionLike {
 }
 
 contract DssExec {
-    ChainlogLike  constant public chainlog = ChainlogLike(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-    uint256                public eta;
-    bytes                  public sig;
-    bool                   public done;
-    bytes32      immutable public tag;
-    address      immutable public action;
-    uint256      immutable public expiration;
-    PauseLike    immutable public pause;
+    ChainlogLike  constant public   chainlog = ChainlogLike(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    uint256                public   eta;
+    bytes                  public   sig;
+    bool                   public   done;
+    bytes32      immutable public   tag;
+    address      immutable public   action;
+    uint256      immutable public   expiration;
+    PauseLike    immutable public   pause;
 
-    uint256 constant public MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
+    uint256       constant internal SEP_17_2024_NOON_UTC = 1726574400; // 2024-09-17T12:00:00Z
+    uint256       constant public   MIN_ETA              = SEP_17_2024_NOON_UTC;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -153,38 +156,34 @@ contract DssSpellAction is DssAction {
     // ---------- Math ----------
     uint256 internal constant THOUSAND = 10**3;
     uint256 internal constant MILLION  = 10**6;
-    uint256 internal constant BILLION  = 10**9;
     uint256 internal constant WAD      = 10**18;
-    uint256 internal constant RAY      = 10**27;
     uint256 internal constant RAD      = 10**45;
 
     // ---------- Phase 1b Addresses ----------
 
-    address internal constant USDS                  = 0xdC035D45d973E3EC169d2276DDab16f1e407384F;
-    address internal constant USDS_IMP              = 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102;
-    address internal constant USDS_JOIN             = 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB;
-    address internal constant DAI_USDS              = 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A;
+    address internal constant USDS                         = 0xdC035D45d973E3EC169d2276DDab16f1e407384F;
+    address internal constant USDS_IMP                     = 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102;
+    address internal constant USDS_JOIN                    = 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB;
+    address internal constant DAI_USDS                     = 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A;
+    address internal constant SUSDS                        = 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
+    address internal constant SUSDS_IMP                    = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
+    address internal constant SKY                          = 0x56072C95FAA701256059aa122697B133aDEd9279;
+    address internal constant MKR_SKY                      = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
+    address internal constant PAIR_DAI_MKR                 = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+    address internal constant PAIR_USDS_SKY                = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+    address internal constant MCD_SPLIT                    = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
+    address internal constant SPLITTER_MOM                 = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
+    address internal constant MCD_FLAP                     = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
+    address internal constant FLAP_SKY_ORACLE              = 0x38e8c1D443f546Dc014D7756ec63116161CB7B25;
+    address internal constant MCD_VEST_SKY                 = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
+    address internal constant REWARDS_USDS_SKY             = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
+    address internal constant REWARDS_DIST_USDS_SKY        = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
+    address internal constant REWARDS_USDS_01              = 0x10ab606B067C9C461d8893c47C7512472E19e2Ce;
+    address internal constant CRON_REWARDS_DIST_JOB        = 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5;
+    address internal constant WRAPPER_USDS_LITE_PSM_USDC_A = 0xA188EEC8F81263234dA3622A406892F3D630f98c;
 
-    address internal constant SUSDS                 = 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
-    address internal constant SUSDS_IMP             = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
-
-    address internal constant SKY                   = 0x56072C95FAA701256059aa122697B133aDEd9279;
-    address internal constant MKR_SKY               = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
-
-    address internal constant PAIR_DAI_MKR          = 0x517F9dD285e75b599234F7221227339478d0FcC8;
-    address internal constant PAIR_USDS_SKY         = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
-
-    address internal constant MCD_SPLIT             = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
-    address internal constant SPLITTER_MOM          = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
-    address internal constant MCD_FLAP              = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
-    address internal constant FLAP_SKY_ORACLE       = 0x38e8c1D443f546Dc014D7756ec63116161CB7B25;
-
-    address internal constant MCD_VEST_SKY          = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
-
-    address internal constant REWARDS_USDS_SKY      = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
-    address internal constant REWARDS_DIST_USDS_SKY = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
-
-    address internal constant CRON_REWARDS_DIST_JOB = 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5;
+    // ---------- MCD Addresses ----------
+    address internal MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
 
     function actions() public override {
 
@@ -244,6 +243,9 @@ contract DssSpellAction is DssAction {
         );
 
         // ---------- Pool Migration and Flapper Init ----------
+        // Forum: TODO
+        // Poll: TODO
+        // MIP: TODO
 
         // Migrate liquidity to the new pool by calling UniV2PoolMigratorInit.init with the following parameters:
         // Migrate liquidity to the new pool with pairDaiMkr parameter being 0x517F9dD285e75b599234F7221227339478d0FcC8
@@ -319,6 +321,9 @@ contract DssSpellAction is DssAction {
 
 
         // ---------- Setup DssVestMintable for SKY ----------
+        // Forum: TODO
+        // Poll: TODO
+        // MIP: TODO
 
         // Authorize DssVestMintable on SKY by calling DssExecLib.authorize with the following parameters:
         // Authorize DssVestMintable on SKY with _base parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
@@ -379,11 +384,42 @@ contract DssSpellAction is DssAction {
         // Add VestedRewardsDistribution to the new cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
         // Add VestedRewardsDistribution to the new cron job with cfg.dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
         // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days
-
         VestedRewardsDistributionJobInit.setDist(CRON_REWARDS_DIST_JOB, VestedRewardsDistributionJobSetDistConfig({
             dist: REWARDS_DIST_USDS_SKY,
             interval: 7 days
         }));
+
+        // ---------- USDS => 01 Farm Setup ----------
+        // Forum: TODO
+        // Poll: TODO
+        // MIP: TODO
+
+        // Init Rewards-01 by calling Usds01PreFarmingInit.init with the following parameters:
+        // Init Rewards-01 with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
+        // Init Rewards-01 with rewards parameter being 0x10ab606B067C9C461d8893c47C7512472E19e2Ce
+        // Init Rewards-01 with rewardsKey parameter being REWARDS_USDS_01
+        Usds01PreFarmingInit.init(Usds01PreFarmingInitParams({
+            usds: USDS,
+            rewards: REWARDS_USDS_01,
+            rewardsKey: "REWARDS_USDS_01"
+        }));
+
+        // ---------- USDS => 01 Farm Setup ----------
+        // Forum: TODO
+        // Poll: TODO
+        // MIP: TODO
+
+        // Add LitePsmWrapper to the Chainlog by calling DssExecLib.setChangelogAddress with the following parameters:
+        // Add LitePsmWrapper to the Chainlog with _key parameter being WRAPPER_USDS_LITE_PSM_USDC_A
+        // Add LitePsmWrapper to the Chainlog with _val parameter being 0xA188EEC8F81263234dA3622A406892F3D630f98c
+        DssExecLib.setChangelogAddress("WRAPPER_USDS_LITE_PSM_USDC_A", WRAPPER_USDS_LITE_PSM_USDC_A);
+
+        // Update GSM Delay
+        // Reduce GSM Delay by 14 hours, from 30 hours to 16 hours by calling MCD_PAUSE.setDelay
+        PauseLike(MCD_PAUSE).setDelay(16 hours);
+
+        // Note: bump chainlog version due to new modules being onboarded
+        DssExecLib.setChangelogVersion("1.18.0");
     }
 }
 
