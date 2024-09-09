@@ -862,8 +862,8 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testUniV2PoolMigration() public {
-        PairLike daiMkr  = PairLike(addr.addr("PAIR_DAI_MKR"));
-        PairLike usdsSky = PairLike(addr.addr("PAIR_USDS_SKY"));
+        PairLike daiMkr  = PairLike(addr.addr("UNIV2DAIMKR"));
+        PairLike usdsSky = PairLike(addr.addr("UNIV2USDSSKY"));
 
         uint256 pbalanceDaiMkr  = daiMkr.balanceOf(address(pauseProxy));
         uint256 pbalanceUsdsSky = usdsSky.balanceOf(address(pauseProxy));

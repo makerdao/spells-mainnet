@@ -498,8 +498,8 @@ contract Addresses {
         addr["SUSDS_IMP"]                        = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
         addr["SKY"]                              = 0x56072C95FAA701256059aa122697B133aDEd9279;
         addr["MKR_SKY"]                          = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
-        addr["PAIR_DAI_MKR"]                     = 0x517F9dD285e75b599234F7221227339478d0FcC8;
-        addr["PAIR_USDS_SKY"]                    = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+        addr["UNIV2DAIMKR"]                      = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+        addr["UNIV2USDSSKY"]                     = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
         addr["MCD_SPLIT"]                        = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
         addr["SPLITTER_MOM"]                     = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
         addr["MCD_FLAP"]                         = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;

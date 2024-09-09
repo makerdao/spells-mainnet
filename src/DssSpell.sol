@@ -169,8 +169,8 @@ contract DssSpellAction is DssAction {
     address internal constant SUSDS_IMP                    = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
     address internal constant SKY                          = 0x56072C95FAA701256059aa122697B133aDEd9279;
     address internal constant MKR_SKY                      = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
-    address internal constant PAIR_DAI_MKR                 = 0x517F9dD285e75b599234F7221227339478d0FcC8;
-    address internal constant PAIR_USDS_SKY                = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+    address internal constant UNIV2DAIMKR                 = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+    address internal constant UNIV2USDSSKY                = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
     address internal constant MCD_SPLIT                    = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
     address internal constant SPLITTER_MOM                 = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
     address internal constant MCD_FLAP                     = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
@@ -210,10 +210,14 @@ contract DssSpellAction is DssAction {
                 daiUsds: DAI_USDS
             })
         );
-        // Add usds to chainlog with key "USDS" via the UsdsInit.init function
-        // Add usdsImp to chainlog under the key "USDS_IMP" via the UsdsInit.init function
-        // Add UsdsJoin to chainlog under the key "USDS_JOIN" via the UsdsInit.init function
-        // Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
+
+        // Note: Add usds to chainlog with key "USDS" via the UsdsInit.init function
+
+        // Note: Add usdsImp to chainlog under the key "USDS_IMP" via the UsdsInit.init function
+
+        // Note: Add UsdsJoin to chainlog under the key "USDS_JOIN" via the UsdsInit.init function
+
+        // Note: Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
 
         // Init sUSDS by calling SUsdsInit.init with the following parameters:
         SUsdsInit.init(
@@ -234,8 +238,10 @@ contract DssSpellAction is DssAction {
                 ssr: SIX_PT_TWO_FIVE_PCT_RATE
             })
         );
-        // Add sUsds to chainlog under the key "SUSDS" via the SUsdsInit.init function
-        // Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
+
+        // Note: Add sUsds to chainlog under the key "SUSDS" via the SUsdsInit.init function
+
+        // Note: Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
 
         // Init SKY by calling SkyInit.init with the following parameters:
         SkyInit.init(
@@ -250,8 +256,10 @@ contract DssSpellAction is DssAction {
             // Init SKY with rate parameter being 24,000
             24_000
         );
-        // Add sky to chainlog under the key "SKY" via the SkyInit.init function
-        // Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
+
+        // Note: Add sky to chainlog under the key "SKY" via the SkyInit.init function
+
+        // Note: Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
 
         // ---------- Pool Migration and Flapper Init ----------
         // Forum: TODO
@@ -263,9 +271,9 @@ contract DssSpellAction is DssAction {
             // Note: Maker Protocol contracts dependencies
             dss,
             // Migrate liquidity to the new pool with pairDaiMkr parameter being 0x517F9dD285e75b599234F7221227339478d0FcC8
-            PAIR_DAI_MKR,
+            UNIV2DAIMKR,
             // Migrate liquidity to the new pool with pairUsdsSky parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
-            PAIR_USDS_SKY
+            UNIV2USDSSKY
         );
 
         // Init Splitter by calling FlapperInit.initSplitter with the following parameters:
@@ -310,7 +318,7 @@ contract DssSpellAction is DssAction {
                 // Init new Flapper with pip parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
                 pip: FLAP_SKY_ORACLE,
                 // Init new Flapper with pair parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
-                pair: PAIR_USDS_SKY,
+                pair: UNIV2USDSSKY,
                 // Init new Flapper with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
                 usds: USDS,
                 // Init new Flapper with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
