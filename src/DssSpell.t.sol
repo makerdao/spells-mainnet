@@ -46,7 +46,6 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-
 interface UsdsPsmWrapperLike {
     function buyGem(address usr, uint256 gemAmt) external returns (uint256 usdsInWad);
     function dai() external view returns (address);
@@ -56,6 +55,11 @@ interface UsdsPsmWrapperLike {
     function sellGem(address usr, uint256 gemAmt) external returns (uint256 usdsOutWad);
     function usds() external view returns (address);
     function usdsJoin() external view returns (address);
+}
+
+interface PairLike {
+    function balanceOf(address usr) external view returns (uint256);
+    function totalSupply() external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -829,6 +833,62 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    uint256 constant MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
+
+    function testNextCastTimeMinEta() public {
+        {
+            uint256 before = vm.snapshot();
+
+            vm.warp(1606161600); // Nov 23, 20 UTC - could be any date far enough in the past
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
+
+            vm.revertTo(before);
+        }
+
+        {
+            uint256 before = vm.snapshot();
+
+            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
+
+            vm.revertTo(before);
+        }
+    }
+
+    function testUniV2PoolMigration() public {
+        PairLike daiMkr  = PairLike(addr.addr("PAIR_DAI_MKR"));
+        PairLike usdsSky = PairLike(addr.addr("PAIR_USDS_SKY"));
+
+        uint256 pbalanceDaiMkr  = daiMkr.balanceOf(address(pauseProxy));
+        uint256 pbalanceUsdsSky = usdsSky.balanceOf(address(pauseProxy));
+
+        assertGt(pbalanceDaiMkr,  0, "before: testPoolMigration/invalid-dai-mkr-balance");
+        assertEq(pbalanceUsdsSky, 0, "before: testPoolMigration/invalid-usds-sky-balance");
+
+        uint256 pbalanceDai = dai.balanceOf(address(daiMkr)) * pbalanceDaiMkr / daiMkr.totalSupply();
+        uint256 pbalanceMkr = gov.balanceOf(address(daiMkr)) * pbalanceDaiMkr / daiMkr.totalSupply();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        uint256 balanceDaiMkr  = daiMkr.balanceOf(address(pauseProxy));
+        uint256 balanceUsdsSky = usdsSky.balanceOf(address(pauseProxy));
+
+        assertEq(balanceDaiMkr,  0,                             "after: testPoolMigration/invalid-dai-mkr-balance");
+        // 10**3 == UniswapV2Pair MINIMUM_LIQUIDITY => https://github.com/Uniswap/v2-core/blob/ee547b17853e71ed4e0101ccfd52e70d5acded58/contracts/UniswapV2Pair.sol#L121
+        assertEq(balanceUsdsSky, usdsSky.totalSupply() - 10**3, "after: testPoolMigration/invalid-usds-sky-balance");
+
+        assertEq(usds.balanceOf(address(usdsSky)), pbalanceDai,          "after: testPoolMigration/invalid-usds-balance");
+        assertEq(sky.balanceOf(address(usdsSky)),  pbalanceMkr * 24_000, "after: testPoolMigration/invalid-usds-balance");
+    }
+
     function testUsdsPsmWrapper() public {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -885,34 +945,6 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(usds.balanceOf(address(this)),  0,      "testUsdsPsmWrapper/buyGem-usds-balance");
 
             vm.revertTo(snapshot);
-        }
-    }
-
-    uint256 constant MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
-
-    function testNextCastTimeMinEta() public {
-        {
-            uint256 before = vm.snapshot();
-
-            vm.warp(1606161600); // Nov 23, 20 UTC - could be any date far enough in the past
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
-
-            vm.revertTo(before);
-        }
-
-        {
-            uint256 before = vm.snapshot();
-
-            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
-
-            vm.revertTo(before);
         }
     }
 }
