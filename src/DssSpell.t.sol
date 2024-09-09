@@ -117,6 +117,10 @@ contract DssSpellTest is DssSpellTestBase {
         _testChainlogValues();
     }
 
+    function testSplitter() public {
+        _testSplitter();
+    }
+
     // Leave this test public (for now) as this is acting like a config test
     function testPSMs() public {
         _vote(address(spell));

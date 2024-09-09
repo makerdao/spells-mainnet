@@ -18,6 +18,8 @@ pragma solidity 0.8.16;
 
 import "dss-interfaces/Interfaces.sol";
 import {DssTest, GodMode} from "dss-test/DssTest.sol";
+import {stdStorage, StdStorage} from "forge-std/Test.sol";
+import "forge-std/console2.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
@@ -143,8 +145,13 @@ interface AuthorityLike {
     function authority() external view returns (address);
 }
 
+interface SplitterMomLike {
+    function authority() external view returns (address);
+    function stop() external;
+}
+
 // TODO: add full interfaces to dss-interfaces and remove from here
-interface FlapUniV2Abstract {
+interface FlapUniV2Like {
     function gem() external view returns (address);
     function pair() external view returns (address);
     function pip() external view returns (address);
@@ -152,13 +159,19 @@ interface FlapUniV2Abstract {
 }
 
 // TODO: add full interfaces to dss-interfaces and remove from here
-interface SplitAbstract {
-    function hop() external view returns (uint256);
+interface SplitLike {
     function burn() external view returns (uint256);
+    function farm() external view returns (address);
+    function flapper() external view returns (address);
+    function hop() external view returns (uint256);
+}
+
+interface FlapOracleLike {
+    function read() external view returns (bytes32);
 }
 
 // TODO: add full interfaces to dss-interfaces and remove from here
-interface UsdsJoinAbstract is DaiJoinAbstract {}
+interface UsdsJoinLike is DaiJoinAbstract {}
 
 interface LitePsmLike {
     function bud(address) external view returns (uint256);
@@ -192,6 +205,8 @@ interface LitePsmMomLike is AuthorityLike {
 }
 
 contract DssSpellTestBase is Config, DssTest {
+    using stdStorage for StdStorage;
+
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
     Deployers deployers = new Deployers();
@@ -211,15 +226,15 @@ contract DssSpellTestBase is Config, DssTest {
     DaiAbstract                      dai = DaiAbstract(        addr.addr("MCD_DAI"));
     DaiJoinAbstract              daiJoin = DaiJoinAbstract(    addr.addr("MCD_JOIN_DAI"));
     GemAbstract                     usds = GemAbstract(        addr.addr("USDS"));
-    UsdsJoinAbstract            usdsJoin = UsdsJoinAbstract(   addr.addr("USDS_JOIN"));
+    UsdsJoinLike                usdsJoin = UsdsJoinLike(       addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));
     CureAbstract                    cure = CureAbstract(       addr.addr("MCD_CURE"));
     IlkRegistryAbstract              reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
-    SplitAbstract                  split = SplitAbstract(      addr.addr("MCD_SPLIT"));
-    FlapUniV2Abstract               flap = FlapUniV2Abstract(  addr.addr("MCD_FLAP"));
+    SplitLike                      split = SplitLike(          addr.addr("MCD_SPLIT"));
+    FlapUniV2Like                   flap = FlapUniV2Like(      addr.addr("MCD_FLAP"));
     CropperLike                  cropper = CropperLike(        addr.addr("MCD_CROPPER"));
 
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
@@ -227,7 +242,7 @@ contract DssSpellTestBase is Config, DssTest {
     AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     AuthorityLike                lineMom = AuthorityLike(      addr.addr("LINE_MOM"));
     AuthorityLike             litePsmMom = AuthorityLike(      addr.addr("LITE_PSM_MOM"));
-    AuthorityLike            splitterMom = AuthorityLike(      addr.addr("SPLITTER_MOM"));
+    SplitterMomLike          splitterMom = SplitterMomLike(    addr.addr("SPLITTER_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
@@ -2482,5 +2497,86 @@ contract DssSpellTestBase is Config, DssTest {
 
         // Dump all dai for next run
         vat.move(address(this), address(0x0), vat.dai(address(this)));
+    }
+
+    function _testSplitter() internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        assertEq(vow.flapper(), address(split), "testSplitter/invalid-vow-flapper");
+        assertEq(split.flapper(), address(flap), "testSplitter/invalid-split-flapper");
+        assertEq(flap.gem(), address(sky), "testSplitter/invalid-flapper-gem");
+        assertEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "testSplitter/invalid-flapper-pip");
+        assertEq(flap.pair(), addr.addr("UNIV2USDSSKY"), "testSplitter/invalid-flapper-pair");
+
+        // Leave surplus buffer ready to be flapped
+        vow.heal(vat.sin(address(vow)) - (vow.Sin() + vow.Ash()));
+        stdstore
+            .target(address(vat))
+            .sig("dai(address)")
+            .with_key(address(vow))
+            .checked_write(vat.sin(address(vow)) + vow.bump() + vow.hump());
+
+        GemAbstract pair = GemAbstract(addr.addr("UNIV2USDSSKY"));
+        FlapOracleLike pip = FlapOracleLike(flap.pip());
+
+        vm.prank(address(flap));
+        uint256 price = uint256(pip.read());
+
+        uint256 usdsWad = 100_000_000 * WAD;
+        GodMode.setBalance(address(usds), address(pair), usdsWad);
+        uint256 skyWad = usdsWad * WAD / price;
+        // Ensure price is within the tolerance (fla.want() + delta (1 p.p.))
+        GodMode.setBalance(address(sky), address(pair), skyWad * (flap.want() + 10**16) / WAD);
+        // Overwrite burn so it is < 100%
+        stdstore
+            .target(address(split))
+            .sig("burn()")
+            .checked_write(1 * WAD * 70 / 100);
+
+        // Overwrite farm, since usds cannot be transferred to `address(0)`
+        // We need a Sink because Spliiter will try to call `notifiRewardAmount()`
+        address fakeFarm = address(new Sink());
+        stdstore
+            .target(address(split))
+            .sig("farm()")
+            .checked_write(fakeFarm);
+
+        uint256 lot = vow.bump() * split.burn() / WAD;
+        uint256 pay = (vow.bump() - lot) / RAY;
+
+        uint256 pbalancePauseProxy = pair.balanceOf(pauseProxy);
+        uint256 pdaiVow = vat.dai(address(vow));
+        uint256 preserveUsds = usds.balanceOf(address(pair));
+        uint256 preserveSky = sky.balanceOf(address(pair));
+        uint256 pbalanceUsdsFarm = usds.balanceOf(split.farm());
+
+        vow.flap();
+
+        assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,     "testSplitter/Flapper/pair-pauseProxy-balance-no-increase");
+        assertGt(usds.balanceOf(address(pair)),   preserveUsds,           "testSplitter/Flapper/usds-pair-balance-no-increase");
+        assertEq(sky.balanceOf(address(pair)),    preserveSky,            "testSplitter/Flapper/unexpected-sky-pair-balance-change");
+        assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,    "testSplitter/Flapper/vat-dai-vow-change-too-low");
+        assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10,   "testSplitter/Flapper/vat-dai-vow-change-too-high");
+        assertEq(usds.balanceOf(address(flap)),   0,                      "testSplitter/Flapper/invalid-usds-balance");
+        assertEq(sky.balanceOf(address(flap)),    0,                      "testSplitter/Flapper/invalid-sky-balance");
+        assertEq(usds.balanceOf(split.farm()),    pbalanceUsdsFarm + pay, "testSplitter/invalid-farm-balance");
+
+        // Check Mom can increase hop
+        {
+            // The check for the configured value is already done in `_checkSystemValues()`
+            assertLt(split.hop(), type(uint256).max);
+            vm.prank(chief.hat());
+            splitterMom.stop();
+            assertEq(split.hop(), type(uint256).max);
+        }
+    }
+}
+
+/// @dev No-op for any call with any parameters
+contract Sink {
+    fallback(bytes calldata) external returns (bytes memory) {
+
     }
 }
