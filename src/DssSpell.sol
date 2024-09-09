@@ -110,9 +110,9 @@ contract DssExec {
     function schedule() public {
         require(block.timestamp <= expiration, "This contract has expired");
         require(eta == 0, "This spell has already been scheduled");
-        // Set earliest execution date September 17, 12:00 UTC
-        // Note: In case the spell is scheduled later than planned, we have to switch back to the regular logic to
-        //       respect GSM delay enforced by MCD_PAUSE
+        // ---------- Set earliest execution date September 17, 12:00 UTC ----------
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Note: In case the spell is scheduled later than planned, we have to switch back to the regular logic to respect GSM delay enforced by MCD_PAUSE
         eta = _max(block.timestamp + PauseLike(pause).delay(), MIN_ETA);
         pause.plot(action, tag, sig, eta);
     }
@@ -191,9 +191,7 @@ contract DssSpellAction is DssAction {
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // ---------- New Tokens Init ----------
-        // Forum: TODO
-        // Poll: TODO
-        // MIP: TODO
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
 
         // Init USDS by calling UsdsInit.init with the following parameters:
         UsdsInit.init(
@@ -262,9 +260,7 @@ contract DssSpellAction is DssAction {
         // Note: Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
 
         // ---------- Pool Migration and Flapper Init ----------
-        // Forum: TODO
-        // Poll: TODO
-        // MIP: TODO
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
 
         // Migrate liquidity to the new pool by calling UniV2PoolMigratorInit.init with the following parameters:
         UniV2PoolMigratorInit.init(
@@ -344,9 +340,7 @@ contract DssSpellAction is DssAction {
 
 
         // ---------- Setup DssVestMintable for SKY ----------
-        // Forum: TODO
-        // Poll: TODO
-        // MIP: TODO
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
 
         // Authorize DssVestMintable on SKY by calling DssExecLib.authorize with the following parameters:
         // Authorize DssVestMintable on SKY with _base parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
@@ -416,9 +410,7 @@ contract DssSpellAction is DssAction {
         );
 
         // ---------- USDS => 01 Farm Setup ----------
-        // Forum: TODO
-        // Poll: TODO
-        // MIP: TODO
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
 
         // Init Rewards-01 by calling Usds01PreFarmingInit.init with the following parameters:
         Usds01PreFarmingInit.init(Usds01PreFarmingInitParams({
@@ -431,9 +423,7 @@ contract DssSpellAction is DssAction {
         }));
 
         // ---------- MISC ----------
-        // Forum: TODO
-        // Poll: TODO
-        // MIP: TODO
+        // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
 
         // Add LitePsmWrapper to the Chainlog by calling DssExecLib.setChangelogAddress with the following parameters:
         // Add LitePsmWrapper to the Chainlog with _key parameter being WRAPPER_USDS_LITE_PSM_USDC_A
