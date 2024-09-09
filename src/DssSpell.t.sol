@@ -77,7 +77,7 @@ contract DssSpellTest is DssSpellTestBase {
         _testCastOnTime();
     }
 
-    function testNextCastTime() public {
+    function testNextCastTime() public skipped {
         _testNextCastTime();
     }
 
@@ -882,9 +882,37 @@ contract DssSpellTest is DssSpellTestBase {
             wrapper.buyGem(address(this), buyAmt);
 
             assertEq(token.balanceOf(address(this)), buyAmt, "testUsdsPsmWrapper/invalid-buyGem-gem-balance");
-            assertEq(usds.balanceOf(address(this)),  0,        "testUsdsPsmWrapper/buyGem-usds-balance");
+            assertEq(usds.balanceOf(address(this)),  0,      "testUsdsPsmWrapper/buyGem-usds-balance");
 
             vm.revertTo(snapshot);
+        }
+    }
+
+    uint256 constant MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
+
+    function testNextCastTimeMinEta() public {
+        {
+            uint256 before = vm.snapshot();
+
+            vm.warp(1606161600); // Nov 23, 20 UTC - could be any date far enough in the past
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
+
+            vm.revertTo(before);
+        }
+
+        {
+            uint256 before = vm.snapshot();
+
+            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
+
+            vm.revertTo(before);
         }
     }
 }
