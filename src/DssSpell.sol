@@ -217,6 +217,8 @@ contract DssSpellAction is DssAction {
 
         // Note: Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
 
+        // Note: The usdsJoin Adapter will be authorized in the usds contract by calling rely via the UsdsInit.init function
+
         // Init sUSDS by calling SUsdsInit.init with the following parameters:
         SUsdsInit.init(
             // Note: Maker Protocol contracts dependencies
@@ -241,6 +243,8 @@ contract DssSpellAction is DssAction {
 
         // Note: Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
 
+        // Note: sUSDS will be authorized to access the vat by calling rely via the SUsdsInit.init function
+
         // Init SKY by calling SkyInit.init with the following parameters:
         SkyInit.init(
             // Note: Maker Protocol contracts dependencies
@@ -258,6 +262,9 @@ contract DssSpellAction is DssAction {
         // Note: Add sky to chainlog under the key "SKY" via the SkyInit.init function
 
         // Note: Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
+
+        // Note: The mkrSky contract will be authorized in the sky contract by calling rely via the SkyInit.init function
+        // Note: The mkrSky contract will be authorized in the MkrAuthority contract by calling rely via the SkyInit.init function
 
         // ---------- Pool Migration and Flapper Init ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
@@ -302,6 +309,8 @@ contract DssSpellAction is DssAction {
             })
         );
 
+        // Note: The flapper variable in the vow will be changed by the splitter address by calling file via the SkyInit.init function
+
         // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
         FlapperInit.initFlapperUniV2(
             // Note: Maker Protocol contracts dependencies
@@ -338,6 +347,7 @@ contract DssSpellAction is DssAction {
             "FLAP_SKY_ORACLE"
         );
 
+        // Note: Authorize wrapper to read MKR oracle price
 
         // ---------- Setup DssVestMintable for SKY ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
@@ -386,6 +396,8 @@ contract DssSpellAction is DssAction {
 
         // Call distribute() in VestedRewardsDistribution contract in the spell execution
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
+
+        // Note: A SKY vesting stream will be created for rewards distribution
 
         // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
         VestedRewardsDistributionJobInit.init(
