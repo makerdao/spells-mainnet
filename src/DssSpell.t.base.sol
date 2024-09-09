@@ -146,15 +146,19 @@ interface AuthorityLike {
 // TODO: add full interfaces to dss-interfaces and remove from here
 interface FlapUniV2Abstract {
     function gem() external view returns (address);
-    function hop() external view returns (uint256);
     function pair() external view returns (address);
     function pip() external view returns (address);
     function want() external view returns (uint256);
 }
 
-interface FlapperMomAbstract {
-    function stop() external;
+// TODO: add full interfaces to dss-interfaces and remove from here
+interface SplitAbstract {
+    function hop() external view returns (uint256);
+    function burn() external view returns (uint256);
 }
+
+// TODO: add full interfaces to dss-interfaces and remove from here
+interface UsdsJoinAbstract is DaiJoinAbstract {}
 
 interface LitePsmLike {
     function bud(address) external view returns (uint256);
@@ -206,24 +210,29 @@ contract DssSpellTestBase is Config, DssTest {
     SpotAbstract                 spotter = SpotAbstract(       addr.addr("MCD_SPOT"));
     DaiAbstract                      dai = DaiAbstract(        addr.addr("MCD_DAI"));
     DaiJoinAbstract              daiJoin = DaiJoinAbstract(    addr.addr("MCD_JOIN_DAI"));
+    GemAbstract                     usds = GemAbstract(        addr.addr("USDS"));
+    UsdsJoinAbstract            usdsJoin = UsdsJoinAbstract(   addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
+    GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));
     CureAbstract                    cure = CureAbstract(       addr.addr("MCD_CURE"));
     IlkRegistryAbstract              reg = IlkRegistryAbstract(addr.addr("ILK_REGISTRY"));
+    SplitAbstract                  split = SplitAbstract(      addr.addr("MCD_SPLIT"));
     FlapUniV2Abstract               flap = FlapUniV2Abstract(  addr.addr("MCD_FLAP"));
     CropperLike                  cropper = CropperLike(        addr.addr("MCD_CROPPER"));
 
     OsmMomAbstract                osmMom = OsmMomAbstract(     addr.addr("OSM_MOM"));
     ClipperMomAbstract           clipMom = ClipperMomAbstract( addr.addr("CLIPPER_MOM"));
-    FlapperMomAbstract           flapMom = FlapperMomAbstract( addr.addr("FLAPPER_MOM"));
     AuthorityLike                 d3mMom = AuthorityLike(      addr.addr("DIRECT_MOM"));
     AuthorityLike                lineMom = AuthorityLike(      addr.addr("LINE_MOM"));
     AuthorityLike             litePsmMom = AuthorityLike(      addr.addr("LITE_PSM_MOM"));
+    AuthorityLike            splitterMom = AuthorityLike(      addr.addr("SPLITTER_MOM"));
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
     VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
+    VestAbstract                 vestSky = VestAbstract(       addr.addr("MCD_VEST_SKY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
     DssSpell spell;
@@ -540,17 +549,37 @@ contract DssSpellTestBase is Config, DssTest {
         // check LitePsmMom authority
         assertEq(litePsmMom.authority(), values.lite_psm_mom_authority, "TestError/linePsmMom-authority");
 
+        // check SplitterMom authority
+        assertEq(splitterMom.authority(), values.splitter_mom_authority, "TestError/splitterMom-authority");
+
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
 
+        // split
+        {
+            // Check split hop and sanity checks
+            assertEq(split.hop(), values.split_hop, "TestError/split-hop");
+            assertTrue(split.hop() > 0 && split.hop() < 86400, "TestError/split-hop-range"); // gt 0 && lt 1 day
+            // check burn value
+            uint256 normalizedTestBurn = values.split_burn * 10**14;
+            assertEq(split.burn(), normalizedTestBurn, "TestError/split-burn");
+            assertTrue(split.burn() >= 50 * WAD / 100 && split.burn() <= 1 * WAD, "TestError/split-burn-range"); // gte 50% and lte 100%
+        }
+
         // flap
-        // Check flap hop and sanity checks
-        assertEq(flap.hop(), values.flap_hop, "TestError/flap-hop");
-        assertTrue(flap.hop() > 0 && flap.hop() < 86400, "TestError/flap-hop-range"); // gt 0 && lt 1 day
-        // check want value
-        uint256 normalizedTestWant = values.flap_want * 10**14;
-        assertEq(flap.want(), normalizedTestWant, "TestError/flap-want");
-        assertTrue(flap.want() >= 90 * WAD / 100 && flap.want() <= 110 * WAD / 100, "TestError/flap-want-range"); // gte 90% and lte 110%
+        {
+            // check want value
+            uint256 normalizedTestWant = values.flap_want * 10**14;
+            assertEq(flap.want(), normalizedTestWant, "TestError/flap-want");
+            assertTrue(flap.want() >= 90 * WAD / 100 && flap.want() <= 110 * WAD / 100, "TestError/flap-want-range"); // gte 90% and lte 110%
+        }
+
+        // vest
+        {
+            assertApproxEqRel(vestDai.cap(), values.vest_dai_cap, 10**16, "TestError/vest-dai-cap");
+            assertApproxEqRel(vestMkr.cap(), values.vest_mkr_cap, 10**16, "TestError/vest-mkr-cap");
+            assertApproxEqRel(vestSky.cap(), values.vest_sky_cap, 10**16, "TestError/vest-sky-cap");
+        }
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
 
@@ -1610,27 +1639,57 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(cure.tell(), expectedTell);
     }
 
-    function _checkDaiVest(
-        uint256 _index,
-        address _wallet,
-        uint256 _start,
-        uint256 _cliff,
-        uint256 _end,
-        uint256 _days,
-        address _manager,
-        uint256 _restricted,
-        uint256 _reward,
-        uint256 _claimed
-    ) internal {
-        assertEq(vestDai.usr(_index), _wallet,            "usr");
-        assertEq(vestDai.bgn(_index), _start,             "bgn");
-        assertEq(vestDai.clf(_index), _cliff,             "clf");
-        assertEq(vestDai.fin(_index), _end,               "fin");
-        assertEq(vestDai.fin(_index), _start + _days - 1, "fin");
-        assertEq(vestDai.mgr(_index), _manager,           "mgr");
-        assertEq(vestDai.res(_index), _restricted,        "res");
-        assertEq(vestDai.tot(_index), _reward,            "tot");
-        assertEq(vestDai.rxd(_index), _claimed,           "rxd");
+    struct VestStream {
+        uint256 id;
+        address usr;
+        uint256 bgn;
+        uint256 clf;
+        uint256 fin;
+        uint256 tau;
+        address mgr;
+        uint256 res;
+        uint256 tot;
+        uint256 rxd;
+    }
+
+    function _checkVestDai(VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = vestDai.ids();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check that all streams added in this spell are tested
+        assertEq(vestDai.ids(), prevStreamCount + _ss.length, "testVestDai/not-all-streams-tested");
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream("testVestDai", vestDai, address(dai), _ss[i]);
+        }
+    }
+
+    function _checkVestMkr(VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = vestMkr.ids();
+        uint256 prevAllowance = gov.allowance(pauseProxy, address(vestMkr));
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check allowance was increased according to the streams
+        uint256 sumTot = 0;
+        uint256 sumRxd = 0;
+        for (uint256 i = 0; i < _ss.length; i++) {
+            sumTot = sumTot + _ss[i].tot;
+            sumRxd = sumRxd + _ss[i].rxd;
+        }
+        assertEq(gov.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
+
+        // Check that all streams added in this spell are tested
+        assertEq(vestMkr.ids(), prevStreamCount + _ss.length, "testVestMrk/not-all-streams-tested");
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream("testVestMkr", vestMkr, address(gov), _ss[i]);
+        }
     }
 
     function _checkTransferrableVestMkrAllowance() internal {
@@ -1645,6 +1704,60 @@ contract DssSpellTestBase is Config, DssTest {
 
         uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
         assertGe(allowance, vestableAmt, "TestError/insufficient-gov-transferrable-vest-mkr-allowance");
+    }
+
+
+    function _checkVestSky(VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = vestSky.ids();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check that all streams added in this spell are tested
+        assertEq(vestSky.ids(), prevStreamCount + _ss.length, "testVestSky/not-all-streams-tested");
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream("testVestSky", vestSky, address(sky), _ss[i]);
+        }
+    }
+
+    function _checkVestStream(
+        string memory _errPrefix,
+        VestAbstract _vest,
+        address _token,
+        VestStream memory _s
+    ) internal {
+        assertEq(_vest.usr(_s.id), _s.usr,          _concat(_errPrefix, string("/usr")));
+        assertEq(_vest.bgn(_s.id), _s.bgn,          _concat(_errPrefix, string("/bgn")));
+        assertEq(_vest.clf(_s.id), _s.clf,          _concat(_errPrefix, string("/clf")));
+        assertEq(_vest.fin(_s.id), _s.fin,          _concat(_errPrefix, string("/fin")));
+        assertEq(_vest.fin(_s.id), _s.bgn + _s.tau, _concat(_errPrefix, string("/fin (bgn + tau)")));
+        assertEq(_vest.mgr(_s.id), _s.mgr,          _concat(_errPrefix, string("/mgr")));
+        assertEq(_vest.res(_s.id), _s.res,          _concat(_errPrefix, string("/res")));
+        assertEq(_vest.tot(_s.id), _s.tot,          _concat(_errPrefix, string("/tot")));
+        assertEq(_vest.rxd(_s.id), _s.rxd,          _concat(_errPrefix, string("/rxd")));
+
+        GemAbstract token = GemAbstract(_token);
+
+        {
+            uint256 before = vm.snapshot();
+
+            // Check each new stream is payable in the future
+            uint256 pbalance = token.balanceOf(_s.usr);
+            GodMode.setWard(address(_vest), address(this), 1);
+            _vest.unrestrict(_s.id);
+
+            vm.warp(_s.fin);
+            _vest.vest(_s.id);
+            assertEq(
+                token.balanceOf(_s.usr),
+                pbalance + _s.tot - _s.rxd,
+                _concat(_errPrefix, string("/invalid-received-amount"))
+            );
+
+            vm.revertTo(before);
+        }
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {

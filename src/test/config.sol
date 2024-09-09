@@ -37,7 +37,8 @@ contract Config {
         uint256 vow_bump;
         uint256 vow_hump_min;
         uint256 vow_hump_max;
-        uint256 flap_hop;
+        uint256 split_hop;
+        uint256 split_burn;
         uint256 flap_want;
         uint256 dog_Hole;
         uint256 esm_min;
@@ -47,6 +48,10 @@ contract Config {
         address d3m_mom_authority;
         address line_mom_authority;
         address lite_psm_mom_authority;
+        address splitter_mom_authority;
+        uint256 vest_dai_cap;
+        uint256 vest_mkr_cap;
+        uint256 vest_sky_cap;
         uint256 ilk_count;
         string  chainlog_version;
         mapping (bytes32 => CollateralValues) collaterals;
@@ -81,6 +86,7 @@ contract Config {
     uint256 constant private THOUSAND = 10 ** 3;
     uint256 constant private MILLION  = 10 ** 6;
     uint256 constant private BILLION  = 10 ** 9;
+    uint256 constant private WAD      = 10 ** 18;
 
     SpellValues  spellValues;
     SystemValues afterSpell;
@@ -106,27 +112,32 @@ contract Config {
         //
         // Values for all system configuration changes
         //
-        afterSpell.line_offset            = 680 * MILLION;  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 6_00;           // In basis points
-        afterSpell.pause_delay            = 16 hours;       // In seconds
-        afterSpell.vow_wait               = 156 hours;      // In seconds
-        afterSpell.vow_dump               = 250;            // In whole Dai units
-        afterSpell.vow_sump               = 50 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_bump               = 65 * THOUSAND;  // In whole Dai units
-        afterSpell.vow_hump_min           = 55 * MILLION;   // In whole Dai units
-        afterSpell.vow_hump_max           = 55 * MILLION;   // In whole Dai units
-        afterSpell.flap_hop               = 10_249 seconds; // In seconds
-        afterSpell.flap_want              = 9800;           // In basis points
-        afterSpell.dog_Hole               = 150 * MILLION;  // In whole Dai units
-        afterSpell.esm_min                = 300 * THOUSAND; // In whole MKR units
-        afterSpell.pause_authority        = chief;          // Pause authority
-        afterSpell.osm_mom_authority      = chief;          // OsmMom authority
-        afterSpell.clipper_mom_authority  = chief;          // ClipperMom authority
-        afterSpell.d3m_mom_authority      = chief;          // D3MMom authority
-        afterSpell.line_mom_authority     = chief;          // LineMom authority
-        afterSpell.lite_psm_mom_authority = chief;          // LitePsmMom authority
-        afterSpell.ilk_count              = 66;             // Num expected in system
-        afterSpell.chainlog_version       = "1.18.0";       // String expected in system
+        afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
+        afterSpell.pot_dsr                = 6_00;                           // In basis points
+        afterSpell.pause_delay            = 16 hours;                       // In seconds
+        afterSpell.vow_wait               = 156 hours;                      // In seconds
+        afterSpell.vow_dump               = 250;                            // In whole Dai units
+        afterSpell.vow_sump               = 50 * THOUSAND;                  // In whole Dai units
+        afterSpell.vow_bump               = 65 * THOUSAND;                  // In whole Dai units
+        afterSpell.vow_hump_min           = 55 * MILLION;                   // In whole Dai units
+        afterSpell.vow_hump_max           = 55 * MILLION;                   // In whole Dai units
+        afterSpell.split_hop              = 10_249 seconds;                 // In seconds
+        afterSpell.split_burn             = 100_00;                         // In basis points
+        afterSpell.flap_want              = 9800;                           // In basis points
+        afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
+        afterSpell.esm_min                = 300 * THOUSAND;                 // In whole MKR units
+        afterSpell.pause_authority        = chief;                          // Pause authority
+        afterSpell.osm_mom_authority      = chief;                          // OsmMom authority
+        afterSpell.clipper_mom_authority  = chief;                          // ClipperMom authority
+        afterSpell.d3m_mom_authority      = chief;                          // D3MMom authority
+        afterSpell.line_mom_authority     = chief;                          // LineMom authority
+        afterSpell.lite_psm_mom_authority = chief;                          // LitePsmMom authority
+        afterSpell.splitter_mom_authority = chief;                          // Splitter authority
+        afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;    // In WAD Dai per second
+        afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
+        afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
+        afterSpell.ilk_count              = 66;                             // Num expected in system
+        afterSpell.chainlog_version       = "1.18.0";                       // String expected in system
 
         //
         // Values for all collateral

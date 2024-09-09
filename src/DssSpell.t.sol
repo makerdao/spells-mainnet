@@ -16,6 +16,8 @@
 
 pragma solidity 0.8.16;
 
+import "forge-std/console2.sol";
+
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 
@@ -42,6 +44,18 @@ interface ProxyLike {
 
 interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
+}
+
+
+interface UsdsPsmWrapperLike {
+    function buyGem(address usr, uint256 gemAmt) external returns (uint256 usdsInWad);
+    function dai() external view returns (address);
+    function gem() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function psm() external view returns (address);
+    function sellGem(address usr, uint256 gemAmt) external returns (uint256 usdsOutWad);
+    function usds() external view returns (address);
+    function usdsJoin() external view returns (address);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -196,9 +210,9 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
-            "MCD_CAT"
+            "FLAPPER_MOM"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
@@ -349,19 +363,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
-    struct Stream {
-        uint256 streamId;
-        address wallet;
-        uint256 rewardAmount;
-        uint256 start;
-        uint256 cliff;
-        uint256 end;
-        uint256 durationDays;
-        address manager;
-        uint256 isRestricted;
-        uint256 claimedAmount;
-    }
-
     function testVestDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 DEC_01_2023 = 1701385200;
@@ -369,103 +370,79 @@ contract DssSpellTest is DssSpellTestBase {
 
         // For each new stream, provide Stream object
         // and initialize the array with the corrent number of new streams
-        Stream[1] memory streams = [
-            Stream({
-                streamId:      38,
-                wallet:        wallets.addr("ECOSYSTEM_FACILITATOR"),
-                rewardAmount:  504_000 * WAD,
-                start:         DEC_01_2023,
-                cliff:         DEC_01_2023,
-                end:           NOV_30_2024,
-                durationDays:  366 days,
-                manager:       address(0),
-                isRestricted:  1,
-                claimedAmount: 0
-            })
-        ];
+        VestStream[] memory streams = new VestStream[](1);
+        streams[0] = VestStream({
+            id:  38,
+            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
+            bgn: DEC_01_2023,
+            clf: DEC_01_2023,
+            fin: NOV_30_2024,
+            tau: 366 days,
+            mgr: address(0),
+            res: 1,
+            tot: 504_000 * WAD,
+            rxd: 0
+        });
 
-        // Record previous values for the reference
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_DAI"));
-        uint256 prevStreamCount = vest.ids();
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check maximum vesting rate (Note: this should eventually be moved to _testGeneral)
-        assertEq(vest.cap(), 1 * MILLION * WAD / 30 days, "testVestDAI/invalid-cap");
-
-        // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + streams.length, "testVestDAI/not-all-streams-tested");
-
-        for (uint256 i = 0; i < streams.length; i++) {
-            uint256 streamId = prevStreamCount + i + 1;
-
-            // Check values of the each stream
-            assertEq(streamId, streams[i].streamId, "testVestDAI/invalid-id");
-            assertEq(vest.usr(streamId), streams[i].wallet, "testVestDAI/invalid-address");
-            assertEq(vest.tot(streamId), streams[i].rewardAmount, "testVestDAI/invalid-total");
-            assertEq(vest.bgn(streamId), streams[i].start, "testVestDAI/invalid-bgn");
-            assertEq(vest.clf(streamId), streams[i].cliff, "testVestDAI/invalid-clif");
-            assertEq(vest.fin(streamId), streams[i].start + streams[i].durationDays - 1, "testVestDAI/invalid-calculated-fin");
-            assertEq(vest.fin(streamId), streams[i].end, "testVestDAI/invalid-fin-variable");
-            assertEq(vest.mgr(streamId), streams[i].manager, "testVestDAI/invalid-manager");
-            assertEq(vest.res(streamId), streams[i].isRestricted, "testVestDAI/invalid-res");
-            assertEq(vest.rxd(streamId), streams[i].claimedAmount, "testVestDAI/invalid-rxd");
-
-            // Check each new stream is payable in the future
-            uint256 prevWalletBalance = dai.balanceOf(streams[i].wallet);
-            GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(streamId);
-            vm.warp(streams[i].end);
-            vest.vest(streamId);
-            assertEq(dai.balanceOf(streams[i].wallet), prevWalletBalance + streams[i].rewardAmount, "testVestDAI/invalid-received-amount");
-        }
+        _checkVestDai(streams);
     }
 
-    struct Payee {
-        address addr;
-        uint256 amount;
+    function testVestMKR() public skipped { // add the `skipped` modifier to skip
+        // Provide human-readable names for timestamps
+        uint256 DEC_01_2023 = 1701385200;
+        uint256 NOV_30_2024 = 1733007599;
+
+        // For each new stream, provide Stream object
+        // and initialize the array with the corrent number of new streams
+        VestStream[] memory streams = new VestStream[](1);
+        streams[0] = VestStream({
+            id:  44,
+            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
+            bgn: DEC_01_2023,
+            clf: DEC_01_2023,
+            fin: NOV_30_2024,
+            tau: 366 days,
+            mgr: address(0),
+            res: 1,
+            tot: 216 * WAD,
+            rxd: 0
+        });
+
+        _checkVestMkr(streams);
     }
 
-    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
-        // For each payment, create a Payee object with
-        //    the Payee address,
-        //    the amount to be paid in whole Dai units
-        // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 9_535_993)
-        ];
+    function testVestSKY() public { // add the `skipped` modifier to skip
+        // Provide human-readable names for timestamps
+        // uint256 DEC_01_2023 = 1701385200;
 
-        uint256 expectedSumPayments = 9_535_993; // Fill the number with the value from exec doc.
+        // For each new stream, provide Stream object
+        // and initialize the array with the corrent number of new streams
+        VestStream[] memory streams = new VestStream[](1);
 
-        uint256 prevBalance;
-        uint256 totAmount;
-        uint256[] memory prevAmounts = new uint256[](payees.length);
+        // This stream is configured in relative to the spell casting time.
+        {
+            uint256 before = vm.snapshot();
+            _vote(address(spell));
+            spell.schedule();
+            vm.warp(spell.nextCastTime());
 
-        for (uint256 i = 0; i < payees.length; i++) {
-            totAmount += payees[i].amount;
-            prevAmounts[i] = dai.balanceOf(payees[i].addr);
-            prevBalance += prevAmounts[i];
+            streams[0] = VestStream({
+                id:  1,
+                usr: addr.addr("REWARDS_DIST_USDS_SKY"),
+                bgn: block.timestamp - 7 days,
+                clf: block.timestamp - 7 days,
+                fin: block.timestamp - 7 days + 365 days - 1,
+                tau: 365 days - 1,
+                mgr: address(0),
+                res: 1,
+                tot: 600_000_000 * WAD,
+                rxd: 600_000_000 * WAD * 7 days / (365 days - 1)
+            });
+
+            vm.revertTo(before);
         }
 
-        _vote(address(spell));
-        spell.schedule();
-        vm.warp(spell.nextCastTime());
-        pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
-        assertEq(vat.sin(address(vow)) - prevSin, expectedSumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
-
-        for (uint256 i = 0; i < payees.length; i++) {
-            assertEq(
-                dai.balanceOf(payees[i].addr) - prevAmounts[i],
-                payees[i].amount * WAD
-            );
-        }
+        _checkVestSky(streams);
     }
 
     struct Yank {
@@ -543,72 +520,48 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testVestMKR() public skipped { // add the `skipped` modifier to skip
-        // Provide human-readable names for timestamps
-        uint256 DEC_01_2023 = 1701385200;
-        uint256 NOV_30_2024 = 1733007599;
+    struct Payee {
+        address addr;
+        uint256 amount;
+    }
 
-        // For each new stream, provide Stream object
-        // and initialize the array with the corrent number of new streams
-        Stream[1] memory streams = [
-            Stream({
-                streamId:      44,
-                wallet:        wallets.addr("ECOSYSTEM_FACILITATOR"),
-                rewardAmount:  216 * WAD,
-                start:         DEC_01_2023,
-                cliff:         DEC_01_2023,
-                end:           NOV_30_2024,
-                durationDays:  366 days,
-                manager:       address(0),
-                isRestricted:  1,
-                claimedAmount: 0
-            })
+    function testDAIPayments() public skipped { // add the `skipped` modifier to skip
+        // For each payment, create a Payee object with
+        //    the Payee address,
+        //    the amount to be paid in whole Dai units
+        // Initialize the array with the number of payees
+        Payee[1] memory payees = [
+            Payee(wallets.addr("LAUNCH_PROJECT_FUNDING"), 9_535_993)
         ];
 
-        // Record previous values for the reference
-        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        uint256 prevStreamCount = vest.ids();
-        uint256 prevAllowance = gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 expectedSumPayments = 9_535_993; // Fill the number with the value from exec doc.
+
+        uint256 prevBalance;
+        uint256 totAmount;
+        uint256[] memory prevAmounts = new uint256[](payees.length);
+
+        for (uint256 i = 0; i < payees.length; i++) {
+            totAmount += payees[i].amount;
+            prevAmounts[i] = dai.balanceOf(payees[i].addr);
+            prevBalance += prevAmounts[i];
+        }
 
         _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
+        spell.schedule();
+        vm.warp(spell.nextCastTime());
+        pot.drip();
+        uint256 prevSin = vat.sin(address(vow));
+        spell.cast();
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        // Check allowance was increased according to the streams
-        uint256 totalRewardAmount = 0;
-        for (uint256 i = 0; i < streams.length; i++) {
-            totalRewardAmount = totalRewardAmount + streams[i].rewardAmount;
-        }
-        assertEq(gov.allowance(pauseProxy, addr.addr("MCD_VEST_MKR_TREASURY")), prevAllowance + totalRewardAmount, "testVestMKR/invalid-allowance");
+        assertEq(vat.sin(address(vow)) - prevSin, totAmount * RAD, "testPayments/vat-sin-mismatch");
+        assertEq(vat.sin(address(vow)) - prevSin, expectedSumPayments * RAD, "testPaymentsSum/vat-sin-mismatch");
 
-        // Check maximum vesting rate (Note: this should eventually be moved to _testGeneral)
-        assertEq(vest.cap(), 2_220 * WAD / 365 days, "testVestMKR/invalid-cap");
-
-        // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + streams.length, "testVestMKR/not-all-streams-tested");
-
-        for (uint256 i = 0; i < streams.length; i++) {
-            uint256 streamId = prevStreamCount + i + 1;
-
-            // Check values of the each stream
-            assertEq(streamId, streams[i].streamId, "testVestMKR/invalid-id");
-            assertEq(vest.usr(streamId), streams[i].wallet, "testVestMKR/invalid-address");
-            assertEq(vest.tot(streamId), streams[i].rewardAmount, "testVestMKR/invalid-total");
-            assertEq(vest.bgn(streamId), streams[i].start, "testVestMKR/invalid-bgn");
-            assertEq(vest.clf(streamId), streams[i].cliff, "testVestMKR/invalid-clif");
-            assertEq(vest.fin(streamId), streams[i].start + streams[i].durationDays - 1, "testVestMKR/invalid-calculated-fin");
-            assertEq(vest.fin(streamId), streams[i].end, "testVestMKR/invalid-fin-variable");
-            assertEq(vest.mgr(streamId), streams[i].manager, "testVestMKR/invalid-manager");
-            assertEq(vest.res(streamId), streams[i].isRestricted, "testVestMKR/invalid-res");
-            assertEq(vest.rxd(streamId), streams[i].claimedAmount, "testVestMKR/invalid-rxd");
-
-            // Check each new stream is payable in the future
-            uint256 prevWalletBalance = gov.balanceOf(streams[i].wallet);
-            GodMode.setWard(address(vest), address(this), 1);
-            vest.unrestrict(streamId);
-            vm.warp(streams[i].end);
-            vest.vest(streamId);
-            assertEq(gov.balanceOf(streams[i].wallet), prevWalletBalance + streams[i].rewardAmount, "testVestMKR/invalid-received-amount");
+        for (uint256 i = 0; i < payees.length; i++) {
+            assertEq(
+                dai.balanceOf(payees[i].addr) - prevAmounts[i],
+                payees[i].amount * WAD
+            );
         }
     }
 
@@ -875,4 +828,64 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    function testUsdsPsmWrapper() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        UsdsPsmWrapperLike wrapper = UsdsPsmWrapperLike(addr.addr("WRAPPER_USDS_LITE_PSM_USDC_A"));
+        LitePsmLike litePsm = LitePsmLike(wrapper.psm());
+
+        assertEq(address(litePsm),   addr.addr("MCD_LITE_PSM_USDC_A"), "testUsdsPsmWrapper/psm-mismatch");
+        assertEq(wrapper.gem(),      litePsm.gem(),                    "testUsdsPsmWrapper/gem-mismatch");
+        assertEq(wrapper.ilk(),      litePsm.ilk(),                    "testUsdsPsmWrapper/ilk-mismatch");
+        assertEq(wrapper.dai(),      addr.addr("USDS"),                "testUsdsPsmWrapper/invalid-dai-alias-usds");
+        assertEq(wrapper.usds(),     addr.addr("USDS"),                "testUsdsPsmWrapper/invalid-usds");
+        assertEq(wrapper.usdsJoin(), addr.addr("USDS_JOIN"),           "testUsdsPsmWrapper/invalid-usds");
+
+        // Arbitrary amount of TOKEN to test PSM sellGem and buyGem with (in whole units)
+        // `amount` is the amount of _TOKEN_ we are selling/buying (NOT measured in USDS)
+        uint256 amount = 100_000;
+        // Amount should be more than 10,000 as `tin` and `tout` are basis point measurements
+        require(amount >= 10_000, "checkLitePsmIlkIntegration/amount-too-low-for-precision-checks");
+
+        GemAbstract token = GemAbstract(wrapper.gem());
+        // Approvals
+        token.approve(address(wrapper), type(uint256).max);
+        usds.approve(address(wrapper), type(uint256).max);
+
+        uint256 snapshot = vm.snapshot();
+
+        // Sell TOKEN _to_ the PSM for USDS
+        {
+
+            uint256 sellWadOut  = amount * WAD;           // Scale to USDS decimals (18) for USDS balance check
+            sellWadOut         -= sellWadOut * litePsm.tin() / WAD; // Subtract `tin` fee (was deducted by PSM)
+
+            uint256 sellAmt = amount * WAD / _to18ConversionFactor(litePsm);
+            _giveTokens(address(token), sellAmt);
+            wrapper.sellGem(address(this), sellAmt);
+
+            assertEq(token.balanceOf(address(this)), 0,          "testUsdsPsmWrapper/invalid-sellGem-gem-balance");
+            assertEq(usds.balanceOf(address(this)),  sellWadOut, "testUsdsPsmWrapper/sellGem-usds-balance");
+
+            vm.revertTo(snapshot);
+        }
+
+        // Buy TOKEN _from_ the PSM for USDS
+        {
+
+            uint256 buyWadIn  = amount * WAD;           // Scale to USDS decimals (18) for USDS balance check
+            buyWadIn         += buyWadIn * litePsm.tout() / WAD; // Add `tout` fee (was included by PSM)
+
+            uint256 buyAmt = amount * WAD / _to18ConversionFactor(litePsm);
+            _giveTokens(address(usds), buyWadIn);
+            wrapper.buyGem(address(this), buyAmt);
+
+            assertEq(token.balanceOf(address(this)), buyAmt, "testUsdsPsmWrapper/invalid-buyGem-gem-balance");
+            assertEq(usds.balanceOf(address(this)),  0,        "testUsdsPsmWrapper/buyGem-usds-balance");
+
+            vm.revertTo(snapshot);
+        }
+    }
 }

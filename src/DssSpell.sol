@@ -364,7 +364,7 @@ contract DssSpellAction is DssAction {
             vest: MCD_VEST_SKY,
             vestTot: 600 * MILLION * WAD,
             vestBgn: block.timestamp - 7 days,
-            vestTau: 365 days
+            vestTau: 365 days - 1
         }));
 
         // Call distribute() in VestedRewardsDistribution contract in the spell execution
