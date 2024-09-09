@@ -436,6 +436,7 @@ contract DssSpellTest is DssSpellTestBase {
                 mgr: address(0),
                 res: 1,
                 tot: 600_000_000 * WAD,
+                // Note: the accumulated vested amount is claimed during the spell (`REWARDS_DIST_USDS_SKY.distribute()`)
                 rxd: 600_000_000 * WAD * 7 days / (365 days - 1)
             });
 

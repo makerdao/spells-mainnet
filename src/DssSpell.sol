@@ -187,7 +187,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
-        // Note: load the MCD contracts depencencies
+        // Note: load the Maker Protocol contracts depencencies
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // ---------- New Tokens Init ----------
@@ -196,51 +196,62 @@ contract DssSpellAction is DssAction {
         // MIP: TODO
 
         // Init USDS by calling UsdsInit.init with the following parameters:
-        // Init USDS with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
-        // Init USDS with usdsImp parameter being 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102
-        // Init USDS with UsdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
-        // Init USDS with DaiUsds parameter being 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A
         UsdsInit.init(
+            // Note: Maker Protocol contracts dependencies
             dss,
             UsdsInstance({
+                // Init USDS with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
                 usds: USDS,
+                // Init USDS with usdsImp parameter being 0x1923DfeE706A8E78157416C29cBCCFDe7cdF4102
                 usdsImp: USDS_IMP,
+                // Init USDS with UsdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
                 usdsJoin: USDS_JOIN,
+                // Init USDS with DaiUsds parameter being 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A
                 daiUsds: DAI_USDS
             })
         );
+        // Add usds to chainlog with key "USDS" via the UsdsInit.init function
+        // Add usdsImp to chainlog under the key "USDS_IMP" via the UsdsInit.init function
+        // Add UsdsJoin to chainlog under the key "USDS_JOIN" via the UsdsInit.init function
+        // Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
 
         // Init sUSDS by calling SUsdsInit.init with the following parameters:
-        // Init sUSDS with sUsds parameter being 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD
-        // Init sUSDS with sUsdsImp parameter being 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0
-        // Init sUSDS with usdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
-        // Init sUSDS with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
-        // Init sUSDS with ssr parameter being 6.25%
         SUsdsInit.init(
+            // Note: Maker Protocol contracts dependencies
             dss,
             SUsdsInstance({
+                // Init sUSDS with sUsds parameter being 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD
                 sUsds: SUSDS,
+                // Init sUSDS with sUsdsImp parameter being 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0
                 sUsdsImp: SUSDS_IMP
             }),
             SUsdsConfig({
+                // Init sUSDS with usdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
                 usdsJoin: USDS_JOIN,
+                // Init sUSDS with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
                 usds: USDS,
+                // Init sUSDS with ssr parameter being 6.25%
                 ssr: SIX_PT_TWO_FIVE_PCT_RATE
             })
         );
+        // Add sUsds to chainlog under the key "SUSDS" via the SUsdsInit.init function
+        // Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
 
         // Init SKY by calling SkyInit.init with the following parameters:
-        // Init SKY with sky parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
-        // Init SKY with mkrSky parameter being 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B
-        // Init SKY with rate parameter being 24,000
         SkyInit.init(
+            // Note: Maker Protocol contracts dependencies
             dss,
             SkyInstance({
+                // Init SKY with sky parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
                 sky: SKY,
+                // Init SKY with mkrSky parameter being 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B
                 mkrSky: MKR_SKY
             }),
+            // Init SKY with rate parameter being 24,000
             24_000
         );
+        // Add sky to chainlog under the key "SKY" via the SkyInit.init function
+        // Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
 
         // ---------- Pool Migration and Flapper Init ----------
         // Forum: TODO
@@ -248,74 +259,78 @@ contract DssSpellAction is DssAction {
         // MIP: TODO
 
         // Migrate liquidity to the new pool by calling UniV2PoolMigratorInit.init with the following parameters:
-        // Migrate liquidity to the new pool with pairDaiMkr parameter being 0x517F9dD285e75b599234F7221227339478d0FcC8
-        // Migrate liquidity to the new pool with pairUsdsSky parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
         UniV2PoolMigratorInit.init(
+            // Note: Maker Protocol contracts dependencies
             dss,
+            // Migrate liquidity to the new pool with pairDaiMkr parameter being 0x517F9dD285e75b599234F7221227339478d0FcC8
             PAIR_DAI_MKR,
+            // Migrate liquidity to the new pool with pairUsdsSky parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
             PAIR_USDS_SKY
         );
 
         // Init Splitter by calling FlapperInit.initSplitter with the following parameters:
-        // Init Splitter with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
-        // Init Splitter with mom parameter being 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e
-        // Init Splitter with hump parameter being 55M DAI/SKY
-        // Init Splitter with bump parameter being 65,000 DAI/SKY
-        // Init Splitter with hop parameter being 10,249 seconds
-        // Init Splitter with burn parameter being 100% (1 * WAD)
-        // Init Splitter with usdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
-        // Init Splitter with splitterChainlogKey parameter being MCD_SPLIT
-        // Init Splitter with prevMomChainlogKey parameter being FLAPPER_MOM
-        // Init Splitter with momChainlogKey parameter being SPLITTER_MOM
         FlapperInit.initSplitter(
+            // Note: Maker Protocol contracts dependencies
             dss,
             SplitterInstance({
+                // Init Splitter with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
                 splitter: MCD_SPLIT,
+                // Init Splitter with mom parameter being 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e
                 mom: SPLITTER_MOM
             }),
             SplitterConfig({
+                // Init Splitter with hump parameter being 55M DAI/SKY
                 hump: 55 * MILLION * RAD,
+                // Init Splitter with bump parameter being 65,000 DAI/SKY
                 bump: 65 * THOUSAND * RAD,
+                // Init Splitter with hop parameter being 10,249 seconds
                 hop: 10_249,
+                // Init Splitter with burn parameter being 100% (1 * WAD)
                 burn: 1 * WAD,
+                // Init Splitter with usdsJoin parameter being 0x3C0f895007CA717Aa01c8693e59DF1e8C3777FEB
                 usdsJoin: USDS_JOIN,
+                // Init Splitter with splitterChainlogKey parameter being MCD_SPLIT
                 splitterChainlogKey: "MCD_SPLIT",
+                // Init Splitter with prevMomChainlogKey parameter being FLAPPER_MOM
                 prevMomChainlogKey: "FLAPPER_MOM",
+                // Init Splitter with momChainlogKey parameter being SPLITTER_MOM
                 momChainlogKey: "SPLITTER_MOM"
             })
         );
 
         // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
-        // Init new Flapper with flapper_ parameter being 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355
-        // Init new Flapper with want parameter being 98% (98 * WAD / 100)
-        // Init new Flapper with pip parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
-        // Init new Flapper with pair parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
-        // Init new Flapper with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
-        // Init new Flapper with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
-        // Init new Flapper with prevChainlogKey parameter being MCD_FLAP
-        // Init new Flapper with chainlogKey parameter being MCD_FLAP
         FlapperInit.initFlapperUniV2(
+            // Note: Maker Protocol contracts dependencies
             dss,
+            // Init new Flapper with flapper_ parameter being 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355
             MCD_FLAP,
             FlapperUniV2Config({
+                // Init new Flapper with want parameter being 98% (98 * WAD / 100)
                 want: 98 * WAD / 100,
+                // Init new Flapper with pip parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
                 pip: FLAP_SKY_ORACLE,
+                // Init new Flapper with pair parameter being 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c
                 pair: PAIR_USDS_SKY,
+                // Init new Flapper with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
                 usds: USDS,
+                // Init new Flapper with splitter parameter being 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF
                 splitter: MCD_SPLIT,
+                // Init new Flapper with prevChainlogKey parameter being MCD_FLAP
                 prevChainlogKey: "MCD_FLAP",
+                // Init new Flapper with chainlogKey parameter being MCD_FLAP
                 chainlogKey: "MCD_FLAP"
             })
         );
 
         // Init new Oracle by calling FlapperInit.initOracleWrapper with the following parameters:
-        // Init new Oracle with wrapper_ parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
-        // Init new Oracle with divisor parameter being 24,000
-        // Init new Oracle with clKey parameter being FLAP_SKY_ORACLE
         FlapperInit.initOracleWrapper(
+            // Note: Maker Protocol contracts dependencies
             dss,
+            // Init new Oracle with wrapper_ parameter being 0x38e8c1D443f546Dc014D7756ec63116161CB7B25
             FLAP_SKY_ORACLE,
+            // Init new Oracle with divisor parameter being 24,000
             24_000,
+            // Init new Oracle with clKey parameter being FLAP_SKY_ORACLE
             "FLAP_SKY_ORACLE"
         );
 
@@ -344,26 +359,26 @@ contract DssSpellAction is DssAction {
         // ---------- USDS => SKY Farm Setup ----------
 
         // Init USDS -> SKY rewards by calling UsdsSkyFarmingInit.init with the following parameters:
-        // Init USDS -> SKY rewards with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
-        // Init USDS -> SKY rewards with sky parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
-        // Init USDS -> SKY rewards with rewards parameter being 0x0650CAF159C5A49f711e8169D4336ECB9b950275
-        // Init USDS -> SKY rewards with rewardsKey parameter being REWARDS_USDS_SKY
-        // Init USDS -> SKY rewards with dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
-        // Init USDS -> SKY rewards with distKey parameter being REWARDS_DIST_USDS_SKY
-        // Init USDS -> SKY rewards with vest parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
-        // Init USDS -> SKY rewards with vestTot parameter being 600M * WAD
-        // Init USDS -> SKY rewards with vestBgn parameter being block.timestamp - 7 days
-        // Init USDS -> SKY rewards with vestTau parameter being 365 days
         UsdsSkyFarmingInit.init(UsdsSkyFarmingInitParams({
+            // Init USDS -> SKY rewards with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
             usds: USDS,
+            // Init USDS -> SKY rewards with sky parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
             sky: SKY,
+            // Init USDS -> SKY rewards with rewards parameter being 0x0650CAF159C5A49f711e8169D4336ECB9b950275
             rewards: REWARDS_USDS_SKY,
+            // Init USDS -> SKY rewards with rewardsKey parameter being REWARDS_USDS_SKY
             rewardsKey: "REWARDS_USDS_SKY",
+            // Init USDS -> SKY rewards with dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
             dist: REWARDS_DIST_USDS_SKY,
+            // Init USDS -> SKY rewards with distKey parameter being REWARDS_DIST_USDS_SKY
             distKey: "REWARDS_DIST_USDS_SKY",
+            // Init USDS -> SKY rewards with vest parameter being 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9
             vest: MCD_VEST_SKY,
+            // Init USDS -> SKY rewards with vestTot parameter being 600M * WAD
             vestTot: 600 * MILLION * WAD,
+            // Init USDS -> SKY rewards with vestBgn parameter being block.timestamp - 7 days
             vestBgn: block.timestamp - 7 days,
+            // Init USDS -> SKY rewards with vestTau parameter being 365 days - 1
             vestTau: 365 days - 1
         }));
 
@@ -371,23 +386,26 @@ contract DssSpellAction is DssAction {
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
         // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
-        // Initialize cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
-        // Initialize cron job with cfg.jobKey parameter being CRON_REWARDS_DIST_JOB
         VestedRewardsDistributionJobInit.init(
+            // Initialize cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
             CRON_REWARDS_DIST_JOB,
             VestedRewardsDistributionJobInitConfig({
+                // Initialize cron job with cfg.jobKey parameter being CRON_REWARDS_DIST_JOB
                 jobKey: "CRON_REWARDS_DIST_JOB"
             })
         );
 
         // Add VestedRewardsDistribution to the new cron job by calling VestedRewardsDistributionJobInit.setDist with the following parameters:
-        // Add VestedRewardsDistribution to the new cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
-        // Add VestedRewardsDistribution to the new cron job with cfg.dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
-        // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days
-        VestedRewardsDistributionJobInit.setDist(CRON_REWARDS_DIST_JOB, VestedRewardsDistributionJobSetDistConfig({
-            dist: REWARDS_DIST_USDS_SKY,
-            interval: 7 days
-        }));
+        VestedRewardsDistributionJobInit.setDist(
+            // Add VestedRewardsDistribution to the new cron job with job parameter being 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5
+            CRON_REWARDS_DIST_JOB,
+            VestedRewardsDistributionJobSetDistConfig({
+                // Add VestedRewardsDistribution to the new cron job with cfg.dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
+                dist: REWARDS_DIST_USDS_SKY,
+                // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days
+                interval: 7 days
+            })
+        );
 
         // ---------- USDS => 01 Farm Setup ----------
         // Forum: TODO
@@ -395,16 +413,16 @@ contract DssSpellAction is DssAction {
         // MIP: TODO
 
         // Init Rewards-01 by calling Usds01PreFarmingInit.init with the following parameters:
-        // Init Rewards-01 with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
-        // Init Rewards-01 with rewards parameter being 0x10ab606B067C9C461d8893c47C7512472E19e2Ce
-        // Init Rewards-01 with rewardsKey parameter being REWARDS_USDS_01
         Usds01PreFarmingInit.init(Usds01PreFarmingInitParams({
+            // Init Rewards-01 with usds parameter being 0xdC035D45d973E3EC169d2276DDab16f1e407384F
             usds: USDS,
+            // Init Rewards-01 with rewards parameter being 0x10ab606B067C9C461d8893c47C7512472E19e2Ce
             rewards: REWARDS_USDS_01,
+            // Init Rewards-01 with rewardsKey parameter being REWARDS_USDS_01
             rewardsKey: "REWARDS_USDS_01"
         }));
 
-        // ---------- USDS => 01 Farm Setup ----------
+        // ---------- MISC ----------
         // Forum: TODO
         // Poll: TODO
         // MIP: TODO
