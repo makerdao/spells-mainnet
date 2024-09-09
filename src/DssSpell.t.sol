@@ -859,8 +859,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Sell TOKEN _to_ the PSM for USDS
         {
-
-            uint256 sellWadOut  = amount * WAD;           // Scale to USDS decimals (18) for USDS balance check
+            uint256 sellWadOut  = amount * WAD;                     // Scale to USDS decimals (18) for USDS balance check
             sellWadOut         -= sellWadOut * litePsm.tin() / WAD; // Subtract `tin` fee (was deducted by PSM)
 
             uint256 sellAmt = amount * WAD / _to18ConversionFactor(litePsm);
@@ -875,8 +874,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Buy TOKEN _from_ the PSM for USDS
         {
-
-            uint256 buyWadIn  = amount * WAD;           // Scale to USDS decimals (18) for USDS balance check
+            uint256 buyWadIn  = amount * WAD;                    // Scale to USDS decimals (18) for USDS balance check
             buyWadIn         += buyWadIn * litePsm.tout() / WAD; // Add `tout` fee (was included by PSM)
 
             uint256 buyAmt = amount * WAD / _to18ConversionFactor(litePsm);
