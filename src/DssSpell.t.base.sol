@@ -2510,58 +2510,59 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "testSplitter/invalid-flapper-pip");
         assertEq(flap.pair(), addr.addr("UNIV2USDSSKY"), "testSplitter/invalid-flapper-pair");
 
-        // Leave surplus buffer ready to be flapped
-        vow.heal(vat.sin(address(vow)) - (vow.Sin() + vow.Ash()));
-        stdstore
-            .target(address(vat))
-            .sig("dai(address)")
-            .with_key(address(vow))
-            .checked_write(vat.sin(address(vow)) + vow.bump() + vow.hump());
+        // Check splitter and flapper
+        {
+            // Leave surplus buffer ready to be flapped
+            vow.heal(vat.sin(address(vow)) - (vow.Sin() + vow.Ash()));
+            // Ensure flapping is possible
+            stdstore
+                .target(address(vat))
+                .sig("dai(address)")
+                .with_key(address(vow))
+                .checked_write(vat.sin(address(vow)) + vow.bump() + vow.hump());
 
-        GemAbstract pair = GemAbstract(addr.addr("UNIV2USDSSKY"));
-        FlapOracleLike pip = FlapOracleLike(flap.pip());
+            GemAbstract pair = GemAbstract(addr.addr("UNIV2USDSSKY"));
+            FlapOracleLike pip = FlapOracleLike(flap.pip());
 
-        vm.prank(address(flap));
-        uint256 price = uint256(pip.read());
+            vm.prank(address(flap));
+            uint256 price = uint256(pip.read());
 
-        uint256 usdsWad = 100_000_000 * WAD;
-        GodMode.setBalance(address(usds), address(pair), usdsWad);
-        uint256 skyWad = usdsWad * WAD / price;
-        // Ensure price is within the tolerance (fla.want() + delta (1 p.p.))
-        GodMode.setBalance(address(sky), address(pair), skyWad * (flap.want() + 10**16) / WAD);
-        // Overwrite burn so it is < 100%
-        stdstore
-            .target(address(split))
-            .sig("burn()")
-            .checked_write(1 * WAD * 70 / 100);
+            // Ensure there is enough liquidity
+            uint256 usdsWad = 150_000_000 * WAD;
+            GodMode.setBalance(address(usds), address(pair), usdsWad);
+            // Ensure price is within the tolerane (flap.want() + delta (1 p.p.))
+            uint256 skyWad = usdsWad * (flap.want() + 10**16) / price;
+            GodMode.setBalance(address(sky), address(pair), skyWad);
 
-        // Overwrite farm, since usds cannot be transferred to `address(0)`
-        // We need a Sink because Spliiter will try to call `notifiRewardAmount()`
-        address fakeFarm = address(new Sink());
-        stdstore
-            .target(address(split))
-            .sig("farm()")
-            .checked_write(fakeFarm);
+            uint256 lotRad = vow.bump() * split.burn() / WAD;
+            uint256 payWad = (vow.bump() - lotRad) / RAY;
 
-        uint256 lot = vow.bump() * split.burn() / WAD;
-        uint256 pay = (vow.bump() - lot) / RAY;
+            uint256 pbalancePauseProxy = pair.balanceOf(pauseProxy);
+            uint256 pdaiVow = vat.dai(address(vow));
+            uint256 preserveUsds = usds.balanceOf(address(pair));
+            uint256 preserveSky = sky.balanceOf(address(pair));
 
-        uint256 pbalancePauseProxy = pair.balanceOf(pauseProxy);
-        uint256 pdaiVow = vat.dai(address(vow));
-        uint256 preserveUsds = usds.balanceOf(address(pair));
-        uint256 preserveSky = sky.balanceOf(address(pair));
-        uint256 pbalanceUsdsFarm = usds.balanceOf(split.farm());
+            uint256 pbalanceUsdsFarm;
+            // Checking the farm balance is only relevant if split.burn() < 100%
+            if (split.burn() < 1 * WAD) {
+                pbalanceUsdsFarm = usds.balanceOf(split.farm());
+                assertFalse(split.farm() == address(0), "testSpliter/Splitter/missing-farm");
+            }
 
-        vow.flap();
+            vow.flap();
 
-        assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,     "testSplitter/Flapper/pair-pauseProxy-balance-no-increase");
-        assertGt(usds.balanceOf(address(pair)),   preserveUsds,           "testSplitter/Flapper/usds-pair-balance-no-increase");
-        assertEq(sky.balanceOf(address(pair)),    preserveSky,            "testSplitter/Flapper/unexpected-sky-pair-balance-change");
-        assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,    "testSplitter/Flapper/vat-dai-vow-change-too-low");
-        assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10,   "testSplitter/Flapper/vat-dai-vow-change-too-high");
-        assertEq(usds.balanceOf(address(flap)),   0,                      "testSplitter/Flapper/invalid-usds-balance");
-        assertEq(sky.balanceOf(address(flap)),    0,                      "testSplitter/Flapper/invalid-sky-balance");
-        assertEq(usds.balanceOf(split.farm()),    pbalanceUsdsFarm + pay, "testSplitter/invalid-farm-balance");
+            assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,   "testSplitter/Flapper/pair-pauseProxy-balance-no-increase");
+            assertGt(usds.balanceOf(address(pair)),   preserveUsds,         "testSplitter/Flapper/usds-pair-balance-no-increase");
+            assertEq(sky.balanceOf(address(pair)),    preserveSky,          "testSplitter/Flapper/unexpected-sky-pair-balance-change");
+            assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,  "testSplitter/Flapper/vat-dai-vow-change-too-low");
+            assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10, "testSplitter/Flapper/vat-dai-vow-change-too-high");
+            assertEq(usds.balanceOf(address(flap)),   0,                    "testSplitter/Flapper/invalid-usds-balance");
+            assertEq(sky.balanceOf(address(flap)),    0,                    "testSplitter/Flapper/invalid-sky-balance");
+
+            if (split.burn() < 1 * WAD) {
+                assertEq(usds.balanceOf(split.farm()), pbalanceUsdsFarm + payWad, "testSplitter/Splitter/invalid-farm-balance");
+            }
+        }
 
         // Check Mom can increase hop
         {
