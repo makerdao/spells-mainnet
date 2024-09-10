@@ -19,7 +19,6 @@ pragma solidity 0.8.16;
 import "dss-interfaces/Interfaces.sol";
 import {DssTest, GodMode} from "dss-test/DssTest.sol";
 import {stdStorage, StdStorage} from "forge-std/Test.sol";
-import "forge-std/console2.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
@@ -594,7 +593,7 @@ contract DssSpellTestBase is Config, DssTest {
 
         // split
         {
-            // Check split hop and sanity checks
+            // check split hop and sanity checks
             assertEq(split.hop(), values.split_hop, "TestError/split-hop");
             assertTrue(split.hop() > 0 && split.hop() < 86400, "TestError/split-hop-range"); // gt 0 && lt 1 day
             // check burn value
@@ -2606,13 +2605,6 @@ contract DssSpellTestBase is Config, DssTest {
 
         // sUSDS is upgradeable, so we need to ensure the implementation contract address is correct.
         assertEq(_imp(address(susds)), addr.addr("SUSDS_IMP"), "TestError/invalid-susds-implementation");
-
-        // Checks that MCD_VEST_SKY is ward of SKY
-        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")), 1, "TestError/sky-vest-cannot-mint-sky");
-
-        // Checks that SUSDS is ward of MCD_VAT, otherwise it cannot call `vat.suck()`
-        // Checks that MCD_VEST_SKY is ward of SKY
-        assertEq(vat.wards(address(susds)), 1, "TestError/susds-canot-suck-vat");
     }
 
     // Obtained as `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)`

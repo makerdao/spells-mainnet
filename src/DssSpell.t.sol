@@ -16,8 +16,6 @@
 
 pragma solidity 0.8.16;
 
-import "forge-std/console2.sol";
-
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 
@@ -1048,5 +1046,30 @@ contract DssSpellTest is DssSpellTestBase {
 
             vm.revertTo(snapshot);
         }
+    }
+
+    function testNewAuthorizations() public {
+        assertEq(WardsAbstract(address(usds)).wards(addr.addr("USDS_JOIN")),     0, "before: testNewAuthorizations/usds-join-already-ward-usds");
+        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MKR_SKY")),        0, "before: testNewAuthorizations/mkr-sky-already-ward-sky");
+        assertEq(WardsAbstract(gov.authority()).wards(addr.addr("MKR_SKY")),     0, "before: testNewAuthorizations/mkr-sky-already-ward-mkr-authority");
+        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")),   0, "TestError/mcd-vest-sky-already-ward-sky");
+        assertEq(WardsAbstract(address(vat)).wards(addr.addr("SUSDS")),          0, "before: testNewAuthorizations/susds-already-ward-vat");
+        assertEq(WardsAbstract(address(flap)).wards(addr.addr("MCD_SPLIT")),     0, "before: testNewAuthorizations/splitter-already-ward-flapper");
+        assertEq(WardsAbstract(address(split)).wards(addr.addr("SPLITTER_MOM")), 0, "before: testNewAuthorizations/splitter-mom-already-ward-splitter");
+        assertEq(WardsAbstract(address(split)).wards(addr.addr("MCD_VOW")),      0, "before: testNewAuthorizations/vow-already-ward-splitter");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(WardsAbstract(address(usds)).wards(addr.addr("USDS_JOIN")),     1, "after: testNewAuthorizations/usds-join-not-ward-usds");
+        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MKR_SKY")),        1, "after: testNewAuthorizations/mkr-sky-not-ward-sky");
+        assertEq(WardsAbstract(gov.authority()).wards(addr.addr("MKR_SKY")),     1, "after: testNewAuthorizations/mkr-sky-not-ward-mkr-authority");
+        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")),   1, "TestError/mcd-vest-sky-not-ward-sky");
+        assertEq(WardsAbstract(address(vat)).wards(addr.addr("SUSDS")),          1, "after: testNewAuthorizations/susds-not-ward-vat");
+        assertEq(WardsAbstract(address(flap)).wards(addr.addr("MCD_SPLIT")),     1, "after: testNewAuthorizations/splitter-not-ward-flapper");
+        assertEq(WardsAbstract(address(split)).wards(addr.addr("SPLITTER_MOM")), 1, "after: testNewAuthorizations/splitter-mom-not-ward-splitter");
+        assertEq(WardsAbstract(address(split)).wards(addr.addr("MCD_VOW")),      1, "after: testNewAuthorizations/vow-not-ward-splitter");
+
     }
 }

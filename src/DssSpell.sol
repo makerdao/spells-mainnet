@@ -184,7 +184,7 @@ contract DssSpellAction is DssAction {
     address internal constant WRAPPER_USDS_LITE_PSM_USDC_A = 0xA188EEC8F81263234dA3622A406892F3D630f98c;
 
     // ---------- MCD Addresses ----------
-    address internal MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
+    address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
 
     function actions() public override {
 
