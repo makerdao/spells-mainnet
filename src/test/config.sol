@@ -30,6 +30,7 @@ contract Config {
     struct SystemValues {
         uint256 line_offset;
         uint256 pot_dsr;
+        uint256 susds_ssr;
         uint256 pause_delay;
         uint256 vow_wait;
         uint256 vow_dump;
@@ -114,6 +115,7 @@ contract Config {
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
         afterSpell.pot_dsr                = 6_00;                           // In basis points
+        afterSpell.susds_ssr              = 6_25;                           // In basis points
         afterSpell.pause_delay            = 16 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units

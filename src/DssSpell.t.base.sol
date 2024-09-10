@@ -173,6 +173,10 @@ interface FlapOracleLike {
 // TODO: add full interfaces to dss-interfaces and remove from here
 interface UsdsJoinLike is DaiJoinAbstract {}
 
+interface SUsdsLike is GemAbstract {
+    function ssr() external view returns (uint256);
+}
+
 interface LitePsmLike {
     function bud(address) external view returns (uint256);
     function buf() external view returns (uint256);
@@ -226,6 +230,7 @@ contract DssSpellTestBase is Config, DssTest {
     DaiAbstract                      dai = DaiAbstract(        addr.addr("MCD_DAI"));
     DaiJoinAbstract              daiJoin = DaiJoinAbstract(    addr.addr("MCD_JOIN_DAI"));
     GemAbstract                     usds = GemAbstract(        addr.addr("USDS"));
+    SUsdsLike                      susds = SUsdsLike(          addr.addr("SUSDS"));
     UsdsJoinLike                usdsJoin = UsdsJoinLike(       addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
@@ -475,6 +480,23 @@ contract DssSpellTestBase is Config, DssTest {
             _diffCalc(_expectedRate(values.pot_dsr), _yearlyYield(expectedDSRRate)) <= TOLERANCE,
             "TestError/pot-dsr-rates-table"
         );
+
+        // ssr
+        uint256 expectedSSRRate = rates.rates(values.susds_ssr);
+        // make sure dsr is less than 100% APR
+        // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
+        // 1000000021979553151239153027
+        assertEq(susds.ssr(), expectedSSRRate, "TestError/susds-ssr-expected-value");
+        assertTrue(
+            susds.ssr() >= RAY && susds.ssr() < 1000000021979553151239153027,
+            "TestError/susds-ssr-range"
+        );
+        assertTrue(
+            _diffCalc(_expectedRate(values.susds_ssr), _yearlyYield(expectedSSRRate)) <= TOLERANCE,
+            "TestError/susds-ssr-rates-table"
+        );
+        // SSR should always be higher than or equal to DSR
+        assertGe(expectedSSRRate, expectedDSRRate, "TestError/ssr-lower-than-dsr");
 
         {
         // Line values in RAD
@@ -2504,11 +2526,11 @@ contract DssSpellTestBase is Config, DssTest {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        assertEq(vow.flapper(), address(split), "testSplitter/invalid-vow-flapper");
-        assertEq(split.flapper(), address(flap), "testSplitter/invalid-split-flapper");
-        assertEq(flap.gem(), address(sky), "testSplitter/invalid-flapper-gem");
-        assertEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "testSplitter/invalid-flapper-pip");
-        assertEq(flap.pair(), addr.addr("UNIV2USDSSKY"), "testSplitter/invalid-flapper-pair");
+        assertEq(vow.flapper(), address(split), "TestError/invalid-vow-flapper");
+        assertEq(split.flapper(), address(flap), "TestError/invalid-split-flapper");
+        assertEq(flap.gem(), address(sky), "TestError/invalid-flapper-gem");
+        assertEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "TestError/invalid-flapper-pip");
+        assertEq(flap.pair(), addr.addr("UNIV2USDSSKY"), "TestError/invalid-flapper-pair");
 
         // Check splitter and flapper
         {
@@ -2546,21 +2568,21 @@ contract DssSpellTestBase is Config, DssTest {
             // Checking the farm balance is only relevant if split.burn() < 100%
             if (split.burn() < 1 * WAD) {
                 pbalanceUsdsFarm = usds.balanceOf(split.farm());
-                assertFalse(split.farm() == address(0), "testSpliter/Splitter/missing-farm");
+                assertFalse(split.farm() == address(0), "TestError/Splitter/missing-farm");
             }
 
             vow.flap();
 
-            assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,   "testSplitter/Flapper/pair-pauseProxy-balance-no-increase");
-            assertGt(usds.balanceOf(address(pair)),   preserveUsds,         "testSplitter/Flapper/usds-pair-balance-no-increase");
-            assertEq(sky.balanceOf(address(pair)),    preserveSky,          "testSplitter/Flapper/unexpected-sky-pair-balance-change");
-            assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,  "testSplitter/Flapper/vat-dai-vow-change-too-low");
-            assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10, "testSplitter/Flapper/vat-dai-vow-change-too-high");
-            assertEq(usds.balanceOf(address(flap)),   0,                    "testSplitter/Flapper/invalid-usds-balance");
-            assertEq(sky.balanceOf(address(flap)),    0,                    "testSplitter/Flapper/invalid-sky-balance");
+            assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,   "TestError/Flapper/pair-pauseProxy-balance-no-increase");
+            assertGt(usds.balanceOf(address(pair)),   preserveUsds,         "TestError/Flapper/usds-pair-balance-no-increase");
+            assertEq(sky.balanceOf(address(pair)),    preserveSky,          "TestError/Flapper/unexpected-sky-pair-balance-change");
+            assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,  "TestError/Flapper/vat-dai-vow-change-too-low");
+            assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10, "TestError/Flapper/vat-dai-vow-change-too-high");
+            assertEq(usds.balanceOf(address(flap)),   0,                    "TestError/Flapper/invalid-usds-balance");
+            assertEq(sky.balanceOf(address(flap)),    0,                    "TestError/Flapper/invalid-sky-balance");
 
             if (split.burn() < 1 * WAD) {
-                assertEq(usds.balanceOf(split.farm()), pbalanceUsdsFarm + payWad, "testSplitter/Splitter/invalid-farm-balance");
+                assertEq(usds.balanceOf(split.farm()), pbalanceUsdsFarm + payWad, "TestError/Splitter/invalid-farm-balance");
             }
         }
 
@@ -2580,13 +2602,17 @@ contract DssSpellTestBase is Config, DssTest {
         assertTrue(spell.done());
 
         // USDS is upgradeable, so we need to ensure the implementation contract address is correct.
-        assertEq(_imp(addr.addr("USDS")), addr.addr("USDS_IMP"), "testSystemTokens/invalid-usds-implementation");
+        assertEq(_imp(address(usds)), addr.addr("USDS_IMP"), "TestError/invalid-usds-implementation");
 
         // sUSDS is upgradeable, so we need to ensure the implementation contract address is correct.
-        assertEq(_imp(addr.addr("SUSDS")), addr.addr("SUSDS_IMP"), "testSystemTokens/invalid-susds-implementation");
+        assertEq(_imp(address(susds)), addr.addr("SUSDS_IMP"), "TestError/invalid-susds-implementation");
 
         // Checks that MCD_VEST_SKY is ward of SKY
-        assertEq(WardsAbstract(addr.addr("SKY")).wards(addr.addr("MCD_VEST_SKY")), 1, "testSytemTokens/sky-vest-cannot-mint-sky");
+        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")), 1, "TestError/sky-vest-cannot-mint-sky");
+
+        // Checks that SUSDS is ward of MCD_VAT, otherwise it cannot call `vat.suck()`
+        // Checks that MCD_VEST_SKY is ward of SKY
+        assertEq(vat.wards(address(susds)), 1, "TestError/susds-canot-suck-vat");
     }
 
     // Obtained as `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)`
