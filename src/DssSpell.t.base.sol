@@ -2573,4 +2573,27 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(split.hop(), type(uint256).max);
         }
     }
+
+    function _testSystemTokens() internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // USDS is upgradeable, so we need to ensure the implementation contract address is correct.
+        assertEq(_imp(addr.addr("USDS")), addr.addr("USDS_IMP"), "testSystemTokens/invalid-usds-implementation");
+
+        // sUSDS is upgradeable, so we need to ensure the implementation contract address is correct.
+        assertEq(_imp(addr.addr("SUSDS")), addr.addr("SUSDS_IMP"), "testSystemTokens/invalid-susds-implementation");
+
+        // Checks that MCD_VEST_SKY is ward of SKY
+        assertEq(WardsAbstract(addr.addr("SKY")).wards(addr.addr("MCD_VEST_SKY")), 1, "testSytemTokens/sky-vest-cannot-mint-sky");
+    }
+
+    // Obtained as `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)`
+    bytes32 constant EIP1967_IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+    /// @dev Returns the implementation of upgradeable contracts following EIP1697
+    function _imp(address _tgt) internal view returns (address) {
+        return address(uint160(uint256(vm.load(_tgt, EIP1967_IMPLEMENTATION_SLOT))));
+    }
 }
