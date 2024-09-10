@@ -2574,10 +2574,3 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 }
-
-/// @dev No-op for any call with any parameters
-contract Sink {
-    fallback(bytes calldata) external returns (bytes memory) {
-
-    }
-}
