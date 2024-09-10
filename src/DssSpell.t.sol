@@ -62,6 +62,23 @@ interface PairLike {
     function totalSupply() external view returns (uint256);
 }
 
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function dssVest() external view returns (address);
+    function lastDistributedAt() external view returns (uint256);
+    function stakingRewards() external view returns (address);
+    function vestId() external view returns (uint256);
+}
+
+interface StakingRewardsLike {
+    function balanceOf(address account) external view returns (uint256);
+    function getReward() external;
+    function rewardsDistribution() external view returns (address);
+    function rewardsToken() external view returns (address);
+    function stake(uint256 amount) external;
+    function stakingToken() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -895,6 +912,83 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(usds.balanceOf(address(usdsSky)), pbalanceDai,          "after: testPoolMigration/invalid-usds-balance");
         assertEq(sky.balanceOf(address(usdsSky)),  pbalanceMkr * 24_000, "after: testPoolMigration/invalid-usds-balance");
+    }
+
+    function testUsdsSkyRewards() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_SKY"));
+        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        // Sanity checks
+        assertEq(rewards.rewardsDistribution(), address(dist), "testUsdsSkyRewards/rewards-rewards-dist-mismatch");
+        assertEq(rewards.stakingToken(),        address(usds), "testUsdsSkyRewards/rewards-staking-token-mismatch");
+        assertEq(rewards.rewardsToken(),        address(sky),  "testUsdsSkyRewards/rewards-rewards-token-mismatch");
+
+        assertTrue(vestSky.valid(dist.vestId()),               "testUsdsSkyRewards/invalid-dist-vest-id");
+
+        assertEq(dist.dssVest(),           address(vestSky),   "testUsdsSkyRewards/dist-vest-mismatch");
+        assertEq(dist.stakingRewards(),    address(rewards),   "testUsdsSkyRewards/dist-rewards-mismatch");
+        assertEq(dist.lastDistributedAt(), block.timestamp,    "testUsdsSkyRewards/dist-distribute-not-called-in-spell");
+
+        // Check if users can stake and get rewards
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 stakingWad = 100_000 * WAD;
+            _giveTokens(address(usds), stakingWad);
+            usds.approve(address(rewards), stakingWad);
+            rewards.stake(stakingWad);
+            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsdsSkyRewards/rewards-invalid-staked-balance");
+
+            uint256 pbalance = sky.balanceOf(address(this));
+            skip(7 days);
+            rewards.getReward();
+            assertGt(sky.balanceOf(address(this)), pbalance);
+
+            vm.revertTo(before);
+        }
+
+        // Check if distribute can be called again in the future
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 pbalance = sky.balanceOf(address(rewards));
+            skip(7 days);
+            dist.distribute();
+            assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
+
+            vm.revertTo(before);
+        }
+    }
+
+    function testUsds01Rewards() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_01"));
+
+        // Sanity checks
+        assertEq(rewards.rewardsDistribution(), address(0),    "testUsds01Rewards/rewards-invalid-rewards-dist");
+        assertEq(rewards.stakingToken(),        address(usds), "testUsds01Rewards/rewards-staking-token-mismatch");
+        assertEq(rewards.rewardsToken(),        address(0),    "testUsds01Rewards/rewards-invalid-rewards-token");
+
+
+        // Check if users can stake
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 stakingWad = 100_000 * WAD;
+            _giveTokens(address(usds), stakingWad);
+            usds.approve(address(rewards), stakingWad);
+            rewards.stake(stakingWad);
+            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsds01Rewards/rewards-invalid-staked-balance");
+
+            vm.revertTo(before);
+        }
     }
 
     function testUsdsPsmWrapper() public {
