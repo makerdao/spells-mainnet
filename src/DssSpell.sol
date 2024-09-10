@@ -361,7 +361,7 @@ contract DssSpellAction is DssAction {
 
         // Authorize wrapper to read MKR oracle price
 
-        // Note: the actions above are executed through SkyInit.init()
+        // Note: the actions above are executed through FlapperInit.initOracleWrapper()
 
         // ---------- Setup DssVestMintable for SKY ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
@@ -414,7 +414,7 @@ contract DssSpellAction is DssAction {
 
         // SKY Vesting Stream  | from 'block.timestamp - 7 days' for '365 days - 1' | 600M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
 
-        // Note: the actions above are executed through SkyInit.init()
+        // Note: the actions above are executed through UsdsSkyFarmingInit.init()
 
         // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
         VestedRewardsDistributionJobInit.init(
