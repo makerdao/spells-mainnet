@@ -112,6 +112,7 @@ contract DssExec {
         require(eta == 0, "This spell has already been scheduled");
         // ---------- Set earliest execution date September 17, 12:00 UTC ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
         // Note: In case the spell is scheduled later than planned, we have to switch back to the regular logic to respect GSM delay enforced by MCD_PAUSE
         eta = _max(block.timestamp + PauseLike(pause).delay(), MIN_ETA);
         pause.plot(action, tag, sig, eta);
@@ -192,6 +193,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- New Tokens Init ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
         // Init USDS by calling UsdsInit.init with the following parameters:
         UsdsInit.init(
@@ -209,15 +211,17 @@ contract DssSpellAction is DssAction {
             })
         );
 
-        // Note: Add usds to chainlog with key "USDS" via the UsdsInit.init function
+        // Add usds to chainlog with key "USDS" via the UsdsInit.init function
 
-        // Note: Add usdsImp to chainlog under the key "USDS_IMP" via the UsdsInit.init function
+        // Add usdsImp to chainlog under the key "USDS_IMP" via the UsdsInit.init function
 
-        // Note: Add UsdsJoin to chainlog under the key "USDS_JOIN" via the UsdsInit.init function
+        // Add UsdsJoin to chainlog under the key "USDS_JOIN" via the UsdsInit.init function
 
-        // Note: Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
+        // Add DaiUsds to chainlog under the key "DAI_USDS" via the UsdsInit.init function
 
-        // Note: The usdsJoin Adapter will be authorized in the usds contract by calling rely via the UsdsInit.init function
+        // The usdsJoin Adapter will be authorized in the usds contract by calling rely via the UsdsInit.init function
+
+        // Note: the actions above are executed through UsdsInit.init()
 
         // Init sUSDS by calling SUsdsInit.init with the following parameters:
         SUsdsInit.init(
@@ -239,11 +243,13 @@ contract DssSpellAction is DssAction {
             })
         );
 
-        // Note: Add sUsds to chainlog under the key "SUSDS" via the SUsdsInit.init function
+        // Add sUsds to chainlog under the key "SUSDS" via the SUsdsInit.init function
 
-        // Note: Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
+        // Add sUsdsImp to chainlog under the key "SUSDS_IMP" via the SUsdsInit.init function
 
-        // Note: sUSDS will be authorized to access the vat by calling rely via the SUsdsInit.init function
+        // sUSDS will be authorized to access the vat by calling rely via the SUsdsInit.init function
+
+        // Note: the actions above are executed through SUsdsInit.init()
 
         // Init SKY by calling SkyInit.init with the following parameters:
         SkyInit.init(
@@ -259,15 +265,19 @@ contract DssSpellAction is DssAction {
             24_000
         );
 
-        // Note: Add sky to chainlog under the key "SKY" via the SkyInit.init function
+        // Add sky to chainlog under the key "SKY" via the SkyInit.init function
 
-        // Note: Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
+        // Add mkrSky to chainlog under the key "MKR_SKY" via the SkyInit.init function
 
-        // Note: The mkrSky contract will be authorized in the sky contract by calling rely via the SkyInit.init function
-        // Note: The mkrSky contract will be authorized in the MkrAuthority contract by calling rely via the SkyInit.init function
+        // The mkrSky contract will be authorized in the sky contract by calling rely via the SkyInit.init function
+
+        // The mkrSky contract will be authorized in the MkrAuthority contract by calling rely via the SkyInit.init function
+
+        // Note: the actions above are executed through SkyInit.init()
 
         // ---------- Pool Migration and Flapper Init ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
         // Migrate liquidity to the new pool by calling UniV2PoolMigratorInit.init with the following parameters:
         UniV2PoolMigratorInit.init(
@@ -309,7 +319,9 @@ contract DssSpellAction is DssAction {
             })
         );
 
-        // Note: The flapper variable in the vow will be changed by the splitter address by calling file via the SkyInit.init function
+        // The flapper variable in the vow will be changed by the splitter address by calling file via the SkyInit.init function
+
+        // Note: the actions above are executed through SkyInit.init()
 
         // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
         FlapperInit.initFlapperUniV2(
@@ -347,10 +359,13 @@ contract DssSpellAction is DssAction {
             "FLAP_SKY_ORACLE"
         );
 
-        // Note: Authorize wrapper to read MKR oracle price
+        // Authorize wrapper to read MKR oracle price
+
+        // Note: the actions above are executed through SkyInit.init()
 
         // ---------- Setup DssVestMintable for SKY ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
         // Authorize DssVestMintable on SKY by calling DssExecLib.authorize with the following parameters:
         // Authorize DssVestMintable on SKY with _base parameter being 0x56072C95FAA701256059aa122697B133aDEd9279
@@ -397,7 +412,9 @@ contract DssSpellAction is DssAction {
         // Call distribute() in VestedRewardsDistribution contract in the spell execution
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
-        // Note: A SKY vesting stream will be created for rewards distribution
+        // SKY Vesting Stream  | from 'block.timestamp - 7 days' for '365 days - 1' | 600M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
+
+        // Note: the actions above are executed through SkyInit.init()
 
         // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
         VestedRewardsDistributionJobInit.init(
@@ -423,6 +440,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- USDS => 01 Farm Setup ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
         // Init Rewards-01 by calling Usds01PreFarmingInit.init with the following parameters:
         Usds01PreFarmingInit.init(Usds01PreFarmingInitParams({
@@ -436,6 +454,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- MISC ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
+        // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
         // Add LitePsmWrapper to the Chainlog by calling DssExecLib.setChangelogAddress with the following parameters:
         // Add LitePsmWrapper to the Chainlog with _key parameter being WRAPPER_USDS_LITE_PSM_USDC_A
