@@ -279,7 +279,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
         // Poll: https://vote.makerdao.com/polling/QmTySKwi
 
-        // Migrate liquidity to the new pool by calling UniV2PoolMigratorInit.init with the following parameters:
+        // Migrate full DAI/MKR UniswapV2 liquidity into USDS/SKY by calling UniV2PoolMigratorInit.init with the following parameters:
         UniV2PoolMigratorInit.init(
             // Note: Maker Protocol contracts dependencies
             dss,
@@ -300,9 +300,9 @@ contract DssSpellAction is DssAction {
                 mom: SPLITTER_MOM
             }),
             SplitterConfig({
-                // Init Splitter with hump parameter being 55M DAI/SKY
+                // Init Splitter with hump parameter being 55M DAI
                 hump: 55 * MILLION * RAD,
-                // Init Splitter with bump parameter being 65,000 DAI/SKY
+                // Init Splitter with bump parameter being 65,000 DAI/USDS
                 bump: 65 * THOUSAND * RAD,
                 // Init Splitter with hop parameter being 10,249 seconds
                 hop: 10_249,
@@ -319,9 +319,9 @@ contract DssSpellAction is DssAction {
             })
         );
 
-        // The flapper variable in the vow will be changed by the splitter address by calling file via the SkyInit.init function
+        // The flapper variable in the vow will be changed by the splitter address by calling file via the initSplitter function
 
-        // Note: the actions above are executed through SkyInit.init()
+        // Note: the actions above are executed through FlapperIni.initSplitter()
 
         // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
         FlapperInit.initFlapperUniV2(
