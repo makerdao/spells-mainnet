@@ -859,6 +859,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256 constant MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
 
     function testNextCastTimeMinEta() public {
+        // Spell obtains approval for execution before MIN_ETA
         {
             uint256 before = vm.snapshot();
 
@@ -871,6 +872,7 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertTo(before);
         }
 
+        // Spell obtains approval for execution after MIN_ETA
         {
             uint256 before = vm.snapshot();
 
