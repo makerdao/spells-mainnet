@@ -633,9 +633,9 @@ contract DssSpellTestBase is Config, DssTest {
 
         // vest
         {
-            assertApproxEqRel(vestDai.cap(), values.vest_dai_cap, 10**16, "TestError/vest-dai-cap");
-            assertApproxEqRel(vestMkr.cap(), values.vest_mkr_cap, 10**16, "TestError/vest-mkr-cap");
-            assertApproxEqRel(vestSky.cap(), values.vest_sky_cap, 10**16, "TestError/vest-sky-cap");
+            assertEq(vestDai.cap(), values.vest_dai_cap, "TestError/vest-dai-cap");
+            assertEq(vestMkr.cap(), values.vest_mkr_cap, "TestError/vest-mkr-cap");
+            assertEq(vestSky.cap(), values.vest_sky_cap, "TestError/vest-sky-cap");
         }
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
@@ -2593,13 +2593,12 @@ contract DssSpellTestBase is Config, DssTest {
 
             vow.flap();
 
-            assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,   "TestError/Flapper/pair-pauseProxy-balance-no-increase");
-            assertGt(usds.balanceOf(address(pair)),   preserveUsds,         "TestError/Flapper/usds-pair-balance-no-increase");
-            assertEq(sky.balanceOf(address(pair)),    preserveSky,          "TestError/Flapper/unexpected-sky-pair-balance-change");
-            assertGt(pdaiVow - vat.dai(address(vow)), vow.bump() * 9 / 10,  "TestError/Flapper/vat-dai-vow-change-too-low");
-            assertLt(pdaiVow - vat.dai(address(vow)), vow.bump() * 11 / 10, "TestError/Flapper/vat-dai-vow-change-too-high");
-            assertEq(usds.balanceOf(address(flap)),   0,                    "TestError/Flapper/invalid-usds-balance");
-            assertEq(sky.balanceOf(address(flap)),    0,                    "TestError/Flapper/invalid-sky-balance");
+            assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,          "TestError/Flapper/pair-pauseProxy-balance-no-increase");
+            assertEq(usds.balanceOf(address(pair)),   preserveUsds + lotRad / RAY, "TestError/Flapper/invalid-usds-pair-balance-increase");
+            assertEq(sky.balanceOf(address(pair)),    preserveSky,                 "TestError/Flapper/unexpected-sky-pair-balance-change");
+            assertEq(pdaiVow - vat.dai(address(vow)), vow.bump(),                  "TestError/Flapper/invalid-vat-dai-vow-change");
+            assertEq(usds.balanceOf(address(flap)),   0,                           "TestError/Flapper/invalid-usds-balance");
+            assertEq(sky.balanceOf(address(flap)),    0,                           "TestError/Flapper/invalid-sky-balance");
 
             if (split.burn() < 1 * WAD) {
                 assertEq(usds.balanceOf(split.farm()), pbalanceUsdsFarm + payWad, "TestError/Splitter/invalid-farm-balance");
@@ -2609,10 +2608,10 @@ contract DssSpellTestBase is Config, DssTest {
         // Check Mom can increase hop
         {
             // The check for the configured value is already done in `_checkSystemValues()`
-            assertLt(split.hop(), type(uint256).max);
+            assertLt(split.hop(), type(uint256).max, "TestError/SplitterMom/already-stopped");
             vm.prank(chief.hat());
             splitterMom.stop();
-            assertEq(split.hop(), type(uint256).max);
+            assertEq(split.hop(), type(uint256).max, "TestError/SplitterMom/not-stopped");
         }
     }
 
@@ -2649,8 +2648,10 @@ contract DssSpellTestBase is Config, DssTest {
                 daiUsds.daiToUsds(usdsHolder,  pdaiBalance);
                 vm.stopPrank();
 
-                assertEq(dai.balanceOf(daiHolder), 0, "TestError/Dai/bad-dai-to-usds-conversion");
-                assertEq(usds.balanceOf(usdsHolder), pusdsBalance + pdaiBalance, "TestError/Usds/bad-dai-to-usds-conversion");
+                uint256 expectedUsdsBalance = pusdsBalance + pdaiBalance;
+
+                assertEq(dai.balanceOf(daiHolder),   0,                   "TestError/Dai/bad-dai-to-usds-conversion");
+                assertEq(usds.balanceOf(usdsHolder), expectedUsdsBalance, "TestError/Usds/bad-dai-to-usds-conversion");
 
                 vm.revertTo(before);
             }
@@ -2668,8 +2669,10 @@ contract DssSpellTestBase is Config, DssTest {
                 daiUsds.usdsToDai(daiHolder,   pusdsBalance);
                 vm.stopPrank();
 
-                assertEq(usds.balanceOf(usdsHolder), 0, "TestError/USDS/bad-usds-to-dai-conversion");
-                assertEq(dai.balanceOf(daiHolder), pdaiBalance + pusdsBalance, "TestError/Dai/bad-usds-to-dai-conversion");
+                uint256 expectedDaiBalance = pdaiBalance + pusdsBalance;
+
+                assertEq(usds.balanceOf(usdsHolder), 0,                  "TestError/USDS/bad-usds-to-dai-conversion");
+                assertEq(dai.balanceOf(daiHolder),   expectedDaiBalance, "TestError/Dai/bad-usds-to-dai-conversion");
 
                 vm.revertTo(before);
             }
@@ -2688,7 +2691,7 @@ contract DssSpellTestBase is Config, DssTest {
             {
                 uint256 before = vm.snapshot();
 
-                uint256 pmkrBalance  = gov.balanceOf(mkrHolder);
+                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
                 uint256 pskyBalance = sky.balanceOf(skyHolder);
 
                 vm.startPrank(mkrHolder);
@@ -2697,8 +2700,10 @@ contract DssSpellTestBase is Config, DssTest {
                 mkrSky.mkrToSky(skyHolder,   pmkrBalance);
                 vm.stopPrank();
 
-                assertEq(gov.balanceOf(mkrHolder), 0, "TestError/MKR/bad-mkr-to-sky-conversion");
-                assertEq(sky.balanceOf(skyHolder), pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate), "TestError/Sky/bad-mkr-to-sky-conversion");
+                uint256 expectedSkyBalance = pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate);
+
+                assertEq(gov.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
+                assertEq(sky.balanceOf(skyHolder), expectedSkyBalance, "TestError/Sky/bad-mkr-to-sky-conversion");
 
                 vm.revertTo(before);
             }
@@ -2708,7 +2713,7 @@ contract DssSpellTestBase is Config, DssTest {
                 uint256 before = vm.snapshot();
 
                 uint256 pskyBalance = sky.balanceOf(skyHolder);
-                uint256 pmkrBalance  = gov.balanceOf(mkrHolder);
+                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
 
                 vm.startPrank(skyHolder);
                 gov.approve(address(mkrSky), type(uint256).max);
@@ -2716,8 +2721,10 @@ contract DssSpellTestBase is Config, DssTest {
                 mkrSky.skyToMkr(mkrHolder,   pskyBalance);
                 vm.stopPrank();
 
-                assertEq(sky.balanceOf(skyHolder), 0, "TestError/SKY/bad-sky-to-mkr-conversion");
-                assertEq(gov.balanceOf(mkrHolder), pmkrBalance + (pskyBalance / afterSpell.sky_mkr_rate), "TestError/Mkr/bad-sky-to-mkr-conversion");
+                uint256 expectedMkrBalance = pmkrBalance + (pskyBalance / afterSpell.sky_mkr_rate);
+
+                assertEq(sky.balanceOf(skyHolder), 0,                  "TestError/SKY/bad-sky-to-mkr-conversion");
+                assertEq(gov.balanceOf(mkrHolder), expectedMkrBalance, "TestError/Mkr/bad-sky-to-mkr-conversion");
 
                 vm.revertTo(before);
             }
@@ -2735,7 +2742,7 @@ contract DssSpellTestBase is Config, DssTest {
             _giveTokens(address(usds),    1_000 * WAD);
             usds.approve(address(susds),  type(uint256).max);
 
-            uint256 pchi = susds.chi();
+            uint256 pchi    = susds.chi();
             uint256 passets = usds.balanceOf(address(this));
 
             uint256 shares  = susds.deposit(passets, address(this));
@@ -2745,13 +2752,12 @@ contract DssSpellTestBase is Config, DssTest {
             skip(interval);
             susds.drip();
 
-            uint256 chi = susds.chi();
+            uint256 chi         = susds.chi();
             uint256 expectedChi = _rpow(rates.rates(afterSpell.susds_ssr), interval, RAY) * pchi / RAY;
-            uint256 assets = susds.redeem(shares, address(this), address(this));
+            uint256 assets      = susds.redeem(shares, address(this), address(this));
 
             // Allow a 0.01% rounding error
-            assertApproxEqRel(chi, expectedChi, 10**14, "TestError/sUSDS/invalid-chi");
-
+            assertApproxEqRel(chi, expectedChi, 10**14,     "TestError/sUSDS/invalid-chi");
             assertGt(assets, passets,                       "TestError/sUSDS/invalid-redeem-assets");
             assertEq(assets, usds.balanceOf(address(this)), "TestError/sUSDS/invalid-balance-after-redeem");
         }

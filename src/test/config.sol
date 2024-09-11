@@ -135,7 +135,7 @@ contract Config {
         afterSpell.d3m_mom_authority      = chief;                          // D3MMom authority
         afterSpell.line_mom_authority     = chief;                          // LineMom authority
         afterSpell.lite_psm_mom_authority = chief;                          // LitePsmMom authority
-        afterSpell.splitter_mom_authority = chief;                          // Splitter authority
+        afterSpell.splitter_mom_authority = chief;                          // SplitterMom authority
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;    // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
