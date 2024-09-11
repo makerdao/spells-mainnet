@@ -61,7 +61,7 @@ interface SpellActionLike {
 }
 
 interface VestedRewardsDistributionLike {
-    function distribute() external;
+    function distribute() external returns (uint256 amount);
 }
 
 contract DssExec {
@@ -74,7 +74,8 @@ contract DssExec {
     uint256      immutable public   expiration;
     PauseLike    immutable public   pause;
 
-    uint256       constant internal SEP_17_2024_NOON_UTC = 1726574400; // 2024-09-17T12:00:00Z
+    // 2024-09-17T12:00:00 UTC
+    uint256       constant internal SEP_17_2024_NOON_UTC = 1726574400;
     uint256       constant public   MIN_ETA              = SEP_17_2024_NOON_UTC;
 
     // Provides a descriptive tag for bot consumption
@@ -132,7 +133,7 @@ contract DssExec {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/9bbb8ac07eb41eca4e0e04588625ab87da2f9413/governance/votes/templates/Executive%20vote%20-%20September%2013%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/23d01e9ea8e102d959e7b9bd1586cb4c31a8b812/governance/votes/Executive%20vote%20-%20September%2013%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2024-09-13 MakerDAO Executive Spell | Hash: 0xbf799f52360afa78bb59155e4f70e90ecc3f4fb6a06526a2d16f9ece9798cdbe";
 
@@ -170,8 +171,8 @@ contract DssSpellAction is DssAction {
     address internal constant SUSDS_IMP                    = 0x4e7991e5C547ce825BdEb665EE14a3274f9F61e0;
     address internal constant SKY                          = 0x56072C95FAA701256059aa122697B133aDEd9279;
     address internal constant MKR_SKY                      = 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B;
-    address internal constant UNIV2DAIMKR                 = 0x517F9dD285e75b599234F7221227339478d0FcC8;
-    address internal constant UNIV2USDSSKY                = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
+    address internal constant UNIV2DAIMKR                  = 0x517F9dD285e75b599234F7221227339478d0FcC8;
+    address internal constant UNIV2USDSSKY                 = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
     address internal constant MCD_SPLIT                    = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
     address internal constant SPLITTER_MOM                 = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
     address internal constant MCD_FLAP                     = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
@@ -221,7 +222,7 @@ contract DssSpellAction is DssAction {
 
         // The usdsJoin Adapter will be authorized in the usds contract by calling rely via the UsdsInit.init function
 
-        // Note: the actions above are executed through UsdsInit.init()
+        // Note: the instructions above are executed through UsdsInit.init()
 
         // Init sUSDS by calling SUsdsInit.init with the following parameters:
         SUsdsInit.init(
@@ -249,7 +250,7 @@ contract DssSpellAction is DssAction {
 
         // sUSDS will be authorized to access the vat by calling rely via the SUsdsInit.init function
 
-        // Note: the actions above are executed through SUsdsInit.init()
+        // Note: the instructions above are executed through SUsdsInit.init()
 
         // Init SKY by calling SkyInit.init with the following parameters:
         SkyInit.init(
@@ -273,7 +274,7 @@ contract DssSpellAction is DssAction {
 
         // The mkrSky contract will be authorized in the MkrAuthority contract by calling rely via the SkyInit.init function
 
-        // Note: the actions above are executed through SkyInit.init()
+        // Note: the instructions above are executed through SkyInit.init()
 
         // ---------- Pool Migration and Flapper Init ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
@@ -321,7 +322,7 @@ contract DssSpellAction is DssAction {
 
         // The flapper variable in the vow will be changed by the splitter address by calling file via the initSplitter function
 
-        // Note: the actions above are executed through FlapperIni.initSplitter()
+        // Note: the instructions above are executed through FlapperInit.initSplitter()
 
         // Init new Flapper by calling FlapperInit.initFlapperUniV2 with the following parameters:
         FlapperInit.initFlapperUniV2(
@@ -361,7 +362,7 @@ contract DssSpellAction is DssAction {
 
         // Authorize wrapper to read MKR oracle price
 
-        // Note: the actions above are executed through FlapperInit.initOracleWrapper()
+        // Note: the instructions above are executed through FlapperInit.initOracleWrapper()
 
         // ---------- Setup DssVestMintable for SKY ----------
         // Forum: https://forum.makerdao.com/t/sky-protocol-launch-season-token-and-product-launch-parameter-proposal/25031
@@ -414,7 +415,7 @@ contract DssSpellAction is DssAction {
 
         // SKY Vesting Stream  | from 'block.timestamp - 7 days' for '365 days - 1' | 600M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
 
-        // Note: the actions above are executed through UsdsSkyFarmingInit.init()
+        // Note: the instructions above are executed through UsdsSkyFarmingInit.init()
 
         // Initialize the new cron job by calling VestedRewardsDistributionJobInit.init with the following parameters:
         VestedRewardsDistributionJobInit.init(

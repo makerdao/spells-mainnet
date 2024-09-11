@@ -1058,9 +1058,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         uint256 plastDistributed = distUsdsSky.lastDistributedAt();
-
         job.work(seq.getMaster(), abi.encode(address(distUsdsSky)));
-
         assertGt(distUsdsSky.lastDistributedAt(), plastDistributed, "testVestedRewardsDistributionJob/missing-distribution");
     }
 
