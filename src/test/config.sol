@@ -53,6 +53,7 @@ contract Config {
         uint256 vest_dai_cap;
         uint256 vest_mkr_cap;
         uint256 vest_sky_cap;
+        uint256 sky_mkr_rate;
         uint256 ilk_count;
         string  chainlog_version;
         mapping (bytes32 => CollateralValues) collaterals;
@@ -138,6 +139,7 @@ contract Config {
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;    // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
+        afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 66;                             // Num expected in system
         afterSpell.chainlog_version       = "1.18.0";                       // String expected in system
 

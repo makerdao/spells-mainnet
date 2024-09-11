@@ -172,8 +172,29 @@ interface FlapOracleLike {
 // TODO: add full interfaces to dss-interfaces and remove from here
 interface UsdsJoinLike is DaiJoinAbstract {}
 
-interface SUsdsLike is GemAbstract {
+interface SUsdsLike {
+    function allowance(address, address) external view returns (uint256);
+    function approve(address spender, uint256 value) external returns (bool);
+    function asset() external view returns (address);
+    function balanceOf(address) external view returns (uint256);
+    function chi() external view returns (uint192);
+    function convertToAssets(uint256 shares) external view returns (uint256);
+    function convertToShares(uint256 assets) external view returns (uint256);
+    function deposit(uint256 assets, address receiver) external returns (uint256 shares);
+    function drip() external returns (uint256 nChi);
+    function redeem(uint256 shares, address receiver, address owner) external returns (uint256 assets);
+    function rho() external view returns (uint64);
     function ssr() external view returns (uint256);
+}
+
+interface DaiUsdsLike {
+    function daiToUsds(address usr, uint256 wad) external;
+    function usdsToDai(address usr, uint256 wad) external;
+}
+
+interface MkrSkyLike {
+    function mkrToSky(address usr, uint256 mkrAmt) external;
+    function skyToMkr(address usr, uint256 skyAmt) external;
 }
 
 interface LitePsmLike {
@@ -2600,11 +2621,140 @@ contract DssSpellTestBase is Config, DssTest {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        // USDS is upgradeable, so we need to ensure the implementation contract address is correct.
-        assertEq(_imp(address(usds)), addr.addr("USDS_IMP"), "TestError/invalid-usds-implementation");
+        // USDS
+        {
+            // USDS is upgradeable, so we need to ensure the implementation contract address is correct.
+            assertEq(_imp(address(usds)), addr.addr("USDS_IMP"), "TestError/USDS/invalid-usds-implementation");
+        }
 
-        // sUSDS is upgradeable, so we need to ensure the implementation contract address is correct.
-        assertEq(_imp(address(susds)), addr.addr("SUSDS_IMP"), "TestError/invalid-susds-implementation");
+        // Converter: Dai <-> USDS
+        {
+            DaiUsdsLike daiUsds = DaiUsdsLike(addr.addr("DAI_USDS"));
+            address daiHolder = address(0x42);
+            deal(address(dai), daiHolder, 1_000 * WAD);
+            address usdsHolder = address(0x65);
+            deal(address(usds), usdsHolder, 1_000 * WAD);
+
+
+            // Dai -> USDS conversion
+            {
+                uint256 before = vm.snapshot();
+
+                uint256 pdaiBalance  = dai.balanceOf(daiHolder);
+                uint256 pusdsBalance = usds.balanceOf(usdsHolder);
+
+                vm.startPrank(daiHolder);
+                dai.approve(address(daiUsds),  type(uint256).max);
+                usds.approve(address(daiUsds), type(uint256).max);
+                daiUsds.daiToUsds(usdsHolder,  pdaiBalance);
+                vm.stopPrank();
+
+                assertEq(dai.balanceOf(daiHolder), 0, "TestError/Dai/bad-dai-to-usds-conversion");
+                assertEq(usds.balanceOf(usdsHolder), pusdsBalance + pdaiBalance, "TestError/Usds/bad-dai-to-usds-conversion");
+
+                vm.revertTo(before);
+            }
+
+            // USDS -> Dai conversion
+            {
+                uint256 before = vm.snapshot();
+
+                uint256 pusdsBalance = usds.balanceOf(usdsHolder);
+                uint256 pdaiBalance  = dai.balanceOf(daiHolder);
+
+                vm.startPrank(usdsHolder);
+                dai.approve(address(daiUsds),  type(uint256).max);
+                usds.approve(address(daiUsds), type(uint256).max);
+                daiUsds.usdsToDai(daiHolder,   pusdsBalance);
+                vm.stopPrank();
+
+                assertEq(usds.balanceOf(usdsHolder), 0, "TestError/USDS/bad-usds-to-dai-conversion");
+                assertEq(dai.balanceOf(daiHolder), pdaiBalance + pusdsBalance, "TestError/Dai/bad-usds-to-dai-conversion");
+
+                vm.revertTo(before);
+            }
+        }
+
+        // Converter: MKR <-> SKY
+        {
+            MkrSkyLike mkrSky = MkrSkyLike(addr.addr("MKR_SKY"));
+            address mkrHolder = address(0x42);
+            deal(address(gov), mkrHolder, 1_000 * WAD);
+            address skyHolder = address(0x65);
+            deal(address(sky), skyHolder, 1_000 * WAD * afterSpell.sky_mkr_rate);
+
+
+            // MKR -> SKY conversion
+            {
+                uint256 before = vm.snapshot();
+
+                uint256 pmkrBalance  = gov.balanceOf(mkrHolder);
+                uint256 pskyBalance = sky.balanceOf(skyHolder);
+
+                vm.startPrank(mkrHolder);
+                gov.approve(address(mkrSky), type(uint256).max);
+                sky.approve(address(mkrSky), type(uint256).max);
+                mkrSky.mkrToSky(skyHolder,   pmkrBalance);
+                vm.stopPrank();
+
+                assertEq(gov.balanceOf(mkrHolder), 0, "TestError/MKR/bad-mkr-to-sky-conversion");
+                assertEq(sky.balanceOf(skyHolder), pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate), "TestError/Sky/bad-mkr-to-sky-conversion");
+
+                vm.revertTo(before);
+            }
+
+            // SKY -> MKR conversion
+            {
+                uint256 before = vm.snapshot();
+
+                uint256 pskyBalance = sky.balanceOf(skyHolder);
+                uint256 pmkrBalance  = gov.balanceOf(mkrHolder);
+
+                vm.startPrank(skyHolder);
+                gov.approve(address(mkrSky), type(uint256).max);
+                sky.approve(address(mkrSky), type(uint256).max);
+                mkrSky.skyToMkr(mkrHolder,   pskyBalance);
+                vm.stopPrank();
+
+                assertEq(sky.balanceOf(skyHolder), 0, "TestError/SKY/bad-sky-to-mkr-conversion");
+                assertEq(gov.balanceOf(mkrHolder), pmkrBalance + (pskyBalance / afterSpell.sky_mkr_rate), "TestError/Mkr/bad-sky-to-mkr-conversion");
+
+                vm.revertTo(before);
+            }
+        }
+
+        // sUSDS
+        {
+            // sUSDS is upgradeable, so we need to ensure the implementation contract address is correct.
+            assertEq(_imp(address(susds)), addr.addr("SUSDS_IMP"), "TestError/sUSDS/invalid-susds-implementation");
+            assertEq(susds.asset(),        address(usds),          "TestError/sUSDS/invalid-susds-asset");
+
+            // Ensure rate accumulator is up-to-date
+            susds.drip();
+            // Ensure the test contract has some tokens
+            _giveTokens(address(usds),    1_000 * WAD);
+            usds.approve(address(susds),  type(uint256).max);
+
+            uint256 pchi = susds.chi();
+            uint256 passets = usds.balanceOf(address(this));
+
+            uint256 shares  = susds.deposit(passets, address(this));
+            assertLe(shares, passets, "TestError/sUSDS/invalid-shares");
+
+            uint256 interval = 365 days;
+            skip(interval);
+            susds.drip();
+
+            uint256 chi = susds.chi();
+            uint256 expectedChi = _rpow(rates.rates(afterSpell.susds_ssr), interval, RAY) * pchi / RAY;
+            uint256 assets = susds.redeem(shares, address(this), address(this));
+
+            // Allow a 0.01% rounding error
+            assertApproxEqRel(chi, expectedChi, 10**14, "TestError/sUSDS/invalid-chi");
+
+            assertGt(assets, passets,                       "TestError/sUSDS/invalid-redeem-assets");
+            assertEq(assets, usds.balanceOf(address(this)), "TestError/sUSDS/invalid-balance-after-redeem");
+        }
     }
 
     // Obtained as `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)`
