@@ -77,6 +77,19 @@ interface StakingRewardsLike {
     function stakingToken() external view returns (address);
 }
 
+interface SequencerLike {
+    function getMaster() external view returns (bytes32);
+    function hasJob(address job) external view returns (bool);
+}
+
+
+interface VestedRewardsDistributionJobLike {
+    function intervals(address dist) external view returns (uint256);
+    function work(bytes32 network, bytes memory args) external;
+    function workable(bytes32 network) external returns (bool, bytes memory);
+}
+
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -628,6 +641,25 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
+    function testNewCronJobs() public { // add the `skipped` modifier to skip
+        SequencerLike seq = SequencerLike(addr.addr("CRON_SEQUENCER"));
+        address[1] memory newJobs = [
+            addr.addr("CRON_REWARDS_DIST_JOB")
+        ];
+
+        for (uint256 i = 0; i < newJobs.length; i++) {
+            assertFalse(seq.hasJob(newJobs[i]), "TestError/cron-job-already-in-sequencer");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < newJobs.length; i++) {
+            assertTrue(seq.hasJob(newJobs[i]), "TestError/cron-job-not-added-to-sequencer");
+        }
+    }
+
     function _setupRootDomain() internal {
         vm.makePersistent(address(spell), address(spell.action()), address(addr));
 
@@ -989,6 +1021,47 @@ contract DssSpellTest is DssSpellTestBase {
 
             vm.revertTo(before);
         }
+    }
+
+    function testVestedRewardsDistributionJob() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        SequencerLike seq = SequencerLike(addr.addr("CRON_SEQUENCER"));
+        VestedRewardsDistributionJobLike job = VestedRewardsDistributionJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
+        VestedRewardsDistributionLike distUsdsSky = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        // Since distribute() was called in the spell, initially the job is not due for execution...
+        {
+            // `workable()` is allowed to modify state in this job, so we need to make sure to revert its effects.
+            uint256 before = vm.snapshot();
+
+            (bool ok, ) = job.workable(seq.getMaster());
+            assertFalse(ok, "testVestedRewardsDistributionJob/unexpected-due-job");
+
+            vm.revertTo(before);
+        }
+
+        // ... as we skip to the next epoch, then we can execute
+        skip(job.intervals(address(distUsdsSky)));
+
+        {
+            uint256 before = vm.snapshot();
+
+            (bool ok, bytes memory out) = job.workable(seq.getMaster());
+            assertTrue(ok, "testVestedRewardsDistributionJob/missing-due-job");
+            (address dist) = abi.decode(out, (address));
+            assertEq(dist, address(distUsdsSky), "testVestedRewardsDistributionJob/invalid-dist-returned");
+
+            vm.revertTo(before);
+        }
+
+        uint256 plastDistributed = distUsdsSky.lastDistributedAt();
+
+        job.work(seq.getMaster(), abi.encode(address(distUsdsSky)));
+
+        assertGt(distUsdsSky.lastDistributedAt(), plastDistributed, "testVestedRewardsDistributionJob/missing-distribution");
     }
 
     function testUsdsPsmWrapper() public {
