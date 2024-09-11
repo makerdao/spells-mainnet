@@ -44,7 +44,12 @@ contract Deployers {
             0x34DBF275E1Df79D1fC7bf6a37feC56A8b1057490,  // Sidestream from 2023-05-17
             0xd1236a6A111879d9862f8374BA15344b6B233Fbd,  // Phoenix Labs from 2023-05-24
             0xfaAD873aDF27bE64D6E27D40Cf2AF0037d39b2eA,  // Deployer of FlapperUniv2
-            0xa44E7F0cEfbdA0aEb5fdf6228acA9b9F069CC1F1   // Dewiz from 2024-01-12
+            0xa44E7F0cEfbdA0aEb5fdf6228acA9b9F069CC1F1,  // Dewiz from 2024-01-12
+            0x548DAc55f260AA4631F589Cb2fe72b5E9E4C93Dc,  // EG_01
+            0x4Ec216c476175a236BD70026b984D4adECa0cfb8,  // EG_02
+            0xEAB682cfE848FE2b42DA69a2591369EF589e8F27,  // EG_03
+            0x54eAde20f7DD1A67624626A3DB9408185eD0039e,  // EG_04
+            0x4E65a603a9170fa572E276D1B70D6295D433bAc5   // EG_05
             // 0x02416B99202081F6b90851e35682Ca90D547054c.  // Deployer for Spark 2023-08-02
             // 0x4953BAe71F6F06b717F7A99DdBe08Cb991412d4D.  // Deployer for Spark 2023-08-30
             // 0x04a733f946C0aD8E2773d9A3891A8CCeD900a0F8.  // Deployer for Spark 2023-09-13
