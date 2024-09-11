@@ -20,7 +20,7 @@ feed                 :; ./scripts/check-oracle-feed.sh $(pip)
 feed-lp              :; ./scripts/check-oracle-feed-lp.sh $(pip)
 wards                :; ./scripts/wards.sh $(target)
 time                 :; ./scripts/time.py date="$(date)" stamp="$(stamp)"
-exec-hash            :; ./scripts/hash-exec-copy.py date="$(date)"
+exec-hash            :; ./scripts/hash-exec-copy.py "$(if $(date),$(date),$(shell date +'%Y-%m-%d'))"
 opt-cost             :; ./scripts/get-opt-relay-cost.sh $(spell)
 arb-cost             :; ./scripts/get-arb-relay-cost.sh $(spell)
 rates                :; ./scripts/rates.sh $(pct)

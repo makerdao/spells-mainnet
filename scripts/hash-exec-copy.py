@@ -73,7 +73,8 @@ def main():
     POSSIBLE_EXEC_TITLES = [
         f"Executive%20vote%20-%20{date.strftime('%B %d, %Y')}.md",
         f"Executive%20Vote%20-%20{date.strftime('%B %d, %Y')}.md",
-        # Remove leading 0 in day
+        # Remove leading 0 in day (e.g. 01 -> 1)
+        # There is no case that year is 0-padded
         f"Executive%20vote%20-%20{date.strftime('%B %d, %Y').replace(' 0', ' ')}.md",
         f"Executive%20Vote%20-%20{date.strftime('%B %d, %Y').replace(' 0', ' ')}.md"
     ]
