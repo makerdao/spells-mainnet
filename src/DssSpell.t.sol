@@ -83,8 +83,7 @@ interface SequencerLike {
 }
 
 
-interface VestedRewardsDistributionJobLike {
-    function intervals(address dist) external view returns (uint256);
+interface CronJobLike {
     function work(bytes32 network, bytes memory args) external;
     function workable(bytes32 network) external returns (bool, bytes memory);
 }
@@ -1028,14 +1027,21 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        SequencerLike seq = SequencerLike(addr.addr("CRON_SEQUENCER"));
-        VestedRewardsDistributionJobLike job = VestedRewardsDistributionJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
+        SequencerLike seq                         = SequencerLike(addr.addr("CRON_SEQUENCER"));
+        CronJobLike job                           = CronJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
         VestedRewardsDistributionLike distUsdsSky = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        uint256 blkt = block.timestamp;
 
         // Since distribute() was called in the spell, initially the job is not due for execution...
         {
             // `workable()` is allowed to modify state in this job, so we need to make sure to revert its effects.
             uint256 before = vm.snapshot();
+
+            // ... even 1 second before the desired interval, it would not be due
+            skip(7 days - 1 hours - 1);
+            // sanity check
+            assertFalse(blkt == block.timestamp);
 
             (bool ok, ) = job.workable(seq.getMaster());
             assertFalse(ok, "testVestedRewardsDistributionJob/unexpected-due-job");
@@ -1043,10 +1049,13 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertTo(before);
         }
 
-        // ... as we skip to the next epoch, then we can execute
-        skip(job.intervals(address(distUsdsSky)));
+        // sanity check: vm.revertTo() restores previous block.timestamp
+        assertTrue(blkt == block.timestamp);
+        // ... as we move to the next due date, the job can execute
+        skip(7 days - 1 hours);
 
         {
+            // `workable()` is allowed to modify state in this job, so we need to make sure to revert its effects.
             uint256 before = vm.snapshot();
 
             (bool ok, bytes memory out) = job.workable(seq.getMaster());
