@@ -133,9 +133,9 @@ contract DssExec {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/23d01e9ea8e102d959e7b9bd1586cb4c31a8b812/governance/votes/Executive%20vote%20-%20September%2013%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/f91fb931018ec8db133b1769a5070b6289c758d5/governance/votes/Executive%20vote%20-%20September%2013%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-09-13 MakerDAO Executive Spell | Hash: 0xbf799f52360afa78bb59155e4f70e90ecc3f4fb6a06526a2d16f9ece9798cdbe";
+        "2024-09-13 MakerDAO Executive Spell | Hash: 0x8e988fde78520f7eb80972e5936d73e08ebc299dcc2bc24a32d4fc57c2da4950";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -188,6 +188,9 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
 
     function actions() public override {
+
+        // Do not authorize ESM in any new contracts
+        // Note: no action needed
 
         // Note: load the Maker Protocol contracts depencencies
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
@@ -434,8 +437,8 @@ contract DssSpellAction is DssAction {
             VestedRewardsDistributionJobSetDistConfig({
                 // Add VestedRewardsDistribution to the new cron job with cfg.dist parameter being 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
                 dist: REWARDS_DIST_USDS_SKY,
-                // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days
-                interval: 7 days
+                // Add VestedRewardsDistribution to the new cron job with cfg.interval parameter being 7 days - 1 hours
+                interval: 7 days - 1 hours
             })
         );
 
