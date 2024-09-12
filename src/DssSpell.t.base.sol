@@ -2644,7 +2644,6 @@ contract DssSpellTestBase is Config, DssTest {
 
                 vm.startPrank(daiHolder);
                 dai.approve(address(daiUsds),  type(uint256).max);
-                usds.approve(address(daiUsds), type(uint256).max);
                 daiUsds.daiToUsds(usdsHolder,  pdaiBalance);
                 vm.stopPrank();
 
@@ -2664,7 +2663,6 @@ contract DssSpellTestBase is Config, DssTest {
                 uint256 pdaiBalance  = dai.balanceOf(daiHolder);
 
                 vm.startPrank(usdsHolder);
-                dai.approve(address(daiUsds),  type(uint256).max);
                 usds.approve(address(daiUsds), type(uint256).max);
                 daiUsds.usdsToDai(daiHolder,   pusdsBalance);
                 vm.stopPrank();
