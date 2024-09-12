@@ -2694,7 +2694,6 @@ contract DssSpellTestBase is Config, DssTest {
 
                 vm.startPrank(mkrHolder);
                 gov.approve(address(mkrSky), type(uint256).max);
-                sky.approve(address(mkrSky), type(uint256).max);
                 mkrSky.mkrToSky(skyHolder,   pmkrBalance);
                 vm.stopPrank();
 
@@ -2714,7 +2713,6 @@ contract DssSpellTestBase is Config, DssTest {
                 uint256 pmkrBalance = gov.balanceOf(mkrHolder);
 
                 vm.startPrank(skyHolder);
-                gov.approve(address(mkrSky), type(uint256).max);
                 sky.approve(address(mkrSky), type(uint256).max);
                 mkrSky.skyToMkr(mkrHolder,   pskyBalance);
                 vm.stopPrank();
