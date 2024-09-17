@@ -108,7 +108,7 @@ contract DssSpellTest is DssSpellTestBase {
         _testCastOnTime();
     }
 
-    function testNextCastTime() public skipped {
+    function testNextCastTime() public {
         _testNextCastTime();
     }
 
@@ -249,7 +249,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
             "FLAPPER_MOM"
         ];
@@ -450,7 +450,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestMkr(streams);
     }
 
-    function testVestSKY() public { // add the `skipped` modifier to skip
+    function testVestSKY() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 DEC_01_2023 = 1701385200;
 
@@ -640,7 +640,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testNewCronJobs() public { // add the `skipped` modifier to skip
+    function testNewCronJobs() public skipped { // add the `skipped` modifier to skip
         SequencerLike seq = SequencerLike(addr.addr("CRON_SEQUENCER"));
         address[1] memory newJobs = [
             addr.addr("CRON_REWARDS_DIST_JOB")
@@ -886,272 +886,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    uint256 constant MIN_ETA = 1726574400; // 2024-09-17T12:00:00Z
-
-    function testNextCastTimeMinEta() public {
-        // Spell obtains approval for execution before MIN_ETA
-        {
-            uint256 before = vm.snapshot();
-
-            vm.warp(1606161600); // Nov 23, 20 UTC - could be any date far enough in the past
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
-
-            vm.revertTo(before);
-        }
-
-        // Spell obtains approval for execution after MIN_ETA
-        {
-            uint256 before = vm.snapshot();
-
-            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
-
-            vm.revertTo(before);
-        }
-    }
-
-    function testUniV2PoolMigration() public {
-        PairLike daiMkr  = PairLike(addr.addr("UNIV2DAIMKR"));
-        PairLike usdsSky = PairLike(addr.addr("UNIV2USDSSKY"));
-
-        uint256 pbalanceDaiMkr  = daiMkr.balanceOf(address(pauseProxy));
-        uint256 pbalanceUsdsSky = usdsSky.balanceOf(address(pauseProxy));
-
-        assertGt(pbalanceDaiMkr,  0, "before: testPoolMigration/invalid-dai-mkr-balance");
-        assertEq(pbalanceUsdsSky, 0, "before: testPoolMigration/invalid-usds-sky-balance");
-
-        uint256 pbalanceDai = dai.balanceOf(address(daiMkr)) * pbalanceDaiMkr / daiMkr.totalSupply();
-        uint256 pbalanceMkr = gov.balanceOf(address(daiMkr)) * pbalanceDaiMkr / daiMkr.totalSupply();
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        uint256 balanceDaiMkr  = daiMkr.balanceOf(address(pauseProxy));
-        uint256 balanceUsdsSky = usdsSky.balanceOf(address(pauseProxy));
-
-        assertEq(balanceDaiMkr,  0,                             "after: testPoolMigration/invalid-dai-mkr-balance");
-        // 10**3 == UniswapV2Pair MINIMUM_LIQUIDITY => https://github.com/Uniswap/v2-core/blob/ee547b17853e71ed4e0101ccfd52e70d5acded58/contracts/UniswapV2Pair.sol#L121
-        assertEq(balanceUsdsSky, usdsSky.totalSupply() - 10**3, "after: testPoolMigration/invalid-usds-sky-balance");
-
-        assertEq(usds.balanceOf(address(usdsSky)), pbalanceDai,          "after: testPoolMigration/invalid-usds-balance");
-        assertEq(sky.balanceOf(address(usdsSky)),  pbalanceMkr * 24_000, "after: testPoolMigration/invalid-usds-balance");
-    }
-
-    function testUsdsSkyRewards() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_SKY"));
-        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
-
-        // Sanity checks
-        assertEq(rewards.rewardsDistribution(), address(dist), "testUsdsSkyRewards/rewards-rewards-dist-mismatch");
-        assertEq(rewards.stakingToken(),        address(usds), "testUsdsSkyRewards/rewards-staking-token-mismatch");
-        assertEq(rewards.rewardsToken(),        address(sky),  "testUsdsSkyRewards/rewards-rewards-token-mismatch");
-
-        assertTrue(vestSky.valid(dist.vestId()),               "testUsdsSkyRewards/invalid-dist-vest-id");
-
-        assertEq(dist.dssVest(),           address(vestSky),   "testUsdsSkyRewards/dist-vest-mismatch");
-        assertEq(dist.stakingRewards(),    address(rewards),   "testUsdsSkyRewards/dist-rewards-mismatch");
-        assertEq(dist.lastDistributedAt(), block.timestamp,    "testUsdsSkyRewards/dist-distribute-not-called-in-spell");
-
-        // Check if users can stake and get rewards
-        {
-            uint256 before = vm.snapshot();
-
-            uint256 stakingWad = 100_000 * WAD;
-            _giveTokens(address(usds), stakingWad);
-            usds.approve(address(rewards), stakingWad);
-            rewards.stake(stakingWad);
-            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsdsSkyRewards/rewards-invalid-staked-balance");
-
-            uint256 pbalance = sky.balanceOf(address(this));
-            skip(7 days);
-            rewards.getReward();
-            assertGt(sky.balanceOf(address(this)), pbalance);
-
-            vm.revertTo(before);
-        }
-
-        // Check if distribute can be called again in the future
-        {
-            uint256 before = vm.snapshot();
-
-            uint256 pbalance = sky.balanceOf(address(rewards));
-            skip(7 days);
-            dist.distribute();
-            assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
-
-            vm.revertTo(before);
-        }
-    }
-
-    function testUsds01Rewards() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_01"));
-
-        // Sanity checks
-        assertEq(rewards.rewardsDistribution(), address(0),    "testUsds01Rewards/rewards-invalid-rewards-dist");
-        assertEq(rewards.stakingToken(),        address(usds), "testUsds01Rewards/rewards-staking-token-mismatch");
-        assertEq(rewards.rewardsToken(),        address(0),    "testUsds01Rewards/rewards-invalid-rewards-token");
-
-
-        // Check if users can stake
-        {
-            uint256 before = vm.snapshot();
-
-            uint256 stakingWad = 100_000 * WAD;
-            _giveTokens(address(usds), stakingWad);
-            usds.approve(address(rewards), stakingWad);
-            rewards.stake(stakingWad);
-            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsds01Rewards/rewards-invalid-staked-balance");
-
-            vm.revertTo(before);
-        }
-    }
-
-    function testVestedRewardsDistributionJob() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        SequencerLike seq                         = SequencerLike(addr.addr("CRON_SEQUENCER"));
-        CronJobLike job                           = CronJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
-        VestedRewardsDistributionLike distUsdsSky = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
-
-        uint256 blkt = block.timestamp;
-
-        // Since distribute() was called in the spell, initially the job is not due for execution...
-        {
-            // `workable()` is allowed to modify state in this job, so we need to make sure to revert its effects.
-            uint256 before = vm.snapshot();
-
-            // ... even 1 second before the desired interval, it would not be due
-            skip(7 days - 1 hours - 1);
-            // sanity check
-            assertFalse(blkt == block.timestamp);
-
-            (bool ok, ) = job.workable(seq.getMaster());
-            assertFalse(ok, "testVestedRewardsDistributionJob/unexpected-due-job");
-
-            vm.revertTo(before);
-        }
-
-        // sanity check: vm.revertTo() restores previous block.timestamp
-        assertTrue(blkt == block.timestamp);
-        // ... as we move to the next due date, the job can execute
-        skip(7 days - 1 hours);
-
-        {
-            // `workable()` is allowed to modify state in this job, so we need to make sure to revert its effects.
-            uint256 before = vm.snapshot();
-
-            (bool ok, bytes memory out) = job.workable(seq.getMaster());
-            assertTrue(ok, "testVestedRewardsDistributionJob/missing-due-job");
-            (address dist) = abi.decode(out, (address));
-            assertEq(dist, address(distUsdsSky), "testVestedRewardsDistributionJob/invalid-dist-returned");
-
-            vm.revertTo(before);
-        }
-
-        uint256 plastDistributed = distUsdsSky.lastDistributedAt();
-        job.work(seq.getMaster(), abi.encode(address(distUsdsSky)));
-        assertGt(distUsdsSky.lastDistributedAt(), plastDistributed, "testVestedRewardsDistributionJob/missing-distribution");
-    }
-
-    function testUsdsPsmWrapper() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        UsdsPsmWrapperLike wrapper = UsdsPsmWrapperLike(addr.addr("WRAPPER_USDS_LITE_PSM_USDC_A"));
-        LitePsmLike litePsm = LitePsmLike(wrapper.psm());
-
-        assertEq(address(litePsm),   addr.addr("MCD_LITE_PSM_USDC_A"), "testUsdsPsmWrapper/psm-mismatch");
-        assertEq(wrapper.gem(),      litePsm.gem(),                    "testUsdsPsmWrapper/gem-mismatch");
-        assertEq(wrapper.ilk(),      litePsm.ilk(),                    "testUsdsPsmWrapper/ilk-mismatch");
-        assertEq(wrapper.dai(),      addr.addr("USDS"),                "testUsdsPsmWrapper/invalid-dai-alias-usds");
-        assertEq(wrapper.usds(),     addr.addr("USDS"),                "testUsdsPsmWrapper/invalid-usds");
-        assertEq(wrapper.usdsJoin(), addr.addr("USDS_JOIN"),           "testUsdsPsmWrapper/invalid-usds");
-
-        // Arbitrary amount of TOKEN to test PSM sellGem and buyGem with (in whole units)
-        // `amount` is the amount of _TOKEN_ we are selling/buying (NOT measured in USDS)
-        uint256 amount = 100_000;
-        // Amount should be more than 10,000 as `tin` and `tout` are basis point measurements
-        require(amount >= 10_000, "checkLitePsmIlkIntegration/amount-too-low-for-precision-checks");
-
-        GemAbstract token = GemAbstract(wrapper.gem());
-        // Approvals
-        token.approve(address(wrapper), type(uint256).max);
-        usds.approve(address(wrapper), type(uint256).max);
-
-        uint256 snapshot = vm.snapshot();
-
-        // Sell TOKEN _to_ the PSM for USDS
-        {
-            uint256 sellWadOut  = amount * WAD;                     // Scale to USDS decimals (18) for USDS balance check
-            sellWadOut         -= sellWadOut * litePsm.tin() / WAD; // Subtract `tin` fee (was deducted by PSM)
-
-            uint256 sellAmt = amount * WAD / _to18ConversionFactor(litePsm);
-            _giveTokens(address(token), sellAmt);
-            wrapper.sellGem(address(this), sellAmt);
-
-            assertEq(token.balanceOf(address(this)), 0,          "testUsdsPsmWrapper/invalid-sellGem-gem-balance");
-            assertEq(usds.balanceOf(address(this)),  sellWadOut, "testUsdsPsmWrapper/sellGem-usds-balance");
-
-            vm.revertTo(snapshot);
-        }
-
-        // Buy TOKEN _from_ the PSM for USDS
-        {
-            uint256 buyWadIn  = amount * WAD;                    // Scale to USDS decimals (18) for USDS balance check
-            buyWadIn         += buyWadIn * litePsm.tout() / WAD; // Add `tout` fee (was included by PSM)
-
-            uint256 buyAmt = amount * WAD / _to18ConversionFactor(litePsm);
-            _giveTokens(address(usds), buyWadIn);
-            wrapper.buyGem(address(this), buyAmt);
-
-            assertEq(token.balanceOf(address(this)), buyAmt, "testUsdsPsmWrapper/invalid-buyGem-gem-balance");
-            assertEq(usds.balanceOf(address(this)),  0,      "testUsdsPsmWrapper/buyGem-usds-balance");
-
-            vm.revertTo(snapshot);
-        }
-    }
-
-    function testNewAuthorizations() public {
-        assertEq(WardsAbstract(address(usds)).wards(addr.addr("USDS_JOIN")),     0, "before: testNewAuthorizations/usds-join-already-ward-usds");
-        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MKR_SKY")),        0, "before: testNewAuthorizations/mkr-sky-already-ward-sky");
-        assertEq(WardsAbstract(gov.authority()).wards(addr.addr("MKR_SKY")),     0, "before: testNewAuthorizations/mkr-sky-already-ward-mkr-authority");
-        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")),   0, "TestError/mcd-vest-sky-already-ward-sky");
-        assertEq(WardsAbstract(address(vat)).wards(addr.addr("SUSDS")),          0, "before: testNewAuthorizations/susds-already-ward-vat");
-        assertEq(WardsAbstract(address(flap)).wards(addr.addr("MCD_SPLIT")),     0, "before: testNewAuthorizations/splitter-already-ward-flapper");
-        assertEq(WardsAbstract(address(split)).wards(addr.addr("SPLITTER_MOM")), 0, "before: testNewAuthorizations/splitter-mom-already-ward-splitter");
-        assertEq(WardsAbstract(address(split)).wards(addr.addr("MCD_VOW")),      0, "before: testNewAuthorizations/vow-already-ward-splitter");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(WardsAbstract(address(usds)).wards(addr.addr("USDS_JOIN")),     1, "after: testNewAuthorizations/usds-join-not-ward-usds");
-        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MKR_SKY")),        1, "after: testNewAuthorizations/mkr-sky-not-ward-sky");
-        assertEq(WardsAbstract(gov.authority()).wards(addr.addr("MKR_SKY")),     1, "after: testNewAuthorizations/mkr-sky-not-ward-mkr-authority");
-        assertEq(WardsAbstract(address(sky)).wards(addr.addr("MCD_VEST_SKY")),   1, "TestError/mcd-vest-sky-not-ward-sky");
-        assertEq(WardsAbstract(address(vat)).wards(addr.addr("SUSDS")),          1, "after: testNewAuthorizations/susds-not-ward-vat");
-        assertEq(WardsAbstract(address(flap)).wards(addr.addr("MCD_SPLIT")),     1, "after: testNewAuthorizations/splitter-not-ward-flapper");
-        assertEq(WardsAbstract(address(split)).wards(addr.addr("SPLITTER_MOM")), 1, "after: testNewAuthorizations/splitter-mom-not-ward-splitter");
-        assertEq(WardsAbstract(address(split)).wards(addr.addr("MCD_VOW")),      1, "after: testNewAuthorizations/vow-not-ward-splitter");
-
-    }
 }
