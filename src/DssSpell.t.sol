@@ -44,48 +44,9 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface UsdsPsmWrapperLike {
-    function buyGem(address usr, uint256 gemAmt) external returns (uint256 usdsInWad);
-    function dai() external view returns (address);
-    function gem() external view returns (address);
-    function ilk() external view returns (bytes32);
-    function psm() external view returns (address);
-    function sellGem(address usr, uint256 gemAmt) external returns (uint256 usdsOutWad);
-    function usds() external view returns (address);
-    function usdsJoin() external view returns (address);
-}
-
-interface PairLike {
-    function balanceOf(address usr) external view returns (uint256);
-    function totalSupply() external view returns (uint256);
-}
-
-interface VestedRewardsDistributionLike {
-    function distribute() external returns (uint256 amount);
-    function dssVest() external view returns (address);
-    function lastDistributedAt() external view returns (uint256);
-    function stakingRewards() external view returns (address);
-    function vestId() external view returns (uint256);
-}
-
-interface StakingRewardsLike {
-    function balanceOf(address account) external view returns (uint256);
-    function getReward() external;
-    function rewardsDistribution() external view returns (address);
-    function rewardsToken() external view returns (address);
-    function stake(uint256 amount) external;
-    function stakingToken() external view returns (address);
-}
-
 interface SequencerLike {
     function getMaster() external view returns (bytes32);
     function hasJob(address job) external view returns (bool);
-}
-
-
-interface CronJobLike {
-    function work(bytes32 network, bytes memory args) external;
-    function workable(bytes32 network) external returns (bool, bytes memory);
 }
 
 
