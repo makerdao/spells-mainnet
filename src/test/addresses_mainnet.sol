@@ -501,8 +501,8 @@ contract Addresses {
         addr["UNIV2USDSSKY"]                     = 0x2621CC0B3F3c079c1Db0E80794AA24976F0b9e3c;
         addr["MCD_SPLIT"]                        = 0xBF7111F13386d23cb2Fba5A538107A73f6872bCF;
         addr["SPLITTER_MOM"]                     = 0xF51a075d468dE7dE3599C1Dc47F5C42d02C9230e;
-        addr["MCD_FLAP"]                         = 0xc5A9CaeBA70D6974cBDFb28120C3611Dd9910355;
-        addr["FLAP_SKY_ORACLE"]                  = 0x38e8c1D443f546Dc014D7756ec63116161CB7B25;
+        addr["MCD_FLAP"]                         = 0x374D9c3d5134052Bc558F432Afa1df6575f07407;
+        addr["FLAP_SKY_ORACLE"]                  = 0x61A12E5b1d5E9CC1302a32f0df1B5451DE6AE437;
         addr["MCD_VEST_SKY"]                     = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
         addr["REWARDS_USDS_SKY"]                 = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
         addr["REWARDS_DIST_USDS_SKY"]            = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;

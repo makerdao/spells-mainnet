@@ -121,10 +121,10 @@ contract Config {
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units
         afterSpell.vow_sump               = 50 * THOUSAND;                  // In whole Dai units
-        afterSpell.vow_bump               = 65 * THOUSAND;                  // In whole Dai units
+        afterSpell.vow_bump               = 25 * THOUSAND;                  // In whole Dai units
         afterSpell.vow_hump_min           = 55 * MILLION;                   // In whole Dai units
         afterSpell.vow_hump_max           = 55 * MILLION;                   // In whole Dai units
-        afterSpell.split_hop              = 10_249 seconds;                 // In seconds
+        afterSpell.split_hop              = 11_635 seconds;                 // In seconds
         afterSpell.split_burn             = 100_00;                         // In basis points
         afterSpell.flap_want              = 9800;                           // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
@@ -141,7 +141,7 @@ contract Config {
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 66;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.18.0";                       // String expected in system
+        afterSpell.chainlog_version       = "1.19.0";                       // String expected in system
 
         //
         // Values for all collateral
