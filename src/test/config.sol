@@ -96,8 +96,8 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x70254BD530684CF4a6323F51098FA39AAE6130b6);
+        address[] memory prevSpells = new address[](0);
+        // prevSpells[0] = address();
 
         //
         // Values for spell-specific parameters
@@ -107,7 +107,7 @@ contract Config {
             deployed_spell_created: 0,          // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:   0,          // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   false,       // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
