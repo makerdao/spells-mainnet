@@ -253,6 +253,7 @@ contract DssSpellTestBase is Config, DssTest {
     SUsdsLike                      susds = SUsdsLike(          addr.addr("SUSDS"));
     UsdsJoinLike                usdsJoin = UsdsJoinLike(       addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
+    DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MCD_GOV"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));

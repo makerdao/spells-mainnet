@@ -147,6 +147,9 @@ contract Wallets {
         // Accessibility Scope
         addr["LAUNCH_PROJECT_FUNDING"]       = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
 
+        // Sky Ecosystem Liquidity Bootstrapping
+        addr["SOLANA_BOOTSTRAPPING"]         = 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD;
+
         // Vest Managers
         addr["PULLUP_LABS_VEST_MGR"]         = 0x9B6213D350A4AFbda2361b6572A07C90c22002F1;
 
