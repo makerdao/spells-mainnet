@@ -527,70 +527,110 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 amount;
     }
 
-    struct DaiUsdsAmounts {
+    struct PaymentAmounts {
         uint256 dai;
         uint256 usds;
+        uint256 mkr;
+        uint256 sky;
     }
 
-    function testDaiAndUsdsPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
-        //    the amount to be paid (in whole units)
+        //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[9] memory payees = [
-            Payee(address(dai), wallets.addr("BLUE"), 54_167),
-            Payee(address(dai), wallets.addr("CLOAKY"), 20_417),
-            Payee(address(dai), wallets.addr("CLOAKY_KOHLA_2"), 10_000),
-            Payee(address(dai), wallets.addr("CLOAKY_ENNOIA"), 10_000),
-            Payee(address(dai), wallets.addr("JULIACHANG"), 8_333),
-            Payee(address(dai), wallets.addr("BYTERON"), 8_333),
-            Payee(address(dai), wallets.addr("ROCKY"), 8_065),
-            Payee(address(dai), wallets.addr("BONAPUBLICA"), 5_430),
-            Payee(address(usds), wallets.addr("SOLANA_BOOTSTRAPPING"), 10_000_000)
+        Payee[15] memory payees = [
+            Payee(address(dai), wallets.addr("BLUE"), 54_167 * WAD),
+            Payee(address(dai), wallets.addr("CLOAKY"), 20_417 * WAD),
+            Payee(address(dai), wallets.addr("CLOAKY_KOHLA_2"), 10_000 * WAD),
+            Payee(address(dai), wallets.addr("CLOAKY_ENNOIA"), 10_000 * WAD),
+            Payee(address(dai), wallets.addr("JULIACHANG"), 8_333 * WAD),
+            Payee(address(dai), wallets.addr("BYTERON"), 8_333 * WAD),
+            Payee(address(dai), wallets.addr("ROCKY"), 8_065 * WAD),
+            Payee(address(dai), wallets.addr("BONAPUBLICA"), 5_430 * WAD),
+            Payee(address(usds), wallets.addr("SOLANA_BOOTSTRAPPING"), 10_000_000 * WAD),
+            Payee(address(mkr), wallets.addr("BONAPUBLICA"), 13.75 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("ROCKY"), 1.21 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("SOLANA_BOOTSTRAPPING"), 320_000_000 ether) // Note: ether is only a keyword helper
         ];
         // Fill the total values from exec sheet
-        DaiUsdsAmounts memory expectedTotalDiffs = DaiUsdsAmounts({
-            dai: 124_745,
-            usds: 10_000_000
+        PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
+            dai: 124_745 * WAD,
+            usds: 10_000_000 * WAD,
+            mkr: 29.46 ether,
+            sky: 320_000_000 ether
         });
 
-        // Calculate and save previous balances
-        DaiUsdsAmounts memory calculatedTotalDiffs;
-        DaiUsdsAmounts[] memory previousPayeeBalances = new DaiUsdsAmounts[](payees.length);
-        for (uint256 i = 0; i < payees.length; i++) {
-            if (payees[i].token == address(dai)) {
-                calculatedTotalDiffs.dai += payees[i].amount;
-            } else if (payees[i].token == address(usds)) {
-                calculatedTotalDiffs.usds += payees[i].amount;
-            } else {
-                revert('TestDaiAndUsdsPayments/unexpected-payee-token');
-            }
-            previousPayeeBalances[i] = DaiUsdsAmounts({
-                dai: dai.balanceOf(payees[i].addr),
-                usds: usds.balanceOf(payees[i].addr)
-            });
-        }
-
-        // Cast the spell
+        // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
         _vote(address(spell));
         spell.schedule();
         vm.warp(spell.nextCastTime());
         pot.drip();
-        uint256 prevSin = vat.sin(address(vow));
-        spell.cast();
-        assertTrue(spell.done(), "TestDaiAndUsdsPayments/spell-not-done");
 
-        // Check no undocumented payments were made
+        // Calculate and save previous balances
+        PaymentAmounts memory previousTotalBalance = PaymentAmounts({
+            dai: vat.sin(address(vow)),
+            usds: usds.balanceOf(address(pauseProxy)),
+            mkr: mkr.balanceOf(address(pauseProxy)),
+            sky: sky.balanceOf(address(pauseProxy))
+        });
+        PaymentAmounts memory calculatedTotalDiff;
+        PaymentAmounts[] memory previousPayeeBalances = new PaymentAmounts[](payees.length);
+        for (uint256 i = 0; i < payees.length; i++) {
+            if (payees[i].token == address(dai)) {
+                calculatedTotalDiff.dai += payees[i].amount;
+            } else if (payees[i].token == address(usds)) {
+                calculatedTotalDiff.usds += payees[i].amount;
+            } else if (payees[i].token == address(mkr)) {
+                calculatedTotalDiff.mkr += payees[i].amount;
+            } else if (payees[i].token == address(sky)) {
+                calculatedTotalDiff.sky += payees[i].amount;
+            } else {
+                revert('TestPayments/unexpected-payee-token');
+            }
+            previousPayeeBalances[i] = PaymentAmounts({
+                dai: dai.balanceOf(payees[i].addr),
+                usds: usds.balanceOf(payees[i].addr),
+                mkr: mkr.balanceOf(payees[i].addr),
+                sky: sky.balanceOf(payees[i].addr)
+            });
+        }
+
+        // Cast spell
+        spell.cast();
+        assertTrue(spell.done(), "TestPayments/spell-not-done");
+
+        // Check no other transfers were made
+        PaymentAmounts memory actualBalanceDiff = PaymentAmounts({
+            dai: vat.sin(address(vow)) - previousTotalBalance.dai, // We expect debt to increase
+            usds: previousTotalBalance.usds - usds.balanceOf(address(pauseProxy)),
+            mkr: previousTotalBalance.mkr - mkr.balanceOf(address(pauseProxy)),
+            sky: sky.balanceOf(address(pauseProxy)) - previousTotalBalance.sky // We expect Sky balance to increase
+        });
+        assertEq(actualBalanceDiff.usds, 0, "TestPayments/unexpected-usds-balance-change");
         assertEq(
-            vat.sin(address(vow)) - prevSin,
-            (calculatedTotalDiffs.dai + calculatedTotalDiffs.usds) * RAD,
-            "TestDaiAndUsdsPayments/vat-sin-mismatch-calculated"
+            actualBalanceDiff.dai,
+            (calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY,
+            "TestPayments/vat-sin-mismatch-calculated"
         );
         assertEq(
-            vat.sin(address(vow)) - prevSin,
-            (expectedTotalDiffs.dai + expectedTotalDiffs.usds) * RAD,
-            "TestDaiAndUsdsPayments/vat-sin-mismatch-expected"
+            actualBalanceDiff.dai,
+            (expectedTotalDiff.dai + expectedTotalDiff.usds) * RAY,
+            "TestPayments/vat-sin-mismatch-expected"
+        );
+        assertLe(
+            actualBalanceDiff.mkr - (calculatedTotalDiff.mkr + calculatedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
+            1, // This is to account for rounding errors when converting Sky back to Mkr
+            "TestPayments/invalid-total"
+        );
+        assertLe(
+            actualBalanceDiff.mkr - (expectedTotalDiff.mkr + expectedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
+            1, // This is to account for rounding errors when converting Sky back to Mkr
+            "TestPayments/invalid-total"
         );
 
         // Check that payees received their payments
@@ -598,100 +638,29 @@ contract DssSpellTest is DssSpellTestBase {
             if (payees[i].token == address(dai)) {
                 assertEq(
                     dai.balanceOf(payees[i].addr),
-                    previousPayeeBalances[i].dai + payees[i].amount * WAD,
-                    "TestDaiAndUsdsPayments/invalid-payee-dai-balance"
+                    previousPayeeBalances[i].dai + payees[i].amount,
+                    "TestPayments/invalid-payee-dai-balance"
                 );
             } else if (payees[i].token == address(usds)) {
                 assertEq(
                     usds.balanceOf(payees[i].addr),
-                    previousPayeeBalances[i].usds + payees[i].amount * WAD,
-                    "TestDaiAndUsdsPayments/invalid-payee-usds-balance"
+                    previousPayeeBalances[i].usds + payees[i].amount,
+                    "TestPayments/invalid-payee-usds-balance"
                 );
-            }
-        }
-    }
-
-    struct MkrSkyAmounts {
-        uint256 mkr;
-        uint256 sky;
-    }
-
-    function testMrkAndSkyPayments() public { // add the `skipped` modifier to skip
-        // For each payment, create a Payee object with:
-        //    the address of the transferred token,
-        //    the destination address,
-        //    the amount to be paid
-        // Initialize the array with the number of payees
-        Payee[6] memory payees = [
-            Payee(address(mkr), wallets.addr("BONAPUBLICA"), 13.75 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(address(mkr), wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(address(mkr), wallets.addr("ROCKY"), 1.21 ether), // Note: ether is a keyword helper, only MKR is transferred here
-            Payee(address(sky), wallets.addr("SOLANA_BOOTSTRAPPING"), 320_000_000 ether) // Note: ether is a keyword helper, only MKR is transferred here
-        ];
-        // Fill the total values from exec sheet
-        MkrSkyAmounts memory expectedTotalDiffs = MkrSkyAmounts({
-            mkr: 29.46 ether,
-            sky: 320_000_000 ether
-        });
-
-        // Calculate and save previous balances
-        MkrSkyAmounts memory previousPauseProxyBalances = MkrSkyAmounts({
-            mkr: mkr.balanceOf(address(pauseProxy)),
-            sky: sky.balanceOf(address(pauseProxy))
-        });
-        MkrSkyAmounts memory calculatedTotalDiffs;
-        MkrSkyAmounts[] memory previousPayeeBalances = new MkrSkyAmounts[](payees.length);
-        for (uint256 i = 0; i < payees.length; i++) {
-            if (payees[i].token == address(mkr)) {
-                calculatedTotalDiffs.mkr += payees[i].amount;
-            } else if (payees[i].token == address(sky)) {
-                calculatedTotalDiffs.sky += payees[i].amount;
-            } else {
-                revert('TestMrkAndSkyPayments/unexpected-payee-token');
-            }
-            previousPayeeBalances[i] = MkrSkyAmounts({
-                mkr: mkr.balanceOf(payees[i].addr),
-                sky: sky.balanceOf(payees[i].addr)
-            });
-        }
-
-        // Cast the spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestMrkAndSkyPayments/spell-not-done");
-
-        // Check no undocumented payments were made
-        MkrSkyAmounts memory actualPauseProxyDiff = MkrSkyAmounts({
-            mkr: previousPauseProxyBalances.mkr - mkr.balanceOf(address(pauseProxy)),
-            sky: sky.balanceOf(address(pauseProxy)) - previousPauseProxyBalances.sky // Note: we expect Sky balance to increase
-        });
-        assertLe(
-            actualPauseProxyDiff.mkr - (calculatedTotalDiffs.mkr + calculatedTotalDiffs.sky / afterSpell.sky_mkr_rate) - actualPauseProxyDiff.sky / afterSpell.sky_mkr_rate,
-            1, // This is to account for rounding errors when converting Sky back to Mkr
-            "TestMrkAndSkyPayments/invalid-total"
-        );
-        assertLe(
-            actualPauseProxyDiff.mkr - (expectedTotalDiffs.mkr + expectedTotalDiffs.sky / afterSpell.sky_mkr_rate) - actualPauseProxyDiff.sky / afterSpell.sky_mkr_rate,
-            1, // This is to account for rounding errors when converting Sky back to Mkr
-            "TestMrkAndSkyPayments/invalid-total"
-        );
-
-        // Check that payees received their payments
-        for (uint256 i = 0; i < payees.length; i++) {
-            if (payees[i].token == address(mkr)) {
+            } else if (payees[i].token == address(mkr)) {
                 assertEq(
                     mkr.balanceOf(payees[i].addr),
                     previousPayeeBalances[i].mkr + payees[i].amount,
-                    "TestMrkAndSkyPayments/invalid-payee-mkr-balance"
+                    "TestPayments/invalid-payee-mkr-balance"
                 );
             } else if (payees[i].token == address(sky)) {
                 assertEq(
                     sky.balanceOf(payees[i].addr),
                     previousPayeeBalances[i].sky + payees[i].amount,
-                    "TestMrkAndSkyPayments/invalid-payee-sky-balance"
+                    "TestPayments/invalid-payee-sky-balance"
                 );
+            } else {
+                revert('TestPayments/unexpected-payee-token');
             }
         }
     }
