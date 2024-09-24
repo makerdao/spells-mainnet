@@ -529,8 +529,8 @@ contract DssSpellTest is DssSpellTestBase {
 
     struct PaymentAmounts {
         uint256 dai;
-        uint256 usds;
         uint256 mkr;
+        uint256 usds;
         uint256 sky;
     }
 
@@ -549,20 +549,20 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(dai), wallets.addr("BYTERON"), 8_333 * WAD),
             Payee(address(dai), wallets.addr("ROCKY"), 8_065 * WAD),
             Payee(address(dai), wallets.addr("BONAPUBLICA"), 5_430 * WAD),
-            Payee(address(usds), wallets.addr("SOLANA_BOOTSTRAPPING"), 10_000_000 * WAD),
             Payee(address(mkr), wallets.addr("BONAPUBLICA"), 13.75 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("ROCKY"), 1.21 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("SOLANA_BOOTSTRAPPING"), 320_000_000 ether) // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("SOLANA_BOOTSTRAPPING"), 10_000_000 * WAD),
+            Payee(address(sky), wallets.addr("SOLANA_BOOTSTRAPPING"), 320_000_000 * WAD)
         ];
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
             dai: 124_745 * WAD,
+            mkr: 29.46 ether, // Note: ether is only a keyword helper
             usds: 10_000_000 * WAD,
-            mkr: 29.46 ether,
-            sky: 320_000_000 ether
+            sky: 320_000_000 * WAD
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -574,8 +574,8 @@ contract DssSpellTest is DssSpellTestBase {
         // Calculate and save previous balances
         PaymentAmounts memory previousTotalBalance = PaymentAmounts({
             dai: vat.sin(address(vow)),
-            usds: usds.balanceOf(address(pauseProxy)),
             mkr: mkr.balanceOf(address(pauseProxy)),
+            usds: usds.balanceOf(address(pauseProxy)),
             sky: sky.balanceOf(address(pauseProxy))
         });
         PaymentAmounts memory calculatedTotalDiff;
@@ -583,10 +583,10 @@ contract DssSpellTest is DssSpellTestBase {
         for (uint256 i = 0; i < payees.length; i++) {
             if (payees[i].token == address(dai)) {
                 calculatedTotalDiff.dai += payees[i].amount;
-            } else if (payees[i].token == address(usds)) {
-                calculatedTotalDiff.usds += payees[i].amount;
             } else if (payees[i].token == address(mkr)) {
                 calculatedTotalDiff.mkr += payees[i].amount;
+            } else if (payees[i].token == address(usds)) {
+                calculatedTotalDiff.usds += payees[i].amount;
             } else if (payees[i].token == address(sky)) {
                 calculatedTotalDiff.sky += payees[i].amount;
             } else {
@@ -594,8 +594,8 @@ contract DssSpellTest is DssSpellTestBase {
             }
             previousPayeeBalances[i] = PaymentAmounts({
                 dai: dai.balanceOf(payees[i].addr),
-                usds: usds.balanceOf(payees[i].addr),
                 mkr: mkr.balanceOf(payees[i].addr),
+                usds: usds.balanceOf(payees[i].addr),
                 sky: sky.balanceOf(payees[i].addr)
             });
         }
@@ -607,11 +607,10 @@ contract DssSpellTest is DssSpellTestBase {
         // Check no other transfers were made
         PaymentAmounts memory actualBalanceDiff = PaymentAmounts({
             dai: vat.sin(address(vow)) - previousTotalBalance.dai, // We expect debt to increase
-            usds: previousTotalBalance.usds - usds.balanceOf(address(pauseProxy)),
             mkr: previousTotalBalance.mkr - mkr.balanceOf(address(pauseProxy)),
+            usds: previousTotalBalance.usds - usds.balanceOf(address(pauseProxy)),
             sky: sky.balanceOf(address(pauseProxy)) - previousTotalBalance.sky // We expect Sky balance to increase
         });
-        assertEq(actualBalanceDiff.usds, 0, "TestPayments/unexpected-usds-balance-change");
         assertEq(
             actualBalanceDiff.dai,
             (calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY,
@@ -624,14 +623,15 @@ contract DssSpellTest is DssSpellTestBase {
         );
         assertLe(
             actualBalanceDiff.mkr - (calculatedTotalDiff.mkr + calculatedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
-            1, // This is to account for rounding errors when converting Sky back to Mkr
+            1, // To account for rounding errors when converting Sky back to Mkr
             "TestPayments/invalid-total"
         );
         assertLe(
             actualBalanceDiff.mkr - (expectedTotalDiff.mkr + expectedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
-            1, // This is to account for rounding errors when converting Sky back to Mkr
+            1, // To account for rounding errors when converting Sky back to Mkr
             "TestPayments/invalid-total"
         );
+        assertEq(actualBalanceDiff.usds, 0, "TestPayments/unexpected-usds-balance-change");
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -641,17 +641,17 @@ contract DssSpellTest is DssSpellTestBase {
                     previousPayeeBalances[i].dai + payees[i].amount,
                     "TestPayments/invalid-payee-dai-balance"
                 );
-            } else if (payees[i].token == address(usds)) {
-                assertEq(
-                    usds.balanceOf(payees[i].addr),
-                    previousPayeeBalances[i].usds + payees[i].amount,
-                    "TestPayments/invalid-payee-usds-balance"
-                );
             } else if (payees[i].token == address(mkr)) {
                 assertEq(
                     mkr.balanceOf(payees[i].addr),
                     previousPayeeBalances[i].mkr + payees[i].amount,
                     "TestPayments/invalid-payee-mkr-balance"
+                );
+            } else if (payees[i].token == address(usds)) {
+                assertEq(
+                    usds.balanceOf(payees[i].addr),
+                    previousPayeeBalances[i].usds + payees[i].amount,
+                    "TestPayments/invalid-payee-usds-balance"
                 );
             } else if (payees[i].token == address(sky)) {
                 assertEq(
