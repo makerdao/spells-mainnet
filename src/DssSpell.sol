@@ -79,15 +79,15 @@ contract DssSpellAction is DssAction {
     address internal constant SWAP_ONLY_FLAP_SKY_ORACLE = 0x61A12E5b1d5E9CC1302a32f0df1B5451DE6AE437;
 
     // ---------- Wallets ----------
-    address internal constant BLUE                 = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
-    address internal constant CLOAKY               = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
-    address internal constant CLOAKY_KOHLA_2       = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
-    address internal constant CLOAKY_ENNOIA        = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
-    address internal constant JULIACHANG           = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
-    address internal constant BYTERON              = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
-    address internal constant ROCKY                = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
-    address internal constant BONAPUBLICA          = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant SOLANA_BOOTSTRAPPING = 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD;
+    address internal constant BLUE                    = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant CLOAKY                  = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant CLOAKY_KOHLA_2          = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+    address internal constant CLOAKY_ENNOIA           = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+    address internal constant JULIACHANG              = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant BYTERON                 = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant ROCKY                   = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+    address internal constant BONAPUBLICA             = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant LIQUIDITY_BOOTSTRAPPING = 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD;
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -151,6 +151,8 @@ contract DssSpellAction is DssAction {
             "FLAP_SKY_ORACLE"
         );
 
+        // Additional Actions
+
         // Increase vow.hop by 1386 seconds from 10249 seconds to 11635 seconds
         DssExecLib.setValue(MCD_SPLIT, "hop", 11_635);
 
@@ -162,6 +164,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Sky Ecosystem Liquidity Bootstrapping ----------
         // Forum: https://forum.makerdao.com/t/atlas-edit-weekly-cycle-proposal-week-of-2024-09-23/25179
+        // Poll: https://vote.makerdao.com/polling/QmfYzKTh
 
         // Transfer 10,000,000 DAI to the Pause Proxy from the Surplus Buffer
         DssExecLib.sendPaymentFromSurplusBuffer(MCD_PAUSE_PROXY, 10_000_000);
@@ -173,7 +176,7 @@ contract DssSpellAction is DssAction {
         // Note: this is done by the next line of code
 
         // Transfer 10,000,000 USDS from PauseProxy to 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD
-        DaiUsdsLike(DAI_USDS).daiToUsds(SOLANA_BOOTSTRAPPING, 10_000_000 * WAD);
+        DaiUsdsLike(DAI_USDS).daiToUsds(LIQUIDITY_BOOTSTRAPPING, 10_000_000 * WAD);
 
         // Note: we have to approve MKR_SKY contract to convert MKR into SKY
         MKR.approve(MKR_SKY, 13_334 * WAD);
@@ -182,13 +185,13 @@ contract DssSpellAction is DssAction {
         MkrSkyLike(MKR_SKY).mkrToSky(MCD_PAUSE_PROXY, 13_334 * WAD);
 
         // Transfer 320,000,000 SKY to 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD
-        SKY.transfer(SOLANA_BOOTSTRAPPING, 320_000_000 * WAD);
+        SKY.transfer(LIQUIDITY_BOOTSTRAPPING, 320_000_000 * WAD);
 
         // ---------- Aligned Delegate DAI Compensation ----------
         // Forum: https://forum.makerdao.com/t/august-2024-aligned-delegate-compensation/25165
         // Mip: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-budget-and-participation-requirements
 
-        // BLUE - 54167 DAI - 0xb6c09680d822f162449cdfb8248a7d3fc26ec9bf
+        // BLUE - 54167 DAI - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         DssExecLib.sendPaymentFromSurplusBuffer(BLUE, 54_167);
 
         // Cloaky - 20417 DAI - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
@@ -216,7 +219,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.makerdao.com/t/august-2024-aligned-delegate-compensation/25165
         // Mip: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-budget-and-participation-requirements
 
-        // BLUE - 13.75 MKR - 0xb6c09680d822f162449cdfb8248a7d3fc26ec9bf
+        // BLUE - 13.75 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         MKR.transfer(BONAPUBLICA, 13.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // Cloaky - 12.00 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818

@@ -554,8 +554,8 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("ROCKY"), 1.21 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("SOLANA_BOOTSTRAPPING"), 10_000_000 * WAD),
-            Payee(address(sky), wallets.addr("SOLANA_BOOTSTRAPPING"), 320_000_000 * WAD)
+            Payee(address(usds), wallets.addr("LIQUIDITY_BOOTSTRAPPING"), 10_000_000 * WAD),
+            Payee(address(sky), wallets.addr("LIQUIDITY_BOOTSTRAPPING"), 320_000_000 * WAD)
         ];
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
