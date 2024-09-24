@@ -911,4 +911,28 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testFlapperChange() public {
+        assertNotEq(split.flapper(), addr.addr("MCD_FLAP"), "testFlapperChange/incorrect-previous-split-flapper-address");
+        assertEq(WardsAbstract(addr.addr("MCD_FLAP")).wards(addr.addr("MCD_SPLIT")),  0, "testFlapperChange/flapper-already-in-splitter-wards");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(split.flapper(), addr.addr("MCD_FLAP"), "testFlapperChange/incorrect-split-flapper-address");
+        assertEq(WardsAbstract(addr.addr("MCD_FLAP")).wards(addr.addr("MCD_SPLIT")),  1, "testFlapperChange/flapper-not-in-splitter-wards");
+    }
+
+    function testSkyOracleChange() public {
+        assertNotEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "testFlapperChange/incorrect-previous-flapper-pip-address");
+        assertEq(OsmAbstract(addr.addr("PIP_MKR")).bud(addr.addr("FLAP_SKY_ORACLE")), 0, "testNewAuthorizations/sky-oracle-already-in-mkr-oracle-buds");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(flap.pip(), addr.addr("FLAP_SKY_ORACLE"), "testFlapperChange/incorrect-flapper-pip-address");
+        assertEq(OsmAbstract(addr.addr("PIP_MKR")).bud(addr.addr("FLAP_SKY_ORACLE")), 1, "testNewAuthorizations/sky-oracle-not-in-mkr-oracle-buds");
+    }
 }

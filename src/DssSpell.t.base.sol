@@ -2580,7 +2580,7 @@ contract DssSpellTestBase is Config, DssTest {
             uint256 lotRad = vow.bump() * split.burn() / WAD;
             uint256 payWad = (vow.bump() - lotRad) / RAY;
 
-            uint256 pbalancePauseProxy = pair.balanceOf(pauseProxy);
+            uint256 pskyBalancePauseProxy = sky.balanceOf(pauseProxy);
             uint256 pdaiVow = vat.dai(address(vow));
             uint256 preserveUsds = usds.balanceOf(address(pair));
             uint256 preserveSky = sky.balanceOf(address(pair));
@@ -2594,10 +2594,8 @@ contract DssSpellTestBase is Config, DssTest {
 
             vow.flap();
 
-            // TODO: fix the tests
-            // assertGt(pair.balanceOf(pauseProxy),      pbalancePauseProxy,          "TestError/Flapper/pair-pauseProxy-balance-no-increase");
-            // assertEq(sky.balanceOf(address(pair)),    preserveSky,                 "TestError/Flapper/unexpected-sky-pair-balance-change");
-
+            assertGt(sky.balanceOf(pauseProxy),       pskyBalancePauseProxy,       "TestError/Flapper/unexpected-sky-pause-proxy-balance-change");
+            assertLt(sky.balanceOf(address(pair)),    preserveSky,                 "TestError/Flapper/unexpected-sky-pair-balance-change");
             assertEq(usds.balanceOf(address(pair)),   preserveUsds + lotRad / RAY, "TestError/Flapper/invalid-usds-pair-balance-increase");
             assertEq(pdaiVow - vat.dai(address(vow)), vow.bump(),                  "TestError/Flapper/invalid-vat-dai-vow-change");
             assertEq(usds.balanceOf(address(flap)),   0,                           "TestError/Flapper/invalid-usds-balance");
