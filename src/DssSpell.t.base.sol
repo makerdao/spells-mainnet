@@ -2594,8 +2594,8 @@ contract DssSpellTestBase is Config, DssTest {
 
             vow.flap();
 
-            assertGt(sky.balanceOf(pauseProxy),       pskyBalancePauseProxy,       "TestError/Flapper/unexpected-sky-pause-proxy-balance-change");
-            assertLt(sky.balanceOf(address(pair)),    preserveSky,                 "TestError/Flapper/unexpected-sky-pair-balance-change");
+            assertGt(sky.balanceOf(pauseProxy),       pskyBalancePauseProxy,       "TestError/Flapper/unexpected-sky-pause-proxy-balance");
+            assertLt(sky.balanceOf(address(pair)),    preserveSky,                 "TestError/Flapper/unexpected-sky-pair-balance");
             assertEq(usds.balanceOf(address(pair)),   preserveUsds + lotRad / RAY, "TestError/Flapper/invalid-usds-pair-balance-increase");
             assertEq(pdaiVow - vat.dai(address(vow)), vow.bump(),                  "TestError/Flapper/invalid-vat-dai-vow-change");
             assertEq(usds.balanceOf(address(flap)),   0,                           "TestError/Flapper/invalid-usds-balance");
