@@ -220,7 +220,7 @@ contract DssSpellAction is DssAction {
         // Mip: https://mips.makerdao.com/mips/details/MIP101#2-6-3-aligned-delegate-budget-and-participation-requirements
 
         // BLUE - 13.75 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
-        MKR.transfer(BONAPUBLICA, 13.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+        MKR.transfer(BLUE, 13.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // Cloaky - 12.00 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
         MKR.transfer(CLOAKY, 12.00 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
