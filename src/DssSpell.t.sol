@@ -549,7 +549,7 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(dai), wallets.addr("BYTERON"), 8_333 * WAD),
             Payee(address(dai), wallets.addr("ROCKY"), 8_065 * WAD),
             Payee(address(dai), wallets.addr("BONAPUBLICA"), 5_430 * WAD),
-            Payee(address(mkr), wallets.addr("BONAPUBLICA"), 13.75 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("BLUE"), 13.75 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is only a keyword helper
