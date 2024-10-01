@@ -115,8 +115,8 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 6_00;                           // In basis points
-        afterSpell.susds_ssr              = 6_25;                           // In basis points
+        afterSpell.pot_dsr                = 5_50;                           // In basis points
+        afterSpell.susds_ssr              = 6_50;                           // In basis points
         afterSpell.pause_delay            = 16 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units
@@ -304,7 +304,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         7_500,
-            pct:          7_75,
+            pct:          9_25,
             mat:          14500,
             liqType:      "clip",
             liqOn:        true,
@@ -329,7 +329,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          8_25,
+            pct:          9_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -354,7 +354,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         3_500,
-            pct:          7_50,
+            pct:          9_00,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
