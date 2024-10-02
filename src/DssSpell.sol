@@ -174,10 +174,8 @@ contract DssSpellAction is DssAction {
         //       and implemented as part of the LitePSM module.
         DssLitePsmMigrationPhase3.migrate(dss, migrationCfg);
 
-
         // ---------- Activate Aave Lido Market USDS D3M  ----------
         // Forum: https://forum.sky.money/t/risk-assessment-and-parameter-recommendations-spark-ddm-to-aave-lido-market/25175
-
 
         // Set D3M DC-IAM with the following parameters:
         // line: 100 million USDS
@@ -195,11 +193,13 @@ contract DssSpellAction is DssAction {
         // Additional Actions
         // Expand DIRECT_MOM breaker to also include new D3M
         // Note: this is already done within D3MInit.sol line 232
+
         // D3MInstance memory d3m = D3MInstance({
         //     plan:   DIRECT_SPK_AAVE_LIDO_USDS_PLAN,
         //     pool:   DIRECT_SPK_AAVE_LIDO_USDS_POOL,
         //     oracle: DIRECT_SPK_AAVE_LIDO_USDS_ORACLE
         // });
+
         // D3MCommonConfig memory d3mCfg = D3MCommonConfig({
         //     hub:         D3M_HUB,
         //     mom:         D3M_MOM,
@@ -210,6 +210,7 @@ contract DssSpellAction is DssAction {
         //     ttl:         24 hours,
         //     tau:         7 days
         // });
+
         // D3MAaveUSDSPoolConfig memory aaveCfg = D3MAaveUSDSPoolConfig({
         //     king:         address(0), // TODO: replace with TBC
         //     ausds:        address(0), // TODO: replace with TBC
@@ -218,24 +219,29 @@ contract DssSpellAction is DssAction {
         //     stableDebt:   address(0), // TODO: replace with TBC
         //     variableDebt: address(0) // TODO: replace with TBC
         // });
+
         // D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
         //     operator: DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR
         // });
+
         // D3MInit.initCommon({
         //     dss:     dss,
         //     d3m:     d3m,
         //     cfg:     d3mCfg
         // });
+
         // D3MInit.initAaveUSDSPool({
         //     dss:     dss,
         //     d3m:     d3m,
         //     cfg:     d3mCfg,
         //     aaveCfg: aaveCfg
         // });
+
         // D3MInit.initOperatorPlan({
         //     d3m: d3m,
         //     operatorCfg: operatorCfg
         // });
+
         // ---------- Update WBTC Legacy Vaults Parameters  ----------
         // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
 

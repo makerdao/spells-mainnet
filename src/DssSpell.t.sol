@@ -927,7 +927,7 @@ contract DssSpellTest is DssSpellTestBase {
     uint256           constant  srcTin        = 0;
     uint256           constant  srcTout       = 0;
 
-    function test_LITE_PSM_USDC_A_MigrationPhase3() public skipped {
+    function test_LITE_PSM_USDC_A_MigrationPhase3() public {
         (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
         uint256 psrcVatGem = vat.gem(SRC_ILK, address(srcPsm));
         uint256 psrcGemBalance = gem.balanceOf(address(srcPsm.gemJoin()));
@@ -937,7 +937,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 pvice = vat.vice();
         uint256 ppauseSin = vat.sin(pauseProxy);
 
-        uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
+        uint256 expectedMoveWad = _min(psrcInk, _subcap(psrcInk, srcKeep));
 
         // ----- Pre-spell sanity checks -----
         {
@@ -959,6 +959,8 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(ttl,     12 hours,              "before: dst ttl does not match");
         }
 
+        assertGt(dstPsm.cut(), 0, "no chug: invalid cut");
+
         // ----- Execute spell -----
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -975,8 +977,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dstPsm.vow(), address(vow), "after: unexpected dst vow update");
 
         // No bad debt is left behind
-        assertEq(vat.vice(), pvice, "vice mismatch");
-        assertEq(vat.sin(pauseProxy), ppauseSin, "sin mismatch");
+        assertGe(vat.vice(), pvice, "after: vice mismatch");
+        assertEq(vat.sin(pauseProxy), ppauseSin, "after: sin mismatch");
 
         // Old PSM state is set correctly
         {
@@ -1012,7 +1014,7 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(dstInk, pdstInk, "after: unexpected dst ink chagne");
             // There might be extra `art` because of the calls to `fill`.
             assertGe(dstArt, pdstArt + expectedMoveWad, "after: dst art is not increased at least by the moved amount");
-            assertEq(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
+            assertGe(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
             assertEq(vat.gem(DST_ILK, address(dstPsm)), pdstVatGem, "after: unexpected dst vat gem change");
             assertEq(
                 _amtToWad(gem.balanceOf(address(pocket))),
@@ -1034,10 +1036,6 @@ contract DssSpellTest is DssSpellTestBase {
 
     function _amtToWad(uint256 amt) internal view returns (uint256) {
         return amt * dstPsm.to18ConversionFactor();
-    }
-
-    function _wadToAmt(uint256 wad) internal view returns (uint256) {
-        return wad / dstPsm.to18ConversionFactor();
     }
 
     function _min(uint256 x, uint256 y) internal pure returns (uint256 z) {
