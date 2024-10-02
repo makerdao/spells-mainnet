@@ -942,8 +942,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
 
-        // This is a hack:
-        pDaiSum = vat.dai(address(pot)) + vat.dai(address(susds));
+        // This is a hack: drip() is called twice in the spell and as a consequence vice is incresed;
+        // In order to prove that the migration did not create any extra debt we do it implicitly by
+        // calculating the dai/usds balances of dsr and susds before and after which gives us the actual increase
+        pDaiSum = vat.dai(address(pot)) + (usds.balanceOf(address(susds)) * RAY);
 
         // ----- Pre-spell sanity checks -----
         {
@@ -982,7 +984,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // No bad debt is left behind
         {
-            uint256 viceIncrease = vat.dai(address(pot)) + vat.dai(address(susds)) - pDaiSum;
+            // The incraase in vice should be solely caused by spell actions not related to the migration
+            uint256 viceIncrease = vat.dai(address(pot)) + (usds.balanceOf(address(susds)) * RAY) - pDaiSum;
             assertEq(vat.vice(), pvice + viceIncrease, "after: vice mismatch");
             assertEq(vat.sin(pauseProxy), ppauseSin, "after: sin mismatch");
         }
@@ -1021,7 +1024,10 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(dstInk, pdstInk, "after: unexpected dst ink chagne");
             // There might be extra `art` because of the calls to `fill`.
             assertGe(dstArt, pdstArt + expectedMoveWad, "after: dst art is not increased at least by the moved amount");
-            assertGe(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
+            // if someone has sent dai to the psm contract then cut() will return a non-zero value
+            // so we have to account for this and subtract it from the reported balance.
+            uint256 excessDai = dstPsm.cut();
+            assertEq(dai.balanceOf(address(dstPsm)) - excessDai, dstBuf, "after: invalid dst psm dai balance");
             assertEq(vat.gem(DST_ILK, address(dstPsm)), pdstVatGem, "after: unexpected dst vat gem change");
             assertEq(
                 _amtToWad(gem.balanceOf(address(pocket))),
