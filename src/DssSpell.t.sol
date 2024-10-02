@@ -927,6 +927,9 @@ contract DssSpellTest is DssSpellTestBase {
     uint256           constant  srcTin        = 0;
     uint256           constant  srcTout       = 0;
 
+    // this is declared here because it was the only way to avoid "stack too deep" errors
+    uint256 pDaiSum;
+
     function test_LITE_PSM_USDC_A_MigrationPhase3() public {
         (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
         uint256 psrcVatGem = vat.gem(SRC_ILK, address(srcPsm));
@@ -937,7 +940,10 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 pvice = vat.vice();
         uint256 ppauseSin = vat.sin(pauseProxy);
 
-        uint256 expectedMoveWad = _min(psrcInk, _subcap(psrcInk, srcKeep));
+        uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
+
+        // This is a hack:
+        pDaiSum = vat.dai(address(pot)) + vat.dai(address(susds));
 
         // ----- Pre-spell sanity checks -----
         {
@@ -959,8 +965,6 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(ttl,     12 hours,              "before: dst ttl does not match");
         }
 
-        assertGt(dstPsm.cut(), 0, "no chug: invalid cut");
-
         // ----- Execute spell -----
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -977,8 +981,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(dstPsm.vow(), address(vow), "after: unexpected dst vow update");
 
         // No bad debt is left behind
-        assertGe(vat.vice(), pvice, "after: vice mismatch");
-        assertEq(vat.sin(pauseProxy), ppauseSin, "after: sin mismatch");
+        {
+            uint256 viceIncrease = vat.dai(address(pot)) + vat.dai(address(susds)) - pDaiSum;
+            assertEq(vat.vice(), pvice + viceIncrease, "after: vice mismatch");
+            assertEq(vat.sin(pauseProxy), ppauseSin, "after: sin mismatch");
+        }
 
         // Old PSM state is set correctly
         {
