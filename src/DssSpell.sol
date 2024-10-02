@@ -73,10 +73,10 @@ contract DssSpellAction is DssAction {
     uint256 constant TARGET_WBTC_B_MAT = 150 * RAY / 100;
 
     // ---------- Contracts ----------
-    address internal immutable D3M_HUB            = DssExecLib.getChangelogAddress("DIRECT_HUB");
-    address internal immutable D3M_MOM            = DssExecLib.getChangelogAddress("DIRECT_MOM");
-    address internal immutable MCD_PSM_USDC_A     = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
-    address internal immutable USDS               = DssExecLib.getChangelogAddress("USDS");
+    address internal immutable D3M_HUB        = DssExecLib.getChangelogAddress("DIRECT_HUB");
+    address internal immutable D3M_MOM        = DssExecLib.getChangelogAddress("DIRECT_MOM");
+    address internal immutable MCD_PSM_USDC_A = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable SUSDS          = DssExecLib.getChangelogAddress("SUSDS");
 
 
     address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN     = address(0); // TODO: replace
@@ -107,18 +107,18 @@ contract DssSpellAction is DssAction {
         DssExecLib.setDSR(FIVE_PT_FIVE_PERCENT_RATE, /* doDrip = */ true);
 
         // SSR: Increase by 0.25 percentage points, from 6.25% to 6.5%
-        SUsdsLike(USDS).drip();
-        SUsdsLike(USDS).file("ssr", SIX_PT_FIVE_PERCENT_RATE);
+        SUsdsLike(SUSDS).drip();
+        SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PERCENT_RATE);
 
         // ---------- Update PSM-USDC-A Fees  ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
         // PSM-USDC-A tin: Decrease by 0.01 percentage points, from 0.01% to 0%
-        DssExecLib.setValue(MCD_PSM_USDC_A, "tin", 0);
+        // Note: this is done via the DssLitePsmMigrationPhase3 script: line 78
 
         // PSM-USDC-A tout: Decrease by 0.01 percentage points, from 0.01% to 0%
-        DssExecLib.setValue(MCD_PSM_USDC_A, "tout", 0);
+        // Note: this is done via the DssLitePsmMigrationPhase3 script: line 79
 
         // ---------- Phase 3 USDC Migration from PSM-USDC-A to LITE-PSM-USDC-A  ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
@@ -139,11 +139,11 @@ contract DssSpellAction is DssAction {
         // Migrate all remaining USDC reserves from PSM-USDC-A to LITE-PSM-USDC-A with a script executed in the spell
         // Note: only heading, copied from the exec sheet for consistency
 
-        // PSM-USDC-A DC-IAM DC-IAM line: Decrease by 2,5 billion DAI, from 2,5 billion DAI to 0
-        // Note: done implicitly via the migration script
+        // PSM-USDC-A DC-IAM line: Decrease by 2,5 billion DAI, from 2,5 billion DAI to 0
+        // Note: this is done via the DssLitePsmMigrationPhase3 script
 
         // Disable PSM-USDC-A DC-IAM
-        // Note: done implicitly via the migration script
+        // Note: this is done via the DssLitePsmMigrationPhase3 script
 
         // Note: load the MCD contracts depencencies
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
@@ -195,47 +195,47 @@ contract DssSpellAction is DssAction {
         // Additional Actions
         // Expand DIRECT_MOM breaker to also include new D3M
         // Note: this is already done within D3MInit.sol line 232
-        D3MInstance memory d3m = D3MInstance({
-            plan:   DIRECT_SPK_AAVE_LIDO_USDS_PLAN,
-            pool:   DIRECT_SPK_AAVE_LIDO_USDS_POOL,
-            oracle: DIRECT_SPK_AAVE_LIDO_USDS_ORACLE
-        });
-        D3MCommonConfig memory d3mCfg = D3MCommonConfig({
-            hub:         D3M_HUB,
-            mom:         D3M_MOM,
-            ilk:         "DIRECT-SPK-AAVE-LIDO-USDS",
-            existingIlk: false,
-            maxLine:     100 * MILLION * RAD,
-            gap:         50 * MILLION * RAD,
-            ttl:         24 hours,
-            tau:         7 days
-        });
-        D3MAaveUSDSPoolConfig memory aaveCfg = D3MAaveUSDSPoolConfig({
-            king:         address(0), // TODO: replace with TBC
-            ausds:        address(0), // TODO: replace with TBC
-            usdsJoin:     address(0), // TODO: replace with TBC
-            usds:         address(0), // TODO: replace with TBC
-            stableDebt:   address(0), // TODO: replace with TBC
-            variableDebt: address(0) // TODO: replace with TBC
-        });
-        D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
-            operator: DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR
-        });
-        D3MInit.initCommon({
-            dss:     dss,
-            d3m:     d3m,
-            cfg:     d3mCfg
-        });
-        D3MInit.initAaveUSDSPool({
-            dss:     dss,
-            d3m:     d3m,
-            cfg:     d3mCfg,
-            aaveCfg: aaveCfg
-        });
-        D3MInit.initOperatorPlan({
-            d3m: d3m,
-            operatorCfg: operatorCfg
-        });
+        // D3MInstance memory d3m = D3MInstance({
+        //     plan:   DIRECT_SPK_AAVE_LIDO_USDS_PLAN,
+        //     pool:   DIRECT_SPK_AAVE_LIDO_USDS_POOL,
+        //     oracle: DIRECT_SPK_AAVE_LIDO_USDS_ORACLE
+        // });
+        // D3MCommonConfig memory d3mCfg = D3MCommonConfig({
+        //     hub:         D3M_HUB,
+        //     mom:         D3M_MOM,
+        //     ilk:         "DIRECT-SPK-AAVE-LIDO-USDS",
+        //     existingIlk: false,
+        //     maxLine:     100 * MILLION * RAD,
+        //     gap:         50 * MILLION * RAD,
+        //     ttl:         24 hours,
+        //     tau:         7 days
+        // });
+        // D3MAaveUSDSPoolConfig memory aaveCfg = D3MAaveUSDSPoolConfig({
+        //     king:         address(0), // TODO: replace with TBC
+        //     ausds:        address(0), // TODO: replace with TBC
+        //     usdsJoin:     address(0), // TODO: replace with TBC
+        //     usds:         address(0), // TODO: replace with TBC
+        //     stableDebt:   address(0), // TODO: replace with TBC
+        //     variableDebt: address(0) // TODO: replace with TBC
+        // });
+        // D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
+        //     operator: DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR
+        // });
+        // D3MInit.initCommon({
+        //     dss:     dss,
+        //     d3m:     d3m,
+        //     cfg:     d3mCfg
+        // });
+        // D3MInit.initAaveUSDSPool({
+        //     dss:     dss,
+        //     d3m:     d3m,
+        //     cfg:     d3mCfg,
+        //     aaveCfg: aaveCfg
+        // });
+        // D3MInit.initOperatorPlan({
+        //     d3m: d3m,
+        //     operatorCfg: operatorCfg
+        // });
         // ---------- Update WBTC Legacy Vaults Parameters  ----------
         // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
 
@@ -269,17 +269,6 @@ contract DssSpellAction is DssAction {
             _end:       TARGET_WBTC_B_MAT,
             _duration:  6 days
         });
-
-        // ---------- Update WBTC SparkLend Parameters  ----------
-        // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
-
-        // Decrease LT from 75% to 70%
-        // Decrease liquidation protocol fee from 10% to 0%
-        // Update cap automator parameters
-        // Supply cap gap: decrease from 500 WBTC to 200 WBTC
-        // Supply cap max: decrease from 10,000 WBTC to 5,000 WBTC
-        // Borrow cap gap: decrease from 100 WBTC to 1 WBTC
-        // Borrow cap max: decrease from 2,000 WBTC to 1 WBTC
     }
 }
 

@@ -133,8 +133,8 @@ contract DssSpellTest is DssSpellTestBase {
             ClipAbstract(addr.addr("MCD_CLIP_PSM_USDC_A")),
             addr.addr("PIP_USDC"),
             PsmAbstract(addr.addr("MCD_PSM_USDC_A")),
-            1,   // tin
-            1    // tout
+            0,   // tin
+            0    // tout
         );
 
         // GUSD
@@ -187,7 +187,7 @@ contract DssSpellTest is DssSpellTestBase {
                 pip:      addr.addr("PIP_USDC"),
                 litePsm:  addr.addr("MCD_LITE_PSM_USDC_A"),
                 pocket:   addr.addr("MCD_LITE_PSM_USDC_A_POCKET"),
-                bufUnits: 200_000_000,
+                bufUnits: 400_000_000,
                 tinBps:             0,
                 toutBps:            0
             })
@@ -266,7 +266,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        _checkIlkClipper(
+       _checkIlkClipper(
             "RETH-A",
             GemJoinAbstract(addr.addr("MCD_JOIN_RETH_A")),
             ClipAbstract(addr.addr("MCD_CLIP_RETH_A")),
@@ -911,4 +911,148 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    bytes32           constant  SRC_ILK       = "PSM-USDC-A";
+    bytes32           constant  DST_ILK       = "LITE-PSM-USDC-A";
+    PsmAbstract       immutable srcPsm        = PsmAbstract(      addr.addr("MCD_PSM_USDC_A"));
+    LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
+    address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
+    GemAbstract       immutable gem           = GemAbstract(      addr.addr("USDC"));
+    uint256           constant  srcKeep       = 0;
+    uint256           constant  dstWant       = type(uint256).max;
+    uint256           constant  dstBuf        = 400 * MILLION * WAD;
+    uint256           constant  dstMaxLine    = 10 * BILLION * RAD;
+    uint256           constant  dstGap        = 400 * MILLION * RAD;
+    uint256           constant  dstTtl        = 12 hours;
+
+    uint256           constant  srcTin        = 0;
+    uint256           constant  srcTout       = 0;
+
+    function test_LITE_PSM_USDC_A_MigrationPhase3() public skipped {
+        (uint256 psrcInk, uint256 psrcArt) = vat.urns(SRC_ILK, address(srcPsm));
+        uint256 psrcVatGem = vat.gem(SRC_ILK, address(srcPsm));
+        uint256 psrcGemBalance = gem.balanceOf(address(srcPsm.gemJoin()));
+        (uint256 pdstInk, uint256 pdstArt) = vat.urns(DST_ILK, address(dstPsm));
+        uint256 pdstVatGem = vat.gem(DST_ILK, address(dstPsm));
+        uint256 pdstGemBalance = gem.balanceOf(address(pocket));
+        uint256 pvice = vat.vice();
+        uint256 ppauseSin = vat.sin(pauseProxy);
+
+        uint256 expectedMoveWad = _min(dstWant, _subcap(psrcInk, srcKeep));
+
+        // ----- Pre-spell sanity checks -----
+        {
+            (uint256 psrcIlkArt,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
+
+            assertGt(psrcIlkArt,       0,                   "before: src ilk Art is zero");
+            assertGt(psrcLine,         0,                   "before: src line is zero");
+            assertGt(psrcArt,          0,                   "before: src art is zero");
+            assertGt(psrcInk,          0,                   "before: src ink is zero");
+            assertGt(srcPsm.tin(),     0,                   "before: src tin is zero");
+            assertGt(srcPsm.tout(),    0,                   "before: src tout is zero");
+            assertEq(dstPsm.buf(),     200 * MILLION * WAD, "before: dst buf does not match");
+        }
+
+        {
+            (uint256 maxLine, uint256 gap, uint48 ttl,,) = autoLine.ilks(DST_ILK);
+            assertEq(maxLine, 7_500 * MILLION * RAD, "before: dst maxLine does not match");
+            assertEq(gap,     200 * MILLION * RAD,   "before: dst gap does not match");
+            assertEq(ttl,     12 hours,              "before: dst ttl does not match");
+        }
+
+        // ----- Execute spell -----
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // ----- Post-spell state checks -----
+
+        // Sanity checks
+        assertEq(srcPsm.tin(), srcTin, "after: invalid src tin");
+        assertEq(srcPsm.tout(), srcTout, "after: invalid src tout");
+        assertEq(srcPsm.vow(), address(vow), "after: unexpected src vow update");
+
+        assertEq(dstPsm.buf(),  dstBuf, "after: invalid dst buf");
+        assertEq(dstPsm.vow(), address(vow), "after: unexpected dst vow update");
+
+        // No bad debt is left behind
+        assertEq(vat.vice(), pvice, "vice mismatch");
+        assertEq(vat.sin(pauseProxy), ppauseSin, "sin mismatch");
+
+        // Old PSM state is set correctly
+        {
+            (uint256 srcInk, uint256 srcArt) = vat.urns(SRC_ILK, address(srcPsm));
+            assertEq(srcInk, psrcInk - expectedMoveWad, "after: src ink is not decreased by the moved amount");
+            assertEq(srcInk, srcKeep, "after: src ink is different from src keep");
+            assertEq(srcArt, psrcArt - expectedMoveWad, "after: src art is not decreased by the moved amount");
+            assertEq(vat.gem(SRC_ILK, address(srcPsm)), psrcVatGem, "after: unexpected src vat gem change");
+            assertEq(
+                _amtToWad(gem.balanceOf(address(srcPsm.gemJoin()))),
+                _amtToWad(psrcGemBalance) - expectedMoveWad,
+                "after: invalid gem balance for src gemJoin"
+            );
+        }
+        // Old PSM line is set to 0
+        {
+            (,,, uint256 psrcLine,) = vat.ilks(SRC_ILK);
+            assertEq(psrcLine, 0, "after: AutoLine invalid maxLine");
+        }
+        // Old PSM is removed from the AutoLine
+        {
+            (uint256 maxLine, uint256 gap, uint48 ttl, uint256 last,) = autoLine.ilks(SRC_ILK);
+            assertEq(maxLine, 0, "after: AutoLine invalid maxLine");
+            assertEq(gap,     0, "after: AutoLine invalid gap");
+            assertEq(ttl,     0, "after: AutoLine invalid ttl");
+            assertEq(last,    0, "after: AutoLine invalid last");
+        }
+
+        // New PSM state is set correctly
+        {
+            // LitePSM ink is never modified
+            (uint256 dstInk, uint256 dstArt) = vat.urns(DST_ILK, address(dstPsm));
+            assertEq(dstInk, pdstInk, "after: unexpected dst ink chagne");
+            // There might be extra `art` because of the calls to `fill`.
+            assertGe(dstArt, pdstArt + expectedMoveWad, "after: dst art is not increased at least by the moved amount");
+            assertEq(dai.balanceOf(address(dstPsm)), dstBuf, "after: invalid dst psm dai balance");
+            assertEq(vat.gem(DST_ILK, address(dstPsm)), pdstVatGem, "after: unexpected dst vat gem change");
+            assertEq(
+                _amtToWad(gem.balanceOf(address(pocket))),
+                _amtToWad(pdstGemBalance) + expectedMoveWad,
+                "after: invalid gem balance for dst pocket"
+            );
+        }
+
+        // New PSM is properly configured on AutoLine
+        {
+            (uint256 maxLine, uint256 gap, uint48 ttl, uint256 last, uint256 lastInc) = autoLine.ilks(DST_ILK);
+            assertEq(maxLine, dstMaxLine, "after: AutoLine invalid maxLine");
+            assertEq(gap, dstGap, "after: AutoLine invalid gap");
+            assertEq(ttl, uint48(dstTtl), "after: AutoLine invalid ttl");
+            assertEq(last, block.number, "after: AutoLine invalid last");
+            assertEq(lastInc, block.timestamp, "after: AutoLine invalid lastInc");
+        }
+    }
+
+    function _amtToWad(uint256 amt) internal view returns (uint256) {
+        return amt * dstPsm.to18ConversionFactor();
+    }
+
+    function _wadToAmt(uint256 wad) internal view returns (uint256) {
+        return wad / dstPsm.to18ConversionFactor();
+    }
+
+    function _min(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = x < y ? x : y;
+    }
+
+    function _subcap(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        z = x < y ? 0 : x - y;
+    }
+
+    function test_WBTC_A_LerpOffboarding() public {
+        _checkIlkLerpOffboarding("WBTC-A", "WBTC-A Offboarding", 145, 150);
+    }
+
+    function test_WBTC_B_LerpOffboarding() public {
+        _checkIlkLerpOffboarding("WBTC-B", "WBTC-B Offboarding", 130, 150);
+    }
 }
