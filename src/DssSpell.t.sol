@@ -49,6 +49,46 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface D3MHubLike {
+    function end() external view returns (address);
+    function exec(bytes32 ilk) external;
+    function ilks(bytes32)
+        external
+        view
+        returns (address pool, address plan, uint256 tau, uint256 culled, uint256 tic);
+    function vow() external view returns (address);
+}
+
+interface D3MMomLike {
+    function authority() external view returns (address);
+    function disable(address who) external;
+}
+
+interface D3MAaveUSDSPoolLike {
+    function hub() external view returns (address);
+    function dai() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function vat() external view returns (address);
+    function file(bytes32, address) external;
+    function ausds() external view returns (address);
+    function usdsJoin() external view returns (address);
+    function usds() external view returns (address);
+    function daiJoin() external view returns (address);
+    function stableDebt() external view returns (address);
+    function variableDebt() external view returns (address);
+}
+
+interface D3MOracleLike {
+    function hub() external view returns (address);
+    function vat() external view returns (address);
+    function ilk() external view returns (bytes32);
+}
+
+interface D3MOperatorPlanLike {
+    function active() external view returns (bool);
+    function operator() external view returns (address);
+    function wards(address) external view returns (uint256);
+}
 
 contract DssSpellTest is DssSpellTestBase {
     string         config;
@@ -915,15 +955,14 @@ contract DssSpellTest is DssSpellTestBase {
     bytes32           constant  DST_ILK       = "LITE-PSM-USDC-A";
     PsmAbstract       immutable srcPsm        = PsmAbstract(      addr.addr("MCD_PSM_USDC_A"));
     LitePsmLike       immutable dstPsm        = LitePsmLike(      addr.addr("MCD_LITE_PSM_USDC_A"));
-    address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
     GemAbstract       immutable gem           = GemAbstract(      addr.addr("USDC"));
+    address           immutable pocket        =                   addr.addr("MCD_LITE_PSM_USDC_A_POCKET");
     uint256           constant  srcKeep       = 0;
     uint256           constant  dstWant       = type(uint256).max;
     uint256           constant  dstBuf        = 400 * MILLION * WAD;
     uint256           constant  dstMaxLine    = 10 * BILLION * RAD;
     uint256           constant  dstGap        = 400 * MILLION * RAD;
     uint256           constant  dstTtl        = 12 hours;
-
     uint256           constant  srcTin        = 0;
     uint256           constant  srcTout       = 0;
 
@@ -1057,6 +1096,78 @@ contract DssSpellTest is DssSpellTestBase {
 
     function _subcap(uint256 x, uint256 y) internal pure returns (uint256 z) {
         z = x < y ? 0 : x - y;
+    }
+
+     function testDirectSparAaveLidoUSDSIntegration() public {
+        bytes32 ilk          = "DIRECT-SPK-AAVE-LIDO-USDS";
+        address operator     = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
+        address ausds        = 0x09AA30b182488f769a9824F15E6Ce58591Da4781;
+        address stableDebt   = 0x779dB175167C60c2B2193Be6B8d8B3602435e89E;
+        address variableDebt = 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        D3MHubLike hub = D3MHubLike(addr.addr("DIRECT_HUB"));
+        D3MMomLike mom = D3MMomLike(addr.addr("DIRECT_MOM"));
+        D3MAaveUSDSPoolLike pool = D3MAaveUSDSPoolLike(addr.addr("DIRECT_SPK_AAVE_LIDO_USDS_POOL"));
+        D3MOperatorPlanLike plan = D3MOperatorPlanLike(addr.addr("DIRECT_SPK_AAVE_LIDO_USDS_PLAN"));
+        D3MOracleLike oracle = D3MOracleLike(addr.addr("DIRECT_SPK_AAVE_LIDO_USDS_ORACLE"));
+
+        // ----- Post-spell state checks -----
+
+        // Sanity checks
+        {
+            (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
+            assertEq(_pool, address(pool));
+            assertEq(_plan, address(plan));
+            assertEq(tau, 7 days);
+            assertEq(hub.vow(), address(vow));
+            assertEq(hub.end(), address(end));
+            assertEq(mom.authority(), address(chief));
+            (address pip,) = spotter.ilks(ilk);
+            assertEq(pip, address(oracle));
+            assertEq(vat.wards(address(hub)), 1);
+        }
+
+        // D3MAaveUSDSPool checks
+        {
+            assertEq(pool.ilk(),                    ilk, "pool: unexpected ilk");
+            assertEq(pool.hub(),           address(hub), "pool: unexpected hub address");
+            assertEq(pool.dai(),           address(dai), "pool: unexpected dai address");
+            assertEq(pool.vat(),           address(vat), "pool: unexpected vat address");
+            assertEq(pool.ausds(),       address(ausds), "pool: unexpected ausds address");
+            assertEq(pool.usds(),         address(usds), "pool: unexpected usds address");
+            assertEq(pool.usdsJoin(), address(usdsJoin), "pool: unexpected usdsJoin address");
+            assertEq(pool.daiJoin(),   address(daiJoin), "pool: unexpected daiJoin address");
+            assertEq(pool.stableDebt(),      stableDebt, "pool: unexpected stableDebt address");
+            assertEq(pool.variableDebt(),  variableDebt, "pool: unexpected variableDebt address");
+        }
+
+        // D3MOracle checks
+        {
+            assertEq(oracle.ilk(),                   ilk, "pool: unexpected ilk");
+            assertEq(oracle.hub(),          address(hub), "pool: unexpected hub address");
+            assertEq(oracle.vat(),          address(vat), "pool: unexpected vat address");
+        }
+
+         // D3MOperatorPlan checks
+        {
+            assertEq(plan.operator(), operator);
+            assertEq(plan.wards(address(mom)), 1);
+            assertEq(plan.active(), true);
+        }
+
+        // De-activate the D3M via mom
+        vm.prank(DSChiefAbstract(chief).hat());
+        mom.disable(address(plan));
+        assertEq(plan.active(), false, "TestError/unexpected-postdisable-active");
+
+        hub.exec(ilk);
+        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+        assertLt(ink, WAD, "TestError/unexpected-postdisable-ink"); // Less than some dust amount is fine (1 DAI)
+        assertLt(art, WAD, "TestError/unexpected-postdisable-art");
     }
 
     function test_WBTC_A_LerpOffboarding() public {

@@ -140,8 +140,8 @@ contract Config {
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
-        afterSpell.ilk_count              = 66;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.0";                       // String expected in system
+        afterSpell.ilk_count              = 67;                             // Num expected in system
+        afterSpell.chainlog_version       = "1.19.1";                       // String expected in system
 
         //
         // Values for all collateral
@@ -1545,6 +1545,31 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
+            offboarding:  false
+        });
+        afterSpell.collaterals["DIRECT-SPK-AAVE-LIDO-USDS"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      100 * MILLION,
+            aL_gap:       50 * MILLION,
+            aL_ttl:       24 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          10000,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({

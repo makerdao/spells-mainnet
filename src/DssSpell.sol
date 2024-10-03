@@ -73,16 +73,24 @@ contract DssSpellAction is DssAction {
     uint256 constant TARGET_WBTC_B_MAT = 150 * RAY / 100;
 
     // ---------- Contracts ----------
-    address internal immutable D3M_HUB        = DssExecLib.getChangelogAddress("DIRECT_HUB");
-    address internal immutable D3M_MOM        = DssExecLib.getChangelogAddress("DIRECT_MOM");
-    address internal immutable MCD_PSM_USDC_A = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
-    address internal immutable SUSDS          = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable D3M_HUB         = DssExecLib.getChangelogAddress("DIRECT_HUB");
+    address internal immutable D3M_MOM         = DssExecLib.getChangelogAddress("DIRECT_MOM");
+    address internal immutable MCD_PSM_USDC_A  = DssExecLib.getChangelogAddress("MCD_PSM_USDC_A");
+    address internal immutable SUSDS           = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable USDS            = DssExecLib.getChangelogAddress("USDS");
+    address internal immutable USDS_JOIN       = DssExecLib.getChangelogAddress("USDS_JOIN");
+    address internal immutable MCD_PAUSE_PROXY = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
 
 
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN     = address(0); // TODO: replace
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_POOL     = address(0); // TODO: replace
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_ORACLE   = address(0); // TODO: replace
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR = address(0); // TODO: replace
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN     = 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_POOL     = 0xbf674d0cD6841C1d7f9b8E809B967B3C5E867653;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_ORACLE   = 0x9dB0EB29c2819f9AE0A91A6E6f644C35a7493E9b;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
+
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_AUSDS         = 0x09AA30b182488f769a9824F15E6Ce58591Da4781;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_STABLE_DEBT   = 0x779dB175167C60c2B2193Be6B8d8B3602435e89E;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_VARIABLE_DEBT = 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E;
+
 
     function actions() public override {
         // ---------- Stability Scope Parameter Changes  ----------
@@ -183,64 +191,64 @@ contract DssSpellAction is DssAction {
         // ttl: 24 hours
         // tau: 7 days
         // D3M Addresses:
-        // oracle: D3MOracle
-        // plan: D3MOperatorPlan
-        // pool: D3MAaveV3USDSNoSupplyCapTypePool
-        // aToken: TBC
+        // oracle: 0x9D9CD271C9f203375b96673056BB20BcC0526E80
+        // plan: 0x4Cb3f51b97D64C122fC52B3CA828516B5FD66EF7
+        // pool: 0x077B5B4b14ebbEF0DAeE21cfAc4CE14523576E07
+        // aToken: 0x09AA30b182488f769a9824F15E6Ce58591Da4781
         // operator: 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5
-        // stabledebt address: TBC
-        // variabledebt address: TBC
+        // stabledebt address: 0x779dB175167C60c2B2193Be6B8d8B3602435e89E
+        // variabledebt address: 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E
         // Additional Actions
         // Expand DIRECT_MOM breaker to also include new D3M
         // Note: this is already done within D3MInit.sol line 232
 
-        // D3MInstance memory d3m = D3MInstance({
-        //     plan:   DIRECT_SPK_AAVE_LIDO_USDS_PLAN,
-        //     pool:   DIRECT_SPK_AAVE_LIDO_USDS_POOL,
-        //     oracle: DIRECT_SPK_AAVE_LIDO_USDS_ORACLE
-        // });
+        D3MInstance memory d3m = D3MInstance({
+            plan:   DIRECT_SPK_AAVE_LIDO_USDS_PLAN,
+            pool:   DIRECT_SPK_AAVE_LIDO_USDS_POOL,
+            oracle: DIRECT_SPK_AAVE_LIDO_USDS_ORACLE
+        });
 
-        // D3MCommonConfig memory d3mCfg = D3MCommonConfig({
-        //     hub:         D3M_HUB,
-        //     mom:         D3M_MOM,
-        //     ilk:         "DIRECT-SPK-AAVE-LIDO-USDS",
-        //     existingIlk: false,
-        //     maxLine:     100 * MILLION * RAD,
-        //     gap:         50 * MILLION * RAD,
-        //     ttl:         24 hours,
-        //     tau:         7 days
-        // });
+        D3MCommonConfig memory d3mCfg = D3MCommonConfig({
+            hub:         D3M_HUB,
+            mom:         D3M_MOM,
+            ilk:         "DIRECT-SPK-AAVE-LIDO-USDS",
+            existingIlk: false,
+            maxLine:     100 * MILLION * RAD,
+            gap:         50 * MILLION * RAD,
+            ttl:         24 hours,
+            tau:         7 days
+        });
 
-        // D3MAaveUSDSPoolConfig memory aaveCfg = D3MAaveUSDSPoolConfig({
-        //     king:         address(0), // TODO: replace with TBC
-        //     ausds:        address(0), // TODO: replace with TBC
-        //     usdsJoin:     address(0), // TODO: replace with TBC
-        //     usds:         address(0), // TODO: replace with TBC
-        //     stableDebt:   address(0), // TODO: replace with TBC
-        //     variableDebt: address(0) // TODO: replace with TBC
-        // });
+        D3MAaveUSDSPoolConfig memory aaveCfg = D3MAaveUSDSPoolConfig({
+            king:         MCD_PAUSE_PROXY,
+            ausds:        DIRECT_SPK_AAVE_LIDO_USDS_AUSDS,
+            usdsJoin:     USDS_JOIN,
+            usds:         USDS,
+            stableDebt:   DIRECT_SPK_AAVE_LIDO_USDS_STABLE_DEBT,
+            variableDebt: DIRECT_SPK_AAVE_LIDO_USDS_VARIABLE_DEBT
+        });
 
-        // D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
-        //     operator: DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR
-        // });
+        D3MOperatorPlanConfig memory operatorCfg = D3MOperatorPlanConfig({
+            operator: DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR
+        });
 
-        // D3MInit.initCommon({
-        //     dss:     dss,
-        //     d3m:     d3m,
-        //     cfg:     d3mCfg
-        // });
+        D3MInit.initCommon({
+            dss:     dss,
+            d3m:     d3m,
+            cfg:     d3mCfg
+        });
 
-        // D3MInit.initAaveUSDSPool({
-        //     dss:     dss,
-        //     d3m:     d3m,
-        //     cfg:     d3mCfg,
-        //     aaveCfg: aaveCfg
-        // });
+        D3MInit.initAaveUSDSPool({
+            dss:     dss,
+            d3m:     d3m,
+            cfg:     d3mCfg,
+            aaveCfg: aaveCfg
+        });
 
-        // D3MInit.initOperatorPlan({
-        //     d3m: d3m,
-        //     operatorCfg: operatorCfg
-        // });
+        D3MInit.initOperatorPlan({
+            d3m: d3m,
+            operatorCfg: operatorCfg
+        });
 
         // ---------- Update WBTC Legacy Vaults Parameters  ----------
         // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
@@ -275,6 +283,10 @@ contract DssSpellAction is DssAction {
             _end:       TARGET_WBTC_B_MAT,
             _duration:  6 days
         });
+
+        // ---------- Chainlog bump ----------
+        // Note: we need to increase chainlog version as D3MInit.initCommon added new keys
+        DssExecLib.setChangelogVersion("1.19.1");
     }
 }
 
