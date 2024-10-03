@@ -51,8 +51,8 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant FIVE_PT_FIVE_PCT_RATE   = 1000000001697766583380253701;
-    uint256 internal constant SIX_PT_FIVE_PCT_RATE    = 1000000001996917783620820123;
+    uint256 internal constant FIVE_PT_FIVE_PCT_RATE       = 1000000001697766583380253701;
+    uint256 internal constant SIX_PT_FIVE_PCT_RATE        = 1000000001996917783620820123;
     uint256 internal constant NINE_PCT_RATE               = 1000000002732676825177582095;
     uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE   = 1000000002805322428706865331;
     uint256 internal constant NINE_PT_SEVEN_FIVE_PCT_RATE = 1000000002950116251408586949;
@@ -82,11 +82,10 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PAUSE_PROXY = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
 
 
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN     = 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31;
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_POOL     = 0xbf674d0cD6841C1d7f9b8E809B967B3C5E867653;
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_ORACLE   = 0x9dB0EB29c2819f9AE0A91A6E6f644C35a7493E9b;
-    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
-
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN          = 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_POOL          = 0xbf674d0cD6841C1d7f9b8E809B967B3C5E867653;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_ORACLE        = 0x9dB0EB29c2819f9AE0A91A6E6f644C35a7493E9b;
+    address internal constant DIRECT_SPK_AAVE_LIDO_USDS_OPERATOR      = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
     address internal constant DIRECT_SPK_AAVE_LIDO_USDS_AUSDS         = 0x09AA30b182488f769a9824F15E6Ce58591Da4781;
     address internal constant DIRECT_SPK_AAVE_LIDO_USDS_STABLE_DEBT   = 0x779dB175167C60c2B2193Be6B8d8B3602435e89E;
     address internal constant DIRECT_SPK_AAVE_LIDO_USDS_VARIABLE_DEBT = 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E;
