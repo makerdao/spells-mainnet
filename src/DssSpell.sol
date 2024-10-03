@@ -188,15 +188,16 @@ contract DssSpellAction is DssAction {
         DssLitePsmMigrationPhase3.migrate(dss, migrationCfg);
 
         // ---------- Activate Aave Lido Market USDS DDM  ----------
-        // Forum: https://forum.sky.money/t/risk-assessment-and-parameter-recommendations-spark-ddm-to-aave-lido-market/25175
+        // Forum: https://forum.makerdao.com/t/risk-assessment-and-parameter-recommendations-spark-ddm-to-aave-lido-market/25175
+        // Forum: https://forum.makerdao.com/t/risk-assessment-and-parameter-recommendations-spark-ddm-to-aave-lido-market/25175/2
 
         // Add new ilk as DIRECT-SPK-AAVE-LIDO-USDS
-        // DDM Addresses:
+        // Set DDM DC-IAM with the following parameters:
         // line: 100 million USDS
         // gap: 50 million USDS
         // ttl: 24 hours
         // tau: 7 days
-        // D3M Addresses:
+        // DDM Addresses:
         // oracle: D3MOracle at 0x9dB0EB29c2819f9AE0A91A6E6f644C35a7493E9b
         // plan: D3MOperatorPlan at 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31
         // pool: D3MAaveV3USDSNoSupplyCapTypePool at 0xbf674d0cD6841C1d7f9b8E809B967B3C5E867653
@@ -258,7 +259,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Update WBTC Legacy Vaults Parameters  ----------
         // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
-        // Forrum: https://forum.sky.money/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/52
+        // Forum: https://forum.sky.money/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/52
 
         // Decrease liquidation penalty for WBTC-A, WBTC-B, and WBTC-C from 13% to 0%
         DssExecLib.setIlkLiquidationPenalty("WBTC-A", 0);
