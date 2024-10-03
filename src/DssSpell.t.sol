@@ -76,6 +76,8 @@ interface D3MAaveUSDSPoolLike {
     function daiJoin() external view returns (address);
     function stableDebt() external view returns (address);
     function variableDebt() external view returns (address);
+    function redeemable() external view returns (address);
+    function king() external view returns (address);
 }
 
 interface D3MOracleLike {
@@ -86,6 +88,8 @@ interface D3MOracleLike {
 
 interface D3MOperatorPlanLike {
     function active() external view returns (bool);
+    function getTargetAssets(uint256) external view returns (uint256);
+    function setTargetAssets(uint256 value) external;
     function operator() external view returns (address);
     function wards(address) external view returns (uint256);
 }
@@ -1098,12 +1102,9 @@ contract DssSpellTest is DssSpellTestBase {
         z = x < y ? 0 : x - y;
     }
 
-     function testDirectSparAaveLidoUSDSIntegration() public {
+    function testDirectSparAaveLidoUSDSIntegration() public {
         bytes32 ilk          = "DIRECT-SPK-AAVE-LIDO-USDS";
         address operator     = 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5;
-        address ausds        = 0x09AA30b182488f769a9824F15E6Ce58591Da4781;
-        address stableDebt   = 0x779dB175167C60c2B2193Be6B8d8B3602435e89E;
-        address variableDebt = 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E;
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1117,57 +1118,112 @@ contract DssSpellTest is DssSpellTestBase {
 
         // ----- Post-spell state checks -----
 
-        // Sanity checks
+        // New ilk is properly configured on AutoLine
         {
-            (address _pool, address _plan, uint256 tau,,) = hub.ilks(ilk);
-            assertEq(_pool, address(pool));
-            assertEq(_plan, address(plan));
-            assertEq(tau, 7 days);
-            assertEq(hub.vow(), address(vow));
-            assertEq(hub.end(), address(end));
-            assertEq(mom.authority(), address(chief));
-            (address pip,) = spotter.ilks(ilk);
-            assertEq(pip, address(oracle));
-            assertEq(vat.wards(address(hub)), 1);
+            uint256 maxLine = 100 * MILLION * RAD;
+            uint256 gap     = 50 * MILLION * RAD;
+            uint256 ttl     = 24 hours;
+            (uint256 _maxLine, uint256 _gap, uint48 _ttl, uint256 _last,) = autoLine.ilks(ilk);
+            assertEq(_maxLine, maxLine,         "D3M: AutoLine invalid maxLine");
+            assertEq(_gap, gap,                 "D3M: AutoLine invalid gap");
+            assertEq(_ttl, uint48(ttl),         "D3M: AutoLine invalid ttl");
+            assertEq(_last, 0,       "D3M: AutoLine invalid last");
         }
 
-        // D3MAaveUSDSPool checks
+        // Test D3MHub
         {
-            assertEq(pool.ilk(),                    ilk, "pool: unexpected ilk");
+            (address _pool, address _plan, uint256 tau, uint256 _culled,) = hub.ilks(ilk);
+            assertEq(_pool, address(pool),       "hub: unexpected pool address");
+            assertEq(_plan, address(plan),       "hub: unexpected plan address");
+            assertEq(tau, 7 days,                "hub: unexpected tau value");
+            assertEq(_culled, 0,                 "hub: culled not 0");
+            assertEq(hub.vow(), address(vow),    "hub: unexpected vow address");
+            assertEq(hub.end(), address(end),    "hub: unexpected vow address");
+            assertEq(vat.wards(address(hub)), 1, "hub: not relied");
+            // Adjust debt
+            uint256 debtCeiling = 1 * MILLION * WAD;
+            vm.prank(operator);
+            plan.setTargetAssets(debtCeiling);
+            assertEq(plan.getTargetAssets(0), debtCeiling, 'TestError/targetAssets-not-set');
+
+            // Fill by the line
+            hub.exec(ilk);
+            (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+            assertEq(ink, debtCeiling, "TestError/unexpected-postexec-ink");
+            assertEq(art, debtCeiling, "TestError/unexpected-postexec-art");
+        }
+
+        // Test MCD_SPOT
+        {
+            (address pip, uint256 mat) = spotter.ilks(ilk);
+            assertEq(pip, address(oracle), "spot:unexpected pip address");
+            assertEq(mat, RAY,  "spot:unexpected mat value");
+        }
+
+        // D3MPool checks
+        {
+            // Set here to avoid stack too deep errors!
+            address stableDebt   = 0x779dB175167C60c2B2193Be6B8d8B3602435e89E;
+            address variableDebt = 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E;
+            address ausds        = 0x09AA30b182488f769a9824F15E6Ce58591Da4781;
             assertEq(pool.hub(),           address(hub), "pool: unexpected hub address");
-            assertEq(pool.dai(),           address(dai), "pool: unexpected dai address");
+            assertEq(pool.ilk(),                    ilk, "pool: unexpected ilk");
             assertEq(pool.vat(),           address(vat), "pool: unexpected vat address");
+            assertEq(pool.dai(),           address(dai), "pool: unexpected dai address");
             assertEq(pool.ausds(),       address(ausds), "pool: unexpected ausds address");
             assertEq(pool.usds(),         address(usds), "pool: unexpected usds address");
             assertEq(pool.usdsJoin(), address(usdsJoin), "pool: unexpected usdsJoin address");
             assertEq(pool.daiJoin(),   address(daiJoin), "pool: unexpected daiJoin address");
             assertEq(pool.stableDebt(),      stableDebt, "pool: unexpected stableDebt address");
             assertEq(pool.variableDebt(),  variableDebt, "pool: unexpected variableDebt address");
+            assertEq(pool.redeemable(),  address(ausds), "pool: redeemable does not match");
+            assertEq(pool.king(),   address(pauseProxy), "pool: king does not match pause proxy");
         }
 
         // D3MOracle checks
         {
-            assertEq(oracle.ilk(),                   ilk, "pool: unexpected ilk");
-            assertEq(oracle.hub(),          address(hub), "pool: unexpected hub address");
-            assertEq(oracle.vat(),          address(vat), "pool: unexpected vat address");
+            assertEq(oracle.ilk(),                   ilk, "oracle: unexpected ilk");
+            assertEq(oracle.hub(),          address(hub), "oracle: unexpected hub address");
+            assertEq(oracle.vat(),          address(vat), "oracle: unexpected vat address");
+            assertEq(oracle.hub(),          address(hub), "oracle: unexpected vat address");
         }
 
-         // D3MOperatorPlan checks
+         // D3MPlan checks
         {
-            assertEq(plan.operator(), operator);
-            assertEq(plan.wards(address(mom)), 1);
-            assertEq(plan.active(), true);
+            assertEq(plan.operator(), operator, "plan: unexpected operator address");
+            assertEq(plan.wards(address(mom)), 1,  "plan: mom not relied");
+            assertEq(plan.active(), true,  "plan: inactive");
+            // Ensure targetAssets can be updated by the operator
+            vm.prank(operator);
+            plan.setTargetAssets(100e18);
+            assertEq(plan.getTargetAssets(0), 100e18,  "plan: unexpected target assets value");
         }
 
-        // De-activate the D3M via mom
-        vm.prank(DSChiefAbstract(chief).hat());
-        mom.disable(address(plan));
-        assertEq(plan.active(), false, "TestError/unexpected-postdisable-active");
+         // Test D3MMom
+        {
+            assertEq(mom.authority(), address(chief), "mom: unexpected authority address");
+            // Deactivate the D3M via mom
+            vm.prank(DSChiefAbstract(chief).hat());
+            mom.disable(address(plan));
+            assertEq(plan.active(), false, "mom: still active");
 
-        hub.exec(ilk);
-        (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
-        assertLt(ink, WAD, "TestError/unexpected-postdisable-ink"); // Less than some dust amount is fine (1 DAI)
-        assertLt(art, WAD, "TestError/unexpected-postdisable-art");
+            hub.exec(ilk);
+            (uint256 ink, uint256 art) = vat.urns(ilk, address(pool));
+            assertLt(ink, WAD, "mom: unexpected ink amount"); // Less than some dust amount is fine (1 DAI)
+            assertLt(art, WAD, "mom: unexpected art amount");
+        }
+
+        // Test new ILK_REGISTRY
+        {
+            assertEq(reg.pos(ilk),    66, "ilk reg: unexpected postion");
+            assertEq(reg.join(ilk),   addr.addr("DIRECT_HUB"), "ilk reg: unexpected join address");
+            assertEq(reg.gem(ilk),    0x09AA30b182488f769a9824F15E6Ce58591Da4781, "ilk reg: unexpected gem address"); // ausds
+            assertEq(reg.dec(ilk),    18, "ilk reg: decimals"); // ausds has 18 decimals
+            assertEq(reg.class(ilk),  4, "ilk reg: unexpected class");
+            assertEq(reg.pip(ilk),    address(oracle), "ilk reg: unexpected pip address");
+            assertEq(reg.name(ilk),   "Aave Ethereum Lido USDS", "ilk reg: unexpected name"); // ausds name
+            assertEq(reg.symbol(ilk), "aEthLidoUSDS", "ilk reg: unexpected symbol"); // ausds symbol
+        }
     }
 
     function test_WBTC_A_LerpOffboarding() public {
