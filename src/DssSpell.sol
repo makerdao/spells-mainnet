@@ -94,6 +94,7 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Stability Scope Parameter Changes  ----------
         // Forum: https://forum.makerdao.com/t/stability-scope-parameter-changes-16-sfs-ssr-dsr-spark-effective-dai-borrow-rate-changes/25257
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-16-sfs-ssr-dsr-spark-effective-dai-borrow-rate-changes/25257/2
 
         // Stability Fee (SF) changes:
         // Note: only heading, changes follow
@@ -118,6 +119,7 @@ contract DssSpellAction is DssAction {
         SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PCT_RATE);
 
         // ---------- Update PSM-USDC-A Fees  ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
@@ -128,18 +130,22 @@ contract DssSpellAction is DssAction {
         // Note: this is done via the DssLitePsmMigrationPhase3 script: line 79
 
         // ---------- Phase 3 USDC Migration from PSM-USDC-A to LITE-PSM-USDC-A  ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
         // ---------- Update PSM-USDC-A DC-IAM  ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
         // ---------- Update MCD_LITE_PSM_USDC_A Buf  ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
         // ---------- Update LITE-PSM-USDC-A DC-IAM  ----------
+        // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
         // Poll: https://vote.makerdao.com/polling/QmRjrFYG
 
@@ -181,24 +187,25 @@ contract DssSpellAction is DssAction {
         //       and implemented as part of the LitePSM module.
         DssLitePsmMigrationPhase3.migrate(dss, migrationCfg);
 
-        // ---------- Activate Aave Lido Market USDS D3M  ----------
+        // ---------- Activate Aave Lido Market USDS DDM  ----------
         // Forum: https://forum.sky.money/t/risk-assessment-and-parameter-recommendations-spark-ddm-to-aave-lido-market/25175
 
-        // Set D3M DC-IAM with the following parameters:
+        // Add new ilk as DIRECT-SPK-AAVE-LIDO-USDS
+        // DDM Addresses:
         // line: 100 million USDS
         // gap: 50 million USDS
         // ttl: 24 hours
         // tau: 7 days
         // D3M Addresses:
-        // oracle: 0x9D9CD271C9f203375b96673056BB20BcC0526E80
-        // plan: 0x4Cb3f51b97D64C122fC52B3CA828516B5FD66EF7
-        // pool: 0x077B5B4b14ebbEF0DAeE21cfAc4CE14523576E07
+        // oracle: D3MOracle at 0x9dB0EB29c2819f9AE0A91A6E6f644C35a7493E9b
+        // plan: D3MOperatorPlan at 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31
+        // pool: D3MAaveV3USDSNoSupplyCapTypePool at 0xbf674d0cD6841C1d7f9b8E809B967B3C5E867653
         // aToken: 0x09AA30b182488f769a9824F15E6Ce58591Da4781
         // operator: 0x298b375f24CeDb45e936D7e21d6Eb05e344adFb5
         // stabledebt address: 0x779dB175167C60c2B2193Be6B8d8B3602435e89E
         // variabledebt address: 0x2D9fe18b6c35FE439cC15D932cc5C943bf2d901E
         // Additional Actions
-        // Expand DIRECT_MOM breaker to also include new D3M
+        // Expand DIRECT_MOM breaker to also include new DDM
         // Note: this is already done within D3MInit.sol line 232
 
         D3MInstance memory d3m = D3MInstance({
@@ -251,6 +258,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Update WBTC Legacy Vaults Parameters  ----------
         // Forum: https://forum.makerdao.com/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/48
+        // Forrum: https://forum.sky.money/t/wbtc-changes-and-risk-mitigation-10-august-2024/24844/52
 
         // Decrease liquidation penalty for WBTC-A, WBTC-B, and WBTC-C from 13% to 0%
         DssExecLib.setIlkLiquidationPenalty("WBTC-A", 0);
@@ -261,7 +269,7 @@ contract DssSpellAction is DssAction {
 
         // WBTC-A: Increase LERP for liquidation ratios from 145% to 150% over 6 days
         DssExecLib.linearInterpolation({
-            _name:      "WBTC-A Offboarding",
+            _name:      "WBTC-A Parameter Update",
             _target:    spotter,
             _ilk:       "WBTC-A",
             _what:      "mat",
@@ -273,7 +281,7 @@ contract DssSpellAction is DssAction {
 
         // WBTC-B: Increase LERP for liquidation ratios from 130% to 150% over 6 days
         DssExecLib.linearInterpolation({
-            _name:      "WBTC-B Offboarding",
+            _name:      "WBTC-B Parameter Update",
             _target:    spotter,
             _ilk:       "WBTC-B",
             _what:      "mat",

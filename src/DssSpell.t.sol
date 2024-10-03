@@ -1171,10 +1171,10 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function test_WBTC_A_LerpOffboarding() public {
-        _checkIlkLerpOffboarding("WBTC-A", "WBTC-A Offboarding", 145, 150);
+        _checkIlkLerpOffboarding("WBTC-A", "WBTC-A Parameter Update", 145, 150);
     }
 
     function test_WBTC_B_LerpOffboarding() public {
-        _checkIlkLerpOffboarding("WBTC-B", "WBTC-B Offboarding", 130, 150);
+        _checkIlkLerpOffboarding("WBTC-B", "WBTC-B Parameter Update", 130, 150);
     }
 }
