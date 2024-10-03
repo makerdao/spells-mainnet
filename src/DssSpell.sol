@@ -111,11 +111,11 @@ contract DssSpellAction is DssAction {
         // Note: only heading, changes follow
 
         // DSR: Decrease by 0.5 percentage points, from 6% to 5.5%
-        DssExecLib.setDSR(FIVE_PT_FIVE_PERCENT_RATE, /* doDrip = */ true);
+        DssExecLib.setDSR(FIVE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // SSR: Increase by 0.25 percentage points, from 6.25% to 6.5%
         SUsdsLike(SUSDS).drip();
-        SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PERCENT_RATE);
+        SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PCT_RATE);
 
         // ---------- Update PSM-USDC-A Fees  ----------
         // Forum: https://forum.makerdao.com/t/lite-psm-usdc-a-phase-3-final-migration-proposed-parameters/25183/2
