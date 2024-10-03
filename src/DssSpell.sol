@@ -51,8 +51,8 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant FIVE_PT_FIVE_PERCENT_RATE   = 1000000001697766583380253701;
-    uint256 internal constant SIX_PT_FIVE_PERCENT_RATE    = 1000000001996917783620820123;
+    uint256 internal constant FIVE_PT_FIVE_PCT_RATE   = 1000000001697766583380253701;
+    uint256 internal constant SIX_PT_FIVE_PCT_RATE    = 1000000001996917783620820123;
     uint256 internal constant NINE_PCT_RATE               = 1000000002732676825177582095;
     uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE   = 1000000002805322428706865331;
     uint256 internal constant NINE_PT_SEVEN_FIVE_PCT_RATE = 1000000002950116251408586949;
