@@ -80,6 +80,7 @@ contract DssSpellAction is DssAction {
     address internal immutable USDS            = DssExecLib.getChangelogAddress("USDS");
     address internal immutable USDS_JOIN       = DssExecLib.getChangelogAddress("USDS_JOIN");
     address internal immutable MCD_PAUSE_PROXY = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
+    address internal immutable MCD_SPOT        = DssExecLib.getChangelogAddress("MCD_SPOT");
 
 
     address internal constant DIRECT_SPK_AAVE_LIDO_USDS_PLAN          = 0xea2abB24bF40ac97746AFf6daCA0BBF885014b31;
@@ -266,12 +267,10 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkLiquidationPenalty("WBTC-B", 0);
         DssExecLib.setIlkLiquidationPenalty("WBTC-C", 0);
 
-        address spotter = DssExecLib.spotter();
-
         // WBTC-A: Increase LERP for liquidation ratios from 145% to 150% over 6 days
         DssExecLib.linearInterpolation({
             _name:      "WBTC-A Parameter Update",
-            _target:    spotter,
+            _target:    MCD_SPOT,
             _ilk:       "WBTC-A",
             _what:      "mat",
             _startTime: block.timestamp,
@@ -283,7 +282,7 @@ contract DssSpellAction is DssAction {
         // WBTC-B: Increase LERP for liquidation ratios from 130% to 150% over 6 days
         DssExecLib.linearInterpolation({
             _name:      "WBTC-B Parameter Update",
-            _target:    spotter,
+            _target:    MCD_SPOT,
             _ilk:       "WBTC-B",
             _what:      "mat",
             _startTime: block.timestamp,

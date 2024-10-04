@@ -1221,6 +1221,7 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(reg.dec(ilk),    18, "ilk reg: decimals"); // ausds has 18 decimals
             assertEq(reg.class(ilk),  4, "ilk reg: unexpected class");
             assertEq(reg.pip(ilk),    address(oracle), "ilk reg: unexpected pip address");
+            assertEq(reg.xlip(ilk),   address(0), "ilk reg: unexpected xlip address");
             assertEq(reg.name(ilk),   "Aave Ethereum Lido USDS", "ilk reg: unexpected name"); // ausds name
             assertEq(reg.symbol(ilk), "aEthLidoUSDS", "ilk reg: unexpected symbol"); // ausds symbol
         }
