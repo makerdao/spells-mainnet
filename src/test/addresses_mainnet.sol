@@ -33,7 +33,8 @@ contract Addresses {
         addr["GOV_GUARD"]                        = 0x6eEB68B2C7A918f36B78E2DB80dcF279236DDFb8;
         addr["MCD_ADM"]                          = 0x0a3f6849f78076aefaDf113F5BED87720274dDC0;
         addr["VOTE_PROXY_FACTORY"]               = 0x6FCD258af181B3221073A96dD90D1f7AE7eEc408;
-        addr["VOTE_DELEGATE_PROXY_FACTORY"]      = 0xD897F108670903D1d6070fcf818f9db3615AF272;
+        addr["VOTE_DELEGATE_FACTORY_LEGACY"]     = 0xD897F108670903D1d6070fcf818f9db3615AF272;
+        addr["VOTE_DELEGATE_FACTORY"]            = 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0;
         addr["MCD_VAT"]                          = 0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B;
         addr["MCD_JUG"]                          = 0x19c0976f590D67707E62397C87829d896Dc0f1F1;
         addr["MCD_DOG"]                          = 0x135954d155898D42C90D2a57824C690e0c7BEf1B;
@@ -73,7 +74,7 @@ contract Addresses {
         addr["CDP_REGISTRY"]                     = 0xBe0274664Ca7A68d6b5dF826FB3CcB7c620bADF3;
         addr["MCD_CROPPER"]                      = 0x8377CD01a5834a6EaD3b7efb482f678f2092b77e;
         addr["MCD_CROPPER_IMP"]                  = 0xaFB21A0e9669cdbA539a4c91Bf6B94c5F013c0DE;
-        addr["PIP_MKR"]                          = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+        addr["PIP_MKR"]                          = 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b;
         addr["ETH"]                              = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
         addr["PIP_ETH"]                          = 0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763;
         addr["MCD_JOIN_ETH_A"]                   = 0x2F0b23f53734252Bda2277357e97e1517d6B042A;
@@ -510,7 +511,12 @@ contract Addresses {
         addr["REWARDS_USDS_SKY"]                 = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
         addr["REWARDS_DIST_USDS_SKY"]            = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
         addr["REWARDS_USDS_01"]                  = 0x10ab606B067C9C461d8893c47C7512472E19e2Ce;
+        addr["REWARDS_LSMKR_USDS"]               = 0x92282235a39bE957fF1f37619fD22A9aE5507CB1;
         addr["CRON_REWARDS_DIST_JOB"]            = 0x6464C34A02DD155dd0c630CE233DD6e21C24F9A5;
         addr["WRAPPER_USDS_LITE_PSM_USDC_A"]     = 0xA188EEC8F81263234dA3622A406892F3D630f98c;
+        addr["LOCKSTAKE_MKR"]                    = 0xb4e0e45e142101dC3Ed768bac219fC35EDBED295;
+        addr["LOCKSTAKE_ENGINE"]                 = 0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12;
+        addr["LOCKSTAKE_CLIP"]                   = 0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239;
+        addr["LOCKSTAKE_CLIP_CALC"]              = 0xf13cF3b39823CcfaE6C2354dA56416C80768474e;
     }
 }

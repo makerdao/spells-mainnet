@@ -96,8 +96,8 @@ contract Config {
     function setValues(address chief) public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x1a0C39D0dBd66956BAfb347f91F55DA1Da2B8F80);
+        address[] memory prevSpells = new address[](0);
+        // prevSpells[0] = address(0);
 
         //
         // Values for spell-specific parameters
@@ -122,10 +122,10 @@ contract Config {
         afterSpell.vow_dump               = 250;                            // In whole Dai units
         afterSpell.vow_sump               = 50 * THOUSAND;                  // In whole Dai units
         afterSpell.vow_bump               = 25 * THOUSAND;                  // In whole Dai units
-        afterSpell.vow_hump_min           = 55 * MILLION;                   // In whole Dai units
-        afterSpell.vow_hump_max           = 55 * MILLION;                   // In whole Dai units
-        afterSpell.split_hop              = 11_635 seconds;                 // In seconds
-        afterSpell.split_burn             = 100_00;                         // In basis points
+        afterSpell.vow_hump_min           = 60 * MILLION;                   // In whole Dai units
+        afterSpell.vow_hump_max           = 60 * MILLION;                   // In whole Dai units
+        afterSpell.split_hop              = 15_649 seconds;                 // In seconds
+        afterSpell.split_burn             = 70_00;                          // In basis points
         afterSpell.flap_want              = 9800;                           // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
         afterSpell.esm_min                = 300 * THOUSAND;                 // In whole MKR units
@@ -140,8 +140,8 @@ contract Config {
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
-        afterSpell.ilk_count              = 67;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.1";                       // String expected in system
+        afterSpell.ilk_count              = 68;                             // Num expected in system
+        afterSpell.chainlog_version       = "1.19.2";                       // String expected in system
 
         //
         // Values for all collateral
@@ -1198,10 +1198,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["RWA007-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      3 * BILLION,
-            aL_gap:       50 * MILLION,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         0,
             pct:          0,
@@ -1377,7 +1377,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         1_500 * MILLION,
+            line:         0,
             dust:         0,
             pct:          0,
             mat:          100_00,
@@ -1820,6 +1820,31 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
+            offboarding:  false
+        });
+        afterSpell.collaterals["LSE-MKR-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      20_000_000,
+            aL_gap:       5_000_000,
+            aL_ttl:       16 hours,
+            line:         0,
+            dust:         30_000,
+            pct:          12_00,
+            mat:          200_00,
+            liqType:      "clip",
+            liqOn:        true,
+            chop:         8_00,
+            dog_hole:     3 * MILLION,
+            clip_buf:     120_00,
+            clip_tail:    100 minutes,
+            clip_cusp:    40_00,
+            clip_chip:    10,
+            clip_tip:     300,
+            clipper_mom:  1,
+            cm_tolerance: 50_00,
+            calc_tau:     0,
+            calc_step:    60,
+            calc_cut:     99_00,
             offboarding:  false
         });
     }

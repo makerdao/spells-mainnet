@@ -718,7 +718,7 @@ contract DssSpellTestBase is Config, DssTest {
             }
             if (values.collaterals[ilk].liqType == "clip") {
                 {
-                assertEq(reg.class(ilk), 1, _concat("TestError/reg-class-", ilk));
+                assertTrue(reg.class(ilk) == 1 || reg.class(ilk) == 7, _concat("TestError/reg-class-", ilk));
                 (bool ok, bytes memory val) = reg.xlip(ilk).call(abi.encodeWithSignature("dog()"));
                 assertTrue(ok, _concat("TestError/reg-xlip-dog-", ilk));
                 assertEq(abi.decode(val, (address)), address(dog), _concat("TestError/reg-xlip-dog-", ilk));
