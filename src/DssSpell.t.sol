@@ -49,6 +49,11 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface RwaLiquidationOracleLike {
+    function good(bytes32 ilk) external view returns (bool);
+    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -524,45 +529,32 @@ contract DssSpellTest is DssSpellTestBase {
     struct Payee {
         address token;
         address addr;
-        uint256 amount;
+        int256 amount;
     }
 
     struct PaymentAmounts {
-        uint256 dai;
-        uint256 mkr;
-        uint256 usds;
-        uint256 sky;
+        int256 dai;
+        int256 mkr;
+        int256 usds;
+        int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[15] memory payees = [
-            Payee(address(dai), wallets.addr("BLUE"), 54_167 * WAD),
-            Payee(address(dai), wallets.addr("CLOAKY"), 20_417 * WAD),
-            Payee(address(dai), wallets.addr("CLOAKY_KOHLA_2"), 10_000 * WAD),
-            Payee(address(dai), wallets.addr("CLOAKY_ENNOIA"), 10_000 * WAD),
-            Payee(address(dai), wallets.addr("JULIACHANG"), 8_333 * WAD),
-            Payee(address(dai), wallets.addr("BYTERON"), 8_333 * WAD),
-            Payee(address(dai), wallets.addr("ROCKY"), 8_065 * WAD),
-            Payee(address(dai), wallets.addr("BONAPUBLICA"), 5_430 * WAD),
-            Payee(address(mkr), wallets.addr("BLUE"), 13.75 ether), // Note: ether is only a keyword helper
-            Payee(address(mkr), wallets.addr("CLOAKY"), 12.00 ether), // Note: ether is only a keyword helper
-            Payee(address(mkr), wallets.addr("JULIACHANG"), 1.25 ether), // Note: ether is only a keyword helper
-            Payee(address(mkr), wallets.addr("BYTERON"), 1.25 ether), // Note: ether is only a keyword helper
-            Payee(address(mkr), wallets.addr("ROCKY"), 1.21 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("LIQUIDITY_BOOTSTRAPPING"), 10_000_000 * WAD),
-            Payee(address(sky), wallets.addr("LIQUIDITY_BOOTSTRAPPING"), 320_000_000 * WAD)
+        Payee[2] memory payees = [
+            Payee(address(dai), wallets.addr("AAVE_V3_TREASURY"), 234_089 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("EARLY_BIRD_REWARDS"), 27_222_832.80 ether) // Note: ether is only a keyword helper
         ];
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
-            dai: 124_745 * WAD,
-            mkr: 29.46 ether, // Note: ether is only a keyword helper
-            usds: 10_000_000 * WAD,
-            sky: 320_000_000 * WAD
+            dai: 234_089 ether, // Note: ether is only a keyword helper
+            mkr: 0 ether, // Note: ether is only a keyword helper
+            usds: 0 ether, // Note: ether is only a keyword helper
+            sky: 27_222_832.80 ether // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -572,11 +564,12 @@ contract DssSpellTest is DssSpellTestBase {
         pot.drip();
 
         // Calculate and save previous balances
-        PaymentAmounts memory previousTotalBalance = PaymentAmounts({
-            dai: vat.sin(address(vow)),
-            mkr: mkr.balanceOf(address(pauseProxy)),
-            usds: usds.balanceOf(address(pauseProxy)),
-            sky: sky.balanceOf(address(pauseProxy))
+        uint256 previousSurplusBalance = vat.sin(address(vow));
+        PaymentAmounts memory previousTotalSupply = PaymentAmounts({
+            dai: int256(dai.totalSupply()),
+            mkr: int256(mkr.totalSupply()),
+            usds: int256(usds.totalSupply()),
+            sky: int256(sky.totalSupply())
         });
         PaymentAmounts memory calculatedTotalDiff;
         PaymentAmounts[] memory previousPayeeBalances = new PaymentAmounts[](payees.length);
@@ -593,69 +586,82 @@ contract DssSpellTest is DssSpellTestBase {
                 revert('TestPayments/unexpected-payee-token');
             }
             previousPayeeBalances[i] = PaymentAmounts({
-                dai: dai.balanceOf(payees[i].addr),
-                mkr: mkr.balanceOf(payees[i].addr),
-                usds: usds.balanceOf(payees[i].addr),
-                sky: sky.balanceOf(payees[i].addr)
+                dai: int256(dai.balanceOf(payees[i].addr)),
+                mkr: int256(mkr.balanceOf(payees[i].addr)),
+                usds: int256(usds.balanceOf(payees[i].addr)),
+                sky: int256(sky.balanceOf(payees[i].addr))
             });
         }
+
+        // Check calculated vs expected totals
+        assertEq(
+            calculatedTotalDiff.dai,
+            expectedTotalDiff.dai,
+            "TestPayments/calculated-vs-expected-dai-total-mismatch"
+        );
+        assertEq(
+            calculatedTotalDiff.usds,
+            expectedTotalDiff.usds,
+            "TestPayments/calculated-vs-expected-usds-total-mismatch"
+        );
+        assertEq(
+            calculatedTotalDiff.mkr,
+            expectedTotalDiff.mkr,
+            "TestPayments/calculated-vs-expected-mkr-total-mismatch"
+        );
+        assertEq(
+            calculatedTotalDiff.sky,
+            expectedTotalDiff.sky,
+            "TestPayments/calculated-vs-expected-sky-total-mismatch"
+        );
 
         // Cast spell
         spell.cast();
         assertTrue(spell.done(), "TestPayments/spell-not-done");
 
-        // Check no other transfers were made
-        PaymentAmounts memory actualBalanceDiff = PaymentAmounts({
-            dai: vat.sin(address(vow)) - previousTotalBalance.dai, // We expect debt to increase
-            mkr: previousTotalBalance.mkr - mkr.balanceOf(address(pauseProxy)),
-            usds: previousTotalBalance.usds - usds.balanceOf(address(pauseProxy)),
-            sky: sky.balanceOf(address(pauseProxy)) - previousTotalBalance.sky // We expect Sky balance to increase
+        // Check calculated vs actual totals
+        PaymentAmounts memory actualTotalDiff = PaymentAmounts({
+            dai: int256(dai.totalSupply()) - previousTotalSupply.dai,
+            mkr: int256(mkr.totalSupply()) - previousTotalSupply.mkr,
+            usds: int256(usds.totalSupply()) - previousTotalSupply.usds,
+            sky: int256(sky.totalSupply()) - previousTotalSupply.sky
         });
         assertEq(
-            actualBalanceDiff.dai,
-            (calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY,
-            "TestPayments/vat-sin-mismatch-calculated"
+            actualTotalDiff.dai,
+            calculatedTotalDiff.dai + calculatedTotalDiff.usds,
+            "TestPayments/invalid-dai-sky-total"
         );
         assertEq(
-            actualBalanceDiff.dai,
-            (expectedTotalDiff.dai + expectedTotalDiff.usds) * RAY,
-            "TestPayments/vat-sin-mismatch-expected"
+            actualTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) + actualTotalDiff.sky,
+            calculatedTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) +  calculatedTotalDiff.sky,
+            "TestPayments/invalid-mkr-sky-total"
         );
-        assertLe(
-            actualBalanceDiff.mkr - (calculatedTotalDiff.mkr + calculatedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
-            1, // To account for rounding errors when converting Sky back to Mkr
-            "TestPayments/invalid-total"
-        );
-        assertLe(
-            actualBalanceDiff.mkr - (expectedTotalDiff.mkr + expectedTotalDiff.sky / afterSpell.sky_mkr_rate) - actualBalanceDiff.sky / afterSpell.sky_mkr_rate,
-            1, // To account for rounding errors when converting Sky back to Mkr
-            "TestPayments/invalid-total"
-        );
-        assertEq(actualBalanceDiff.usds, 0, "TestPayments/unexpected-usds-balance-change");
+        // Check that dai/usds transfers modify surplus buffer
+        assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY);
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
             if (payees[i].token == address(dai)) {
                 assertEq(
-                    dai.balanceOf(payees[i].addr),
+                    int256(dai.balanceOf(payees[i].addr)),
                     previousPayeeBalances[i].dai + payees[i].amount,
                     "TestPayments/invalid-payee-dai-balance"
                 );
             } else if (payees[i].token == address(mkr)) {
                 assertEq(
-                    mkr.balanceOf(payees[i].addr),
+                    int256(mkr.balanceOf(payees[i].addr)),
                     previousPayeeBalances[i].mkr + payees[i].amount,
                     "TestPayments/invalid-payee-mkr-balance"
                 );
             } else if (payees[i].token == address(usds)) {
                 assertEq(
-                    usds.balanceOf(payees[i].addr),
+                    int256(usds.balanceOf(payees[i].addr)),
                     previousPayeeBalances[i].usds + payees[i].amount,
                     "TestPayments/invalid-payee-usds-balance"
                 );
             } else if (payees[i].token == address(sky)) {
                 assertEq(
-                    sky.balanceOf(payees[i].addr),
+                    int256(sky.balanceOf(payees[i].addr)),
                     previousPayeeBalances[i].sky + payees[i].amount,
                     "TestPayments/invalid-payee-sky-balance"
                 );
@@ -873,11 +879,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmaYKt61v6aCTNTYjuHm1Wjpe6JWBzCW2ZHR4XDEJhjm1R"
+            "QmYJUvw5xbAJmJknG2xUKDLe424JSTWQQhbJCnucRRjUv7"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -911,4 +917,19 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+
+    function testTellAndCullRWA014() public {
+        bytes32 ilk = "RWA014-A";
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        (, , uint tau, uint toc) = oracle.ilks(ilk);
+        assertGt(toc, 0, _concat("TestError/bad-toc-after-tell-", ilk));
+        skip(tau);
+        assertFalse(oracle.good(ilk), _concat("TestError/still-good-after-tell-", ilk));
+    }
 }

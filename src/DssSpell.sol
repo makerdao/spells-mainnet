@@ -100,8 +100,8 @@ contract DssSpellAction is DssAction {
     address internal constant LOCKSTAKE_CLIP_CALC          = 0xf13cF3b39823CcfaE6C2354dA56416C80768474e;
 
     // ---------- Wallets ----------
-    address internal constant AAVE_V3_TREASURY  = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
-    address internal constant AIRDROP_FUND      = 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68;
+    address internal constant AAVE_V3_TREASURY   = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address internal constant EARLY_BIRD_REWARDS = 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68;
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -327,7 +327,7 @@ contract DssSpellAction is DssAction {
         // ---------- Fund Early Bird Rewards Multisig ----------
 
         // Mint 27,222,832.80 SKY to 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68
-        SkyLike(SKY).mint(AIRDROP_FUND, 28_220_926 * WAD);
+        SkyLike(SKY).mint(EARLY_BIRD_REWARDS, 27_222_832.80 ether); // Note: ether is only a keyword helper
 
         // ---------- Lower Deprecated RWA Debt Ceilings ----------
 
@@ -338,9 +338,11 @@ contract DssSpellAction is DssAction {
         // Remove RWA007-A from Debt Ceiling Instant Access Module
         DssExecLib.removeIlkFromAutoLine("RWA007-A");
 
-        // Set RWA007-A Debt Ceiling to 0
+        // Note: in order to decrease global debt ceiling, we need to fetch current `line`
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA007-A");
         globalLineReduction += line;
+
+        // Set RWA007-A Debt Ceiling to 0
         DssExecLib.setIlkDebtCeiling("RWA007-A", 0);
 
         // Initiate RWA007-A soft liquidation by calling `tell()`
@@ -349,9 +351,11 @@ contract DssSpellAction is DssAction {
         // Write-off the debt of RWA007-A and set its oracle price to 0 by calling `cull()`
         RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA007-A", RWA007_A_URN);
 
-        // Reduce RWA014-A Debt Ceiling by 1.5 billion Dai from 1.5 billion Dai to 0
+        // Note: in order to decrease global debt ceiling, we need to fetch current `line`
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA014-A");
         globalLineReduction += line;
+
+        // Reduce RWA014-A Debt Ceiling by 1.5 billion Dai from 1.5 billion Dai to 0
         DssExecLib.setIlkDebtCeiling("RWA014-A", 0);
 
         // Initiate RWA014-A soft liquidation by calling `tell()`
@@ -376,7 +380,8 @@ contract DssSpellAction is DssAction {
         // ---------- Spark Spell ----------
 
         // Execute Spark Proxy Spell at 0x74b3D0E74f2711f30442536832D7fBCB0F42C195
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // TODO: update spell address when redeployed
 
         // ---------- Chainlog bump ----------
 
