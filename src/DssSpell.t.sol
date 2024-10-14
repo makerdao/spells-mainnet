@@ -344,17 +344,26 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOSMs() public skipped { // add the `skipped` modifier to skip
-        address READER = address(0);
+    function testOSMs() public { // add the `skipped` modifier to skip
+        address OSM = addr.addr("PIP_MKR");
+        address[4] memory newReaders = [
+            addr.addr("MCD_SPOT"),
+            addr.addr("LOCKSTAKE_CLIP"),
+            addr.addr("CLIPPER_MOM"),
+            addr.addr("MCD_END")
+        ];
 
-        // Track OSM authorizations here
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 0);
+        for (uint256 i = 0; i < newReaders.length; i++) {
+            assertEq(OsmAbstract(OSM).bud(newReaders[i]), 0);
+        }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(OsmAbstract(addr.addr("PIP_TOKEN")).bud(READER), 1);
+        for (uint256 i = 0; i < newReaders.length; i++) {
+            assertEq(OsmAbstract(OSM).bud(newReaders[i]), 1);
+        }
     }
 
     function testMedianizers() public skipped { // add the `skipped` modifier to skip
