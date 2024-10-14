@@ -366,6 +366,41 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
+    struct Authorization {
+        bytes32 base;
+        bytes32 ward;
+    }
+
+    function testNewAuthorizations() public { // add the `skipped` modifier to skip
+        Authorization[9] memory newAuthorizations = [
+            Authorization({ base: "MCD_VAT",              ward: "LOCKSTAKE_ENGINE" }),
+            Authorization({ base: "MCD_VAT",              ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "PIP_MKR",              ward: "OSM_MOM" }),
+            Authorization({ base: "MCD_DOG",              ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "LOCKSTAKE_MKR",        ward: "LOCKSTAKE_ENGINE" }),
+            Authorization({ base: "LOCKSTAKE_ENGINE",     ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "MCD_DOG" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "MCD_END" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "CLIPPER_MOM" })
+        ];
+
+        for (uint256 i = 0; i < newAuthorizations.length; i++) {
+            address base = addr.addr(newAuthorizations[i].base);
+            address ward = addr.addr(newAuthorizations[i].ward);
+            assertEq(WardsAbstract(base).wards(ward), 0, "testNewAuthorizations/already-authorized");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < newAuthorizations.length; i++) {
+            address base = addr.addr(newAuthorizations[i].base);
+            address ward = addr.addr(newAuthorizations[i].ward);
+            assertEq(WardsAbstract(base).wards(ward), 1, "testNewAuthorizations/not-authorized");
+        }
+    }
+
     function testMedianizers() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
