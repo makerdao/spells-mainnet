@@ -113,6 +113,8 @@ contract DssSpellAction is DssAction {
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // ---------- Setup new MkrOsm ----------
+        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
+        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
 
         // Whitelist MkrOsm to read from current PIP_MKR using `DssExecLib.addReaderToWhitelist` with the following parameters:
         // Set parameter address _oracle: PIP_MKR address from chainlog (0xdbbe5e9b1daa91430cf0772fcebe53f6c6f137df)
@@ -125,8 +127,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("PIP_MKR", NEW_PIP_MKR);
 
         // ---------- Setup new VoteDelegateFactory ----------
+        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
+        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
+
         // Rename "VOTE_DELEGATE_PROXY_FACTORY" to "VOTE_DELEGATE_FACTORY_LEGACY" in chainlog:
-        // Note: this is a subheading, actual instructions are below
+        // Note: this is a meta instruction, actual instructions are below
 
         // Call DssExecLib.setChangelogAddress with the following parameters:
         // Set parameter bytes32 _key: "VOTE_DELEGATE_FACTORY_LEGACY"
@@ -141,6 +146,8 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("VOTE_DELEGATE_FACTORY", VOTE_DELEGATE_FACTORY);
 
         // ---------- Setup Lockstake Engine ----------
+        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
+        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
 
         // SBE Parameter Changes
         // Note: this is a subheading, actual instructions are below
@@ -325,11 +332,14 @@ contract DssSpellAction is DssAction {
         // Note: above instructions are taken inside FlapperInit.setFarm method
 
         // ---------- Fund Early Bird Rewards Multisig ----------
+        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324#p-99402-early-bird-bonus-3
+        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
 
         // Mint 27,222,832.80 SKY to 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68
         SkyLike(SKY).mint(EARLY_BIRD_REWARDS, 27_222_832.80 ether); // Note: ether is only a keyword helper
 
         // ---------- Lower Deprecated RWA Debt Ceilings ----------
+        // Forum: https://forum.sky.money/t/2024-10-17-expected-executive-contents-rwa-vault-changes/25323
 
         // Remove RWA007-A from Debt Ceiling Instant Access Module
         DssExecLib.removeIlkFromAutoLine("RWA007-A");
@@ -368,16 +378,22 @@ contract DssSpellAction is DssAction {
         VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - (line1 + line2));
 
         // ---------- Pinwheel DAO Resolution ----------
+        // Forum: https://forum.sky.money/t/coinbase-web3-wallet-legal-overview/24577/3
 
         // Approve DAO Resolution at QmYJUvw5xbAJmJknG2xUKDLe424JSTWQQhbJCnucRRjUv7
         // Note: see `dao_resolutions` public variable declared above
 
         // ---------- AAVE Revenue Share Payment ----------
+        // Forum: https://forum.sky.money/t/spark-aave-revenue-share-calculation-payment-5-q3-2024/25286
 
         // AAVE Revenue Share - 234089 DAI - 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 234_089);
 
         // ---------- Spark Spell ----------
+        // Forum: https://forum.sky.money/t/oct-3-2024-proposed-changes-to-spark-for-upcoming-spell/25293
+        // Poll: https://vote.makerdao.com/polling/QmbHaA2G
+        // Poll: https://vote.makerdao.com/polling/QmShWccA
+        // Poll: https://vote.makerdao.com/polling/QmTksxrr
 
         // Execute Spark Proxy Spell at 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
