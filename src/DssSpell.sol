@@ -106,7 +106,7 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0x74b3D0E74f2711f30442536832D7fBCB0F42C195;
+    address internal constant SPARK_SPELL = 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187;
 
     function actions() public override {
         // Note: multple actions in the spell depend on DssInstance
@@ -378,9 +378,8 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Spell ----------
 
-        // Execute Spark Proxy Spell at 0x74b3D0E74f2711f30442536832D7fBCB0F42C195
-        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
-        // TODO: update spell address when redeployed
+        // Execute Spark Proxy Spell at 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- Chainlog bump ----------
 
