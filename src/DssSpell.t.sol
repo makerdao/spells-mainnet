@@ -918,18 +918,30 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-
-    function testTellAndCullRWA014() public {
-        bytes32 ilk = "RWA014-A";
+    function testRwaTellAndCull() public {
+        bytes32[2] memory ilks = [
+            bytes32("RWA007-A"),
+            bytes32("RWA014-A")
+        ];
+        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
 
-        (, , uint tau, uint toc) = oracle.ilks(ilk);
-        assertGt(toc, 0, _concat("TestError/bad-toc-after-tell-", ilk));
-        skip(tau);
-        assertFalse(oracle.good(ilk), _concat("TestError/still-good-after-tell-", ilk));
+        for (uint256 i = 0; i < ilks.length; i++) {
+            bytes32 ilk = ilks[i];
+            (, address pip, uint256 tau, uint256 toc) = oracle.ilks(ilk);
+            assertGt(toc, 0, _concat("TestError/bad-toc-after-tell-", ilk));
+            assertEq(tau, 0, _concat("TestError/bad-tau-after-tell-", ilk));
+            assertFalse(oracle.good(ilk), _concat("TestError/still-good-after-tell-", ilk));
+
+            uint256 price = uint256(DSValueAbstract(pip).read());
+            assertEq(price, 0, _concat("TestError/non-zero-oracle-price-after-cull-", ilk));
+
+            (uint256 Art,, uint256 spot,,) = vat.ilks(ilk);
+            assertEq(Art, 0, _concat("TestError/non-zero-total-debt-after-cull-", ilk));
+            assertEq(spot, 0, _concat("TestError/non-zero-spot-price-after-cull-", ilk));
+        }
     }
 }

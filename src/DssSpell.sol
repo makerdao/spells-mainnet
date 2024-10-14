@@ -351,6 +351,9 @@ contract DssSpellAction is DssAction {
         // Write-off the debt of RWA007-A and set its oracle price to 0 by calling `cull()`
         RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA007-A", RWA007_A_URN);
 
+        // Note: update the spot value in vat by propagating the price
+        DssExecLib.updateCollateralPrice("RWA007-A");
+
         // Note: in order to decrease global debt ceiling, we need to fetch current `line`
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA014-A");
         globalLineReduction += line;
@@ -363,6 +366,9 @@ contract DssSpellAction is DssAction {
 
         // Write-off the debt of RWA014-A and set its oracle price to 0 by calling `cull()`
         RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA014-A", RWA014_A_URN);
+
+        // Note: update the spot value in vat by propagating the price
+        DssExecLib.updateCollateralPrice("RWA014-A");
 
         // Note: decrease global line
         VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - globalLineReduction);
