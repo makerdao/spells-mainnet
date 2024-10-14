@@ -114,29 +114,30 @@ contract DssSpellAction is DssAction {
 
         // ---------- Setup new MkrOsm ----------
 
-        // Authorize MkrOsm at 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b to read MKR oracle price from PIP_MKR using the following parameters:
-        // Authorize MkrOSm with address _oracle: PIP_MKR from chainlog
-        // Authorize MkrOSm with address _reader: 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
+        // Whitelist MkrOsm to read from current PIP_MKR using `DssExecLib.addReaderToWhitelist` with the following parameters:
+        // Set parameter address _oracle: PIP_MKR address from chainlog (0xdbbe5e9b1daa91430cf0772fcebe53f6c6f137df)
+        // Set parameter address _reader: 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
         DssExecLib.addReaderToWhitelist(PIP_MKR, NEW_PIP_MKR);
 
-        // Set MkrOsm at 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b as "PIP_MKR" in the chainlog using the following parameters:
-        // Set MkrOsm with bytes32 _key: "PIP_MKR"
-        // Set MkrOsm with address _val:  0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
+        // Set MkrOsm as "PIP_MKR" in the chainlog using the following parameters:
+        // Set parameter bytes32 _key: "PIP_MKR"
+        // Set parameter address _val:  0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
         DssExecLib.setChangelogAddress("PIP_MKR", NEW_PIP_MKR);
 
         // ---------- Setup new VoteDelegateFactory ----------
+        // Rename "VOTE_DELEGATE_PROXY_FACTORY" to "VOTE_DELEGATE_FACTORY_LEGACY" in chainlog:
+        // Note: this is a subheading, actual instructions are below
 
-        // Rename "VOTE_DELEGATE_PROXY_FACTORY" to "VOTE_DELEGATE_FACTORY_LEGACY" in chainlog with the following parameters:
-        // Rename chainlog item address with bytes32 _key: "VOTE_DELEGATE_PROXY_FACTORY"
-        dss.chainlog.removeAddress("VOTE_DELEGATE_PROXY_FACTORY");
-
-        // Rename chainlog item with bytes32 _key: "VOTE_DELEGATE_FACTORY_LEGACY"
-        // Rename chainlog item  with address _val (VOTE_DELEGATE_PROXY_FACTORY from chainlog)
+        // Call DssExecLib.setChangelogAddress with the following parameters:
+        // Set parameter bytes32 _key: "VOTE_DELEGATE_FACTORY_LEGACY"
+        // Set parameter address _val: VOTE_DELEGATE_PROXY_FACTORY address (0xd897f108670903d1d6070fcf818f9db3615af272) from the chainlog
         DssExecLib.setChangelogAddress("VOTE_DELEGATE_FACTORY_LEGACY", VOTE_DELEGATE_PROXY_FACTORY);
 
-        // Set "VOTE_DELEGATE_FACTORY" in the chainlog to 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0 with the following parameters:
-        // Set new chainlog item with bytes32 _key: "VOTE_DELEGATE_FACTORY"
-        // Set new chainlog item with address _val:  0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
+        // Call CHAINLOG.removeAddress with the following parameters:
+        // Set parameter bytes32 _key: "VOTE_DELEGATE_PROXY_FACTORY"
+        dss.chainlog.removeAddress("VOTE_DELEGATE_PROXY_FACTORY");
+
+        // Set "VOTE_DELEGATE_FACTORY" in the chainlog to 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
         DssExecLib.setChangelogAddress("VOTE_DELEGATE_FACTORY", VOTE_DELEGATE_FACTORY);
 
         // ---------- Setup Lockstake Engine ----------
