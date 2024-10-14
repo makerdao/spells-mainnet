@@ -178,7 +178,7 @@ contract DssSpellAction is DssAction {
                 // Set Flapper farm with bytes32 prevChainlogKey: bytes32(0)
                 prevChainlogKey: bytes32(0),
 
-                // Set Flapper farm with bytes32 chainlogKey: REWARDS_LSMKR_USDS
+                // Set Flapper farm with chainlogKey: "REWARDS_LSMKR_USDS"
                 chainlogKey:     "REWARDS_LSMKR_USDS"
             })
         );
