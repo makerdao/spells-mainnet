@@ -228,6 +228,11 @@ interface LitePsmMomLike is AuthorityLike {
     function halt(address, uint8) external;
 }
 
+interface StakingRewardsLike {
+    function rewardsDistribution() external view returns (address);
+    function rewardsDuration() external view returns (uint256);
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -622,6 +627,16 @@ contract DssSpellTestBase is Config, DssTest {
             uint256 normalizedTestBurn = values.split_burn * 10**14;
             assertEq(split.burn(), normalizedTestBurn, "TestError/split-burn");
             assertTrue(split.burn() >= 50 * WAD / 100 && split.burn() <= 1 * WAD, "TestError/split-burn-range"); // gte 50% and lte 100%
+            // check farm address
+            address split_farm = addr.addr(values.split_farm);
+            assertEq(split.farm(), split_farm, "TestError/split-farm");
+            // check rewards distribution and duration
+            if (split_farm != address(0)) {
+                address rewardsDistribution = StakingRewardsLike(split_farm).rewardsDistribution();
+                assertEq(rewardsDistribution, address(split), "TestError/farm-distribution");
+                uint256 rewardsDuration = StakingRewardsLike(split_farm).rewardsDuration();
+                assertEq(rewardsDuration, values.split_hop, "TestError/farm-duration-does-not-match-split-hop");
+            }
         }
 
         // flap

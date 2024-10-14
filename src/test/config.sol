@@ -40,6 +40,7 @@ contract Config {
         uint256 vow_hump_max;
         uint256 split_hop;
         uint256 split_burn;
+        bytes32 split_farm;
         uint256 flap_want;
         uint256 dog_Hole;
         uint256 esm_min;
@@ -126,6 +127,7 @@ contract Config {
         afterSpell.vow_hump_max           = 60 * MILLION;                   // In whole Dai units
         afterSpell.split_hop              = 15_649 seconds;                 // In seconds
         afterSpell.split_burn             = 70_00;                          // In basis points
+        afterSpell.split_farm             = "REWARDS_LSMKR_USDS";           // Farm chainlog key
         afterSpell.flap_want              = 9800;                           // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
         afterSpell.esm_min                = 300 * THOUSAND;                 // In whole MKR units

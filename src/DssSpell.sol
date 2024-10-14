@@ -188,7 +188,6 @@ contract DssSpellAction is DssAction {
         // MCD_SPLIT will be set as "rewardsDistribution" in LsMkrUsdsFarm
         // Provided "hop" will be set as "rewardsDuration" in LsMkrUsdsFarm
         // New chainlog key REWARDS_LSMKR_USDS will be added
-        // Provided "hop" will be set as "rewardsDuration" in LsMkrUsdsFarm
         // Note: above instructions are taken inside FlapperInit.setFarm method
 
         // Note: prepare "farms" variable used inside Lockstake init call below
