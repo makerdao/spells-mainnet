@@ -299,11 +299,11 @@ contract DssSpellAction is DssAction {
                 // Init Lockstake Engine with uint256 tolerance: 0.5
                 tolerance:           5 * RAY / 10,
 
-                // Init Lockstake Engine with string name: "LOCKSTAKE"
-                name:                "LOCKSTAKE",
+                // Init Lockstake Engine with string name: "LockstakeMkr"
+                name:                "LockstakeMkr",
 
-                // Init Lockstake Engine with string symbol: "LMKR"
-                symbol:              "LMKR"
+                // Init Lockstake Engine with string symbol: "lsMKR"
+                symbol:              "lsMKR"
             })
         );
 
