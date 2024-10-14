@@ -233,6 +233,36 @@ interface StakingRewardsLike {
     function rewardsDuration() external view returns (uint256);
 }
 
+interface LockstakeEngineLike {
+    function voteDelegateFactory() external view returns (address);
+    function vat() external view returns (address);
+    function usdsJoin() external view returns (address);
+    function usds() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function mkr() external view returns (address);
+    function lsmkr() external view returns (address);
+    function fee() external view returns (uint256);
+    function mkrSky() external view returns (address);
+    function sky() external view returns (address);
+    function rely(address) external;
+    function file(bytes32, address) external;
+    function file(bytes32, uint256) external;
+    function addFarm(address) external;
+    function farms(address farm) external view returns (uint8);
+}
+
+interface LockstakeClipperLike {
+    function vat() external view returns (address);
+    function dog() external view returns (address);
+    function spotter() external view returns (address);
+    function engine() external view returns (address);
+    function ilk() external view returns (bytes32);
+    function rely(address) external;
+    function file(bytes32, address) external;
+    function file(bytes32, uint256) external;
+    function upchost() external;
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -808,6 +838,17 @@ contract DssSpellTestBase is Config, DssTest {
                     uint256 normalizedTestChop = (values.collaterals[ilk].chop * 10**14) + WAD;
                     uint256 _chost = (values.collaterals[ilk].dust * RAD) * normalizedTestChop / WAD;
                     assertEq(clip.chost(), _chost, _concat("TestError/calc-chost-incorrect-", ilk)); // Ensure clip.upchost() is called when dust changes
+                }
+                if (reg.class(ilk) == 7) {
+                    address engine = LockstakeClipperLike(address(clip)).engine();
+                    assertNotEq(engine, address(0), _concat("TestError/engine-is-not-set-", ilk));
+                    uint256 normalisedFee = values.collaterals[ilk].engine_fee * WAD / 10_000;
+                    assertEq(normalisedFee, LockstakeEngineLike(engine).fee(), _concat("TestError/engine-fee-", ilk));
+                    for (uint256 j = 0; j < values.collaterals[ilk].engine_farms.length; j++) {
+                        address farm = addr.addr(values.collaterals[ilk].engine_farms[j]);
+                        assertNotEq(farm, address(0), _concat("TestError/farm-is-empty-", ilk));
+                        assertEq(LockstakeEngineLike(engine).farms(farm), 1, _concat("TestError/engine-farms-", ilk));
+                    }
                 }
             }
             if (reg.class(ilk) < 3) {
