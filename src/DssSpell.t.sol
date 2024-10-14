@@ -215,9 +215,9 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
-            "FLAPPER_MOM"
+            "VOTE_DELEGATE_PROXY_FACTORY"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
