@@ -331,16 +331,11 @@ contract DssSpellAction is DssAction {
 
         // ---------- Lower Deprecated RWA Debt Ceilings ----------
 
-        // Note: we need extra variables to calculate the decrease of the global debt ceiling
-        uint256 line;
-        uint256 globalLineReduction = 0;
-
         // Remove RWA007-A from Debt Ceiling Instant Access Module
         DssExecLib.removeIlkFromAutoLine("RWA007-A");
 
         // Note: in order to decrease global debt ceiling, we need to fetch current `line`
-        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA007-A");
-        globalLineReduction += line;
+        (,,, uint256 line1,) = VatAbstract(MCD_VAT).ilks("RWA007-A");
 
         // Set RWA007-A Debt Ceiling to 0
         DssExecLib.setIlkDebtCeiling("RWA007-A", 0);
@@ -355,8 +350,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("RWA007-A");
 
         // Note: in order to decrease global debt ceiling, we need to fetch current `line`
-        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA014-A");
-        globalLineReduction += line;
+        (,,, uint256 line2,) = VatAbstract(MCD_VAT).ilks("RWA014-A");
 
         // Reduce RWA014-A Debt Ceiling by 1.5 billion Dai from 1.5 billion Dai to 0
         DssExecLib.setIlkDebtCeiling("RWA014-A", 0);
@@ -371,7 +365,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.updateCollateralPrice("RWA014-A");
 
         // Note: decrease global line
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - globalLineReduction);
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - (line1 + line2));
 
         // ---------- Pinwheel DAO Resolution ----------
 
