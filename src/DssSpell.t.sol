@@ -281,6 +281,22 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
+    function testLockstakeIlkIntegration() public { // add the `skipped` modifier to skip
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        _checkLockstakeIlkIntegration(
+            LockstakeIlkParams({
+                ilk:    "LSE-MKR-A",
+                clip:   addr.addr("LOCKSTAKE_CLIP"),
+                calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
+                pip:    addr.addr("PIP_MKR"),
+                ilkAmt: 1_000 * WAD
+            })
+        );
+    }
+
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -299,23 +315,6 @@ contract DssSpellTest is DssSpellTestBase {
         lerp.tick();
         assertEq(vow.hump(), 90 * MILLION * RAD);
         assertTrue(lerp.done());
-    }
-
-    function testNewIlkRegistryValues() public skipped { // add the `skipped` modifier to skip
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Insert new ilk registry values tests here
-        _checkIlkIntegration(
-             "TOKEN-X",
-             GemJoinAbstract(addr.addr("MCD_JOIN_TOKEN_X")),
-             ClipAbstract(addr.addr("MCD_CLIP_TOKEN_X")),
-             addr.addr("PIP_TOKEN"),
-             true,
-             true,
-             false
-        );
     }
 
     function testEsmAuth() public skipped { // add the `skipped` modifier to skip

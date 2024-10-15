@@ -249,6 +249,9 @@ interface LockstakeEngineLike {
     function file(bytes32, uint256) external;
     function addFarm(address) external;
     function farms(address farm) external view returns (uint8);
+    function open(uint256 index) external returns (address urn);
+    function draw(address owner, uint256 index, address to, uint256 wad) external;
+    function lock(address owner, uint256 index, uint256 wad, uint16 ref) external;
 }
 
 interface LockstakeClipperLike {
@@ -261,6 +264,10 @@ interface LockstakeClipperLike {
     function file(bytes32, address) external;
     function file(bytes32, uint256) external;
     function upchost() external;
+    function sales(uint256)
+        external
+        view
+        returns (uint256 pos, uint256 tab, uint256 lot, uint256 tot, address usr, uint96 tic, uint256 top);
 }
 
 contract DssSpellTestBase is Config, DssTest {
@@ -1196,6 +1203,138 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(lot, 0);
         assertEq(vat.dai(address(this)), 0);
         assertEq(vat.gem(ilk, address(this)), ilkAmt); // What was purchased + returned back as it is the owner of the vault
+        }
+    }
+
+    struct LockstakeIlkParams {
+        bytes32 ilk;
+        address clip;
+        address calc;
+        address pip;
+        uint256 ilkAmt;
+    }
+
+    function _checkLockstakeIlkIntegration(
+        LockstakeIlkParams memory p
+    ) internal {
+        assertEq(vat.dai(address(this)), 0, "LockstakeIlkIntegration/non-zero-initial-dai");
+        // Check that all contracts are set
+        {
+            assertEq(dog.vat(), address(vat), "LockstakeIlkIntegration/invalid-dog-vat");
+            assertEq(dog.vow(), address(vow), "LockstakeIlkIntegration/invalid-dog-vow");
+            (address clip,,,) = dog.ilks(p.ilk);
+            assertEq(clip, p.clip, "LockstakeIlkIntegration/invalid-dog-clip");
+            assertEq(ClipAbstract(p.clip).ilk(), p.ilk, "LockstakeIlkIntegration/invalid-clip-ilk");
+            assertEq(ClipAbstract(p.clip).vat(), address(vat), "LockstakeIlkIntegration/invalid-clip-vat");
+            assertEq(ClipAbstract(p.clip).vow(), address(vow), "LockstakeIlkIntegration/invalid-clip-vow");
+            assertEq(ClipAbstract(p.clip).dog(), address(dog), "LockstakeIlkIntegration/invalid-clip-dog");
+            assertEq(ClipAbstract(p.clip).spotter(), address(spotter), "LockstakeIlkIntegration/invalid-clip-spotter");
+            assertEq(ClipAbstract(p.clip).calc(), p.calc, "LockstakeIlkIntegration/invalid-clip-calc");
+        }
+        // Check all required authorizations
+        {
+            assertEq(vat.wards(p.clip), 1, "LockstakeIlkIntegration/missing-auth-vat-clip");
+            assertEq(dog.wards(p.clip), 1, "LockstakeIlkIntegration/missing-auth-dog-clip");
+            assertEq(ClipAbstract(p.clip).wards(address(dog)), 1, "LockstakeIlkIntegration/missing-auth-clip-dog");
+            assertEq(ClipAbstract(p.clip).wards(address(end)), 1, "LockstakeIlkIntegration/missing-auth-clip-end");
+            assertEq(ClipAbstract(p.clip).wards(address(clipMom)), 1, "LockstakeIlkIntegration/missing-auth--cliclippMom");
+        }
+        // Check OSM buds
+        {
+            assertEq(OsmAbstract(p.pip).bud(address(spotter)), 1, "LockstakeIlkIntegration/missing-spotter-bud");
+            assertEq(OsmAbstract(p.pip).bud(p.clip), 1, "LockstakeIlkIntegration/missing-clip-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(clipMom)), 1, "LockstakeIlkIntegration/missing-clipMom-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(end)), 1, "LockstakeIlkIntegration/missing-end-bud");
+        }
+        // Prepare for liquidation
+        {
+            // Force max Hole
+            vm.store(
+                address(dog),
+                bytes32(uint256(4)),
+                bytes32(type(uint256).max)
+            );
+            // Initially this test assume that's we are using freshly deployed Cliiper contract without any past auctions
+            if (ClipAbstract(p.clip).kicks() > 0) {
+                vm.store(
+                    p.clip,
+                    bytes32(uint256(10)),
+                    bytes32(uint256(0))
+                );
+                assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeIlkIntegration/unchanged-kicks");
+            }
+        }
+        // Open new vault
+        LockstakeEngineLike engine = LockstakeEngineLike(LockstakeClipperLike(p.clip).engine());
+        address urn = engine.open(0);
+        GemAbstract token = GemAbstract(reg.gem(p.ilk));
+        // Lock collateral
+        {
+            uint256 tknAmt = p.ilkAmt / 10 ** (18 - token.decimals());
+            _giveTokens(address(token), tknAmt);
+            assertEq(token.balanceOf(address(this)), tknAmt, "LockstakeIlkIntegration/unchanged-balance");
+            token.approve(address(engine), tknAmt);
+            engine.lock(address(this), 0, tknAmt, 0);
+        }
+        // Simulate normal operation of the OSM
+        OsmAbstract(p.pip).poke();
+        vm.warp(block.timestamp + 1 hours);
+        OsmAbstract(p.pip).poke();
+        // Generate new DAI to force a liquidation
+        int256 art;
+        uint256 rate;
+        {
+            uint256 line;
+            uint256 spot;
+            spotter.poke(p.ilk);
+            jug.drip(p.ilk);
+            (, rate, spot, line,) = vat.ilks(p.ilk);
+            art = int256(p.ilkAmt * spot / rate);
+            assertGt(art, 0, "LockstakeIlkIntegration/art-is-zero");
+            _setIlkLine(p.ilk, type(uint256).max);
+            engine.draw(address(this), 0, address(this), uint256(art));
+            _setIlkLine(p.ilk, line);
+        }
+        // Liquidate the vault
+        address keeper1 = address(111);
+        {
+            _setIlkMat(p.ilk, 100000 * RAY);
+            vm.warp(block.timestamp + 10 days);
+            spotter.poke(p.ilk);
+            assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeIlkIntegration/unexpected-kicks-before");
+            dog.bark(p.ilk, urn, keeper1);
+            assertEq(ClipAbstract(p.clip).kicks(), 1, "LockstakeIlkIntegration/unexpected-kicks-after");
+
+            (, rate,,,) = vat.ilks(p.ilk);
+            uint256 debt = rate * uint256(art) * dog.chop(p.ilk) / WAD;
+            vm.store(
+                address(vat),
+                keccak256(abi.encode(address(this), uint256(5))),
+                bytes32(debt)
+            );
+            assertEq(vat.gem(p.ilk, p.clip), p.ilkAmt, "LockstakeIlkIntegration/unexpected-clip-gem-amt");
+            assertGt(vat.dai(keeper1), 0, "LockstakeIlkIntegration/unexpected-zero-dai-after-bark");
+        }
+        // Take auction
+        address keeper2 = address(222);
+        {
+            vm.warp(block.timestamp + 20 minutes);
+            (, uint256 tab, uint256 lot,,,, uint256 top) = LockstakeClipperLike(p.clip).sales(1);
+
+            assertEq(lot, p.ilkAmt, "LockstakeIlkIntegration/unexpected-lot");
+            assertGt(lot * top, tab, "LockstakeIlkIntegration/not-enough-to-cover-debt");
+
+            vat.hope(p.clip);
+            ClipAbstract(p.clip).take(1, lot, top, keeper2, bytes(""));
+        }
+        // Check values after take
+        {
+            (, uint256 tab, uint256 lot,, address usr,,) = LockstakeClipperLike(p.clip).sales(1);
+            assertEq(usr, address(0), "LockstakeIlkIntegration/unexpected-usr");
+            assertEq(tab, 0, "LockstakeIlkIntegration/non-zero-tab");
+            assertEq(lot, 0, "LockstakeIlkIntegration/non-zero-lot");
+            assertEq(vat.dai(keeper2), 0, "LockstakeIlkIntegration/non-zero-dai");
+            assertGt(token.balanceOf(keeper2), 0, "LockstakeIlkIntegration/unexpected-zero-gem-after-take");
         }
     }
 
