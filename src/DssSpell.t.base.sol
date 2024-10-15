@@ -657,10 +657,10 @@ contract DssSpellTestBase is Config, DssTest {
             uint256 normalizedTestBurn = values.split_burn * 10**14;
             assertEq(split.burn(), normalizedTestBurn, "TestError/split-burn");
             assertTrue(split.burn() >= 50 * WAD / 100 && split.burn() <= 1 * WAD, "TestError/split-burn-range"); // gte 50% and lte 100%
-            // check farm address
+            // check split.farm address to match config
             address split_farm = addr.addr(values.split_farm);
             assertEq(split.farm(), split_farm, "TestError/split-farm");
-            // check rewards distribution and duration
+            // check farm rewards distribution and duration to match splitter
             if (split_farm != address(0)) {
                 address rewardsDistribution = StakingRewardsLike(split_farm).rewardsDistribution();
                 assertEq(rewardsDistribution, address(split), "TestError/farm-distribution");
@@ -840,10 +840,13 @@ contract DssSpellTestBase is Config, DssTest {
                     assertEq(clip.chost(), _chost, _concat("TestError/calc-chost-incorrect-", ilk)); // Ensure clip.upchost() is called when dust changes
                 }
                 if (reg.class(ilk) == 7) {
+                    // check correct clipper type is used for the reg.class 7
                     address engine = LockstakeClipperLike(address(clip)).engine();
-                    assertNotEq(engine, address(0), _concat("TestError/engine-is-not-set-", ilk));
+                    assertNotEq(engine, address(0), _concat("TestError/clip-engine-is-not-set-", ilk));
+                    // check lockstake engine fee to match config
                     uint256 normalisedFee = values.collaterals[ilk].engine_fee * WAD / 10_000;
-                    assertEq(normalisedFee, LockstakeEngineLike(engine).fee(), _concat("TestError/engine-fee-", ilk));
+                    assertEq(LockstakeEngineLike(engine).fee(), normalisedFee, _concat("TestError/engine-fee-", ilk));
+                    // check lockstake engine farms to match config
                     for (uint256 j = 0; j < values.collaterals[ilk].engine_farms.length; j++) {
                         address farm = addr.addr(values.collaterals[ilk].engine_farms[j]);
                         assertNotEq(farm, address(0), _concat("TestError/farm-is-empty-", ilk));
