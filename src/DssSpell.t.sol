@@ -387,7 +387,7 @@ contract DssSpellTest is DssSpellTestBase {
         for (uint256 i = 0; i < newAuthorizations.length; i++) {
             address base = addr.addr(newAuthorizations[i].base);
             address ward = addr.addr(newAuthorizations[i].ward);
-            assertEq(WardsAbstract(base).wards(ward), 0, "testNewAuthorizations/already-authorized");
+            assertEq(WardsAbstract(base).wards(ward), 0, _concat("testNewAuthorizations/already-authorized-", newAuthorizations[i].base));
         }
 
         _vote(address(spell));
@@ -397,7 +397,7 @@ contract DssSpellTest is DssSpellTestBase {
         for (uint256 i = 0; i < newAuthorizations.length; i++) {
             address base = addr.addr(newAuthorizations[i].base);
             address ward = addr.addr(newAuthorizations[i].ward);
-            assertEq(WardsAbstract(base).wards(ward), 1, "testNewAuthorizations/not-authorized");
+            assertEq(WardsAbstract(base).wards(ward), 1, _concat("testNewAuthorizations/not-authorized-", newAuthorizations[i].base));
         }
     }
 
