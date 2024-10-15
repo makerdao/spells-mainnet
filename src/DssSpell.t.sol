@@ -672,7 +672,7 @@ contract DssSpellTest is DssSpellTestBase {
             sky: int256(sky.totalSupply()) - previousTotalSupply.sky
         });
         assertEq(
-            actualTotalDiff.dai,
+            actualTotalDiff.dai + actualTotalDiff.usds,
             calculatedTotalDiff.dai + calculatedTotalDiff.usds,
             "TestPayments/invalid-dai-sky-total"
         );

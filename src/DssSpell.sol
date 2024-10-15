@@ -329,7 +329,7 @@ contract DssSpellAction is DssAction {
         // LockstakeClipper will be authorized to access "vat" and LockstakeEngine
         // CLIPPER_MOM, MCD_DOG and MCD_END will be authorized to access LockstakeClipper
         // New chainlog keys LOCKSTAKE_MKR, LOCKSTAKE_ENGINE, LOCKSTAKE_CLIP and LOCKSTAKE_CLIP_CALC will be added
-        // Note: above instructions are taken inside FlapperInit.setFarm method
+        // Note: above instructions are taken inside LockstakeInit.initLockstake method
 
         // ---------- Fund Early Bird Rewards Multisig ----------
         // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324#p-99402-early-bird-bonus-3
