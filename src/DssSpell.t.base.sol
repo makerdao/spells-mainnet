@@ -1297,22 +1297,22 @@ contract DssSpellTestBase is Config, DssTest {
         }
         // Check required authorizations
         {
-            assertEq(vat.wards(p.engine),                            1, "LockstakeIlkIntegration/missing-auth-vat-engine");
-            assertEq(vat.wards(p.clip),                              1, "LockstakeIlkIntegration/missing-auth-vat-clip");
-            assertEq(WardsAbstract(p.pip).wards(address(osmMom)),    1, "LockstakeIlkIntegration/missing-auth-pip-osmMom");
-            assertEq(dog.wards(p.clip),                              1, "LockstakeIlkIntegration/missing-auth-dog-clip");
-            assertEq(WardsAbstract(p.lsmkr).wards(p.engine),         1, "LockstakeIlkIntegration/missing-auth-lsgem-engine");
-            assertEq(WardsAbstract(p.engine).wards(p.clip),          1, "LockstakeIlkIntegration/missing-auth-engine-clip");
-            assertEq(WardsAbstract(p.clip).wards(address(dog)),      1, "LockstakeIlkIntegration/missing-auth-clip-dog");
-            assertEq(WardsAbstract(p.clip).wards(address(end)),      1, "LockstakeIlkIntegration/missing-auth-clip-end");
-            assertEq(WardsAbstract(p.clip).wards(address(clipMom)),  1, "LockstakeIlkIntegration/missing-auth-clip-clipMom");
+            assertEq(vat.wards(p.engine),                           1, "LockstakeIlkIntegration/missing-auth-vat-engine");
+            assertEq(vat.wards(p.clip),                             1, "LockstakeIlkIntegration/missing-auth-vat-clip");
+            assertEq(WardsAbstract(p.pip).wards(address(osmMom)),   1, "LockstakeIlkIntegration/missing-auth-pip-osmMom");
+            assertEq(dog.wards(p.clip),                             1, "LockstakeIlkIntegration/missing-auth-dog-clip");
+            assertEq(WardsAbstract(p.lsmkr).wards(p.engine),        1, "LockstakeIlkIntegration/missing-auth-lsgem-engine");
+            assertEq(WardsAbstract(p.engine).wards(p.clip),         1, "LockstakeIlkIntegration/missing-auth-engine-clip");
+            assertEq(WardsAbstract(p.clip).wards(address(dog)),     1, "LockstakeIlkIntegration/missing-auth-clip-dog");
+            assertEq(WardsAbstract(p.clip).wards(address(end)),     1, "LockstakeIlkIntegration/missing-auth-clip-end");
+            assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 1, "LockstakeIlkIntegration/missing-auth-clip-clipMom");
         }
         // Check required OSM buds
         {
-            assertEq(OsmAbstract(p.pip).bud(address(spotter)),  1, "LockstakeIlkIntegration/missing-spotter-bud");
-            assertEq(OsmAbstract(p.pip).bud(p.clip),            1, "LockstakeIlkIntegration/missing-clip-bud");
-            assertEq(OsmAbstract(p.pip).bud(address(clipMom)),  1, "LockstakeIlkIntegration/missing-clipMom-bud");
-            assertEq(OsmAbstract(p.pip).bud(address(end)),      1, "LockstakeIlkIntegration/missing-end-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(spotter)), 1, "LockstakeIlkIntegration/missing-spotter-bud");
+            assertEq(OsmAbstract(p.pip).bud(p.clip),           1, "LockstakeIlkIntegration/missing-clip-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(clipMom)), 1, "LockstakeIlkIntegration/missing-clipMom-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(end)),     1, "LockstakeIlkIntegration/missing-end-bud");
         }
         // Prepare for liquidation
         uint256 drawAmt;
@@ -1333,7 +1333,7 @@ contract DssSpellTestBase is Config, DssTest {
             // Calculate lock and draw amounts
             (,,,, uint256 dust) = vat.ilks(p.ilk);
             drawAmt = dust / RAY;
-            lockAmt = drawAmt / 2;
+            lockAmt = drawAmt * WAD / _getOSMPrice(p.pip) * 10;
             // Give tokens
             _giveTokens(address(mkr), lockAmt);
             _giveTokens(address(sky), lockAmt * afterSpell.sky_mkr_rate);
@@ -1373,8 +1373,6 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/DrawAndWipe/invalid-locked-mkr-balance");
             engine.draw(address(this), 0, address(this), drawAmt);
             assertEq(usds.balanceOf(address(this)), drawAmt, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-draw");
-            skip(1000 days);
-            jug.drip(p.ilk);
             (, uint256 art) = vat.urns(p.ilk, urn);
             (, uint256 rate,,,) = vat.ilks(p.ilk);
             uint256 wipeAmt = _divup(art * rate, RAY);
