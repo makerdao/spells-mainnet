@@ -1269,7 +1269,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(engine.mkrSky(),                        address(mkrSky),      "LockstakeIlkIntegration/invalid-engine-mkrSky");
             assertEq(engine.lsmkr(),                         p.lsmkr,              "LockstakeIlkIntegration/invalid-engine-lsmkr");
             assertEq(engine.jug(),                           address(jug),         "LockstakeIlkIntegration/invalid-engine-jug");
-            assertEq(engine.fee(),                           p.fee * WAD / 10_000, "LockstakeIlkIntegration/invalid-fee");
+            assertEq(engine.fee(),                           p.fee * WAD / 100_00, "LockstakeIlkIntegration/invalid-fee");
             assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
             assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
             assertEq(farm.stakingToken(),                    p.lsmkr,              "LockstakeIlkIntegration/invalid-stakingToken");
@@ -1359,7 +1359,7 @@ contract DssSpellTestBase is Config, DssTest {
             engine.lock(address(this), 0, lockAmt, 0);
             assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeMkr/invalid-locked-mkr-balance");
             engine.free(address(this), 0, address(this), lockAmt);
-            uint256 exitFee = lockAmt * p.fee / 10_000;
+            uint256 exitFee = lockAmt * p.fee / 100_00;
             assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "LockstakeTake/LockAndFreeMkr/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }
@@ -1372,7 +1372,7 @@ contract DssSpellTestBase is Config, DssTest {
             engine.lockSky(address(this), 0, skyAmt, 0);
             assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeSky/invalid-locked-mkr-balance");
             engine.freeSky(address(this), 0, address(this), skyAmt);
-            uint256 exitFee = skyAmt * p.fee / 10_000;
+            uint256 exitFee = skyAmt * p.fee / 100_00;
             assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "LockstakeTake/LockAndFreeSky/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }

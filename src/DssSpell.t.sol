@@ -378,15 +378,15 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testNewAuthorizations() public { // add the `skipped` modifier to skip
         Authorization[9] memory newAuthorizations = [
-            Authorization({ base: "MCD_VAT",              ward: "LOCKSTAKE_ENGINE" }),
-            Authorization({ base: "MCD_VAT",              ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "PIP_MKR",              ward: "OSM_MOM" }),
-            Authorization({ base: "MCD_DOG",              ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "LOCKSTAKE_MKR",        ward: "LOCKSTAKE_ENGINE" }),
-            Authorization({ base: "LOCKSTAKE_ENGINE",     ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "MCD_DOG" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "MCD_END" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",       ward: "CLIPPER_MOM" })
+            Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_ENGINE" }),
+            Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "PIP_MKR",          ward: "OSM_MOM" }),
+            Authorization({ base: "MCD_DOG",          ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "LOCKSTAKE_MKR",    ward: "LOCKSTAKE_ENGINE" }),
+            Authorization({ base: "LOCKSTAKE_ENGINE", ward: "LOCKSTAKE_CLIP" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "MCD_DOG" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "MCD_END" }),
+            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "CLIPPER_MOM" })
         ];
 
         for (uint256 i = 0; i < newAuthorizations.length; i++) {
@@ -678,7 +678,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(
             actualTotalDiff.dai + actualTotalDiff.usds,
             calculatedTotalDiff.dai + calculatedTotalDiff.usds,
-            "TestPayments/invalid-dai-sky-total"
+            "TestPayments/invalid-dai-usds-total"
         );
         assertEq(
             actualTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) + actualTotalDiff.sky,
