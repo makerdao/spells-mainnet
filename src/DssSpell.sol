@@ -400,7 +400,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Chainlog bump ----------
 
-        // Note: we have to increase minor chainlog version as new keys are added
+        // Note: we have to patch chainlog version as new collateral is added
         DssExecLib.setChangelogVersion("1.19.2");
     }
 }
