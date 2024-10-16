@@ -289,13 +289,16 @@ contract DssSpellTest is DssSpellTestBase {
         _checkLockstakeIlkIntegration(
             LockstakeIlkParams({
                 ilk:    "LSE-MKR-A",
+                fee:    5_00,
                 pip:    addr.addr("PIP_MKR"),
                 lsmkr:  addr.addr("LOCKSTAKE_MKR"),
                 engine: addr.addr("LOCKSTAKE_ENGINE"),
                 clip:   addr.addr("LOCKSTAKE_CLIP"),
                 calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
                 farm:   addr.addr("REWARDS_LSMKR_USDS"),
-                fee:    5_00
+                rToken: addr.addr("USDS"),
+                rDistr: addr.addr("MCD_SPLIT"),
+                rDur:   15_649 seconds
             })
         );
     }

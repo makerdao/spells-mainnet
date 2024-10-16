@@ -1236,13 +1236,16 @@ contract DssSpellTestBase is Config, DssTest {
 
     struct LockstakeIlkParams {
         bytes32 ilk;
+        uint256 fee;
         address pip;
         address lsmkr;
         address engine;
         address clip;
         address calc;
         address farm;
-        uint256 fee;
+        address rToken;
+        address rDistr;
+        uint256 rDur;
     }
 
     function _checkLockstakeIlkIntegration(
@@ -1251,9 +1254,7 @@ contract DssSpellTestBase is Config, DssTest {
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
         // Check relevant contracts are correctly configured
         {
-            assertEq(engine.fee(),                           p.fee * WAD / 10_000, "LockstakeIlkIntegration/invalid-fee");
-            assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
-            assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
+            StakingRewardsLike farm = StakingRewardsLike(p.farm);
             assertEq(dog.vat(),                              address(vat),         "LockstakeIlkIntegration/invalid-dog-vat");
             assertEq(dog.vow(),                              address(vow),         "LockstakeIlkIntegration/invalid-dog-vow");
             (address clip,,,) = dog.ilks(p.ilk);
@@ -1264,6 +1265,12 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(engine.mkrSky(),                        address(mkrSky),      "LockstakeIlkIntegration/invalid-engine-mkrSky");
             assertEq(engine.lsmkr(),                         p.lsmkr,              "LockstakeIlkIntegration/invalid-engine-lsmkr");
             assertEq(engine.jug(),                           address(jug),         "LockstakeIlkIntegration/invalid-engine-jug");
+            assertEq(engine.fee(),                           p.fee * WAD / 10_000, "LockstakeIlkIntegration/invalid-fee");
+            assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
+            assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
+            assertEq(farm.rewardsToken(),                    p.rToken,             "LockstakeIlkIntegration/invalid-rewardsToken");
+            assertEq(farm.rewardsDistribution(),             p.rDistr,             "LockstakeIlkIntegration/invalid-rewardsDistribution");
+            assertEq(farm.rewardsDuration(),                 p.rDur,               "LockstakeIlkIntegration/invalid-rewardsDuration");
             assertEq(ClipAbstract(p.clip).vat(),             address(vat),         "LockstakeIlkIntegration/invalid-clip-vat");
             assertEq(ClipAbstract(p.clip).spotter(),         address(spotter),     "LockstakeIlkIntegration/invalid-clip-spotter");
             assertEq(ClipAbstract(p.clip).dog(),             address(dog),         "LockstakeIlkIntegration/invalid-clip-dog");
