@@ -294,7 +294,8 @@ contract DssSpellTest is DssSpellTestBase {
                 lsgem:  addr.addr("LOCKSTAKE_MKR"),
                 engine: addr.addr("LOCKSTAKE_ENGINE"),
                 clip:   addr.addr("LOCKSTAKE_CLIP"),
-                calc:   addr.addr("LOCKSTAKE_CLIP_CALC")
+                calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
+                farm:   addr.addr("REWARDS_LSMKR_USDS")
             })
         );
     }

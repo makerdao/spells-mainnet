@@ -234,25 +234,53 @@ interface StakingRewardsLike {
 }
 
 interface LockstakeEngineLike {
-    function voteDelegateFactory() external view returns (address);
-    function vat() external view returns (address);
-    function usdsJoin() external view returns (address);
-    function usds() external view returns (address);
-    function ilk() external view returns (bytes32);
-    function mkr() external view returns (address);
-    function lsmkr() external view returns (address);
-    function fee() external view returns (uint256);
-    function mkrSky() external view returns (address);
-    function sky() external view returns (address);
-    function rely(address) external;
-    function file(bytes32, address) external;
-    function file(bytes32, uint256) external;
-    function addFarm(address) external;
-    function farms(address farm) external view returns (uint8);
-    function open(uint256 index) external returns (address urn);
+    function addFarm(address farm) external;
+    function delFarm(address farm) external;
+    function deny(address usr) external;
     function draw(address owner, uint256 index, address to, uint256 wad) external;
-    function lock(address owner, uint256 index, uint256 wad, uint16 ref) external;
+    function farms(address farm) external view returns (uint8 farmStatus);
+    function fee() external view returns (uint256);
+    function file(bytes32 what, uint256 data) external;
+    function file(bytes32 what, address data) external;
+    function free(address owner, uint256 index, address to, uint256 wad) external returns (uint256 freed);
+    function freeNoFee(address owner, uint256 index, address to, uint256 wad) external;
+    function freeSky(address owner, uint256 index, address to, uint256 skyWad) external returns (uint256 skyFreed);
+    function getReward(address owner, uint256 index, address farm, address to) external returns (uint256 amt);
+    function hope(address owner, uint256 index, address usr) external;
+    function ilk() external view returns (bytes32);
+    function isUrnAuth(address owner, uint256 index, address usr) external view returns (bool ok);
     function jug() external view returns (address);
+    function lock(address owner, uint256 index, uint256 wad, uint16 ref) external;
+    function lockSky(address owner, uint256 index, uint256 skyWad, uint16 ref) external;
+    function lsmkr() external view returns (address);
+    function mkr() external view returns (address);
+    function mkrSky() external view returns (address);
+    function mkrSkyRate() external view returns (uint256);
+    function multicall(bytes[] memory data) external returns (bytes[] memory results);
+    function nope(address owner, uint256 index, address usr) external;
+    function onKick(address urn, uint256 wad) external;
+    function onRemove(address urn, uint256 sold, uint256 left) external;
+    function onTake(address urn, address who, uint256 wad) external;
+    function open(uint256 index) external returns (address urn);
+    function ownerUrns(address owner, uint256 index) external view returns (address urn);
+    function ownerUrnsCount(address owner) external view returns (uint256 count);
+    function rely(address usr) external;
+    function selectFarm(address owner, uint256 index, address farm, uint16 ref) external;
+    function selectVoteDelegate(address owner, uint256 index, address voteDelegate) external;
+    function sky() external view returns (address);
+    function urnAuctions(address urn) external view returns (uint256 auctionsCount);
+    function urnCan(address urn, address usr) external view returns (uint256 allowed);
+    function urnFarms(address urn) external view returns (address farm);
+    function urnImplementation() external view returns (address);
+    function urnOwners(address urn) external view returns (address owner);
+    function urnVoteDelegates(address urn) external view returns (address voteDelegate);
+    function usds() external view returns (address);
+    function usdsJoin() external view returns (address);
+    function vat() external view returns (address);
+    function voteDelegateFactory() external view returns (address);
+    function wards(address usr) external view returns (uint256 allowed);
+    function wipe(address owner, uint256 index, uint256 wad) external;
+    function wipeAll(address owner, uint256 index) external returns (uint256 wad);
 }
 
 interface LockstakeClipperLike {
@@ -1222,6 +1250,7 @@ contract DssSpellTestBase is Config, DssTest {
         address engine;
         address clip;
         address calc;
+        address farm;
     }
 
     function _checkLockstakeIlkIntegration(
@@ -1230,6 +1259,7 @@ contract DssSpellTestBase is Config, DssTest {
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
         // Check relevant contracts are correctly configured
         {
+            assertEq(p.gem,                                  address(mkr),        "LockstakeIlkIntegration/invalid-gem");
             assertEq(dog.vat(),                              address(vat),        "LockstakeIlkIntegration/invalid-dog-vat");
             assertEq(dog.vow(),                              address(vow),        "LockstakeIlkIntegration/invalid-dog-vow");
             (address clip,,,) = dog.ilks(p.ilk);
@@ -1290,12 +1320,153 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(OsmAbstract(p.pip).bud(address(clipMom)),  1, "LockstakeIlkIntegration/missing-clipMom-bud");
             assertEq(OsmAbstract(p.pip).bud(address(end)),      1, "LockstakeIlkIntegration/missing-end-bud");
         }
-        // TODO:
-        // create vault
-        // lock and free mkr and sky
-        // draw and wipe
-        // farm and get a reward
-        // liquidate with farming and delegating
+        // Prepare for liquidation
+        uint256 drawAmt;
+        uint256 lockAmt;
+        {
+            // Force max Hole
+            vm.store(address(dog), bytes32(uint256(4)), bytes32(type(uint256).max));
+            // Reset auction count
+            if (ClipAbstract(p.clip).kicks() > 0) {
+                vm.store(p.clip, bytes32(uint256(10)), bytes32(uint256(0)));
+                assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeIlkIntegration/unchanged-kicks");
+            }
+            // Give tokens
+            _giveTokens(address(mkr), 100_000 * 10**18);
+            _giveTokens(address(sky), 100_000 * 10**18);
+            // Poke OSM price
+            OsmAbstract(p.pip).poke();
+            vm.warp(block.timestamp + 1 hours);
+            OsmAbstract(p.pip).poke();
+            spotter.poke(p.ilk);
+            // Calculate lock and draw amounts
+            (,,,, uint256 dust) = vat.ilks(p.ilk);
+            drawAmt = dust / RAY;
+            lockAmt = drawAmt / 2;
+        }
+        uint256 snapshot = vm.snapshot();
+        _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertTo(snapshot);
+
+        // TODO: fix tests for liquidation of the delegated tokens
+        // _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertTo(snapshot);
+        // _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertTo(snapshot);
+
+        // TODO: add more coverange
+        // - lock and free mkr and sky
+        // - draw and wipe
+        // - farm and get a reward
+        // - Liquidate with farming and delegating
+    }
+
+    function _ink(bytes32 ilk_, address urn) internal view returns (uint256 ink) {
+        (ink,) = vat.urns(ilk_, urn);
+    }
+
+    function _art(bytes32 ilk_, address urn) internal view returns (uint256 art) {
+        (, art) = vat.urns(ilk_, urn);
+    }
+
+    struct Sale {
+        uint256 pos;  // Index in active array
+        uint256 tab;  // Dai to raise       [rad]
+        uint256 lot;  // collateral to sell [wad]
+        uint256 tot;  // static registry of total collateral to sell [wad]
+        address usr;  // Liquidated CDP
+        uint96  tic;  // Auction start time
+        uint256 top;  // Starting price     [ray]
+    }
+
+    function _checkLockstakeTake(
+        LockstakeIlkParams memory p,
+        uint256 lockAmt,
+        uint256 drawAmt,
+        bool withDelegate,
+        bool withStaking
+    ) internal {
+        // Open vault
+        LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
+        vm.prank(address(123)); address voteDelegate = VoteDelegateFactoryLike(voteDelegateFactory).create();
+        assertNotEq(voteDelegate, address(0), "LockstakeTake/invalid-voteDelegate-address");
+        address urn = engine.open(0);
+
+        // Lock and draw
+        if (withDelegate) {
+            engine.selectVoteDelegate(address(this), 0, voteDelegate);
+        }
+        if (withStaking) {
+            engine.selectFarm(address(this), 0, address(p.farm), 0);
+        }
+        mkr.approve(address(engine), lockAmt);
+        engine.lock(address(this), 0, lockAmt, 0);
+        vm.warp(block.timestamp + 1);
+        engine.draw(address(this), 0, address(this), drawAmt);
+        if (withDelegate) {
+            assertEq(engine.urnVoteDelegates(urn), voteDelegate, "LockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
+            assertEq(mkr.balanceOf(voteDelegate), lockAmt, "LockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), 0, "LockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
+        } else {
+            assertEq(engine.urnVoteDelegates(urn), address(0), "LockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
+        }
+        if (withStaking) {
+            assertEq(GemAbstract(p.lsgem).balanceOf(urn), 0, "LockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsgem).balanceOf(p.farm), lockAmt, "LockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "LockstakeTake/AfterLockDraw/withStaking/invalid-urn-farm-balance");
+        } else {
+            assertEq(GemAbstract(p.lsgem).balanceOf(urn), lockAmt, "LockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
+        }
+
+        // Force liquidation
+        uint256 lsgemInitialSupply = GemAbstract(p.lsgem).totalSupply();
+        _setIlkMat(p.ilk, 100_000 * RAY);
+        spotter.poke(p.ilk);
+        assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeTake/non-0-kicks");
+        assertEq(engine.urnAuctions(urn), 0, "LockstakeTake/non-0-actions");
+        uint256 id = dog.bark(p.ilk, urn, address(this));
+        assertEq(ClipAbstract(p.clip).kicks(), 1, "LockstakeTake/AfterBark/no-kicks");
+        assertEq(engine.urnAuctions(urn), 1, "LockstakeTake/AfterBark/no-actions");
+        Sale memory sale;
+        (sale.pos, sale.tab, sale.lot, sale.tot, sale.usr, sale.tic, sale.top) = LockstakeClipperLike(p.clip).sales(id);
+        assertEq(sale.pos, 0, "LockstakeTake/AfterBark/invalid-sale.pos");
+        assertGt(sale.tab, drawAmt * RAY, "LockstakeTake/AfterBark/invalid-sale.tab");
+        assertEq(sale.lot, lockAmt, "LockstakeTake/AfterBark/invalid-sale.lot");
+        assertEq(sale.tot, lockAmt, "LockstakeTake/AfterBark/invalid-sale.tot");
+        assertEq(sale.usr, urn, "LockstakeTake/AfterBark/invalid-sale.usr");
+        assertEq(sale.tic, block.timestamp, "LockstakeTake/AfterBark/invalid-sale.tic");
+        assertEq(sale.top, _getOSMPrice(p.pip) * ClipAbstract(p.clip).buf() / WAD, "LockstakeTake/AfterBark/invalid-sale.top");
+        assertEq(vat.gem(p.ilk, p.clip), lockAmt, "LockstakeTake/AfterBark/invalid-vat-gem-clip");
+        if (withDelegate) {
+            assertEq(mkr.balanceOf(voteDelegate), 0, "LockstakeTake/AfterBark/withDelegate/invalid-voteDelegate-mkr-balance");
+        }
+        assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/AfterBark/invalid-engine-mkr-balance");
+        if (withStaking) {
+            assertEq(GemAbstract(p.lsgem).balanceOf(p.farm), 0, "LockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "LockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
+        }
+        assertEq(GemAbstract(p.lsgem).balanceOf(urn), 0, "LockstakeTake/AfterBark/invalid-urn-lsgem-balance");
+        assertEq(GemAbstract(p.lsgem).totalSupply(), lsgemInitialSupply - lockAmt, "LockstakeTake/AfterBark/invalid-lsgem-totalSupply");
+
+        // Take auction
+        address buyer = address(888);
+        vm.prank(pauseProxy); vat.suck(address(0), buyer, sale.tab);
+        vm.prank(buyer); vat.hope(p.clip);
+        assertEq(mkr.balanceOf(buyer), 0, "LockstakeTake/AfterBark/invalid-buyer-mkr-balance");
+        vm.prank(buyer); ClipAbstract(p.clip).take(id, lockAmt, type(uint256).max, buyer, "");
+        assertGt(mkr.balanceOf(buyer), 0, "LockstakeTake/AfterTake/invalid-buyer-mkr-balance");
+        (sale.pos, sale.tab, sale.lot, sale.tot, sale.usr, sale.tic, sale.top) = LockstakeClipperLike(p.clip).sales(id);
+        assertEq(sale.pos, 0, "LockstakeTake/AfterTake/invalid-sale.pos");
+        assertEq(sale.tab, 0, "LockstakeTake/AfterTake/invalid-sale.tab");
+        assertEq(sale.lot, 0, "LockstakeTake/AfterTake/invalid-sale.lot");
+        assertEq(sale.tot, 0, "LockstakeTake/AfterTake/invalid-sale.tot");
+        assertEq(sale.usr, address(0), "LockstakeTake/AfterTake/invalid-sale.usr");
+        assertEq(sale.tic, 0, "LockstakeTake/AfterTake/invalid-sale.tic");
+        assertEq(sale.top, 0, "LockstakeTake/AfterTake/invalid-sale.top");
+        assertEq(vat.gem(p.ilk, p.clip), 0, "LockstakeTake/AfterTake/invalid-vat.gem");
+        if (withStaking) {
+            assertEq(GemAbstract(p.lsgem).balanceOf(p.farm), 0, "LockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "LockstakeTake/AfterTake/withStaking/invalid-farm-urn-balance");
+        }
     }
 
     function _checkUNILPIntegration(
