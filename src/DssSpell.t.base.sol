@@ -229,9 +229,13 @@ interface LitePsmMomLike is AuthorityLike {
 }
 
 interface StakingRewardsLike {
+    function stake(uint256 amount) external;
+    function notifyRewardAmount(uint256 reward) external;
+    function rewardPerToken() external view returns (uint256);
     function rewardsDistribution() external view returns (address);
     function rewardsDuration() external view returns (uint256);
     function rewardsToken() external view returns (address);
+    function stakingToken() external view returns (address);
 }
 
 interface LockstakeEngineLike {
@@ -1252,9 +1256,9 @@ contract DssSpellTestBase is Config, DssTest {
         LockstakeIlkParams memory p
     ) internal {
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
+        StakingRewardsLike farm = StakingRewardsLike(p.farm);
         // Check relevant contracts are correctly configured
         {
-            StakingRewardsLike farm = StakingRewardsLike(p.farm);
             assertEq(dog.vat(),                              address(vat),         "LockstakeIlkIntegration/invalid-dog-vat");
             assertEq(dog.vow(),                              address(vow),         "LockstakeIlkIntegration/invalid-dog-vow");
             (address clip,,,) = dog.ilks(p.ilk);
@@ -1268,6 +1272,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(engine.fee(),                           p.fee * WAD / 10_000, "LockstakeIlkIntegration/invalid-fee");
             assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
             assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
+            assertEq(farm.stakingToken(),                    p.lsmkr,              "LockstakeIlkIntegration/invalid-stakingToken");
             assertEq(farm.rewardsToken(),                    p.rToken,             "LockstakeIlkIntegration/invalid-rewardsToken");
             assertEq(farm.rewardsDistribution(),             p.rDistr,             "LockstakeIlkIntegration/invalid-rewardsDistribution");
             assertEq(farm.rewardsDuration(),                 p.rDur,               "LockstakeIlkIntegration/invalid-rewardsDuration");
@@ -1390,7 +1395,27 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(usds.balanceOf(address(this)), 0, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-wipe");
             vm.revertTo(snapshot);
         }
-        // TODO: Check farming and getting a reward
+        // Check farming and getting a reward
+        {
+            // Lock with selected farm
+            address urn = engine.open(0);
+            mkr.approve(address(engine), lockAmt);
+            engine.selectFarm(address(this), 0, p.farm, 0);
+            engine.lock(address(this), 0, lockAmt, 0);
+            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "LockstakeTake/FarmAndGetReward/FarmAndGetReward/invalid-urn-farm-balance");
+            // Deposit rewards into farm and notify
+            uint256 rewardAmt = 1_000_000 * WAD;
+            address rewardsToken = farm.rewardsToken();
+            deal(rewardsToken, p.farm, rewardAmt, true);
+            vm.prank(farm.rewardsDistribution()); farm.notifyRewardAmount(rewardAmt);
+            // Claim rewards
+            address rewardsUser = address(this);
+            skip(farm.rewardsDuration());
+            uint256 resultAmt = engine.getReward(address(this), 0, p.farm, rewardsUser);
+            assertGt(resultAmt, 0, "LockstakeTake/FarmAndGetReward/no-reward-amt");
+            assertGt(GemAbstract(rewardsToken).balanceOf(rewardsUser), 0, "LockstakeTake/FarmAndGetReward/no-reward-balance");
+            vm.revertTo(snapshot);
+        }
         // Check liquidations
         _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertTo(snapshot);
         _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertTo(snapshot);
