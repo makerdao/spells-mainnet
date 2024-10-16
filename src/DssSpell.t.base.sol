@@ -886,15 +886,6 @@ contract DssSpellTestBase is Config, DssTest {
                     // check correct clipper type is used for the reg.class 7
                     address engine = LockstakeClipperLike(address(clip)).engine();
                     assertNotEq(engine, address(0), _concat("TestError/clip-engine-is-not-set-", ilk));
-                    // check lockstake engine fee to match config
-                    uint256 normalisedFee = values.collaterals[ilk].engine_fee * WAD / 10_000;
-                    assertEq(LockstakeEngineLike(engine).fee(), normalisedFee, _concat("TestError/engine-fee-", ilk));
-                    // check lockstake engine farms to match config
-                    for (uint256 j = 0; j < values.collaterals[ilk].engine_farms.length; j++) {
-                        address farm = addr.addr(values.collaterals[ilk].engine_farms[j]);
-                        assertNotEq(farm, address(0), _concat("TestError/farm-is-empty-", ilk));
-                        assertEq(LockstakeEngineLike(engine).farms(farm), 1, _concat("TestError/engine-farms-", ilk));
-                    }
                 }
             }
             if (reg.class(ilk) < 3) {
@@ -1251,6 +1242,7 @@ contract DssSpellTestBase is Config, DssTest {
         address clip;
         address calc;
         address farm;
+        uint256 fee;
     }
 
     function _checkLockstakeIlkIntegration(
@@ -1259,26 +1251,29 @@ contract DssSpellTestBase is Config, DssTest {
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
         // Check relevant contracts are correctly configured
         {
-            assertEq(p.gem,                                  address(mkr),        "LockstakeIlkIntegration/invalid-gem");
-            assertEq(dog.vat(),                              address(vat),        "LockstakeIlkIntegration/invalid-dog-vat");
-            assertEq(dog.vow(),                              address(vow),        "LockstakeIlkIntegration/invalid-dog-vow");
+            assertEq(p.gem,                                  address(mkr),         "LockstakeIlkIntegration/invalid-gem");
+            assertEq(engine.fee(),                           p.fee * WAD / 10_000, "LockstakeIlkIntegration/invalid-fee");
+            assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
+            assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
+            assertEq(dog.vat(),                              address(vat),         "LockstakeIlkIntegration/invalid-dog-vat");
+            assertEq(dog.vow(),                              address(vow),         "LockstakeIlkIntegration/invalid-dog-vow");
             (address clip,,,) = dog.ilks(p.ilk);
-            assertEq(clip,                                   p.clip,              "LockstakeIlkIntegration/invalid-dog-clip");
-            assertEq(engine.voteDelegateFactory(),           voteDelegateFactory, "LockstakeIlkIntegration/invalid-engine-voteDelegateFactory");
-            assertEq(engine.usdsJoin(),                      address(usdsJoin),   "LockstakeIlkIntegration/invalid-engine-usdsJoin");
-            assertEq(engine.ilk(),                           p.ilk,               "LockstakeIlkIntegration/invalid-engine-ilk");
-            assertEq(engine.mkrSky(),                        address(mkrSky),     "LockstakeIlkIntegration/invalid-engine-mkrSky");
-            assertEq(engine.lsmkr(),                         p.lsgem,             "LockstakeIlkIntegration/invalid-engine-lsmkr");
-            assertEq(engine.jug(),                           address(jug),        "LockstakeIlkIntegration/invalid-engine-jug");
-            assertEq(ClipAbstract(p.clip).vat(),             address(vat),        "LockstakeIlkIntegration/invalid-clip-vat");
-            assertEq(ClipAbstract(p.clip).spotter(),         address(spotter),    "LockstakeIlkIntegration/invalid-clip-spotter");
-            assertEq(ClipAbstract(p.clip).dog(),             address(dog),        "LockstakeIlkIntegration/invalid-clip-dog");
-            assertEq(ClipAbstract(p.clip).ilk(),             p.ilk,               "LockstakeIlkIntegration/invalid-clip-ilk");
-            assertEq(ClipAbstract(p.clip).vow(),             address(vow),        "LockstakeIlkIntegration/invalid-clip-vow");
-            assertEq(ClipAbstract(p.clip).calc(),            p.calc,              "LockstakeIlkIntegration/invalid-clip-calc");
-            assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,            "LockstakeIlkIntegration/invalid-clip-engine");
-            assertEq(LockstakeClipperLike(p.clip).stopped(), 0,                   "LockstakeIlkIntegration/invalid-clip-stopped");
-            assertEq(osmMom.osms(p.ilk),                     p.pip,               "LockstakeIlkIntegration/invalid-osmMom-pip");
+            assertEq(clip,                                   p.clip,               "LockstakeIlkIntegration/invalid-dog-clip");
+            assertEq(engine.voteDelegateFactory(),           voteDelegateFactory,  "LockstakeIlkIntegration/invalid-engine-voteDelegateFactory");
+            assertEq(engine.usdsJoin(),                      address(usdsJoin),    "LockstakeIlkIntegration/invalid-engine-usdsJoin");
+            assertEq(engine.ilk(),                           p.ilk,                "LockstakeIlkIntegration/invalid-engine-ilk");
+            assertEq(engine.mkrSky(),                        address(mkrSky),      "LockstakeIlkIntegration/invalid-engine-mkrSky");
+            assertEq(engine.lsmkr(),                         p.lsgem,              "LockstakeIlkIntegration/invalid-engine-lsmkr");
+            assertEq(engine.jug(),                           address(jug),         "LockstakeIlkIntegration/invalid-engine-jug");
+            assertEq(ClipAbstract(p.clip).vat(),             address(vat),         "LockstakeIlkIntegration/invalid-clip-vat");
+            assertEq(ClipAbstract(p.clip).spotter(),         address(spotter),     "LockstakeIlkIntegration/invalid-clip-spotter");
+            assertEq(ClipAbstract(p.clip).dog(),             address(dog),         "LockstakeIlkIntegration/invalid-clip-dog");
+            assertEq(ClipAbstract(p.clip).ilk(),             p.ilk,                "LockstakeIlkIntegration/invalid-clip-ilk");
+            assertEq(ClipAbstract(p.clip).vow(),             address(vow),         "LockstakeIlkIntegration/invalid-clip-vow");
+            assertEq(ClipAbstract(p.clip).calc(),            p.calc,               "LockstakeIlkIntegration/invalid-clip-calc");
+            assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,             "LockstakeIlkIntegration/invalid-clip-engine");
+            assertEq(LockstakeClipperLike(p.clip).stopped(), 0,                    "LockstakeIlkIntegration/invalid-clip-stopped");
+            assertEq(osmMom.osms(p.ilk),                     p.pip,                "LockstakeIlkIntegration/invalid-osmMom-pip");
         }
         // Check ilk registry values
         {

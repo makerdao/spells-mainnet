@@ -83,8 +83,6 @@ contract Config {
         uint256 calc_tau;
         uint256 calc_step;
         uint256 calc_cut;
-        uint256 engine_fee;
-        bytes32[] engine_farms;
         bool    offboarding;
     }
 
@@ -174,8 +172,6 @@ contract Config {
             calc_tau:     0,               // In seconds
             calc_step:    90,              // In seconds
             calc_cut:     9900,            // In basis points
-            engine_fee:   0,               // In basis points
-            engine_farms: new bytes32[](0), // Array of chainlog keys of added farms
             offboarding:  false            // If mat is being offboarded
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
@@ -201,8 +197,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    60,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["ETH-C"] = CollateralValues({
@@ -228,8 +222,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
@@ -255,8 +247,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["USDC-A"] = CollateralValues({
@@ -282,8 +272,6 @@ contract Config {
             calc_tau:     4_320_000,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["USDC-B"] = CollateralValues({
@@ -309,8 +297,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-A"] = CollateralValues({
@@ -336,8 +322,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-B"] = CollateralValues({
@@ -363,8 +347,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    60,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-C"] = CollateralValues({
@@ -390,8 +372,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
@@ -417,8 +397,6 @@ contract Config {
             calc_tau:     250 days,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["KNC-A"] = CollateralValues({
@@ -444,8 +422,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["ZRX-A"] = CollateralValues({
@@ -471,8 +447,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["MANA-A"] = CollateralValues({
@@ -498,8 +472,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["USDT-A"] = CollateralValues({
@@ -525,8 +497,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["PAXUSD-A"] = CollateralValues({
@@ -552,8 +522,6 @@ contract Config {
             calc_tau:     4_320_000,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["COMP-A"] = CollateralValues({
@@ -579,8 +547,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["LRC-A"] = CollateralValues({
@@ -606,8 +572,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["LINK-A"] = CollateralValues({
@@ -633,8 +597,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["BAL-A"] = CollateralValues({
@@ -660,8 +622,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["YFI-A"] = CollateralValues({
@@ -687,8 +647,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["GUSD-A"] = CollateralValues({
@@ -714,8 +672,6 @@ contract Config {
             calc_tau:     4_320_000,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNI-A"] = CollateralValues({
@@ -741,8 +697,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["RENBTC-A"] = CollateralValues({
@@ -768,8 +722,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["AAVE-A"] = CollateralValues({
@@ -795,8 +747,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2DAIETH-A"] = CollateralValues({
@@ -822,8 +772,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    125,
             calc_cut:     9950,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["PSM-USDC-A"] = CollateralValues({
@@ -849,8 +797,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["LITE-PSM-USDC-A"] = CollateralValues({
@@ -876,8 +822,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2WBTCETH-A"] = CollateralValues({
@@ -903,8 +847,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    130,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2USDCETH-A"] = CollateralValues({
@@ -930,8 +872,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    125,
             calc_cut:     9950,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2DAIUSDC-A"] = CollateralValues({
@@ -957,8 +897,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2ETHUSDT-A"] = CollateralValues({
@@ -984,8 +922,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    125,
             calc_cut:     9950,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2LINKETH-A"] = CollateralValues({
@@ -1011,8 +947,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    130,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2UNIETH-A"] = CollateralValues({
@@ -1038,8 +972,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    130,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["UNIV2WBTCDAI-A"] = CollateralValues({
@@ -1065,8 +997,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    125,
             calc_cut:     9950,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2AAVEETH-A"] = CollateralValues({
@@ -1092,8 +1022,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    130,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["UNIV2DAIUSDT-A"] = CollateralValues({
@@ -1119,8 +1047,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA001-A"] = CollateralValues({
@@ -1146,8 +1072,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA002-A"] = CollateralValues({
@@ -1173,8 +1097,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA003-A"] = CollateralValues({
@@ -1200,8 +1122,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA004-A"] = CollateralValues({
@@ -1227,8 +1147,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA005-A"] = CollateralValues({
@@ -1254,8 +1172,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA006-A"] = CollateralValues({
@@ -1281,8 +1197,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA007-A"] = CollateralValues({
@@ -1308,8 +1222,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA008-A"] = CollateralValues({
@@ -1335,8 +1247,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA009-A"] = CollateralValues({
@@ -1362,8 +1272,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA010-A"] = CollateralValues({
@@ -1389,8 +1297,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA011-A"] = CollateralValues({
@@ -1416,8 +1322,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA012-A"] = CollateralValues({
@@ -1443,8 +1347,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA013-A"] = CollateralValues({
@@ -1470,8 +1372,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA014-A"] = CollateralValues({
@@ -1497,8 +1397,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RWA015-A"] = CollateralValues({
@@ -1524,8 +1422,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["MATIC-A"] = CollateralValues({
@@ -1551,8 +1447,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["PSM-PAX-A"] = CollateralValues({
@@ -1578,8 +1472,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["GUNIV3DAIUSDC1-A"] = CollateralValues({
@@ -1605,8 +1497,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["WSTETH-A"] = CollateralValues({
@@ -1632,8 +1522,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["WSTETH-B"] = CollateralValues({
@@ -1659,8 +1547,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-SPK-AAVE-LIDO-USDS"] = CollateralValues({
@@ -1686,8 +1572,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-AAVEV2-DAI"] = CollateralValues({
@@ -1713,8 +1597,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-COMPV2-DAI"] = CollateralValues({
@@ -1740,8 +1622,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["PSM-GUSD-A"] = CollateralValues({
@@ -1767,8 +1647,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["GUNIV3DAIUSDC2-A"] = CollateralValues({
@@ -1794,8 +1672,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    120,
             calc_cut:     9990,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["CRVV1ETHSTETH-A"] = CollateralValues({
@@ -1821,8 +1697,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     9900,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["TELEPORT-FW-A"] = CollateralValues({
@@ -1848,8 +1722,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["RETH-A"] = CollateralValues({
@@ -1875,8 +1747,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    90,
             calc_cut:     99_00,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  true
         });
         afterSpell.collaterals["GNO-A"] = CollateralValues({
@@ -1902,8 +1772,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    60,
             calc_cut:     99_00,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-SPARK-DAI"] = CollateralValues({
@@ -1929,8 +1797,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-SPARK-MORPHO-DAI"] = CollateralValues({
@@ -1956,8 +1822,6 @@ contract Config {
             calc_tau:     0,
             calc_step:    0,
             calc_cut:     0,
-            engine_fee:   0,
-            engine_farms: new bytes32[](0),
             offboarding:  false
         });
         afterSpell.collaterals["LSE-MKR-A"] = CollateralValues({
@@ -1983,10 +1847,7 @@ contract Config {
             calc_tau:     0,
             calc_step:    60,
             calc_cut:     99_00,
-            engine_fee:   5_00,
-            engine_farms: new bytes32[](1),
             offboarding:  false
         });
-        afterSpell.collaterals["LSE-MKR-A"].engine_farms[0] = "REWARDS_LSMKR_USDS";
     }
 }
