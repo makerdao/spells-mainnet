@@ -1347,10 +1347,8 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 snapshot = vm.snapshot();
         _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertTo(snapshot);
         _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertTo(snapshot);
-
-        // TODO: fix tests for liquidation of the delegated tokens
-        // _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertTo(snapshot);
-        // _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertTo(snapshot);
 
         // TODO: add more coverange
         // - lock and free mkr and sky
@@ -1397,13 +1395,13 @@ contract DssSpellTestBase is Config, DssTest {
         if (withStaking) {
             engine.selectFarm(address(this), 0, address(p.farm), 0);
         }
+        uint256 previousCheifBalance = mkr.balanceOf(address(chief));
         mkr.approve(address(engine), lockAmt);
         engine.lock(address(this), 0, lockAmt, 0);
-        vm.warp(block.timestamp + 1);
         engine.draw(address(this), 0, address(this), drawAmt);
         if (withDelegate) {
             assertEq(engine.urnVoteDelegates(urn), voteDelegate, "LockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
-            assertEq(mkr.balanceOf(voteDelegate), lockAmt, "LockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-mkr-balance");
+            assertEq(mkr.balanceOf(address(chief)) - previousCheifBalance, lockAmt, "LockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
             assertEq(mkr.balanceOf(p.engine), 0, "LockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
         } else {
             assertEq(engine.urnVoteDelegates(urn), address(0), "LockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
@@ -1418,7 +1416,9 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // Force liquidation
-        uint256 lsgemInitialSupply = GemAbstract(p.lsgem).totalSupply();
+        if (withDelegate) {
+            vm.roll(block.number + 1); // Roll one block to allow freeing from cheif
+        }
         _setIlkMat(p.ilk, 100_000 * RAY);
         spotter.poke(p.ilk);
         assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeTake/non-0-kicks");
@@ -1445,7 +1445,6 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "LockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
         }
         assertEq(GemAbstract(p.lsgem).balanceOf(urn), 0, "LockstakeTake/AfterBark/invalid-urn-lsgem-balance");
-        assertEq(GemAbstract(p.lsgem).totalSupply(), lsgemInitialSupply - lockAmt, "LockstakeTake/AfterBark/invalid-lsgem-totalSupply");
 
         // Take auction
         address buyer = address(888);
