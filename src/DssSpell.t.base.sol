@@ -231,6 +231,7 @@ interface LitePsmMomLike is AuthorityLike {
 interface StakingRewardsLike {
     function rewardsDistribution() external view returns (address);
     function rewardsDuration() external view returns (uint256);
+    function rewardsToken() external view returns (address);
 }
 
 interface LockstakeEngineLike {
@@ -1340,16 +1341,58 @@ contract DssSpellTestBase is Config, DssTest {
             _giveTokens(address(sky), lockAmt * afterSpell.sky_mkr_rate);
         }
         uint256 snapshot = vm.snapshot();
+        // Check locking and freeing Mkr
+        {
+            engine.open(0);
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "LockstakeTake/LockAndFreeMkr/invalid-initial-balance");
+            mkr.approve(address(engine), lockAmt);
+            engine.lock(address(this), 0, lockAmt, 0);
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeMkr/invalid-locked-mkr-balance");
+            engine.free(address(this), 0, address(this), lockAmt);
+            uint256 exitFee = lockAmt * p.fee / 10_000;
+            assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "LockstakeTake/LockAndFreeMkr/invalid-unlocked-balance");
+            vm.revertTo(snapshot);
+        }
+        // Check locking and freeing Sky
+        {
+            engine.open(0);
+            uint256 skyAmt = lockAmt * afterSpell.sky_mkr_rate;
+            assertEq(sky.balanceOf(address(this)), skyAmt, "LockstakeTake/LockAndFreeSky/invalid-initial-balance");
+            sky.approve(address(engine), skyAmt);
+            engine.lockSky(address(this), 0, skyAmt, 0);
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeSky/invalid-locked-mkr-balance");
+            engine.freeSky(address(this), 0, address(this), skyAmt);
+            uint256 exitFee = skyAmt * p.fee / 10_000;
+            assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "LockstakeTake/LockAndFreeSky/invalid-unlocked-balance");
+            vm.revertTo(snapshot);
+        }
+        // Check drawing and wiping
+        {
+            address urn = engine.open(0);
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "LockstakeTake/DrawAndWipe/invalid-initial-balance");
+            mkr.approve(address(engine), lockAmt);
+            engine.lock(address(this), 0, lockAmt, 0);
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/DrawAndWipe/invalid-locked-mkr-balance");
+            engine.draw(address(this), 0, address(this), drawAmt);
+            assertEq(usds.balanceOf(address(this)), drawAmt, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-draw");
+            skip(1000 days);
+            jug.drip(p.ilk);
+            (, uint256 art) = vat.urns(p.ilk, urn);
+            (, uint256 rate,,,) = vat.ilks(p.ilk);
+            uint256 wipeAmt = _divup(art * rate, RAY);
+            assertGt(wipeAmt, drawAmt, "LockstakeTake/DrawAndWipe/invalid-wipe-after-draw");
+            _giveTokens(address(usds), wipeAmt);
+            usds.approve(address(engine), wipeAmt);
+            engine.wipe(address(this), 0, wipeAmt);
+            assertEq(usds.balanceOf(address(this)), 0, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-wipe");
+            vm.revertTo(snapshot);
+        }
+        // TODO: Check farming and getting a reward
+        // Check liquidations
         _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertTo(snapshot);
         _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertTo(snapshot);
         _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertTo(snapshot);
         _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertTo(snapshot);
-
-        // TODO: add more coverange
-        // - lock and free mkr and sky
-        // - draw and wipe
-        // - farm and get a reward
-        // - Liquidate with farming and delegating
     }
 
     struct Sale {
