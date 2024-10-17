@@ -1388,10 +1388,12 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-mkr-balance");
             engine.draw(address(this), 0, address(this), drawAmt);
             assertEq(usds.balanceOf(address(this)), drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-draw");
+            skip(10 days);
+            jug.drip(p.ilk);
             (, uint256 art) = vat.urns(p.ilk, urn);
             (, uint256 rate,,,) = vat.ilks(p.ilk);
             uint256 wipeAmt = _divup(art * rate, RAY);
-            assertGt(wipeAmt, drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-wipe-after-draw");
+            assertGt(wipeAmt, drawAmt + 1 /* +1 to exclude rounding up */, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-wipe-after-draw");
             _giveTokens(address(usds), wipeAmt);
             usds.approve(address(engine), wipeAmt);
             engine.wipe(address(this), 0, wipeAmt);
