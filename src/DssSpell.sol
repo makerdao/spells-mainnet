@@ -79,16 +79,16 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     address internal immutable MCD_VAT                     = DssExecLib.vat();
+    address internal immutable MCD_VOW                     = DssExecLib.vow();
+    address internal immutable MCD_GOV                     = DssExecLib.mkr();
     address internal immutable MIP21_LIQUIDATION_ORACLE    = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable RWA007_A_URN                = DssExecLib.getChangelogAddress("RWA007_A_URN");
     address internal immutable RWA014_A_URN                = DssExecLib.getChangelogAddress("RWA014_A_URN");
     address internal immutable PIP_MKR                     = DssExecLib.getChangelogAddress("PIP_MKR");
     address internal immutable VOTE_DELEGATE_PROXY_FACTORY = DssExecLib.getChangelogAddress("VOTE_DELEGATE_PROXY_FACTORY");
     address internal immutable MCD_SPLIT                   = DssExecLib.getChangelogAddress("MCD_SPLIT");
-    address internal immutable MCD_VOW                     = DssExecLib.getChangelogAddress("MCD_VOW");
     address internal immutable USDS_JOIN                   = DssExecLib.getChangelogAddress("USDS_JOIN");
     address internal immutable USDS                        = DssExecLib.getChangelogAddress("USDS");
-    address internal immutable MCD_GOV                     = DssExecLib.getChangelogAddress("MCD_GOV");
     address internal immutable MKR_SKY                     = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable SKY                         = DssExecLib.getChangelogAddress("SKY");
     address internal constant NEW_PIP_MKR                  = 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b;
