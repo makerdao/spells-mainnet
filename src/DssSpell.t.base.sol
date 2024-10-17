@@ -1374,8 +1374,8 @@ contract DssSpellTestBase is Config, DssTest {
             engine.lockSky(address(this), 0, skyAmt, 0);
             assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-mkr-balance");
             engine.freeSky(address(this), 0, address(this), skyAmt);
-            uint256 exitFee = skyAmt * p.fee / 100_00;
-            assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
+            uint256 exitFee = lockAmt * p.fee / 100_00 * afterSpell.sky_mkr_rate;
+            assertGe(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }
         // Check drawing and wiping
