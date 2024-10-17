@@ -1001,4 +1001,21 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(spot, 0, _concat("TestError/non-zero-spot-price-after-cull-", ilk));
         }
     }
+
+    function testNewOsmMomAddition() public {
+        bytes32 ilk = "LSE-MKR-A";
+        address osm = addr.addr("PIP_MKR");
+
+        assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(osmMom.osms(ilk), osm, "TestError/osm-not-in-mom");
+
+        assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
+        vm.prank(chief.hat()); osmMom.stop(ilk);
+        assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
+    }
 }
