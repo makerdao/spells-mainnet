@@ -44,13 +44,13 @@ contract Config {
         uint256 flap_want;
         uint256 dog_Hole;
         uint256 esm_min;
-        address pause_authority;
-        address osm_mom_authority;
-        address clipper_mom_authority;
-        address d3m_mom_authority;
-        address line_mom_authority;
-        address lite_psm_mom_authority;
-        address splitter_mom_authority;
+        bytes32 pause_authority;
+        bytes32 osm_mom_authority;
+        bytes32 clipper_mom_authority;
+        bytes32 d3m_mom_authority;
+        bytes32 line_mom_authority;
+        bytes32 lite_psm_mom_authority;
+        bytes32 splitter_mom_authority;
         uint256 vest_dai_cap;
         uint256 vest_mkr_cap;
         uint256 vest_sky_cap;
@@ -94,7 +94,7 @@ contract Config {
     SpellValues  spellValues;
     SystemValues afterSpell;
 
-    function setValues(address chief) public {
+    function setValues() public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
         address[] memory prevSpells = new address[](0);
@@ -131,13 +131,13 @@ contract Config {
         afterSpell.flap_want              = 9800;                           // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
         afterSpell.esm_min                = 300 * THOUSAND;                 // In whole MKR units
-        afterSpell.pause_authority        = chief;                          // Pause authority
-        afterSpell.osm_mom_authority      = chief;                          // OsmMom authority
-        afterSpell.clipper_mom_authority  = chief;                          // ClipperMom authority
-        afterSpell.d3m_mom_authority      = chief;                          // D3MMom authority
-        afterSpell.line_mom_authority     = chief;                          // LineMom authority
-        afterSpell.lite_psm_mom_authority = chief;                          // LitePsmMom authority
-        afterSpell.splitter_mom_authority = chief;                          // SplitterMom authority
+        afterSpell.pause_authority        = "MCD_ADM";                      // Pause authority
+        afterSpell.osm_mom_authority      = "MCD_ADM";                      // OsmMom authority
+        afterSpell.clipper_mom_authority  = "MCD_ADM";                      // ClipperMom authority
+        afterSpell.d3m_mom_authority      = "MCD_ADM";                      // D3MMom authority
+        afterSpell.line_mom_authority     = "MCD_ADM";                      // LineMom authority
+        afterSpell.lite_psm_mom_authority = "MCD_ADM";                      // LitePsmMom authority
+        afterSpell.splitter_mom_authority = "MCD_ADM";                      // SplitterMom authority
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;    // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second

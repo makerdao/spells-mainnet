@@ -32,7 +32,7 @@ contract ConfigStarknet {
         uint256 relay_selector;
     }
 
-    function setValues() public {
+    function setStarknetValues() public {
         uint256 WAD = 10 ** 18;
 
         starknetValues = StarknetValues({
@@ -99,7 +99,7 @@ contract StarknetTests is DssSpellTestBase, ConfigStarknet {
         );
 
     constructor() {
-        setValues();
+        setStarknetValues();
     }
 
     function testStarknet() public {

@@ -511,7 +511,7 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function setUp() public {
-        setValues(address(chief));
+        setValues();
         _castPreviousSpell();
 
         spellValues.deployed_spell_created = spellValues.deployed_spell != address(0)
@@ -673,25 +673,25 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // check Pause authority
-        assertEq(pause.authority(), values.pause_authority, "TestError/pause-authority");
+        assertEq(pause.authority(), addr.addr(values.pause_authority), "TestError/pause-authority");
 
         // check OsmMom authority
-        assertEq(osmMom.authority(), values.osm_mom_authority, "TestError/osmMom-authority");
+        assertEq(osmMom.authority(), addr.addr(values.osm_mom_authority), "TestError/osmMom-authority");
 
         // check ClipperMom authority
-        assertEq(clipMom.authority(), values.clipper_mom_authority, "TestError/clipperMom-authority");
+        assertEq(clipMom.authority(), addr.addr(values.clipper_mom_authority), "TestError/clipperMom-authority");
 
         // check D3MMom authority
-        assertEq(d3mMom.authority(), values.d3m_mom_authority, "TestError/d3mMom-authority");
+        assertEq(d3mMom.authority(), addr.addr(values.d3m_mom_authority), "TestError/d3mMom-authority");
 
         // check LineMom authority
-        assertEq(lineMom.authority(), values.line_mom_authority, "TestError/lineMom-authority");
+        assertEq(lineMom.authority(), addr.addr(values.line_mom_authority), "TestError/lineMom-authority");
 
         // check LitePsmMom authority
-        assertEq(litePsmMom.authority(), values.lite_psm_mom_authority, "TestError/linePsmMom-authority");
+        assertEq(litePsmMom.authority(), addr.addr(values.lite_psm_mom_authority), "TestError/linePsmMom-authority");
 
         // check SplitterMom authority
-        assertEq(splitterMom.authority(), values.splitter_mom_authority, "TestError/splitterMom-authority");
+        assertEq(splitterMom.authority(), addr.addr(values.splitter_mom_authority), "TestError/splitterMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");
