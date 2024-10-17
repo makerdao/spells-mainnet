@@ -349,7 +349,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOSMs() public { // add the `skipped` modifier to skip
+    function testOsmReaders() public { // add the `skipped` modifier to skip
         address OSM = addr.addr("PIP_MKR");
         address[4] memory newReaders = [
             addr.addr("MCD_SPOT"),
@@ -368,6 +368,25 @@ contract DssSpellTest is DssSpellTestBase {
 
         for (uint256 i = 0; i < newReaders.length; i++) {
             assertEq(OsmAbstract(OSM).bud(newReaders[i]), 1);
+        }
+    }
+
+    function testMedianReaders() public { // add the `skipped` modifier to skip
+        address median = chainLog.getAddress("PIP_MKR"); // PIP_MKR before spell
+        address[1] memory newReaders = [
+            addr.addr('PIP_MKR') // PIP_MKR after spell
+        ];
+
+        for (uint256 i = 0; i < newReaders.length; i++) {
+            assertEq(MedianAbstract(median).bud(newReaders[i]), 0);
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < newReaders.length; i++) {
+            assertEq(MedianAbstract(median).bud(newReaders[i]), 1);
         }
     }
 
@@ -404,17 +423,6 @@ contract DssSpellTest is DssSpellTestBase {
             address ward = addr.addr(newAuthorizations[i].ward);
             assertEq(WardsAbstract(base).wards(ward), 1, _concat("testNewAuthorizations/not-authorized-", newAuthorizations[i].base));
         }
-    }
-
-    function testMedianizers() public skipped { // add the `skipped` modifier to skip
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Track Median authorizations here
-        address SET_TOKEN    = address(0);
-        address TOKENUSD_MED = OsmAbstract(addr.addr("PIP_TOKEN")).src();
-        assertEq(MedianAbstract(TOKENUSD_MED).bud(SET_TOKEN), 1);
     }
 
     function testVestDAI() public skipped { // add the `skipped` modifier to skip
