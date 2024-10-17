@@ -1353,11 +1353,12 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 snapshot = vm.snapshot();
         // Check locking and freeing Mkr
         {
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
             engine.open(0);
             assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-initial-balance");
             mkr.approve(address(engine), lockAmt);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-locked-mkr-balance");
             engine.free(address(this), 0, address(this), lockAmt);
             uint256 exitFee = lockAmt * p.fee / 100_00;
             assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-unlocked-balance");
@@ -1365,12 +1366,13 @@ contract DssSpellTestBase is Config, DssTest {
         }
         // Check locking and freeing Sky
         {
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
             engine.open(0);
             uint256 skyAmt = lockAmt * afterSpell.sky_mkr_rate;
             assertEq(sky.balanceOf(address(this)), skyAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-initial-balance");
             sky.approve(address(engine), skyAmt);
             engine.lockSky(address(this), 0, skyAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-mkr-balance");
             engine.freeSky(address(this), 0, address(this), skyAmt);
             uint256 exitFee = skyAmt * p.fee / 100_00;
             assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
@@ -1378,11 +1380,12 @@ contract DssSpellTestBase is Config, DssTest {
         }
         // Check drawing and wiping
         {
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
             address urn = engine.open(0);
             assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-initial-balance");
             mkr.approve(address(engine), lockAmt);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-mkr-balance");
             engine.draw(address(this), 0, address(this), drawAmt);
             assertEq(usds.balanceOf(address(this)), drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-draw");
             (, uint256 art) = vat.urns(p.ilk, urn);
@@ -1433,6 +1436,13 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 top;  // Starting price     [ray]
     }
 
+    struct LockstakeBalances {
+        uint256 chiefMkr;
+        uint256 engineMkr;
+        uint256 farmLsmkr;
+        uint256 vatGem;
+    }
+
     function _checkLockstakeTake(
         LockstakeIlkParams memory p,
         uint256 lockAmt,
@@ -1445,7 +1455,12 @@ contract DssSpellTestBase is Config, DssTest {
         vm.prank(address(123)); address voteDelegate = VoteDelegateFactoryLike(voteDelegateFactory).create();
         assertNotEq(voteDelegate, address(0), "checkLockstakeTake/invalid-voteDelegate-address");
         address urn = engine.open(0);
-        uint256 initialChiefBalance = mkr.balanceOf(address(chief));
+        LockstakeBalances memory initialBalances = LockstakeBalances({
+            chiefMkr: mkr.balanceOf(address(chief)),
+            engineMkr: mkr.balanceOf(p.engine),
+            farmLsmkr: GemAbstract(p.lsmkr).balanceOf(p.farm),
+            vatGem: vat.gem(p.ilk, p.clip)
+        });
 
         // Lock and draw
         if (withDelegate) {
@@ -1459,19 +1474,21 @@ contract DssSpellTestBase is Config, DssTest {
         engine.draw(address(this), 0, address(this), drawAmt);
         if (withDelegate) {
             assertEq(engine.urnVoteDelegates(urn), voteDelegate, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
-            assertEq(mkr.balanceOf(address(chief)) - initialChiefBalance, lockAmt, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
-            assertEq(mkr.balanceOf(p.engine), 0, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
+            assertEq(mkr.balanceOf(address(chief)) - initialBalances.chiefMkr, lockAmt, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
         } else {
             assertEq(engine.urnVoteDelegates(urn), address(0), "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
-            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-chief-mkr-balance");
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr + lockAmt, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
         }
         if (withStaking) {
             assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr + lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-farm-balance");
         } else {
             assertEq(GemAbstract(p.lsmkr).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-farm-balance");
         }
 
         // Force liquidation
@@ -1494,14 +1511,14 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(sale.usr, urn, "checkLockstakeTake/AfterBark/invalid-sale.usr");
         assertEq(sale.tic, block.timestamp, "checkLockstakeTake/AfterBark/invalid-sale.tic");
         assertEq(sale.top, _getOSMPrice(p.pip) * ClipAbstract(p.clip).buf() / WAD, "checkLockstakeTake/AfterBark/invalid-sale.top");
-        assertEq(vat.gem(p.ilk, p.clip), lockAmt, "checkLockstakeTake/AfterBark/invalid-vat-gem-clip");
-        assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeTake/AfterBark/invalid-engine-mkr-balance");
+        assertEq(vat.gem(p.ilk, p.clip), initialBalances.vatGem + lockAmt, "checkLockstakeTake/AfterBark/invalid-vat-gem-clip");
+        assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr + lockAmt, "checkLockstakeTake/AfterBark/invalid-engine-mkr-balance");
         assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/invalid-urn-lsgem-balance");
         if (withDelegate) {
-            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterBark/withDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterBark/withDelegate/invalid-chief-mkr-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "checkLockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
         }
 
@@ -1520,12 +1537,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(sale.usr, address(0), "checkLockstakeTake/AfterTake/invalid-sale.usr");
         assertEq(sale.tic, 0, "checkLockstakeTake/AfterTake/invalid-sale.tic");
         assertEq(sale.top, 0, "checkLockstakeTake/AfterTake/invalid-sale.top");
-        assertEq(vat.gem(p.ilk, p.clip), 0, "checkLockstakeTake/AfterTake/invalid-vat.gem");
+        assertEq(vat.gem(p.ilk, p.clip), initialBalances.vatGem, "checkLockstakeTake/AfterTake/invalid-vat.gem");
         if (withDelegate) {
-            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterTake/withDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterTake/withDelegate/invalid-chief-mkr-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "checkLockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterTake/withStaking/invalid-farm-urn-balance");
         }
     }
