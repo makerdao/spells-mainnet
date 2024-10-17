@@ -320,7 +320,7 @@ contract DssSpellAction is DssAction {
         // New collateral type "LSE-MKR-A" will be added to LINE_MOM
         // New collateral type "LSE-MKR-A" will be added to auto-line using provided maxLine, gap and ttl
         // New collateral type "LSE-MKR-A" will be added to ILK_REGISTRY with provided values ("name", "symbol") and the new ilk class 7
-        // New MKR OSM will allow MCD_SPOT, CLIPPER_MOM, OSM_MOM, MCD_END and LockstakeClipper to access its price
+        // The new MKR OSM will allow MCD_SPOT, CLIPPER_MOM, LOCKSTAKE_CLIP, MCD_END to access its price.
         // PIP_MKR will be added to OSM_MOM
         // LockstakeClipper will be configured using provided values ("buf", "tail", "cusp", "chip", "tip", "stopped", "clip", "tolerance")
         // StairstepExponentialDecrease calc contract will be configured using provided values ("cut", "step")
@@ -329,6 +329,7 @@ contract DssSpellAction is DssAction {
         // LockstakeClipper will be authorized to access "vat" and LockstakeEngine
         // CLIPPER_MOM, MCD_DOG and MCD_END will be authorized to access LockstakeClipper
         // New chainlog keys LOCKSTAKE_MKR, LOCKSTAKE_ENGINE, LOCKSTAKE_CLIP and LOCKSTAKE_CLIP_CALC will be added
+        // OSM_MOM will be authorized to access the new MKR OSM
         // Note: above instructions are taken inside LockstakeInit.initLockstake method
 
         // ---------- Fund Early Bird Rewards Multisig ----------
