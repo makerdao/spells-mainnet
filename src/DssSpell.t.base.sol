@@ -1259,32 +1259,32 @@ contract DssSpellTestBase is Config, DssTest {
         StakingRewardsLike farm = StakingRewardsLike(p.farm);
         // Check relevant contracts are correctly configured
         {
-            assertEq(dog.vat(),                              address(vat),         "LockstakeIlkIntegration/invalid-dog-vat");
-            assertEq(dog.vow(),                              address(vow),         "LockstakeIlkIntegration/invalid-dog-vow");
+            assertEq(dog.vat(),                              address(vat),         "checkLockstakeIlkIntegration/invalid-dog-vat");
+            assertEq(dog.vow(),                              address(vow),         "checkLockstakeIlkIntegration/invalid-dog-vow");
             (address clip,,,) = dog.ilks(p.ilk);
-            assertEq(clip,                                   p.clip,               "LockstakeIlkIntegration/invalid-dog-clip");
-            assertEq(engine.voteDelegateFactory(),           voteDelegateFactory,  "LockstakeIlkIntegration/invalid-engine-voteDelegateFactory");
-            assertEq(engine.usdsJoin(),                      address(usdsJoin),    "LockstakeIlkIntegration/invalid-engine-usdsJoin");
-            assertEq(engine.ilk(),                           p.ilk,                "LockstakeIlkIntegration/invalid-engine-ilk");
-            assertEq(engine.mkrSky(),                        address(mkrSky),      "LockstakeIlkIntegration/invalid-engine-mkrSky");
-            assertEq(engine.lsmkr(),                         p.lsmkr,              "LockstakeIlkIntegration/invalid-engine-lsmkr");
-            assertEq(engine.jug(),                           address(jug),         "LockstakeIlkIntegration/invalid-engine-jug");
-            assertEq(engine.fee(),                           p.fee * WAD / 100_00, "LockstakeIlkIntegration/invalid-fee");
-            assertNotEq(p.farm,                              address(0),           "LockstakeIlkIntegration/invalid-farm");
-            assertEq(engine.farms(p.farm),                   1,                    "LockstakeIlkIntegration/disabled-farm");
-            assertEq(farm.stakingToken(),                    p.lsmkr,              "LockstakeIlkIntegration/invalid-stakingToken");
-            assertEq(farm.rewardsToken(),                    p.rToken,             "LockstakeIlkIntegration/invalid-rewardsToken");
-            assertEq(farm.rewardsDistribution(),             p.rDistr,             "LockstakeIlkIntegration/invalid-rewardsDistribution");
-            assertEq(farm.rewardsDuration(),                 p.rDur,               "LockstakeIlkIntegration/invalid-rewardsDuration");
-            assertEq(ClipAbstract(p.clip).vat(),             address(vat),         "LockstakeIlkIntegration/invalid-clip-vat");
-            assertEq(ClipAbstract(p.clip).spotter(),         address(spotter),     "LockstakeIlkIntegration/invalid-clip-spotter");
-            assertEq(ClipAbstract(p.clip).dog(),             address(dog),         "LockstakeIlkIntegration/invalid-clip-dog");
-            assertEq(ClipAbstract(p.clip).ilk(),             p.ilk,                "LockstakeIlkIntegration/invalid-clip-ilk");
-            assertEq(ClipAbstract(p.clip).vow(),             address(vow),         "LockstakeIlkIntegration/invalid-clip-vow");
-            assertEq(ClipAbstract(p.clip).calc(),            p.calc,               "LockstakeIlkIntegration/invalid-clip-calc");
-            assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,             "LockstakeIlkIntegration/invalid-clip-engine");
-            assertEq(LockstakeClipperLike(p.clip).stopped(), 0,                    "LockstakeIlkIntegration/invalid-clip-stopped");
-            assertEq(osmMom.osms(p.ilk),                     p.pip,                "LockstakeIlkIntegration/invalid-osmMom-pip");
+            assertEq(clip,                                   p.clip,               "checkLockstakeIlkIntegration/invalid-dog-clip");
+            assertEq(engine.voteDelegateFactory(),           voteDelegateFactory,  "checkLockstakeIlkIntegration/invalid-engine-voteDelegateFactory");
+            assertEq(engine.usdsJoin(),                      address(usdsJoin),    "checkLockstakeIlkIntegration/invalid-engine-usdsJoin");
+            assertEq(engine.ilk(),                           p.ilk,                "checkLockstakeIlkIntegration/invalid-engine-ilk");
+            assertEq(engine.mkrSky(),                        address(mkrSky),      "checkLockstakeIlkIntegration/invalid-engine-mkrSky");
+            assertEq(engine.lsmkr(),                         p.lsmkr,              "checkLockstakeIlkIntegration/invalid-engine-lsmkr");
+            assertEq(engine.jug(),                           address(jug),         "checkLockstakeIlkIntegration/invalid-engine-jug");
+            assertEq(engine.fee(),                           p.fee * WAD / 100_00, "checkLockstakeIlkIntegration/invalid-fee");
+            assertNotEq(p.farm,                              address(0),           "checkLockstakeIlkIntegration/invalid-farm");
+            assertEq(engine.farms(p.farm),                   1,                    "checkLockstakeIlkIntegration/disabled-farm");
+            assertEq(farm.stakingToken(),                    p.lsmkr,              "checkLockstakeIlkIntegration/invalid-stakingToken");
+            assertEq(farm.rewardsToken(),                    p.rToken,             "checkLockstakeIlkIntegration/invalid-rewardsToken");
+            assertEq(farm.rewardsDistribution(),             p.rDistr,             "checkLockstakeIlkIntegration/invalid-rewardsDistribution");
+            assertEq(farm.rewardsDuration(),                 p.rDur,               "checkLockstakeIlkIntegration/invalid-rewardsDuration");
+            assertEq(ClipAbstract(p.clip).vat(),             address(vat),         "checkLockstakeIlkIntegration/invalid-clip-vat");
+            assertEq(ClipAbstract(p.clip).spotter(),         address(spotter),     "checkLockstakeIlkIntegration/invalid-clip-spotter");
+            assertEq(ClipAbstract(p.clip).dog(),             address(dog),         "checkLockstakeIlkIntegration/invalid-clip-dog");
+            assertEq(ClipAbstract(p.clip).ilk(),             p.ilk,                "checkLockstakeIlkIntegration/invalid-clip-ilk");
+            assertEq(ClipAbstract(p.clip).vow(),             address(vow),         "checkLockstakeIlkIntegration/invalid-clip-vow");
+            assertEq(ClipAbstract(p.clip).calc(),            p.calc,               "checkLockstakeIlkIntegration/invalid-clip-calc");
+            assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,             "checkLockstakeIlkIntegration/invalid-clip-engine");
+            assertEq(LockstakeClipperLike(p.clip).stopped(), 0,                    "checkLockstakeIlkIntegration/invalid-clip-stopped");
+            assertEq(osmMom.osms(p.ilk),                     p.pip,                "checkLockstakeIlkIntegration/invalid-osmMom-pip");
         }
         // Check ilk registry values
         {
@@ -1298,33 +1298,33 @@ contract DssSpellTestBase is Config, DssTest {
                 address gemJoin,
                 address clip
             ) = reg.info(p.ilk);
-            assertEq(name,     GemAbstract(p.lsmkr).name(),     "LockstakeIlkIntegration/incorrect-reg-name");
-            assertEq(symbol,   GemAbstract(p.lsmkr).symbol(),   "LockstakeIlkIntegration/incorrect-reg-symbol");
-            assertEq(_class,   7,                               "LockstakeIlkIntegration/incorrect-reg-class"); // REG_CLASS_JOINLESS
-            assertEq(decimals, GemAbstract(p.lsmkr).decimals(), "LockstakeIlkIntegration/incorrect-reg-dec");
-            assertEq(gem,      address(mkr),                    "LockstakeIlkIntegration/incorrect-reg-gem");
-            assertEq(pip,      p.pip,                           "LockstakeIlkIntegration/incorrect-reg-pip");
-            assertEq(gemJoin,  address(0),                      "LockstakeIlkIntegration/incorrect-reg-gemJoin");
-            assertEq(clip,     p.clip,                          "LockstakeIlkIntegration/incorrect-reg-xlip");
+            assertEq(name,     GemAbstract(p.lsmkr).name(),     "checkLockstakeIlkIntegration/incorrect-reg-name");
+            assertEq(symbol,   GemAbstract(p.lsmkr).symbol(),   "checkLockstakeIlkIntegration/incorrect-reg-symbol");
+            assertEq(_class,   7,                               "checkLockstakeIlkIntegration/incorrect-reg-class"); // REG_CLASS_JOINLESS
+            assertEq(decimals, GemAbstract(p.lsmkr).decimals(), "checkLockstakeIlkIntegration/incorrect-reg-decimals");
+            assertEq(gem,      address(mkr),                    "checkLockstakeIlkIntegration/incorrect-reg-gem");
+            assertEq(pip,      p.pip,                           "checkLockstakeIlkIntegration/incorrect-reg-pip");
+            assertEq(gemJoin,  address(0),                      "checkLockstakeIlkIntegration/incorrect-reg-gemJoin");
+            assertEq(clip,     p.clip,                          "checkLockstakeIlkIntegration/incorrect-reg-clip");
         }
         // Check required authorizations
         {
-            assertEq(vat.wards(p.engine),                           1, "LockstakeIlkIntegration/missing-auth-vat-engine");
-            assertEq(vat.wards(p.clip),                             1, "LockstakeIlkIntegration/missing-auth-vat-clip");
-            assertEq(WardsAbstract(p.pip).wards(address(osmMom)),   1, "LockstakeIlkIntegration/missing-auth-pip-osmMom");
-            assertEq(dog.wards(p.clip),                             1, "LockstakeIlkIntegration/missing-auth-dog-clip");
-            assertEq(WardsAbstract(p.lsmkr).wards(p.engine),        1, "LockstakeIlkIntegration/missing-auth-lsgem-engine");
-            assertEq(WardsAbstract(p.engine).wards(p.clip),         1, "LockstakeIlkIntegration/missing-auth-engine-clip");
-            assertEq(WardsAbstract(p.clip).wards(address(dog)),     1, "LockstakeIlkIntegration/missing-auth-clip-dog");
-            assertEq(WardsAbstract(p.clip).wards(address(end)),     1, "LockstakeIlkIntegration/missing-auth-clip-end");
-            assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 1, "LockstakeIlkIntegration/missing-auth-clip-clipMom");
+            assertEq(vat.wards(p.engine),                           1, "checkLockstakeIlkIntegration/missing-auth-vat-engine");
+            assertEq(vat.wards(p.clip),                             1, "checkLockstakeIlkIntegration/missing-auth-vat-clip");
+            assertEq(WardsAbstract(p.pip).wards(address(osmMom)),   1, "checkLockstakeIlkIntegration/missing-auth-pip-osmMom");
+            assertEq(dog.wards(p.clip),                             1, "checkLockstakeIlkIntegration/missing-auth-dog-clip");
+            assertEq(WardsAbstract(p.lsmkr).wards(p.engine),        1, "checkLockstakeIlkIntegration/missing-auth-lsmkr-engine");
+            assertEq(WardsAbstract(p.engine).wards(p.clip),         1, "checkLockstakeIlkIntegration/missing-auth-engine-clip");
+            assertEq(WardsAbstract(p.clip).wards(address(dog)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-dog");
+            assertEq(WardsAbstract(p.clip).wards(address(end)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-end");
+            assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 1, "checkLockstakeIlkIntegration/missing-auth-clip-clipMom");
         }
         // Check required OSM buds
         {
-            assertEq(OsmAbstract(p.pip).bud(address(spotter)), 1, "LockstakeIlkIntegration/missing-spotter-bud");
-            assertEq(OsmAbstract(p.pip).bud(p.clip),           1, "LockstakeIlkIntegration/missing-clip-bud");
-            assertEq(OsmAbstract(p.pip).bud(address(clipMom)), 1, "LockstakeIlkIntegration/missing-clipMom-bud");
-            assertEq(OsmAbstract(p.pip).bud(address(end)),     1, "LockstakeIlkIntegration/missing-end-bud");
+            assertEq(OsmAbstract(p.pip).bud(address(spotter)), 1, "checkLockstakeIlkIntegration/missing-bud-spotter");
+            assertEq(OsmAbstract(p.pip).bud(p.clip),           1, "checkLockstakeIlkIntegration/missing-bud-clip");
+            assertEq(OsmAbstract(p.pip).bud(address(clipMom)), 1, "checkLockstakeIlkIntegration/missing-bud-clipMom");
+            assertEq(OsmAbstract(p.pip).bud(address(end)),     1, "checkLockstakeIlkIntegration/missing-bud-end");
         }
         // Prepare for liquidation
         uint256 drawAmt;
@@ -1334,8 +1334,8 @@ contract DssSpellTestBase is Config, DssTest {
             vm.store(address(dog), bytes32(uint256(4)), bytes32(type(uint256).max));
             // Reset auction count
             if (ClipAbstract(p.clip).kicks() > 0) {
-                vm.store(p.clip, bytes32(uint256(10)), bytes32(uint256(0)));
-                assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeIlkIntegration/unchanged-kicks");
+                stdstore.target(p.clip).sig("kicks()").checked_write(uint256(0));
+                assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeIlkIntegration/unchanged-kicks");
             }
             // Poke OSM price
             OsmAbstract(p.pip).poke();
@@ -1354,45 +1354,45 @@ contract DssSpellTestBase is Config, DssTest {
         // Check locking and freeing Mkr
         {
             engine.open(0);
-            assertEq(mkr.balanceOf(address(this)), lockAmt, "LockstakeTake/LockAndFreeMkr/invalid-initial-balance");
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-initial-balance");
             mkr.approve(address(engine), lockAmt);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeMkr/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-locked-mkr-balance");
             engine.free(address(this), 0, address(this), lockAmt);
             uint256 exitFee = lockAmt * p.fee / 100_00;
-            assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "LockstakeTake/LockAndFreeMkr/invalid-unlocked-balance");
+            assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }
         // Check locking and freeing Sky
         {
             engine.open(0);
             uint256 skyAmt = lockAmt * afterSpell.sky_mkr_rate;
-            assertEq(sky.balanceOf(address(this)), skyAmt, "LockstakeTake/LockAndFreeSky/invalid-initial-balance");
+            assertEq(sky.balanceOf(address(this)), skyAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-initial-balance");
             sky.approve(address(engine), skyAmt);
             engine.lockSky(address(this), 0, skyAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/LockAndFreeSky/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-mkr-balance");
             engine.freeSky(address(this), 0, address(this), skyAmt);
             uint256 exitFee = skyAmt * p.fee / 100_00;
-            assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "LockstakeTake/LockAndFreeSky/invalid-unlocked-balance");
+            assertEq(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }
         // Check drawing and wiping
         {
             address urn = engine.open(0);
-            assertEq(mkr.balanceOf(address(this)), lockAmt, "LockstakeTake/DrawAndWipe/invalid-initial-balance");
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-initial-balance");
             mkr.approve(address(engine), lockAmt);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/DrawAndWipe/invalid-locked-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-mkr-balance");
             engine.draw(address(this), 0, address(this), drawAmt);
-            assertEq(usds.balanceOf(address(this)), drawAmt, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-draw");
+            assertEq(usds.balanceOf(address(this)), drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-draw");
             (, uint256 art) = vat.urns(p.ilk, urn);
             (, uint256 rate,,,) = vat.ilks(p.ilk);
             uint256 wipeAmt = _divup(art * rate, RAY);
-            assertGt(wipeAmt, drawAmt, "LockstakeTake/DrawAndWipe/invalid-wipe-after-draw");
+            assertGt(wipeAmt, drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-wipe-after-draw");
             _giveTokens(address(usds), wipeAmt);
             usds.approve(address(engine), wipeAmt);
             engine.wipe(address(this), 0, wipeAmt);
-            assertEq(usds.balanceOf(address(this)), 0, "LockstakeTake/DrawAndWipe/invalid-usds-balance-after-wipe");
+            assertEq(usds.balanceOf(address(this)), 0, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-wipe");
             vm.revertTo(snapshot);
         }
         // Check farming and getting a reward
@@ -1402,7 +1402,7 @@ contract DssSpellTestBase is Config, DssTest {
             mkr.approve(address(engine), lockAmt);
             engine.selectFarm(address(this), 0, p.farm, 0);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "LockstakeTake/FarmAndGetReward/FarmAndGetReward/invalid-urn-farm-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "checkLockstakeIlkIntegration/FarmAndGetReward/FarmAndGetReward/invalid-urn-farm-balance");
             // Deposit rewards into farm and notify
             uint256 rewardAmt = 1_000_000 * WAD;
             address rewardsToken = farm.rewardsToken();
@@ -1412,8 +1412,8 @@ contract DssSpellTestBase is Config, DssTest {
             address rewardsUser = address(this);
             skip(farm.rewardsDuration());
             uint256 resultAmt = engine.getReward(address(this), 0, p.farm, rewardsUser);
-            assertGt(resultAmt, 0, "LockstakeTake/FarmAndGetReward/no-reward-amt");
-            assertGt(GemAbstract(rewardsToken).balanceOf(rewardsUser), 0, "LockstakeTake/FarmAndGetReward/no-reward-balance");
+            assertGt(resultAmt, 0, "checkLockstakeIlkIntegration/FarmAndGetReward/no-reward-amt");
+            assertGt(GemAbstract(rewardsToken).balanceOf(rewardsUser), 0, "checkLockstakeIlkIntegration/FarmAndGetReward/no-reward-balance");
             vm.revertTo(snapshot);
         }
         // Check liquidations
@@ -1443,8 +1443,9 @@ contract DssSpellTestBase is Config, DssTest {
         // Open vault
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
         vm.prank(address(123)); address voteDelegate = VoteDelegateFactoryLike(voteDelegateFactory).create();
-        assertNotEq(voteDelegate, address(0), "LockstakeTake/invalid-voteDelegate-address");
+        assertNotEq(voteDelegate, address(0), "checkLockstakeTake/invalid-voteDelegate-address");
         address urn = engine.open(0);
+        uint256 initialChiefBalance = mkr.balanceOf(address(chief));
 
         // Lock and draw
         if (withDelegate) {
@@ -1453,76 +1454,79 @@ contract DssSpellTestBase is Config, DssTest {
         if (withStaking) {
             engine.selectFarm(address(this), 0, address(p.farm), 0);
         }
-        uint256 previousCheifBalance = mkr.balanceOf(address(chief));
         mkr.approve(address(engine), lockAmt);
         engine.lock(address(this), 0, lockAmt, 0);
         engine.draw(address(this), 0, address(this), drawAmt);
         if (withDelegate) {
-            assertEq(engine.urnVoteDelegates(urn), voteDelegate, "LockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
-            assertEq(mkr.balanceOf(address(chief)) - previousCheifBalance, lockAmt, "LockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
-            assertEq(mkr.balanceOf(p.engine), 0, "LockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
+            assertEq(engine.urnVoteDelegates(urn), voteDelegate, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
+            assertEq(mkr.balanceOf(address(chief)) - initialChiefBalance, lockAmt, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), 0, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
         } else {
-            assertEq(engine.urnVoteDelegates(urn), address(0), "LockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
-            assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
+            assertEq(engine.urnVoteDelegates(urn), address(0), "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
+            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "LockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), lockAmt, "LockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
-            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "LockstakeTake/AfterLockDraw/withStaking/invalid-urn-farm-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-farm-balance");
         } else {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), lockAmt, "LockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
         }
 
         // Force liquidation
         if (withDelegate) {
-            vm.roll(block.number + 1); // Roll one block to allow freeing from cheif
+            vm.roll(block.number + 1); // Roll one block to allow freeing from chief
         }
         _setIlkMat(p.ilk, 100_000 * RAY);
         spotter.poke(p.ilk);
-        assertEq(ClipAbstract(p.clip).kicks(), 0, "LockstakeTake/non-0-kicks");
-        assertEq(engine.urnAuctions(urn), 0, "LockstakeTake/non-0-actions");
+        assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeTake/non-0-kicks");
+        assertEq(engine.urnAuctions(urn), 0, "checkLockstakeTake/non-0-actions");
         uint256 id = dog.bark(p.ilk, urn, address(this));
-        assertEq(ClipAbstract(p.clip).kicks(), 1, "LockstakeTake/AfterBark/no-kicks");
-        assertEq(engine.urnAuctions(urn), 1, "LockstakeTake/AfterBark/no-actions");
+        assertEq(ClipAbstract(p.clip).kicks(), 1, "checkLockstakeTake/AfterBark/no-kicks");
+        assertEq(engine.urnAuctions(urn), 1, "checkLockstakeTake/AfterBark/no-actions");
         Sale memory sale;
         (sale.pos, sale.tab, sale.lot, sale.tot, sale.usr, sale.tic, sale.top) = LockstakeClipperLike(p.clip).sales(id);
-        assertEq(sale.pos, 0, "LockstakeTake/AfterBark/invalid-sale.pos");
-        assertGt(sale.tab, drawAmt * RAY, "LockstakeTake/AfterBark/invalid-sale.tab");
-        assertEq(sale.lot, lockAmt, "LockstakeTake/AfterBark/invalid-sale.lot");
-        assertEq(sale.tot, lockAmt, "LockstakeTake/AfterBark/invalid-sale.tot");
-        assertEq(sale.usr, urn, "LockstakeTake/AfterBark/invalid-sale.usr");
-        assertEq(sale.tic, block.timestamp, "LockstakeTake/AfterBark/invalid-sale.tic");
-        assertEq(sale.top, _getOSMPrice(p.pip) * ClipAbstract(p.clip).buf() / WAD, "LockstakeTake/AfterBark/invalid-sale.top");
-        assertEq(vat.gem(p.ilk, p.clip), lockAmt, "LockstakeTake/AfterBark/invalid-vat-gem-clip");
-        assertEq(mkr.balanceOf(p.engine), lockAmt, "LockstakeTake/AfterBark/invalid-engine-mkr-balance");
-        assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "LockstakeTake/AfterBark/invalid-urn-lsgem-balance");
+        assertEq(sale.pos, 0, "checkLockstakeTake/AfterBark/invalid-sale.pos");
+        assertGt(sale.tab, drawAmt * RAY, "checkLockstakeTake/AfterBark/invalid-sale.tab");
+        assertEq(sale.lot, lockAmt, "checkLockstakeTake/AfterBark/invalid-sale.lot");
+        assertEq(sale.tot, lockAmt, "checkLockstakeTake/AfterBark/invalid-sale.tot");
+        assertEq(sale.usr, urn, "checkLockstakeTake/AfterBark/invalid-sale.usr");
+        assertEq(sale.tic, block.timestamp, "checkLockstakeTake/AfterBark/invalid-sale.tic");
+        assertEq(sale.top, _getOSMPrice(p.pip) * ClipAbstract(p.clip).buf() / WAD, "checkLockstakeTake/AfterBark/invalid-sale.top");
+        assertEq(vat.gem(p.ilk, p.clip), lockAmt, "checkLockstakeTake/AfterBark/invalid-vat-gem-clip");
+        assertEq(mkr.balanceOf(p.engine), lockAmt, "checkLockstakeTake/AfterBark/invalid-engine-mkr-balance");
+        assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/invalid-urn-lsgem-balance");
         if (withDelegate) {
-            assertEq(mkr.balanceOf(voteDelegate), 0, "LockstakeTake/AfterBark/withDelegate/invalid-voteDelegate-mkr-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterBark/withDelegate/invalid-chief-mkr-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "LockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
-            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "LockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "checkLockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
         }
 
         // Take auction
         address buyer = address(888);
         vm.prank(pauseProxy); vat.suck(address(0), buyer, sale.tab);
         vm.prank(buyer); vat.hope(p.clip);
-        assertEq(mkr.balanceOf(buyer), 0, "LockstakeTake/AfterBark/invalid-buyer-mkr-balance");
+        assertEq(mkr.balanceOf(buyer), 0, "checkLockstakeTake/AfterBark/invalid-buyer-mkr-balance");
         vm.prank(buyer); ClipAbstract(p.clip).take(id, lockAmt, type(uint256).max, buyer, "");
-        assertGt(mkr.balanceOf(buyer), 0, "LockstakeTake/AfterTake/invalid-buyer-mkr-balance");
+        assertGt(mkr.balanceOf(buyer), 0, "checkLockstakeTake/AfterTake/invalid-buyer-mkr-balance");
         (sale.pos, sale.tab, sale.lot, sale.tot, sale.usr, sale.tic, sale.top) = LockstakeClipperLike(p.clip).sales(id);
-        assertEq(sale.pos, 0, "LockstakeTake/AfterTake/invalid-sale.pos");
-        assertEq(sale.tab, 0, "LockstakeTake/AfterTake/invalid-sale.tab");
-        assertEq(sale.lot, 0, "LockstakeTake/AfterTake/invalid-sale.lot");
-        assertEq(sale.tot, 0, "LockstakeTake/AfterTake/invalid-sale.tot");
-        assertEq(sale.usr, address(0), "LockstakeTake/AfterTake/invalid-sale.usr");
-        assertEq(sale.tic, 0, "LockstakeTake/AfterTake/invalid-sale.tic");
-        assertEq(sale.top, 0, "LockstakeTake/AfterTake/invalid-sale.top");
-        assertEq(vat.gem(p.ilk, p.clip), 0, "LockstakeTake/AfterTake/invalid-vat.gem");
+        assertEq(sale.pos, 0, "checkLockstakeTake/AfterTake/invalid-sale.pos");
+        assertEq(sale.tab, 0, "checkLockstakeTake/AfterTake/invalid-sale.tab");
+        assertEq(sale.lot, 0, "checkLockstakeTake/AfterTake/invalid-sale.lot");
+        assertEq(sale.tot, 0, "checkLockstakeTake/AfterTake/invalid-sale.tot");
+        assertEq(sale.usr, address(0), "checkLockstakeTake/AfterTake/invalid-sale.usr");
+        assertEq(sale.tic, 0, "checkLockstakeTake/AfterTake/invalid-sale.tic");
+        assertEq(sale.top, 0, "checkLockstakeTake/AfterTake/invalid-sale.top");
+        assertEq(vat.gem(p.ilk, p.clip), 0, "checkLockstakeTake/AfterTake/invalid-vat.gem");
+        if (withDelegate) {
+            assertEq(mkr.balanceOf(address(chief)), initialChiefBalance, "checkLockstakeTake/AfterTake/withDelegate/invalid-chief-mkr-balance");
+        }
         if (withStaking) {
-            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "LockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
-            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "LockstakeTake/AfterTake/withStaking/invalid-farm-urn-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), 0, "checkLockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
+            assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterTake/withStaking/invalid-farm-urn-balance");
         }
     }
 
