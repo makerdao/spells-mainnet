@@ -1060,7 +1060,7 @@ contract DssSpellTest is DssSpellTestBase {
     address            immutable L1_ESCROW              =                    addr.addr("BASE_ESCROW");
     address            immutable L1_BRIDGE_IMP          =                    addr.addr("BASE_TOKEN_BRIDGE_IMP");
     address            constant  L2_BRIDGE_IMP          =                    0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
-    address            constant  MESSANGER              =                    0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
+    address            constant  MESSENGER              =                    0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
     address            constant  L2_MESSANGER           =                    0x4200000000000000000000000000000000000007;
 
     address            immutable PIP_ALLOCATOR_SPARK    =                    addr.addr("PIP_ALLOCATOR_SPARK_A");
