@@ -63,7 +63,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant FIVE_PT_TWO_PCT_RATE = 1000000001607468111246255079;
 
     // --- Math ---
-    uint256 internal constant RAD     = 10 ** 45;
+    uint256 internal constant RAD = 10 ** 45;
 
     address internal immutable USDS                    = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
