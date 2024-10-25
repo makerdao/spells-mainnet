@@ -518,5 +518,14 @@ contract Addresses {
         addr["LOCKSTAKE_ENGINE"]                 = 0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12;
         addr["LOCKSTAKE_CLIP"]                   = 0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239;
         addr["LOCKSTAKE_CLIP_CALC"]              = 0xf13cF3b39823CcfaE6C2354dA56416C80768474e;
+        addr["BASE_GOV_RELAY"]                   = 0x1Ee0AE8A993F2f5abDB51EAF4AC2876202b65c3b;
+        addr["BASE_ESCROW"]                      = 0x7F311a4D48377030bD810395f4CCfC03bdbe9Ef3;
+        addr["BASE_TOKEN_BRIDGE"]                = 0xA5874756416Fa632257eEA380CAbd2E87cED352A;
+        addr["BASE_TOKEN_BRIDGE_IMP"]            = 0xaeFd31c2e593Dc971f9Cb42cBbD5d4AD7F1970b6;
+        addr["ALLOCATOR_ROLES"]                  = 0x9A865A710399cea85dbD9144b7a09C889e94E803;
+        addr["ALLOCATOR_REGISTRY"]               = 0xCdCFA95343DA7821fdD01dc4d0AeDA958051bB3B;
+        addr["ALLOCATOR_SPARK_A_VAULT"]          = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
+        addr["ALLOCATOR_SPARK_A_BUFFER"]         = 0xc395D150e71378B47A1b8E9de0c1a83b75a08324;
+        addr["PIP_ALLOCATOR_SPARK_A"]            = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
     }
 }

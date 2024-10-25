@@ -49,11 +49,91 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface AuthLike {
+    function wards(address) external view returns (uint256);
+}
+
+interface L1TokenBridgeLike {
+    function l1ToL2Token(address) external view returns (address);
+    function isOpen() external view returns (uint256);
+    function escrow() external view returns (address);
+    function otherBridge() external view returns (address);
+    function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function getImplementation() external view returns (address);
+    function bridgeERC20To(
+        address _localToken,
+        address _remoteToken,
+        address _to,
+        uint256 _amount,
+        uint32 _minGasLimit,
+        bytes memory _extraData
+    ) external;
+}
+
+interface L2TokenBridgeLike {
+    function l1ToL2Token(address) external view returns (address);
+    function isOpen() external view returns (uint256);
+    function escrow() external view returns (address);
+    function otherBridge() external view returns (address);
+    function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function maxWithdraws(address) external view returns (uint256);
+    function getImplementation() external view returns (address);
+    function bridgeERC20To(
+        address _localToken,
+        address _remoteToken,
+        address _to,
+        uint256 _amount,
+        uint32 _minGasLimit,
+        bytes memory _extraData
+    ) external;
+}
+
+interface BaseGovRelayLike {
+    function l2GovernanceRelay() external view returns (address);
+    function l1GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2BridgeSpell {
+    function l2Bridge() external view returns (address);
+}
+
+interface AllocatorVaultLike {
+    function buffer() external view returns (address);
+    function draw(uint256 wad) external;
+    function ilk() external view returns (bytes32);
+    function jug() external view returns (address);
+    function roles() external view returns (address);
+    function usdsJoin() external view returns (address);
+    function vat() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function wipe(uint256 wad) external;
+}
+
+interface AllocatorRegistryLike {
+    function buffers(bytes32) external view returns (address);
+}
+
+interface AllocatorRolesLike {
+    function ilkAdmins(bytes32) external view returns (address);
+}
+
+interface DssLitePsm {
+    function bud(address) external view returns (uint256);
+}
+
+interface MedianLike {
+    function orcl(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
     OptimismDomain optimismDomain;
     ArbitrumDomain arbitrumDomain;
+    OptimismDomain baseDomain;
 
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -969,4 +1049,257 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    L2TokenBridgeLike  immutable l2bridge               = L2TokenBridgeLike( 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7);
+    BaseGovRelayLike   immutable l2govRelay             = BaseGovRelayLike(  0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255);
+    L2BridgeSpell      immutable l2spell                = L2BridgeSpell(     0x6f29C3A29A3F056A71FB0714551C8D3547268D62);
+    GemAbstract        immutable l2usds                 = GemAbstract(       0x820C137fa70C8691f0e44Dc420a5e53c168921Dc);
+    GemAbstract        immutable l2susds                = GemAbstract(       0x5875eEE11Cf8398102FdAd704C9E96607675467a);
+    GemAbstract        immutable susd                   = GemAbstract(       addr.addr("SUSDS"));
+    L1TokenBridgeLike  immutable l1bridge               = L1TokenBridgeLike( addr.addr("BASE_TOKEN_BRIDGE"));
+    BaseGovRelayLike   immutable l1govRelay             = BaseGovRelayLike(  addr.addr("BASE_GOV_RELAY"));
+    address            immutable L1_ESCROW              =                    addr.addr("BASE_ESCROW");
+    address            immutable L1_BRIDGE_IMP          =                    addr.addr("BASE_TOKEN_BRIDGE_IMP");
+    address            constant  L2_BRIDGE_IMP          =                    0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
+    address            constant  MESSANGER              =                    0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
+    address            constant  L2_MESSANGER           =                    0x4200000000000000000000000000000000000007;
+
+    address            immutable PIP_ALLOCATOR_SPARK    =                    addr.addr("PIP_ALLOCATOR_SPARK_A");
+    address            immutable ALLOCATOR_ROLES        =                    addr.addr("ALLOCATOR_ROLES");
+    address            immutable ALLOCATOR_REGISTRY     =                    addr.addr("ALLOCATOR_REGISTRY");
+    address            immutable ALLOCATOR_SPARK_BUFFER =                    addr.addr("ALLOCATOR_SPARK_A_BUFFER");
+    address            immutable ALLOCATOR_SPARK_VAULT  =                    addr.addr("ALLOCATOR_SPARK_A_VAULT");
+    address            immutable ALLOCATOR_SPARK_PROXY  =                    addr.addr('SPARK_PROXY');
+    bytes32            constant  ALLOCATOR_ILK          =                    "ALLOCATOR-SPARK-A";
+
+    address            immutable LITE_PSM               =                    addr.addr("MCD_LITE_PSM_USDC_A");
+
+    // ---------- Medians and Validators  ----------
+    address           constant ETH_GLOBAL_VALIDATOR     =                    0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
+    address           constant MANTLE_VALIDATOR         =                    0xFa6eb665e067759ADdE03a8E6bD259adBd1D70c9;
+    address           constant NETHERMIND_VALIDATOR     =                    0x91242198eD62F9255F2048935D6AFb0C2302D147;
+    address           constant EULER_VALIDATOR          =                    0x1DCB8CcC022938e102814F1A299C7ae48A8BAAf6;
+    address           constant BTC_USD_MEDIAN           =                    0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address           constant ETH_USD_MEDIAN           =                    0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address           constant WSTETH_USD_MEDIAN        =                    0x2F73b6567B866302e132273f67661fB89b5a66F2;
+    address           constant MKR_USD_MEDIAN           =                    0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+
+    function testBaseTokenBridge() public {
+        _setupRootDomain();
+        baseDomain = new OptimismDomain(config, getChain("base"), rootDomain);
+
+        // ------ Sanity checks -------
+
+        baseDomain.selectFork();
+
+        require(l2bridge.isOpen() == 1, "L2BaseTokenBridge/not-open");
+        require(l2bridge.otherBridge() == address(l1bridge), "L2BaseTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2bridge.version())) == keccak256("1"), "L2BaseTokenBridge/version-does-not-match");
+        require(l2bridge.getImplementation() == L2_BRIDGE_IMP, "L2BaseTokenBridge/imp-does-not-match");
+        require(l2bridge.messenger() == L2_MESSANGER, "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2govRelay.l1GovernanceRelay() == address(l1govRelay), "L2BaseGovRelay/l2-gov-relay-mismatch");
+        require(l2govRelay.messenger() == L2_MESSANGER, "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
+        require(l2spell.l2Bridge() == address(l2bridge), "L2Spell/l2-bridge-mismatch");
+
+        rootDomain.selectFork();
+
+        require(keccak256(bytes(l1bridge.version())) == keccak256("1"), "BaseTokenBridge/version-does-not-match");
+        require(l1bridge.getImplementation() == L1_BRIDGE_IMP, "BaseTokenBridge/imp-does-not-match");
+        require(l1bridge.isOpen() == 1, "BaseTokenBridge/not-open");
+        require(l1bridge.otherBridge() == address(l2bridge), "BaseTokenBridge/other-bridge-mismatch");
+        require(l1bridge.messenger() == MESSANGER, "BaseTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1govRelay.l2GovernanceRelay() == address(l2govRelay), "BaseGovRelay/l2-gov-relay-mismatch");
+        require(l1govRelay.messenger() == MESSANGER, "BaseGovRelay/l1-gov-relay-messenger-mismatch");
+
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        require(l1bridge.escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
+        // // test tokens
+        assertEq(usds.allowance(L1_ESCROW, address(l1bridge)), type(uint256).max);
+        assertEq(l1bridge.l1ToL2Token(address(address(usds))), address(l2usds));
+
+        assertEq(susds.allowance(L1_ESCROW, address(l1bridge)), type(uint256).max);
+        assertEq(l1bridge.l1ToL2Token(address(address(susds))), address(l2susds));
+
+
+        // switch to Optimism domain and relay the spell from L1
+        // the `true` keeps us on Optimism rather than `rootDomain.selectFork()
+        baseDomain.relayFromHost(true);
+
+        // // test L2 side of initBridges
+        assertEq(l2bridge.l1ToL2Token(address(susds)), address(l2susds));
+        assertEq(l2bridge.maxWithdraws(address(l2susds)), type(uint256).max);
+
+        assertEq(l2bridge.l1ToL2Token(address(usds)), address(l2usds));
+        assertEq(l2bridge.maxWithdraws(address(l2usds)), type(uint256).max);
+
+        assertEq(AuthLike(address(l2susds)).wards(address(l2bridge)), 1);
+        assertEq(AuthLike(address(l2usds)).wards(address(l2bridge)), 1);
+
+
+        // ------- Test Deposit -------
+
+        rootDomain.selectFork();
+
+        deal(address(usds), address(this), 100 ether);
+        deal(address(susds), address(this), 100 ether);
+        assertEq(usds.balanceOf(address(this)), 100 ether);
+        assertEq(susds.balanceOf(address(this)), 100 ether);
+
+        usds.approve(address(l1bridge), 100 ether);
+        susds.approve(address(l1bridge), 100 ether);
+        uint256 escrowBeforeUsds = usds.balanceOf(L1_ESCROW);
+        uint256 escrowBeforesUsds = susds.balanceOf(L1_ESCROW);
+
+        l1bridge.bridgeERC20To(
+            address(usds),
+            address(l2usds),
+            address(0xb0b),
+            100 ether,
+            1_000_000,
+            ""
+        );
+        l1bridge.bridgeERC20To(
+            address(susds),
+            address(l2susds),
+            address(0xb0b),
+            100 ether,
+            1_000_000,
+            ""
+        );
+
+        assertEq(usds.balanceOf(address(this)), 0);
+        assertEq(usds.balanceOf(L1_ESCROW), escrowBeforeUsds + 100 ether);
+        assertEq(susds.balanceOf(address(this)), 0);
+        assertEq(susds.balanceOf(L1_ESCROW), escrowBeforesUsds + 100 ether);
+
+        baseDomain.relayFromHost(true);
+
+        assertEq(l2usds.balanceOf(address(0xb0b)), 100 ether);
+        assertEq(l2susds.balanceOf(address(0xb0b)), 100 ether);
+
+       // ------- Test Withdrawal -------
+
+        vm.startPrank(address(0xb0b));
+
+        l2usds.approve(address(l2bridge), 100 ether);
+        l2susds.approve(address(l2bridge), 100 ether);
+
+        l2bridge.bridgeERC20To(
+            address(l2usds),
+            address(usds),
+            address(0xced),
+            100 ether,
+            1_000_000,
+            ""
+        );
+        l2bridge.bridgeERC20To(
+            address(l2susds),
+            address(susds),
+            address(0xced),
+            100 ether,
+            1_000_000,
+            ""
+        );
+        vm.stopPrank();
+
+        assertEq(l2usds.balanceOf(address(0xb0b)), 0);
+        assertEq(l2susds.balanceOf(address(0xb0b)), 0);
+
+        baseDomain.relayToHost(true);
+
+        assertEq(usds.balanceOf(address(0xced)), 100 ether);
+        assertEq(susds.balanceOf(address(0xced)), 100 ether);
+    }
+
+    function testSparkAllocator() public {
+        uint256 previousIlkRegistryCount = reg.count();
+
+        // Sanity checks
+        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).ilk()      == ALLOCATOR_ILK,           "AllocatorInit/vault-ilk-mismatch");
+        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).roles()    == ALLOCATOR_ROLES,         "AllocatorInit/vault-roles-mismatch");
+        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).buffer()   == ALLOCATOR_SPARK_BUFFER,  "AllocatorInit/vault-buffer-mismatch");
+        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).vat()      == address(vat),            "AllocatorInit/vault-vat-mismatch");
+        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).usdsJoin() == address(usdsJoin),       "AllocatorInit/vault-usds-join-mismatch");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        (, uint256 rate, uint256 spot,,) = vat.ilks(ALLOCATOR_ILK);
+        assertEq(rate, RAY);
+        assertEq(spot, 10**18 * RAY * 10**9 / spotter.par());
+
+        (address pip,) = spotter.ilks(ALLOCATOR_ILK);
+        assertEq(pip, PIP_ALLOCATOR_SPARK);
+
+        assertEq(vat.gem(ALLOCATOR_ILK, ALLOCATOR_SPARK_VAULT), 0);
+        (uint256 ink, uint256 art) = vat.urns(ALLOCATOR_ILK, ALLOCATOR_SPARK_VAULT);
+        assertEq(ink, 1_000_000_000_000 * WAD);
+        assertEq(art, 0);
+
+        assertEq(AllocatorRegistryLike(ALLOCATOR_REGISTRY).buffers(ALLOCATOR_ILK), ALLOCATOR_SPARK_BUFFER);
+        assertEq(address(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).jug()), address(jug));
+
+        assertEq(usds.allowance(ALLOCATOR_SPARK_BUFFER, ALLOCATOR_SPARK_VAULT), type(uint256).max);
+
+        assertEq(AllocatorRolesLike(ALLOCATOR_ROLES).ilkAdmins(ALLOCATOR_ILK), ALLOCATOR_SPARK_PROXY);
+
+        assertEq(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wards(pauseProxy),  0);
+        assertEq(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wards(ALLOCATOR_SPARK_PROXY), 1);
+
+        assertEq(AuthLike(ALLOCATOR_SPARK_BUFFER).wards(pauseProxy),  0);
+        assertEq(AuthLike(ALLOCATOR_SPARK_BUFFER).wards(ALLOCATOR_SPARK_PROXY), 1);
+
+        assertEq(reg.count(),               previousIlkRegistryCount + 1);
+        assertEq(reg.pos(ALLOCATOR_ILK),    previousIlkRegistryCount);
+        assertEq(reg.join(ALLOCATOR_ILK),   address(0));
+        assertEq(reg.gem(ALLOCATOR_ILK),    address(0));
+        assertEq(reg.dec(ALLOCATOR_ILK),    0);
+        assertEq(reg.class(ALLOCATOR_ILK),  5);
+        assertEq(reg.pip(ALLOCATOR_ILK),    PIP_ALLOCATOR_SPARK);
+        assertEq(reg.xlip(ALLOCATOR_ILK),   address(0));
+        assertEq(reg.name(ALLOCATOR_ILK),   string("ALLOCATOR-SPARK-A"));
+        assertEq(reg.symbol(ALLOCATOR_ILK), string("ALLOCATOR-SPARK-A"));
+
+        // Draw & Wipe from Vault
+        vm.prank(address(ALLOCATOR_SPARK_PROXY));
+        AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).draw(1_000 * WAD);
+        assertEq(usds.balanceOf(ALLOCATOR_SPARK_BUFFER), 1_000 * WAD);
+
+        vm.prank(address(ALLOCATOR_SPARK_PROXY));
+        AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wipe(1_000 * WAD);
+        assertEq(usds.balanceOf(ALLOCATOR_SPARK_BUFFER), 0);
+    }
+
+    function testsWhitelistSparkProxyOnLitePsm() public {
+         _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(LitePsmLike(LITE_PSM).bud(ALLOCATOR_SPARK_PROXY), 1);
+    }
+
+    function testMedianValidators() public {
+         _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        address[] memory validators = new address[](4);
+        validators[0] = ETH_GLOBAL_VALIDATOR;
+        validators[1] = MANTLE_VALIDATOR;
+        validators[2] = NETHERMIND_VALIDATOR;
+        validators[3] = EULER_VALIDATOR;
+
+        for (uint i = 0; i < validators.length; i++) {
+            assertEq(MedianLike(BTC_USD_MEDIAN).orcl(validators[1]), 1);
+            assertEq(MedianLike(ETH_USD_MEDIAN).orcl(validators[1]), 1);
+            assertEq(MedianLike(WSTETH_USD_MEDIAN).orcl(validators[1]), 1);
+            assertEq(MedianLike(MKR_USD_MEDIAN).orcl(validators[1]), 1);
+         }
+    }
 }

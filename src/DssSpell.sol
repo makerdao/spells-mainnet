@@ -20,6 +20,19 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { DssInstance, MCD } from "dss-test/MCD.sol";
+import { BridgesConfig, TokenBridgeInit } from "./dependencies/base-token-bridge/TokenBridgeInit.sol";
+import { L1TokenBridgeInstance } from "./dependencies/base-token-bridge/L1TokenBridgeInstance.sol";
+import { L2TokenBridgeInstance } from "./dependencies/base-token-bridge/L2TokenBridgeInstance.sol";
+import { AllocatorSharedInstance, AllocatorIlkInstance } from "./dependencies/dss-allocator/AllocatorInstances.sol";
+import { AllocatorInit, AllocatorIlkConfig } from "./dependencies/dss-allocator/AllocatorInit.sol";
+
+interface DssLitePsmLike {
+    function kiss(address usr) external;
+}
+
+interface MedianLike {
+    function lift(address[] memory a) external;
+}
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -47,302 +60,225 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant FIVE_PT_TWO_PCT_RATE = 1000000001607468111246255079;
+
+    // --- Math ---
+    uint256 internal constant RAD     = 10 ** 45;
+
+    address internal immutable USDS                    = DssExecLib.getChangelogAddress("USDS");
+    address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable ILK_REGISTRY            = DssExecLib.getChangelogAddress("ILK_REGISTRY");
+    address internal immutable LITE_PSM                = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
+
+    // ---------- BASE Token Bridge ----------
+    // Mainnet addresses
+    address internal constant BASE_GOV_RELAY           = 0x1Ee0AE8A993F2f5abDB51EAF4AC2876202b65c3b;
+    address internal constant BASE_ESCROW              = 0x7F311a4D48377030bD810395f4CCfC03bdbe9Ef3;
+    address internal constant BASE_TOKEN_BRIDGE        = 0xA5874756416Fa632257eEA380CAbd2E87cED352A;
+    address internal constant BASE_TOKEN_BRIDGE_IMP    = 0xaeFd31c2e593Dc971f9Cb42cBbD5d4AD7F1970b6;
+    address internal constant MESSANGER                = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
+    // BASE addresses
+    address internal constant BASE_GOV_RELAY_L2        = 0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255;
+    address internal constant BASE_TOKEN_BRIDGE_L2     = 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7;
+    address internal constant BASE_TOKEN_BRIDGE_IMP_L2 = 0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
+    address internal constant USDS_L2                  = 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc;
+    address internal constant SUSDS_L2                 = 0x5875eEE11Cf8398102FdAd704C9E96607675467a;
+    address internal constant SPELL_L2                 = 0x6f29C3A29A3F056A71FB0714551C8D3547268D62;
+    address internal constant MESSANGER_L2             = 0x4200000000000000000000000000000000000007;
+
+    // ---------- Allocator System  ----------
+    address internal constant ALLOCATOR_ROLES          = 0x9A865A710399cea85dbD9144b7a09C889e94E803;
+    address internal constant ALLOCATOR_REGISTRY       = 0xCdCFA95343DA7821fdD01dc4d0AeDA958051bB3B;
+    address internal constant PIP_ALLOCATOR_SPARK_A    = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
+    address internal constant ALLOCATOR_SPARK_BUFFER   = 0xc395D150e71378B47A1b8E9de0c1a83b75a08324;
+    address internal constant ALLOCATOR_SPARK_VAULT    = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
+    address internal constant ALLOCATOR_SPARK_OWNER    = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
+
+    // ---------- Medians and Validators  ----------
+    address internal constant ETH_GLOBAL_VALIDATOR     = 0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
+    address internal constant MANTLE_VALIDATOR         = 0xFa6eb665e067759ADdE03a8E6bD259adBd1D70c9;
+    address internal constant NETHERMIND_VALIDATOR     = 0x91242198eD62F9255F2048935D6AFb0C2302D147;
+    address internal constant EULER_VALIDATOR          = 0x1DCB8CcC022938e102814F1A299C7ae48A8BAAf6;
+    address internal constant BTC_USD_MEDIAN           = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address internal constant ETH_USD_MEDIAN           = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address internal constant WSTETH_USD_MEDIAN        = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
+    address internal constant MKR_USD_MEDIAN           = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     function actions() public override {
         // Note: multple actions in the spell depend on DssInstance
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
-        // ---------- Setup new MkrOsm ----------
-        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
-        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
+        // ---------- Init Base Token Bridge for USDS and sUSDS tokens ----------
+        // Forum: TODO
+        //
+        // Set Escrow contract for L1 Bridge
+        // Register USDS, sUSDS on L1 Bridge
+        // Give max approval on Enscrow contract for L1 Bridge (USDS, sUSDS tokens)
+        // Execute L2 Bridge spell through Gov Relay (register nad set maxWithdrawals for USDS, sUSDS tokens on L2 Bridge)
+        // Set BASE_GOV_RELAY, BASE_ENSCROW, BASE_TOKEN_BRIDGE and BASE_TOKEN_BRIDGE_IMP ro CHAINLOG
+
+        // Mainnet Token Bridge instace
+        L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
+            govRelay: BASE_GOV_RELAY,
+            escrow: BASE_ESCROW,
+            bridge: BASE_TOKEN_BRIDGE,
+            bridgeImp: BASE_TOKEN_BRIDGE_IMP
+        });
+
+        // Base Token Bridge instace
+        L2TokenBridgeInstance memory l2BridgeInstance = L2TokenBridgeInstance({
+            govRelay: BASE_GOV_RELAY_L2,
+            bridge: BASE_TOKEN_BRIDGE_L2,
+            bridgeImp: BASE_TOKEN_BRIDGE_IMP_L2,
+            spell: SPELL_L2
+        });
+
+        // Array with mainnet tokens
+        address[] memory l1Tokens = new address[](2);
+        l1Tokens[0] = USDS;
+        l1Tokens[1] = SUSDS;
+
+        // Array with Base tokens
+        address[] memory l2Tokens = new address[](2);
+        l2Tokens[0] = USDS_L2;
+        l2Tokens[1] = SUSDS_L2;
+
+        // Max withdrawals for Base tokens
+        uint256[] memory maxWithdrawals = new uint256[](2);
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        BridgesConfig memory bridgeCfg = BridgesConfig({
+            // Mainnet CrossDomain Messanger
+            l1Messenger: MESSANGER,
+            // Base CrossDomain Messanger
+            l2Messenger: MESSANGER_L2,
+            // Mainnet tokens (USDS, sUSDS)
+            l1Tokens: l1Tokens,
+            // Base tokens (USDS, sUSDS)
+            l2Tokens: l2Tokens,
+            // Max withdrawals for USDS, sUSDS
+            maxWithdraws: maxWithdrawals,
+            // Min gas for bridging
+            minGasLimit: 500_000,
+            // Chainlog key for Base Gov Relay Contract
+            govRelayCLKey: "BASE_GOV_RELAY",
+            // Chainlog key for Base Escrow Contract
+            escrowCLKey: "BASE_ESCROW",
+            // Chainlog key for Base Token Bridge Contract
+            l1BridgeCLKey: "BASE_TOKEN_BRIDGE",
+            // Chainlog key for Base Token Bridge Implementaion Contract
+            l1BridgeImpCLKey: "BASE_TOKEN_BRIDGE_IMP"
+        });
+
+        // Init Base Token Bridge for USDS and sUSDS
+        TokenBridgeInit.initBridges(dss, l1BridgeInstance, l2BridgeInstance, bridgeCfg);
+
+
+        // ---------- Init Allocator ILK for Spark Subdao ----------
+        // Forum: TODO
+        //
+        // Init ALLOCATOR-SPARK-A ilk on vat, jug and spotter
+        // Set duty on jug to 5.2%
+        // Set line on vat
+        // Increase Global Line on vat
+        // Setup AutoLine for ALLOCATOR-SPARK-A:
+        // line: 10_000_000
+        // gap: 2_500_000
+        // ttl: 86_400 seconds
+        // Set spotter.pip for ALLOCATOR-SPARK-A to AllocatorOracle contract
+        // Set spotter.mat for ALLOCATOR-SPARK-A to RAY
+        // poke ALLOCATOR-SPARK-A (spotter.poke)
+        // Add AllocatorBuffer address to AllocatorRegistry
+        // Initiate the allocator vault by calling vat.slip & vat.grab
+        // Set jug on AllocatorVault
+        // Allow vault to pull funds from the buffer by giving max USDS approval
+        // Set the allocator proxy as the ALLOCATOR-SPARK-A ilk admin instead of the Pause Proxy on AllocatorRoles
+        // Move ownership of AllocatorVault & AllocatorBuffer to AllocatorProxy (SparkProxy)
+        // Add Allocator contracts to chainlog (ALLOCATOR_ROLES, ALLOCATOR_REGISTRY, ALLOCATOR_SPARK_A_VAULT, ALLOCATOR_SPARK_A_BUFFER, PIP_ALLOCATOR_SPARK_A)
+        // Add ALLOCATOR-SPARK-A ilk to IlkRegistry
+
+
+        // Allocator shared contracts instance
+        AllocatorSharedInstance memory allocatorSharedInstance = AllocatorSharedInstance({
+            oracle:   PIP_ALLOCATOR_SPARK_A,
+            roles:    ALLOCATOR_ROLES,
+            registry: ALLOCATOR_REGISTRY
+        });
+
+        // Allocator ALLOCATOR-SPARK-A ilk contracts instance
+        AllocatorIlkInstance memory allocatorIlkInstance = AllocatorIlkInstance({
+            owner:  ALLOCATOR_SPARK_OWNER,
+            vault:  ALLOCATOR_SPARK_VAULT,
+            buffer: ALLOCATOR_SPARK_BUFFER
+        });
 
-        // Whitelist MkrOsm to read from current PIP_MKR using `DssExecLib.addReaderToWhitelist` with the following parameters:
-        // Set parameter address _oracle: PIP_MKR address from chainlog (0xdbbe5e9b1daa91430cf0772fcebe53f6c6f137df)
-        // Set parameter address _reader: 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
-        DssExecLib.addReaderToWhitelist(PIP_MKR, NEW_PIP_MKR);
+        // Allocator init config
+        AllocatorIlkConfig memory allocatorIlkCfg = AllocatorIlkConfig({
+            // Init ilk for ALLOCATOR-SPARK-A
+            ilk             : "ALLOCATOR-SPARK-A",
+            // jug.duty      -> 5.2%
+            duty            : FIVE_PT_TWO_PCT_RATE,
+            // Autoline line -> 10_000_000
+            maxLine         : 10_000_000 * RAD,
+            // Autoline gap  -> 2_500_000
+            gap             : 2_500_000 * RAD,
+            // Autoline ttl  -> 1 day
+            ttl             : 86_400 seconds,
+            // Spark Proxy   -> 0x3300f198988e4C9C63F75dF86De36421f06af8c4
+            allocatorProxy  : SPARK_PROXY,
+            // Ilk Registry  -> 0x5a464c28d19848f44199d003bef5ecc87d090f87
+            ilkRegistry     : ILK_REGISTRY
+        });
 
-        // Set MkrOsm as "PIP_MKR" in the chainlog using the following parameters:
-        // Set parameter bytes32 _key: "PIP_MKR"
-        // Set parameter address _val:  0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b
-        DssExecLib.setChangelogAddress("PIP_MKR", NEW_PIP_MKR);
+        // Init allocator shared contracts
+        AllocatorInit.initShared(dss, allocatorSharedInstance);
 
-        // ---------- Setup new VoteDelegateFactory ----------
-        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
-        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
+        // Init allocator system for ALLOCATOR-SPARK-A ilk
+        AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
 
-        // Rename "VOTE_DELEGATE_PROXY_FACTORY" to "VOTE_DELEGATE_FACTORY_LEGACY" in chainlog:
-        // Note: this is a meta instruction, actual instructions are below
 
-        // Call DssExecLib.setChangelogAddress with the following parameters:
-        // Set parameter bytes32 _key: "VOTE_DELEGATE_FACTORY_LEGACY"
-        // Set parameter address _val: VOTE_DELEGATE_PROXY_FACTORY address (0xd897f108670903d1d6070fcf818f9db3615af272) from the chainlog
-        DssExecLib.setChangelogAddress("VOTE_DELEGATE_FACTORY_LEGACY", VOTE_DELEGATE_PROXY_FACTORY);
+        // ---------- Whitelist Spark ALM Proxy on the PSM ----------
+        // Forum: TODO
+        DssLitePsmLike(LITE_PSM).kiss(SPARK_PROXY);
 
-        // Call CHAINLOG.removeAddress with the following parameters:
-        // Set parameter bytes32 _key: "VOTE_DELEGATE_PROXY_FACTORY"
-        dss.chainlog.removeAddress("VOTE_DELEGATE_PROXY_FACTORY");
 
-        // Set "VOTE_DELEGATE_FACTORY" in the chainlog to 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
-        DssExecLib.setChangelogAddress("VOTE_DELEGATE_FACTORY", VOTE_DELEGATE_FACTORY);
+        // ---------- Add new validators for Median (Medianizer) ----------
+        // Forum: TODO
 
-        // ---------- Setup Lockstake Engine ----------
-        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324
-        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
+        address[] memory validators = new address[](4);
+        validators[0] = ETH_GLOBAL_VALIDATOR;
+        validators[1] = MANTLE_VALIDATOR;
+        validators[2] = NETHERMIND_VALIDATOR;
+        validators[3] = EULER_VALIDATOR;
 
-        // SBE Parameter Changes
-        // Note: this is a subheading, actual instructions are below
+        MedianLike(BTC_USD_MEDIAN).lift(validators);
+        MedianLike(ETH_USD_MEDIAN).lift(validators);
+        MedianLike(WSTETH_USD_MEDIAN).lift(validators);
+        MedianLike(MKR_USD_MEDIAN).lift(validators);
 
-        // Decrease splitter "burn" rate by 30% from 100% to 70% with the following parameters:
-        // Decrease splitter "burn" with address _base: MCD_SPLIT from chainlog
-        // Decrease splitter "burn" with bytes32 _what: "burn"
-        // Decrease splitter "burn" with uint256 _amt: 70%
-        DssExecLib.setValue(MCD_SPLIT, "burn", 70 * WAD / 100);
 
-        // Increase vow.hump by 5 million DAI, from 55 million DAI to 60 million DAI
-        DssExecLib.setValue(MCD_VOW, "hump", 60 * MILLION * RAD);
+        // ---------- Set up Governance Facilitator Streams ----------
+        // Forum: TODO
 
-        // Increase splitter.hop by 4,014 seconds, from 11,635 seconds to 15,649 seconds.
-        DssExecLib.setValue(MCD_SPLIT, "hop", 15_649);
 
-        // Set Flapper farm by calling FlapperInit.setFarm with the following parameters:
-        FlapperInit.setFarm(
+        // ---------- September 2024 AD compensation ----------
+        // Forum: TODO
 
-            // Note: FlapperInit.setFarm requires DssInstance
-            dss,
 
-            // Set Flapper farm with address farm_ : 0x92282235a39bE957fF1f37619fD22A9aE5507CB1
-            REWARDS_LSMKR_USDS,
+        // ---------- Chainlog bump ----------
+        // Note: we need to increase chainlog version as D3MInit.initCommon added new keys
+        DssExecLib.setChangelogVersion("1.19.3");
 
-            FarmConfig({
-                // Set Flapper farm with address splitter: MCD_SPLIT from chainlog
-                splitter:        MCD_SPLIT,
-
-                // Set Flapper farm with address usdsJoin: USDS_JOIN from chainlog
-                usdsJoin:        USDS_JOIN,
-
-                // Set Flapper farm with uint256 hop: 15,649
-                hop:             15_649 seconds,
-
-                // Set Flapper farm with bytes32 prevChainlogKey: bytes32(0)
-                prevChainlogKey: bytes32(0),
-
-                // Set Flapper farm with chainlogKey: "REWARDS_LSMKR_USDS"
-                chainlogKey:     "REWARDS_LSMKR_USDS"
-            })
-        );
-
-        // "Under the hood" actions for setting flapper:
-        // LsMkrUsdsFarm will be set as "farm" in MCD_SPLIT
-        // MCD_SPLIT will be set as "rewardsDistribution" in LsMkrUsdsFarm
-        // Provided "hop" will be set as "rewardsDuration" in LsMkrUsdsFarm
-        // New chainlog key REWARDS_LSMKR_USDS will be added
-        // Note: above instructions are taken inside FlapperInit.setFarm method
-
-        // Note: prepare "farms" variable used inside Lockstake init call below
-        address[] memory farms = new address[](1);
-        farms[0] = REWARDS_LSMKR_USDS;
-
-        // Init Lockstake Engine by calling LockstakeInit.initLockstake with the following parameters:
-        LockstakeInit.initLockstake(
-
-            // Note: LockstakeInit.initLockstake requires DssInstance
-            dss,
-
-            LockstakeInstance({
-                // Init Lockstake Engine with address lsmkr:  0xb4e0e45e142101dC3Ed768bac219fC35EDBED295
-                lsmkr:       LOCKSTAKE_MKR,
-
-                // Init Lockstake Engine with address engine:  0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12
-                engine:      LOCKSTAKE_ENGINE,
-
-                // Init Lockstake Engine with address clipper:  0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239
-                clipper:     LOCKSTAKE_CLIP,
-
-                // Init Lockstake Engine with address clipperCalc:  0xf13cF3b39823CcfaE6C2354dA56416C80768474e
-                clipperCalc: LOCKSTAKE_CLIP_CALC
-            }),
-
-            LockstakeConfig({
-                // Init Lockstake Engine with bytes32 ilk: "LSE-MKR-A"
-                ilk:                 "LSE-MKR-A",
-
-                // Init Lockstake Engine with address voteDelegateFactory: 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
-                voteDelegateFactory: VOTE_DELEGATE_FACTORY,
-
-                // Init Lockstake Engine with address usdsJoin: USDS_JOIN from chainlog
-                usdsJoin:            USDS_JOIN,
-
-                // Init Lockstake Engine with address usds: USDS from chainlog
-                usds:                USDS,
-
-                // Init Lockstake Engine with address mkr: MCD_GOV from chainlog
-                mkr:                 MCD_GOV,
-
-                // Init Lockstake Engine with address mkrSky: MKR_SKY from chainlog
-                mkrSky:              MKR_SKY,
-
-                // Init Lockstake Engine with address sky: SKY from chainlog
-                sky:                 SKY,
-
-                // Init Lockstake Engine with address[] farms:  0x92282235a39bE957fF1f37619fD22A9aE5507CB1
-                farms:               farms,
-
-                // Init Lockstake Engine with uint256 fee: 5%
-                fee:                 5 * WAD / 100,
-
-                // Init Lockstake Engine with uint256 maxLine: 20 million DAI
-                maxLine:             20 * MILLION * RAD,
-
-                // Init Lockstake Engine with uint256 gap: 5 million
-                gap:                 5 * MILLION * RAD,
-
-                // Init Lockstake Engine with uint256 ttl: 16 hours
-                ttl:                 16 hours,
-
-                // Init Lockstake Engine with uint256 dust: 30,000 DAI
-                dust:                30_000 * RAD,
-
-                // Init Lockstake Engine with uint256 duty: 12%
-                duty:                TWELVE_PCT_RATE,
-
-                // Init Lockstake Engine with uint256 mat: 200%
-                mat:                 200 * RAY / 100,
-
-                // Init Lockstake Engine with uint256 buf: 1.20
-                buf:                 120 * RAY / 100,
-
-                // Init Lockstake Engine with uint256 tail: 6,000 seconds
-                tail:                6_000 seconds,
-
-                // Init Lockstake Engine with uint256 cusp: 0.40
-                cusp:                40 * RAY / 100,
-
-                // Init Lockstake Engine with uint256 chip: 0.1%
-                chip:                1 * WAD / 1000,
-
-                // Init Lockstake Engine with uint256 tip: 300 DAI
-                tip:                 300 * RAD,
-
-                // Init Lockstake Engine with uint256 stopped: 0
-                stopped:             0,
-
-                // Init Lockstake Engine with uint256 chop: 8%
-                chop:                108 * WAD / 100,
-
-                // Init Lockstake Engine with uint256 hole: 3 million DAI
-                hole:                3 * MILLION * RAD,
-
-                // Init Lockstake Engine with uint256 tau: 0
-                tau:                 0,
-
-                // Init Lockstake Engine with uint256 cut: 0.99
-                cut:                 99 * RAY / 100,
-
-                // Init Lockstake Engine with uint256 step: 60 seconds
-                step:                60 seconds,
-
-                // Init Lockstake Engine with bool lineMom: true
-                lineMom:             true,
-
-                // Init Lockstake Engine with uint256 tolerance: 0.5
-                tolerance:           5 * RAY / 10,
-
-                // Init Lockstake Engine with string name: "LockstakeMkr"
-                name:                "LockstakeMkr",
-
-                // Init Lockstake Engine with string symbol: "lsMKR"
-                symbol:              "lsMKR"
-            })
-        );
-
-        // "Under the hood" actions for Init Lockstake Engine:
-        // New collateral type "LSE-MKR-A" will be added to "vat", "jug", "spotter", "dog" contracts
-        // New collateral type "LSE-MKR-A" will be added to LINE_MOM
-        // New collateral type "LSE-MKR-A" will be added to auto-line using provided maxLine, gap and ttl
-        // New collateral type "LSE-MKR-A" will be added to ILK_REGISTRY with provided values ("name", "symbol") and the new ilk class 7
-        // The new MKR OSM will allow MCD_SPOT, CLIPPER_MOM, LOCKSTAKE_CLIP, MCD_END to access its price.
-        // PIP_MKR will be added to OSM_MOM
-        // LockstakeClipper will be configured using provided values ("buf", "tail", "cusp", "chip", "tip", "stopped", "clip", "tolerance")
-        // StairstepExponentialDecrease calc contract will be configured using provided values ("cut", "step")
-        // The LsMkrUsdsFarm will be added to the LockstakeEngine as a first farm
-        // LockstakeEngine will be authorized to access "vat"
-        // LockstakeClipper will be authorized to access "vat" and LockstakeEngine
-        // CLIPPER_MOM, MCD_DOG and MCD_END will be authorized to access LockstakeClipper
-        // New chainlog keys LOCKSTAKE_MKR, LOCKSTAKE_ENGINE, LOCKSTAKE_CLIP and LOCKSTAKE_CLIP_CALC will be added
-        // OSM_MOM will be authorized to access the new MKR OSM
-        // Note: above instructions are taken inside LockstakeInit.initLockstake method
-
-        // ---------- Fund Early Bird Rewards Multisig ----------
-        // Forum: https://forum.sky.money/t/atlas-weekly-cycle-edit-proposal-week-of-october-14-2024-01/25324#p-99402-early-bird-bonus-3
-        // Poll: https://vote.makerdao.com/polling/QmUm8Krq
-
-        // Mint 27,222,832.80 SKY to 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68
-        SkyLike(SKY).mint(EARLY_BIRD_REWARDS, 27_222_832.80 ether); // Note: ether is only a keyword helper
-
-        // ---------- Lower Deprecated RWA Debt Ceilings ----------
-        // Forum: https://forum.sky.money/t/2024-10-17-expected-executive-contents-rwa-vault-changes/25323
-
-        // Remove RWA007-A from Debt Ceiling Instant Access Module
-        DssExecLib.removeIlkFromAutoLine("RWA007-A");
-
-        // Note: in order to decrease global debt ceiling, we need to fetch current `line`
-        (,,, uint256 line1,) = VatAbstract(MCD_VAT).ilks("RWA007-A");
-
-        // Set RWA007-A Debt Ceiling to 0
-        DssExecLib.setIlkDebtCeiling("RWA007-A", 0);
-
-        // Initiate RWA007-A soft liquidation by calling `tell()`
-        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).tell("RWA007-A");
-
-        // Write-off the debt of RWA007-A and set its oracle price to 0 by calling `cull()`
-        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA007-A", RWA007_A_URN);
-
-        // Note: update the spot value in vat by propagating the price
-        DssExecLib.updateCollateralPrice("RWA007-A");
-
-        // Note: in order to decrease global debt ceiling, we need to fetch current `line`
-        (,,, uint256 line2,) = VatAbstract(MCD_VAT).ilks("RWA014-A");
-
-        // Reduce RWA014-A Debt Ceiling by 1.5 billion Dai from 1.5 billion Dai to 0
-        DssExecLib.setIlkDebtCeiling("RWA014-A", 0);
-
-        // Initiate RWA014-A soft liquidation by calling `tell()`
-        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).tell("RWA014-A");
-
-        // Write-off the debt of RWA014-A and set its oracle price to 0 by calling `cull()`
-        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA014-A", RWA014_A_URN);
-
-        // Note: update the spot value in vat by propagating the price
-        DssExecLib.updateCollateralPrice("RWA014-A");
-
-        // Note: decrease global line
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - (line1 + line2));
-
-        // ---------- Pinwheel DAO Resolution ----------
-        // Forum: https://forum.sky.money/t/coinbase-web3-wallet-legal-overview/24577/3
-
-        // Approve DAO Resolution at QmYJUvw5xbAJmJknG2xUKDLe424JSTWQQhbJCnucRRjUv7
-        // Note: see `dao_resolutions` public variable declared above
-
-        // ---------- AAVE Revenue Share Payment ----------
-        // Forum: https://forum.sky.money/t/spark-aave-revenue-share-calculation-payment-5-q3-2024/25286
-
-        // AAVE Revenue Share - 234089 DAI - 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
-        DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 234_089);
-
-        // ---------- Spark Spell ----------
-        // Forum: https://forum.sky.money/t/oct-3-2024-proposed-changes-to-spark-for-upcoming-spell/25293
-        // Poll: https://vote.makerdao.com/polling/QmbHaA2G
-        // Poll: https://vote.makerdao.com/polling/QmShWccA
-        // Poll: https://vote.makerdao.com/polling/QmTksxrr
-
-        // Execute Spark Proxy Spell at 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- Chainlog bump ----------
 
         // Note: we have to patch chainlog version as new collateral is added
-        DssExecLib.setChangelogVersion("1.19.2");
+        DssExecLib.setChangelogVersion("1.19.3");
     }
 }
 
