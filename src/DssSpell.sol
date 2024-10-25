@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.16;
+pragma solidity ^0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
@@ -94,6 +94,7 @@ contract DssSpellAction is DssAction {
     address internal constant ALLOCATOR_SPARK_VAULT    = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
     address internal constant ALLOCATOR_SPARK_OWNER    = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     address internal constant SPARK_ALM_PROXY          = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
+    address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     // ---------- Medians and Validators  ----------
     address internal constant ETH_GLOBAL_VALIDATOR     = 0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
@@ -223,12 +224,12 @@ contract DssSpellAction is DssAction {
             duty            : FIVE_PT_TWO_PCT_RATE,
             // Autoline line -> 10_000_000
             maxLine         : 10_000_000 * RAD,
-            // Autoline gap  -> 2_500_000
-            gap             : 2_500_000 * RAD,
+            // Autoline gap  -> 10_000_000
+            gap             : 10_000_000 * RAD,
             // Autoline ttl  -> 1 day
             ttl             : 86_400 seconds,
             // Spark Proxy   -> 0x1601843c5E9bC251A3272907010AFa41Fa18347E
-            allocatorProxy  : SPARK_ALM_PROXY,
+            allocatorProxy  : SPARK_PROXY,
             // Ilk Registry  -> 0x5a464c28d19848f44199d003bef5ecc87d090f87
             ilkRegistry     : ILK_REGISTRY
         });
