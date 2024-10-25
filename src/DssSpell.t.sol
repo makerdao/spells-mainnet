@@ -299,9 +299,9 @@ contract DssSpellTest is DssSpellTestBase {
             try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
             } catch Error(string memory errmsg) {
                 if (_cmpStr(errmsg, "dss-chain-log/invalid-key")) {
-                    assertTrue(false, _concat("TestError/key-to-remove-does-not-exist: ", removedKeys[i]));
+                    vm.revert(_concat("TestError/key-to-remove-does-not-exist: ", removedKeys[i]));
                 } else {
-                    assertTrue(false, errmsg);
+                    vm.revert(errmsg);
                 }
             }
         }
@@ -312,14 +312,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
             try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
-                assertTrue(false, _concat("TestError/key-not-removed: ", removedKeys[i]));
+                vm.revert(_concat("TestError/key-not-removed: ", removedKeys[i]));
             } catch Error(string memory errmsg) {
                 assertTrue(
                     _cmpStr(errmsg, "dss-chain-log/invalid-key"),
                     _concat("TestError/key-not-removed: ", removedKeys[i])
                 );
             } catch {
-                assertTrue(false, _concat("TestError/unknown-reason: ", removedKeys[i]));
+                vm.revert(_concat("TestError/unknown-reason: ", removedKeys[i]));
             }
         }
     }
@@ -1068,7 +1068,7 @@ contract DssSpellTest is DssSpellTestBase {
     address            immutable ALLOCATOR_REGISTRY     =                    addr.addr("ALLOCATOR_REGISTRY");
     address            immutable ALLOCATOR_SPARK_BUFFER =                    addr.addr("ALLOCATOR_SPARK_A_BUFFER");
     address            immutable ALLOCATOR_SPARK_VAULT  =                    addr.addr("ALLOCATOR_SPARK_A_VAULT");
-    address            immutable ALLOCATOR_SPARK_PROXY  =                    addr.addr('SPARK_PROXY');
+    address            immutable ALLOCATOR_SPARK_PROXY  =                    0x1601843c5E9bC251A3272907010AFa41Fa18347E;
     bytes32            constant  ALLOCATOR_ILK          =                    "ALLOCATOR-SPARK-A";
 
     address            immutable LITE_PSM               =                    addr.addr("MCD_LITE_PSM_USDC_A");
