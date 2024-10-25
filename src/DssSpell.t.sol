@@ -299,9 +299,9 @@ contract DssSpellTest is DssSpellTestBase {
             try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
             } catch Error(string memory errmsg) {
                 if (_cmpStr(errmsg, "dss-chain-log/invalid-key")) {
-                    fail(_concat("TestError/key-to-remove-does-not-exist: ", removedKeys[i]));
+                    assertTrue(false, _concat("TestError/key-to-remove-does-not-exist: ", removedKeys[i]));
                 } else {
-                    fail(errmsg);
+                    assertTrue(false, errmsg);
                 }
             }
         }
@@ -312,14 +312,14 @@ contract DssSpellTest is DssSpellTestBase {
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
             try chainLog.getAddress(_stringToBytes32(removedKeys[i])) {
-                fail(_concat("TestError/key-not-removed: ", removedKeys[i]));
+                assertTrue(false, _concat("TestError/key-not-removed: ", removedKeys[i]));
             } catch Error(string memory errmsg) {
                 assertTrue(
                     _cmpStr(errmsg, "dss-chain-log/invalid-key"),
                     _concat("TestError/key-not-removed: ", removedKeys[i])
                 );
             } catch {
-                fail(_concat("TestError/unknown-reason: ", removedKeys[i]));
+                assertTrue(false, _concat("TestError/unknown-reason: ", removedKeys[i]));
             }
         }
     }
