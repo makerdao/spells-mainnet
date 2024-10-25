@@ -49,11 +49,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface RwaLiquidationOracleLike {
-    function good(bytes32 ilk) external view returns (bool);
-    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     string         config;
     RootDomain     rootDomain;
@@ -215,7 +210,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
             "VOTE_DELEGATE_PROXY_FACTORY"
         ];
@@ -281,7 +276,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLockstakeIlkIntegration() public { // add the `skipped` modifier to skip
+    function testLockstakeIlkIntegration() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -349,7 +344,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOsmReaders() public { // add the `skipped` modifier to skip
+    function testOsmReaders() public skipped { // add the `skipped` modifier to skip
         address OSM = addr.addr("PIP_MKR");
         address[4] memory newReaders = [
             addr.addr("MCD_SPOT"),
@@ -371,7 +366,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testMedianReaders() public { // add the `skipped` modifier to skip
+    function testMedianReaders() public skipped { // add the `skipped` modifier to skip
         address median = chainLog.getAddress("PIP_MKR"); // PIP_MKR before spell
         address[1] memory newReaders = [
             addr.addr('PIP_MKR') // PIP_MKR after spell
@@ -395,7 +390,7 @@ contract DssSpellTest is DssSpellTestBase {
         bytes32 ward;
     }
 
-    function testNewAuthorizations() public { // add the `skipped` modifier to skip
+    function testNewAuthorizations() public skipped { // add the `skipped` modifier to skip
         Authorization[9] memory newAuthorizations = [
             Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_ENGINE" }),
             Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_CLIP" }),
@@ -596,7 +591,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
@@ -936,7 +931,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public { // add the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -955,7 +950,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187;
 
@@ -974,48 +969,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testRwaTellAndCull() public {
-        bytes32[2] memory ilks = [
-            bytes32("RWA007-A"),
-            bytes32("RWA014-A")
-        ];
-        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            bytes32 ilk = ilks[i];
-            (, address pip, uint256 tau, uint256 toc) = oracle.ilks(ilk);
-            assertGt(toc, 0, _concat("TestError/bad-toc-after-tell-", ilk));
-            assertEq(tau, 0, _concat("TestError/bad-tau-after-tell-", ilk));
-            assertFalse(oracle.good(ilk), _concat("TestError/still-good-after-tell-", ilk));
-
-            uint256 price = uint256(DSValueAbstract(pip).read());
-            assertEq(price, 0, _concat("TestError/non-zero-oracle-price-after-cull-", ilk));
-
-            (uint256 Art,, uint256 spot,,) = vat.ilks(ilk);
-            assertEq(Art, 0, _concat("TestError/non-zero-total-debt-after-cull-", ilk));
-            assertEq(spot, 0, _concat("TestError/non-zero-spot-price-after-cull-", ilk));
-        }
-    }
-
-    function testNewOsmMomAddition() public {
-        bytes32 ilk = "LSE-MKR-A";
-        address osm = addr.addr("PIP_MKR");
-
-        assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(osmMom.osms(ilk), osm, "TestError/osm-not-in-mom");
-
-        assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
-        vm.prank(chief.hat()); osmMom.stop(ilk);
-        assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
-    }
 }

@@ -20,49 +20,21 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { DssInstance, MCD } from "dss-test/MCD.sol";
-import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
-
-// Note: source code matches https://github.com/makerdao/dss-flappers/blob/95431f3d4da66babf81c6e1138bd05f5ddc5e516/deploy/FlapperInit.sol
-import { FlapperInit, FarmConfig } from "src/dependencies/dss-flappers/FlapperInit.sol";
-
-// Note: source code matches https://github.com/makerdao/lockstake/blob/7c71318623f5d6732457fd0c247a1f1760960011/deploy/LockstakeInit.sol
-import { LockstakeInit, LockstakeConfig } from "src/dependencies/lockstake/LockstakeInit.sol";
-// Note: source code matches https://github.com/makerdao/lockstake/blob/7c71318623f5d6732457fd0c247a1f1760960011/deploy/LockstakeInstance.sol
-import { LockstakeInstance } from "src/dependencies/lockstake/LockstakeInstance.sol";
-
-interface SkyLike {
-    function mint(address to, uint256 value) external;
-}
-
-interface RwaLiquidationOracleLike {
-    function cull(bytes32 ilk, address urn) external;
-    function tell(bytes32 ilk) external;
-}
-
-interface ProxyLike {
-    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
-}
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/7c7d7d16734407fdde827801ab4bbd6878560375/governance/votes/Executive%20vote%20-%20October%2017%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-10-17 MakerDAO Executive Spell | Hash: 0xa1e0345f807a0333170271e69caca6d384b3a715ccad597b8ad9502963eabd6f";
+        "2024-10-31 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return true;
     }
 
-    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
-    string public constant dao_resolutions = "QmYJUvw5xbAJmJknG2xUKDLe424JSTWQQhbJCnucRRjUv7";
-
     // ---------- Math ----------
-    uint256 internal constant MILLION = 10 ** 6;
-    uint256 internal constant WAD     = 10 ** 18;
     uint256 internal constant RAY     = 10 ** 27;
-    uint256 internal constant RAD     = 10 ** 45;
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -75,38 +47,6 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant TWELVE_PCT_RATE = 1000000003593629043335673582;
-
-    // ---------- Contracts ----------
-    address internal immutable MCD_VAT                     = DssExecLib.vat();
-    address internal immutable MCD_VOW                     = DssExecLib.vow();
-    address internal immutable MCD_GOV                     = DssExecLib.mkr();
-    address internal immutable MIP21_LIQUIDATION_ORACLE    = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
-    address internal immutable RWA007_A_URN                = DssExecLib.getChangelogAddress("RWA007_A_URN");
-    address internal immutable RWA014_A_URN                = DssExecLib.getChangelogAddress("RWA014_A_URN");
-    address internal immutable PIP_MKR                     = DssExecLib.getChangelogAddress("PIP_MKR");
-    address internal immutable VOTE_DELEGATE_PROXY_FACTORY = DssExecLib.getChangelogAddress("VOTE_DELEGATE_PROXY_FACTORY");
-    address internal immutable MCD_SPLIT                   = DssExecLib.getChangelogAddress("MCD_SPLIT");
-    address internal immutable USDS_JOIN                   = DssExecLib.getChangelogAddress("USDS_JOIN");
-    address internal immutable USDS                        = DssExecLib.getChangelogAddress("USDS");
-    address internal immutable MKR_SKY                     = DssExecLib.getChangelogAddress("MKR_SKY");
-    address internal immutable SKY                         = DssExecLib.getChangelogAddress("SKY");
-    address internal constant NEW_PIP_MKR                  = 0x4F94e33D0D74CfF5Ca0D3a66F1A650628551C56b;
-    address internal constant VOTE_DELEGATE_FACTORY        = 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0;
-    address internal constant REWARDS_LSMKR_USDS           = 0x92282235a39bE957fF1f37619fD22A9aE5507CB1;
-    address internal constant LOCKSTAKE_MKR                = 0xb4e0e45e142101dC3Ed768bac219fC35EDBED295;
-    address internal constant LOCKSTAKE_ENGINE             = 0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12;
-    address internal constant LOCKSTAKE_CLIP               = 0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239;
-    address internal constant LOCKSTAKE_CLIP_CALC          = 0xf13cF3b39823CcfaE6C2354dA56416C80768474e;
-
-    // ---------- Wallets ----------
-    address internal constant AAVE_V3_TREASURY   = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
-    address internal constant EARLY_BIRD_REWARDS = 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68;
-
-    // ---------- Spark Proxy Spell ----------
-    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
-    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187;
 
     function actions() public override {
         // Note: multple actions in the spell depend on DssInstance
