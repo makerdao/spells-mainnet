@@ -2341,7 +2341,7 @@ contract DssSpellTestBase is Config, DssTest {
             if (ward > 0) {
                 emit log_named_address("   Deployer Address", deployer);
                 emit log_named_string("  Affected Contract", contractName);
-                vm.revert("Error: Bad Auth");
+                revert("Error: Bad Auth");
             }
         }
     }
