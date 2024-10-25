@@ -1106,9 +1106,9 @@ contract DssSpellTest is DssSpellTestBase {
         require(l1bridge.getImplementation() == L1_BRIDGE_IMP, "BaseTokenBridge/imp-does-not-match");
         require(l1bridge.isOpen() == 1, "BaseTokenBridge/not-open");
         require(l1bridge.otherBridge() == address(l2bridge), "BaseTokenBridge/other-bridge-mismatch");
-        require(l1bridge.messenger() == MESSANGER, "BaseTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1bridge.messenger() == MESSENGER, "BaseTokenBridge/l1-bridge-messenger-mismatch");
         require(l1govRelay.l2GovernanceRelay() == address(l2govRelay), "BaseGovRelay/l2-gov-relay-mismatch");
-        require(l1govRelay.messenger() == MESSANGER, "BaseGovRelay/l1-gov-relay-messenger-mismatch");
+        require(l1govRelay.messenger() == MESSENGER, "BaseGovRelay/l1-gov-relay-messenger-mismatch");
 
 
         _vote(address(spell));

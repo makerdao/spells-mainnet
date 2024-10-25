@@ -262,19 +262,6 @@ contract DssSpellAction is DssAction {
         MedianLike(MKR_USD_MEDIAN).lift(validators);
 
 
-        // ---------- Set up Governance Facilitator Streams ----------
-        // Forum: TODO
-
-
-        // ---------- September 2024 AD compensation ----------
-        // Forum: TODO
-
-
-        // ---------- Chainlog bump ----------
-        // Note: we need to increase chainlog version as D3MInit.initCommon added new keys
-        DssExecLib.setChangelogVersion("1.19.3");
-
-
         // ---------- Chainlog bump ----------
 
         // Note: we have to patch chainlog version as new collateral is added
