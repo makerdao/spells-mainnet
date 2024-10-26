@@ -1068,9 +1068,10 @@ contract DssSpellTest is DssSpellTestBase {
     address            immutable ALLOCATOR_REGISTRY     =                    addr.addr("ALLOCATOR_REGISTRY");
     address            immutable ALLOCATOR_SPARK_BUFFER =                    addr.addr("ALLOCATOR_SPARK_A_BUFFER");
     address            immutable ALLOCATOR_SPARK_VAULT  =                    addr.addr("ALLOCATOR_SPARK_A_VAULT");
-    address            immutable ALLOCATOR_SPARK_PROXY  =                    0x1601843c5E9bC251A3272907010AFa41Fa18347E;
+    address            immutable ALLOCATOR_SPARK_PROXY  =                    0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     bytes32            constant  ALLOCATOR_ILK          =                    "ALLOCATOR-SPARK-A";
 
+    address            immutable ALM_SPARK_PROXY        =                    0x1601843c5E9bC251A3272907010AFa41Fa18347E;
     address            immutable LITE_PSM               =                    addr.addr("MCD_LITE_PSM_USDC_A");
 
     // ---------- Medians and Validators  ----------
@@ -1281,7 +1282,7 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(LitePsmLike(LITE_PSM).bud(ALLOCATOR_SPARK_PROXY), 1);
+        assertEq(LitePsmLike(LITE_PSM).bud(ALM_SPARK_PROXY), 1);
     }
 
     function testMedianValidators() public {

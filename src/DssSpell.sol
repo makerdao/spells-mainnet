@@ -69,6 +69,8 @@ contract DssSpellAction is DssAction {
     address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
     address internal immutable ILK_REGISTRY            = DssExecLib.getChangelogAddress("ILK_REGISTRY");
     address internal immutable LITE_PSM                = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
+    address internal immutable MCD_PAUSE_PROXY         = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
+
 
     // ---------- BASE Token Bridge ----------
     // Mainnet addresses
@@ -92,7 +94,6 @@ contract DssSpellAction is DssAction {
     address internal constant PIP_ALLOCATOR_SPARK_A    = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
     address internal constant ALLOCATOR_SPARK_BUFFER   = 0xc395D150e71378B47A1b8E9de0c1a83b75a08324;
     address internal constant ALLOCATOR_SPARK_VAULT    = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
-    address internal constant ALLOCATOR_SPARK_OWNER    = 0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB;
     address internal constant SPARK_ALM_PROXY          = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
 
     // ---------- Medians and Validators  ----------
@@ -105,6 +106,9 @@ contract DssSpellAction is DssAction {
     address internal constant WSTETH_USD_MEDIAN        = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
     address internal constant MKR_USD_MEDIAN           = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
 
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY              = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
 
     function actions() public override {
         // Note: multple actions in the spell depend on DssInstance
@@ -210,7 +214,7 @@ contract DssSpellAction is DssAction {
 
         // Allocator ALLOCATOR-SPARK-A ilk contracts instance
         AllocatorIlkInstance memory allocatorIlkInstance = AllocatorIlkInstance({
-            owner:  ALLOCATOR_SPARK_OWNER,
+            owner:  MCD_PAUSE_PROXY,
             vault:  ALLOCATOR_SPARK_VAULT,
             buffer: ALLOCATOR_SPARK_BUFFER
         });
@@ -227,8 +231,8 @@ contract DssSpellAction is DssAction {
             gap             : 2_500_000 * RAD,
             // Autoline ttl  -> 1 day
             ttl             : 86_400 seconds,
-            // Spark Proxy   -> 0x1601843c5E9bC251A3272907010AFa41Fa18347E
-            allocatorProxy  : SPARK_ALM_PROXY,
+            // Spark Proxy   -> 0x3300f198988e4C9C63F75dF86De36421f06af8c4
+            allocatorProxy  : SPARK_PROXY,
             // Ilk Registry  -> 0x5a464c28d19848f44199d003bef5ecc87d090f87
             ilkRegistry     : ILK_REGISTRY
         });
