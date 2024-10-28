@@ -1852,7 +1852,7 @@ contract Config {
         afterSpell.collaterals["ALLOCATOR-SPARK-A"] = CollateralValues({
             aL_enabled:   true,
             aL_line:      10 * MILLION,
-            aL_gap:       2_500_000,
+            aL_gap:       10 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,

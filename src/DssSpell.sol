@@ -78,7 +78,7 @@ contract DssSpellAction is DssAction {
     address internal constant BASE_ESCROW              = 0x7F311a4D48377030bD810395f4CCfC03bdbe9Ef3;
     address internal constant BASE_TOKEN_BRIDGE        = 0xA5874756416Fa632257eEA380CAbd2E87cED352A;
     address internal constant BASE_TOKEN_BRIDGE_IMP    = 0xaeFd31c2e593Dc971f9Cb42cBbD5d4AD7F1970b6;
-    address internal constant MESSANGER                = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
+    address internal constant MESSENGER                = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
     // BASE addresses
     address internal constant BASE_GOV_RELAY_L2        = 0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255;
     address internal constant BASE_TOKEN_BRIDGE_L2     = 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7;
@@ -86,12 +86,12 @@ contract DssSpellAction is DssAction {
     address internal constant USDS_L2                  = 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc;
     address internal constant SUSDS_L2                 = 0x5875eEE11Cf8398102FdAd704C9E96607675467a;
     address internal constant SPELL_L2                 = 0x6f29C3A29A3F056A71FB0714551C8D3547268D62;
-    address internal constant MESSANGER_L2             = 0x4200000000000000000000000000000000000007;
+    address internal constant MESSENGER_L2             = 0x4200000000000000000000000000000000000007;
 
     // ---------- Allocator System  ----------
     address internal constant ALLOCATOR_ROLES          = 0x9A865A710399cea85dbD9144b7a09C889e94E803;
     address internal constant ALLOCATOR_REGISTRY       = 0xCdCFA95343DA7821fdD01dc4d0AeDA958051bB3B;
-    address internal constant PIP_ALLOCATOR_SPARK_A    = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
+    address internal constant PIP_ALLOCATOR            = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
     address internal constant ALLOCATOR_SPARK_BUFFER   = 0xc395D150e71378B47A1b8E9de0c1a83b75a08324;
     address internal constant ALLOCATOR_SPARK_VAULT    = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
     address internal constant SPARK_ALM_PROXY          = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
@@ -156,9 +156,9 @@ contract DssSpellAction is DssAction {
 
         BridgesConfig memory bridgeCfg = BridgesConfig({
             // Mainnet CrossDomain Messanger
-            l1Messenger: MESSANGER,
+            l1Messenger: MESSENGER,
             // Base CrossDomain Messanger
-            l2Messenger: MESSANGER_L2,
+            l2Messenger: MESSENGER_L2,
             // Mainnet tokens (USDS, sUSDS)
             l1Tokens: l1Tokens,
             // Base tokens (USDS, sUSDS)
@@ -207,7 +207,7 @@ contract DssSpellAction is DssAction {
 
         // Allocator shared contracts instance
         AllocatorSharedInstance memory allocatorSharedInstance = AllocatorSharedInstance({
-            oracle:   PIP_ALLOCATOR_SPARK_A,
+            oracle:   PIP_ALLOCATOR,
             roles:    ALLOCATOR_ROLES,
             registry: ALLOCATOR_REGISTRY
         });
@@ -228,7 +228,7 @@ contract DssSpellAction is DssAction {
             // Autoline line -> 10_000_000
             maxLine         : 10_000_000 * RAD,
             // Autoline gap  -> 2_500_000
-            gap             : 2_500_000 * RAD,
+            gap             : 10_000_000 * RAD,
             // Autoline ttl  -> 1 day
             ttl             : 86_400 seconds,
             // Spark Proxy   -> 0x3300f198988e4C9C63F75dF86De36421f06af8c4

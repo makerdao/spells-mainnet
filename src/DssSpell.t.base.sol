@@ -309,6 +309,26 @@ interface VoteDelegateFactoryLike {
     function create() external returns (address voteDelegate);
 }
 
+interface AllocatorVaultLike {
+    function buffer() external view returns (address);
+    function draw(uint256 wad) external;
+    function ilk() external view returns (bytes32);
+    function jug() external view returns (address);
+    function roles() external view returns (address);
+    function usdsJoin() external view returns (address);
+    function vat() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function wipe(uint256 wad) external;
+}
+
+interface AllocatorRegistryLike {
+    function buffers(bytes32) external view returns (address);
+}
+
+interface AllocatorRolesLike {
+    function ilkAdmins(bytes32) external view returns (address);
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -1904,6 +1924,77 @@ contract DssSpellTestBase is Config, DssTest {
 
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
         assertEq(litePsm.tout(), type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tout-", p.ilk));
+    }
+
+     struct AllocatorIntegrationParams {
+        bytes32 ilk;
+        address pip;
+        address registry;
+        address roles;
+        address buffer;
+        address vault;
+        address allocatorProxy;
+    }
+
+    function _checkAllocatorIntegration(AllocatorIntegrationParams memory p) internal {
+        uint256 previousIlkRegistryCount = reg.count();
+
+        // Sanity checks
+        require(AllocatorVaultLike(p.vault).ilk()      == p.ilk,                 "AllocatorInit/vault-ilk-mismatch");
+        require(AllocatorVaultLike(p.vault).roles()    == p.roles,               "AllocatorInit/vault-roles-mismatch");
+        require(AllocatorVaultLike(p.vault).buffer()   == p.buffer,              "AllocatorInit/vault-buffer-mismatch");
+        require(AllocatorVaultLike(p.vault).vat()      == address(vat),          "AllocatorInit/vault-vat-mismatch");
+        require(AllocatorVaultLike(p.vault).usdsJoin() == address(usdsJoin),     "AllocatorInit/vault-usds-join-mismatch");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        (, uint256 rate, uint256 spot,,) = vat.ilks(p.ilk);
+        assertEq(rate, RAY);
+        assertEq(spot, 10**18 * RAY * 10**9 / spotter.par());
+
+        (address pip,) = spotter.ilks(p.ilk);
+        assertEq(pip, p.pip);
+
+        assertEq(vat.gem(p.ilk, p.vault), 0);
+        (uint256 ink, uint256 art) = vat.urns(p.ilk, p.vault);
+        assertEq(ink, 1_000_000_000_000 * WAD);
+        assertEq(art, 0);
+
+        assertEq(AllocatorRegistryLike(p.registry).buffers(p.ilk), p.buffer);
+        assertEq(address(AllocatorVaultLike(p.vault).jug()), address(jug));
+
+        assertEq(usds.allowance(p.buffer, p.vault), type(uint256).max);
+
+        assertEq(AllocatorRolesLike(p.roles).ilkAdmins(p.ilk), p.allocatorProxy);
+
+        assertEq(AllocatorVaultLike(p.vault).wards(pauseProxy),  0);
+        assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
+
+        assertEq(WardsAbstract(p.buffer).wards(pauseProxy),  0);
+        assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
+
+        assertEq(reg.count(),               previousIlkRegistryCount + 1);
+        assertEq(reg.pos(p.ilk),    previousIlkRegistryCount);
+        assertEq(reg.join(p.ilk),   address(0));
+        assertEq(reg.gem(p.ilk),    address(0));
+        assertEq(reg.dec(p.ilk),    0);
+        assertEq(reg.class(p.ilk),  5);
+        assertEq(reg.pip(p.ilk),    p.pip);
+        assertEq(reg.xlip(p.ilk),   address(0));
+        assertEq(reg.name(p.ilk),   string("ALLOCATOR-SPARK-A"));
+        assertEq(reg.symbol(p.ilk), string("ALLOCATOR-SPARK-A"));
+
+        // Draw & Wipe from Vault
+        vm.prank(address(p.allocatorProxy));
+        AllocatorVaultLike(p.vault).draw(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
+
+        vm.prank(address(p.allocatorProxy));
+        AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 0);
     }
 
     function _to18ConversionFactor(LitePsmLike litePsm) internal view returns (uint256) {

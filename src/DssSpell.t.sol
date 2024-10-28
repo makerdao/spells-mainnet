@@ -49,10 +49,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface AuthLike {
-    function wards(address) external view returns (uint256);
-}
-
 interface L1TokenBridgeLike {
     function l1ToL2Token(address) external view returns (address);
     function isOpen() external view returns (uint256);
@@ -98,26 +94,6 @@ interface BaseGovRelayLike {
 
 interface L2BridgeSpell {
     function l2Bridge() external view returns (address);
-}
-
-interface AllocatorVaultLike {
-    function buffer() external view returns (address);
-    function draw(uint256 wad) external;
-    function ilk() external view returns (bytes32);
-    function jug() external view returns (address);
-    function roles() external view returns (address);
-    function usdsJoin() external view returns (address);
-    function vat() external view returns (address);
-    function wards(address) external view returns (uint256);
-    function wipe(uint256 wad) external;
-}
-
-interface AllocatorRegistryLike {
-    function buffers(bytes32) external view returns (address);
-}
-
-interface AllocatorRolesLike {
-    function ilkAdmins(bytes32) external view returns (address);
 }
 
 interface DssLitePsm {
@@ -374,6 +350,20 @@ contract DssSpellTest is DssSpellTestBase {
                 rToken: addr.addr("USDS"),
                 rDistr: addr.addr("MCD_SPLIT"),
                 rDur:   15_649 seconds
+            })
+        );
+    }
+
+    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
+        _checkAllocatorIntegration(
+            AllocatorIntegrationParams({
+                ilk: "ALLOCATOR-SPARK-A",
+                pip: addr.addr("PIP_ALLOCATOR"),
+                registry: addr.addr("ALLOCATOR_REGISTRY"),
+                roles: addr.addr("ALLOCATOR_ROLES"),
+                buffer: addr.addr("ALLOCATOR_SPARK_A_BUFFER"),
+                vault: addr.addr("ALLOCATOR_SPARK_A_VAULT"),
+                allocatorProxy: 0x3300f198988e4C9C63F75dF86De36421f06af8c4 // Spark Proxy
             })
         );
     }
@@ -1061,15 +1051,7 @@ contract DssSpellTest is DssSpellTestBase {
     address            immutable L1_BRIDGE_IMP          =                    addr.addr("BASE_TOKEN_BRIDGE_IMP");
     address            constant  L2_BRIDGE_IMP          =                    0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
     address            constant  MESSENGER              =                    0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
-    address            constant  L2_MESSANGER           =                    0x4200000000000000000000000000000000000007;
-
-    address            immutable PIP_ALLOCATOR_SPARK    =                    addr.addr("PIP_ALLOCATOR_SPARK_A");
-    address            immutable ALLOCATOR_ROLES        =                    addr.addr("ALLOCATOR_ROLES");
-    address            immutable ALLOCATOR_REGISTRY     =                    addr.addr("ALLOCATOR_REGISTRY");
-    address            immutable ALLOCATOR_SPARK_BUFFER =                    addr.addr("ALLOCATOR_SPARK_A_BUFFER");
-    address            immutable ALLOCATOR_SPARK_VAULT  =                    addr.addr("ALLOCATOR_SPARK_A_VAULT");
-    address            immutable ALLOCATOR_SPARK_PROXY  =                    0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    bytes32            constant  ALLOCATOR_ILK          =                    "ALLOCATOR-SPARK-A";
+    address            constant  L2_MESSENGER           =                    0x4200000000000000000000000000000000000007;
 
     address            immutable ALM_SPARK_PROXY        =                    0x1601843c5E9bC251A3272907010AFa41Fa18347E;
     address            immutable LITE_PSM               =                    addr.addr("MCD_LITE_PSM_USDC_A");
@@ -1084,7 +1066,7 @@ contract DssSpellTest is DssSpellTestBase {
     address           constant WSTETH_USD_MEDIAN        =                    0x2F73b6567B866302e132273f67661fB89b5a66F2;
     address           constant MKR_USD_MEDIAN           =                    0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
 
-    function testBaseTokenBridge() public {
+    function testBaseTokenBridgeIntegration() public {
         _setupRootDomain();
         baseDomain = new OptimismDomain(config, getChain("base"), rootDomain);
 
@@ -1096,9 +1078,9 @@ contract DssSpellTest is DssSpellTestBase {
         require(l2bridge.otherBridge() == address(l1bridge), "L2BaseTokenBridge/other-bridge-mismatch");
         require(keccak256(bytes(l2bridge.version())) == keccak256("1"), "L2BaseTokenBridge/version-does-not-match");
         require(l2bridge.getImplementation() == L2_BRIDGE_IMP, "L2BaseTokenBridge/imp-does-not-match");
-        require(l2bridge.messenger() == L2_MESSANGER, "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2bridge.messenger() == L2_MESSENGER, "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
         require(l2govRelay.l1GovernanceRelay() == address(l1govRelay), "L2BaseGovRelay/l2-gov-relay-mismatch");
-        require(l2govRelay.messenger() == L2_MESSANGER, "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
+        require(l2govRelay.messenger() == L2_MESSENGER, "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
         require(l2spell.l2Bridge() == address(l2bridge), "L2Spell/l2-bridge-mismatch");
 
         rootDomain.selectFork();
@@ -1137,8 +1119,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(l2bridge.l1ToL2Token(address(usds)), address(l2usds));
         assertEq(l2bridge.maxWithdraws(address(l2usds)), type(uint256).max);
 
-        assertEq(AuthLike(address(l2susds)).wards(address(l2bridge)), 1);
-        assertEq(AuthLike(address(l2usds)).wards(address(l2bridge)), 1);
+        assertEq(WardsAbstract(address(l2susds)).wards(address(l2bridge)), 1);
+        assertEq(WardsAbstract(address(l2usds)).wards(address(l2bridge)), 1);
 
 
         // ------- Test Deposit -------
@@ -1216,67 +1198,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(susds.balanceOf(address(0xced)), 100 ether);
     }
 
-    function testSparkAllocator() public {
-        uint256 previousIlkRegistryCount = reg.count();
-
-        // Sanity checks
-        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).ilk()      == ALLOCATOR_ILK,           "AllocatorInit/vault-ilk-mismatch");
-        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).roles()    == ALLOCATOR_ROLES,         "AllocatorInit/vault-roles-mismatch");
-        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).buffer()   == ALLOCATOR_SPARK_BUFFER,  "AllocatorInit/vault-buffer-mismatch");
-        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).vat()      == address(vat),            "AllocatorInit/vault-vat-mismatch");
-        require(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).usdsJoin() == address(usdsJoin),       "AllocatorInit/vault-usds-join-mismatch");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-
-        (, uint256 rate, uint256 spot,,) = vat.ilks(ALLOCATOR_ILK);
-        assertEq(rate, RAY);
-        assertEq(spot, 10**18 * RAY * 10**9 / spotter.par());
-
-        (address pip,) = spotter.ilks(ALLOCATOR_ILK);
-        assertEq(pip, PIP_ALLOCATOR_SPARK);
-
-        assertEq(vat.gem(ALLOCATOR_ILK, ALLOCATOR_SPARK_VAULT), 0);
-        (uint256 ink, uint256 art) = vat.urns(ALLOCATOR_ILK, ALLOCATOR_SPARK_VAULT);
-        assertEq(ink, 1_000_000_000_000 * WAD);
-        assertEq(art, 0);
-
-        assertEq(AllocatorRegistryLike(ALLOCATOR_REGISTRY).buffers(ALLOCATOR_ILK), ALLOCATOR_SPARK_BUFFER);
-        assertEq(address(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).jug()), address(jug));
-
-        assertEq(usds.allowance(ALLOCATOR_SPARK_BUFFER, ALLOCATOR_SPARK_VAULT), type(uint256).max);
-
-        assertEq(AllocatorRolesLike(ALLOCATOR_ROLES).ilkAdmins(ALLOCATOR_ILK), ALLOCATOR_SPARK_PROXY);
-
-        assertEq(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wards(pauseProxy),  0);
-        assertEq(AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wards(ALLOCATOR_SPARK_PROXY), 1);
-
-        assertEq(AuthLike(ALLOCATOR_SPARK_BUFFER).wards(pauseProxy),  0);
-        assertEq(AuthLike(ALLOCATOR_SPARK_BUFFER).wards(ALLOCATOR_SPARK_PROXY), 1);
-
-        assertEq(reg.count(),               previousIlkRegistryCount + 1);
-        assertEq(reg.pos(ALLOCATOR_ILK),    previousIlkRegistryCount);
-        assertEq(reg.join(ALLOCATOR_ILK),   address(0));
-        assertEq(reg.gem(ALLOCATOR_ILK),    address(0));
-        assertEq(reg.dec(ALLOCATOR_ILK),    0);
-        assertEq(reg.class(ALLOCATOR_ILK),  5);
-        assertEq(reg.pip(ALLOCATOR_ILK),    PIP_ALLOCATOR_SPARK);
-        assertEq(reg.xlip(ALLOCATOR_ILK),   address(0));
-        assertEq(reg.name(ALLOCATOR_ILK),   string("ALLOCATOR-SPARK-A"));
-        assertEq(reg.symbol(ALLOCATOR_ILK), string("ALLOCATOR-SPARK-A"));
-
-        // Draw & Wipe from Vault
-        vm.prank(address(ALLOCATOR_SPARK_PROXY));
-        AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).draw(1_000 * WAD);
-        assertEq(usds.balanceOf(ALLOCATOR_SPARK_BUFFER), 1_000 * WAD);
-
-        vm.prank(address(ALLOCATOR_SPARK_PROXY));
-        AllocatorVaultLike(ALLOCATOR_SPARK_VAULT).wipe(1_000 * WAD);
-        assertEq(usds.balanceOf(ALLOCATOR_SPARK_BUFFER), 0);
-    }
-
     function testsWhitelistSparkProxyOnLitePsm() public {
          _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1286,21 +1207,32 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testMedianValidators() public {
-         _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
         address[] memory validators = new address[](4);
         validators[0] = ETH_GLOBAL_VALIDATOR;
         validators[1] = MANTLE_VALIDATOR;
         validators[2] = NETHERMIND_VALIDATOR;
         validators[3] = EULER_VALIDATOR;
 
+        address[] memory medians = new address[](4);
+        validators[0] = BTC_USD_MEDIAN;
+        validators[1] = ETH_USD_MEDIAN;
+        validators[2] = WSTETH_USD_MEDIAN;
+        validators[3] = MKR_USD_MEDIAN;
+
         for (uint i = 0; i < validators.length; i++) {
-            assertEq(MedianLike(BTC_USD_MEDIAN).orcl(validators[1]), 1);
-            assertEq(MedianLike(ETH_USD_MEDIAN).orcl(validators[1]), 1);
-            assertEq(MedianLike(WSTETH_USD_MEDIAN).orcl(validators[1]), 1);
-            assertEq(MedianLike(MKR_USD_MEDIAN).orcl(validators[1]), 1);
-         }
+            for (uint j = 0; j < medians.length; j++) {
+                assertEq(MedianLike(medians[j]).orcl(validators[i]), 0);
+            }
+        }
+
+         _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint i = 0; i < validators.length; i++) {
+            for (uint j = 0; j < medians.length; j++) {
+                assertEq(MedianLike(medians[j]).orcl(validators[i]), 1);
+            }
+        }
     }
 }
