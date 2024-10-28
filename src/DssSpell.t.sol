@@ -358,7 +358,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkAllocatorIntegration(
             AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-SPARK-A",
-                pip: addr.addr("PIP_ALLOCATOR"),
+                pip: addr.addr("PIP_ALLOCATOR_SPARK_A"),
                 registry: addr.addr("ALLOCATOR_REGISTRY"),
                 roles: addr.addr("ALLOCATOR_ROLES"),
                 buffer: addr.addr("ALLOCATOR_SPARK_A_BUFFER"),
@@ -1108,8 +1108,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(l1bridge.l1ToL2Token(address(address(susds))), address(l2susds));
 
 
-        // switch to Optimism domain and relay the spell from L1
-        // the `true` keeps us on Optimism rather than `rootDomain.selectFork()
+        // switch to Base domain and relay the spell from L1
+        // the `true` keeps us on Base rather than `rootDomain.selectFork()`
         baseDomain.relayFromHost(true);
 
         // // test L2 side of initBridges
@@ -1135,7 +1135,7 @@ contract DssSpellTest is DssSpellTestBase {
         usds.approve(address(l1bridge), 100 ether);
         susds.approve(address(l1bridge), 100 ether);
         uint256 escrowBeforeUsds = usds.balanceOf(L1_ESCROW);
-        uint256 escrowBeforesUsds = susds.balanceOf(L1_ESCROW);
+        uint256 escrowBeforeSUsds = susds.balanceOf(L1_ESCROW);
 
         l1bridge.bridgeERC20To(
             address(usds),
@@ -1157,7 +1157,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(usds.balanceOf(address(this)), 0);
         assertEq(usds.balanceOf(L1_ESCROW), escrowBeforeUsds + 100 ether);
         assertEq(susds.balanceOf(address(this)), 0);
-        assertEq(susds.balanceOf(L1_ESCROW), escrowBeforesUsds + 100 ether);
+        assertEq(susds.balanceOf(L1_ESCROW), escrowBeforeSUsds + 100 ether);
 
         baseDomain.relayFromHost(true);
 
@@ -1214,10 +1214,10 @@ contract DssSpellTest is DssSpellTestBase {
         validators[3] = EULER_VALIDATOR;
 
         address[] memory medians = new address[](4);
-        validators[0] = BTC_USD_MEDIAN;
-        validators[1] = ETH_USD_MEDIAN;
-        validators[2] = WSTETH_USD_MEDIAN;
-        validators[3] = MKR_USD_MEDIAN;
+        medians[0] = BTC_USD_MEDIAN;
+        medians[1] = ETH_USD_MEDIAN;
+        medians[2] = WSTETH_USD_MEDIAN;
+        medians[3] = MKR_USD_MEDIAN;
 
         for (uint i = 0; i < validators.length; i++) {
             for (uint j = 0; j < medians.length; j++) {

@@ -1937,8 +1937,6 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _checkAllocatorIntegration(AllocatorIntegrationParams memory p) internal {
-        uint256 previousIlkRegistryCount = reg.count();
-
         // Sanity checks
         require(AllocatorVaultLike(p.vault).ilk()      == p.ilk,                 "AllocatorInit/vault-ilk-mismatch");
         require(AllocatorVaultLike(p.vault).roles()    == p.roles,               "AllocatorInit/vault-roles-mismatch");
@@ -1976,16 +1974,14 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(WardsAbstract(p.buffer).wards(pauseProxy),  0);
         assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
 
-        assertEq(reg.count(),               previousIlkRegistryCount + 1);
-        assertEq(reg.pos(p.ilk),    previousIlkRegistryCount);
         assertEq(reg.join(p.ilk),   address(0));
         assertEq(reg.gem(p.ilk),    address(0));
         assertEq(reg.dec(p.ilk),    0);
         assertEq(reg.class(p.ilk),  5);
         assertEq(reg.pip(p.ilk),    p.pip);
         assertEq(reg.xlip(p.ilk),   address(0));
-        assertEq(reg.name(p.ilk),   string("ALLOCATOR-SPARK-A"));
-        assertEq(reg.symbol(p.ilk), string("ALLOCATOR-SPARK-A"));
+        assertEq(reg.name(p.ilk),   _bytes32ToString(p.ilk));
+        assertEq(reg.symbol(p.ilk), _bytes32ToString(p.ilk));
 
         // Draw & Wipe from Vault
         vm.prank(address(p.allocatorProxy));

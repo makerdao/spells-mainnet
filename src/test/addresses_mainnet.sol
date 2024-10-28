@@ -526,6 +526,6 @@ contract Addresses {
         addr["ALLOCATOR_REGISTRY"]               = 0xCdCFA95343DA7821fdD01dc4d0AeDA958051bB3B;
         addr["ALLOCATOR_SPARK_A_VAULT"]          = 0x691a6c29e9e96dd897718305427Ad5D534db16BA;
         addr["ALLOCATOR_SPARK_A_BUFFER"]         = 0xc395D150e71378B47A1b8E9de0c1a83b75a08324;
-        addr["PIP_ALLOCATOR"]                    = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
+        addr["PIP_ALLOCATOR_SPARK_A"]            = 0xc7B91C401C02B73CBdF424dFaaa60950d5040dB7;
     }
 }
