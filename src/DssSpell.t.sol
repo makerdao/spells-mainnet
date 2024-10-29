@@ -86,8 +86,12 @@ interface L2TokenBridgeLike {
     ) external;
 }
 
-interface BaseGovRelayLike {
+interface L1GovRelayLike {
     function l2GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2GovRelayLike {
     function l1GovernanceRelay() external view returns (address);
     function messenger() external view returns (address);
 }
@@ -1040,13 +1044,13 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
     L2TokenBridgeLike  immutable l2bridge               = L2TokenBridgeLike( 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7);
-    BaseGovRelayLike   immutable l2govRelay             = BaseGovRelayLike(  0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255);
+    L2GovRelayLike     immutable l2govRelay             = L2GovRelayLike(    0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255);
     L2BridgeSpell      immutable l2spell                = L2BridgeSpell(     0x6f29C3A29A3F056A71FB0714551C8D3547268D62);
     GemAbstract        immutable l2usds                 = GemAbstract(       0x820C137fa70C8691f0e44Dc420a5e53c168921Dc);
     GemAbstract        immutable l2susds                = GemAbstract(       0x5875eEE11Cf8398102FdAd704C9E96607675467a);
     GemAbstract        immutable susd                   = GemAbstract(       addr.addr("SUSDS"));
     L1TokenBridgeLike  immutable l1bridge               = L1TokenBridgeLike( addr.addr("BASE_TOKEN_BRIDGE"));
-    BaseGovRelayLike   immutable l1govRelay             = BaseGovRelayLike(  addr.addr("BASE_GOV_RELAY"));
+    L1GovRelayLike     immutable l1govRelay             = L1GovRelayLike(    addr.addr("BASE_GOV_RELAY"));
     address            immutable L1_ESCROW              =                    addr.addr("BASE_ESCROW");
     address            immutable L1_BRIDGE_IMP          =                    addr.addr("BASE_TOKEN_BRIDGE_IMP");
     address            constant  L2_BRIDGE_IMP          =                    0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
