@@ -80,13 +80,13 @@ contract DssSpellAction is DssAction {
     address internal constant BASE_TOKEN_BRIDGE_IMP    = 0xaeFd31c2e593Dc971f9Cb42cBbD5d4AD7F1970b6;
     address internal constant MESSENGER                = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
     // BASE addresses
-    address internal constant BASE_GOV_RELAY_L2        = 0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255;
-    address internal constant BASE_TOKEN_BRIDGE_L2     = 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7;
-    address internal constant BASE_TOKEN_BRIDGE_IMP_L2 = 0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
-    address internal constant USDS_L2                  = 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc;
-    address internal constant SUSDS_L2                 = 0x5875eEE11Cf8398102FdAd704C9E96607675467a;
-    address internal constant SPELL_L2                 = 0x6f29C3A29A3F056A71FB0714551C8D3547268D62;
-    address internal constant MESSENGER_L2             = 0x4200000000000000000000000000000000000007;
+    address internal constant L2_BASE_GOV_RELAY        = 0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255;
+    address internal constant L2_BASE_TOKEN_BRIDGE     = 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7;
+    address internal constant L2_BASE_TOKEN_BRIDGE_IMP = 0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
+    address internal constant L2_USDS                  = 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc;
+    address internal constant L2_SUSDS                 = 0x5875eEE11Cf8398102FdAd704C9E96607675467a;
+    address internal constant L2_SPELL                 = 0x6f29C3A29A3F056A71FB0714551C8D3547268D62;
+    address internal constant L2_MESSENGER             = 0x4200000000000000000000000000000000000007;
 
     // ---------- Allocator System  ----------
     address internal constant ALLOCATOR_ROLES          = 0x9A865A710399cea85dbD9144b7a09C889e94E803;
@@ -138,13 +138,13 @@ contract DssSpellAction is DssAction {
         // Set l2BridgeInstance with the following parameters (Base Network):
         L2TokenBridgeInstance memory l2BridgeInstance = L2TokenBridgeInstance({
             // Set parameter l2BridgeInstance.govRelay: (L2GovernanceRelay: 0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255)
-            govRelay: BASE_GOV_RELAY_L2,
+            govRelay: L2_BASE_GOV_RELAY,
             // Set parameter l2BridgeInstance.bridge: (ERC1967Proxy: 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7)
-            bridge: BASE_TOKEN_BRIDGE_L2,
+            bridge: L2_BASE_TOKEN_BRIDGE,
             // Set parameter l2BridgeInstance.bridgeImp: (L2TokenBridge: 0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72)
-            bridgeImp: BASE_TOKEN_BRIDGE_IMP_L2,
+            bridgeImp: L2_BASE_TOKEN_BRIDGE_IMP,
             // Set parameter l2BridgeInstance.spell: (L2TokenBridgeSpell: 0x6f29C3A29A3F056A71FB0714551C8D3547268D62)
-            spell: SPELL_L2
+            spell: L2_SPELL
         });
 
         // Array with mainnet tokens
@@ -154,8 +154,8 @@ contract DssSpellAction is DssAction {
 
         // Array with Base tokens
         address[] memory l2Tokens = new address[](2);
-        l2Tokens[0] = USDS_L2;
-        l2Tokens[1] = SUSDS_L2;
+        l2Tokens[0] = L2_USDS;
+        l2Tokens[1] = L2_SUSDS;
 
         // Max withdrawals for Base tokens
         uint256[] memory maxWithdrawals = new uint256[](2);
@@ -167,7 +167,7 @@ contract DssSpellAction is DssAction {
             // Set parameter cfg.l1Messenger: (l1messenger 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa)
             l1Messenger: MESSENGER,
             // Set parameter cfg.l2Messenger: (l2messenger 0x4200000000000000000000000000000000000007)
-            l2Messenger: MESSENGER_L2,
+            l2Messenger: L2_MESSENGER,
             // Set parameter cfg.l1Tokens: (USDS, SUSDS on mainnet)
             l1Tokens: l1Tokens,
             // Set parameter cfg.l2Tokens: (USDS: 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc, sUSDS: 0x5875eEE11Cf8398102FdAd704C9E96607675467a on Base chain)
