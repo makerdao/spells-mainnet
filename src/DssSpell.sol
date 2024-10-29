@@ -116,12 +116,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Init Base Native Bridge ----------
         // Forum: https://forum.sky.money/t/spell-contents-2024-10-31/25421/
-        //
-        // Set Escrow contract for L1 Bridge
-        // Register USDS, sUSDS on L1 Bridge
-        // Give max approval on Enscrow contract for L1 Bridge (USDS, sUSDS tokens)
-        // Execute L2 Bridge spell through Gov Relay (register and set maxWithdrawals for USDS, sUSDS tokens on L2 Bridge)
-        // Set BASE_GOV_RELAY, BASE_ENSCROW, BASE_TOKEN_BRIDGE and BASE_TOKEN_BRIDGE_IMP to CHAINLOG
+        // Note: Init Base Token Bridge for USDS, sUSDS by calling TokenBridgeInit.initBridges using the following parameters:
 
         // Set l1BridgeInstance with the following parameters:
         L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
@@ -147,17 +142,17 @@ contract DssSpellAction is DssAction {
             spell: L2_SPELL
         });
 
-        // Array with mainnet tokens
+        // Note: Array with mainnet tokens
         address[] memory l1Tokens = new address[](2);
         l1Tokens[0] = USDS;
         l1Tokens[1] = SUSDS;
 
-        // Array with Base tokens
+        // Note: Array with Base tokens
         address[] memory l2Tokens = new address[](2);
         l2Tokens[0] = L2_USDS;
         l2Tokens[1] = L2_SUSDS;
 
-        // Max withdrawals for Base tokens
+        // Note: Max withdrawals for Base tokens
         uint256[] memory maxWithdrawals = new uint256[](2);
         maxWithdrawals[0] = type(uint256).max;
         maxWithdrawals[1] = type(uint256).max;
@@ -192,26 +187,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- Init Allocator System for Spark Subdao Proxy ----------
         // Forum: https://forum.sky.money/t/spell-contents-2024-10-31/25421/
-        //
-        // Init ALLOCATOR-SPARK-A ilk on vat, jug and spotter
-        // Set duty on jug to 5.2%
-        // Set line on vat
-        // Increase Global Line on vat
-        // Setup AutoLine for ALLOCATOR-SPARK-A:
-        // line: 10_000_000
-        // gap: 10_000_000
-        // ttl: 86_400 seconds
-        // Set spotter.pip for ALLOCATOR-SPARK-A to AllocatorOracle contract
-        // Set spotter.mat for ALLOCATOR-SPARK-A to RAY
-        // poke ALLOCATOR-SPARK-A (spotter.poke)
-        // Add AllocatorBuffer address to AllocatorRegistry
-        // Initiate the allocator vault by calling vat.slip & vat.grab
-        // Set jug on AllocatorVault
-        // Allow vault to pull funds from the buffer by giving max USDS approval
-        // Set the allocator proxy as the ALLOCATOR-SPARK-A ilk admin instead of the Pause Proxy on AllocatorRoles
-        // Move ownership of AllocatorVault & AllocatorBuffer to AllocatorProxy (SparkProxy)
-        // Add Allocator contracts to chainlog (ALLOCATOR_ROLES, ALLOCATOR_REGISTRY, ALLOCATOR_SPARK_A_VAULT, ALLOCATOR_SPARK_A_BUFFER, PIP_ALLOCATOR_SPARK_A)
-        // Add ALLOCATOR-SPARK-A ilk to IlkRegistry
 
         // Set sharedInstance with the following parameters:
         AllocatorSharedInstance memory allocatorSharedInstance = AllocatorSharedInstance({
@@ -251,16 +226,17 @@ contract DssSpellAction is DssAction {
             ilkRegistry     : ILK_REGISTRY
         });
 
-        // Init shared components for Allocator System
+        // Note: Init shared components for Allocator System be calling AllocatorInit.initShared
         AllocatorInit.initShared(dss, allocatorSharedInstance);
 
-        // Init Allocator ILK for Spark Subdao by calling
+        // Note: Init Allocator ILK for Spark Subdao by calling AllocatorInit.initIlk using the following parameters:
         AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
 
 
         // ---------- Whitelist Spark ALM Proxy on the PSM ----------
         // Forum: https://forum.sky.money/t/spell-contents-2024-10-31/25421/
 
+        // Note: IPSMLike(MCD_LITE_PSM_USDC_A).kiss(almProxy: 0x1601843c5E9bC251A3272907010AFa41Fa18347E);
         DssLitePsmLike(LITE_PSM).kiss(SPARK_ALM_PROXY);
 
 
