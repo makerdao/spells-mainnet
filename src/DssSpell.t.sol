@@ -1105,7 +1105,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(l1bridge.l1ToL2Token(address(address(usds))), address(l2usds));
 
         assertEq(susds.allowance(L1_ESCROW, address(l1bridge)), type(uint256).max);
-        assertEq(l1bridge.l1ToL2Token(address(address(susds))), address(l2susds));
+        assertEq(l1bridge.l1ToL2Token(address(susds)), address(l2susds));
 
 
         // switch to Base domain and relay the spell from L1
