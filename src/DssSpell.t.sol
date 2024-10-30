@@ -1012,8 +1012,8 @@ contract DssSpellTest is DssSpellTestBase {
     address            immutable L2_SUSDS               = base.addr("L2_SUSDS");
     address            immutable L2_MESSENGER           = base.addr("L2_MESSENGER");
     address            immutable SUSDS                  = addr.addr("SUSDS");
-    L1TokenBridgeLike  immutable l1Bridge               = L2TokenBridgeLike(addr.addr("BASE_TOKEN_BRIDGE"));
-    L1GovRelayLike     immutable l1GovRelay             = L2GovRelayLike(addr.addr("BASE_GOV_RELAY"));
+    L1TokenBridgeLike  immutable l1Bridge               = L1TokenBridgeLike(addr.addr("BASE_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1GovRelay             = L1GovRelayLike(addr.addr("BASE_GOV_RELAY"));
     address            immutable L1_ESCROW              = addr.addr("BASE_ESCROW");
     address            immutable L1_BRIDGE_IMP          = addr.addr("BASE_TOKEN_BRIDGE_IMP");
     address            constant  L1_MESSENGER           = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
