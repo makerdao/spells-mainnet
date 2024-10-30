@@ -267,7 +267,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Chainlog bump ----------
 
-        // Note: we have to patch chainlog version as new keys are is added
+        // Note: we have to patch chainlog version as new keys are added
         DssExecLib.setChangelogVersion("1.19.3");
     }
 }

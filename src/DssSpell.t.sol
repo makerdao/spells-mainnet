@@ -320,11 +320,11 @@ contract DssSpellTest is DssSpellTestBase {
         });
 
         // Sanity checks
-        require(AllocatorVaultLike(p.vault).ilk()      == "ALLOCATOR-SPARK-A",                   "AllocatorInit/vault-ilk-mismatch");
-        require(AllocatorVaultLike(p.vault).roles()    == addr.addr("ALLOCATOR_ROLES"),          "AllocatorInit/vault-roles-mismatch");
-        require(AllocatorVaultLike(p.vault).buffer()   == addr.addr("ALLOCATOR_SPARK_A_BUFFER"), "AllocatorInit/vault-buffer-mismatch");
-        require(AllocatorVaultLike(p.vault).vat()      == address(vat),                          "AllocatorInit/vault-vat-mismatch");
-        require(AllocatorVaultLike(p.vault).usdsJoin() == address(usdsJoin),                     "AllocatorInit/vault-usds-join-mismatch");
+        require(AllocatorVaultLike(p.vault).ilk()      == p.ilk,                 "AllocatorInit/vault-ilk-mismatch");
+        require(AllocatorVaultLike(p.vault).roles()    == p.roles,               "AllocatorInit/vault-roles-mismatch");
+        require(AllocatorVaultLike(p.vault).buffer()   == p.buffer,              "AllocatorInit/vault-buffer-mismatch");
+        require(AllocatorVaultLike(p.vault).vat()      == address(vat),          "AllocatorInit/vault-vat-mismatch");
+        require(AllocatorVaultLike(p.vault).usdsJoin() == address(usdsJoin),     "AllocatorInit/vault-usds-join-mismatch");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
