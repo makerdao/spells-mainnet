@@ -22,11 +22,16 @@ import {stdStorage, StdStorage} from "forge-std/Test.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
+import "./test/addresses_base.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
 import "./test/config.sol";
 
 import {DssSpell} from "./DssSpell.sol";
+
+import {RootDomain} from "dss-test/domains/RootDomain.sol";
+import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
+import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
 
 struct TeleportGUID {
     bytes32 sourceDomain;
@@ -329,11 +334,49 @@ interface AllocatorRolesLike {
     function ilkAdmins(bytes32) external view returns (address);
 }
 
+interface L1TokenBridgeLike {
+    function l1ToL2Token(address) external view returns (address);
+    function isOpen() external view returns (uint256);
+    function escrow() external view returns (address);
+    function otherBridge() external view returns (address);
+    function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function getImplementation() external view returns (address);
+    function bridgeERC20To(
+        address _localToken,
+        address _remoteToken,
+        address _to,
+        uint256 _amount,
+        uint32 _minGasLimit,
+        bytes memory _extraData
+    ) external;
+}
+
+interface L2TokenBridgeLike {
+    function l1ToL2Token(address) external view returns (address);
+    function isOpen() external view returns (uint256);
+    function escrow() external view returns (address);
+    function otherBridge() external view returns (address);
+    function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function maxWithdraws(address) external view returns (uint256);
+    function getImplementation() external view returns (address);
+    function bridgeERC20To(
+        address _localToken,
+        address _remoteToken,
+        address _to,
+        uint256 _amount,
+        uint32 _minGasLimit,
+        bytes memory _extraData
+    ) external;
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
     Rates         rates = new Rates();
     Addresses      addr = new Addresses();
+    BaseAddresses  base = new BaseAddresses();
     Deployers deployers = new Deployers();
     Wallets     wallets = new Wallets();
 
@@ -380,6 +423,12 @@ contract DssSpellTestBase is Config, DssTest {
     address          voteDelegateFactory =                     addr.addr("VOTE_DELEGATE_FACTORY");
 
     DssSpell spell;
+
+    string         config;
+    RootDomain     rootDomain;
+    OptimismDomain optimismDomain;
+    ArbitrumDomain arbitrumDomain;
+    OptimismDomain baseDomain;
 
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
@@ -1925,8 +1974,7 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
         assertEq(litePsm.tout(), type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tout-", p.ilk));
     }
-
-     struct AllocatorIntegrationParams {
+    struct AllocatorIntegrationParams {
         bytes32 ilk;
         address pip;
         address registry;
@@ -1937,18 +1985,6 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _checkAllocatorIntegration(AllocatorIntegrationParams memory p) internal {
-        // Sanity checks
-        require(AllocatorVaultLike(p.vault).ilk()      == p.ilk,                 "AllocatorInit/vault-ilk-mismatch");
-        require(AllocatorVaultLike(p.vault).roles()    == p.roles,               "AllocatorInit/vault-roles-mismatch");
-        require(AllocatorVaultLike(p.vault).buffer()   == p.buffer,              "AllocatorInit/vault-buffer-mismatch");
-        require(AllocatorVaultLike(p.vault).vat()      == address(vat),          "AllocatorInit/vault-vat-mismatch");
-        require(AllocatorVaultLike(p.vault).usdsJoin() == address(usdsJoin),     "AllocatorInit/vault-usds-join-mismatch");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-
         (, uint256 rate, uint256 spot,,) = vat.ilks(p.ilk);
         assertEq(rate, RAY);
         assertEq(spot, 10**18 * RAY * 10**9 / spotter.par());
@@ -1988,9 +2024,89 @@ contract DssSpellTestBase is Config, DssTest {
         AllocatorVaultLike(p.vault).draw(1_000 * WAD);
         assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
 
+        vm.warp(block.timestamp + 1);
+        jug.drip(p.ilk);
+
         vm.prank(address(p.allocatorProxy));
         AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
         assertEq(usds.balanceOf(p.buffer), 0);
+    }
+
+        struct BaseTokenBridgeParams {
+        address l2bridge;
+        address l1bridge;
+        address l1escrow;
+        address[] tokens;
+        address[] l2tokens;
+        uint256[] maxWithdrawals;
+    }
+
+    function _testBaseTokenBridgeIntegration(BaseTokenBridgeParams memory p) public {
+        for (uint i = 0; i < p.tokens.length; i ++) {
+            rootDomain.selectFork();
+
+            assertEq(GemAbstract(p.tokens[i]).allowance(p.l1escrow, p.l1bridge), type(uint256).max);
+            assertEq(L1TokenBridgeLike(p.l1bridge).l1ToL2Token(p.tokens[i]), p.l2tokens[i]);
+
+            // switch to Base domain and relay the spell from L1
+            // the `true` keeps us on Base rather than `rootDomain.selectFork()`
+            baseDomain.relayFromHost(true);
+
+            // test L2 side of initBridges
+            assertEq(L2TokenBridgeLike(p.l2bridge).l1ToL2Token(p.tokens[i]), p.l2tokens[i]);
+            assertEq(L2TokenBridgeLike(p.l2bridge).maxWithdraws(p.l2tokens[i]), p.maxWithdrawals[i]);
+
+            assertEq(WardsAbstract(p.l2tokens[i]).wards(p.l2bridge), 1);
+
+            // ------- Test Deposit -------
+
+            rootDomain.selectFork();
+
+            deal(p.tokens[i], address(this), 100 ether);
+            assertEq(GemAbstract(p.tokens[i]).balanceOf(address(this)), 100 ether);
+
+            GemAbstract(p.tokens[i]).approve(p.l1bridge, 100 ether);
+            uint256 escrowBeforeBalance = GemAbstract(p.tokens[i]).balanceOf(p.l1escrow);
+
+            L1TokenBridgeLike(p.l1bridge).bridgeERC20To(
+                p.tokens[i],
+                p.l2tokens[i],
+                address(0xb0b),
+                100 ether,
+                1_000_000,
+                ""
+            );
+
+            assertEq(GemAbstract(p.tokens[i]).balanceOf(address(this)), 0);
+            assertEq(GemAbstract(p.tokens[i]).balanceOf(p.l1escrow), escrowBeforeBalance + 100 ether);
+
+            baseDomain.relayFromHost(true);
+
+            assertEq(GemAbstract(p.l2tokens[i]).balanceOf(address(0xb0b)), 100 ether);
+
+            // ------- Test Withdrawal -------
+
+            vm.startPrank(address(0xb0b));
+
+            GemAbstract(p.l2tokens[i]).approve(p.l2bridge, 100 ether);
+
+            L2TokenBridgeLike(p.l2bridge).bridgeERC20To(
+                p.l2tokens[i],
+                p.tokens[i],
+                address(0xced),
+                100 ether,
+                1_000_000,
+                ""
+            );
+
+            vm.stopPrank();
+
+            assertEq(GemAbstract(p.l2tokens[i]).balanceOf(address(0xb0b)), 0);
+
+            baseDomain.relayToHost(true);
+
+            assertEq(GemAbstract(p.tokens[i]).balanceOf(address(0xced)), 100 ether);
+        }
     }
 
     function _to18ConversionFactor(LitePsmLike litePsm) internal view returns (uint256) {

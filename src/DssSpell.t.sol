@@ -19,9 +19,6 @@ pragma solidity 0.8.16;
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 
-import {RootDomain} from "dss-test/domains/RootDomain.sol";
-import {OptimismDomain} from "dss-test/domains/OptimismDomain.sol";
-import {ArbitrumDomain} from "dss-test/domains/ArbitrumDomain.sol";
 
 interface L2Spell {
     function dstDomain() external returns (bytes32);
@@ -49,43 +46,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface L1TokenBridgeLike {
-    function l1ToL2Token(address) external view returns (address);
-    function isOpen() external view returns (uint256);
-    function escrow() external view returns (address);
-    function otherBridge() external view returns (address);
-    function messenger() external view returns (address);
-    function version() external view returns (string memory);
-    function getImplementation() external view returns (address);
-    function bridgeERC20To(
-        address _localToken,
-        address _remoteToken,
-        address _to,
-        uint256 _amount,
-        uint32 _minGasLimit,
-        bytes memory _extraData
-    ) external;
-}
-
-interface L2TokenBridgeLike {
-    function l1ToL2Token(address) external view returns (address);
-    function isOpen() external view returns (uint256);
-    function escrow() external view returns (address);
-    function otherBridge() external view returns (address);
-    function messenger() external view returns (address);
-    function version() external view returns (string memory);
-    function maxWithdraws(address) external view returns (uint256);
-    function getImplementation() external view returns (address);
-    function bridgeERC20To(
-        address _localToken,
-        address _remoteToken,
-        address _to,
-        uint256 _amount,
-        uint32 _minGasLimit,
-        bytes memory _extraData
-    ) external;
-}
-
 interface L1GovRelayLike {
     function l2GovernanceRelay() external view returns (address);
     function messenger() external view returns (address);
@@ -96,12 +56,8 @@ interface L2GovRelayLike {
     function messenger() external view returns (address);
 }
 
-interface L2BridgeSpell {
+interface L2BridgeSpellLike {
     function l2Bridge() external view returns (address);
-}
-
-interface DssLitePsm {
-    function bud(address) external view returns (uint256);
 }
 
 interface MedianLike {
@@ -109,12 +65,6 @@ interface MedianLike {
 }
 
 contract DssSpellTest is DssSpellTestBase {
-    string         config;
-    RootDomain     rootDomain;
-    OptimismDomain optimismDomain;
-    ArbitrumDomain arbitrumDomain;
-    OptimismDomain baseDomain;
-
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
         _testGeneral();
@@ -359,6 +309,19 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAllocatorIntegration() public { // add the `skipped` modifier to skip
+        AllocatorVaultLike sparkVault = AllocatorVaultLike(addr.addr("ALLOCATOR_SPARK_A_VAULT"));
+
+        // Sanity checks
+        require(AllocatorVaultLike(sparkVault).ilk()      == "ALLOCATOR-SPARK-A",                   "AllocatorInit/vault-ilk-mismatch");
+        require(AllocatorVaultLike(sparkVault).roles()    == addr.addr("ALLOCATOR_ROLES"),          "AllocatorInit/vault-roles-mismatch");
+        require(AllocatorVaultLike(sparkVault).buffer()   == addr.addr("ALLOCATOR_SPARK_A_BUFFER"), "AllocatorInit/vault-buffer-mismatch");
+        require(AllocatorVaultLike(sparkVault).vat()      == address(vat),                          "AllocatorInit/vault-vat-mismatch");
+        require(AllocatorVaultLike(sparkVault).usdsJoin() == address(usdsJoin),                     "AllocatorInit/vault-usds-join-mismatch");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
         _checkAllocatorIntegration(
             AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-SPARK-A",
@@ -1043,32 +1006,32 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    L2TokenBridgeLike  immutable l2bridge               = L2TokenBridgeLike( 0xee44cdb68D618d58F75d9fe0818B640BD7B8A7B7);
-    L2GovRelayLike     immutable l2govRelay             = L2GovRelayLike(    0xdD0BCc201C9E47c6F6eE68E4dB05b652Bb6aC255);
-    L2BridgeSpell      immutable l2spell                = L2BridgeSpell(     0x6f29C3A29A3F056A71FB0714551C8D3547268D62);
-    GemAbstract        immutable l2usds                 = GemAbstract(       0x820C137fa70C8691f0e44Dc420a5e53c168921Dc);
-    GemAbstract        immutable l2susds                = GemAbstract(       0x5875eEE11Cf8398102FdAd704C9E96607675467a);
-    GemAbstract        immutable susd                   = GemAbstract(       addr.addr("SUSDS"));
-    L1TokenBridgeLike  immutable l1bridge               = L1TokenBridgeLike( addr.addr("BASE_TOKEN_BRIDGE"));
-    L1GovRelayLike     immutable l1govRelay             = L1GovRelayLike(    addr.addr("BASE_GOV_RELAY"));
-    address            immutable L1_ESCROW              =                    addr.addr("BASE_ESCROW");
-    address            immutable L1_BRIDGE_IMP          =                    addr.addr("BASE_TOKEN_BRIDGE_IMP");
-    address            constant  L2_BRIDGE_IMP          =                    0x289A37BE5D6CCeF7A8f2b90535B3BB6bD3905f72;
-    address            constant  MESSENGER              =                    0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
-    address            constant  L2_MESSENGER           =                    0x4200000000000000000000000000000000000007;
+    address            immutable L2_BRIDGE              = base.addr("L2_BASE_TOKEN_BRIDGE");
+    address            immutable L2_BRIDGE_IMP          = base.addr("L2_BRIDGE_IMP");
+    address            immutable L2_GOV_RELAY           = base.addr("L2_GOV_RELAY");
+    address            immutable L2_SPELL               = base.addr("L2_SPELL");
+    address            immutable L2_USDS                = base.addr("L2_USDS");
+    address            immutable L2_SUSDS               = base.addr("L2_SUSDS");
+    address            immutable L2_MESSENGER           = base.addr("L2_MESSENGER");
+    address            immutable SUSDS                  = addr.addr("SUSDS");
+    address            immutable L1_BRIDGE              = addr.addr("BASE_TOKEN_BRIDGE");
+    address            immutable L1_GOV_RELAY           = addr.addr("BASE_GOV_RELAY");
+    address            immutable L1_ESCROW              = addr.addr("BASE_ESCROW");
+    address            immutable L1_BRIDGE_IMP          = addr.addr("BASE_TOKEN_BRIDGE_IMP");
+    address            constant  L1_MESSENGER           = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
 
-    address            immutable ALM_SPARK_PROXY        =                    0x1601843c5E9bC251A3272907010AFa41Fa18347E;
-    address            immutable LITE_PSM               =                    addr.addr("MCD_LITE_PSM_USDC_A");
+    address            immutable ALM_SPARK_PROXY        = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
+    address            immutable MCD_LITE_PSM_USDC_A    = addr.addr("MCD_LITE_PSM_USDC_A");
 
     // ---------- Medians and Validators  ----------
-    address           constant ETH_GLOBAL_VALIDATOR     =                    0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
-    address           constant MANTLE_VALIDATOR         =                    0xFa6eb665e067759ADdE03a8E6bD259adBd1D70c9;
-    address           constant NETHERMIND_VALIDATOR     =                    0x91242198eD62F9255F2048935D6AFb0C2302D147;
-    address           constant EULER_VALIDATOR          =                    0x1DCB8CcC022938e102814F1A299C7ae48A8BAAf6;
-    address           constant BTC_USD_MEDIAN           =                    0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
-    address           constant ETH_USD_MEDIAN           =                    0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address           constant WSTETH_USD_MEDIAN        =                    0x2F73b6567B866302e132273f67661fB89b5a66F2;
-    address           constant MKR_USD_MEDIAN           =                    0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
+    address            constant ETH_GLOBAL_VALIDATOR    = 0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
+    address            constant MANTLE_VALIDATOR        = 0xFa6eb665e067759ADdE03a8E6bD259adBd1D70c9;
+    address            constant NETHERMIND_VALIDATOR    = 0x91242198eD62F9255F2048935D6AFb0C2302D147;
+    address            constant EULER_VALIDATOR         = 0x1DCB8CcC022938e102814F1A299C7ae48A8BAAf6;
+    address            constant BTC_USD_MEDIAN          = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
+    address            constant ETH_USD_MEDIAN          = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
+    address            constant WSTETH_USD_MEDIAN       = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
+    address            constant MKR_USD_MEDIAN          = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
 
     function testBaseTokenBridgeIntegration() public {
         _setupRootDomain();
@@ -1078,24 +1041,24 @@ contract DssSpellTest is DssSpellTestBase {
 
         baseDomain.selectFork();
 
-        require(l2bridge.isOpen() == 1, "L2BaseTokenBridge/not-open");
-        require(l2bridge.otherBridge() == address(l1bridge), "L2BaseTokenBridge/other-bridge-mismatch");
-        require(keccak256(bytes(l2bridge.version())) == keccak256("1"), "L2BaseTokenBridge/version-does-not-match");
-        require(l2bridge.getImplementation() == L2_BRIDGE_IMP, "L2BaseTokenBridge/imp-does-not-match");
-        require(l2bridge.messenger() == L2_MESSENGER, "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
-        require(l2govRelay.l1GovernanceRelay() == address(l1govRelay), "L2BaseGovRelay/l2-gov-relay-mismatch");
-        require(l2govRelay.messenger() == L2_MESSENGER, "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
-        require(l2spell.l2Bridge() == address(l2bridge), "L2Spell/l2-bridge-mismatch");
+        require(L2TokenBridgeLike(L2_BRIDGE).isOpen()                    == 1,              "L2BaseTokenBridge/not-open");
+        require(L2TokenBridgeLike(L2_BRIDGE).otherBridge()               == L1_BRIDGE,      "L2BaseTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(L2TokenBridgeLike(L2_BRIDGE).version())) == keccak256("1"), "L2BaseTokenBridge/version-does-not-match");
+        require(L2TokenBridgeLike(L2_BRIDGE).getImplementation()         == L2_BRIDGE_IMP,  "L2BaseTokenBridge/imp-does-not-match");
+        require(L2TokenBridgeLike(L2_BRIDGE).messenger()                 == L2_MESSENGER,   "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
+        require(L2GovRelayLike(L2_GOV_RELAY).l1GovernanceRelay()         == L1_GOV_RELAY,   "L2BaseGovRelay/l2-gov-relay-mismatch");
+        require(L2GovRelayLike(L2_GOV_RELAY).messenger()                 == L2_MESSENGER,   "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_SPELL).l2Bridge()                   == L2_BRIDGE,      "L2Spell/l2-bridge-mismatch");
 
         rootDomain.selectFork();
 
-        require(keccak256(bytes(l1bridge.version())) == keccak256("1"), "BaseTokenBridge/version-does-not-match");
-        require(l1bridge.getImplementation() == L1_BRIDGE_IMP, "BaseTokenBridge/imp-does-not-match");
-        require(l1bridge.isOpen() == 1, "BaseTokenBridge/not-open");
-        require(l1bridge.otherBridge() == address(l2bridge), "BaseTokenBridge/other-bridge-mismatch");
-        require(l1bridge.messenger() == MESSENGER, "BaseTokenBridge/l1-bridge-messenger-mismatch");
-        require(l1govRelay.l2GovernanceRelay() == address(l2govRelay), "BaseGovRelay/l2-gov-relay-mismatch");
-        require(l1govRelay.messenger() == MESSENGER, "BaseGovRelay/l1-gov-relay-messenger-mismatch");
+        require(keccak256(bytes(L1TokenBridgeLike(L1_BRIDGE).version())) == keccak256("1"), "BaseTokenBridge/version-does-not-match");
+        require(L1TokenBridgeLike(L1_BRIDGE).getImplementation()         == L1_BRIDGE_IMP,  "BaseTokenBridge/imp-does-not-match");
+        require(L1TokenBridgeLike(L1_BRIDGE).isOpen()                    == 1,              "BaseTokenBridge/not-open");
+        require(L1TokenBridgeLike(L1_BRIDGE).otherBridge()               == L2_BRIDGE,      "BaseTokenBridge/other-bridge-mismatch");
+        require(L1TokenBridgeLike(L1_BRIDGE).messenger()                 == L1_MESSENGER,   "BaseTokenBridge/l1-bridge-messenger-mismatch");
+        require(L1GovRelayLike(L1_GOV_RELAY).l2GovernanceRelay()         == L2_GOV_RELAY,   "BaseGovRelay/l2-gov-relay-mismatch");
+        require(L1GovRelayLike(L1_GOV_RELAY).messenger()                 == L1_MESSENGER,   "BaseGovRelay/l1-gov-relay-messenger-mismatch");
 
 
         _vote(address(spell));
@@ -1103,111 +1066,39 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
 
-        require(l1bridge.escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
-        // // test tokens
-        assertEq(usds.allowance(L1_ESCROW, address(l1bridge)), type(uint256).max);
-        assertEq(l1bridge.l1ToL2Token(address(address(usds))), address(l2usds));
+        require(L1TokenBridgeLike(L1_BRIDGE).escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
 
-        assertEq(susds.allowance(L1_ESCROW, address(l1bridge)), type(uint256).max);
-        assertEq(l1bridge.l1ToL2Token(address(susds)), address(l2susds));
+        address[] memory tokens = new address[](2);
+        address[] memory l2tokens = new address[](2);
+        uint256[] memory maxWithdrawals = new uint256[](2);
 
+        tokens[0] = address(usds);
+        tokens[1] = SUSDS;
 
-        // switch to Base domain and relay the spell from L1
-        // the `true` keeps us on Base rather than `rootDomain.selectFork()`
-        baseDomain.relayFromHost(true);
+        l2tokens[0] = L2_USDS;
+        l2tokens[1] = L2_SUSDS;
 
-        // // test L2 side of initBridges
-        assertEq(l2bridge.l1ToL2Token(address(susds)), address(l2susds));
-        assertEq(l2bridge.maxWithdraws(address(l2susds)), type(uint256).max);
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
 
-        assertEq(l2bridge.l1ToL2Token(address(usds)), address(l2usds));
-        assertEq(l2bridge.maxWithdraws(address(l2usds)), type(uint256).max);
-
-        assertEq(WardsAbstract(address(l2susds)).wards(address(l2bridge)), 1);
-        assertEq(WardsAbstract(address(l2usds)).wards(address(l2bridge)), 1);
-
-
-        // ------- Test Deposit -------
-
-        rootDomain.selectFork();
-
-        deal(address(usds), address(this), 100 ether);
-        deal(address(susds), address(this), 100 ether);
-        assertEq(usds.balanceOf(address(this)), 100 ether);
-        assertEq(susds.balanceOf(address(this)), 100 ether);
-
-        usds.approve(address(l1bridge), 100 ether);
-        susds.approve(address(l1bridge), 100 ether);
-        uint256 escrowBeforeUsds = usds.balanceOf(L1_ESCROW);
-        uint256 escrowBeforeSUsds = susds.balanceOf(L1_ESCROW);
-
-        l1bridge.bridgeERC20To(
-            address(usds),
-            address(l2usds),
-            address(0xb0b),
-            100 ether,
-            1_000_000,
-            ""
-        );
-        l1bridge.bridgeERC20To(
-            address(susds),
-            address(l2susds),
-            address(0xb0b),
-            100 ether,
-            1_000_000,
-            ""
-        );
-
-        assertEq(usds.balanceOf(address(this)), 0);
-        assertEq(usds.balanceOf(L1_ESCROW), escrowBeforeUsds + 100 ether);
-        assertEq(susds.balanceOf(address(this)), 0);
-        assertEq(susds.balanceOf(L1_ESCROW), escrowBeforeSUsds + 100 ether);
-
-        baseDomain.relayFromHost(true);
-
-        assertEq(l2usds.balanceOf(address(0xb0b)), 100 ether);
-        assertEq(l2susds.balanceOf(address(0xb0b)), 100 ether);
-
-       // ------- Test Withdrawal -------
-
-        vm.startPrank(address(0xb0b));
-
-        l2usds.approve(address(l2bridge), 100 ether);
-        l2susds.approve(address(l2bridge), 100 ether);
-
-        l2bridge.bridgeERC20To(
-            address(l2usds),
-            address(usds),
-            address(0xced),
-            100 ether,
-            1_000_000,
-            ""
-        );
-        l2bridge.bridgeERC20To(
-            address(l2susds),
-            address(susds),
-            address(0xced),
-            100 ether,
-            1_000_000,
-            ""
-        );
-        vm.stopPrank();
-
-        assertEq(l2usds.balanceOf(address(0xb0b)), 0);
-        assertEq(l2susds.balanceOf(address(0xb0b)), 0);
-
-        baseDomain.relayToHost(true);
-
-        assertEq(usds.balanceOf(address(0xced)), 100 ether);
-        assertEq(susds.balanceOf(address(0xced)), 100 ether);
+        _testBaseTokenBridgeIntegration(BaseTokenBridgeParams({
+            l2bridge:       L2_BRIDGE,
+            l1bridge:       L1_BRIDGE,
+            l1escrow:       L1_ESCROW,
+            tokens:         tokens,
+            l2tokens:       l2tokens,
+            maxWithdrawals: maxWithdrawals
+        }));
     }
 
     function testsWhitelistSparkProxyOnLitePsm() public {
-         _vote(address(spell));
+        assertEq(LitePsmLike(MCD_LITE_PSM_USDC_A).bud(ALM_SPARK_PROXY), 0);
+
+        _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(LitePsmLike(LITE_PSM).bud(ALM_SPARK_PROXY), 1);
+        assertEq(LitePsmLike(MCD_LITE_PSM_USDC_A).bud(ALM_SPARK_PROXY), 1);
     }
 
     function testMedianValidators() public {

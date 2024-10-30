@@ -20,9 +20,9 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
 import { DssInstance, MCD } from "dss-test/MCD.sol";
-import { BridgesConfig, TokenBridgeInit } from "./dependencies/base-token-bridge/TokenBridgeInit.sol";
-import { L1TokenBridgeInstance } from "./dependencies/base-token-bridge/L1TokenBridgeInstance.sol";
-import { L2TokenBridgeInstance } from "./dependencies/base-token-bridge/L2TokenBridgeInstance.sol";
+import { BridgesConfig, TokenBridgeInit } from "./dependencies/op-token-bridge/TokenBridgeInit.sol";
+import { L1TokenBridgeInstance } from "./dependencies/op-token-bridge/L1TokenBridgeInstance.sol";
+import { L2TokenBridgeInstance } from "./dependencies/op-token-bridge/L2TokenBridgeInstance.sol";
 import { AllocatorSharedInstance, AllocatorIlkInstance } from "./dependencies/dss-allocator/AllocatorInstances.sol";
 import { AllocatorInit, AllocatorIlkConfig } from "./dependencies/dss-allocator/AllocatorInit.sol";
 
@@ -37,7 +37,7 @@ interface MedianLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/71f200566736bdd5a3de20bd456181de1c7a2eb2/governance/votes/Executive%20vote%20-%20October%2031%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/820339cf860e625924811f181062851d7e25b610/governance/votes/Executive%20vote%20-%20October%2031%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
         "2024-10-31 MakerDAO Executive Spell | Hash: 0x6407f9203bf4f816cc353ebc95463d917e77ccb701f2e85945dcf91274b628ed";
 
@@ -68,8 +68,8 @@ contract DssSpellAction is DssAction {
     address internal immutable USDS                    = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
     address internal immutable ILK_REGISTRY            = DssExecLib.getChangelogAddress("ILK_REGISTRY");
-    address internal immutable LITE_PSM                = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
-    address internal immutable MCD_PAUSE_PROXY         = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
+    address internal immutable MCD_LITE_PSM_USDC_A     = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
+    address internal immutable MCD_PAUSE_PROXY         = DssExecLib.pauseProxy();
 
 
     // ---------- BASE Token Bridge ----------
@@ -226,18 +226,18 @@ contract DssSpellAction is DssAction {
             ilkRegistry     : ILK_REGISTRY
         });
 
-        // Note: Init shared components for Allocator System be calling AllocatorInit.initShared
+        // Init shared components for Allocator System be calling AllocatorInit.initShared
         AllocatorInit.initShared(dss, allocatorSharedInstance);
 
-        // Note: Init Allocator ILK for Spark Subdao by calling AllocatorInit.initIlk using the following parameters:
+        // Init Allocator ILK for Spark Subdao by calling AllocatorInit.initIlk using the following parameters:
         AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
 
 
         // ---------- Whitelist Spark ALM Proxy on the PSM ----------
         // Forum: https://forum.sky.money/t/spell-contents-2024-10-31/25421/
 
-        // Note: IPSMLike(MCD_LITE_PSM_USDC_A).kiss(almProxy: 0x1601843c5E9bC251A3272907010AFa41Fa18347E);
-        DssLitePsmLike(LITE_PSM).kiss(SPARK_ALM_PROXY);
+        // IPSMLike(MCD_LITE_PSM_USDC_A).kiss(almProxy: 0x1601843c5E9bC251A3272907010AFa41Fa18347E);
+        DssLitePsmLike(MCD_LITE_PSM_USDC_A).kiss(SPARK_ALM_PROXY);
 
 
         // ---------- Add new validators for Median (Medianizer) ----------
