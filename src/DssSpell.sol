@@ -46,9 +46,6 @@ contract DssSpellAction is DssAction {
         return false;
     }
 
-    // ---------- Math ----------
-    uint256 internal constant RAY     = 10 ** 27;
-
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -65,6 +62,7 @@ contract DssSpellAction is DssAction {
     // --- Math ---
     uint256 internal constant RAD = 10 ** 45;
 
+    //  ---------- Contracts ----------
     address internal immutable USDS                    = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
     address internal immutable ILK_REGISTRY            = DssExecLib.getChangelogAddress("ILK_REGISTRY");

@@ -316,7 +316,7 @@ contract DssSpellTest is DssSpellTestBase {
                 roles: addr.addr("ALLOCATOR_ROLES"),
                 buffer: addr.addr("ALLOCATOR_SPARK_A_BUFFER"),
                 vault: addr.addr("ALLOCATOR_SPARK_A_VAULT"),
-                allocatorProxy: 0x3300f198988e4C9C63F75dF86De36421f06af8c4 // Spark Proxy
+                allocatorProxy: addr.addr("SPARK_PROXY")
         });
 
         // Sanity checks
