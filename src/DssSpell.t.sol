@@ -309,21 +309,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAllocatorIntegration() public { // add the `skipped` modifier to skip
-        AllocatorVaultLike sparkVault = AllocatorVaultLike(addr.addr("ALLOCATOR_SPARK_A_VAULT"));
-
-        // Sanity checks
-        require(AllocatorVaultLike(sparkVault).ilk()      == "ALLOCATOR-SPARK-A",                   "AllocatorInit/vault-ilk-mismatch");
-        require(AllocatorVaultLike(sparkVault).roles()    == addr.addr("ALLOCATOR_ROLES"),          "AllocatorInit/vault-roles-mismatch");
-        require(AllocatorVaultLike(sparkVault).buffer()   == addr.addr("ALLOCATOR_SPARK_A_BUFFER"), "AllocatorInit/vault-buffer-mismatch");
-        require(AllocatorVaultLike(sparkVault).vat()      == address(vat),                          "AllocatorInit/vault-vat-mismatch");
-        require(AllocatorVaultLike(sparkVault).usdsJoin() == address(usdsJoin),                     "AllocatorInit/vault-usds-join-mismatch");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        _checkAllocatorIntegration(
-            AllocatorIntegrationParams({
+        AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-SPARK-A",
                 pip: addr.addr("PIP_ALLOCATOR_SPARK_A"),
                 registry: addr.addr("ALLOCATOR_REGISTRY"),
@@ -331,8 +317,20 @@ contract DssSpellTest is DssSpellTestBase {
                 buffer: addr.addr("ALLOCATOR_SPARK_A_BUFFER"),
                 vault: addr.addr("ALLOCATOR_SPARK_A_VAULT"),
                 allocatorProxy: 0x3300f198988e4C9C63F75dF86De36421f06af8c4 // Spark Proxy
-            })
-        );
+        });
+
+        // Sanity checks
+        require(AllocatorVaultLike(p.vault).ilk()      == "ALLOCATOR-SPARK-A",                   "AllocatorInit/vault-ilk-mismatch");
+        require(AllocatorVaultLike(p.vault).roles()    == addr.addr("ALLOCATOR_ROLES"),          "AllocatorInit/vault-roles-mismatch");
+        require(AllocatorVaultLike(p.vault).buffer()   == addr.addr("ALLOCATOR_SPARK_A_BUFFER"), "AllocatorInit/vault-buffer-mismatch");
+        require(AllocatorVaultLike(p.vault).vat()      == address(vat),                          "AllocatorInit/vault-vat-mismatch");
+        require(AllocatorVaultLike(p.vault).usdsJoin() == address(usdsJoin),                     "AllocatorInit/vault-usds-join-mismatch");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        _checkAllocatorIntegration(p);
     }
 
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
@@ -1006,16 +1004,16 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    address            immutable L2_BRIDGE              = base.addr("L2_BASE_TOKEN_BRIDGE");
-    address            immutable L2_BRIDGE_IMP          = base.addr("L2_BRIDGE_IMP");
-    address            immutable L2_GOV_RELAY           = base.addr("L2_GOV_RELAY");
+    L2TokenBridgeLike  immutable l2Bridge               = L2TokenBridgeLike(base.addr("L2_BASE_TOKEN_BRIDGE"));
+    address            immutable L2_BRIDGE_IMP          = base.addr("L2_BASE_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2GovRelay             = L2GovRelayLike(base.addr("L2_GOV_RELAY"));
     address            immutable L2_SPELL               = base.addr("L2_SPELL");
     address            immutable L2_USDS                = base.addr("L2_USDS");
     address            immutable L2_SUSDS               = base.addr("L2_SUSDS");
     address            immutable L2_MESSENGER           = base.addr("L2_MESSENGER");
     address            immutable SUSDS                  = addr.addr("SUSDS");
-    address            immutable L1_BRIDGE              = addr.addr("BASE_TOKEN_BRIDGE");
-    address            immutable L1_GOV_RELAY           = addr.addr("BASE_GOV_RELAY");
+    L1TokenBridgeLike  immutable l1Bridge               = L2TokenBridgeLike(addr.addr("BASE_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1GovRelay             = L2GovRelayLike(addr.addr("BASE_GOV_RELAY"));
     address            immutable L1_ESCROW              = addr.addr("BASE_ESCROW");
     address            immutable L1_BRIDGE_IMP          = addr.addr("BASE_TOKEN_BRIDGE_IMP");
     address            constant  L1_MESSENGER           = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
@@ -1041,24 +1039,24 @@ contract DssSpellTest is DssSpellTestBase {
 
         baseDomain.selectFork();
 
-        require(L2TokenBridgeLike(L2_BRIDGE).isOpen()                    == 1,              "L2BaseTokenBridge/not-open");
-        require(L2TokenBridgeLike(L2_BRIDGE).otherBridge()               == L1_BRIDGE,      "L2BaseTokenBridge/other-bridge-mismatch");
-        require(keccak256(bytes(L2TokenBridgeLike(L2_BRIDGE).version())) == keccak256("1"), "L2BaseTokenBridge/version-does-not-match");
-        require(L2TokenBridgeLike(L2_BRIDGE).getImplementation()         == L2_BRIDGE_IMP,  "L2BaseTokenBridge/imp-does-not-match");
-        require(L2TokenBridgeLike(L2_BRIDGE).messenger()                 == L2_MESSENGER,   "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
-        require(L2GovRelayLike(L2_GOV_RELAY).l1GovernanceRelay()         == L1_GOV_RELAY,   "L2BaseGovRelay/l2-gov-relay-mismatch");
-        require(L2GovRelayLike(L2_GOV_RELAY).messenger()                 == L2_MESSENGER,   "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
-        require(L2BridgeSpellLike(L2_SPELL).l2Bridge()                   == L2_BRIDGE,      "L2Spell/l2-bridge-mismatch");
+        require(l2Bridge.isOpen()                      == 1,                   "L2BaseTokenBridge/not-open");
+        require(l2Bridge.otherBridge()                 == address(l1Bridge),   "L2BaseTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2Bridge.version()))   == keccak256("1"),      "L2BaseTokenBridge/version-does-not-match");
+        require(l2Bridge.getImplementation()           == L2_BRIDGE_IMP,       "L2BaseTokenBridge/imp-does-not-match");
+        require(l2Bridge.messenger()                   == L2_MESSENGER,        "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2GovRelay.l1GovernanceRelay()         == address(l1GovRelay), "L2BaseGovRelay/l2-gov-relay-mismatch");
+        require(l2GovRelay.messenger()                 == L2_MESSENGER,        "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_SPELL).l2Bridge() == address(l2Bridge),   "L2Spell/l2-bridge-mismatch");
 
         rootDomain.selectFork();
 
-        require(keccak256(bytes(L1TokenBridgeLike(L1_BRIDGE).version())) == keccak256("1"), "BaseTokenBridge/version-does-not-match");
-        require(L1TokenBridgeLike(L1_BRIDGE).getImplementation()         == L1_BRIDGE_IMP,  "BaseTokenBridge/imp-does-not-match");
-        require(L1TokenBridgeLike(L1_BRIDGE).isOpen()                    == 1,              "BaseTokenBridge/not-open");
-        require(L1TokenBridgeLike(L1_BRIDGE).otherBridge()               == L2_BRIDGE,      "BaseTokenBridge/other-bridge-mismatch");
-        require(L1TokenBridgeLike(L1_BRIDGE).messenger()                 == L1_MESSENGER,   "BaseTokenBridge/l1-bridge-messenger-mismatch");
-        require(L1GovRelayLike(L1_GOV_RELAY).l2GovernanceRelay()         == L2_GOV_RELAY,   "BaseGovRelay/l2-gov-relay-mismatch");
-        require(L1GovRelayLike(L1_GOV_RELAY).messenger()                 == L1_MESSENGER,   "BaseGovRelay/l1-gov-relay-messenger-mismatch");
+        require(keccak256(bytes(l1Bridge.version()))   == keccak256("1"),      "BaseTokenBridge/version-does-not-match");
+        require(l1Bridge.getImplementation()           == L1_BRIDGE_IMP,       "BaseTokenBridge/imp-does-not-match");
+        require(l1Bridge.isOpen()                      == 1,                   "BaseTokenBridge/not-open");
+        require(l1Bridge.otherBridge()                 == address(l2Bridge),   "BaseTokenBridge/other-bridge-mismatch");
+        require(l1Bridge.messenger()                   == L1_MESSENGER,        "BaseTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1GovRelay.l2GovernanceRelay()         == address(l2GovRelay), "BaseGovRelay/l2-gov-relay-mismatch");
+        require(l1GovRelay.messenger()                 == L1_MESSENGER,        "BaseGovRelay/l1-gov-relay-messenger-mismatch");
 
 
         _vote(address(spell));
@@ -1066,7 +1064,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
 
-        require(L1TokenBridgeLike(L1_BRIDGE).escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
+        require(l1Bridge.escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
 
         address[] memory tokens = new address[](2);
         address[] memory l2tokens = new address[](2);
@@ -1082,11 +1080,11 @@ contract DssSpellTest is DssSpellTestBase {
         maxWithdrawals[1] = type(uint256).max;
 
         _testBaseTokenBridgeIntegration(BaseTokenBridgeParams({
-            l2bridge:       L2_BRIDGE,
-            l1bridge:       L1_BRIDGE,
-            l1escrow:       L1_ESCROW,
+            l2Bridge:       address(l2Bridge),
+            l1Bridge:       address(l1Bridge),
+            l1Escrow:       L1_ESCROW,
             tokens:         tokens,
-            l2tokens:       l2tokens,
+            l2Tokens:       l2tokens,
             maxWithdrawals: maxWithdrawals
         }));
     }

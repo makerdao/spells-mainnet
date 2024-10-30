@@ -1974,6 +1974,7 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
         assertEq(litePsm.tout(), type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tout-", p.ilk));
     }
+
     struct AllocatorIntegrationParams {
         bytes32 ilk;
         address pip;
@@ -2032,12 +2033,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(usds.balanceOf(p.buffer), 0);
     }
 
-        struct BaseTokenBridgeParams {
-        address l2bridge;
-        address l1bridge;
-        address l1escrow;
+    struct BaseTokenBridgeParams {
+        address l2Bridge;
+        address l1Bridge;
+        address l1Escrow;
         address[] tokens;
-        address[] l2tokens;
+        address[] l2Tokens;
         uint256[] maxWithdrawals;
     }
 
@@ -2045,18 +2046,18 @@ contract DssSpellTestBase is Config, DssTest {
         for (uint i = 0; i < p.tokens.length; i ++) {
             rootDomain.selectFork();
 
-            assertEq(GemAbstract(p.tokens[i]).allowance(p.l1escrow, p.l1bridge), type(uint256).max);
-            assertEq(L1TokenBridgeLike(p.l1bridge).l1ToL2Token(p.tokens[i]), p.l2tokens[i]);
+            assertEq(GemAbstract(p.tokens[i]).allowance(p.l1Escrow, p.l1Bridge), type(uint256).max);
+            assertEq(L1TokenBridgeLike(p.l1Bridge).l1ToL2Token(p.tokens[i]), p.l2Tokens[i]);
 
             // switch to Base domain and relay the spell from L1
             // the `true` keeps us on Base rather than `rootDomain.selectFork()`
             baseDomain.relayFromHost(true);
 
             // test L2 side of initBridges
-            assertEq(L2TokenBridgeLike(p.l2bridge).l1ToL2Token(p.tokens[i]), p.l2tokens[i]);
-            assertEq(L2TokenBridgeLike(p.l2bridge).maxWithdraws(p.l2tokens[i]), p.maxWithdrawals[i]);
+            assertEq(L2TokenBridgeLike(p.l2Bridge).l1ToL2Token(p.tokens[i]), p.l2Tokens[i]);
+            assertEq(L2TokenBridgeLike(p.l2Bridge).maxWithdraws(p.l2Tokens[i]), p.maxWithdrawals[i]);
 
-            assertEq(WardsAbstract(p.l2tokens[i]).wards(p.l2bridge), 1);
+            assertEq(WardsAbstract(p.l2Tokens[i]).wards(p.l2Bridge), 1);
 
             // ------- Test Deposit -------
 
@@ -2065,12 +2066,12 @@ contract DssSpellTestBase is Config, DssTest {
             deal(p.tokens[i], address(this), 100 ether);
             assertEq(GemAbstract(p.tokens[i]).balanceOf(address(this)), 100 ether);
 
-            GemAbstract(p.tokens[i]).approve(p.l1bridge, 100 ether);
-            uint256 escrowBeforeBalance = GemAbstract(p.tokens[i]).balanceOf(p.l1escrow);
+            GemAbstract(p.tokens[i]).approve(p.l1Bridge, 100 ether);
+            uint256 escrowBeforeBalance = GemAbstract(p.tokens[i]).balanceOf(p.l1Escrow);
 
-            L1TokenBridgeLike(p.l1bridge).bridgeERC20To(
+            L1TokenBridgeLike(p.l1Bridge).bridgeERC20To(
                 p.tokens[i],
-                p.l2tokens[i],
+                p.l2Tokens[i],
                 address(0xb0b),
                 100 ether,
                 1_000_000,
@@ -2078,20 +2079,20 @@ contract DssSpellTestBase is Config, DssTest {
             );
 
             assertEq(GemAbstract(p.tokens[i]).balanceOf(address(this)), 0);
-            assertEq(GemAbstract(p.tokens[i]).balanceOf(p.l1escrow), escrowBeforeBalance + 100 ether);
+            assertEq(GemAbstract(p.tokens[i]).balanceOf(p.l1Escrow), escrowBeforeBalance + 100 ether);
 
             baseDomain.relayFromHost(true);
 
-            assertEq(GemAbstract(p.l2tokens[i]).balanceOf(address(0xb0b)), 100 ether);
+            assertEq(GemAbstract(p.l2Tokens[i]).balanceOf(address(0xb0b)), 100 ether);
 
             // ------- Test Withdrawal -------
 
             vm.startPrank(address(0xb0b));
 
-            GemAbstract(p.l2tokens[i]).approve(p.l2bridge, 100 ether);
+            GemAbstract(p.l2Tokens[i]).approve(p.l2Bridge, 100 ether);
 
-            L2TokenBridgeLike(p.l2bridge).bridgeERC20To(
-                p.l2tokens[i],
+            L2TokenBridgeLike(p.l2Bridge).bridgeERC20To(
+                p.l2Tokens[i],
                 p.tokens[i],
                 address(0xced),
                 100 ether,
@@ -2101,7 +2102,7 @@ contract DssSpellTestBase is Config, DssTest {
 
             vm.stopPrank();
 
-            assertEq(GemAbstract(p.l2tokens[i]).balanceOf(address(0xb0b)), 0);
+            assertEq(GemAbstract(p.l2Tokens[i]).balanceOf(address(0xb0b)), 0);
 
             baseDomain.relayToHost(true);
 

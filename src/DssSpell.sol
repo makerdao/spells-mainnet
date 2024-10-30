@@ -116,7 +116,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- Init Base Native Bridge ----------
         // Forum: https://forum.sky.money/t/spell-contents-2024-10-31/25421/
-        // Note: Init Base Token Bridge for USDS, sUSDS by calling TokenBridgeInit.initBridges using the following parameters:
 
         // Set l1BridgeInstance with the following parameters:
         L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
@@ -181,7 +180,7 @@ contract DssSpellAction is DssAction {
             l1BridgeImpCLKey: "BASE_TOKEN_BRIDGE_IMP"
         });
 
-        // Init Base Token Bridge for USDS, sUSDS
+        // Init Base Token Bridge for USDS, sUSDS by calling TokenBridgeInit.initBridges using the following parameters:
         TokenBridgeInit.initBridges(dss, l1BridgeInstance, l2BridgeInstance, bridgeCfg);
 
 
@@ -268,7 +267,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Chainlog bump ----------
 
-        // Note: we have to patch chainlog version as new collateral is added
+        // Note: we have to patch chainlog version as new keys are is added
         DssExecLib.setChangelogVersion("1.19.3");
     }
 }
