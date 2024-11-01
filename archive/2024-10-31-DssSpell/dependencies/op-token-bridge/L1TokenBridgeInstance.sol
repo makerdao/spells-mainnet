@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2023 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2024 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,9 @@
 
 pragma solidity >=0.8.0;
 
-struct LockstakeInstance {
-    address lsmkr;
-    address engine;
-    address clipper;
-    address clipperCalc;
+struct L1TokenBridgeInstance {
+    address govRelay;
+    address escrow;
+    address bridge;
+    address bridgeImp;
 }
