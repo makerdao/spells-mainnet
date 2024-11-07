@@ -45,6 +45,47 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
 
+        // ---------- Increase SparkLend D3M Buffer Parameter ----------
+        // Forum: https://forum.sky.money/t/14-nov-2024-proposed-changes-to-spark-for-upcoming-spell/25466
+        // Poll: https://vote.makerdao.com/polling/QmNTKFqG#poll-detail
+
+        // Increase SparkLend D3M buffer parameter (`buf`) by 50 million DAI from 50 million DAI to 100 million DAI.
+
+        // ---------- Update Gelato Keeper Treasury Address ----------
+        // Forum: https://forum.sky.money/t/gelato-keeper-update/25456
+
+        // Update DssExecLib.setContract: GELATO_PAYMENT_ADAPTER - "treasury" to 0x5041c60C75633F29DEb2AED79cB0A9ed79202415
+
+        // ---------- Approve ConsolFreight DAO Resolution ----------
+
+        // Write-off the debt of RWA003-A by calling `cull()`
+
+        // Approve ConsolFreight Dao Resolution with IPFS hash X (TODO)
+
+        // ---------- Set Facilitator DAI Payment Streams ----------
+
+        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 168,000 DAI | 0xf3F868534FAD48EF5a228Fe78669cf242745a755
+
+        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 168,000 DAI | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+
+        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | 84,000 DAI | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+
+        // ---------- Set Facilitator MKR Payment Streams ----------
+
+        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 72.00 MKR | 0xf3F868534FAD48EF5a228Fe78669cf242745a755
+
+        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 72.00 MKR | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+
+        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | 36.00 MKR | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+
+        // ---------- Aligned Delegate DAI Compensation ----------
+
+        // ---------- Aligned Delegate MKR Compensation ----------
+
+        // ---------- Launch Project Funding ----------
+
+        // ---------- Spark Proxy Spell ----------
+
     }
 }
 
