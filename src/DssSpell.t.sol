@@ -46,24 +46,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface L1GovRelayLike {
-    function l2GovernanceRelay() external view returns (address);
-    function messenger() external view returns (address);
-}
-
-interface L2GovRelayLike {
-    function l1GovernanceRelay() external view returns (address);
-    function messenger() external view returns (address);
-}
-
-interface L2BridgeSpellLike {
-    function l2Bridge() external view returns (address);
-}
-
-interface MedianLike {
-    function orcl(address) external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -308,7 +290,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
+    function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-SPARK-A",
                 pip: addr.addr("PIP_ALLOCATOR_SPARK_A"),
@@ -1004,128 +986,5 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    L2TokenBridgeLike  immutable l2Bridge               = L2TokenBridgeLike(base.addr("L2_BASE_TOKEN_BRIDGE"));
-    address            immutable L2_BRIDGE_IMP          = base.addr("L2_BASE_TOKEN_BRIDGE_IMP");
-    L2GovRelayLike     immutable l2GovRelay             = L2GovRelayLike(base.addr("L2_GOV_RELAY"));
-    address            immutable L2_SPELL               = base.addr("L2_SPELL");
-    address            immutable L2_USDS                = base.addr("L2_USDS");
-    address            immutable L2_SUSDS               = base.addr("L2_SUSDS");
-    address            immutable L2_MESSENGER           = base.addr("L2_MESSENGER");
-    address            immutable SUSDS                  = addr.addr("SUSDS");
-    L1TokenBridgeLike  immutable l1Bridge               = L1TokenBridgeLike(addr.addr("BASE_TOKEN_BRIDGE"));
-    L1GovRelayLike     immutable l1GovRelay             = L1GovRelayLike(addr.addr("BASE_GOV_RELAY"));
-    address            immutable L1_ESCROW              = addr.addr("BASE_ESCROW");
-    address            immutable L1_BRIDGE_IMP          = addr.addr("BASE_TOKEN_BRIDGE_IMP");
-    address            constant  L1_MESSENGER           = 0x866E82a600A1414e583f7F13623F1aC5d58b0Afa;
 
-    address            immutable ALM_SPARK_PROXY        = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
-    address            immutable MCD_LITE_PSM_USDC_A    = addr.addr("MCD_LITE_PSM_USDC_A");
-
-    // ---------- Medians and Validators  ----------
-    address            constant ETH_GLOBAL_VALIDATOR    = 0xcfC62b2269521e3212Ce1b6670caE6F0e34E8bF3;
-    address            constant MANTLE_VALIDATOR        = 0xFa6eb665e067759ADdE03a8E6bD259adBd1D70c9;
-    address            constant NETHERMIND_VALIDATOR    = 0x91242198eD62F9255F2048935D6AFb0C2302D147;
-    address            constant EULER_VALIDATOR         = 0x1DCB8CcC022938e102814F1A299C7ae48A8BAAf6;
-    address            constant BTC_USD_MEDIAN          = 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f;
-    address            constant ETH_USD_MEDIAN          = 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85;
-    address            constant WSTETH_USD_MEDIAN       = 0x2F73b6567B866302e132273f67661fB89b5a66F2;
-    address            constant MKR_USD_MEDIAN          = 0xdbBe5e9B1dAa91430cF0772fCEbe53F6c6f137DF;
-
-    function testBaseTokenBridgeIntegration() public {
-        _setupRootDomain();
-        baseDomain = new OptimismDomain(config, getChain("base"), rootDomain);
-
-        // ------ Sanity checks -------
-
-        baseDomain.selectFork();
-
-        require(l2Bridge.isOpen()                      == 1,                   "L2BaseTokenBridge/not-open");
-        require(l2Bridge.otherBridge()                 == address(l1Bridge),   "L2BaseTokenBridge/other-bridge-mismatch");
-        require(keccak256(bytes(l2Bridge.version()))   == keccak256("1"),      "L2BaseTokenBridge/version-does-not-match");
-        require(l2Bridge.getImplementation()           == L2_BRIDGE_IMP,       "L2BaseTokenBridge/imp-does-not-match");
-        require(l2Bridge.messenger()                   == L2_MESSENGER,        "L2BaseTokenBridge/l2-bridge-messenger-mismatch");
-        require(l2GovRelay.l1GovernanceRelay()         == address(l1GovRelay), "L2BaseGovRelay/l2-gov-relay-mismatch");
-        require(l2GovRelay.messenger()                 == L2_MESSENGER,        "L2BaseGovRelay/l2-gov-relay-messenger-mismatch");
-        require(L2BridgeSpellLike(L2_SPELL).l2Bridge() == address(l2Bridge),   "L2Spell/l2-bridge-mismatch");
-
-        rootDomain.selectFork();
-
-        require(keccak256(bytes(l1Bridge.version()))   == keccak256("1"),      "BaseTokenBridge/version-does-not-match");
-        require(l1Bridge.getImplementation()           == L1_BRIDGE_IMP,       "BaseTokenBridge/imp-does-not-match");
-        require(l1Bridge.isOpen()                      == 1,                   "BaseTokenBridge/not-open");
-        require(l1Bridge.otherBridge()                 == address(l2Bridge),   "BaseTokenBridge/other-bridge-mismatch");
-        require(l1Bridge.messenger()                   == L1_MESSENGER,        "BaseTokenBridge/l1-bridge-messenger-mismatch");
-        require(l1GovRelay.l2GovernanceRelay()         == address(l2GovRelay), "BaseGovRelay/l2-gov-relay-mismatch");
-        require(l1GovRelay.messenger()                 == L1_MESSENGER,        "BaseGovRelay/l1-gov-relay-messenger-mismatch");
-
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-
-        require(l1Bridge.escrow() == L1_ESCROW, "BaseTokenBridge/escrow-does-not-match");
-
-        address[] memory tokens = new address[](2);
-        address[] memory l2tokens = new address[](2);
-        uint256[] memory maxWithdrawals = new uint256[](2);
-
-        tokens[0] = address(usds);
-        tokens[1] = SUSDS;
-
-        l2tokens[0] = L2_USDS;
-        l2tokens[1] = L2_SUSDS;
-
-        maxWithdrawals[0] = type(uint256).max;
-        maxWithdrawals[1] = type(uint256).max;
-
-        _testBaseTokenBridgeIntegration(BaseTokenBridgeParams({
-            l2Bridge:       address(l2Bridge),
-            l1Bridge:       address(l1Bridge),
-            l1Escrow:       L1_ESCROW,
-            tokens:         tokens,
-            l2Tokens:       l2tokens,
-            maxWithdrawals: maxWithdrawals
-        }));
-    }
-
-    function testsWhitelistSparkProxyOnLitePsm() public {
-        assertEq(LitePsmLike(MCD_LITE_PSM_USDC_A).bud(ALM_SPARK_PROXY), 0);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(LitePsmLike(MCD_LITE_PSM_USDC_A).bud(ALM_SPARK_PROXY), 1);
-    }
-
-    function testMedianValidators() public {
-        address[] memory validators = new address[](4);
-        validators[0] = ETH_GLOBAL_VALIDATOR;
-        validators[1] = MANTLE_VALIDATOR;
-        validators[2] = NETHERMIND_VALIDATOR;
-        validators[3] = EULER_VALIDATOR;
-
-        address[] memory medians = new address[](4);
-        medians[0] = BTC_USD_MEDIAN;
-        medians[1] = ETH_USD_MEDIAN;
-        medians[2] = WSTETH_USD_MEDIAN;
-        medians[3] = MKR_USD_MEDIAN;
-
-        for (uint i = 0; i < validators.length; i++) {
-            for (uint j = 0; j < medians.length; j++) {
-                assertEq(MedianLike(medians[j]).orcl(validators[i]), 0);
-            }
-        }
-
-         _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for (uint i = 0; i < validators.length; i++) {
-            for (uint j = 0; j < medians.length; j++) {
-                assertEq(MedianLike(medians[j]).orcl(validators[i]), 1);
-            }
-        }
-    }
 }
