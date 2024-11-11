@@ -675,6 +675,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testPayments() public { // add the `skipped` modifier to skip
+        bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
@@ -716,7 +717,7 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 previousSurplusBalance = vat.sin(address(vow));
         PaymentAmounts memory previousTotalSupply = PaymentAmounts({
             dai: int256(dai.totalSupply()),
-            mkr: int256(mkr.totalSupply()),
+            mkr: int256(mkr.balanceOf(address(pauseProxy))),
             usds: int256(usds.totalSupply()),
             sky: int256(sky.totalSupply())
         });
@@ -771,22 +772,24 @@ contract DssSpellTest is DssSpellTestBase {
         // Check calculated vs actual totals
         PaymentAmounts memory actualTotalDiff = PaymentAmounts({
             dai: int256(dai.totalSupply()) - previousTotalSupply.dai,
-            mkr: int256(mkr.totalSupply()) - previousTotalSupply.mkr,
+            mkr: previousTotalSupply.mkr - int256(mkr.balanceOf(address(pauseProxy))),
             usds: int256(usds.totalSupply()) - previousTotalSupply.usds,
             sky: int256(sky.totalSupply()) - previousTotalSupply.sky
         });
-        assertEq(
-            actualTotalDiff.dai + actualTotalDiff.usds,
-            calculatedTotalDiff.dai + calculatedTotalDiff.usds,
-            "TestPayments/invalid-dai-usds-total"
-        );
+        if (ignoreTotalSupplyDaiUsds == false) {
+            assertEq(
+                actualTotalDiff.dai + actualTotalDiff.usds,
+                calculatedTotalDiff.dai + calculatedTotalDiff.usds,
+                "TestPayments/invalid-dai-usds-total"
+            );
+            // Check that dai/usds transfers modify surplus buffer
+            assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY);
+        }
         assertEq(
             actualTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) + actualTotalDiff.sky,
             calculatedTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) +  calculatedTotalDiff.sky,
             "TestPayments/invalid-mkr-sky-total"
         );
-        // Check that dai/usds transfers modify surplus buffer
-        assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY);
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
