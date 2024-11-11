@@ -46,6 +46,18 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface DirectSparkDaiPlanLike {
+    function buffer() external view returns (uint256);
+}
+
+interface GelatoPaymentAdapterLike {
+    function treasury() external view returns (address);
+}
+
+interface RwaLiquidationOracleLike {
+    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -437,48 +449,102 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testVestDAI() public skipped { // add the `skipped` modifier to skip
+    function testVestDAI() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 DEC_01_2023 = 1701385200;
-        uint256 NOV_30_2024 = 1733007599;
+        uint256 OCT_01_2024 = 1727740800;
+        uint256 DEC_01_2024 = 1733011200;
+        uint256 JAN_31_2025 = 1738367999;
 
         // For each new stream, provide Stream object
         // and initialize the array with the corrent number of new streams
-        VestStream[] memory streams = new VestStream[](1);
+        VestStream[] memory streams = new VestStream[](3);
         streams[0] = VestStream({
-            id:  38,
-            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
-            bgn: DEC_01_2023,
-            clf: DEC_01_2023,
-            fin: NOV_30_2024,
-            tau: 366 days,
+            id:  39,
+            usr: wallets.addr("JANSKY"),
+            bgn: OCT_01_2024,
+            clf: OCT_01_2024,
+            fin: JAN_31_2025,
+            tau: 123 days - 1,
             mgr: address(0),
             res: 1,
-            tot: 504_000 * WAD,
+            tot: 168_000 * WAD,
+            rxd: 0
+        });
+
+        streams[1] = VestStream({
+            id:  40,
+            usr: wallets.addr("VOTEWIZARD"),
+            bgn: OCT_01_2024,
+            clf: OCT_01_2024,
+            fin: JAN_31_2025,
+            tau: 123 days - 1,
+            mgr: address(0),
+            res: 1,
+            tot: 168_000 * WAD,
+            rxd: 0
+        });
+
+        streams[2] = VestStream({
+            id:  41,
+            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
+            bgn: DEC_01_2024,
+            clf: DEC_01_2024,
+            fin: JAN_31_2025,
+            tau: 62 days - 1,
+            mgr: address(0),
+            res: 1,
+            tot: 84_000 * WAD,
             rxd: 0
         });
 
         _checkVestDai(streams);
     }
 
-    function testVestMKR() public skipped { // add the `skipped` modifier to skip
+    function testVestMKR() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 DEC_01_2023 = 1701385200;
-        uint256 NOV_30_2024 = 1733007599;
+        uint256 OCT_01_2024 = 1727740800;
+        uint256 DEC_01_2024 = 1733011200;
+        uint256 JAN_31_2025 = 1738367999;
 
         // For each new stream, provide Stream object
         // and initialize the array with the corrent number of new streams
-        VestStream[] memory streams = new VestStream[](1);
+        VestStream[] memory streams = new VestStream[](3);
         streams[0] = VestStream({
-            id:  44,
-            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
-            bgn: DEC_01_2023,
-            clf: DEC_01_2023,
-            fin: NOV_30_2024,
-            tau: 366 days,
+            id:  45,
+            usr: wallets.addr("JANSKY"),
+            bgn: OCT_01_2024,
+            clf: OCT_01_2024,
+            fin: JAN_31_2025,
+            tau: 123 days - 1,
             mgr: address(0),
             res: 1,
-            tot: 216 * WAD,
+            tot: 72 * WAD,
+            rxd: 0
+        });
+
+        streams[1] = VestStream({
+            id:  46,
+            usr: wallets.addr("VOTEWIZARD"),
+            bgn: OCT_01_2024,
+            clf: OCT_01_2024,
+            fin: JAN_31_2025,
+            tau: 123 days - 1,
+            mgr: address(0),
+            res: 1,
+            tot: 72 * WAD,
+            rxd: 0
+        });
+
+        streams[2] = VestStream({
+            id:  47,
+            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
+            bgn: DEC_01_2024,
+            clf: DEC_01_2024,
+            fin: JAN_31_2025,
+            tau: 62 days - 1,
+            mgr: address(0),
+            res: 1,
+            tot: 36 * WAD,
             rxd: 0
         });
 
@@ -608,22 +674,36 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[2] memory payees = [
-            Payee(address(dai), wallets.addr("AAVE_V3_TREASURY"), 234_089 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("EARLY_BIRD_REWARDS"), 27_222_832.80 ether) // Note: ether is only a keyword helper
+        Payee[16] memory payees = [
+            Payee(address(dai), wallets.addr("JULIACHANG"), 109_168 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("CLOAKY"), 58_412 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("BLUE"), 54_167 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("BYTERON"), 34_517 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("VIGILANT"), 16_155 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("CLOAKY_KOHLA_2"), 10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("CLOAKY_ENNOIA"), 10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("BONAPUBLICA"), 8_333 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("ROCKY"), 7_796 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("BLUE"), 13.75 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("CLOAKY"), 29.25 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("JULIACHANG"), 28.75 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("BYTERON"), 9.68 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("VIGILANT"), 2.43 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("BONAPUBLICA"), 2.06 ether), // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("ROCKY"), 1.17 ether) // Note: ether is only a keyword helper
         ];
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
-            dai: 234_089 ether, // Note: ether is only a keyword helper
-            mkr: 0 ether, // Note: ether is only a keyword helper
+            dai: 308_548 ether, // Note: ether is only a keyword helper
+            mkr: 87.09 ether, // Note: ether is only a keyword helper
             usds: 0 ether, // Note: ether is only a keyword helper
-            sky: 27_222_832.80 ether // Note: ether is only a keyword helper
+            sky: 0 ether // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -948,11 +1028,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // add the `skipped` modifier to skip
+    function testDaoResolutions() public { // add the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmYJUvw5xbAJmJknG2xUKDLe424JSTWQQhbJCnucRRjUv7"
+            "QmX4DdVBiDBjLXYT4J4jC1XMdTn2Q7Ao8L66pKB8N3yETA"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -967,9 +1047,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = 0xcc3B9e79261A7064A0f734Cc749A8e3762e0a187;
+        address SPARK_SPELL = 0x8a3aaeAC45Cf3D76Cf82b0e4C63cCfa8c72BDCa7;
 
         vm.expectCall(
             SPARK_PROXY,
@@ -986,5 +1066,53 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testSparkLendD3MBuffer() public {
+        DirectSparkDaiPlanLike DIRECT_SPARK_DAI_PLAN = DirectSparkDaiPlanLike(addr.addr('DIRECT_SPARK_DAI_PLAN'));
+
+        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 50 * MILLION * WAD, "spark-lend-d3m-buffer/invalid-buffer-amount");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 100 * MILLION * WAD, "spark-lend-d3m-buffer/invalid-buffer-amount");
+    }
+
+    function testGelatoKeeperTreasuryAddress() public {
+        GelatoPaymentAdapterLike GELATO_PAYMENT_ADAPTER = GelatoPaymentAdapterLike(0x0B5a34D084b6A5ae4361de033d1e6255623b41eD);
+        address GELATO_TREASURY_OLD = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
+        address GELATO_TREASURY_NEW = 0x5041c60C75633F29DEb2AED79cB0A9ed79202415;
+
+        assertEq(GELATO_PAYMENT_ADAPTER.treasury(), GELATO_TREASURY_OLD, "gelato-keeper-treasury-address/invalid-treasury-address");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(GELATO_PAYMENT_ADAPTER.treasury(), GELATO_TREASURY_NEW, "gelato-keeper-treasury-address/invalid-treasury-address");
+    }
+
+    function testConsoleFreightDebtWriteOff() public {
+        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
+        address RWA003_A_URN = addr.addr("RWA003_A_URN");
+
+        bytes32 ilk = bytes32("RWA003-A");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        (, address pip,,) = oracle.ilks(ilk);
+        uint256 price = uint256(DSValueAbstract(pip).read());
+        assertEq(price, 0, "console-freight-debt-write-off/invalid-price-after-cull");
+
+        (uint256 Art,,,,) = vat.ilks(ilk);
+        assertEq(Art, 0, "console-freight-debt-write-off/invalid-art-after-cull");
+
+        (uint256 ink, uint256 art) = vat.urns(ilk, RWA003_A_URN);
+        assertEq(ink, 0, "console-freight-debt-write-off/invalid-ink-after-cull");
+        assertEq(art, 0, "console-freight-debt-write-off/invalid-art-after-cull");
+    }
 
 }

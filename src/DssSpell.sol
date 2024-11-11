@@ -18,6 +18,17 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { JugAbstract } from "dss-interfaces/dss/JugAbstract.sol";
+
+interface RwaLiquidationOracleLike {
+    function cull(bytes32 ilk, address urn) external;
+}
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -28,8 +39,11 @@ contract DssSpellAction is DssAction {
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return false;
+        return true;
     }
+
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "QmX4DdVBiDBjLXYT4J4jC1XMdTn2Q7Ao8L66pKB8N3yETA";
 
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
@@ -43,6 +57,48 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
+    // ---------- Math ----------
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD     = 10 ** 18;
+
+    // ---------- Contracts ----------
+    GemAbstract internal immutable MKR                  = GemAbstract(DssExecLib.mkr());
+    address internal immutable MCD_JUG                  = DssExecLib.jug();
+    address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
+    address internal immutable RWA003_A_URN             = DssExecLib.getChangelogAddress("RWA003_A_URN");
+    address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
+    address internal immutable MCD_VEST_MKR_TREASURY    = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    address internal immutable DIRECT_SPARK_DAI_PLAN    = DssExecLib.getChangelogAddress("DIRECT_SPARK_DAI_PLAN");
+    address internal constant GELATO_PAYMENT_ADAPTER    = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
+    address internal constant GELATO_TREASURY_NEW       = 0x5041c60C75633F29DEb2AED79cB0A9ed79202415;
+
+    // ---------- Wallets ----------
+    address internal constant JANSKY                = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
+    address internal constant VOTEWIZARD            = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+    address internal constant ECOSYSTEM_FACILITATOR = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
+    address internal constant JULIACHANG            = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant CLOAKY                = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant BLUE                  = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BYTERON               = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant VIGILANT              = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant CLOAKY_KOHLA_2        = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+    address internal constant CLOAKY_ENNOIA         = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+    address internal constant BONAPUBLICA           = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant ROCKY                 = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+
+    // ---------- Timestamps ----------
+    // 2024-10-01 00:00:00
+    uint256 internal constant OCT_01_2024 = 1727740800;
+    // 2024-12-01 00:00:00
+    uint256 internal constant DEC_01_2024 = 1733011200;
+    // 2025-01-31 23:59:59
+    uint256 internal constant JAN_31_2025 = 1738367999;
+
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x8a3aaeAC45Cf3D76Cf82b0e4C63cCfa8c72BDCa7;
+
     function actions() public override {
 
         // ---------- Increase SparkLend D3M Buffer Parameter ----------
@@ -50,42 +106,174 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmNTKFqG#poll-detail
 
         // Increase SparkLend D3M buffer parameter (`buf`) by 50 million DAI from 50 million DAI to 100 million DAI.
+        DssExecLib.setValue(DIRECT_SPARK_DAI_PLAN, "buffer", 100 * MILLION * WAD);
 
         // ---------- Update Gelato Keeper Treasury Address ----------
         // Forum: https://forum.sky.money/t/gelato-keeper-update/25456
 
         // Update DssExecLib.setContract: GELATO_PAYMENT_ADAPTER - "treasury" to 0x5041c60C75633F29DEb2AED79cB0A9ed79202415
+        DssExecLib.setContract(GELATO_PAYMENT_ADAPTER, "treasury", GELATO_TREASURY_NEW);
 
-        // ---------- Approve ConsolFreight DAO Resolution ----------
+        // ---------- ConsolFreight Debt Write-Off and DAO Resolution ----------
+        // Forum: https://forum.sky.money/t/consolfreight-rwa-003-cf4-drop-default/21745/21
+        // Forum: https://forum.sky.money/t/consolfreight-rwa-003-cf4-drop-default/21745/22
 
-        // Write-off the debt of RWA003-A by calling `cull()`
+        // Account for the accumulated stability fee by calling jug.drip("RWA003-A")
+        JugAbstract(MCD_JUG).drip("RWA003-A");
 
-        // Approve ConsolFreight Dao Resolution with IPFS hash X (TODO)
+        // Write-off the debt of RWA003-A by calling rwaLiqOrcl.cull("RWA003-A", RWA003_A_URN)
+        RwaLiquidationOracleLike(MIP21_LIQUIDATION_ORACLE).cull("RWA003-A", RWA003_A_URN);
+
+        // Approve ConsolFreight Dao Resolution with IPFS hash QmX4DdVBiDBjLXYT4J4jC1XMdTn2Q7Ao8L66pKB8N3yETA
+        // Note: see `dao_resolutions` public variable declared above
 
         // ---------- Set Facilitator DAI Payment Streams ----------
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.6.2.4.1_List_of_Facilitator_Budgets/c511460d-53df-47e9-a4a5-2e48a533315b%7C0db3343515519c4a
 
-        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 168,000 DAI | 0xf3F868534FAD48EF5a228Fe78669cf242745a755
+        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-10-01 00:00:00 | 168,000 DAI | 0xf3F868534FAD48EF5a228Fe78669cf242745a755 | Restricted: Yes
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(
+                JANSKY,                    // usr
+                168_000 * WAD,             // tot
+                OCT_01_2024,               // bgn
+                JAN_31_2025 - OCT_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
-        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 168,000 DAI | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-10-01 00:00:00 | 168,000 DAI | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1 | Restricted: Yes
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(
+                VOTEWIZARD,                // usr
+                168_000 * WAD,             // tot
+                OCT_01_2024,               // bgn
+                JAN_31_2025 - OCT_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
-        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | 84,000 DAI | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-12-01 00:00:00 | 84,000 DAI | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75 | Restricted: Yes
+        VestAbstract(MCD_VEST_DAI).restrict(
+            VestAbstract(MCD_VEST_DAI).create(
+                ECOSYSTEM_FACILITATOR,     // usr
+                84_000 * WAD,              // tot
+                DEC_01_2024,               // bgn
+                JAN_31_2025 - DEC_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
         // ---------- Set Facilitator MKR Payment Streams ----------
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.6.2.4.1_List_of_Facilitator_Budgets/c511460d-53df-47e9-a4a5-2e48a533315b%7C0db3343515519c4a
 
-        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 72.00 MKR | 0xf3F868534FAD48EF5a228Fe78669cf242745a755
+        // Note: For the MKR stream we need to increase allowance by new vesting delta
+        MKR.approve(address(MCD_VEST_MKR_TREASURY), MKR.allowance(address(this), address(MCD_VEST_MKR_TREASURY)) + 180 * WAD);
 
-        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | 72.00 MKR | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1
+        // JanSky | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-10-01 00:00:00 | 72.00 MKR | 0xf3F868534FAD48EF5a228Fe78669cf242745a755 | Restricted: Yes
+        VestAbstract(MCD_VEST_MKR_TREASURY).restrict(
+            VestAbstract(MCD_VEST_MKR_TREASURY).create(
+                JANSKY,                    // usr
+                72 * WAD,                  // tot
+                OCT_01_2024,               // bgn
+                JAN_31_2025 - OCT_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
-        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | 36.00 MKR | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75
+        // Endgame Edge | 2024-10-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-10-01 00:00:00 | 72.00 MKR | 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1 | Restricted: Yes
+        VestAbstract(MCD_VEST_MKR_TREASURY).restrict(
+            VestAbstract(MCD_VEST_MKR_TREASURY).create(
+                VOTEWIZARD,                // usr
+                72 * WAD,                  // tot
+                OCT_01_2024,               // bgn
+                JAN_31_2025 - OCT_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
+
+        // Ecosystem | 2024-12-01 00:00:00 to 2025-01-31 23:59:59 | Cliff: 2024-12-01 00:00:00 | 36.00 MKR | 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75 | Restricted: Yes
+        VestAbstract(MCD_VEST_MKR_TREASURY).restrict(
+            VestAbstract(MCD_VEST_MKR_TREASURY).create(
+                ECOSYSTEM_FACILITATOR,     // usr
+                36 * WAD,                  // tot
+                DEC_01_2024,               // bgn
+                JAN_31_2025 - DEC_01_2024, // tau
+                0,                         // eta
+                address(0)                 // mgr
+            )
+        );
 
         // ---------- Aligned Delegate DAI Compensation ----------
+        // Forum: https://forum.sky.money/t/september-2024-aligned-delegate-compensation/25489
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.5.8_Budget_For_Prime_Delegate_Slots/e3e420fc-9b1f-4fdc-9983-fcebc45dd3aa%7C0db3af4ece0c
+
+        // JuliaChang - 109168 DAI - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        DssExecLib.sendPaymentFromSurplusBuffer(JULIACHANG, 109_168);
+
+        // Cloaky - 58412 DAI - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY, 58_412);
+
+        // BLUE - 54167 DAI - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        DssExecLib.sendPaymentFromSurplusBuffer(BLUE, 54_167);
+
+        // Byteron - 34517 DAI - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        DssExecLib.sendPaymentFromSurplusBuffer(BYTERON, 34_517);
+
+        // vigilant - 16155 DAI - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        DssExecLib.sendPaymentFromSurplusBuffer(VIGILANT, 16_155);
+
+        // Kohla (Cloaky) - 10000 DAI - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY_KOHLA_2, 10_000);
+
+        // Ennoia (Cloaky) - 10000 DAI - 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b
+        DssExecLib.sendPaymentFromSurplusBuffer(CLOAKY_ENNOIA, 10_000);
+
+        // Bonapublica - 8333 DAI - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        DssExecLib.sendPaymentFromSurplusBuffer(BONAPUBLICA, 8_333);
+
+        // Rocky - 7796 DAI - 0xC31637BDA32a0811E39456A59022D2C386cb2C85
+        DssExecLib.sendPaymentFromSurplusBuffer(ROCKY, 7_796);
 
         // ---------- Aligned Delegate MKR Compensation ----------
+        // Forum: https://forum.sky.money/t/september-2024-aligned-delegate-compensation/25489
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.5.8_Budget_For_Prime_Delegate_Slots/e3e420fc-9b1f-4fdc-9983-fcebc45dd3aa%7C0db3af4ece0c
 
-        // ---------- Launch Project Funding ----------
+        // BLUE - 13.75 MKR - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        MKR.transfer(BLUE, 13.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Cloaky - 29.25 MKR - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
+        MKR.transfer(CLOAKY, 29.25 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // JuliaChang - 28.75 MKR - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        MKR.transfer(JULIACHANG, 28.75 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Byteron - 9.68 MKR - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        MKR.transfer(BYTERON, 9.68 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // vigilant - 2.43 MKR - 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61
+        MKR.transfer(VIGILANT, 2.43 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Bonapublica - 2.06 MKR - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        MKR.transfer(BONAPUBLICA, 2.06 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
+
+        // Rocky - 1.17 MKR - 0xC31637BDA32a0811E39456A59022D2C386cb2C85
+        MKR.transfer(ROCKY, 1.17 ether); // Note: 'ether' is a keyword helper, only MKR is transferred here
 
         // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/14-nov-2024-proposed-changes-to-spark-for-upcoming-spell/25466
+        // Poll: https://vote.makerdao.com/polling/QmQizL1F
+        // Poll: https://vote.makerdao.com/polling/Qmbohkr5
+        // Poll: https://vote.makerdao.com/polling/QmYqM8Yf
+        // Poll: https://vote.makerdao.com/polling/QmXsXzot
+        // Poll: https://vote.makerdao.com/polling/Qmf955yA
 
+        // Execute Spark Proxy Spell at 0x8a3aaeAC45Cf3D76Cf82b0e4C63cCfa8c72BDCa7
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
