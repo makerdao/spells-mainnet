@@ -681,7 +681,7 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[16] memory payees = [
+        Payee[18] memory payees = [
             Payee(address(dai), wallets.addr("JULIACHANG"), 109_168 ether), // Note: ether is only a keyword helper
             Payee(address(dai), wallets.addr("CLOAKY"), 58_412 ether), // Note: ether is only a keyword helper
             Payee(address(dai), wallets.addr("BLUE"), 54_167 ether), // Note: ether is only a keyword helper
@@ -697,13 +697,15 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(mkr), wallets.addr("BYTERON"), 9.68 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("VIGILANT"), 2.43 ether), // Note: ether is only a keyword helper
             Payee(address(mkr), wallets.addr("BONAPUBLICA"), 2.06 ether), // Note: ether is only a keyword helper
-            Payee(address(mkr), wallets.addr("ROCKY"), 1.17 ether) // Note: ether is only a keyword helper
+            Payee(address(mkr), wallets.addr("ROCKY"), 1.17 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("LIQUIDITY_BOOTSTRAPPING"), 4_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether) // Note: ether is only a keyword helper
         ];
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
             dai: 308_548 ether, // Note: ether is only a keyword helper
             mkr: 87.09 ether, // Note: ether is only a keyword helper
-            usds: 0 ether, // Note: ether is only a keyword helper
+            usds: 7_000_000 ether, // Note: ether is only a keyword helper
             sky: 0 ether // Note: ether is only a keyword helper
         });
 

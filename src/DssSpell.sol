@@ -35,6 +35,10 @@ interface SUsdsLike {
     function drip() external returns (uint256);
 }
 
+interface DaiUsdsLike {
+    function daiToUsds(address usr, uint256 wad) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -79,29 +83,34 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     GemAbstract internal immutable MKR                  = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable DAI                  = GemAbstract(DssExecLib.dai());
     address internal immutable MCD_JUG                  = DssExecLib.jug();
+    address internal immutable MCD_PAUSE_PROXY          = DssExecLib.pauseProxy();
     address internal immutable MIP21_LIQUIDATION_ORACLE = DssExecLib.getChangelogAddress("MIP21_LIQUIDATION_ORACLE");
     address internal immutable RWA003_A_URN             = DssExecLib.getChangelogAddress("RWA003_A_URN");
     address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     address internal immutable MCD_VEST_MKR_TREASURY    = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable DIRECT_SPARK_DAI_PLAN    = DssExecLib.getChangelogAddress("DIRECT_SPARK_DAI_PLAN");
     address internal immutable SUSDS                    = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable DAI_USDS                 = DssExecLib.getChangelogAddress("DAI_USDS");
     address internal constant GELATO_PAYMENT_ADAPTER    = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
     address internal constant GELATO_TREASURY_NEW       = 0x5041c60C75633F29DEb2AED79cB0A9ed79202415;
 
     // ---------- Wallets ----------
-    address internal constant JANSKY                = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
-    address internal constant VOTEWIZARD            = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
-    address internal constant ECOSYSTEM_FACILITATOR = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
-    address internal constant JULIACHANG            = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
-    address internal constant CLOAKY                = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
-    address internal constant BLUE                  = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
-    address internal constant BYTERON               = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
-    address internal constant VIGILANT              = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
-    address internal constant CLOAKY_KOHLA_2        = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
-    address internal constant CLOAKY_ENNOIA         = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
-    address internal constant BONAPUBLICA           = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant ROCKY                 = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+    address internal constant JANSKY                       = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
+    address internal constant VOTEWIZARD                   = 0x9E72629dF4fcaA2c2F5813FbbDc55064345431b1;
+    address internal constant ECOSYSTEM_FACILITATOR        = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
+    address internal constant JULIACHANG                   = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant CLOAKY                       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+    address internal constant BLUE                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BYTERON                      = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant VIGILANT                     = 0x2474937cB55500601BCCE9f4cb0A0A72Dc226F61;
+    address internal constant CLOAKY_KOHLA_2               = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+    address internal constant CLOAKY_ENNOIA                = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
+    address internal constant BONAPUBLICA                  = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant ROCKY                        = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
+    address internal constant LIQUIDITY_BOOTSTRAPPING      = 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD;
+    address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
 
     // ---------- Timestamps ----------
     // 2024-10-01 00:00:00 UTC
@@ -181,6 +190,38 @@ contract DssSpellAction is DssAction {
 
         // Approve ConsolFreight Dao Resolution with IPFS hash QmX4DdVBiDBjLXYT4J4jC1XMdTn2Q7Ao8L66pKB8N3yETA
         // Note: see `dao_resolutions` public variable declared above
+
+        // ---------- Sky Ecosystem Liquidity Bootstrapping Funding ----------
+        // Forum: https://forum.sky.money/t/utilization-of-the-sky-ecosystem-liquidity-bootstrapping-budget-a-5-6-1-9/25537
+        // Poll: https://vote.makerdao.com/polling/QmYHUDVA#poll-detail
+
+        // Transfer 4,000,000 DAI to the Pause Proxy from the Surplus Buffer
+        DssExecLib.sendPaymentFromSurplusBuffer(MCD_PAUSE_PROXY, 4_000_000);
+
+        // Note: we have to approve DAI_USDS contract to convert DAI into USDS
+        DAI.approve(DAI_USDS, 4_000_000 * WAD);
+
+        // Convert 4,000,000 DAI to USDS using DAI_USDS
+        // Note: this is done by the next line of code
+
+        // Transfer 4,000,000 USDS from PauseProxy to 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD
+        DaiUsdsLike(DAI_USDS).daiToUsds(LIQUIDITY_BOOTSTRAPPING, 4_000_000 * WAD);
+
+        // ---------- Integration Boost Funding ----------
+        // Forum: https://forum.sky.money/t/utilization-of-the-integration-boost-budget-a-5-2-1-2/25536/1
+        // Poll: https://vote.makerdao.com/polling/QmYHUDVA#poll-detail
+
+        // Transfer 3,000,000 DAI to the Pause Proxy from the Surplus Buffer
+        DssExecLib.sendPaymentFromSurplusBuffer(MCD_PAUSE_PROXY, 3_000_000);
+
+        // Note: we have to approve DAI_USDS contract to convert DAI into USDS
+        DAI.approve(DAI_USDS, 3_000_000 * WAD);
+
+        // Convert 3,000,000 DAI to USDS using DAI_USDS
+        // Note: this is done by the next line of code
+
+        // Transfer 3,000,000 USDS from PauseProxy to 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
+        DaiUsdsLike(DAI_USDS).daiToUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
 
         // ---------- Set Facilitator DAI Payment Streams ----------
         // Atlas: https://sky-atlas.powerhouse.io/A.1.6.2.4.1_List_of_Facilitator_Budgets/c511460d-53df-47e9-a4a5-2e48a533315b%7C0db3343515519c4a

@@ -150,6 +150,9 @@ contract Wallets {
         // Sky Ecosystem Liquidity Bootstrapping
         addr["LIQUIDITY_BOOTSTRAPPING"]      = 0xD8507ef0A59f37d15B5D7b630FA6EEa40CE4AFdD;
 
+        // Integration Boost Initiative
+        addr["INTEGRATION_BOOST_INITIATIVE"] = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
+
         // Early Bird Rewards Multisig
         addr["EARLY_BIRD_REWARDS"]           = 0x14D98650d46BF7679BBD05D4f615A1547C87Bf68;
 
