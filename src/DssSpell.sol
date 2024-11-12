@@ -61,16 +61,17 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant SIX_PT_FIVE_PCT_RATE         = 1000000001996917783620820123;
-    uint256 internal constant SEVEN_PCT_RATE               = 1000000002145441671308778766;
-    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
-    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
-    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
-    uint256 internal constant EIGHT_PCT_RATE               = 1000000002440418608258400030;
-    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
-    uint256 internal constant TEN_PCT_RATE                 = 1000000003022265980097387650;
-    uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE     = 1000000003094251918120023627;
-    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE   = 1000000003237735385034516037;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE        = 1000000002293273137447730714;
+    uint256 internal constant EIGHT_PCT_RATE                = 1000000002440418608258400030;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
+    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE        = 1000000002586884420913935572;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
+    uint256 internal constant NINE_PCT_RATE                 = 1000000002732676825177582095;
+    uint256 internal constant NINE_PT_TWO_FIVE_PCT_RATE     = 1000000002805322428706865331;
+    uint256 internal constant ELEVEN_PCT_RATE               = 1000000003309234382829738808;
+    uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000003380572527855758393;
+    uint256 internal constant ELEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000003522769143241571114;
+
 
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
@@ -117,43 +118,43 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- Stability Fee Changes ----------
-        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522
-        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/2
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/3
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/4
 
-        // Increase ETH-A Stability Fee by 1 percentage point from 6.25% to 7.25%
-        DssExecLib.setIlkStabilityFee("ETH-A", SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-A Stability Fee by 2 percentage point from 6.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase ETH-B Stability Fee by 1 percentage point from 6.75% to 7.75%
-        DssExecLib.setIlkStabilityFee("ETH-B", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-B Stability Fee by 2 percentage point from 6.75% to 8.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", EIGHT_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase ETH-C Stability Fee by 1 percentage point from 6.00% to 7.00%
-        DssExecLib.setIlkStabilityFee("ETH-C", SEVEN_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-C Stability Fee by 2 percentage point from 6.00% to 8.00%
+        DssExecLib.setIlkStabilityFee("ETH-C", EIGHT_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WSTETH-A Stability Fee by 1 percentage point from 7.25% to 8.25%
-        DssExecLib.setIlkStabilityFee("WSTETH-A", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WSTETH-A Stability Fee by 2 percentage point from 7.25% to 9.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", NINE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WSTETH-B Stability Fee by 1 percentage point from 7.00% to 8.00%
-        DssExecLib.setIlkStabilityFee("WSTETH-B", EIGHT_PCT_RATE, /* doDrip = */ true);
+        // Increase WSTETH-B Stability Fee by 2 percentage point from 7.00% to 9.00%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", NINE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-A Stability Fee by 1 percentage point from 9.25% to 10.25%
-        DssExecLib.setIlkStabilityFee("WBTC-A", TEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-A Stability Fee by 2 percentage point from 9.25% to 11.25%
+        DssExecLib.setIlkStabilityFee("WBTC-A", ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-B Stability Fee by 1 percentage point from 9.75% to 10.75%
-        DssExecLib.setIlkStabilityFee("WBTC-B", TEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-B Stability Fee by 2 percentage point from 9.75% to 11.75%
+        DssExecLib.setIlkStabilityFee("WBTC-B", ELEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-C Stability Fee by 1 percentage point from 9.00% to 10.00%
-        DssExecLib.setIlkStabilityFee("WBTC-C", TEN_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-C Stability Fee by 2 percentage point from 9.00% to 11.00%
+        DssExecLib.setIlkStabilityFee("WBTC-C", ELEVEN_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Savings Rate Changes ----------
-        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522
-        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/2
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/3
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/4
 
-        // Increase DSR by 1 percentage point from 5.50% to 6.50%
-        DssExecLib.setDSR(SIX_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase DSR by 2 percentage point from 5.50% to 7.50%
+        DssExecLib.setDSR(SEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase SSR by 1 percentage point from 6.50% to 7.50%
+        // Increase SSR by 2 percentage point from 6.50% to 8.50%
         SUsdsLike(SUSDS).drip();
-        SUsdsLike(SUSDS).file("ssr", SEVEN_PT_FIVE_PCT_RATE);
+        SUsdsLike(SUSDS).file("ssr", EIGHT_PT_FIVE_PCT_RATE);
 
         // ---------- Increase SparkLend D3M Buffer Parameter ----------
         // Forum: https://forum.sky.money/t/14-nov-2024-proposed-changes-to-spark-for-upcoming-spell/25466
