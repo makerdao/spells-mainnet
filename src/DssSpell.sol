@@ -87,11 +87,11 @@ contract DssSpellAction is DssAction {
     address internal constant ROCKY                 = 0xC31637BDA32a0811E39456A59022D2C386cb2C85;
 
     // ---------- Timestamps ----------
-    // 2024-10-01 00:00:00
+    // 2024-10-01 00:00:00 UTC
     uint256 internal constant OCT_01_2024 = 1727740800;
-    // 2024-12-01 00:00:00
+    // 2024-12-01 00:00:00 UTC
     uint256 internal constant DEC_01_2024 = 1733011200;
-    // 2025-01-31 23:59:59
+    // 2025-01-31 23:59:59 UTC
     uint256 internal constant JAN_31_2025 = 1738367999;
 
     // ---------- Spark Proxy Spell ----------
@@ -105,7 +105,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/14-nov-2024-proposed-changes-to-spark-for-upcoming-spell/25466
         // Poll: https://vote.makerdao.com/polling/QmNTKFqG#poll-detail
 
-        // Increase SparkLend D3M buffer parameter (`buf`) by 50 million DAI from 50 million DAI to 100 million DAI.
+        // Increase the DIRECT-SPARK-DAI buffer parameter by 50 million DAI from 50 million DAI to 100 million DAI.
         DssExecLib.setValue(DIRECT_SPARK_DAI_PLAN, "buffer", 100 * MILLION * WAD);
 
         // ---------- Update Gelato Keeper Treasury Address ----------
