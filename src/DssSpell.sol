@@ -42,9 +42,9 @@ interface DaiUsdsLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/0a85403ea3fc07ade010d5b96668b2c340650801/governance/votes/Executive%20vote%20-%20November%2014,%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-11-14 MakerDAO Executive Spell | Hash: TODO";
+        "2024-11-14 MakerDAO Executive Spell | Hash: 0x5ae05fabba4e9371876847dac746aa08b007867f50e5b53b34d1379e88daf94a";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -221,7 +221,7 @@ contract DssSpellAction is DssAction {
         // Note: this is done by the next line of code
 
         // Transfer 3,000,000 USDS from PauseProxy to 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
-        DaiUsdsLike(DAI_USDS).daiToUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
+        DaiUsdsLike(DAI_USDS).daiToUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);x
 
         // ---------- Set Facilitator DAI Payment Streams ----------
         // Atlas: https://sky-atlas.powerhouse.io/A.1.6.2.4.1_List_of_Facilitator_Budgets/c511460d-53df-47e9-a4a5-2e48a533315b%7C0db3343515519c4a
