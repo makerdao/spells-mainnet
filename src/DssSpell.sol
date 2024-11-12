@@ -30,6 +30,11 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface SUsdsLike {
+    function file(bytes32, uint256) external;
+    function drip() external returns (uint256);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -56,6 +61,16 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant SIX_PT_FIVE_PCT_RATE         = 1000000001996917783620820123;
+    uint256 internal constant SEVEN_PCT_RATE               = 1000000002145441671308778766;
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE   = 1000000002219443553326580536;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE       = 1000000002293273137447730714;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PCT_RATE               = 1000000002440418608258400030;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE   = 1000000002513736079215619839;
+    uint256 internal constant TEN_PCT_RATE                 = 1000000003022265980097387650;
+    uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE     = 1000000003094251918120023627;
+    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE   = 1000000003237735385034516037;
 
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
@@ -69,6 +84,7 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_DAI             = DssExecLib.getChangelogAddress("MCD_VEST_DAI");
     address internal immutable MCD_VEST_MKR_TREASURY    = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable DIRECT_SPARK_DAI_PLAN    = DssExecLib.getChangelogAddress("DIRECT_SPARK_DAI_PLAN");
+    address internal immutable SUSDS                    = DssExecLib.getChangelogAddress("SUSDS");
     address internal constant GELATO_PAYMENT_ADAPTER    = 0x0B5a34D084b6A5ae4361de033d1e6255623b41eD;
     address internal constant GELATO_TREASURY_NEW       = 0x5041c60C75633F29DEb2AED79cB0A9ed79202415;
 
@@ -100,6 +116,44 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x8a3aaeAC45Cf3D76Cf82b0e4C63cCfa8c72BDCa7;
 
     function actions() public override {
+        // ---------- Stability Fee Changes ----------
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/2
+
+        // Increase ETH-A Stability Fee by 1 percentage point from 6.25% to 7.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase ETH-B Stability Fee by 1 percentage point from 6.75% to 7.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase ETH-C Stability Fee by 1 percentage point from 6.00% to 7.00%
+        DssExecLib.setIlkStabilityFee("ETH-C", SEVEN_PCT_RATE, /* doDrip = */ true);
+
+        // Increase WSTETH-A Stability Fee by 1 percentage point from 7.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase WSTETH-B Stability Fee by 1 percentage point from 7.00% to 8.00%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", EIGHT_PCT_RATE, /* doDrip = */ true);
+
+        // Increase WBTC-A Stability Fee by 1 percentage point from 9.25% to 10.25%
+        DssExecLib.setIlkStabilityFee("WBTC-A", TEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase WBTC-B Stability Fee by 1 percentage point from 9.75% to 10.75%
+        DssExecLib.setIlkStabilityFee("WBTC-B", TEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase WBTC-C Stability Fee by 1 percentage point from 9.00% to 10.00%
+        DssExecLib.setIlkStabilityFee("WBTC-C", TEN_PCT_RATE, /* doDrip = */ true);
+
+        // ---------- Savings Rate Changes ----------
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-17-sfs-dsr-ssr-spark-effective-dai-borrow-rate/25522/2
+
+        // Increase DSR by 1 percentage point from 5.50% to 6.50%
+        DssExecLib.setDSR(SIX_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+
+        // Increase SSR by 1 percentage point from 6.50% to 7.50%
+        SUsdsLike(SUSDS).drip();
+        SUsdsLike(SUSDS).file("ssr", SEVEN_PT_FIVE_PCT_RATE);
 
         // ---------- Increase SparkLend D3M Buffer Parameter ----------
         // Forum: https://forum.sky.money/t/14-nov-2024-proposed-changes-to-spark-for-upcoming-spell/25466
