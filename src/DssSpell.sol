@@ -221,7 +221,7 @@ contract DssSpellAction is DssAction {
         // Note: this is done by the next line of code
 
         // Transfer 3,000,000 USDS from PauseProxy to 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
-        DaiUsdsLike(DAI_USDS).daiToUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);x
+        DaiUsdsLike(DAI_USDS).daiToUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
 
         // ---------- Set Facilitator DAI Payment Streams ----------
         // Atlas: https://sky-atlas.powerhouse.io/A.1.6.2.4.1_List_of_Facilitator_Budgets/c511460d-53df-47e9-a4a5-2e48a533315b%7C0db3343515519c4a
