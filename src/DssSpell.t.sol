@@ -1085,9 +1085,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testGelatoKeeperTreasuryAddress() public {
-        GelatoPaymentAdapterLike GELATO_PAYMENT_ADAPTER = GelatoPaymentAdapterLike(0x0B5a34D084b6A5ae4361de033d1e6255623b41eD);
+        GelatoPaymentAdapterLike GELATO_PAYMENT_ADAPTER = GelatoPaymentAdapterLike(wallets.addr("GELATO_PAYMENT_ADAPTER"));
         address GELATO_TREASURY_OLD = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
-        address GELATO_TREASURY_NEW = 0x5041c60C75633F29DEb2AED79cB0A9ed79202415;
+        address GELATO_TREASURY_NEW = wallets.addr("GELATO_TREASURY");
 
         assertEq(GELATO_PAYMENT_ADAPTER.treasury(), GELATO_TREASURY_OLD, "gelato-keeper-treasury-address/invalid-treasury-address");
 
