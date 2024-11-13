@@ -42,9 +42,9 @@ interface DaiUsdsLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/0a85403ea3fc07ade010d5b96668b2c340650801/governance/votes/Executive%20vote%20-%20November%2014%2C%202024.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/aa58678ff632f8e25047a345709cd3c9f1819e4f/governance/votes/Executive%20vote%20-%20November%2014%2C%202024.md' -q -O - 2>/dev/null)"
     string public constant override description =
-        "2024-11-14 MakerDAO Executive Spell | Hash: 0x5ae05fabba4e9371876847dac746aa08b007867f50e5b53b34d1379e88daf94a";
+        "2024-11-14 MakerDAO Executive Spell | Hash: 0xbe93b128518195d2240db74a5a56bf32b10dfaf81cddc790be66b4509c94ed95";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
