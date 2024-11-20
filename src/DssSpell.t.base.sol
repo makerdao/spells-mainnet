@@ -638,7 +638,7 @@ contract DssSpellTestBase is Config, DssTest {
         DssSpell(spell_).cast();
     }
 
-    function _checkSystemValues(SystemValues storage values) internal {
+    function _checkSystemValues(SystemValues storage values) internal view {
         // dsr
         uint256 expectedDSRRate = rates.rates(values.pot_dsr);
         // make sure dsr is less than 100% APR
@@ -980,7 +980,7 @@ contract DssSpellTestBase is Config, DssTest {
         // TODO: have a discussion about how we want to manage the global Line going forward.
     }
 
-    function _getOSMPrice(address pip) internal returns (uint256) {
+    function _getOSMPrice(address pip) internal view returns (uint256) {
         // vm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(vm.load(
             pip,
@@ -991,12 +991,12 @@ contract DssSpellTestBase is Config, DssTest {
         // Give a 10^9 buffer for price appreciation over time
         // Note: This currently can't be hit due to the uint112, but we want to backstop
         //       once the PIP uint256 size is increased
-        assertTrue(price <= (10 ** 14) * WAD);
+        assertLe(price, (10 ** 14) * WAD, "TestError/invalid-osm-price");
 
         return price;
     }
 
-    function _getUNIV2LPPrice(address pip) internal returns (uint256) {
+    function _getUNIV2LPPrice(address pip) internal view returns (uint256) {
         // vm.load is to pull the price from the LP Oracle storage bypassing the whitelist
         uint256 price = uint256(vm.load(
             pip,
@@ -1007,7 +1007,7 @@ contract DssSpellTestBase is Config, DssTest {
         // Give a 10^9 buffer for price appreciation over time
         // Note: This currently can't be hit due to the uint112, but we want to backstop
         //       once the PIP uint256 size is increased
-        assertTrue(price <= (10 ** 14) * WAD);
+        assertLe(price, (10 ** 14) * WAD, "TestError/invalid-univ2lp-price");
 
         return price;
     }
@@ -2171,7 +2171,7 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(join.tic(), 0);
     }
 
-    function _getSignatures(bytes32 signHash) internal returns (bytes memory signatures, address[] memory signers) {
+    function _getSignatures(bytes32 signHash) internal pure returns (bytes memory signatures, address[] memory signers) {
         // seeds chosen s.t. corresponding addresses are in ascending order
         uint8[30] memory seeds = [8,10,6,2,9,15,14,20,7,29,24,13,12,25,16,26,21,22,0,18,17,27,3,28,23,19,4,5,1,11];
         uint256 numSigners = seeds.length;
@@ -2363,7 +2363,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
-    function _checkTransferrableVestMkrAllowance() internal {
+    function _checkTransferrableVestMkrAllowance() internal view {
         uint256 vestableAmt;
 
         for(uint256 i = 1; i <= vestMkr.ids(); i++) {
@@ -2719,7 +2719,7 @@ contract DssSpellTestBase is Config, DssTest {
     // This contract may not be deployable.
     // Consider enabling the optimizer (with a low "runs" value!),
     //   turning off revert strings, or using libraries.
-    function _testContractSize() internal {
+    function _testContractSize() internal view {
         uint256 _sizeSpell;
         address _spellAddr  = address(spell);
         assembly {
@@ -2834,27 +2834,15 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         uint256 metadataLength = _getBytecodeMetadataLength(expectedAction);
-        assertTrue(metadataLength <= expectedBytecodeSize, "TestError/metadata-length-gt-expected-bytecode-size");
+        assertLe(metadataLength, expectedBytecodeSize, "TestError/metadata-length-gt-expected-bytecode-size");
         expectedBytecodeSize -= metadataLength;
 
         metadataLength = _getBytecodeMetadataLength(actualAction);
-        assertTrue(metadataLength <= actualBytecodeSize, "TestError/metadata-length-gt-actual-bytecode-size");
+        assertLe(metadataLength, actualBytecodeSize, "TestError/metadata-length-gt-actual-bytecode-size");
         actualBytecodeSize -= metadataLength;
 
         assertEq(actualBytecodeSize, expectedBytecodeSize, "TestError/bytecode-size-mismatch");
-        uint256 size = actualBytecodeSize;
-        uint256 expectedHash;
-        uint256 actualHash;
-        assembly {
-            let ptr := mload(0x40)
-
-            extcodecopy(expectedAction, ptr, 0, size)
-            expectedHash := keccak256(ptr, size)
-
-            extcodecopy(actualAction, ptr, 0, size)
-            actualHash := keccak256(ptr, size)
-        }
-        assertEq(actualHash, expectedHash, "TestError/bytecode-hash-mismatch");
+        assertEq(actualAction.codehash, expectedAction.codehash, "TestError/bytecode-hash-mismatch");
     }
 
     struct ChainlogCache {
