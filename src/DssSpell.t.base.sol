@@ -2842,7 +2842,19 @@ contract DssSpellTestBase is Config, DssTest {
         actualBytecodeSize -= metadataLength;
 
         assertEq(actualBytecodeSize, expectedBytecodeSize, "TestError/bytecode-size-mismatch");
-        assertEq(actualAction.codehash, expectedAction.codehash, "TestError/bytecode-hash-mismatch");
+        uint256 size = actualBytecodeSize;
+        uint256 expectedHash;
+        uint256 actualHash;
+        assembly {
+            let ptr := mload(0x40)
+
+            extcodecopy(expectedAction, ptr, 0, size)
+            expectedHash := keccak256(ptr, size)
+
+            extcodecopy(actualAction, ptr, 0, size)
+            actualHash := keccak256(ptr, size)
+        }
+        assertEq(actualHash, expectedHash, "TestError/bytecode-hash-mismatch");
     }
 
     struct ChainlogCache {
