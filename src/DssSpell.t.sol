@@ -449,7 +449,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testVestDAI() public { // add the `skipped` modifier to skip
+    function testVestDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
         uint256 DEC_01_2024 = 1733011200;
@@ -500,7 +500,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestDai(streams);
     }
 
-    function testVestMKR() public { // add the `skipped` modifier to skip
+    function testVestMKR() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
         uint256 DEC_01_2024 = 1733011200;
@@ -674,7 +674,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
@@ -1033,7 +1033,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public view { // replace `view` with the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // replace `view` with the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -1052,7 +1052,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = 0x8a3aaeAC45Cf3D76Cf82b0e4C63cCfa8c72BDCa7;
 
@@ -1071,53 +1071,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testSparkLendD3MBuffer() public {
-        DirectSparkDaiPlanLike DIRECT_SPARK_DAI_PLAN = DirectSparkDaiPlanLike(addr.addr('DIRECT_SPARK_DAI_PLAN'));
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 50 * MILLION * WAD, "spark-lend-d3m-buffer/invalid-buffer-amount");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(DIRECT_SPARK_DAI_PLAN.buffer(), 100 * MILLION * WAD, "spark-lend-d3m-buffer/invalid-buffer-amount");
-    }
-
-    function testGelatoKeeperTreasuryAddress() public {
-        GelatoPaymentAdapterLike GELATO_PAYMENT_ADAPTER = GelatoPaymentAdapterLike(wallets.addr("GELATO_PAYMENT_ADAPTER"));
-        address GELATO_TREASURY_OLD = 0xbfDC6b9944B7EFdb1e2Bc9D55ae9424a2a55b206;
-        address GELATO_TREASURY_NEW = wallets.addr("GELATO_TREASURY");
-
-        assertEq(GELATO_PAYMENT_ADAPTER.treasury(), GELATO_TREASURY_OLD, "gelato-keeper-treasury-address/invalid-treasury-address");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(GELATO_PAYMENT_ADAPTER.treasury(), GELATO_TREASURY_NEW, "gelato-keeper-treasury-address/invalid-treasury-address");
-    }
-
-    function testConsoleFreightDebtWriteOff() public {
-        RwaLiquidationOracleLike oracle = RwaLiquidationOracleLike(addr.addr("MIP21_LIQUIDATION_ORACLE"));
-        address RWA003_A_URN = addr.addr("RWA003_A_URN");
-
-        bytes32 ilk = bytes32("RWA003-A");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-
-        (, address pip,,) = oracle.ilks(ilk);
-        uint256 price = uint256(DSValueAbstract(pip).read());
-        assertEq(price, 0, "console-freight-debt-write-off/invalid-price-after-cull");
-
-        (uint256 Art,,,,) = vat.ilks(ilk);
-        assertEq(Art, 0, "console-freight-debt-write-off/invalid-art-after-cull");
-
-        (uint256 ink, uint256 art) = vat.urns(ilk, RWA003_A_URN);
-        assertEq(ink, 0, "console-freight-debt-write-off/invalid-ink-after-cull");
-        assertEq(art, 0, "console-freight-debt-write-off/invalid-art-after-cull");
-    }
-
 }
