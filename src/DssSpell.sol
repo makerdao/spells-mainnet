@@ -321,9 +321,9 @@ contract DssSpellAction is DssAction {
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
-    /// @notice wraps the operations required to transfer USDS from the surplus buffer
+    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
     /// @param usr The USDS receiver.
-    /// @param wad The USDS amount in wad precision (10**18)
+    /// @param wad The USDS amount in wad precision (10 ** 18).
     function _transferUsds(address usr, uint256 wad) internal {
         // Note: Enforce whole units to avoid rounding errors
         require(wad % WAD == 0, "transferUsds/non-integer-wad");
@@ -335,9 +335,9 @@ contract DssSpellAction is DssAction {
         DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 
-    /// @notice wraps the operations required to transfer SKY from the surplus buffer
+    /// @notice wraps the operations required to transfer SKY from the treasury.
     /// @param usr The SKY receiver.
-    /// @param wad The SKY amount in wad precision (10**18).
+    /// @param wad The SKY amount in wad precision (10 ** 18).
     function _transferSky(address usr, uint256 wad) internal {
         // Note: Enforce exact conversion to avoid rounding errors
         require(wad % MKR_SKY_RATE == 0, "transferSky/non-exact-conversion");
