@@ -674,6 +674,11 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
+    struct TreasuryAmounts {
+        int256 mkr;
+        int256 sky;
+    }
+
     function testPayments() public { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = false; // Set to false unless there is SubDAO spell interference
 
@@ -699,11 +704,17 @@ contract DssSpellTest is DssSpellTestBase {
         ];
 
         // Fill the total values from exec sheet
-        PaymentAmounts memory expectedTotalDiff = PaymentAmounts({
+        PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:           0 ether, // Note: ether is only a keyword helper
             mkr:           0 ether, // Note: ether is only a keyword helper
             usds: 19_110_978 ether, // Note: ether is only a keyword helper
             sky:  24_330_000 ether  // Note: ether is only a keyword helper
+        });
+
+        // Fill the total values based on the source for the transfers above
+        TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
+            mkr: -1013.75 ether, // Note: ether is only a keyword helper
+            sky:     0.00 ether  // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -714,23 +725,27 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Calculate and save previous balances
         uint256 previousSurplusBalance = vat.sin(address(vow));
+        TreasuryAmounts memory previousTreasuryBalances = TreasuryAmounts({
+            mkr: int256(mkr.balanceOf(pauseProxy)),
+            sky: int256(sky.balanceOf(pauseProxy))
+        });
         PaymentAmounts memory previousTotalSupply = PaymentAmounts({
             dai: int256(dai.totalSupply()),
-            mkr: int256(mkr.balanceOf(address(pauseProxy))),
+            mkr: int256(mkr.totalSupply()),
             usds: int256(usds.totalSupply()),
             sky: int256(sky.totalSupply())
         });
-        PaymentAmounts memory calculatedTotalDiff;
+        PaymentAmounts memory calculatedTotalPayments;
         PaymentAmounts[] memory previousPayeeBalances = new PaymentAmounts[](payees.length);
         for (uint256 i = 0; i < payees.length; i++) {
             if (payees[i].token == address(dai)) {
-                calculatedTotalDiff.dai += payees[i].amount;
+                calculatedTotalPayments.dai += payees[i].amount;
             } else if (payees[i].token == address(mkr)) {
-                calculatedTotalDiff.mkr += payees[i].amount;
+                calculatedTotalPayments.mkr += payees[i].amount;
             } else if (payees[i].token == address(usds)) {
-                calculatedTotalDiff.usds += payees[i].amount;
+                calculatedTotalPayments.usds += payees[i].amount;
             } else if (payees[i].token == address(sky)) {
-                calculatedTotalDiff.sky += payees[i].amount;
+                calculatedTotalPayments.sky += payees[i].amount;
             } else {
                 revert('TestPayments/unexpected-payee-token');
             }
@@ -744,23 +759,23 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check calculated vs expected totals
         assertEq(
-            calculatedTotalDiff.dai,
-            expectedTotalDiff.dai,
+            calculatedTotalPayments.dai,
+            expectedTotalPayments.dai,
             "TestPayments/calculated-vs-expected-dai-total-mismatch"
         );
         assertEq(
-            calculatedTotalDiff.usds,
-            expectedTotalDiff.usds,
+            calculatedTotalPayments.usds,
+            expectedTotalPayments.usds,
             "TestPayments/calculated-vs-expected-usds-total-mismatch"
         );
         assertEq(
-            calculatedTotalDiff.mkr,
-            expectedTotalDiff.mkr,
+            calculatedTotalPayments.mkr,
+            expectedTotalPayments.mkr,
             "TestPayments/calculated-vs-expected-mkr-total-mismatch"
         );
         assertEq(
-            calculatedTotalDiff.sky,
-            expectedTotalDiff.sky,
+            calculatedTotalPayments.sky,
+            expectedTotalPayments.sky,
             "TestPayments/calculated-vs-expected-sky-total-mismatch"
         );
 
@@ -769,24 +784,44 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestPayments/spell-not-done");
 
         // Check calculated vs actual totals
-        PaymentAmounts memory actualTotalDiff = PaymentAmounts({
-            dai: int256(dai.totalSupply()) - previousTotalSupply.dai,
-            mkr: previousTotalSupply.mkr - int256(mkr.balanceOf(address(pauseProxy))),
+        PaymentAmounts memory totalSupplyDiff = PaymentAmounts({
+            dai:  int256(dai.totalSupply())  - previousTotalSupply.dai,
+            mkr:  int256(mkr.totalSupply())  - previousTotalSupply.mkr,
             usds: int256(usds.totalSupply()) - previousTotalSupply.usds,
-            sky: int256(sky.totalSupply()) - previousTotalSupply.sky
+            sky:  int256(sky.totalSupply())  - previousTotalSupply.sky
         });
+
         if (ignoreTotalSupplyDaiUsds == false) {
+            // Assume USDS or Dai payments are made form the surplus buffer, meaning new ERC-20 tokens are emitted
             assertEq(
-                actualTotalDiff.dai + actualTotalDiff.usds,
-                calculatedTotalDiff.dai + calculatedTotalDiff.usds,
+                totalSupplyDiff.dai + totalSupplyDiff.usds,
+                calculatedTotalPayments.dai + calculatedTotalPayments.usds,
                 "TestPayments/invalid-dai-usds-total"
             );
             // Check that dai/usds transfers modify surplus buffer
-            assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalDiff.dai + calculatedTotalDiff.usds) * RAY);
+            assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalPayments.dai + calculatedTotalPayments.usds) * RAY);
         }
+
+        TreasuryAmounts memory treasuryBalancesDiff = TreasuryAmounts({
+            mkr: int256(mkr.balanceOf(pauseProxy)) - previousTreasuryBalances.mkr,
+            sky: int256(sky.balanceOf(pauseProxy)) - previousTreasuryBalances.sky
+        });
         assertEq(
-            actualTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) + actualTotalDiff.sky,
-            calculatedTotalDiff.mkr * int256(afterSpell.sky_mkr_rate) +  calculatedTotalDiff.sky,
+            expectedTreasuryBalancesDiff.mkr,
+            treasuryBalancesDiff.mkr,
+            "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
+        );
+        assertEq(
+            expectedTreasuryBalancesDiff.sky,
+            treasuryBalancesDiff.sky,
+            "TestPayments/actual-vs-expected-sky-treasury-mismatch"
+        );
+        // Sky or MKR payments might come from token emission or from the treasury
+        assertEq(
+            (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
+                + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
+            calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
+                + calculatedTotalPayments.sky,
             "TestPayments/invalid-mkr-sky-total"
         );
 
