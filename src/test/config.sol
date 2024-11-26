@@ -116,8 +116,8 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 7_50;                           // In basis points
-        afterSpell.susds_ssr              = 8_50;                           // In basis points
+        afterSpell.pot_dsr                = 8_50;                           // In basis points
+        afterSpell.susds_ssr              = 9_50;                           // In basis points
         afterSpell.pause_delay            = 30 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units
@@ -143,7 +143,7 @@ contract Config {
         afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 69;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.3";                       // String expected in system
+        afterSpell.chainlog_version       = "1.19.4";                       // String expected in system
 
         //
         // Values for all collateral
@@ -156,7 +156,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          8_25,            // In basis points
+            pct:          9_25,            // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -181,7 +181,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          8_75,
+            pct:          9_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -206,7 +206,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          8_00,
+            pct:          9_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -306,7 +306,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         7_500,
-            pct:          11_25,
+            pct:          12_25,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -331,7 +331,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          11_75,
+            pct:          12_75,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -356,7 +356,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         3_500,
-            pct:          11_00,
+            pct:          12_00,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1506,7 +1506,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          9_25,
+            pct:          10_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1531,7 +1531,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          9_00,
+            pct:          10_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1851,13 +1851,13 @@ contract Config {
         });
         afterSpell.collaterals["ALLOCATOR-SPARK-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10 * MILLION,
-            aL_gap:       10 * MILLION,
+            aL_line:      100 * MILLION,
+            aL_gap:       100 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
-            pct:          520,
-            mat:          10000,
+            pct:          9_31,
+            mat:          100_00,
             liqType:      "",
             liqOn:        false,
             chop:         0,

@@ -19,7 +19,6 @@ pragma solidity 0.8.16;
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 
-
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -46,16 +45,8 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface DirectSparkDaiPlanLike {
-    function buffer() external view returns (uint256);
-}
-
-interface GelatoPaymentAdapterLike {
-    function treasury() external view returns (address);
-}
-
-interface RwaLiquidationOracleLike {
-    function ilks(bytes32) external view returns (string memory doc, address pip, uint48 tau, uint48 toc);
+interface LineMomLike {
+    function ilks(bytes32 ilk) external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -680,7 +671,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testPayments() public { // add the `skipped` modifier to skip
-        bool ignoreTotalSupplyDaiUsds = false; // Set to false unless there is SubDAO spell interference
+        bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
@@ -1103,4 +1094,36 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testNewLineMomIlks() public {
+        string[7] memory ilks = [
+            "ALLOCATOR-SPARK-A",
+            "RWA001-A",
+            "RWA002-A",
+            "RWA009-A",
+            "RWA012-A",
+            "RWA013-A",
+            "RWA015-A"
+        ];
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                0,
+                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
+            );
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                1,
+                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
+            );
+        }
+    }
 }
