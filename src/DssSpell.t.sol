@@ -704,8 +704,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -1013.75 ether, // Note: ether is only a keyword helper
-            sky:     0.00 ether  // Note: ether is only a keyword helper
+            mkr: -1_013.75 ether, // Note: ether is only a keyword helper
+            sky:      0.00 ether  // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -788,7 +788,7 @@ contract DssSpellTest is DssSpellTestBase {
                 totalSupplyDiff.dai + totalSupplyDiff.usds,
                 calculatedTotalPayments.dai + calculatedTotalPayments.usds,
                 "TestPayments/invalid-dai-usds-total"
-            );
+            );.
             // Check that dai/usds transfers modify surplus buffer
             assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalPayments.dai + calculatedTotalPayments.usds) * RAY);
         }
