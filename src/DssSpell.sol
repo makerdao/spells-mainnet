@@ -18,6 +18,8 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+
+import {DssAutoLineAbstract} from "dss-interfaces/dss/DssAutoLineAbstract.sol";
 import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface ProxyLike {
@@ -35,10 +37,6 @@ interface DaiUsdsLike {
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 wad) external;
     function rate() external view returns (uint256);
-}
-
-interface AutoLineLike {
-    function exec(bytes32 _ilk) external returns (uint256);
 }
 
 interface SUsdsLike {
@@ -90,16 +88,23 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD      = 10 ** 18;
 
     // ---------- MCD Addresses ----------
-    GemAbstract internal immutable MKR      = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable DAI      = GemAbstract(DssExecLib.dai());
-    address internal immutable AUTO_LINE    = DssExecLib.autoLine();
-    address internal immutable DAI_USDS     = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable LINE_MOM     = DssExecLib.getChangelogAddress("LINE_MOM");
-    address internal immutable MCD_ESM      = DssExecLib.getChangelogAddress("MCD_ESM");
-    address internal immutable MCD_PAUSE    = DssExecLib.getChangelogAddress("MCD_PAUSE");
-    address internal immutable MKR_SKY      = DssExecLib.getChangelogAddress("MKR_SKY");
-    uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
-    address internal immutable SUSDS        = DssExecLib.getChangelogAddress("SUSDS");
+    GemAbstract internal immutable MKR                 = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable DAI                 = GemAbstract(DssExecLib.dai());
+    address internal immutable AUTO_LINE               = DssExecLib.autoLine();
+    address internal immutable DAI_USDS                = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable LINE_MOM                = DssExecLib.getChangelogAddress("LINE_MOM");
+    address internal immutable MCD_ESM                 = DssExecLib.getChangelogAddress("MCD_ESM");
+    address internal immutable MCD_PAUSE               = DssExecLib.getChangelogAddress("MCD_PAUSE");
+    address internal immutable MKR_SKY                 = DssExecLib.getChangelogAddress("MKR_SKY");
+    uint256 internal immutable MKR_SKY_RATE            = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
+    address internal immutable SUSDS                   = DssExecLib.getChangelogAddress("SUSDS");
+    address internal constant EMSP_CLIP_BREAKER_FAB    = 0xd7321d0919573a33f9147fD2579a48F60237564A;
+    address internal constant EMSP_DDM_DISABLE_FAB     = 0x8BA0f6C4009Ea915706e1bCfB1d879E34587dC69;
+    address internal constant EMSP_LINE_WIPE_FAB       = 0xA649730fA92695096b7C49DBae682995F8906684;
+    address internal constant EMSP_OSM_STOP_FAB        = 0x83211c74131bA2B3de7538f588f1c2f309e81eF0;
+    address internal constant EMSP_GLOBAL_CLIP_BREAKER = 0x828824dBC62Fba126C76E0Abe79AE28E5393C2cb;
+    address internal constant EMSP_GLOBAL_LINE_WIPE    = 0x4B5f856B59448304585C2AA009802A16946DDb0f;
+    address internal constant EMSP_GLOBAL_OSM_STOP     = 0x3021dEdB0bC677F43A23Fcd1dE91A07e5195BaE8;
 
     // ---------- Wallets ----------
     address internal constant BLUE                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
@@ -129,6 +134,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM changes ----------
         // Forum: https://forum.sky.money/t/28-nov-2024-proposed-changes-to-spark-for-upcoming-spell-amendments/25575
+        // Poll: https://vote.makerdao.com/polling/QmcNd4mH#poll-detail
 
         // Increase DC-IAM gap by 90 million USDS, from 10 million USDS to 100 million USDS
         // Increase DC-IAM line by 90 million USDS, from 10 million USDS to 100 million USDS
@@ -217,31 +223,32 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmRfTQ5t
 
         // Contract: SingleClipBreakerFactory - Key: EMSP_CLIP_BREAKER_FAB - Value: 0xd7321d0919573a33f9147fD2579a48F60237564A
-        DssExecLib.setChangelogAddress("EMSP_CLIP_BREAKER_FAB", 0xd7321d0919573a33f9147fD2579a48F60237564A);
+        DssExecLib.setChangelogAddress("EMSP_CLIP_BREAKER_FAB", EMSP_CLIP_BREAKER_FAB);
 
         // Contract: SingleDdmDisableFactory - Key: EMSP_DDM_DISABLE_FAB - Value: 0x8BA0f6C4009Ea915706e1bCfB1d879E34587dC69
-        DssExecLib.setChangelogAddress("EMSP_DDM_DISABLE_FAB", 0x8BA0f6C4009Ea915706e1bCfB1d879E34587dC69);
+        DssExecLib.setChangelogAddress("EMSP_DDM_DISABLE_FAB", EMSP_DDM_DISABLE_FAB);
 
         // Contract: SingleLineWipeFactory - Key: EMSP_LINE_WIPE_FAB - Value: 0xA649730fA92695096b7C49DBae682995F8906684
-        DssExecLib.setChangelogAddress("EMSP_LINE_WIPE_FAB", 0xA649730fA92695096b7C49DBae682995F8906684);
+        DssExecLib.setChangelogAddress("EMSP_LINE_WIPE_FAB", EMSP_LINE_WIPE_FAB);
 
         // Contract: SingleOsmStopFactory - Key: EMSP_OSM_STOP_FAB - Value: 0x83211c74131bA2B3de7538f588f1c2f309e81eF0
-        DssExecLib.setChangelogAddress("EMSP_OSM_STOP_FAB", 0x83211c74131bA2B3de7538f588f1c2f309e81eF0);
+        DssExecLib.setChangelogAddress("EMSP_OSM_STOP_FAB", EMSP_OSM_STOP_FAB);
 
         // Contract: MultiClipBreakerSpell - Key: EMSP_GLOBAL_CLIP_BREAKER - Value: 0x828824dBC62Fba126C76E0Abe79AE28E5393C2cb
-        DssExecLib.setChangelogAddress("EMSP_GLOBAL_CLIP_BREAKER", 0x828824dBC62Fba126C76E0Abe79AE28E5393C2cb);
+        DssExecLib.setChangelogAddress("EMSP_GLOBAL_CLIP_BREAKER", EMSP_GLOBAL_CLIP_BREAKER);
 
         // Contract: MultiLineWipeSpell - Key: EMSP_GLOBAL_LINE_WIPE - Value: 0x4B5f856B59448304585C2AA009802A16946DDb0f
-        DssExecLib.setChangelogAddress("EMSP_GLOBAL_LINE_WIPE", 0x4B5f856B59448304585C2AA009802A16946DDb0f);
+        DssExecLib.setChangelogAddress("EMSP_GLOBAL_LINE_WIPE", EMSP_GLOBAL_LINE_WIPE);
 
         // Contract: MultiOsmStopSpell - Key: EMSP_GLOBAL_OSM_STOP - Value: 0x3021dEdB0bC677F43A23Fcd1dE91A07e5195BaE8
-        DssExecLib.setChangelogAddress("EMSP_GLOBAL_OSM_STOP", 0x3021dEdB0bC677F43A23Fcd1dE91A07e5195BaE8);
+        DssExecLib.setChangelogAddress("EMSP_GLOBAL_OSM_STOP", EMSP_GLOBAL_OSM_STOP);
 
         // Note: Bump chainlog patch version as new keys are being added
         DssExecLib.setChangelogVersion("1.19.4");
 
         // ---------- Launch Project Funding ----------
         // Forum: https://forum.sky.money/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/26
+        // Atlas: https://sky-atlas.powerhouse.io/A.5.6_Launch_Project/1f433d9d-7cdb-406f-b7e8-f9bc4855eb77%7C8d5a
 
         // Transfer 10,000,000 USDS to 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         _transferUsds(LAUNCH_PROJECT_FUNDING, 10 * MILLION * WAD);
@@ -271,6 +278,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- October 2024 AD Compensation ----------
         // Forum: https://forum.sky.money/t/october-2024-aligned-delegate-compensation/25581
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.5.8_Budget_For_Prime_Delegate_Slots/e3e420fc-9b1f-4fdc-9983-fcebc45dd3aa%7C0db3af4ece0c
 
         // BLUE - 2,968 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferUsds(BLUE,        2_968 * WAD);
@@ -292,6 +300,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Atlas Core Development Payments ----------
         // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-november-2024/25580
+        // Atlas: https://forum.sky.money/t/atlas-core-development-payment-requests-november-2024/25580/8
 
         // Kohla (Cloaky) - 20,000 USDS - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
         _transferUsds(CLOAKY_KOHLA_2,  20_000 * WAD);
@@ -315,7 +324,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmcNd4mH
 
         // Note: The spark spell below expects the new auto-line settings to be effective.
-        AutoLineLike(AUTO_LINE).exec("ALLOCATOR-SPARK-A");
+        DssAutoLineAbstract(AUTO_LINE).exec("ALLOCATOR-SPARK-A");
 
         // Execute Spark Proxy Spell at 0x6c87D984689CeD0bB367A58722aC74013F82267d
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
@@ -331,7 +340,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
         // Note: Approve DAI_USDS for the amount sent to be able to convert it.
         DAI.approve(DAI_USDS, wad);
-        // Transfer 3,000,000 USDS to 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
+        // Note: Transfer USDS to `usr`.
         DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 
