@@ -340,7 +340,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
         // Note: Approve DAI_USDS for the amount sent to be able to convert it.
         DAI.approve(DAI_USDS, wad);
-        // Note: Transfer USDS to `usr`.
+        // Note: Convert Dai to USDS for `usr`.
         DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 
