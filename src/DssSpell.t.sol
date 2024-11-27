@@ -788,7 +788,7 @@ contract DssSpellTest is DssSpellTestBase {
                 totalSupplyDiff.dai + totalSupplyDiff.usds,
                 calculatedTotalPayments.dai + calculatedTotalPayments.usds,
                 "TestPayments/invalid-dai-usds-total"
-            );.
+            );
             // Check that dai/usds transfers modify surplus buffer
             assertEq(vat.sin(address(vow)) - previousSurplusBalance, uint256(calculatedTotalPayments.dai + calculatedTotalPayments.usds) * RAY);
         }
