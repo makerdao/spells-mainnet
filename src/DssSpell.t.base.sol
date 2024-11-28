@@ -966,9 +966,8 @@ contract DssSpellTestBase is Config, DssTest {
                 // incentive is always smaller than liquidation penalty
                     (, uint256 chop,,) = dog.ilks(ilk);
                     (,,,, uint256 dust) = vat.ilks(ilk);
-                    uint256 minimumDebt = dust == 0 ? RAD : dust;
-                    uint256 penaltyAmount = (minimumDebt * chop / WAD) - minimumDebt;
-                    uint256 incentiveAmount = uint256(clip.tip()) + (minimumDebt * uint256(clip.chip())) / WAD;
+                    uint256 penaltyAmount = (dust * chop / WAD) - dust;
+                    uint256 incentiveAmount = uint256(clip.tip()) + (dust * uint256(clip.chip())) / WAD;
                     assertTrue(penaltyAmount >= incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
                 }
             }
