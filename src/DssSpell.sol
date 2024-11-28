@@ -300,7 +300,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- Atlas Core Development Payments ----------
         // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-november-2024/25580
-        // Atlas: https://forum.sky.money/t/atlas-core-development-payment-requests-november-2024/25580/8
 
         // Kohla (Cloaky) - 20,000 USDS - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
         _transferUsds(CLOAKY_KOHLA_2,  20_000 * WAD);
