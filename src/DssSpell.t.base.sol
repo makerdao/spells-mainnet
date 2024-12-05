@@ -685,6 +685,10 @@ contract DssSpellTestBase is Config, DssTest {
 
         // wait
         assertEq(vow.wait(), values.vow_wait, "TestError/vow-wait");
+
+        // This is a safety check to ensure that DAI holders have enough time to redeem their DAI from LPs
+        assertGe(vow.wait(), pause.delay() * 2, "TestError/vow-wait-too-short");
+
         {
         // dump values in WAD
         uint256 normalizedDump = values.vow_dump * WAD;
