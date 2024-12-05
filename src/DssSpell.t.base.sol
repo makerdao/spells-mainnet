@@ -961,15 +961,15 @@ contract DssSpellTestBase is Config, DssTest {
                     address engine = LockstakeClipperLike(address(clip)).engine();
                     assertNotEq(engine, address(0), _concat("TestError/clip-engine-is-not-set-", ilk));
                 }
-
-                (,,,uint256 line,uint256 dust) = vat.ilks(ilk);
-
-                if(line != 0 && clip.stopped() == 0) {
-                // incentive is always smaller than liquidation penalty
-                    (,uint256 chop,,) = dog.ilks(ilk);
-                    uint256 penaltyAmount = (dust * chop / WAD) - dust;
-                    uint256 incentiveAmount = uint256(clip.tip()) + (dust * uint256(clip.chip())) / WAD;
-                    assertTrue(penaltyAmount >= incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
+                {
+                    (,,,uint256 line,uint256 dust) = vat.ilks(ilk);
+                    if(line != 0 && clip.stopped() == 0) {
+                    // incentive is always smaller than liquidation penalty
+                        (,uint256 chop,,) = dog.ilks(ilk);
+                        uint256 penaltyAmount = (dust * chop / WAD) - dust;
+                        uint256 incentiveAmount = uint256(clip.tip()) + (dust * uint256(clip.chip())) / WAD;
+                        assertTrue(penaltyAmount >= incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
+                    }
                 }
             }
             if (reg.class(ilk) < 3) {
