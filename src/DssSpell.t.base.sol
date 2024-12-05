@@ -962,7 +962,7 @@ contract DssSpellTestBase is Config, DssTest {
                     assertNotEq(engine, address(0), _concat("TestError/clip-engine-is-not-set-", ilk));
                 }
 
-                if(values.collaterals[ilk].chop != 0 && values.collaterals[ilk].liqOn) {
+                if(values.collaterals[ilk].line != 0 && values.collaterals[ilk].liqOn) {
                 // incentive is always smaller than liquidation penalty
                     (, uint256 chop,,) = dog.ilks(ilk);
                     (,,,, uint256 dust) = vat.ilks(ilk);
