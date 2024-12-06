@@ -45,6 +45,10 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface LineMomLike {
+    function ilks(bytes32 ilk) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -666,7 +670,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
 
         // For each payment, create a Payee object with:
@@ -674,22 +678,34 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 0 ether) // Note: ether is only a keyword helper
+        Payee[13] memory payees = [
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"),       10_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("LIQUIDITY_BOOTSTRAPPING"),       6_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"),  3_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"),                             53_135 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"),                       4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"),                           1_733 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY"),                            4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"),                        4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("VIGILANT"),                          4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),                   20_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"),                    20_110 ether), // Note: ether is only a keyword helper
+            Payee(address(sky),  wallets.addr("LAUNCH_PROJECT_FUNDING"),       24_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky),  wallets.addr("BLUE"),                            330_000 ether)  // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:  0 ether, // Note: ether is only a keyword helper
-            mkr:  0 ether, // Note: ether is only a keyword helper
-            usds: 0 ether, // Note: ether is only a keyword helper
-            sky:  0 ether  // Note: ether is only a keyword helper
+            dai:           0 ether, // Note: ether is only a keyword helper
+            mkr:           0 ether, // Note: ether is only a keyword helper
+            usds: 19_110_978 ether, // Note: ether is only a keyword helper
+            sky:  24_330_000 ether  // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: 0.00 ether, // Note: ether is only a keyword helper
-            sky: 0.00 ether  // Note: ether is only a keyword helper
+            mkr: -1_013.75 ether, // Note: ether is only a keyword helper
+            sky:      0.00 ether  // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -1059,9 +1075,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0); // Insert Spark spell address
+        address SPARK_SPELL = 0x6c87D984689CeD0bB367A58722aC74013F82267d;
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1078,4 +1094,36 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testNewLineMomIlks() public {
+        string[7] memory ilks = [
+            "ALLOCATOR-SPARK-A",
+            "RWA001-A",
+            "RWA002-A",
+            "RWA009-A",
+            "RWA012-A",
+            "RWA013-A",
+            "RWA015-A"
+        ];
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                0,
+                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
+            );
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                1,
+                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
+            );
+        }
+    }
 }

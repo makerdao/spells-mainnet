@@ -685,10 +685,6 @@ contract DssSpellTestBase is Config, DssTest {
 
         // wait
         assertEq(vow.wait(), values.vow_wait, "TestError/vow-wait");
-
-        // Ensure there is enough time for the governance to unwind SBE LP tokens instead of starting a Flop auction
-        assertGe(vow.wait(), pause.delay() * 2, "TestError/vow-wait-too-short");
-
         {
         // dump values in WAD
         uint256 normalizedDump = values.vow_dump * WAD;
@@ -964,16 +960,6 @@ contract DssSpellTestBase is Config, DssTest {
                     // check correct clipper type is used for the reg.class 7
                     address engine = LockstakeClipperLike(address(clip)).engine();
                     assertNotEq(engine, address(0), _concat("TestError/clip-engine-is-not-set-", ilk));
-                }
-                {
-                    // Ensure liquidation penalty is always bigger than combined keeper incentives
-                    (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
-                    if (line != 0 && clip.stopped() == 0) {
-                        (, uint256 chop,,) = dog.ilks(ilk);
-                        uint256 penaltyAmount = (dust * chop / WAD) - dust;
-                        uint256 incentiveAmount = uint256(clip.tip()) + (dust * uint256(clip.chip())) / WAD;
-                        assertTrue(penaltyAmount >= incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
-                    }
                 }
             }
             if (reg.class(ilk) < 3) {
