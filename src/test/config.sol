@@ -116,8 +116,8 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 11_50;                          // In basis points
-        afterSpell.susds_ssr              = 12_50;                          // In basis points
+        afterSpell.pot_dsr                = 14_50;                          // In basis points
+        afterSpell.susds_ssr              = 15_50;                          // In basis points
         afterSpell.pause_delay            = 30 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units
@@ -156,7 +156,7 @@ contract Config {
             aL_ttl:       6 hours,         // In seconds
             line:         0,               // In whole Dai units  // Not checked here as there is auto line
             dust:         7_500,           // In whole Dai units
-            pct:          12_75,           // In basis points
+            pct:          16_25,           // In basis points
             mat:          14500,           // In basis points
             liqType:      "clip",          // "" or "flip" or "clip"
             liqOn:        true,            // If liquidations are enabled
@@ -181,7 +181,7 @@ contract Config {
             aL_ttl:       6 hours,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          13_25,
+            pct:          16_75,
             mat:          13000,
             liqType:      "clip",
             liqOn:        true,
@@ -206,7 +206,7 @@ contract Config {
             aL_ttl:       8 hours,
             line:         0,
             dust:         3_500,
-            pct:          12_50,
+            pct:          16_00,
             mat:          17000,
             liqType:      "clip",
             liqOn:        true,
@@ -306,7 +306,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         7_500,
-            pct:          16_25,
+            pct:          20_25,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -331,7 +331,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         25 * THOUSAND,
-            pct:          16_75,
+            pct:          20_75,
             mat:          15000,
             liqType:      "clip",
             liqOn:        true,
@@ -356,7 +356,7 @@ contract Config {
             aL_ttl:       0,
             line:         0,
             dust:         3_500,
-            pct:          16_00,
+            pct:          20_00,
             mat:          17500,
             liqType:      "clip",
             liqOn:        true,
@@ -1506,7 +1506,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         7_500,
-            pct:          13_75,
+            pct:          17_25,
             mat:          150_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1531,7 +1531,7 @@ contract Config {
             aL_ttl:       12 hours,
             line:         0,
             dust:         3_500,
-            pct:          13_50,
+            pct:          17_00,
             mat:          175_00,
             liqType:      "clip",
             liqOn:        true,
@@ -1856,7 +1856,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
-            pct:          12_25,
+            pct:          15_19,
             mat:          100_00,
             liqType:      "",
             liqOn:        false,
