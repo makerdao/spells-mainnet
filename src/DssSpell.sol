@@ -27,8 +27,8 @@ interface SUsdsLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/b97b2079e2f7ee950676c39f1d67303d19d55fdf/governance/votes/Executive%20vote%20-%20December%206%2C%202024.md' -q -O - 2>/dev/null)"
-    string public constant override description = "2024-12-06 MakerDAO Executive Spell | Hash: 0xf3154487b58605fd6398364065ba51165e10514f45d063ed3727de31d2b7a3a7";
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/a10d6efcc985be925bda5eb140d18c863040b7bb/governance/votes/December%202024%20out-of-schedule%20spell%202.md' -q -O - 2>/dev/null)"
+    string public constant override description = "2024-12-OOS2 MakerDAO Executive Spell | Hash: 0xcd88c3304dd5e4f3697fed10bb1949af6cd134ac5c832c61dd1589aff5993eee";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -46,60 +46,61 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant ELEVEN_PT_FIVE_PCT_RATE         = 1000000003451750542235895695;
-    uint256 internal constant TWELVE_PT_TWO_FIVE_PCT_RATE     = 1000000003664330950215446102;
-    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE         = 1000000003734875566854894261;
-    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE   = 1000000003805263591546724039;
-    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE   = 1000000003945572635100236468;
-    uint256 internal constant THIRTEEN_PT_FIVE_PCT_RATE       = 1000000004015495027511808328;
-    uint256 internal constant THIRTEEN_PT_SEVEN_FIVE_PCT_RATE = 1000000004085263575156219812;
-    uint256 internal constant SIXTEEN_PCT_RATE                = 1000000004706367499604668374;
-    uint256 internal constant SIXTEEN_PT_TWO_FIVE_PCT_RATE    = 1000000004774634032180348552;
-    uint256 internal constant SIXTEEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000004910727769570159235;
+    uint256 internal constant FOURTEEN_PT_FIVE_PCT_RATE      = 1000000004293652882321576158;
+    uint256 internal constant FIFTEEN_PT_ONE_NINE_PCT_RATE   = 1000000004484168989960140704;
+    uint256 internal constant FIFTEEN_PT_FIVE_PCT_RATE       = 1000000004569391942636426248;
+    uint256 internal constant SIXTEEN_PCT_RATE               = 1000000004706367499604668374;
+    uint256 internal constant SIXTEEN_PT_TWO_FIVE_PCT_RATE   = 1000000004774634032180348552;
+    uint256 internal constant SIXTEEN_PT_SEVEN_FIVE_PCT_RATE = 1000000004910727769570159235;
+    uint256 internal constant SEVENTEEN_PCT_RATE             = 1000000004978556227818707070;
+    uint256 internal constant SEVENTEEN_PT_TWO_FIVE_PCT_RATE = 1000000005046239908035965222;
+    uint256 internal constant TWENTY_PCT_RATE                = 1000000005781378656804591712;
+    uint256 internal constant TWENTY_PT_TWO_FIVE_PCT_RATE    = 1000000005847372004595219844;
+    uint256 internal constant TWENTY_PT_SEVEN_FIVE_PCT_RATE  = 1000000005978948094503498507;
 
     // ---------- Addresses ----------
     address internal immutable SUSDS = DssExecLib.getChangelogAddress("SUSDS");
 
     function actions() public override {
         // ---------- Stability Fees Changes ----------
-        // Forum: https://forum.sky.money/t/out-of-schedule-executive-proposal-stability-scope-parameter-changes-19-sfs-dsr-ssr-spark-effective-dai-borrow-rate-spark-liquidity-layer/25648
+        // Forum: https://forum.sky.money/t/out-of-schedule-executive-proposal-stability-scope-parameter-changes-19-sfs-dsr-ssr-spark-effective-dai-borrow-rate-spark-liquidity-layer/25648/4
 
-        // Increase ETH-A Stability Fee by 3.50 percentage points from 9.25% to 12.75%
-        DssExecLib.setIlkStabilityFee("ETH-A", TWELVE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-A Stability Fee by 3.50 percentage points from 12.75% to 16.25%
+        DssExecLib.setIlkStabilityFee("ETH-A", SIXTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase ETH-B Stability Fee by 3.50 percentage points from 9.75% to 13.25%
-        DssExecLib.setIlkStabilityFee("ETH-B", THIRTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-B Stability Fee by 3.50 percentage points from 13.25% to 16.75%
+        DssExecLib.setIlkStabilityFee("ETH-B", SIXTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase ETH-C Stability Fee by 3.50 percentage points from 9.00% to 12.50%
-        DssExecLib.setIlkStabilityFee("ETH-C", TWELVE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ETH-C Stability Fee by 3.50 percentage points from 12.50% to 16.00%
+        DssExecLib.setIlkStabilityFee("ETH-C", SIXTEEN_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WSTETH-A Stability Fee by 3.50 percentage points from 10.25% to 13.75%
-        DssExecLib.setIlkStabilityFee("WSTETH-A", THIRTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WSTETH-A Stability Fee by 3.50 percentage points from 13.75% to 17.25%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", SEVENTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WSTETH-B Stability Fee by 3.50 percentage points from 10.00% to 13.50%
-        DssExecLib.setIlkStabilityFee("WSTETH-B", THIRTEEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WSTETH-B Stability Fee by 3.50 percentage points from 13.50% to 17.00%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", SEVENTEEN_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-A Stability Fee by 4.00 percentage points from 12.25% to 16.25%
-        DssExecLib.setIlkStabilityFee("WBTC-A", SIXTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-A Stability Fee by 4.00 percentage points from 16.25% to 20.25%
+        DssExecLib.setIlkStabilityFee("WBTC-A", TWENTY_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-B Stability Fee by 4.00 percentage points from 12.75% to 16.75%
-        DssExecLib.setIlkStabilityFee("WBTC-B", SIXTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-B Stability Fee by 4.00 percentage points from 16.75% to 20.75%
+        DssExecLib.setIlkStabilityFee("WBTC-B", TWENTY_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase WBTC-C Stability Fee by 4.00 percentage points from 12.00% to 16.00%
-        DssExecLib.setIlkStabilityFee("WBTC-C", SIXTEEN_PCT_RATE, /* doDrip = */ true);
+        // Increase WBTC-C Stability Fee by 4.00 percentage points from 16.00% to 20.00%
+        DssExecLib.setIlkStabilityFee("WBTC-C", TWENTY_PCT_RATE, /* doDrip = */ true);
 
-        // Increase ALLOCATOR-SPARK-A Stability Fee by 2.94 percentage points from 9.31% to 12.25%
-        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", TWELVE_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase ALLOCATOR-SPARK-A Stability Fee by 2.94 percentage points from 12.25% to 15.19%
+        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", FIFTEEN_PT_ONE_NINE_PCT_RATE, /* doDrip = */ true);
 
         // ---------- Savings Rate Changes ----------
-        // Forum: https://forum.sky.money/t/out-of-schedule-executive-proposal-stability-scope-parameter-changes-19-sfs-dsr-ssr-spark-effective-dai-borrow-rate-spark-liquidity-layer/25648
+        // Forum: https://forum.sky.money/t/out-of-schedule-executive-proposal-stability-scope-parameter-changes-19-sfs-dsr-ssr-spark-effective-dai-borrow-rate-spark-liquidity-layer/25648/4
 
-        // Increase DSR by 3 percentage points from 8.50% to 11.50%
-        DssExecLib.setDSR(ELEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
+        // Increase DSR by 3.00 percentage points from 11.50% to 14.50%
+        DssExecLib.setDSR(FOURTEEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Increase SSR by 3 percentage points from 9.50% to 12.50%
+        // Increase SSR by 3.00 percentage points from 12.50% to 15.50%
         SUsdsLike(SUSDS).drip();
-        SUsdsLike(SUSDS).file("ssr", TWELVE_PT_FIVE_PCT_RATE);
+        SUsdsLike(SUSDS).file("ssr", FIFTEEN_PT_FIVE_PCT_RATE);
     }
 }
 
