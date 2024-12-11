@@ -970,9 +970,10 @@ contract DssSpellTestBase is Config, DssTest {
                     (,,, uint256 line, uint256 dust) = vat.ilks(ilk);
                     if (line != 0 && clip.stopped() == 0) {
                         (, uint256 chop,,) = dog.ilks(ilk);
-                        uint256 penaltyAmount = (dust * chop / WAD) - dust;
-                        uint256 incentiveAmount = uint256(clip.tip()) + (dust * uint256(clip.chip())) / WAD;
-                        assertTrue(penaltyAmount >= incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
+                        uint256 tab = dust * chop / WAD;
+                        uint256 penaltyAmount = tab - dust;
+                        uint256 incentiveAmount = uint256(clip.tip()) + (tab * uint256(clip.chip()) / WAD);
+                        assertGe(penaltyAmount, incentiveAmount, _concat("TestError/too-low-dog-chop-", ilk));
                     }
                 }
             }
