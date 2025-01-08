@@ -107,7 +107,7 @@ contract DssSpellAction is DssAction {
         // ---------- WBTC Oracle Migration ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-the-wbtc-oracle-migration/25715
 
-        //Change WBTC OSM source to 0x24C392CDbF32Cf911B258981a66d5541d85269ce
+        // Change WBTC OSM source to 0x24C392CDbF32Cf911B258981a66d5541d85269ce
         OsmAbstractLike(PIP_WBTC).change(0x24C392CDbF32Cf911B258981a66d5541d85269ce);
 
         // ---------- Increase ALLOCATOR-SPARK-A Maximum Debt Ceiling (line) ----------
@@ -148,10 +148,10 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/november-2024-aligned-delegate-compensation/25740
         // Atlas: https://sky-atlas.powerhouse.io/A.1.5.8_Budget_For_Prime_Delegate_Slots/e3e420fc-9b1f-4fdc-9983-fcebc45dd3aa%7C0db3af4ece0c
 
-        //BLUE - 4000 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        // BLUE - 4000 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferUsds(BLUE,        4_000 * WAD);
 
-        //Bonapublica - 4000 USDS - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        // Bonapublica - 4000 USDS - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
         _transferUsds(BONAPUBLICA, 4_000 * WAD);
 
         // Byteron - 533 USDS - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
