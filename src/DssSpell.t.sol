@@ -666,7 +666,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
 
         // For each payment, create a Payee object with:
@@ -674,16 +674,33 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 0 ether) // Note: ether is only a keyword helper
+
+        Payee[17] memory payees = [
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"),  3_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("WHITEHAT"),                          1_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("IMMUNEFI_COMISSION"),                  100 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("RESILIENCE_RESEARCH_FUNDING"),      32_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"),                              4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"),                       4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"),                             533 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY"),                            4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"),                        4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("ROCKY"),                             2_790 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("VIGILANT"),                          4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds),  wallets.addr("BLUE"),                            83_602 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),                   10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"),                    10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY"),                           22_836 ether), // Note: ether is only a keyword helper
+            Payee(address(sky),  wallets.addr("BLUE"),                            550_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky),  wallets.addr("CLOAKY"),                          438_000 ether)  // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:  0 ether, // Note: ether is only a keyword helper
-            mkr:  0 ether, // Note: ether is only a keyword helper
-            usds: 0 ether, // Note: ether is only a keyword helper
-            sky:  0 ether  // Note: ether is only a keyword helper
+            dai:          0 ether, // Note: ether is only a keyword helper
+            mkr:          0 ether, // Note: ether is only a keyword helper
+            usds: 3_182_861 ether, // Note: ether is only a keyword helper
+            sky:    988_000 ether  // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
@@ -1059,9 +1076,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0); // Insert Spark spell address
+        address SPARK_SPELL = 0x7fb2967cDC6816Dc508f35C5A6CB035C8B6507Ec; // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
