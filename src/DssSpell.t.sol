@@ -46,7 +46,11 @@ interface SequencerLike {
 }
 
 interface OsmAbstractLike {
+    function kiss(address) external;
+    function poke() external;
+    function peep() external view returns (bytes32, bool);
     function src() external view returns (address);
+    function zzz() external view returns (uint64);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -1123,13 +1127,30 @@ contract DssSpellTest is DssSpellTestBase {
     address immutable PIP_WBTC = addr.addr("PIP_WBTC");
 
     function testWBTC_OracleMigration() public {
-        // check the current WBTC OSM source
+        // Check the current WBTC OSM source
         assertEq(OsmAbstractLike(PIP_WBTC).src(), 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
+        // Check if the migration happened
         assertEq(OsmAbstractLike(PIP_WBTC).src(), 0x24C392CDbF32Cf911B258981a66d5541d85269ce);
+
+        // Integration testing: the values are updated properly
+        GodMode.setWard(PIP_WBTC, address(this), 1);
+        OsmAbstractLike(PIP_WBTC).kiss(address(this));
+        // Before
+        (bytes32 currentPrice,) = OsmAbstractLike(PIP_WBTC).peep();
+        uint64 currentZzz = OsmAbstractLike(PIP_WBTC).zzz();
+        OsmAbstractLike(PIP_WBTC).poke();
+        // After
+        vm.warp(block.timestamp + 3601);
+        OsmAbstractLike(PIP_WBTC).poke();
+        (bytes32 newPrice,) = OsmAbstractLike(PIP_WBTC).peep();
+        uint64 newZzz = OsmAbstractLike(PIP_WBTC).zzz();
+        // Ensure that changes took place
+        assertNotEq(currentPrice, newPrice, "testWBTC_OracleMigration/no-price-change");
+        assertNotEq(currentZzz, newZzz, "testWBTC_OracleMigration/no-zzz-change");
     }
 }
