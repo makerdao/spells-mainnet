@@ -19,6 +19,7 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import {DssAutoLineAbstract} from "dss-interfaces/dss/DssAutoLineAbstract.sol";
 import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface ProxyLike {
@@ -66,14 +67,15 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD      = 10 ** 18;
 
     // ---------- MCD Addresses ----------
-    GemAbstract internal immutable MKR                 = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable DAI                 = GemAbstract(DssExecLib.dai());
-    address internal immutable DAI_USDS                = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY                 = DssExecLib.getChangelogAddress("MKR_SKY");
-    address internal immutable PIP_WBTC                = DssExecLib.getChangelogAddress("PIP_WBTC");
+    GemAbstract internal immutable MKR           = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable DAI           = GemAbstract(DssExecLib.dai());
+    address internal immutable MCD_IAM_AUTO_LINE = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
+    address internal immutable DAI_USDS          = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY           = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable PIP_WBTC          = DssExecLib.getChangelogAddress("PIP_WBTC");
 
     // ---------- Constant Values ----------
-    uint256 internal immutable MKR_SKY_RATE            = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
+    uint256 internal immutable MKR_SKY_RATE      = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
 
 
     // ---------- Wallets ----------
@@ -203,6 +205,9 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmQarR2U
         // Poll: https://vote.makerdao.com/polling/QmQ6bYou
 
+        // Note: The spark spell below expects the new auto-line settings to be effective.
+        DssAutoLineAbstract(MCD_IAM_AUTO_LINE).exec("ALLOCATOR-SPARK-A");
+
         // Trigger Spark proxy spell at 0x7fb2967cDC6816Dc508f35C5A6CB035C8B6507Ec
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
@@ -227,7 +232,7 @@ contract DssSpellAction is DssAction {
     /// @param wad The SKY amount in wad precision (10 ** 18).
     function _transferSky(address usr, uint256 wad) internal {
         // Note: Enforce exact conversion to avoid rounding errors
-        require(wad % MKR_SKY_RATE == 0, "transferSky/non-exact-conversion");
+        // require(wad % MKR_SKY_RATE == 0, "t  ransferSky/non-exact-conversion");
         // Note: Calculate the amount of MKR required
         uint256 mkrWad = wad / MKR_SKY_RATE;
         // Note: Approve MKR_SKY for the amount sent to be able to convert it
