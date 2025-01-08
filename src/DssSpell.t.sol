@@ -45,6 +45,10 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface OsmAbstractLike {
+    function src() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1095,4 +1099,16 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    address immutable PIP_WBTC = addr.addr("PIP_WBTC");
+
+    function testWBTC_OracleMigration() public {
+        // check the current WBTC OSM source
+        assertEq(OsmAbstractLike(PIP_WBTC).src(), 0xe0F30cb149fAADC7247E953746Be9BbBB6B5751f);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(OsmAbstractLike(PIP_WBTC).src(), 0x24C392CDbF32Cf911B258981a66d5541d85269ce);
+    }
 }
