@@ -41,8 +41,8 @@ interface OsmAbstractLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
-    string public constant override description = "TODO MakerDAO Executive Spell | Hash: TODO";
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/74179a046b3b0d124fbc1c9905f219b3c39d1033/governance/votes/Executive%20vote%20-%20January%209,%202025.md' -q -O - 2>/dev/null)"
+    string public constant override description = "2025-01-09 MakerDAO Executive Spell | Hash: 0x4f68cae9437b4a41a4ecad47023f43ffb63902d9ec54ac4bddfb60a729cda882";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -204,7 +204,7 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmQ6bYou
 
         // Trigger Spark proxy spell at 0x7fb2967cDC6816Dc508f35C5A6CB035C8B6507Ec
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
     }
 
