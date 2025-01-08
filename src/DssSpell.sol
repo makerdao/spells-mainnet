@@ -88,7 +88,7 @@ contract DssSpellAction is DssAction {
     address internal constant CLOAKY_KOHLA_2               = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
     address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
     address internal constant IMMUNEFI_COMISSION           = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
-    address internal constant WHITEHAT                     = 0xB5BB14252099CAef65912ad2F1BBd9434cF24c38;
+    address internal constant WHITEHAT_PAYOUT_2025_01_09   = 0xB5BB14252099CAef65912ad2F1BBd9434cF24c38;
     address internal constant RESILIENCE_RESEARCH_FUNDING  = 0x1378056c0cdd771de52A111E2777293516fA910c;
 
     // ---------- Spark Proxy Spell ----------
@@ -125,7 +125,7 @@ contract DssSpellAction is DssAction {
         // Atlas: https://sky-atlas.powerhouse.io/A.2.9.1.1.3.3.2_Rewards_Payout_Process/c4f5fe0d-a3cc-491d-b3af-db4176ad74cf%7C9e1f4492c8ce0c250f1a4db7
 
         // Whitehat Bug Bounty  - 1000 USDS - 0xB5BB14252099CAef65912ad2F1BBd9434cF24c38
-        _transferUsds(WHITEHAT, 1_000 * WAD);
+        _transferUsds(WHITEHAT_PAYOUT_2025_01_09, 1_000 * WAD);
 
         // Immunefi Bug Bounty - 100 USDS - 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18
         _transferUsds(IMMUNEFI_COMISSION, 100 * WAD);

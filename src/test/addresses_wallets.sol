@@ -196,10 +196,10 @@ contract Wallets {
         addr["COMPACTER"]                    = 0xbbd4bC3FE72691663c6ffE984Bcdb6C6E6b3a8Dd;
 
         // Bug Bounty
-        addr["IMMUNEFI_COMISSION"]           = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
+        addr["IMMUNEFI_COMISSION"]                    = 0x7119f398b6C06095c6E8964C1f58e7C1BAa79E18;
         addr["IMMUNEFI_USER_PAYOUT_2024_05_16"]       = 0xa24EC79bdF03bB325F36878573B13AedFEd0717f;
         addr["IMMUNEFI_USER_PAYOUT_2024_08_08"]       = 0xA4a6B5f005cBd2eD38f49ac496d86d3528C7a1aa;
-        addr["WHITEHAT"]                     = 0xB5BB14252099CAef65912ad2F1BBd9434cF24c38;
+        addr["WHITEHAT_HACKER_2025_01_09"]            = 0xB5BB14252099CAef65912ad2F1BBd9434cF24c38;
 
         // Resilience Research Funding
         addr["RESILIENCE_RESEARCH_FUNDING"]  = 0x1378056c0cdd771de52A111E2777293516fA910c;

@@ -681,7 +681,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         Payee[17] memory payees = [
             Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"),  3_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("WHITEHAT"),                          1_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("WHITEHAT_PAYOUT_2025_01_09"),        1_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("IMMUNEFI_COMISSION"),                  100 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("RESILIENCE_RESEARCH_FUNDING"),      32_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("BLUE"),                              4_000 ether), // Note: ether is only a keyword helper
