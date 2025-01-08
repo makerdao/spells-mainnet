@@ -35,6 +35,10 @@ interface MkrSkyLike {
     function rate() external view returns (uint256);
 }
 
+interface SkyLike {
+    function transfer(address to, uint256 value) external returns (bool);
+}
+
 interface OsmAbstractLike {
     function change(address) external;
 }
@@ -72,6 +76,7 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_IAM_AUTO_LINE = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
     address internal immutable DAI_USDS          = DssExecLib.getChangelogAddress("DAI_USDS");
     address internal immutable MKR_SKY           = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable SKY               = DssExecLib.getChangelogAddress("SKY");
     address internal immutable PIP_WBTC          = DssExecLib.getChangelogAddress("PIP_WBTC");
 
     // ---------- Constant Values ----------
@@ -231,14 +236,24 @@ contract DssSpellAction is DssAction {
     /// @param usr The SKY receiver.
     /// @param wad The SKY amount in wad precision (10 ** 18).
     function _transferSky(address usr, uint256 wad) internal {
-        // Note: Enforce exact conversion to avoid rounding errors
-        // require(wad % MKR_SKY_RATE == 0, "t  ransferSky/non-exact-conversion");
+        // Note: Calculate the remainder
+        uint256 wadRem = wad % MKR_SKY_RATE;
+        // Note: The remainder has to be strictly less than the rate (24_000)
+        require(wadRem < MKR_SKY_RATE, "transferUsds/wrong-remainder");
+        // Note: this extra amount is used for enforce exact conversion and avoiding rounding errors
+        uint256 extraWad;
+        if (wadRem != 0) {
+            extraWad = MKR_SKY_RATE - wadRem;
+        }
         // Note: Calculate the amount of MKR required
-        uint256 mkrWad = wad / MKR_SKY_RATE;
+        require((wad + extraWad) % MKR_SKY_RATE == 0, "transferSky/non-exact-conversion");
+        uint256 mkrWad = (wad + extraWad) / MKR_SKY_RATE;
         // Note: Approve MKR_SKY for the amount sent to be able to convert it
         MKR.approve(MKR_SKY, mkrWad);
-        // Note: Convert the calculated amount to SKY for `usr`
-        MkrSkyLike(MKR_SKY).mkrToSky(usr, mkrWad);
+        // Note: Convert the calculated amount to SKY
+        MkrSkyLike(MKR_SKY).mkrToSky(address(this), mkrWad);
+        // Note: Transer the required SKY to 'usr'
+        SkyLike(SKY).transfer(usr, wad);
     }
 }
 

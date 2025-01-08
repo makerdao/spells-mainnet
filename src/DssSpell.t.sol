@@ -670,6 +670,11 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
+    struct RoundingErrorHandling {
+        int256 mkrSkyRate;
+        int256 extraSky;
+    }
+
     function testPayments() public { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
 
@@ -697,6 +702,14 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(sky),  wallets.addr("CLOAKY"),                          438_000 ether)  // Note: ether is only a keyword helper
         ];
 
+        // Created a struct to avoid "Stack too deep" errors
+        RoundingErrorHandling memory roundingErrorHandling = RoundingErrorHandling({
+            mkrSkyRate: 24000,
+            // Set the variable with the amount of the  extra SKY that was sent to PAUSE_PROXY
+            // for each SKY payment do: extraSky += rate - (paymentAmount % rate)
+            extraSky: 24000 - 16000 // only one payment (BLUE - 550_000 SKY) is not divisible by rate
+        });
+
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether, // Note: ether is only a keyword helper
@@ -707,8 +720,8 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -41.166666666666666666 ether, // Note: ether is only a keyword helper
-            sky:                   0.00 ether // Note: ether is only a keyword helper
+            mkr: -int(988_000 ether + roundingErrorHandling.extraSky) / roundingErrorHandling.mkrSkyRate, // Note: ether is only a keyword helper
+            sky:                                   roundingErrorHandling.extraSky   // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -731,6 +744,8 @@ contract DssSpellTest is DssSpellTestBase {
         });
         PaymentAmounts memory calculatedTotalPayments;
         PaymentAmounts[] memory previousPayeeBalances = new PaymentAmounts[](payees.length);
+        // This is to account for the extra SKy we add for dealing with precision issues
+        int256 totalExtraSky;
         for (uint256 i = 0; i < payees.length; i++) {
             if (payees[i].token == address(dai)) {
                 calculatedTotalPayments.dai += payees[i].amount;
@@ -739,6 +754,10 @@ contract DssSpellTest is DssSpellTestBase {
             } else if (payees[i].token == address(usds)) {
                 calculatedTotalPayments.usds += payees[i].amount;
             } else if (payees[i].token == address(sky)) {
+                int256 rem = payees[i].amount % roundingErrorHandling.mkrSkyRate;
+                if (rem != 0) {
+                    totalExtraSky += roundingErrorHandling.mkrSkyRate - rem;
+                }
                 calculatedTotalPayments.sky += payees[i].amount;
             } else {
                 revert('TestPayments/unexpected-payee-token');
@@ -752,6 +771,10 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         // Check calculated vs expected totals
+        assertEq(roundingErrorHandling.extraSky,
+                 totalExtraSky,
+                "TestPayments/calculated-vs-expected-extra-sky-mismatch"
+        );
         assertEq(
             calculatedTotalPayments.dai,
             expectedTotalPayments.dai,
