@@ -236,24 +236,16 @@ contract DssSpellAction is DssAction {
     /// @param usr The SKY receiver.
     /// @param wad The SKY amount in wad precision (10 ** 18).
     function _transferSky(address usr, uint256 wad) internal {
-        // Note: Calculate the remainder
-        uint256 wadRem = wad % MKR_SKY_RATE;
-        // Note: The remainder has to be strictly less than the rate (24_000)
-        require(wadRem < MKR_SKY_RATE, "transferUsds/wrong-remainder");
-        // Note: this extra amount is used for enforce exact conversion and avoiding rounding errors
-        uint256 extraWad;
-        if (wadRem != 0) {
-            extraWad = MKR_SKY_RATE - wadRem;
-        }
-        // Note: Calculate the amount of MKR required
-        require((wad + extraWad) % MKR_SKY_RATE == 0, "transferSky/non-exact-conversion");
-        uint256 mkrWad = (wad + extraWad) / MKR_SKY_RATE;
+        // Note: Calculate the equivalent amount of MKR required
+        uint256 mkrWad = wad / MKR_SKY_RATE;
+        // Note: if rounding error is expected, add an extra wei of MKR
+        if (wad % MKR_SKY_RATE != 0) { mkrWad++; }
         // Note: Approve MKR_SKY for the amount sent to be able to convert it
         MKR.approve(MKR_SKY, mkrWad);
-        // Note: Convert the calculated amount to SKY
+        // Note: Convert the calculated amount to SKY for `PAUSE_PROXY`
         MkrSkyLike(MKR_SKY).mkrToSky(address(this), mkrWad);
-        // Note: Transer the required SKY to 'usr'
-        SkyLike(SKY).transfer(usr, wad);
+        // Note: Transfer originally requested amount, leaving extra on the `PAUSE_PROXY`
+        GemAbstract(SKY).transfer(usr, wad);
     }
 }
 
