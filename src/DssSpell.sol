@@ -35,10 +35,6 @@ interface MkrSkyLike {
     function rate() external view returns (uint256);
 }
 
-interface SkyLike {
-    function transfer(address to, uint256 value) external returns (bool);
-}
-
 interface OsmAbstractLike {
     function change(address) external;
 }
