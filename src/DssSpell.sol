@@ -42,7 +42,7 @@ interface OsmAbstractLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/MakerJanSky/community/2ccbb576d51cc5c876f497c6bb55dafc5bdb8bf9/governance/votes/Executive%20vote%20-%20January%209%2C%202025.md' -q -O - 2>/dev/null)"
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/2ccbb576d51cc5c876f497c6bb55dafc5bdb8bf9/governance/votes/Executive%20vote%20-%20January%209%2C%202025.md' -q -O - 2>/dev/null)"
     string public constant override description = "2025-01-09 MakerDAO Executive Spell | Hash: 0x4737c14701b1607fdf13336c0f0217a6cb17560f12f7c0a9b09f69a0874ccdd4";
 
     // Set office hours according to the summary
