@@ -195,7 +195,7 @@ contract DssSpellAction is DssAction {
         // Cloaky (Team) - 438000.00 SKY - 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818
         _transferSky(CLOAKY, 438_000 * WAD);
 
-        // Trigger Spark Proxy Spell
+        // ---------- Trigger Spark Proxy Spell ----------
         // Forum: https://forum.sky.money/t/27-dec-2024-proposed-changes-to-spark-for-upcoming-spell/25760
         // Poll: https://vote.makerdao.com/polling/QmYScEHT
         // Poll: https://vote.makerdao.com/polling/Qma1xA18
