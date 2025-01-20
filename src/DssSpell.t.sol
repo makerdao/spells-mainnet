@@ -439,12 +439,11 @@ contract DssSpellTest is DssSpellTestBase {
     function testVestDAI() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
-        uint256 DEC_01_2024 = 1733011200;
         uint256 JAN_31_2025 = 1738367999;
 
         // For each new stream, provide Stream object
         // and initialize the array with the corrent number of new streams
-        VestStream[] memory streams = new VestStream[](3);
+        VestStream[] memory streams = new VestStream[](1);
         streams[0] = VestStream({
             id:  39,
             usr: wallets.addr("JANSKY"),
@@ -458,44 +457,17 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        streams[1] = VestStream({
-            id:  40,
-            usr: wallets.addr("VOTEWIZARD"),
-            bgn: OCT_01_2024,
-            clf: OCT_01_2024,
-            fin: JAN_31_2025,
-            tau: 123 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 168_000 * WAD,
-            rxd: 0
-        });
-
-        streams[2] = VestStream({
-            id:  41,
-            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
-            bgn: DEC_01_2024,
-            clf: DEC_01_2024,
-            fin: JAN_31_2025,
-            tau: 62 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 84_000 * WAD,
-            rxd: 0
-        });
-
         _checkVestDai(streams);
     }
 
     function testVestMKR() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
-        uint256 DEC_01_2024 = 1733011200;
         uint256 JAN_31_2025 = 1738367999;
 
         // For each new stream, provide Stream object
         // and initialize the array with the corrent number of new streams
-        VestStream[] memory streams = new VestStream[](3);
+        VestStream[] memory streams = new VestStream[](1);
         streams[0] = VestStream({
             id:  45,
             usr: wallets.addr("JANSKY"),
@@ -506,32 +478,6 @@ contract DssSpellTest is DssSpellTestBase {
             mgr: address(0),
             res: 1,
             tot: 72 * WAD,
-            rxd: 0
-        });
-
-        streams[1] = VestStream({
-            id:  46,
-            usr: wallets.addr("VOTEWIZARD"),
-            bgn: OCT_01_2024,
-            clf: OCT_01_2024,
-            fin: JAN_31_2025,
-            tau: 123 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 72 * WAD,
-            rxd: 0
-        });
-
-        streams[2] = VestStream({
-            id:  47,
-            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
-            bgn: DEC_01_2024,
-            clf: DEC_01_2024,
-            fin: JAN_31_2025,
-            tau: 62 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 36 * WAD,
             rxd: 0
         });
 
@@ -586,7 +532,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestUsds(streams);
     }
 
-    function testVestSKY() public skipped { // add the `skipped` modifier to skip
+    function testVestSKY() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 FEB_01_2025 = 1738368000;
         uint256 DEC_31_2025 = 1767225599;
