@@ -71,14 +71,13 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable DAI              = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR              = GemAbstract(DssExecLib.mkr());
     GemAbstract internal immutable SKY              = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable MCD_PAUSE_PROXY      = DssExecLib.pauseProxy();
     address internal immutable DAI_USDS             = DssExecLib.getChangelogAddress("DAI_USDS");
     address internal immutable MKR_SKY              = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal constant MCD_VEST_USDS         = 0xc447a9745aDe9A44Bb9E37B7F6C92f9582544110;
     address internal constant MCD_VEST_SKY_TREASURY = 0x67eaDb3288cceDe034cE95b0511DCc65cf630bB6;
 
     // ---------- Constant Values ----------
-    uint256 internal immutable MKR_SKY_RATE      = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
+    uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
 
     // ---------- Wallets ----------
     address internal constant LAUNCH_PROJECT_FUNDING       = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
@@ -190,7 +189,7 @@ contract DssSpellAction is DssAction {
         MKR.approve(MKR_SKY, 624 * WAD);
 
         // Convert 624 MKR held in Pause Proxy to SKY (use MKR_SKY contract)
-        MkrSkyLike(MKR_SKY).mkrToSky(MCD_PAUSE_PROXY, 624 * WAD);
+        MkrSkyLike(MKR_SKY).mkrToSky(address(this), 624 * WAD);
 
         // Approve new SKY vest (0x67eaDb3288cceDe034cE95b0511DCc65cf630bB6) to take total 14,256,000 SKY from the treasury (MCD_PAUSE_PROXY)
         SKY.approve(MCD_VEST_SKY_TREASURY, 14_256_000 * WAD);
@@ -334,7 +333,7 @@ contract DssSpellAction is DssAction {
         // Note: Convert the calculated amount to SKY for `PAUSE_PROXY`
         MkrSkyLike(MKR_SKY).mkrToSky(address(this), mkrWad);
         // Note: Transfer originally requested amount, leaving extra on the `PAUSE_PROXY`
-        GemAbstract(SKY).transfer(usr, wad);
+        SKY.transfer(usr, wad);
     }
 }
 
