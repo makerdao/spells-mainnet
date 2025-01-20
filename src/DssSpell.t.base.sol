@@ -2420,7 +2420,7 @@ contract DssSpellTestBase is Config, DssTest {
         for (uint256 i = 0; i < _ss.length; i++) {
             vestableAmt += _ss[i].tot - _ss[i].rxd;
         }
-        assertGe(sky.allowance(pauseProxy, address(vestSky)), prevAllowance + vestableAmt, "testVestSky/invalid-allowance");
+        assertEq(sky.allowance(pauseProxy, address(vestSky)), prevAllowance + vestableAmt, "testVestSky/invalid-allowance");
 
         // Check that all streams added in this spell are tested
         assertEq(vestSky.ids(), prevStreamCount + _ss.length, "testVestSky/not-all-streams-tested");

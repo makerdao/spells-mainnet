@@ -45,6 +45,16 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface DssVestSuckableLike {
+    function chainlog() external view returns (address);
+    function join() external view returns (address);
+}
+
+interface DssVestTransferrableLike {
+    function czar() external view returns (address);
+    function gem() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1134,4 +1144,14 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testNewUsdsVestConstructor() public view {
+        assertEq(DssVestSuckableLike(address(vestUsds)).chainlog(), address(chainLog), "TestError/unexpected-VestSuckable-constructor-chainlog");
+        assertEq(DssVestSuckableLike(address(vestUsds)).join(), address(usdsJoin), "TestError/unexpected-VestSuckable-constructor-join");
+    }
+
+    function testNewSkyVestConstructor() public view {
+        assertEq(DssVestTransferrableLike(address(vestSky)).czar(), address(pauseProxy), "TestError/unexpected-VestTransferrable-constructor-czar");
+        assertEq(DssVestTransferrableLike(address(vestSky)).gem(), address(sky), "TestError/unexpected-VestTransferrable-constructor-gem");
+    }
 }
