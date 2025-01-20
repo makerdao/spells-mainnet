@@ -291,6 +291,16 @@ contract DssSpellAction is DssAction {
         // Approve DAO Resolution with IPFS hash bafkreieqcricvrwb7ndxep6unlhhm6iie3dlkr3cl4tdypinjws4pycalq
         // Note: see `dao_resolutions` public variable declared above
 
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/jan-23-2025-proposed-changes-to-spark-for-upcoming-spell/25825
+        // Poll: https://vote.makerdao.com/polling/QmRAavx5
+        // Poll: https://vote.makerdao.com/polling/QmY4D1u8
+        // Poll: https://vote.makerdao.com/polling/QmU3Xu4W
+        // Forum: https://forum.sky.money/t/jan-23-2025-proposed-changes-to-spark-for-upcoming-spell-2/25837/3
+
+        // Execute Spark Proxy Spell at TBC
+        // TODO
+
         // ---------- Chainlog bump ----------
 
         // Note: Bump chainlog patch version as new keys are being added
