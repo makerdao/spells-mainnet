@@ -192,8 +192,8 @@ contract DssSpellAction is DssAction {
         // Convert 624 MKR held in Pause Proxy to SKY (use MKR_SKY contract)
         MkrSkyLike(MKR_SKY).mkrToSky(MCD_PAUSE_PROXY, 624 * WAD);
 
-        // Approve new SKY vest (0x67eaDb3288cceDe034cE95b0511DCc65cf630bB6) to take total 14,968,800 SKY from the treasury (MCD_PAUSE_PROXY)
-        SKY.approve(MCD_VEST_SKY_TREASURY, 14_968_800 * WAD);
+        // Approve new SKY vest (0x67eaDb3288cceDe034cE95b0511DCc65cf630bB6) to take total 14,256,000 SKY from the treasury (MCD_PAUSE_PROXY)
+        SKY.approve(MCD_VEST_SKY_TREASURY, 14_256_000 * WAD);
 
         // Set maximum vesting speed (cap) on the new SKY vest to 475,200 per 30 days
         DssExecLib.setValue(MCD_VEST_SKY_TREASURY, "cap", 475_200 * WAD / 30 days);
