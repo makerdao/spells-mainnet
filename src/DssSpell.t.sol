@@ -762,31 +762,44 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
-        bool ignoreTotalSupplyDaiUsds = true; // Set to false unless there is SubDAO spell interference
+    function testPayments() public { // add the `skipped` modifier to skip
+        bool ignoreTotalSupplyDaiUsds = false; // Set to false unless there is SubDAO spell interference
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-
-        Payee[1] memory payees = [
-            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"),            0 ether) // Note: ether is only a keyword helper
+        Payee[15] memory payees = [
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 10_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"), 24_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 2_500_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"), 4_000 ether + 83_602 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY"), 4_000 ether + 18_836 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("VIGILANT"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("PBG"), 3_467 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"), 1_935 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"), 10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"), 10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("BLUE"), 550_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("CLOAKY"), 438_000 ether), // Note: ether is only a keyword helper
+            Payee(address(dai), wallets.addr("AAVE_V3_TREASURY"), 314_567 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:          0 ether, // Note: ether is only a keyword helper
+            dai:          314_567 ether, // Note: ether is only a keyword helper
             mkr:          0 ether, // Note: ether is only a keyword helper
-            usds:         0 ether, // Note: ether is only a keyword helper
-            sky:          0 ether  // Note: ether is only a keyword helper
+            usds:         12_647_840 ether, // Note: ether is only a keyword helper
+            sky:          24_988_000 ether  // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: 0,
-            sky: 0
+            mkr: -1665_166666666666666667,
+            sky: 14_976_000_000000000000008000
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
