@@ -1096,11 +1096,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // replace `view` with the `skipped` modifier to skip
+    function testDaoResolutions() public view { // replace `view` with the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "QmX4DdVBiDBjLXYT4J4jC1XMdTn2Q7Ao8L66pKB8N3yETA"
+            "bafkreieqcricvrwb7ndxep6unlhhm6iie3dlkr3cl4tdypinjws4pycalq"
         ];
 
         string memory comma_separated_resolutions = "";

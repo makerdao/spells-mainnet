@@ -42,6 +42,9 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "bafkreieqcricvrwb7ndxep6unlhhm6iie3dlkr3cl4tdypinjws4pycalq";
+
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -274,6 +277,12 @@ contract DssSpellAction is DssAction {
 
         // AAVE Revenue Share - 314,567 DAI - 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 314_567);
+
+        // ---------- TACO DAO Resolution ----------
+        // Forum: https://forum.sky.money/t/project-andromeda-risk-legal-assessment/20969/12?u=steakhouse
+
+        // Approve DAO Resolution with IPFS hash bafkreieqcricvrwb7ndxep6unlhhm6iie3dlkr3cl4tdypinjws4pycalq
+        // Note: see `dao_resolutions` public variable declared above
 
         // ---------- Chainlog bump ----------
 
