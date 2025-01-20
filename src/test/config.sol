@@ -118,7 +118,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 11_50;                          // In basis points
+        afterSpell.pot_dsr                = 11_25;                          // In basis points
         afterSpell.susds_ssr              = 12_50;                          // In basis points
         afterSpell.pause_delay            = 30 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds

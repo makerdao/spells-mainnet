@@ -56,6 +56,7 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE = 1000000003380572527855758393;
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
@@ -97,6 +98,12 @@ contract DssSpellAction is DssAction {
     address internal constant AAVE_V3_TREASURY             = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
 
     function actions() public override {
+        // ---------- Savings Rate Changes ----------
+        // Forum: TODO
+
+        // Decrease DSR by 0.25 percentage points from 11.50% to 11.25%
+        DssExecLib.setDSR(ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
+
         // ---------- Launch Project Funding ----------
         // Forum: https://forum.sky.money/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/27?u=ecosystem-team
         // Atlas: https://sky-atlas.powerhouse.io/A.5.6_Launch_Project/1f433d9d-7cdb-406f-b7e8-f9bc4855eb77%7C8d5a
