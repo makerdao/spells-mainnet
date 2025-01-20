@@ -417,8 +417,10 @@ contract DssSpellTestBase is Config, DssTest {
     DssAutoLineAbstract         autoLine = DssAutoLineAbstract(addr.addr("MCD_IAM_AUTO_LINE"));
     LerpFactoryAbstract      lerpFactory = LerpFactoryAbstract(addr.addr("LERP_FAB"));
     VestAbstract                 vestDai = VestAbstract(       addr.addr("MCD_VEST_DAI"));
+    VestAbstract                vestUsds = VestAbstract(       addr.addr("MCD_VEST_USDS"));
     VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
-    VestAbstract                 vestSky = VestAbstract(       addr.addr("MCD_VEST_SKY"));
+    VestAbstract                 vestSky = VestAbstract(       addr.addr("MCD_VEST_SKY_TREASURY"));
+    VestAbstract             vestSkyMint = VestAbstract(       addr.addr("MCD_VEST_SKY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
     address          voteDelegateFactory =                     addr.addr("VOTE_DELEGATE_FACTORY");
 
@@ -798,14 +800,20 @@ contract DssSpellTestBase is Config, DssTest {
         {
             assertEq(vestDai.cap(), values.vest_dai_cap, "TestError/vest-dai-cap");
             assertEq(vestMkr.cap(), values.vest_mkr_cap, "TestError/vest-mkr-cap");
+            assertEq(vestUsds.cap(), values.vest_usds_cap, "TestError/vest-usds-cap");
             assertEq(vestSky.cap(), values.vest_sky_cap, "TestError/vest-sky-cap");
+            assertEq(vestSkyMint.cap(), values.vest_sky_mint_cap, "TestError/vest-sky-mint-cap");
         }
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
 
-        // transferrable vest
-        // check mkr allowance
-        _checkTransferrableVestMkrAllowance();
+        // transferrable vests
+        {
+            // check mkr allowance and balance
+            _checkTransferrableVestAllowanceAndBalance('mkr', address(mkr), vestMkr);
+            // check sky allowance and balance
+            _checkTransferrableVestAllowanceAndBalance('sky', address(sky), vestSky);
+        }
     }
 
     function _checkCollateralValues(SystemValues storage values) internal {
@@ -2338,6 +2346,21 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
+    function _checkVestUsds(VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = vestUsds.ids();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check that all streams added in this spell are tested
+        assertEq(vestUsds.ids(), prevStreamCount + _ss.length, "testVestUsds/not-all-streams-tested");
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream("testVestUsds", vestUsds, address(usds), _ss[i]);
+        }
+    }
+
     function _checkVestMkr(VestStream[] memory _ss) internal {
         uint256 prevStreamCount = vestMkr.ids();
         uint256 prevAllowance = gov.allowance(pauseProxy, address(vestMkr));
@@ -2363,33 +2386,62 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
-    function _checkTransferrableVestMkrAllowance() internal view {
+    function _checkTransferrableVestAllowanceAndBalance(
+        string memory _errSuffix,
+        address token,
+        VestAbstract vest
+    ) internal view {
         uint256 vestableAmt;
 
-        for(uint256 i = 1; i <= vestMkr.ids(); i++) {
-            if (vestMkr.valid(i)) {
-                (,,,,,,uint128 tot, uint128 rxd) = vestMkr.awards(i);
+        for(uint256 i = 1; i <= vest.ids(); i++) {
+            if (vest.valid(i)) {
+                (,,,,,,uint128 tot, uint128 rxd) = vest.awards(i);
                 vestableAmt = vestableAmt + (tot - rxd);
             }
         }
 
-        uint256 allowance = gov.allowance(pauseProxy, address(vestMkr));
-        assertGe(allowance, vestableAmt, "TestError/insufficient-gov-transferrable-vest-mkr-allowance");
+        uint256 allowance = GemAbstract(token).allowance(pauseProxy, address(vest));
+        assertGe(allowance, vestableAmt, _concat(string("TestError/insufficient-transferrable-vest-allowance-"), _errSuffix));
+
+        uint256 balance = GemAbstract(token).balanceOf(pauseProxy);
+        assertGe(balance, vestableAmt, _concat(string("TestError/insufficient-transferrable-vest-balance-"), _errSuffix));
     }
 
-
-    function _checkVestSky(VestStream[] memory _ss) internal {
+    function _checkVestSKY(VestStream[] memory _ss) internal {
         uint256 prevStreamCount = vestSky.ids();
+        uint256 prevAllowance = sky.allowance(pauseProxy, address(vestSky));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check allowance was increased according to the streams
+        uint256 vestableAmt;
+        for (uint256 i = 0; i < _ss.length; i++) {
+            vestableAmt = _ss[i].tot - _ss[i].rxd;
+        }
+        assertEq(sky.allowance(pauseProxy, address(vestSky)), prevAllowance + vestableAmt, "testVestSky/invalid-allowance");
 
         // Check that all streams added in this spell are tested
         assertEq(vestSky.ids(), prevStreamCount + _ss.length, "testVestSky/not-all-streams-tested");
 
         for (uint256 i = 0; i < _ss.length; i++) {
             _checkVestStream("testVestSky", vestSky, address(sky), _ss[i]);
+        }
+    }
+
+    function _checkVestSkyMint(VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = vestSkyMint.ids();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check that all streams added in this spell are tested
+        assertEq(vestSkyMint.ids(), prevStreamCount + _ss.length, "testVestSkyMint/not-all-streams-tested");
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream("testVestSkyMint", vestSkyMint, address(sky), _ss[i]);
         }
     }
 

@@ -64,6 +64,7 @@ contract Addresses {
         addr["PROXY_REGISTRY"]                   = 0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4;
         addr["MCD_VEST_DAI"]                     = 0xa4c22f0e25C6630B2017979AcF1f865e94695C4b;
         addr["MCD_VEST_DAI_LEGACY"]              = 0x2Cc583c0AaCDaC9e23CB601fDA8F1A0c56Cdcb71;
+        addr["MCD_VEST_USDS"]                    = 0xc447a9745aDe9A44Bb9E37B7F6C92f9582544110;
         addr["MCD_VEST_MKR"]                     = 0x0fC8D4f2151453ca0cA56f07359049c8f07997Bd;
         addr["MCD_VEST_MKR_TREASURY"]            = 0x6D635c8d08a1eA2F1687a5E46b666949c977B7dd;
         addr["MCD_FLASH"]                        = 0x60744434d6339a6B27d73d9Eda62b6F66a0a04FA;
@@ -508,6 +509,7 @@ contract Addresses {
         addr["MCD_FLAP"]                         = 0x374D9c3d5134052Bc558F432Afa1df6575f07407;
         addr["FLAP_SKY_ORACLE"]                  = 0x61A12E5b1d5E9CC1302a32f0df1B5451DE6AE437;
         addr["MCD_VEST_SKY"]                     = 0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9;
+        addr["MCD_VEST_SKY_TREASURY"]            = 0x67eaDb3288cceDe034cE95b0511DCc65cf630bB6;
         addr["REWARDS_USDS_SKY"]                 = 0x0650CAF159C5A49f711e8169D4336ECB9b950275;
         addr["REWARDS_DIST_USDS_SKY"]            = 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9;
         addr["REWARDS_USDS_01"]                  = 0x10ab606B067C9C461d8893c47C7512472E19e2Ce;

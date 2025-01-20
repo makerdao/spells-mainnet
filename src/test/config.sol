@@ -53,7 +53,9 @@ contract Config {
         bytes32 splitter_mom_authority;
         uint256 vest_dai_cap;
         uint256 vest_mkr_cap;
+        uint256 vest_usds_cap;
         uint256 vest_sky_cap;
+        uint256 vest_sky_mint_cap;
         uint256 sky_mkr_rate;
         uint256 ilk_count;
         string  chainlog_version;
@@ -140,10 +142,12 @@ contract Config {
         afterSpell.splitter_mom_authority = "MCD_ADM";                      // SplitterMom authority
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;    // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;         // In WAD MKR per second
-        afterSpell.vest_sky_cap           = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
+        afterSpell.vest_usds_cap          = 46_200 * WAD / 30 days;         // In WAD USDS per second
+        afterSpell.vest_sky_cap           = 475_200 * WAD / 30 days;        // In WAD SKY per second
+        afterSpell.vest_sky_mint_cap      = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 69;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.4";                       // String expected in system
+        afterSpell.chainlog_version       = "1.19.5";                       // String expected in system
 
         //
         // Values for all collateral
