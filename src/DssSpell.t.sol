@@ -416,17 +416,9 @@ contract DssSpellTest is DssSpellTestBase {
         bytes32 ward;
     }
 
-    function testNewAuthorizations() public skipped { // add the `skipped` modifier to skip
-        Authorization[9] memory newAuthorizations = [
-            Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_ENGINE" }),
-            Authorization({ base: "MCD_VAT",          ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "PIP_MKR",          ward: "OSM_MOM" }),
-            Authorization({ base: "MCD_DOG",          ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "LOCKSTAKE_MKR",    ward: "LOCKSTAKE_ENGINE" }),
-            Authorization({ base: "LOCKSTAKE_ENGINE", ward: "LOCKSTAKE_CLIP" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "MCD_DOG" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "MCD_END" }),
-            Authorization({ base: "LOCKSTAKE_CLIP",   ward: "CLIPPER_MOM" })
+    function testNewAuthorizations() public { // add the `skipped` modifier to skip
+        Authorization[1] memory newAuthorizations = [
+            Authorization({ base: "MCD_VAT",          ward: "MCD_VEST_USDS" })
         ];
 
         for (uint256 i = 0; i < newAuthorizations.length; i++) {
