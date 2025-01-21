@@ -1860,7 +1860,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
-            pct:          12_25,
+            pct:          5_37,
             mat:          100_00,
             liqType:      "",
             liqOn:        false,

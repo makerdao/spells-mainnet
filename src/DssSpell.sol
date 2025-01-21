@@ -60,7 +60,8 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE = 1000000003380572527855758393;
+    uint256 internal constant FIVE_PT_THREE_SEVEN_PCT_RATE = 1000000001658668812364456731;
+    uint256 internal constant ELEVEN_PT_TWO_FIVE_PCT_RATE  = 1000000003380572527855758393;
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
@@ -106,8 +107,14 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0xFe447da54AdD21a8503eb81d328c5D60fE90eC26;
 
     function actions() public override {
+        // ---------- Stability Fees Changes ----------
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-20-spark-liquidity-layer-dsr/25861
+
+        // Decrease ALLOCATOR-SPARK-A Stability Fee by 6.88 percentage points from 12.25% to 5.37%
+        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", FIVE_PT_THREE_SEVEN_PCT_RATE, /* doDrip = */ true);
+
         // ---------- Savings Rate Changes ----------
-        // Forum: TODO
+        // Forum: https://forum.sky.money/t/stability-scope-parameter-changes-20-spark-liquidity-layer-dsr/25861
 
         // Decrease DSR by 0.25 percentage points from 11.50% to 11.25%
         DssExecLib.setDSR(ELEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
