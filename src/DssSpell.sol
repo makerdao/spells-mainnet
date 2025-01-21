@@ -38,8 +38,8 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
-    string public constant override description = "2025-01-23 MakerDAO Executive Spell | Hash: TODO";
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/2914739de9b900b9778992a08dd146ebd516c514/governance/votes/Executive%20vote%20-%20January%2023%2C%202025.md' -q -O - 2>/dev/null)"
+    string public constant override description = "2025-01-23 MakerDAO Executive Spell | Hash: 0x68d2d9868ef1cf1e6141a9698bcf85d66b3685df0fc263fffd6ac5cce041ecec";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
