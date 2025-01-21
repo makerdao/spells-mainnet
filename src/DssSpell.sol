@@ -31,6 +31,10 @@ interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -95,6 +99,11 @@ contract DssSpellAction is DssAction {
     address internal constant JANSKY                       = 0xf3F868534FAD48EF5a228Fe78669cf242745a755;
     address internal constant ECOSYSTEM_FACILITATOR        = 0xFCa6e196c2ad557E64D9397e283C2AFe57344b75;
     address internal constant AAVE_V3_TREASURY             = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0xFe447da54AdD21a8503eb81d328c5D60fE90eC26;
 
     function actions() public override {
         // ---------- Savings Rate Changes ----------
@@ -296,9 +305,10 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmY4D1u8
         // Poll: https://vote.makerdao.com/polling/QmU3Xu4W
         // Forum: https://forum.sky.money/t/jan-23-2025-proposed-changes-to-spark-for-upcoming-spell-2/25837/3
+        // Poll: https://vote.makerdao.com/polling/QmexceBK
 
-        // Execute Spark Proxy Spell at TBC
-        // TODO
+        // Execute Spark Proxy Spell at 0xFe447da54AdD21a8503eb81d328c5D60fE90eC26
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // ---------- Chainlog bump ----------
 
