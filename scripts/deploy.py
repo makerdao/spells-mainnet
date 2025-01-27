@@ -9,6 +9,8 @@ PATH_TO_SPELL       = 'src/DssSpell.sol'
 SPELL_CONTRACT_NAME = 'DssSpell'
 PATH_TO_EXEC_LIB    = './DssExecLib.address'
 SOLIDITY_USE        = 'solc:0.8.16'
+SOLIDITY_VERSION    = 'v0.8.16+commit.07a7930e'
+PATH_TO_FLATTENED   = 'out/flat.sol'
 PATH_TO_CONFIG      = 'src/test/config.sol'
 
 # Read DssExecLib address
@@ -94,16 +96,26 @@ config_content = re.sub(r'(\s*deployed_spell_created:\s*).*(,)', r'\g<1>' + tx_t
 with open(PATH_TO_CONFIG, 'w') as f:
     f.write(config_content)
 
+# Flatten the contract
+print(f'Flattening the spell to {PATH_TO_FLATTENED}')
+subprocess.run([
+    'forge', 'flatten',
+    '--output', PATH_TO_FLATTENED,
+    f'{PATH_TO_SPELL}'
+], text=True)
+
 # Verify deployed code
-print('Verifying the spell...')
+print('Verifying the flattened spell...')
 verify_command = [
     'forge', 'verify-contract',
-    '--flatten', '--force', # do not recompile after flattening
-    '--watch',
+    '--verifier', 'etherscan',
     '--chain-id', CHAIN_ID,
+    '--compiler-version', SOLIDITY_VERSION,
+    '--watch',
+    '--flatten',
     '--libraries', f'lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:{EXEC_LIB_ADDRESS}',
     spell_address,
-    f'{PATH_TO_SPELL}:{SPELL_CONTRACT_NAME}'
+    f'{PATH_TO_FLATTENED}:{SPELL_CONTRACT_NAME}'
 ]
 if OPTIMIZER_ENABLED != 'false':
     verify_command.extend(['--optimizer-runs', OPTIMIZER_RUNS,])
