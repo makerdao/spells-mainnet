@@ -45,16 +45,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface DssVestSuckableLike {
-    function chainlog() external view returns (address);
-    function join() external view returns (address);
-}
-
-interface DssVestTransferrableLike {
-    function czar() external view returns (address);
-    function gem() external view returns (address);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -416,7 +406,7 @@ contract DssSpellTest is DssSpellTestBase {
         bytes32 ward;
     }
 
-    function testNewAuthorizations() public { // add the `skipped` modifier to skip
+    function testNewAuthorizations() public skipped { // add the `skipped` modifier to skip
         Authorization[1] memory newAuthorizations = [
             Authorization({ base: "MCD_VAT",          ward: "MCD_VEST_USDS" })
         ];
@@ -486,7 +476,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestMkr(streams);
     }
 
-    function testVestUSDS() public { // add the `skipped` modifier to skip
+    function testVestUSDS() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 FEB_01_2025 = 1738368000;
         uint256 DEC_31_2025 = 1767225599;
@@ -534,7 +524,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestUsds(streams);
     }
 
-    function testVestSKY() public { // add the `skipped` modifier to skip
+    function testVestSKY() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 FEB_01_2025 = 1738368000;
         uint256 DEC_31_2025 = 1767225599;
@@ -710,7 +700,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         bool ignoreTotalSupplyDaiUsds = false; // Set to false unless there is SubDAO spell interference
 
         // For each payment, create a Payee object with:
@@ -1098,7 +1088,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public view { // replace `view` with the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // replace `view` with the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -1117,7 +1107,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0xFe447da54AdD21a8503eb81d328c5D60fE90eC26); // Insert Spark spell address
 
@@ -1136,14 +1126,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testNewUsdsVestConstructor() public view {
-        assertEq(DssVestSuckableLike(address(vestUsds)).chainlog(), address(chainLog), "TestError/unexpected-VestSuckable-constructor-chainlog");
-        assertEq(DssVestSuckableLike(address(vestUsds)).join(), address(usdsJoin), "TestError/unexpected-VestSuckable-constructor-join");
-    }
-
-    function testNewSkyVestConstructor() public view {
-        assertEq(DssVestTransferrableLike(address(vestSky)).czar(), address(pauseProxy), "TestError/unexpected-VestTransferrable-constructor-czar");
-        assertEq(DssVestTransferrableLike(address(vestSky)).gem(), address(sky), "TestError/unexpected-VestTransferrable-constructor-gem");
-    }
 }
