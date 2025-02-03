@@ -637,7 +637,30 @@ contract DssSpellTestBase is Config, DssTest {
 
         vm.warp(DssSpell(spell_).nextCastTime());
 
+        // Note: this is a workaround for the issue with the Spark Spell of 2025-02-06
+        // Mock Aggor price feed responses before casting
+        address[] memory priceFeeds = new address[](5);
+        priceFeeds[0] = 0x2750e4CB635aF1FCCFB10C0eA54B5b5bfC2759b6;  // ETH/USD  - 8 decimals
+        priceFeeds[1] = 0x4219aA1A99f3fe90C2ACB97fCbc1204f6485B537;  // cbBTC/USD - 8 decimals
+        priceFeeds[2] = 0xE98d51fa014C7Ed68018DbfE6347DE9C3f39Ca39;  // wstETH/USD - 8 decimals
+        priceFeeds[3] = 0xBE21C54Dff3b2F1708970d185aa5b0eEB70556f1;  // weETH/USD - 8 decimals
+        priceFeeds[4] = 0xFDdf8D19D092839A26b31365c927cA236B5086cf;  // rETH/USD - 8 decimals
+
+        // Mock each price feed to return valid data
+        // Note: All of these price feeds use 8 decimal precision for USD prices
+        // e.g. 2000 * 1e8 = 200000000000 represents $2000.00000000
+        for (uint256 i = 0; i < priceFeeds.length; i++) {
+            vm.mockCall(
+                priceFeeds[i],
+                abi.encodeWithSignature("latestAnswer()"),
+                abi.encode(2000 * 1e8)  // $2000.00000000
+            );
+        }
+
         DssSpell(spell_).cast();
+
+        // Clean up mocks
+        vm.clearMockedCalls();
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
