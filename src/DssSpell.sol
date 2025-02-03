@@ -83,21 +83,6 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VAT      = DssExecLib.vat();
     address internal immutable MCD_VOW      = DssExecLib.vow();
 
-    // ---------- Helper Functions ----------
-    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
-    /// @param usr The USDS receiver.
-    /// @param wad The USDS amount in wad precision (10 ** 18).
-    function _transferUsds(address usr, uint256 wad) internal {
-        // Note: Enforce whole units to avoid rounding errors
-        require(wad % WAD == 0, "transferUsds/non-integer-wad");
-        // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
-        DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
-        // Note: Approve DAI_USDS for the amount sent to be able to convert it.
-        DAI.approve(DAI_USDS, wad);
-        // Note: Convert Dai to USDS for `usr`.
-        DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
-    }
-
     // ---------- Wallets ----------
     address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
     address internal constant GFXLABS                      = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
@@ -184,6 +169,22 @@ contract DssSpellAction is DssAction {
         try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {
 
         } catch {}
+    }
+
+    // ---------- Helper Functions ----------
+
+    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
+    /// @param usr The USDS receiver.
+    /// @param wad The USDS amount in wad precision (10 ** 18).
+    function _transferUsds(address usr, uint256 wad) internal {
+        // Note: Enforce whole units to avoid rounding errors
+        require(wad % WAD == 0, "transferUsds/non-integer-wad");
+        // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
+        DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
+        // Note: Approve DAI_USDS for the amount sent to be able to convert it.
+        DAI.approve(DAI_USDS, wad);
+        // Note: Convert Dai to USDS for `usr`.
+        DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 }
 
