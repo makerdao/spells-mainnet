@@ -700,44 +700,32 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
-        bool ignoreTotalSupplyDaiUsds = false; // Set to false unless there is SubDAO spell interference
+    function testPayments() public { // add the `skipped` modifier to skip
+        // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
+        bool ignoreTotalSupplyDaiUsds = true;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[15] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 10_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"), 24_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 2_500_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BLUE"), 4_000 ether + 83_602 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY"), 4_000 ether + 18_836 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("VIGILANT"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("PBG"), 3_467 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BYTERON"), 1_935 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"), 10_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"), 10_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("BLUE"), 550_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("CLOAKY"), 438_000 ether), // Note: ether is only a keyword helper
-            Payee(address(dai), wallets.addr("AAVE_V3_TREASURY"), 314_567 ether) // Note: ether is only a keyword helper
+        Payee[2] memory payees = [
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("GFXLABS"), 1_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:          314_567 ether, // Note: ether is only a keyword helper
-            mkr:          0 ether, // Note: ether is only a keyword helper
-            usds:         12_647_840 ether, // Note: ether is only a keyword helper
-            sky:          24_988_000 ether  // Note: ether is only a keyword helper
+            dai:          0 ether,         // Note: ether is only a keyword helper
+            mkr:          0 ether,         // Note: ether is only a keyword helper
+            usds:         3_001_000 ether, // Note: ether is only a keyword helper
+            sky:          0 ether          // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -1665_166666666666666667,
-            sky: 14_976_000_000000000000008000
+            mkr: 0,
+            sky: 0
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -1109,7 +1097,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
     function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xFe447da54AdD21a8503eb81d328c5D60fE90eC26); // Insert Spark spell address
+        address SPARK_SPELL = address(0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,

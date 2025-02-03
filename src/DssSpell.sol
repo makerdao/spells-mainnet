@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2020 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: 2020 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,6 @@ import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
-
-interface MkrSkyLike {
-    function mkrToSky(address usr, uint256 wad) external;
-    function rate() external view returns (uint256);
-}
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
@@ -82,16 +77,11 @@ contract DssSpellAction is DssAction {
     // ---------- Contracts ----------
     GemAbstract internal immutable DAI      = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR      = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable SKY      = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
     address internal immutable DAI_USDS     = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY      = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable SUSDS        = DssExecLib.getChangelogAddress("SUSDS");
     address internal immutable MCD_JOIN_DAI = DssExecLib.daiJoin();
     address internal immutable MCD_VAT      = DssExecLib.vat();
     address internal immutable MCD_VOW      = DssExecLib.vow();
-
-    // ---------- Constant Values ----------
-    uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
 
     // ---------- Helper Functions ----------
     /// @notice wraps the operations required to transfer USDS from the surplus buffer.
@@ -108,31 +98,19 @@ contract DssSpellAction is DssAction {
         DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 
-    /// @notice wraps the operations required to transfer SKY from the treasury.
-    /// @param usr The SKY receiver.
-    /// @param wad The SKY amount in wad precision (10 ** 18).
-    function _transferSky(address usr, uint256 wad) internal {
-        // Note: Calculate the equivalent amount of MKR required
-        uint256 mkrWad = wad / MKR_SKY_RATE;
-        // Note: if rounding error is expected, add an extra wei of MKR
-        if (wad % MKR_SKY_RATE != 0) { mkrWad++; }
-        // Note: Approve MKR_SKY for the amount sent to be able to convert it
-        MKR.approve(MKR_SKY, mkrWad);
-        // Note: Convert the calculated amount to SKY for `PAUSE_PROXY`
-        MkrSkyLike(MKR_SKY).mkrToSky(address(this), mkrWad);
-        // Note: Transfer originally requested amount, leaving extra on the `PAUSE_PROXY`
-        SKY.transfer(usr, wad);
-    }
-
     // ---------- Wallets ----------
+    address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
+    address internal constant GFXLABS                      = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0);
+    address internal constant SPARK_SPELL = 0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0;
 
     function actions() public override {
         // ---------- Rate Adjustments ----------
+        // Forum: https://forum.sky.money/t/feb-6-2025-stability-scope-parameter-changes-21/25906
+        // Forum: https://forum.sky.money/t/feb-6-2025-stability-scope-parameter-changes-21/25906/3
 
         // Reduce ETH-A Stability Fee from 12.75% to 9.75%
         DssExecLib.setIlkStabilityFee("ETH-A", NINE_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
@@ -169,6 +147,7 @@ contract DssSpellAction is DssAction {
         SUsdsLike(SUSDS).file("ssr", EIGHT_PT_SEVEN_FIVE_PCT);
 
         // ---------- Sweep Dai from PauseProxy to Surplus Buffer ----------
+        // Forum: https://forum.sky.money/t/consolfreight-rwa-003-cf4-drop-default/21745/23
 
         // Sweep 406,451.52 Dai returned by ConsolFreight from the PauseProxy to the Surplus Buffer
         // Note: Approve the DaiJoin for the amount sent
@@ -177,6 +156,31 @@ contract DssSpellAction is DssAction {
         DaiJoinAbstract(MCD_JOIN_DAI).join(address(this), 406_451.52 ether);
         // Note: Move 406,451.52 Dai from the PauseProxy to the Vow
         VatAbstract(MCD_VAT).move(address(this), MCD_VOW, 406_451.52 ether * RAY);
+
+        // ---------- Integration Boost Funding ----------
+        // Forum: http://forum.sky.money/t/utilization-of-the-integration-boost-budget-a-5-2-1-2/25536/5
+        // Atlas: https://sky-atlas.powerhouse.io/A.5.2.1.2_Integration_Boost/129f2ff0-8d73-8057-850b-d32304e9c91a%7C8d5a9e88cf49
+
+        // Integration Boost - 3,000,000 USDS - 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
+        _transferUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
+
+        // ---------- Whistleblower Payment ----------
+        // Forum: https://forum.sky.money/t/whistleblower-bounty-and-ad-penalty-for-misalignment/25911
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.5.19_Whistleblower_Bounty/fb2de9a9-8154-46b8-9631-a5dda875921e%7C0db3af4e955e
+
+        // GFX Labs - 1,000 USDS - 0xa6e8772af29b29B9202a073f8E36f447689BEef6
+        _transferUsds(GFXLABS, 1_000 * WAD);
+
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/feb-6-2025-proposed-changes-to-spark-for-upcoming-spell-actual/25888
+        // Poll: https://vote.makerdao.com/polling/QmUMkWLQ
+        // Poll: https://vote.makerdao.com/polling/QmTfntSm
+        // Poll: https://vote.makerdao.com/polling/QmWCe4JD
+        // Poll: https://vote.makerdao.com/polling/QmbSANrr
+        // Poll: https://vote.makerdao.com/polling/QmRKhzad
+
+        // Execute Spark Spell at 0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0
+        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
