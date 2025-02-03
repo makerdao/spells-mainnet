@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2020 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: 2020 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -1126,4 +1126,29 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testSweepDaiToSurplusBuffer() public {
+        uint256 initialPauseProxyDaiBalance = dai.balanceOf(address(pauseProxy));
+        uint256 initialVowDai = vat.dai(address(vow));
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        // Check that 406,451.52 Dai was moved from PauseProxy
+        assertEq(
+            dai.balanceOf(address(pauseProxy)),
+            initialPauseProxyDaiBalance - 406_451.52 ether,
+            "testSweepDaiToSurplusBuffer/incorrect-pause-proxy-dai-balance"
+        );
+
+        // Check that at least the swept amount was added to the Vow
+        uint256 finalVowDai = vat.dai(address(vow));
+        // Note: We cannot use assertEq here because jug.drip() is called in the spell
+        assertGe(
+            finalVowDai,
+            initialVowDai + 406_451.52 ether * RAY,
+            "testSweepDaiToSurplusBuffer/insufficient-vow-dai-balance"
+        );
+    }
 }

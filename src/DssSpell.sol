@@ -21,6 +21,8 @@ import "dss-exec-lib/DssAction.sol";
 
 import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
+import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 wad) external;
@@ -29,6 +31,11 @@ interface MkrSkyLike {
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
+}
+
+interface SUsdsLike {
+    function drip() external;
+    function file(bytes32 what, uint256 data) external;
 }
 
 interface ProxyLike {
@@ -56,17 +63,32 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant ONE_PT_THREE_THREE_PCT     = 1000000000418960282689704878;  //  1.33%
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT      = 1000000002219443553326580536;  //  7.25%
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT    = 1000000002659864411854984565;  //  8.75%
+    uint256 internal constant NINE_PT_FIVE_PCT           = 1000000002877801985002875644;  //  9.50%
+    uint256 internal constant NINE_PT_SEVEN_FIVE_PCT     = 1000000002950116251408586949;  //  9.75%
+    uint256 internal constant TEN_PT_TWO_FIVE_PCT        = 1000000003094251918120023627;  // 10.25%
+    uint256 internal constant TEN_PT_FIVE_PCT            = 1000000003166074807451009595;  // 10.50%
+    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT      = 1000000003237735385034516037;  // 10.75%
+    uint256 internal constant FOURTEEN_PCT               = 1000000004154878953532704765;  // 14.00%
+    uint256 internal constant FOURTEEN_PT_TWO_FIVE_PCT   = 1000000004224341833701283597;  // 14.25%
+    uint256 internal constant FOURTEEN_PT_SEVEN_FIVE_PCT = 1000000004362812761691191350;  // 14.75%
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
 
     // ---------- Contracts ----------
-    GemAbstract internal immutable DAI  = GemAbstract(DssExecLib.dai());
-    GemAbstract internal immutable MKR  = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable SKY  = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable DAI_USDS = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY  = DssExecLib.getChangelogAddress("MKR_SKY");
+    GemAbstract internal immutable DAI      = GemAbstract(DssExecLib.dai());
+    GemAbstract internal immutable MKR      = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable SKY      = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable DAI_USDS     = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY      = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable SUSDS        = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable MCD_JOIN_DAI = DssExecLib.daiJoin();
+    address internal immutable MCD_VAT      = DssExecLib.vat();
+    address internal immutable MCD_VOW      = DssExecLib.vow();
 
     // ---------- Constant Values ----------
     uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
@@ -110,11 +132,51 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = address(0);
 
     function actions() public override {
-        // ---------- Action ----------
-        // Forum: TODO
+        // ---------- Rate Adjustments ----------
 
-        // Increase ETH-A Stability Fee by N percentage point from X.YZ% to A.BC%
-        // DssExecLib.setIlkStabilityFee("ILK-NAME", X_PCT_RATE, /* doDrip = */ true);
+        // Reduce ETH-A Stability Fee from 12.75% to 9.75%
+        DssExecLib.setIlkStabilityFee("ETH-A", NINE_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce ETH-B Stability Fee from 13.25% to 10.25%
+        DssExecLib.setIlkStabilityFee("ETH-B", TEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce ETH-C Stability Fee from 12.50% to 9.50%
+        DssExecLib.setIlkStabilityFee("ETH-C", NINE_PT_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce WSTETH-A Stability Fee from 13.75% to 10.75%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", TEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce WSTETH-B Stability Fee from 13.50% to 10.50%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", TEN_PT_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce WBTC-A Stability Fee from 16.25% to 14.25%
+        DssExecLib.setIlkStabilityFee("WBTC-A", FOURTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce WBTC-B Stability Fee from 16.75% to 14.75%
+        DssExecLib.setIlkStabilityFee("WBTC-B", FOURTEEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce WBTC-C Stability Fee from 16.00% to 14.00%
+        DssExecLib.setIlkStabilityFee("WBTC-C", FOURTEEN_PCT, /* doDrip = */ true);
+
+        // Reduce ALLOCATOR-SPARK-A Stability Fee from 5.37% to 1.33%
+        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", ONE_PT_THREE_THREE_PCT, /* doDrip = */ true);
+
+        // Reduce DSR from 11.25% to 7.25%
+        DssExecLib.setDSR(SEVEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+
+        // Reduce SSR from 12.50% to 8.75%
+        SUsdsLike(SUSDS).drip();
+        SUsdsLike(SUSDS).file("ssr", EIGHT_PT_SEVEN_FIVE_PCT);
+
+        // ---------- Sweep Dai from PauseProxy to Surplus Buffer ----------
+
+        // Sweep 406,451.52 Dai returned by ConsolFreight from the PauseProxy to the Surplus Buffer
+        // Note: Approve the DaiJoin for the amount sent
+        DAI.approve(MCD_JOIN_DAI, 406_451.52 ether);
+        // Note: Join the DaiJoin for the amount sent
+        DaiJoinAbstract(MCD_JOIN_DAI).join(address(this), 406_451.52 ether);
+        // Note: Move 406,451.52 Dai from the PauseProxy to the Vow
+        VatAbstract(MCD_VAT).move(address(this), MCD_VOW, 406_451.52 ether * RAY);
     }
 }
 
