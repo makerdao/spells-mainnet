@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2020 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: 2020 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ interface DaiUsdsLike {
 }
 
 interface SUsdsLike {
-    function drip() external;
+    function drip() external returns (uint256);
     function file(bytes32 what, uint256 data) external;
 }
 
