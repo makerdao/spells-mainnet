@@ -136,9 +136,9 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/consolfreight-rwa-003-cf4-drop-default/21745/24
 
         // Sweep 406,451.52 Dai returned by ConsolFreight from the PauseProxy to the Surplus Buffer
-        // Note: Approve the DaiJoin for the amount sent
+        // Note: Approve the DaiJoin for the amount returned
         DAI.approve(MCD_JOIN_DAI, 406_451.52 ether);
-        // Note: Join the DaiJoin for the amount sent
+        // Note: Join the DaiJoin for the amount returned
         DaiJoinAbstract(MCD_JOIN_DAI).join(address(this), 406_451.52 ether);
         // Note: Move 406,451.52 Dai from the PauseProxy to the Vow
         VatAbstract(MCD_VAT).move(address(this), MCD_VOW, 406_451.52 ether * RAY);
