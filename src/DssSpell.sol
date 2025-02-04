@@ -19,7 +19,6 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
@@ -40,8 +39,8 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/master/governance/votes/Executive%20vote%20-%20February%206%2C%202025.md' -q -O - 2>/dev/null)"
-    string public constant override description = "2025-02-06 MakerDAO Executive Spell | Hash: 0xc89ebc18cbe250c96a4a72bdbdb45cf258b6634597b119fdb1fd0969e79cf629";
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/718790846590c531038a3ebd58fbea9a48a0f293/governance/votes/Executive%20vote%20-%20February%206%2C%202025.md' -q -O - 2>/dev/null)"
+        string public constant override description = "2025-02-06 MakerDAO Executive Spell | Hash: 0xc89ebc18cbe250c96a4a72bdbdb45cf258b6634597b119fdb1fd0969e79cf629";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -97,31 +96,31 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/feb-6-2025-stability-scope-parameter-changes-21/25906
         // Forum: https://forum.sky.money/t/feb-6-2025-stability-scope-parameter-changes-21/25906/3
 
-        // Reduce ETH-A Stability Fee from 12.75% to 9.75%
+        // Reduce ETH-A Stability Fee by 3 percentage points from 12.75% to 9.75%
         DssExecLib.setIlkStabilityFee("ETH-A", NINE_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce ETH-B Stability Fee from 13.25% to 10.25%
+        // Reduce ETH-B Stability Fee by 3 percentage points from 13.25% to 10.25%
         DssExecLib.setIlkStabilityFee("ETH-B", TEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce ETH-C Stability Fee from 12.50% to 9.50%
+        // Reduce ETH-C Stability Fee by 3 percentage points from 12.50% to 9.50%
         DssExecLib.setIlkStabilityFee("ETH-C", NINE_PT_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce WSTETH-A Stability Fee from 13.75% to 10.75%
+        // Reduce WSTETH-A Stability Fee by 3 percentage points from 13.75% to 10.75%
         DssExecLib.setIlkStabilityFee("WSTETH-A", TEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce WSTETH-B Stability Fee from 13.50% to 10.50%
+        // Reduce WSTETH-B Stability Fee by 3 percentage points from 13.50% to 10.50%
         DssExecLib.setIlkStabilityFee("WSTETH-B", TEN_PT_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce WBTC-A Stability Fee from 16.25% to 14.25%
+        // Reduce WBTC-A Stability Fee by 2 percentage points from 16.25% to 14.25%
         DssExecLib.setIlkStabilityFee("WBTC-A", FOURTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce WBTC-B Stability Fee from 16.75% to 14.75%
+        // Reduce WBTC-B Stability Fee by 2 percentage points from 16.75% to 14.75%
         DssExecLib.setIlkStabilityFee("WBTC-B", FOURTEEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce WBTC-C Stability Fee from 16.00% to 14.00%
+        // Reduce WBTC-C Stability Fee by 2 percentage points from 16.00% to 14.00%
         DssExecLib.setIlkStabilityFee("WBTC-C", FOURTEEN_PCT, /* doDrip = */ true);
 
-        // Reduce ALLOCATOR-SPARK-A Stability Fee from 5.37% to 1.33%
+        // Reduce ALLOCATOR-SPARK-A Stability Fee by 4.04 percentage points from 5.37% to 1.33%
         DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", ONE_PT_THREE_THREE_PCT, /* doDrip = */ true);
 
         // Reduce DSR from 11.25% to 7.25%

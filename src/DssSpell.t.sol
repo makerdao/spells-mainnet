@@ -1120,7 +1120,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
         // Check that 406,451.52 Dai was moved from PauseProxy
         assertEq(
