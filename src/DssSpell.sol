@@ -124,10 +124,10 @@ contract DssSpellAction is DssAction {
         // Reduce ALLOCATOR-SPARK-A Stability Fee by 4.04 percentage points from 5.37% to 1.33%
         DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", ONE_PT_THREE_THREE_PCT, /* doDrip = */ true);
 
-        // Reduce DSR from 11.25% to 7.25%
+        // Reduce DSR by 4 percentage points from 11.25% to 7.25%
         DssExecLib.setDSR(SEVEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
 
-        // Reduce SSR from 12.50% to 8.75%
+        // Reduce SSR by 3.75 percentage points from 12.50% to 8.75%
         SUsdsLike(SUSDS).drip();
         SUsdsLike(SUSDS).file("ssr", EIGHT_PT_SEVEN_FIVE_PCT);
 
@@ -138,13 +138,11 @@ contract DssSpellAction is DssAction {
         // Sweep 406,451.52 Dai returned by ConsolFreight from the PauseProxy to the Surplus Buffer
         // Note: Approve the DaiJoin for the amount returned
         DAI.approve(MCD_JOIN_DAI, 406_451.52 ether);
-        // Note: Join the DaiJoin for the amount returned
-        DaiJoinAbstract(MCD_JOIN_DAI).join(address(this), 406_451.52 ether);
-        // Note: Move 406,451.52 Dai from the PauseProxy to the Vow
-        VatAbstract(MCD_VAT).move(address(this), MCD_VOW, 406_451.52 ether * RAY);
+        // Note: Join the DaiJoin for the amount returned using the Vow as destination
+        DaiJoinAbstract(MCD_JOIN_DAI).join(MCD_VOW, 406_451.52 ether);
 
         // ---------- Integration Boost Funding ----------
-        // Forum: http://forum.sky.money/t/utilization-of-the-integration-boost-budget-a-5-2-1-2/25536/5
+        // Forum: https://forum.sky.money/t/utilization-of-the-integration-boost-budget-a-5-2-1-2/25536/5
         // Atlas: https://sky-atlas.powerhouse.io/A.5.2.1.2_Integration_Boost/129f2ff0-8d73-8057-850b-d32304e9c91a%7C8d5a9e88cf49
 
         // Integration Boost - 3,000,000 USDS - 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
