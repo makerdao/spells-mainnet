@@ -21,7 +21,6 @@ import "dss-exec-lib/DssAction.sol";
 
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
-import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
