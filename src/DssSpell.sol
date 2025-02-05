@@ -57,17 +57,18 @@ contract DssSpellAction is DssAction {
     // A table of rates can be found at
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
-    uint256 internal constant ONE_PT_THREE_THREE_PCT     = 1000000000418960282689704878;  //  1.33%
-    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT      = 1000000002219443553326580536;  //  7.25%
-    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT    = 1000000002659864411854984565;  //  8.75%
-    uint256 internal constant NINE_PT_FIVE_PCT           = 1000000002877801985002875644;  //  9.50%
-    uint256 internal constant NINE_PT_SEVEN_FIVE_PCT     = 1000000002950116251408586949;  //  9.75%
-    uint256 internal constant TEN_PT_TWO_FIVE_PCT        = 1000000003094251918120023627;  // 10.25%
-    uint256 internal constant TEN_PT_FIVE_PCT            = 1000000003166074807451009595;  // 10.50%
-    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT      = 1000000003237735385034516037;  // 10.75%
-    uint256 internal constant FOURTEEN_PCT               = 1000000004154878953532704765;  // 14.00%
-    uint256 internal constant FOURTEEN_PT_TWO_FIVE_PCT   = 1000000004224341833701283597;  // 14.25%
-    uint256 internal constant FOURTEEN_PT_SEVEN_FIVE_PCT = 1000000004362812761691191350;  // 14.75%
+    // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant ONE_PT_THREE_THREE_PCT_RATE     = 1000000000418960282689704878;  //  1.33%
+    uint256 internal constant SEVEN_PT_TWO_FIVE_PCT_RATE      = 1000000002219443553326580536;  //  7.25%
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE    = 1000000002659864411854984565;  //  8.75%
+    uint256 internal constant NINE_PT_FIVE_PCT_RATE           = 1000000002877801985002875644;  //  9.50%
+    uint256 internal constant NINE_PT_SEVEN_FIVE_PCT_RATE     = 1000000002950116251408586949;  //  9.75%
+    uint256 internal constant TEN_PT_TWO_FIVE_PCT_RATE        = 1000000003094251918120023627;  // 10.25%
+    uint256 internal constant TEN_PT_FIVE_PCT_RATE            = 1000000003166074807451009595;  // 10.50%
+    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE      = 1000000003237735385034516037;  // 10.75%
+    uint256 internal constant FOURTEEN_PCT_RATE               = 1000000004154878953532704765;  // 14.00%
+    uint256 internal constant FOURTEEN_PT_TWO_FIVE_PCT_RATE   = 1000000004224341833701283597;  // 14.25%
+    uint256 internal constant FOURTEEN_PT_SEVEN_FIVE_PCT_RATE = 1000000004362812761691191350;  // 14.75%
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
@@ -98,38 +99,38 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/feb-6-2025-stability-scope-parameter-changes-21/25906/4
 
         // Reduce ETH-A Stability Fee by 3 percentage points from 12.75% to 9.75%
-        DssExecLib.setIlkStabilityFee("ETH-A", NINE_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-A", NINE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce ETH-B Stability Fee by 3 percentage points from 13.25% to 10.25%
-        DssExecLib.setIlkStabilityFee("ETH-B", TEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-B", TEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce ETH-C Stability Fee by 3 percentage points from 12.50% to 9.50%
-        DssExecLib.setIlkStabilityFee("ETH-C", NINE_PT_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ETH-C", NINE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce WSTETH-A Stability Fee by 3 percentage points from 13.75% to 10.75%
-        DssExecLib.setIlkStabilityFee("WSTETH-A", TEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WSTETH-A", TEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce WSTETH-B Stability Fee by 3 percentage points from 13.50% to 10.50%
-        DssExecLib.setIlkStabilityFee("WSTETH-B", TEN_PT_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WSTETH-B", TEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce WBTC-A Stability Fee by 2 percentage points from 16.25% to 14.25%
-        DssExecLib.setIlkStabilityFee("WBTC-A", FOURTEEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-A", FOURTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce WBTC-B Stability Fee by 2 percentage points from 16.75% to 14.75%
-        DssExecLib.setIlkStabilityFee("WBTC-B", FOURTEEN_PT_SEVEN_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-B", FOURTEEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce WBTC-C Stability Fee by 2 percentage points from 16.00% to 14.00%
-        DssExecLib.setIlkStabilityFee("WBTC-C", FOURTEEN_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("WBTC-C", FOURTEEN_PCT_RATE, /* doDrip = */ true);
 
         // Reduce ALLOCATOR-SPARK-A Stability Fee by 4.04 percentage points from 5.37% to 1.33%
-        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", ONE_PT_THREE_THREE_PCT, /* doDrip = */ true);
+        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", ONE_PT_THREE_THREE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce DSR by 4 percentage points from 11.25% to 7.25%
-        DssExecLib.setDSR(SEVEN_PT_TWO_FIVE_PCT, /* doDrip = */ true);
+        DssExecLib.setDSR(SEVEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
         // Reduce SSR by 3.75 percentage points from 12.50% to 8.75%
         SUsdsLike(SUSDS).drip();
-        SUsdsLike(SUSDS).file("ssr", EIGHT_PT_SEVEN_FIVE_PCT);
+        SUsdsLike(SUSDS).file("ssr", EIGHT_PT_SEVEN_FIVE_PCT_RATE);
 
         // ---------- Sweep Dai from PauseProxy to Surplus Buffer ----------
         // Forum: https://forum.sky.money/t/consolfreight-rwa-003-cf4-drop-default/21745/23
@@ -165,9 +166,7 @@ contract DssSpellAction is DssAction {
 
         // Execute Spark Spell at 0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0
         // Note: Make sure to not revert the Core spell if the Spark spell reverts
-        try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {
-
-        } catch {}
+        try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {} catch {}
     }
 
     // ---------- Helper Functions ----------
