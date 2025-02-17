@@ -147,7 +147,7 @@ contract Config {
         afterSpell.vest_sky_mint_cap      = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 69;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.5";                       // String expected in system
+        afterSpell.chainlog_version       = "1.19.6";                       // String expected in system
 
         //
         // Values for all collateral
@@ -1855,8 +1855,8 @@ contract Config {
         });
         afterSpell.collaterals["ALLOCATOR-SPARK-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1000 * MILLION,
-            aL_gap:       100 * MILLION,
+            aL_line:      5 * BILLION,
+            aL_gap:       500 * MILLION,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
