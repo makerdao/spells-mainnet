@@ -706,20 +706,21 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = false;
+        bool ignoreTotalSupplyDaiUsds = true;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[8] memory payees = [
+        Payee[9] memory payees = [
             Payee(address(usds), wallets.addr("BLUE"), 87_601 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("BYTERON"), 4_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("CLOAKY_2"), 22_835 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("PBG"), 387 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
             Payee(address(sky), wallets.addr("BLUE"), 550_000 ether), // Note: ether is only a keyword helper
             Payee(address(sky), wallets.addr("CLOAKY_2"), 438_000 ether) // Note: ether is only a keyword helper
         ];
@@ -728,7 +729,7 @@ contract DssSpellTest is DssSpellTestBase {
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         122_823 ether,   // Note: ether is only a keyword helper
+            usds:         3_122_823 ether,   // Note: ether is only a keyword helper
             sky:          988_000 ether    // Note: ether is only a keyword helper
         });
 
@@ -1105,9 +1106,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0); // Insert Spark spell address
+        address SPARK_SPELL = address(0x9EAa8d72BD731BE8eD71D768a912F6832492071e); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,

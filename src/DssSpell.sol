@@ -24,6 +24,11 @@ import { L2TokenGatewayInstance } from "./dependencies/arbitrum-token-bridge/L2T
 import { GatewaysConfig, MessageParams, TokenGatewayInit } from "./dependencies/arbitrum-token-bridge/TokenGatewayInit.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
+interface SUsdsLike {
+    function drip() external returns (uint256);
+    function file(bytes32 what, uint256 data) external;
+}
+
 interface ChainlogLike {
     function removeAddress(bytes32) external;
 }
@@ -63,6 +68,17 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE        = 1000000002293273137447730714;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
+    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE        = 1000000002586884420913935572;
+    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE = 1000000003805263591546724039;
+    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE = 1000000003945572635100236468;
+    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE       = 1000000003734875566854894261;
+    uint256 internal constant THREE_PT_TWO_TWO_PCT_RATE     = 1000000001004960893848761962;
+    uint256 internal constant FOUR_PT_SEVEN_FIVE_PCT_RATE   = 1000000001471536429740616381;
+    uint256 internal constant SIX_PT_FIVE_PCT_RATE          = 1000000001996917783620820123;
 
     // ---------- Math ----------
     uint256 internal constant MILLION  = 10 ** 6;
@@ -70,32 +86,30 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD = 10 ** 18;
 
     // ---------- Wallets ----------
-    address internal constant BLUE          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
-    address internal constant BONAPUBLICA   = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant BYTERON       = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
-    address internal constant CLOAKY_2      = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
-    address internal constant JULIACHANG    = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
-    address internal constant PBG           = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant BLUE                          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BONAPUBLICA                   = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant BYTERON                       = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant CLOAKY_2                      = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
+    address internal constant JULIACHANG                    = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant PBG                           = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant INTEGRATION_BOOST_INITIATIVE  = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
 
     // ---------- Contracts ----------
-    GemAbstract internal immutable DAI                 = GemAbstract(DssExecLib.dai());
-    GemAbstract internal immutable MKR                 = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable SKY                 = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable DAI_USDS                = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY                 = DssExecLib.getChangelogAddress("MKR_SKY");
-    address internal constant EMSP_CLIP_BREAKER_FAB    = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
-    address internal constant EMSP_LINE_WIPE_FAB       = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
-    address internal constant EMSP_LITE_PSM_HALT_FAB   = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
-    address internal constant EMSP_SPLITTER_STOP       = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
-
-    // ---------- Arbitrum Token Bridge Contracts  ----------
-    // Mainnet
+    GemAbstract internal immutable DAI                       = GemAbstract(DssExecLib.dai());
+    GemAbstract internal immutable MKR                       = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable SKY                       = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable DAI_USDS                      = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY                       = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal constant EMSP_CLIP_BREAKER_FAB          = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
+    address internal constant EMSP_LINE_WIPE_FAB             = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
+    address internal constant EMSP_LITE_PSM_HALT_FAB         = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
+    address internal constant EMSP_SPLITTER_STOP             = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
     address internal immutable USDS                          = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                         = DssExecLib.getChangelogAddress("SUSDS");
-    address internal constant  ARBITRUM_ROUTER               = 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef;
-    address internal constant  ARBITRUM_INBOX                = 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f;
-    address internal constant  ARBITRUM_TOKEN_BRIDGE         = 0x84b9700E28B23F873b82c1BEb23d86C091b6079E;
-    address internal constant  ARBITRUM_TOKEN_BRIDGE_IMP     = 0x12eDe82637d5507026D4CDb3515B4b022Ed157b1;
+    address internal constant ARBITRUM_ROUTER                = 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef;
+    address internal constant ARBITRUM_INBOX                 = 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f;
+    address internal constant ARBITRUM_TOKEN_BRIDGE          = 0x84b9700E28B23F873b82c1BEb23d86C091b6079E;
+    address internal constant ARBITRUM_TOKEN_BRIDGE_IMP      = 0x12eDe82637d5507026D4CDb3515B4b022Ed157b1;
     // Arbitrum
     address internal constant L2_USDS                        = 0x6491c05A82219b8D1479057361ff1654749b876b;
     address internal constant L2_SUSDS                       = 0xdDb46999F8891663a8F2828d25298f70416d7610;
@@ -109,33 +123,45 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    // address internal constant SPARK_SPELL = 0x0;
+    address internal constant SPARK_SPELL = 0x9EAa8d72BD731BE8eD71D768a912F6832492071e;
 
     function actions() public override {
         // ---------- Rate Adjustments ----------
-        // Forum: TODO
+        // Forum: https://forum.sky.money/t/feb-20-2025-stability-scope-parameter-changes-22/26003
 
-        // Reduce ETH-A Stability Fee by TBC percentage points from 9.75% to TBC%
+        // Reduce ETH-A Stability Fee by 2.00 percentage points from 9.75% to 7.75%
+        DssExecLib.setIlkStabilityFee("ETH-A", SEVEN_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce ETH-B Stability Fee by TBC percentage points from 10.25% to TBC%
+        // Reduce ETH-B Stability Fee by 2.00 percentage points from 10.25% to 8.25%
+        DssExecLib.setIlkStabilityFee("ETH-B", EIGHT_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce ETH-C Stability Fee by TBC percentage points from 9.50% to TBC%
+        // Reduce ETH-C Stability Fee by 2.00 percentage points from 9.50% to 7.50%
+        DssExecLib.setIlkStabilityFee("ETH-C", SEVEN_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce WSTETH-A Stability Fee by TBC percentage points from 10.75% to TBC%
+        // Reduce WSTETH-A Stability Fee by 2.00 percentage points from 10.75% to 8.75%
+        DssExecLib.setIlkStabilityFee("WSTETH-A", EIGHT_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce WSTETH-B Stability Fee by TBC percentage points from 10.50% to TBC%
+        // Reduce WSTETH-B Stability Fee by 2.00 percentage points from 10.50% to 8.50%
+        DssExecLib.setIlkStabilityFee("WSTETH-B", EIGHT_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce WBTC-A Stability Fee by TBC percentage points from 14.25% to TBC%
+        // Reduce WBTC-A Stability Fee by 1.50 percentage points from 14.25% to 12.75%
+        DssExecLib.setIlkStabilityFee("WBTC-A", TWELVE_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce WBTC-B Stability Fee by TBC percentage points from 14.75% to TBC%
+        // Reduce WBTC-B Stability Fee by 1.50 percentage points from 14.75% to 13.25%
+        DssExecLib.setIlkStabilityFee("WBTC-B", THIRTEEN_PT_TWO_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce WBTC-C Stability Fee by TBC percentage points from 14.00% to TBC%
+        // Reduce WBTC-C Stability Fee by 1.50 percentage points from 14.00% to 12.50%
+        DssExecLib.setIlkStabilityFee("WBTC-C", TWELVE_PT_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce ALLOCATOR-SPARK-A Stability Fee by TBC percentage points from 1.33% to TBC%
+        // Increase ALLOCATOR-SPARK-A Stability Fee by 1.89 percentage points from 1.33% to 3.22%
+        DssExecLib.setIlkStabilityFee("ALLOCATOR-SPARK-A", THREE_PT_TWO_TWO_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce DSR by TBC percentage points from 7.25% to TBC%
+        // Reduce DSR by 2.50 percentage points from 7.25% to 4.75%
+        DssExecLib.setDSR(FOUR_PT_SEVEN_FIVE_PCT_RATE, /* doDrip = */ true);
 
-        // Reduce SSR by TBC percentage points from 8.75% to TBC%
+        // Reduce SSR by 2.25 percentage points from 8.75% to 6.50%
+        SUsdsLike(SUSDS).drip();
+        SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PCT_RATE);
 
         // ---------- Init Arbitrum Token Bridge by calling TokenGatewayInit.initGateways using the following parameters: ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-the-arbitrum-token-gateway-launch/25972
@@ -210,6 +236,8 @@ contract DssSpellAction is DssAction {
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM parameter changes ----------
         // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951
+        // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951/6
+        // Poll: https://vote.makerdao.com/polling/QmXpKEFg
 
         // Increase DC-IAM gap by 400 million, from 100 million to 500 million USDS
         // Increase DC-IAM line by 4 billion USDS, from 1 billion USDS to 5 billion USDS
@@ -219,6 +247,7 @@ contract DssSpellAction is DssAction {
         // ---------- Modify emergency spells in the chainlog ----------
         // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-for-week-of-february-17-2025/25979
         // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951/6
+        // Poll: https://vote.makerdao.com/polling/QmQW5mb1
 
         // Update the value of EMSP_CLIP_BREAKER_FAB in the Chainlog to 0x867852D30bb3CB1411fB4e404FAE28EF742b1023
         // Note: remove the old address
@@ -279,13 +308,24 @@ contract DssSpellAction is DssAction {
         _transferSky(CLOAKY_2, 438_000 * WAD);
 
         // ---------- Top-up of the Integration Boost ----------
-        // Forum: TODO
+        // Forum: https://forum.sky.money/t/utilization-of-the-integration-boost-budget-a-5-2-1-2/25536/6
+        // Atlas: https://sky-atlas.powerhouse.io/A.5.2.1.2_Integration_Boost/129f2ff0-8d73-8057-850b-d32304e9c91a%7C8d5a9e88cf49
+
+        // Integration Boost - 3,000,000 USDS - 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7
+        _transferUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
 
         // ---------- Spark Proxy Spell ----------
-        // Forum: TODO
+        // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951
+        // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell-2/25961
+        // Poll: https://vote.makerdao.com/polling/QmWQcu5A
+        // Poll: https://vote.makerdao.com/polling/Qmdr4yqX
+        // Poll: https://vote.makerdao.com/polling/QmUEJbje
+        // Poll: https://vote.makerdao.com/polling/QmWbSTxi
+        // Poll: https://vote.makerdao.com/polling/QmcicBXG
 
-        // Execute Spark Spell at TBC
-        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Execute Spark Spell at 0x9EAa8d72BD731BE8eD71D768a912F6832492071e
+        // Note: Make sure to not revert the Core spell if the Spark spell reverts
+        try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {} catch {}
 
         // Note: Bump chainlog version
         DssExecLib.setChangelogVersion("1.19.6");
