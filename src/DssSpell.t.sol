@@ -700,7 +700,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = true;
 
@@ -1095,7 +1095,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0); // Insert Spark spell address
 
@@ -1112,30 +1112,6 @@ contract DssSpellTest is DssSpellTestBase {
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
     }
+
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testSweepDaiToSurplusBuffer() public {
-        uint256 initialPauseProxyDaiBalance = dai.balanceOf(address(pauseProxy));
-        uint256 initialVowDai = vat.dai(address(vow));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check that 406,451.52 Dai was moved from PauseProxy
-        assertEq(
-            dai.balanceOf(address(pauseProxy)),
-            initialPauseProxyDaiBalance - 406_451.52 ether,
-            "testSweepDaiToSurplusBuffer/incorrect-pause-proxy-dai-balance"
-        );
-
-        // Check that at least the swept amount was added to the Vow
-        uint256 finalVowDai = vat.dai(address(vow));
-        // Note: We cannot use assertEq here because jug.drip() is called in the spell
-        assertGe(
-            finalVowDai,
-            initialVowDai + 406_451.52 ether * RAY,
-            "testSweepDaiToSurplusBuffer/insufficient-vow-dai-balance"
-        );
-    }
 }
