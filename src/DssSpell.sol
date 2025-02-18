@@ -68,22 +68,22 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000002366931224128103346;
-    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
-    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE        = 1000000002293273137447730714;
-    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
-    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE        = 1000000002586884420913935572;
-    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE = 1000000003805263591546724039;
-    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE = 1000000003945572635100236468;
-    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE       = 1000000003734875566854894261;
     uint256 internal constant THREE_PT_TWO_TWO_PCT_RATE     = 1000000001004960893848761962;
     uint256 internal constant FOUR_PT_SEVEN_FIVE_PCT_RATE   = 1000000001471536429740616381;
     uint256 internal constant SIX_PT_FIVE_PCT_RATE          = 1000000001996917783620820123;
+    uint256 internal constant SEVEN_PT_FIVE_PCT_RATE        = 1000000002293273137447730714;
+    uint256 internal constant SEVEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000002366931224128103346;
+    uint256 internal constant EIGHT_PT_TWO_FIVE_PCT_RATE    = 1000000002513736079215619839;
+    uint256 internal constant EIGHT_PT_FIVE_PCT_RATE        = 1000000002586884420913935572;
+    uint256 internal constant EIGHT_PT_SEVEN_FIVE_PCT_RATE  = 1000000002659864411854984565;
+    uint256 internal constant TWELVE_PT_FIVE_PCT_RATE       = 1000000003734875566854894261;
+    uint256 internal constant TWELVE_PT_SEVEN_FIVE_PCT_RATE = 1000000003805263591546724039;
+    uint256 internal constant THIRTEEN_PT_TWO_FIVE_PCT_RATE = 1000000003945572635100236468;
 
     // ---------- Math ----------
-    uint256 internal constant MILLION  = 10 ** 6;
-    uint256 internal constant BILLION  = 10 ** 9;
-    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant BILLION = 10 ** 9;
+    uint256 internal constant WAD     = 10 ** 18;
 
     // ---------- Wallets ----------
     address internal constant BLUE                          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
