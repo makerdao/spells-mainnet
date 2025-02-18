@@ -86,13 +86,13 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD     = 10 ** 18;
 
     // ---------- Wallets ----------
-    address internal constant BLUE                          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
-    address internal constant BONAPUBLICA                   = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
-    address internal constant BYTERON                       = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
-    address internal constant CLOAKY_2                      = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
-    address internal constant JULIACHANG                    = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
-    address internal constant PBG                           = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
-    address internal constant INTEGRATION_BOOST_INITIATIVE  = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
+    address internal constant BLUE                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BONAPUBLICA                  = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant BYTERON                      = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant CLOAKY_2                     = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
+    address internal constant JULIACHANG                   = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant PBG                          = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
 
     // ---------- Contracts ----------
     GemAbstract internal immutable DAI                       = GemAbstract(DssExecLib.dai());
@@ -226,7 +226,7 @@ contract DssSpellAction is DssAction {
             xchainMsg: xchainMsg
         });
 
-        // Note: Load DssInstance
+        // Note: Load DssInstance to pass in TokenGatewayInit.initGateways
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // Init Arbitrum Token Bridge by calling TokenGatewayInit.initGateways using the following parameters:

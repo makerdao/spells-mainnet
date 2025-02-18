@@ -1125,7 +1125,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
     L1TokenGatewayLike      immutable ARBITRUM_TOKEN_BRIDGE           = L1TokenGatewayLike(addr.addr("ARBITRUM_TOKEN_BRIDGE"));
     address                 immutable ARBITRUM_TOKEN_BRIDGE_IMP       = addr.addr("ARBITRUM_TOKEN_BRIDGE_IMP");
     address                 immutable ARBITRUM_ROUTER                 = addr.addr("ARBITRUM_ROUTER");
@@ -1148,22 +1147,22 @@ contract DssSpellTest is DssSpellTestBase {
         // ------ Sanity checks -------
         rootDomain.selectFork();
 
-        require(ARBITRUM_TOKEN_BRIDGE.isOpen()                      == 1,                                 "ArbitrumTokenBridge/not-open");
-        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                    == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-rounter-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.inbox()                       == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatchpen");
-        require(ARBITRUM_TOKEN_BRIDGE.counterpartGateway()          == address(L2_ARBITRUM_TOKEN_BRIDGE), "ArbitrumTokenBridge/counterpart-gateway-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.getImplementation()           == ARBITRUM_TOKEN_BRIDGE_IMP,         "ArbitrumTokenBridge/imp-does-not-match");
-        require(keccak256(bytes(ARBITRUM_TOKEN_BRIDGE.version()))   == keccak256("1"),                    "ArbitrumTokenBridge/version-does-not-match");
+        require(ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "ArbitrumTokenBridge/not-open");
+        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                  == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-rounter-mismatch");
+        require(ARBITRUM_TOKEN_BRIDGE.inbox()                     == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatchpen");
+        require(ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(L2_ARBITRUM_TOKEN_BRIDGE), "ArbitrumTokenBridge/counterpart-gateway-mismatch");
+        require(ARBITRUM_TOKEN_BRIDGE.getImplementation()         == ARBITRUM_TOKEN_BRIDGE_IMP,         "ArbitrumTokenBridge/imp-does-not-match");
+        require(keccak256(bytes(ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "ArbitrumTokenBridge/version-does-not-match");
 
         arbitrumDomain.selectFork();
 
-        require(L2_ARBITRUM_TOKEN_BRIDGE.isOpen()                      == 1,                                 "L2ArbitrumTokenBridge/not-open");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                    == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-rounter-mismatch");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.counterpartGateway()          == address(ARBITRUM_TOKEN_BRIDGE),    "L2ArbitrumTokenBridge/counterpart-gateway-mismatch");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.getImplementation()           == L2_ARBITRUM_TOKEN_BRIDGE_IMP,      "L2ArbitrumTokenBridge/imp-does-not-match");
-        require(keccak256(bytes(L2_ARBITRUM_TOKEN_BRIDGE.version()))   == keccak256("1"),                    "L2ArbitrumTokenBridge/version-does-not-match");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "L2ArbitrumTokenBridge/not-open");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                  == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-rounter-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(ARBITRUM_TOKEN_BRIDGE),    "L2ArbitrumTokenBridge/counterpart-gateway-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.getImplementation()         == L2_ARBITRUM_TOKEN_BRIDGE_IMP,      "L2ArbitrumTokenBridge/imp-does-not-match");
+        require(keccak256(bytes(L2_ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "L2ArbitrumTokenBridge/version-does-not-match");
 
-        require(L2_ARBITRUM_TOKEN_BRIDGE_SPELL.l2Gateway()             == address(L2_ARBITRUM_TOKEN_BRIDGE), "L2ArbitrumTokenBridgeSpell/l2-gateway-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE_SPELL.l2Gateway()           == address(L2_ARBITRUM_TOKEN_BRIDGE), "L2ArbitrumTokenBridgeSpell/l2-gateway-mismatch");
 
         rootDomain.selectFork();
         _vote(address(spell));
