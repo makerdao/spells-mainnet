@@ -118,7 +118,7 @@ contract DssSpellAction is DssAction {
     address internal constant L2_ARBITRUM_TOKEN_BRIDGE_SPELL = 0x3D4357c3944F7A5b6a0B5b67B36588BA45D3f49D;
 
     // ---------- Constant Values ----------
-    uint256 internal immutable MKR_SKY_RATE      = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
+    uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -168,7 +168,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/technical-scope-of-the-arbitrum-token-gateway-launch/25972/3
         // Poll: https://vote.makerdao.com/polling/QmcicBXG
 
-        // Note: Create L1TokenGatewayInstance to pass in TokenGatewayInit.initGateways
+        // Note: L1TokenGatewayInstance to pass in TokenGatewayInit.initGateways
         L1TokenGatewayInstance memory l1GatewayInstance = L1TokenGatewayInstance({
             // Set parameter l1GatewayInstance.gateway: (ERC1967Proxy: 0x84b9700E28B23F873b82c1BEb23d86C091b6079E)
             gateway: ARBITRUM_TOKEN_BRIDGE,
@@ -176,7 +176,7 @@ contract DssSpellAction is DssAction {
             gatewayImp: ARBITRUM_TOKEN_BRIDGE_IMP
         });
 
-        // Note: Create L2TokenGatewayInstance to pass in TokenGatewayInit.initGateways
+        // Note: L2TokenGatewayInstance to pass in TokenGatewayInit.initGateways
         L2TokenGatewayInstance memory l2GatewayInstance = L2TokenGatewayInstance({
             // Set parameter l2GatewayInstance.gateway: (ERC1967Proxy: 0x13F7F24CA959359a4D710D32c715D4bce273C793)
             gateway: L2_ARBITRUM_TOKEN_BRIDGE,
@@ -186,41 +186,44 @@ contract DssSpellAction is DssAction {
             spell: L2_ARBITRUM_TOKEN_BRIDGE_SPELL
         });
 
-        // Note: Create MessageParams for GatewaysConfig
-        MessageParams memory xchainMsg = MessageParams({
-            // Set parameter cfg.xchainMsg.maxGas: 350000
-            maxGas: 350_000,
-            // Set parameter cfg.xchainMsg.gasPriceBid: 100000000
-            gasPriceBid: 100_000_000,
-            // Set parameter cfg.xchainMsg.maxSubmissionCost: 1316000000000000
-            maxSubmissionCost: 1_316_000_000_000_000
-        });
-
-        // Set parameter cfg.l1Tokens: (array [`USDS`, `SUSDS`])
+        // Note: Mainnet tokens for GatewaysConfig
         address[] memory l1Tokens = new address[](2);
         l1Tokens[0] = USDS;
         l1Tokens[1] = SUSDS;
 
-        // Set parameter cfg.l2Tokens: (array [Usds(ERC1967Proxy): 0x6491c05A82219b8D1479057361ff1654749b876b, SUsds(ERC1967Proxy): 0xdDb46999F8891663a8F2828d25298f70416d7610])
+        // Note: Arbitrum tokens for GatewaysConfig
         address[] memory l2Tokens = new address[](2);
         l2Tokens[0] = L2_USDS;
         l2Tokens[1] = L2_SUSDS;
 
-        // Set parameter cfg.maxWithdraws: (array [type(uint256).max, type(uint256).max])
+        // Note: Arbitrum tokens max withdrawals for GatewaysConfig
         uint256[] memory maxWithdrawals = new uint256[](2);
         maxWithdrawals[0] = type(uint256).max;
         maxWithdrawals[1] = type(uint256).max;
 
+        // Note: MessageParams for GatewaysConfig
+        MessageParams memory xchainMsg = MessageParams({
+            maxGas: 350_000,
+            gasPriceBid: 100_000_000,
+            maxSubmissionCost: 1_316_000_000_000_000
+        });
+
         // Note: Create GatewaysConfig to pass in TokenGatewayInit.initGateways
-        GatewaysConfig memory gatewaysCfg = GatewaysConfig({
+        GatewaysConfig memory cfg = GatewaysConfig({
             // Set parameter cfg.l1Router: (L1GatewayRouter (ERC1967Proxy): 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef)
             l1Router: ARBITRUM_ROUTER,
             // Set parameter cfg.inbox: (Inbox(ERC1967Proxy): 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f)
             inbox: ARBITRUM_INBOX,
-            xchainMsg: xchainMsg,
+            // Set parameter cfg.l1Tokens: (array [`USDS`, `SUSDS`])
             l1Tokens: l1Tokens,
+            // Set parameter cfg.l2Tokens: (array [Usds(ERC1967Proxy): 0x6491c05A82219b8D1479057361ff1654749b876b, SUsds(ERC1967Proxy): 0xdDb46999F8891663a8F2828d25298f70416d7610])
             l2Tokens: l2Tokens,
-            maxWithdraws: maxWithdrawals
+            // Set parameter cfg.maxWithdraws: (array [type(uint256).max, type(uint256).max])
+            maxWithdraws: maxWithdrawals,
+            // Set parameter cfg.xchainMsg.maxGas: 350000
+            // Set parameter cfg.xchainMsg.gasPriceBid: 100000000
+            // Set parameter cfg.xchainMsg.maxSubmissionCost: 1316000000000000
+            xchainMsg: xchainMsg
         });
 
         // Note: Load DssInstance
@@ -231,7 +234,7 @@ contract DssSpellAction is DssAction {
             dss,
             l1GatewayInstance,
             l2GatewayInstance,
-            gatewaysCfg
+            cfg
         );
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM parameter changes ----------
@@ -256,7 +259,7 @@ contract DssSpellAction is DssAction {
 
         // Update the value of EMSP_LINE_WIPE_FAB in the Chainlog to 0x8646F8778B58a0dF118FacEdf522181bA7277529
         // Note: remove the old address
-        ChainlogLike(DssExecLib.LOG).removeAddress("EMSP_CLIP_BREAKER_FAB");
+        ChainlogLike(DssExecLib.LOG).removeAddress("EMSP_LINE_WIPE_FAB");
         DssExecLib.setChangelogAddress("EMSP_LINE_WIPE_FAB", EMSP_LINE_WIPE_FAB);
 
         // Add Standby spell to the chainlog, key: EMSP_LITE_PSM_HALT_FAB ,value: 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A
