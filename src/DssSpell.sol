@@ -23,6 +23,7 @@ import { L1TokenGatewayInstance } from "./dependencies/arbitrum-token-bridge/L1T
 import { L2TokenGatewayInstance } from "./dependencies/arbitrum-token-bridge/L2TokenGatewayInstance.sol";
 import { GatewaysConfig, MessageParams, TokenGatewayInit } from "./dependencies/arbitrum-token-bridge/TokenGatewayInit.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { DssAutoLineAbstract } from "dss-interfaces/dss/DssAutoLineAbstract.sol";
 
 interface SUsdsLike {
     function drip() external returns (uint256);
@@ -98,6 +99,7 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable DAI                       = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR                       = GemAbstract(DssExecLib.mkr());
     GemAbstract internal immutable SKY                       = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable MCD_IAM_AUTO_LINE             = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
     address internal immutable DAI_USDS                      = DssExecLib.getChangelogAddress("DAI_USDS");
     address internal immutable MKR_SKY                       = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal constant EMSP_CLIP_BREAKER_FAB          = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
@@ -326,9 +328,11 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmWbSTxi
         // Poll: https://vote.makerdao.com/polling/QmcicBXG
 
+        // Note: The spark spell below expects the new auto-line settings to be effective.
+        DssAutoLineAbstract(MCD_IAM_AUTO_LINE).exec("ALLOCATOR-SPARK-A");
+
         // Execute Spark Spell at 0x9EAa8d72BD731BE8eD71D768a912F6832492071e
-        // Note: Make sure to not revert the Core spell if the Spark spell reverts
-        try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {} catch {}
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
         // Note: Bump chainlog version
         DssExecLib.setChangelogVersion("1.19.6");
