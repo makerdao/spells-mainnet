@@ -177,6 +177,7 @@ contract Wallets {
         addr["NAVIGATOR"]                    = 0x11406a9CC2e37425F15f920F494A51133ac93072;
         addr["JAG"]                          = 0x58D1ec57E4294E4fe650D1CB12b96AE34349556f;
         addr["CLOAKY"]                       = 0x869b6d5d8FA7f4FFdaCA4D23FFE0735c5eD1F818;
+        addr["CLOAKY_2"]                     = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
         addr["SKYNET"]                       = 0xd4d1A446cD5976a11bd32D3e815A9F85FED2F9F3;
         addr["BLUE"]                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
         addr["PIPKIN"]                       = 0x0E661eFE390aE39f90a58b04CF891044e56DEDB7;

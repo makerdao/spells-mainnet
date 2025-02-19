@@ -45,6 +45,10 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface L2TokenGatewaySpellLike {
+    function l2Gateway() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -700,7 +704,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = true;
 
@@ -709,23 +713,30 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[2] memory payees = [
+        Payee[9] memory payees = [
+            Payee(address(usds), wallets.addr("BLUE"), 87_601 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_2"), 22_835 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("PBG"), 387 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("GFXLABS"), 1_000 ether) // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("BLUE"), 550_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("CLOAKY_2"), 438_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         3_001_000 ether, // Note: ether is only a keyword helper
-            sky:          0 ether          // Note: ether is only a keyword helper
+            usds:         3_122_823 ether, // Note: ether is only a keyword helper
+            sky:          988_000 ether    // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: 0,
-            sky: 0
+            mkr: -41_166666666666666667,
+            sky: 8000
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -1095,9 +1106,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xD5c59b7c1DD8D2663b4c826574ed968B2C8329C0); // Insert Spark spell address
+        address SPARK_SPELL = address(0x9EAa8d72BD731BE8eD71D768a912F6832492071e); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1114,5 +1125,73 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    L1TokenGatewayLike      immutable ARBITRUM_TOKEN_BRIDGE           = L1TokenGatewayLike(addr.addr("ARBITRUM_TOKEN_BRIDGE"));
+    address                 immutable ARBITRUM_TOKEN_BRIDGE_IMP       = addr.addr("ARBITRUM_TOKEN_BRIDGE_IMP");
+    address                 immutable ARBITRUM_ROUTER                 = addr.addr("ARBITRUM_ROUTER");
+    address                 immutable USDS                            = addr.addr("USDS");
+    address                 immutable SUSDS                           = addr.addr("SUSDS");
+    address                 immutable ARBITRUM_ESCROW                 = addr.addr("ARBITRUM_ESCROW");
+    address                 immutable ARBITRUM_INBOX                  = addr.addr("ARBITRUM_INBOX");
+    L2TokenGatewayLike      immutable L2_ARBITRUM_TOKEN_BRIDGE        = L2TokenGatewayLike(arbitrum.addr("L2_TOKEN_BRIDGE"));
+    address                 immutable L2_ARBITRUM_TOKEN_BRIDGE_IMP    = arbitrum.addr("L2_TOKEN_BRIDGE_IMP");
+    address                 immutable L2_ARBITRUM_ROUTER              = arbitrum.addr("L2_ROUTER");
+    address                 immutable L2_USDS                         = arbitrum.addr("L2_USDS");
+    address                 immutable L2_SUSDS                        = arbitrum.addr("L2_SUSDS");
+    L2TokenGatewaySpellLike immutable L2_ARBITRUM_TOKEN_BRIDGE_SPELL  = L2TokenGatewaySpellLike(arbitrum.addr("L2_TOKEN_BRIDGE_SPELL"));
 
+    function testArbitrumTokenGatewayIntegration() public {
+        _setupRootDomain();
+        rootDomain.selectFork();
+        arbitrumDomain = new ArbitrumDomain(config, getRelativeChain("arbitrum_one"), rootDomain);
+
+        // ------ Sanity checks -------
+        rootDomain.selectFork();
+
+        require(ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "ArbitrumTokenBridge/not-open");
+        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                  == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-rounter-mismatch");
+        require(ARBITRUM_TOKEN_BRIDGE.inbox()                     == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatchpen");
+        require(ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(L2_ARBITRUM_TOKEN_BRIDGE), "ArbitrumTokenBridge/counterpart-gateway-mismatch");
+        require(ARBITRUM_TOKEN_BRIDGE.getImplementation()         == ARBITRUM_TOKEN_BRIDGE_IMP,         "ArbitrumTokenBridge/imp-does-not-match");
+        require(keccak256(bytes(ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "ArbitrumTokenBridge/version-does-not-match");
+
+        arbitrumDomain.selectFork();
+
+        require(L2_ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "L2ArbitrumTokenBridge/not-open");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                  == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-rounter-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(ARBITRUM_TOKEN_BRIDGE),    "L2ArbitrumTokenBridge/counterpart-gateway-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.getImplementation()         == L2_ARBITRUM_TOKEN_BRIDGE_IMP,      "L2ArbitrumTokenBridge/imp-does-not-match");
+        require(keccak256(bytes(L2_ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "L2ArbitrumTokenBridge/version-does-not-match");
+
+        require(L2_ARBITRUM_TOKEN_BRIDGE_SPELL.l2Gateway()           == address(L2_ARBITRUM_TOKEN_BRIDGE), "L2ArbitrumTokenBridgeSpell/l2-gateway-mismatch");
+
+        rootDomain.selectFork();
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+        // Read all x-chain messages
+        arbitrumDomain.relayFromHost(false);
+
+        require(ARBITRUM_TOKEN_BRIDGE.escrow() == ARBITRUM_ESCROW, "ArbitrumTokenBridge/escrow-does-not-match");
+
+        address[] memory l1Tokens = new address[](2);
+        l1Tokens[0] = USDS;
+        l1Tokens[1] = SUSDS;
+
+        address[] memory l2Tokens = new address[](2);
+        l2Tokens[0] = L2_USDS;
+        l2Tokens[1] = L2_SUSDS;
+
+        uint256[] memory maxWithdrawals = new uint256[](2);
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        _testArbitrumTokenGatewayIntegration(
+            ARBITRUM_TOKEN_BRIDGE,
+            L2_ARBITRUM_TOKEN_BRIDGE,
+            ARBITRUM_ESCROW,
+            l1Tokens,
+            l2Tokens,
+            maxWithdrawals
+        );
+    }
 }

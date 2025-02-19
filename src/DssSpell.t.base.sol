@@ -23,6 +23,7 @@ import {stdStorage, StdStorage} from "forge-std/Test.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_base.sol";
+import "./test/addresses_arbitrum.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
 import "./test/config.sol";
@@ -371,14 +372,67 @@ interface L2TokenBridgeLike {
     ) external;
 }
 
+interface L1TokenGatewayLike {
+    function counterpartGateway() external view returns (address);
+    function escrow() external view returns (address);
+    function getImplementation() external view returns (address);
+    function inbox() external view returns (address);
+    function isOpen() external view returns (uint256);
+    function l1Router() external view returns (address);
+    function l1ToL2Token(address) external view returns (address);
+    function outboundTransfer(
+        address l1Token,
+        address to,
+        uint256 amount,
+        uint256 maxGas,
+        uint256 gasPriceBid,
+        bytes memory data
+    ) external payable returns (bytes memory res);
+    function outboundTransferCustomRefund(
+        address l1Token,
+        address refundTo,
+        address to,
+        uint256 amount,
+        uint256 maxGas,
+        uint256 gasPriceBid,
+        bytes calldata data
+    ) external payable returns (bytes memory res);
+    function version() external view returns (string memory);
+}
+
+interface L2TokenGatewayLike {
+    function counterpartGateway() external view returns (address);
+    function getImplementation() external view returns (address);
+    function isOpen() external view returns (uint256);
+    function maxWithdraws(address) external view returns (uint256);
+    function l2Router() external view returns (address);
+    function l1ToL2Token(address) external view returns (address);
+    function outboundTransfer(
+        address l1Token,
+        address to,
+        uint256 amount,
+        bytes memory data
+    ) external payable returns (bytes memory res);
+    function outboundTransfer(
+        address l1Token,
+        address to,
+        uint256 amount,
+        uint256 maxGas,
+        uint256 gasPriceBid,
+        bytes memory data
+    ) external payable returns (bytes memory res);
+    function version() external view returns (string memory);
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
-    Rates         rates = new Rates();
-    Addresses      addr = new Addresses();
-    BaseAddresses  base = new BaseAddresses();
-    Deployers deployers = new Deployers();
-    Wallets     wallets = new Wallets();
+    Rates                 rates = new Rates();
+    Addresses              addr = new Addresses();
+    BaseAddresses          base = new BaseAddresses();
+    ArbitrumAddresses  arbitrum = new ArbitrumAddresses();
+    Deployers         deployers = new Deployers();
+    Wallets             wallets = new Wallets();
 
     // ADDRESSES
     ChainlogAbstract            chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
@@ -2130,6 +2184,91 @@ contract DssSpellTestBase is Config, DssTest {
             baseDomain.relayToHost(true);
 
             assertEq(GemAbstract(p.tokens[i]).balanceOf(address(0xced)), 100 ether);
+        }
+    }
+
+    function _testArbitrumTokenGatewayIntegration(
+        L1TokenGatewayLike l1Gateway,
+        L2TokenGatewayLike l2Gateway,
+        address l1Escrow,
+        address[] memory l1Tokens,
+        address[] memory l2Tokens,
+        uint256[] memory maxWithdrawals
+    ) public {
+        for (uint i = 0; i < l1Tokens.length; i ++) {
+            rootDomain.selectFork();
+
+            // test L1 side of gateway init
+            assertEq(GemAbstract(l1Tokens[i]).allowance(l1Escrow, address(l1Gateway)), maxWithdrawals[i]);
+            assertEq(l1Gateway.l1ToL2Token(l1Tokens[i]), l2Tokens[i]);
+
+            arbitrumDomain.selectFork();
+            // test L2 side of gateway init
+            assertEq(l2Gateway.l1ToL2Token(l1Tokens[i]), l2Tokens[i]);
+            assertEq(l2Gateway.maxWithdraws(l2Tokens[i]), maxWithdrawals[i]);
+
+            // ------- Test Deposit -------
+
+            rootDomain.selectFork();
+            uint256 maxSubmissionCost = 0.1 ether;
+            uint256 maxGas = 1_000_000;
+            uint256 gasPriceBid = 1 gwei;
+            uint256 value = maxSubmissionCost + maxGas * gasPriceBid;
+
+            deal(l1Tokens[i], address(this), 100 ether);
+            assertEq(GemAbstract(l1Tokens[i]).balanceOf(address(this)), 100 ether);
+
+            GemAbstract(l1Tokens[i]).approve(address(l1Gateway), 100 ether);
+            uint256 escrowBeforeBalance = GemAbstract(l1Tokens[i]).balanceOf(l1Escrow);
+
+            l1Gateway.outboundTransferCustomRefund{value: value}(
+                address(l1Tokens[i]),
+                address(0x7ef),
+                address(0xb0b),
+                50 ether,
+                maxGas,
+                gasPriceBid,
+                abi.encode(maxSubmissionCost, "")
+            );
+            l1Gateway.outboundTransfer{value: value}(
+                address(l1Tokens[i]),
+                address(0xb0b),
+                50 ether,
+                maxGas,
+                gasPriceBid,
+                abi.encode(maxSubmissionCost, "")
+            );
+
+            assertEq(GemAbstract(l1Tokens[i]).balanceOf(l1Escrow), escrowBeforeBalance + 100 ether);
+
+            arbitrumDomain.relayFromHost(true);
+            assertEq(GemAbstract(l2Tokens[i]).balanceOf(address(0xb0b)), 100 ether);
+
+            // ------- Test Widthrawl -------
+
+            vm.startPrank(address(0xb0b));
+            GemAbstract(l2Tokens[i]).approve(address(l2Gateway), 100 ether);
+            l2Gateway.outboundTransfer(
+                l1Tokens[i],
+                address(0xced),
+                50 ether,
+                0,
+                0,
+                ""
+            );
+            l2Gateway.outboundTransfer(
+                l1Tokens[i],
+                address(0xced),
+                50 ether,
+                ""
+            );
+            vm.stopPrank();
+
+            assertEq(GemAbstract(l2Tokens[i]).balanceOf(address(0xb0b)), 0);
+
+            arbitrumDomain.relayToHost(true);
+
+            assertEq(GemAbstract(l1Tokens[i]).balanceOf(address(0xced)), 100 ether);
         }
     }
 
