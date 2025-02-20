@@ -1158,8 +1158,8 @@ contract DssSpellTest is DssSpellTestBase {
         rootDomain.selectFork();
 
         require(ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "ArbitrumTokenBridge/not-open");
-        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                  == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-rounter-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.inbox()                     == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatchpen");
+        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                  == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-router-mismatch");
+        require(ARBITRUM_TOKEN_BRIDGE.inbox()                     == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatch");
         require(ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(L2_ARBITRUM_TOKEN_BRIDGE), "ArbitrumTokenBridge/counterpart-gateway-mismatch");
         require(ARBITRUM_TOKEN_BRIDGE.getImplementation()         == ARBITRUM_TOKEN_BRIDGE_IMP,         "ArbitrumTokenBridge/imp-does-not-match");
         require(keccak256(bytes(ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "ArbitrumTokenBridge/version-does-not-match");
@@ -1167,7 +1167,7 @@ contract DssSpellTest is DssSpellTestBase {
         arbitrumDomain.selectFork();
 
         require(L2_ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "L2ArbitrumTokenBridge/not-open");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                  == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-rounter-mismatch");
+        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                  == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-router-mismatch");
         require(L2_ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(ARBITRUM_TOKEN_BRIDGE),    "L2ArbitrumTokenBridge/counterpart-gateway-mismatch");
         require(L2_ARBITRUM_TOKEN_BRIDGE.getImplementation()         == L2_ARBITRUM_TOKEN_BRIDGE_IMP,      "L2ArbitrumTokenBridge/imp-does-not-match");
         require(keccak256(bytes(L2_ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "L2ArbitrumTokenBridge/version-does-not-match");
@@ -1238,10 +1238,10 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check Sky amount on PauseProxy is increased
         uint256 receivedSkyAmount = sky.balanceOf(pauseProxy) - pProxySkyPrev - 8000; // Note: The spell accumulated leftover sky amount(8000) from SkyMkr conversion in transfer
-        assertGt( receivedSkyAmount, 0, "testUnwindSurplusBuffer/received-sky-balance-bigger-than-0");
+        assertGt(receivedSkyAmount, 0, "testUnwindSurplusBuffer/received-sky-balance-bigger-than-0");
 
         // Check expected sky amount matches received
-        uint256 expectedSkyAmount  = burntLpAmount * uniSkyPrev / totalSupplyLpPrev;
+        uint256 expectedSkyAmount = burntLpAmount * uniSkyPrev / totalSupplyLpPrev;
         assertEq(receivedSkyAmount, expectedSkyAmount, "testUnwindSurplusBuffer/incorrect-received-sky-balance");
 
         // Check Surplus amount is euqals to prev + expectedExactUsdsWithdraw

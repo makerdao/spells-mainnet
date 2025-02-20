@@ -2244,7 +2244,7 @@ contract DssSpellTestBase is Config, DssTest {
             arbitrumDomain.relayFromHost(true);
             assertEq(GemAbstract(l2Tokens[i]).balanceOf(address(0xb0b)), 100 ether);
 
-            // ------- Test Widthrawl -------
+            // ------- Test Withdrawal -------
 
             vm.startPrank(address(0xb0b));
             GemAbstract(l2Tokens[i]).approve(address(l2Gateway), 100 ether);
