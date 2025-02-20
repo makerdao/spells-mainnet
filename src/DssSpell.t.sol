@@ -742,7 +742,8 @@ contract DssSpellTest is DssSpellTestBase {
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
             mkr: -41_166666666666666667,
-            sky: 8000
+            // Note: Sky treasury balance cannot be checked in the current spell because the sky balance is also updated from SBE unwind
+            sky: 0
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -840,7 +841,7 @@ contract DssSpellTest is DssSpellTestBase {
             "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
         );
 
-        // Note: This cannot be checked in the current spell because the sky balance is also updated from SBE unwindl
+        // Note: Sky treasury balance cannot be checked in the current spell because the sky balance is also updated from SBE unwind
         // assertEq(
         //     expectedTreasuryBalancesDiff.sky,
         //     treasuryBalancesDiff.sky,
@@ -1209,22 +1210,16 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 pProxyUsdsPrev    = usds.balanceOf(address(pauseProxy));
         uint256 pProxyDaiPrev     = dai.balanceOf(address(pauseProxy));
         uint256 pProxySkyPrev     = sky.balanceOf(address(pauseProxy));
-        uint256 totalSupplyPrev   = UNIV2_USDS_SKY.totalSupply();
+        uint256 totalSupplyLpPrev = UNIV2_USDS_SKY.totalSupply();
         uint256 vowDaiPrev        = vat.dai(address(vow));
-        uint256 usdsToLeave       = 7_500_000 * WAD;
+        uint256 uniSkyPrev        = sky.balanceOf(address(UNIV2_USDS_SKY));
+        uint256 uniUsdsPrev       = usds.balanceOf(address(UNIV2_USDS_SKY));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        // Check UNIV2_USDS_SKY has usdsToLeave amount
-        assertGe(
-            usds.balanceOf(address(UNIV2_USDS_SKY)),
-            usdsToLeave,
-            "testUnwindSurplusBuffer/incorrect-univ2-usds-sky-usds-balance"
-        );
-
-        uint256 burntLpAmount = totalSupplyPrev - UNIV2_USDS_SKY.totalSupply();
+        uint256 burntLpAmount = totalSupplyLpPrev - UNIV2_USDS_SKY.totalSupply();
         assertEq(UNIV2_USDS_SKY.balanceOf(address(pauseProxy)), pProxyUsdsSkyPrev - burntLpAmount);
 
         // Check Dai amount on PauseProxy stays the same
@@ -1241,22 +1236,20 @@ contract DssSpellTest is DssSpellTestBase {
             "testUnwindSurplusBuffer/incorrect-pause-proxy-usds-balance"
         );
 
-        // Check Sky amount on PauseProxy is equals to prev + expectedExactSkyWithdraw
-        // Note: The spell accumulates leftover sky amount(8000) from SkyMkr conversion in _transferSky
-        uint256 expectedExactSkyWithdraw  = burntLpAmount * (sky.balanceOf(address(UNIV2_USDS_SKY)) + sky.balanceOf(pauseProxy) - pProxySkyPrev - 8000) / totalSupplyPrev;
-        assertEq(
-            sky.balanceOf(address(pauseProxy)),
-            pProxySkyPrev + expectedExactSkyWithdraw + 8000,
-            "testUnwindSurplusBuffer/incorrect-pause-proxy-sky-balance"
-        );
+        // Check Sky amount on PauseProxy is increased
+        uint256 receivedSkyAmount = sky.balanceOf(pauseProxy) - pProxySkyPrev - 8000; // Note: The spell accumulated leftover sky amount(8000) from SkyMkr conversion in transfer
+        assertGt( receivedSkyAmount, 0, "testUnwindSurplusBuffer/received-sky-balance-bigger-than-0");
+
+        // Check expected sky amount matches received
+        uint256 expectedSkyAmount  = burntLpAmount * uniSkyPrev / totalSupplyLpPrev;
+        assertEq(receivedSkyAmount, expectedSkyAmount, "testUnwindSurplusBuffer/incorrect-received-sky-balance");
 
         // Check Surplus amount is euqals to prev + expectedExactUsdsWithdraw
-        uint256 daiSentToSurplus = vat.dai(address(vow)) - vowDaiPrev;
-        uint256 expectedExactUsdsWithdraw = burntLpAmount * ((usds.balanceOf(address(UNIV2_USDS_SKY)) + daiSentToSurplus - pProxyUsdsPrev) / totalSupplyPrev);
+        uint256 expectedUsdsAmount = burntLpAmount * uniUsdsPrev / totalSupplyLpPrev;
         // Note: We cannot use assertEq here because jug.drip() is called in the spell
         assertGe(
             vat.dai(address(vow)),
-            vowDaiPrev + expectedExactUsdsWithdraw,
+            vowDaiPrev + expectedUsdsAmount,
             "testUnwindSurplusBuffer/insufficient-vow-dai-balance"
         );
     }

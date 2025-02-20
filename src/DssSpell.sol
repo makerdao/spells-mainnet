@@ -252,8 +252,12 @@ contract DssSpellAction is DssAction {
         uint256 pProxyUsdsPrev = GemAbstract(USDS).balanceOf(address(this));
 
         // Unwind SBE liquidity by calling UniV2PoolWithdraw.withdraw using the following parameter:
-        // Set parameter usdsToLeave: 7,500,000 * 1e18
-        UniV2PoolWithdraw.withdraw(dss, 7_500_000 * WAD);
+        UniV2PoolWithdraw.withdraw(
+            // Note: Pass DssInstance
+            dss,
+            // Set parameter usdsToLeave: 7,500,000 * 1e18
+            7_500_000 * WAD
+        );
 
         // Note: Calculate the amount of Usds withdrawn
         uint256 withdrawnUsdsAmount = GemAbstract(USDS).balanceOf(address(this)) - pProxyUsdsPrev;
@@ -261,14 +265,16 @@ contract DssSpellAction is DssAction {
         // Sweep USDS returned by the SBE from the PauseProxy to the Surplus Buffer
         // Note: instruction is done in multiple actions below
 
-        // Note: Convert Usds to Dai
+        // Note: Approve DaiUsds for the amount returned
         GemAbstract(USDS).approve(DAI_USDS, withdrawnUsdsAmount);
+
+        // Note: Convert Usds to Dai
         DaiUsdsLike(DAI_USDS).usdsToDai(address(this), withdrawnUsdsAmount);
 
-        // Note: Approve the DaiJoin for the amount returned
+        // Note: Approve DaiJoin for the amount returned
         DAI.approve(MCD_JOIN_DAI, withdrawnUsdsAmount);
 
-        // Note: Join the DaiJoin for the amount returned using the Vow as destination
+        // Note: Move converted Dai into surplus buffer
         DaiJoinAbstract(MCD_JOIN_DAI).join(MCD_VOW, withdrawnUsdsAmount);
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM parameter changes ----------
