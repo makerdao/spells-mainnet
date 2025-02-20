@@ -49,6 +49,12 @@ interface L2TokenGatewaySpellLike {
     function l2Gateway() external view returns (address);
 }
 
+interface PairLike {
+    function getReserves() external view returns (uint112, uint112, uint32);
+    function balanceOf(address) external view returns (uint256);
+    function totalSupply() external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -833,11 +839,14 @@ contract DssSpellTest is DssSpellTestBase {
             treasuryBalancesDiff.mkr,
             "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
         );
-        assertEq(
-            expectedTreasuryBalancesDiff.sky,
-            treasuryBalancesDiff.sky,
-            "TestPayments/actual-vs-expected-sky-treasury-mismatch"
-        );
+
+        // Note: This cannot be checked in the current spell because the sky balance is updated from SBE unwind as well
+        // assertEq(
+        //     expectedTreasuryBalancesDiff.sky,
+        //     treasuryBalancesDiff.sky,
+        //     "TestPayments/actual-vs-expected-sky-treasury-mismatch"
+        // );
+
         // Sky or MKR payments might come from token emission or from the treasury
         assertEq(
             (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
@@ -1138,6 +1147,7 @@ contract DssSpellTest is DssSpellTestBase {
     address                 immutable L2_USDS                         = arbitrum.addr("L2_USDS");
     address                 immutable L2_SUSDS                        = arbitrum.addr("L2_SUSDS");
     L2TokenGatewaySpellLike immutable L2_ARBITRUM_TOKEN_BRIDGE_SPELL  = L2TokenGatewaySpellLike(arbitrum.addr("L2_TOKEN_BRIDGE_SPELL"));
+    PairLike                immutable UNIV2_USDS_SKY                  = PairLike(addr.addr("UNIV2USDSSKY"));
 
     function testArbitrumTokenGatewayIntegration() public {
         _setupRootDomain();
@@ -1192,6 +1202,63 @@ contract DssSpellTest is DssSpellTestBase {
             l1Tokens,
             l2Tokens,
             maxWithdrawals
+        );
+    }
+
+    function testUnwindSurplusBuffer() public {
+        uint256 pProxyUsdsSkyPrev = UNIV2_USDS_SKY.balanceOf(address(pauseProxy));
+        uint256 pProxyUsdsPrev    = usds.balanceOf(address(pauseProxy));
+        uint256 pProxyDaiPrev     = dai.balanceOf(address(pauseProxy));
+        uint256 pProxySkyPrev     = sky.balanceOf(address(pauseProxy));
+        uint256 totalSupplyPrev   = UNIV2_USDS_SKY.totalSupply();
+        uint256 vowDaiPrev        = vat.dai(address(vow));
+        uint256 usdsToLeave       = 7_500_000 * WAD;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check UNIV2_USDS_SKY has usdsToLeave amount
+        assertGe(
+            usds.balanceOf(address(UNIV2_USDS_SKY)),
+            usdsToLeave,
+            "testUnwindSurplusBufferUnwind/incorrect-univ2-usds-sky-usds-balance"
+        );
+
+        uint256 burntLpAmount = totalSupplyPrev - UNIV2_USDS_SKY.totalSupply();
+        assertEq(UNIV2_USDS_SKY.balanceOf(address(pauseProxy)), pProxyUsdsSkyPrev - burntLpAmount);
+
+        // Check Dai amount on PauseProxy stays the same
+        assertEq(
+            dai.balanceOf(address(pauseProxy)),
+            pProxyDaiPrev,
+            "testUnwindSurplusBufferUnwind/incorrect-pause-proxy-dai-balance"
+        );
+
+        // Check Usds amount on PauseProxy stays the same
+        assertEq(
+            usds.balanceOf(address(pauseProxy)),
+            pProxyUsdsPrev,
+            "testUnwindSurplusBufferUnwind/incorrect-pause-proxy-usds-balance"
+        );
+
+        // Check Sky amount on PauseProxy is equals to prev + expectedExactSkyWithdraw
+        uint256 expectedExactSkyWithdraw  = burntLpAmount * (sky.balanceOf(address(UNIV2_USDS_SKY)) + sky.balanceOf(pauseProxy) - pProxySkyPrev) / totalSupplyPrev;
+        assertEq(
+            sky.balanceOf(address(pauseProxy)),
+            // Note: The spell accumulates leftover sky amount(8000) from SkyMkr conversion in _transferSky
+            pProxySkyPrev + expectedExactSkyWithdraw + 8000,
+            "testUnwindSurplusBufferUnwind/incorrect-pause-proxy-sky-balance"
+        );
+
+        // Check Surplus amount is euqals to prev + expectedExactUsdsWithdraw
+        uint256 daiSentToSurplus = vat.dai(address(vow)) - vowDaiPrev;
+        uint256 expectedExactUsdsWithdraw = burntLpAmount * ((usds.balanceOf(address(UNIV2_USDS_SKY)) + daiSentToSurplus - pProxyUsdsPrev) / totalSupplyPrev);
+        // Note: We cannot use assertEq here because jug.drip() is called in the spell
+        assertGe(
+            vat.dai(address(vow)),
+            vowDaiPrev + expectedExactUsdsWithdraw,
+            "testUnwindSurplusBufferUnwind/insufficient-vow-dai-balance"
         );
     }
 }

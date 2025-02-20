@@ -22,8 +22,10 @@ import { DssInstance, MCD } from "dss-test/MCD.sol";
 import { L1TokenGatewayInstance } from "./dependencies/arbitrum-token-bridge/L1TokenGatewayInstance.sol";
 import { L2TokenGatewayInstance } from "./dependencies/arbitrum-token-bridge/L2TokenGatewayInstance.sol";
 import { GatewaysConfig, MessageParams, TokenGatewayInit } from "./dependencies/arbitrum-token-bridge/TokenGatewayInit.sol";
+import { UniV2PoolWithdraw } from "./dependencies/univ2-pool-migrator/UniV2PoolWithdraw.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { DssAutoLineAbstract } from "dss-interfaces/dss/DssAutoLineAbstract.sol";
+import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
 
 interface SUsdsLike {
     function drip() external returns (uint256);
@@ -36,6 +38,7 @@ interface ChainlogLike {
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
+    function usdsToDai(address usr, uint256 wad) external;
 }
 
 interface MkrSkyLike {
@@ -106,6 +109,8 @@ contract DssSpellAction is DssAction {
     address internal constant EMSP_LINE_WIPE_FAB             = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
     address internal constant EMSP_LITE_PSM_HALT_FAB         = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
     address internal constant EMSP_SPLITTER_STOP             = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
+    address internal immutable MCD_JOIN_DAI                  = DssExecLib.daiJoin();
+    address internal immutable MCD_VOW                       = DssExecLib.vow();
     address internal immutable USDS                          = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                         = DssExecLib.getChangelogAddress("SUSDS");
     address internal constant ARBITRUM_ROUTER                = 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef;
@@ -128,6 +133,9 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x9EAa8d72BD731BE8eD71D768a912F6832492071e;
 
     function actions() public override {
+        // Note: Multiple actions in the spell depend on DssInstance
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
         // ---------- Rate Adjustments ----------
         // Forum: https://forum.sky.money/t/feb-20-2025-stability-scope-parameter-changes-22/26003
 
@@ -228,9 +236,6 @@ contract DssSpellAction is DssAction {
             xchainMsg: xchainMsg
         });
 
-        // Note: Load DssInstance to pass in TokenGatewayInit.initGateways
-        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
-
         // Init Arbitrum Token Bridge by calling TokenGatewayInit.initGateways using the following parameters:
         TokenGatewayInit.initGateways(
             dss,
@@ -238,6 +243,33 @@ contract DssSpellAction is DssAction {
             l2GatewayInstance,
             cfg
         );
+
+        // ---------- Unwind SBE liquidity ----------
+        // Forum: https://forum.sky.money/t/smart-burn-engine-liquidity-unwind/26027
+        // Forum: https://forum.sky.money/t/smart-burn-engine-liquidity-unwind/26027/3
+
+        // Note: Save Usds amount before withdraw
+        uint256 pProxyUsdsPrev = GemAbstract(USDS).balanceOf(address(this));
+
+        // Unwind SBE liquidity by calling UniV2PoolWithdraw.withdraw using the following parameter:
+        // Set parameter usdsToLeave: 7,500,000 * 1e18
+        UniV2PoolWithdraw.withdraw(dss, 7_500_000 * WAD);
+
+        // Note: Calculate the amount of Usds withdrawn
+        uint256 withdrawnUsdsAmount = GemAbstract(USDS).balanceOf(address(this)) - pProxyUsdsPrev;
+
+        // Sweep USDS returned by the SBE from the PauseProxy to the Surplus Buffer
+        // Note: instruction is done in multiple actions below
+
+        // Note: Convert Usds to Dai
+        GemAbstract(USDS).approve(DAI_USDS, withdrawnUsdsAmount);
+        DaiUsdsLike(DAI_USDS).usdsToDai(address(this), withdrawnUsdsAmount);
+
+        // Note: Approve the DaiJoin for the amount returned
+        DAI.approve(MCD_JOIN_DAI, withdrawnUsdsAmount);
+
+        // Note: Join the DaiJoin for the amount returned using the Vow as destination
+        DaiJoinAbstract(MCD_JOIN_DAI).join(MCD_VOW, withdrawnUsdsAmount);
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM parameter changes ----------
         // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951
