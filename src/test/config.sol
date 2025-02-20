@@ -99,9 +99,8 @@ contract Config {
     function setValues() public {
         // Add spells if there is a need to test prior to their cast() functions
         // being called on-chain. They will be executed in order from index 0.
-        // TODO: this can be removed once the spell is fully executed
-        address[] memory prevSpells = new address[](1);
-        prevSpells[0] = address(0x1C8F5979a93Ba0412677A9d315451dE1570B3d03);
+        address[] memory prevSpells = new address[](0);
+        // prevSpells[0] = address(0);
 
         //
         // Values for spell-specific parameters
