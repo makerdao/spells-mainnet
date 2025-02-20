@@ -46,6 +46,10 @@ interface MkrSkyLike {
     function rate() external view returns (uint256);
 }
 
+interface StakingRewardsLike {
+    function setRewardsDuration(uint256) external;
+}
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -88,6 +92,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant BILLION = 10 ** 9;
     uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant RAD     = 10 ** 45;
 
     // ---------- Wallets ----------
     address internal constant BLUE                         = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
@@ -111,6 +116,8 @@ contract DssSpellAction is DssAction {
     address internal constant EMSP_SPLITTER_STOP             = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
     address internal immutable MCD_JOIN_DAI                  = DssExecLib.daiJoin();
     address internal immutable MCD_VOW                       = DssExecLib.vow();
+    address internal immutable MCD_SPLIT                     = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable REWARDS_LSMKR_USDS            = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
     address internal immutable USDS                          = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                         = DssExecLib.getChangelogAddress("SUSDS");
     address internal constant ARBITRUM_ROUTER                = 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef;
@@ -276,6 +283,24 @@ contract DssSpellAction is DssAction {
 
         // Note: Move converted Dai into surplus buffer
         DaiJoinAbstract(MCD_JOIN_DAI).join(MCD_VOW, withdrawnUsdsAmount);
+
+        // ---------- SBE Parameter Changes ----------
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-feb-21-spell/26033
+
+        // Decrease vow.hump by 50 million DAI, from 120 million to 70 million DAI
+        DssExecLib.setValue(MCD_VOW, "hump", 70 * MILLION * RAD);
+
+        // Decrease vow.bump by 15,000 DAI, from 25,000 to 10,000 DAI
+        DssExecLib.setValue(MCD_VOW, "bump", 10_000 * RAD);
+
+        // Increase splitter.burn by 30.00 percentage points, from 70% to 100%
+        DssExecLib.setValue(MCD_SPLIT, "burn", WAD);
+
+        // Decrease splitter.hop by 14,773 seconds, from 15,649 seconds to 876 seconds
+        DssExecLib.setValue(MCD_SPLIT, "hop", 876);
+
+        // Note: Update farm rewards duration
+        StakingRewardsLike(REWARDS_LSMKR_USDS).setRewardsDuration(876);
 
         // ---------- ALLOCATOR-SPARK-A DC-IAM parameter changes ----------
         // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951

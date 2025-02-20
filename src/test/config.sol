@@ -124,11 +124,11 @@ contract Config {
         afterSpell.vow_wait               = 156 hours;                      // In seconds
         afterSpell.vow_dump               = 250;                            // In whole Dai units
         afterSpell.vow_sump               = 50 * THOUSAND;                  // In whole Dai units
-        afterSpell.vow_bump               = 25 * THOUSAND;                  // In whole Dai units
-        afterSpell.vow_hump_min           = 120 * MILLION;                  // In whole Dai units
-        afterSpell.vow_hump_max           = 120 * MILLION;                  // In whole Dai units
-        afterSpell.split_hop              = 15_649 seconds;                 // In seconds
-        afterSpell.split_burn             = 70_00;                          // In basis points
+        afterSpell.vow_bump               = 10 * THOUSAND;                  // In whole Dai units
+        afterSpell.vow_hump_min           = 70 * MILLION;                   // In whole Dai units
+        afterSpell.vow_hump_max           = 70 * MILLION;                   // In whole Dai units
+        afterSpell.split_hop              = 876 seconds;                    // In seconds
+        afterSpell.split_burn             = 100_00;                         // In basis points
         afterSpell.split_farm             = "REWARDS_LSMKR_USDS";           // Farm chainlog key
         afterSpell.flap_want              = 9800;                           // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                  // In whole Dai units
