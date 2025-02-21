@@ -25,7 +25,6 @@ import { GatewaysConfig, MessageParams, TokenGatewayInit } from "./dependencies/
 import { UniV2PoolWithdraw } from "./dependencies/univ2-pool-migrator/UniV2PoolWithdraw.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { DssAutoLineAbstract } from "dss-interfaces/dss/DssAutoLineAbstract.sol";
-import { DaiJoinAbstract } from "dss-interfaces/dss/DaiJoinAbstract.sol";
 
 interface SUsdsLike {
     function drip() external returns (uint256);
@@ -44,6 +43,10 @@ interface DaiUsdsLike {
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 wad) external;
     function rate() external view returns (uint256);
+}
+
+interface UsdsJoinLike {
+    function join(address usr, uint256 wad) external;
 }
 
 interface StakingRewardsLike {
@@ -114,7 +117,7 @@ contract DssSpellAction is DssAction {
     address internal constant EMSP_LINE_WIPE_FAB             = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
     address internal constant EMSP_LITE_PSM_HALT_FAB         = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
     address internal constant EMSP_SPLITTER_STOP             = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
-    address internal immutable MCD_JOIN_DAI                  = DssExecLib.daiJoin();
+    address internal immutable USDS_JOIN                     = DssExecLib.getChangelogAddress("USDS_JOIN");
     address internal immutable MCD_VOW                       = DssExecLib.vow();
     address internal immutable MCD_SPLIT                     = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable REWARDS_LSMKR_USDS            = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
@@ -272,17 +275,11 @@ contract DssSpellAction is DssAction {
         // Sweep USDS returned by the SBE from the PauseProxy to the Surplus Buffer
         // Note: instruction is done in multiple actions below
 
-        // Note: Approve DaiUsds for the amount returned
-        GemAbstract(USDS).approve(DAI_USDS, withdrawnUsdsAmount);
+        // Note: Approve UsdsJoin for the amount returned
+        GemAbstract(USDS).approve(USDS_JOIN, withdrawnUsdsAmount);
 
-        // Note: Convert Usds to Dai
-        DaiUsdsLike(DAI_USDS).usdsToDai(address(this), withdrawnUsdsAmount);
-
-        // Note: Approve DaiJoin for the amount returned
-        DAI.approve(MCD_JOIN_DAI, withdrawnUsdsAmount);
-
-        // Note: Move converted Dai into surplus buffer
-        DaiJoinAbstract(MCD_JOIN_DAI).join(MCD_VOW, withdrawnUsdsAmount);
+        // Note: Move Usds to surplus buffer
+        UsdsJoinLike(USDS_JOIN).join(MCD_VOW, withdrawnUsdsAmount);
 
         // ---------- SBE Parameter Changes ----------
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-feb-21-spell/26033
