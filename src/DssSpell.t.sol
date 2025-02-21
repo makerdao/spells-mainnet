@@ -1254,30 +1254,46 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testNewChainlogKeys() public {
-        string[6] memory addedKeys = [
-            "ARBITRUM_TOKEN_BRIDGE",
-            "ARBITRUM_TOKEN_BRIDGE_IMP",
-            "EMSP_CLIP_BREAKER_FAB",
-            "EMSP_LINE_WIPE_FAB",
-            "EMSP_LITE_PSM_HALT_FAB",
-            "EMSP_SPLITTER_STOP"
-        ];
+    function testAddChainlogKeys() public {
+        bytes32[] memory addedKeys = new bytes32[](4);
+        addedKeys[0] = "ARBITRUM_TOKEN_BRIDGE";
+        addedKeys[1] = "ARBITRUM_TOKEN_BRIDGE_IMP";
+        addedKeys[2] = "EMSP_LITE_PSM_HALT_FAB";
+        addedKeys[3] = "EMSP_SPLITTER_STOP";
 
-        address[] memory newAddresses = new address[](6);
-        newAddresses[0] = 0x84b9700E28B23F873b82c1BEb23d86C091b6079E;
-        newAddresses[1] = 0x12eDe82637d5507026D4CDb3515B4b022Ed157b1;
-        newAddresses[2] = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
-        newAddresses[3] = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
-        newAddresses[4] = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
-        newAddresses[5] = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            vm.expectRevert("dss-chain-log/invalid-key");
+            chainLog.getAddress(addedKeys[i]);
+        }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         for(uint256 i = 0; i < addedKeys.length; i++) {
-            assertEq(chainLog.getAddress(_stringToBytes32(addedKeys[i])), newAddresses[i], string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", addedKeys[i])));
+            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
+        }
+    }
+
+    function testUpdateChainlogKeys() public {
+        bytes32[] memory updatedKeys = new bytes32[](2);
+        updatedKeys[0] = "EMSP_CLIP_BREAKER_FAB";
+        updatedKeys[1] = "EMSP_LINE_WIPE_FAB";
+
+        address[] memory newAddresses = new address[](2);
+        newAddresses[0] = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
+        newAddresses[1] = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
+
+        for(uint256 i = 0; i < updatedKeys.length; i++) {
+            assertNotEq(chainLog.getAddress(updatedKeys[i]), newAddresses[i], string.concat(_concat("testUpdateChainlogKeys/chainlog-key-already-match: ", _bytes32ToString(updatedKeys[i]))));
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < updatedKeys.length; i++) {
+            assertEq(chainLog.getAddress(updatedKeys[i]), newAddresses[i], string.concat(_concat("testUpdateChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(updatedKeys[i]))));
         }
     }
 }
