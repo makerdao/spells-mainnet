@@ -37,7 +37,6 @@ interface ChainlogLike {
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
-    function usdsToDai(address usr, uint256 wad) external;
 }
 
 interface MkrSkyLike {

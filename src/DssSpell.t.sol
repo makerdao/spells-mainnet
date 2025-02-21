@@ -49,12 +49,6 @@ interface L2TokenGatewaySpellLike {
     function l2Gateway() external view returns (address);
 }
 
-interface PairLike {
-    function getReserves() external view returns (uint112, uint112, uint32);
-    function balanceOf(address) external view returns (uint256);
-    function totalSupply() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1147,7 +1141,7 @@ contract DssSpellTest is DssSpellTestBase {
     address                 immutable L2_USDS                         = arbitrum.addr("L2_USDS");
     address                 immutable L2_SUSDS                        = arbitrum.addr("L2_SUSDS");
     L2TokenGatewaySpellLike immutable L2_ARBITRUM_TOKEN_BRIDGE_SPELL  = L2TokenGatewaySpellLike(arbitrum.addr("L2_TOKEN_BRIDGE_SPELL"));
-    PairLike                immutable UNIV2_USDS_SKY                  = PairLike(addr.addr("UNIV2USDSSKY"));
+    GemAbstract             immutable UNIV2_USDS_SKY                  = GemAbstract(addr.addr("UNIV2USDSSKY"));
 
     function testArbitrumTokenGatewayIntegration() public {
         _setupRootDomain();
