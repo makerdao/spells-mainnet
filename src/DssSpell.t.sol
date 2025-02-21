@@ -1253,4 +1253,31 @@ contract DssSpellTest is DssSpellTestBase {
             "testUnwindSurplusBuffer/insufficient-vow-dai-balance"
         );
     }
+
+    function testNewChainlogKeys() public {
+        string[6] memory addedKeys = [
+            "ARBITRUM_TOKEN_BRIDGE",
+            "ARBITRUM_TOKEN_BRIDGE_IMP",
+            "EMSP_CLIP_BREAKER_FAB",
+            "EMSP_LINE_WIPE_FAB",
+            "EMSP_LITE_PSM_HALT_FAB",
+            "EMSP_SPLITTER_STOP"
+        ];
+
+        address[] memory newAddresses = new address[](6);
+        newAddresses[0] = 0x84b9700E28B23F873b82c1BEb23d86C091b6079E;
+        newAddresses[1] = 0x12eDe82637d5507026D4CDb3515B4b022Ed157b1;
+        newAddresses[2] = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
+        newAddresses[3] = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
+        newAddresses[4] = 0xB261b73698F6dBC03cB1E998A3176bdD81C3514A;
+        newAddresses[5] = 0x12531afC02aC18a9597Cfe8a889b7B948243a60b;
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            assertEq(chainLog.getAddress(_stringToBytes32(addedKeys[i])), newAddresses[i], string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", addedKeys[i])));
+        }
+    }
 }
