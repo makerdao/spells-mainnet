@@ -183,7 +183,7 @@ contract DssSpellAction is DssAction {
         SUsdsLike(SUSDS).drip();
         SUsdsLike(SUSDS).file("ssr", SIX_PT_FIVE_PCT_RATE);
 
-        // ---------- Init Arbitrum Token Bridge by calling TokenGatewayInit.initGateways using the following parameters: ----------
+        // ---------- Init Arbitrum Token Bridge ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-the-arbitrum-token-gateway-launch/25972
         // Forum: https://forum.sky.money/t/technical-scope-of-the-arbitrum-token-gateway-launch/25972/3
         // Poll: https://vote.makerdao.com/polling/QmcicBXG
@@ -311,7 +311,6 @@ contract DssSpellAction is DssAction {
 
         // ---------- Modify emergency spells in the chainlog ----------
         // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-for-week-of-february-17-2025/25979
-        // Forum: https://forum.sky.money/t/feb-20-2025-proposed-changes-to-spark-for-upcoming-spell/25951/6
         // Poll: https://vote.makerdao.com/polling/QmQW5mb1
 
         // Update the value of EMSP_CLIP_BREAKER_FAB in the Chainlog to 0x867852D30bb3CB1411fB4e404FAE28EF742b1023
@@ -394,7 +393,9 @@ contract DssSpellAction is DssAction {
         // Execute Spark Spell at 0x9EAa8d72BD731BE8eD71D768a912F6832492071e
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
 
-        // Note: Bump chainlog version
+        // ---------- Chainlog bump ----------
+
+        // Note: Bump chainlog patch version as multiple keys are being added
         DssExecLib.setChangelogVersion("1.19.6");
     }
 
