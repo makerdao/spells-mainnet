@@ -22,6 +22,9 @@ export FOUNDRY_LIBRARIES="lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:$DSS_EX
 export FOUNDRY_OPTIMIZER=false
 export FOUNDRY_OPTIMIZER_RUNS=200
 export FOUNDRY_ROOT_CHAINID=1
+# Gas limit and memory limit are bumped to read RecordedLogs in test
+export FOUNDRY_GAS_LIMIT=18446744073709551615
+export FOUNDRY_MEMORY_LIMIT=167772160
 
 TEST_ARGS=''
 
