@@ -85,7 +85,9 @@ const publishTenderlyTestnet = async function (testnetId) {
         method: 'put',
         path: `/testnet/container/${testnetId}`,
         body: {
-            explorerPage: 'ENABLED',
+            explorerConfig: {
+                enabled: true,
+            },
         },
     });
     if (response.data?.container?.explorer_page !== 'ENABLED') {
