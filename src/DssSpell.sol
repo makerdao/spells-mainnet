@@ -43,6 +43,7 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     function actions() public override {}
+}
 
 contract DssSpell is DssExec {
     constructor() DssExec(block.timestamp + 30 days, address(new DssSpellAction())) {}
