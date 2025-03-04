@@ -52,6 +52,10 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface StakingRewardsLike {
+    function setRewardsDuration(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -79,6 +83,7 @@ contract DssSpellAction is DssAction {
 
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
     uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
@@ -94,6 +99,7 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_SPLIT                  = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable MKR_SKY                    = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable PIP_ALLOCATOR              = DssExecLib.getChangelogAddress("PIP_ALLOCATOR_SPARK_A");
+    address internal immutable REWARDS_LSMKR_USDS         = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
     address internal immutable USDS                       = DssExecLib.getChangelogAddress("USDS");
     address internal constant  ALLOCATOR_NOVA_A_VAULT     = 0xe4470DD3158F7A905cDeA07260551F72d4bB0e77;
     address internal constant  ALLOCATOR_NOVA_A_BUFFER    = 0x065E5De3D3A08c9d14BF79Ce5A6d3D0E8794640c;
@@ -113,9 +119,6 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0xBeA5FA2bFC4F6a0b6060Eb8EC23F25db8259cEE0;
 
     function actions() public override {
-        // Note: multple actions in the spell depend on DssInstance
-        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
-
         // ---------- Init Nova Allocator Instance ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-the-nova-allocator-instance/26031
         // Forum: https://forum.sky.money/t/technical-scope-of-the-nova-allocator-instance/26031/4
@@ -151,7 +154,7 @@ contract DssSpellAction is DssAction {
             // cfg.ilk: ALLOCATOR-NOVA-A
             ilk             : "ALLOCATOR-NOVA-A",
             // cfg.duty: 0
-            duty            : 0,
+            duty            : RAY,
             // cfg.gap: 1 million
             maxLine         : 1_000_000 * RAD,
             // cfg.maxLine: 60 million
@@ -163,6 +166,9 @@ contract DssSpellAction is DssAction {
             // cfg.ilkRegistry: ILK_REGISTRY from chainlog
             ilkRegistry     : ILK_REGISTRY
         });
+
+        // Note: We also need dss as an input parameter for initIlk
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // Note: Now we can execute the initial instruction with all the relevant parameters by calling AllocatorInit.initIlk
         AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
@@ -193,6 +199,9 @@ contract DssSpellAction is DssAction {
 
         // Increase hop for 1284 seconds, from 876 seconds to 2160 seconds
         DssExecLib.setValue(MCD_SPLIT, "hop", 2_160);
+
+        // Note: Update farm rewards duration
+        StakingRewardsLike(REWARDS_LSMKR_USDS).setRewardsDuration(2_160);
 
         // ---------- Rates Changes ----------
         // Forum: https://forum.sky.money/t/march-6-2025-stability-scope-parameter-changes-23/26078
