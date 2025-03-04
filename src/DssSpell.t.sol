@@ -1148,7 +1148,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testNewLineMomIlks() public {
         string[1] memory ilks = [
-            "ALLOCATOR_NOVA_A"
+            "ALLOCATOR-NOVA-A"
         ];
 
         for (uint256 i = 0; i < ilks.length; i++) {

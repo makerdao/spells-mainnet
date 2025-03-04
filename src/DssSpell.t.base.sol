@@ -2084,9 +2084,11 @@ contract DssSpellTestBase is Config, DssTest {
 
         assertEq(AllocatorRolesLike(p.roles).ilkAdmins(p.ilk), p.allocatorProxy);
 
+        // Note: this is duplicate check, for clarity: pauseProxy == allocatorProxy in this instance
         assertEq(AllocatorVaultLike(p.vault).wards(pauseProxy),  1);
         assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
 
+        // Note: this is duplicate check, for clarity: pauseProxy == allocatorProxy in this instance
         assertEq(WardsAbstract(p.buffer).wards(pauseProxy),  1);
         assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
 

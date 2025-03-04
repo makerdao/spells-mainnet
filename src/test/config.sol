@@ -146,7 +146,7 @@ contract Config {
         afterSpell.vest_sky_cap           = 475_200 * WAD / 30 days;        // In WAD SKY per second
         afterSpell.vest_sky_mint_cap      = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
-        afterSpell.ilk_count              = 69;                             // Num expected in system
+        afterSpell.ilk_count              = 70;                             // Num expected in system
         afterSpell.chainlog_version       = "1.19.7";                       // String expected in system
 
         //

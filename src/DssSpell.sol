@@ -28,6 +28,7 @@ interface AllocatorBufferLike {
 }
 
 interface AllocatorRolesLike {
+    function setRoleAction(bytes32 ilk, uint8 role, address target, bytes4 sig, bool enabled) external;
     function setUserRole(bytes32 ilk, address who, uint8 role, bool enabled) external;
 }
 
@@ -54,6 +55,11 @@ interface ProxyLike {
 
 interface StakingRewardsLike {
     function setRewardsDuration(uint256) external;
+}
+
+interface VaultLike {
+    function draw(uint256 wad) external;
+    function wipe(uint256 wad) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -189,6 +195,10 @@ contract DssSpellAction is DssAction {
         // uint8 role: 0
         // bool enabled: true
         AllocatorRolesLike(ALLOCATOR_ROLES).setUserRole("ALLOCATOR-NOVA-A", ALLOCATOR_NOVA_A_OPERATOR, 0, true);
+        AllocatorRolesLike(ALLOCATOR_ROLES).setRoleAction("ALLOCATOR-NOVA-A", 0, ALLOCATOR_NOVA_A_VAULT, VaultLike.draw.selector, true);
+        AllocatorRolesLike(ALLOCATOR_ROLES).setRoleAction("ALLOCATOR-NOVA-A", 0, ALLOCATOR_NOVA_A_VAULT, VaultLike.wipe.selector, true);
+
+
 
         // Add ALLOCATOR-NOVA-A ilk to the LINE_MOM
         LineMomLike(LINE_MOM).addIlk("ALLOCATOR-NOVA-A");
