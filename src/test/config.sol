@@ -1880,8 +1880,8 @@ contract Config {
         });
         afterSpell.collaterals["ALLOCATOR-NOVA-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      1 * MILLION,
-            aL_gap:       60 * MILLION,
+            aL_line:      60 * MILLION,
+            aL_gap:       1 * MILLION,
             aL_ttl:       20 hours,
             line:         0,
             dust:         0,
