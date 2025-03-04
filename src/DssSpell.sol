@@ -198,8 +198,6 @@ contract DssSpellAction is DssAction {
         AllocatorRolesLike(ALLOCATOR_ROLES).setRoleAction("ALLOCATOR-NOVA-A", 0, ALLOCATOR_NOVA_A_VAULT, VaultLike.draw.selector, true);
         AllocatorRolesLike(ALLOCATOR_ROLES).setRoleAction("ALLOCATOR-NOVA-A", 0, ALLOCATOR_NOVA_A_VAULT, VaultLike.wipe.selector, true);
 
-
-
         // Add ALLOCATOR-NOVA-A ilk to the LINE_MOM
         LineMomLike(LINE_MOM).addIlk("ALLOCATOR-NOVA-A");
 
