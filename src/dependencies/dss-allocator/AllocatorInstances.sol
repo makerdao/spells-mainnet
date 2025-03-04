@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2024 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2023 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,14 @@
 
 pragma solidity >=0.8.0;
 
-struct L2TokenGatewayInstance {
-    address gateway;
-    address gatewayImp;
-    address spell;
+struct AllocatorSharedInstance {
+    address oracle;
+    address roles;
+    address registry;
+}
+
+struct AllocatorIlkInstance {
+    address owner;
+    address vault;
+    address buffer;
 }

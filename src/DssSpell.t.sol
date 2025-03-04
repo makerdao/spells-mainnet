@@ -45,8 +45,8 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface L2TokenGatewaySpellLike {
-    function l2Gateway() external view returns (address);
+interface LineMomLike {
+    function ilks(bytes32 ilk) external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -205,9 +205,9 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
-            "VOTE_DELEGATE_PROXY_FACTORY"
+            "PIP_ALLOCATOR_SPARK_A"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
@@ -293,15 +293,15 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
+    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
-                ilk: "ALLOCATOR-SPARK-A",
-                pip: addr.addr("PIP_ALLOCATOR_SPARK_A"),
+                ilk: "ALLOCATOR-NOVA-A",
+                pip: addr.addr("PIP_ALLOCATOR"),
                 registry: addr.addr("ALLOCATOR_REGISTRY"),
                 roles: addr.addr("ALLOCATOR_ROLES"),
-                buffer: addr.addr("ALLOCATOR_SPARK_A_BUFFER"),
-                vault: addr.addr("ALLOCATOR_SPARK_A_VAULT"),
-                allocatorProxy: addr.addr("SPARK_PROXY")
+                buffer: addr.addr("ALLOCATOR_NOVA_A_BUFFER"),
+                vault: addr.addr("ALLOCATOR_NOVA_A_VAULT"),
+                allocatorProxy: addr.addr("MCD_PAUSE_PROXY")
         });
 
         // Sanity checks
@@ -713,30 +713,23 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[9] memory payees = [
-            Payee(address(usds), wallets.addr("BLUE"), 87_601 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BYTERON"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_2"), 22_835 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("PBG"), 387 ether), // Note: ether is only a keyword helper
+        Payee[3] memory payees = [
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("BLUE"), 550_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("CLOAKY_2"), 438_000 ether) // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"), 9_600_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         3_122_823 ether, // Note: ether is only a keyword helper
-            sky:          988_000 ether    // Note: ether is only a keyword helper
+            usds:         8_000_000 ether, // Note: ether is only a keyword helper
+            sky:          9_600_000 ether    // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -41_166666666666666667,
-            // Note: Sky treasury balance cannot be checked in the current spell because the sky balance is also updated from SBE unwind
+            mkr: -400 ether,
             sky: 0
         });
 
@@ -835,20 +828,20 @@ contract DssSpellTest is DssSpellTestBase {
             "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
         );
 
-        // Note: Sky treasury balance cannot be checked in the current spell because the sky balance is also updated from SBE unwind
-        // assertEq(
-        //     expectedTreasuryBalancesDiff.sky,
-        //     treasuryBalancesDiff.sky,
-        //     "TestPayments/actual-vs-expected-sky-treasury-mismatch"
-        // );
+
+        assertEq(
+            expectedTreasuryBalancesDiff.sky,
+            treasuryBalancesDiff.sky,
+            "TestPayments/actual-vs-expected-sky-treasury-mismatch"
+        );
         // Sky or MKR payments might come from token emission or from the treasury
-        // assertEq(
-        //     (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
-        //         + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
-        //     calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
-        //         + calculatedTotalPayments.sky,
-        //     "TestPayments/invalid-mkr-sky-total"
-        // );
+        assertEq(
+            (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
+                + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
+            calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
+                + calculatedTotalPayments.sky,
+            "TestPayments/invalid-mkr-sky-total"
+        );
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -1111,7 +1104,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x9EAa8d72BD731BE8eD71D768a912F6832492071e); // Insert Spark spell address
+        address SPARK_SPELL = address(0xBeA5FA2bFC4F6a0b6060Eb8EC23F25db8259cEE0); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1128,132 +1121,12 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    L1TokenGatewayLike      immutable ARBITRUM_TOKEN_BRIDGE           = L1TokenGatewayLike(addr.addr("ARBITRUM_TOKEN_BRIDGE"));
-    address                 immutable ARBITRUM_TOKEN_BRIDGE_IMP       = addr.addr("ARBITRUM_TOKEN_BRIDGE_IMP");
-    address                 immutable ARBITRUM_ROUTER                 = addr.addr("ARBITRUM_ROUTER");
-    address                 immutable USDS                            = addr.addr("USDS");
-    address                 immutable SUSDS                           = addr.addr("SUSDS");
-    address                 immutable ARBITRUM_ESCROW                 = addr.addr("ARBITRUM_ESCROW");
-    address                 immutable ARBITRUM_INBOX                  = addr.addr("ARBITRUM_INBOX");
-    L2TokenGatewayLike      immutable L2_ARBITRUM_TOKEN_BRIDGE        = L2TokenGatewayLike(arbitrum.addr("L2_TOKEN_BRIDGE"));
-    address                 immutable L2_ARBITRUM_TOKEN_BRIDGE_IMP    = arbitrum.addr("L2_TOKEN_BRIDGE_IMP");
-    address                 immutable L2_ARBITRUM_ROUTER              = arbitrum.addr("L2_ROUTER");
-    address                 immutable L2_USDS                         = arbitrum.addr("L2_USDS");
-    address                 immutable L2_SUSDS                        = arbitrum.addr("L2_SUSDS");
-    L2TokenGatewaySpellLike immutable L2_ARBITRUM_TOKEN_BRIDGE_SPELL  = L2TokenGatewaySpellLike(arbitrum.addr("L2_TOKEN_BRIDGE_SPELL"));
-    GemAbstract             immutable UNIV2_USDS_SKY                  = GemAbstract(addr.addr("UNIV2USDSSKY"));
-
-    function testArbitrumTokenGatewayIntegration() public {
-        _setupRootDomain();
-        rootDomain.selectFork();
-        arbitrumDomain = new ArbitrumDomain(config, getRelativeChain("arbitrum_one"), rootDomain);
-
-        // ------ Sanity checks -------
-        rootDomain.selectFork();
-
-        require(ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "ArbitrumTokenBridge/not-open");
-        require(ARBITRUM_TOKEN_BRIDGE.l1Router()                  == ARBITRUM_ROUTER,                   "ArbitrumTokenBridge/l1-router-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.inbox()                     == ARBITRUM_INBOX,                    "ArbitrumTokenBridge/inbox-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(L2_ARBITRUM_TOKEN_BRIDGE), "ArbitrumTokenBridge/counterpart-gateway-mismatch");
-        require(ARBITRUM_TOKEN_BRIDGE.getImplementation()         == ARBITRUM_TOKEN_BRIDGE_IMP,         "ArbitrumTokenBridge/imp-does-not-match");
-        require(keccak256(bytes(ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "ArbitrumTokenBridge/version-does-not-match");
-
-        arbitrumDomain.selectFork();
-
-        require(L2_ARBITRUM_TOKEN_BRIDGE.isOpen()                    == 1,                                 "L2ArbitrumTokenBridge/not-open");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.l2Router()                  == L2_ARBITRUM_ROUTER,                "L2ArbitrumTokenBridge/l2-router-mismatch");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.counterpartGateway()        == address(ARBITRUM_TOKEN_BRIDGE),    "L2ArbitrumTokenBridge/counterpart-gateway-mismatch");
-        require(L2_ARBITRUM_TOKEN_BRIDGE.getImplementation()         == L2_ARBITRUM_TOKEN_BRIDGE_IMP,      "L2ArbitrumTokenBridge/imp-does-not-match");
-        require(keccak256(bytes(L2_ARBITRUM_TOKEN_BRIDGE.version())) == keccak256("1"),                    "L2ArbitrumTokenBridge/version-does-not-match");
-
-        require(L2_ARBITRUM_TOKEN_BRIDGE_SPELL.l2Gateway()           == address(L2_ARBITRUM_TOKEN_BRIDGE), "L2ArbitrumTokenBridgeSpell/l2-gateway-mismatch");
-
-        rootDomain.selectFork();
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-        // Read all x-chain messages
-        arbitrumDomain.relayFromHost(false);
-
-        require(ARBITRUM_TOKEN_BRIDGE.escrow() == ARBITRUM_ESCROW, "ArbitrumTokenBridge/escrow-does-not-match");
-
-        address[] memory l1Tokens = new address[](2);
-        l1Tokens[0] = USDS;
-        l1Tokens[1] = SUSDS;
-
-        address[] memory l2Tokens = new address[](2);
-        l2Tokens[0] = L2_USDS;
-        l2Tokens[1] = L2_SUSDS;
-
-        uint256[] memory maxWithdrawals = new uint256[](2);
-        maxWithdrawals[0] = type(uint256).max;
-        maxWithdrawals[1] = type(uint256).max;
-
-        _testArbitrumTokenGatewayIntegration(
-            ARBITRUM_TOKEN_BRIDGE,
-            L2_ARBITRUM_TOKEN_BRIDGE,
-            ARBITRUM_ESCROW,
-            l1Tokens,
-            l2Tokens,
-            maxWithdrawals
-        );
-    }
-
-    function testUnwindSurplusBuffer() public {
-        uint256 pProxyUsdsSkyPrev = UNIV2_USDS_SKY.balanceOf(address(pauseProxy));
-        uint256 pProxyUsdsPrev    = usds.balanceOf(address(pauseProxy));
-        uint256 pProxyDaiPrev     = dai.balanceOf(address(pauseProxy));
-        uint256 pProxySkyPrev     = sky.balanceOf(address(pauseProxy));
-        uint256 totalSupplyLpPrev = UNIV2_USDS_SKY.totalSupply();
-        uint256 vowDaiPrev        = vat.dai(address(vow));
-        uint256 uniSkyPrev        = sky.balanceOf(address(UNIV2_USDS_SKY));
-        uint256 uniUsdsPrev       = usds.balanceOf(address(UNIV2_USDS_SKY));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        uint256 burntLpAmount = totalSupplyLpPrev - UNIV2_USDS_SKY.totalSupply();
-        assertEq(UNIV2_USDS_SKY.balanceOf(address(pauseProxy)), pProxyUsdsSkyPrev - burntLpAmount);
-
-        // Check Dai amount on PauseProxy stays the same
-        assertEq(
-            dai.balanceOf(address(pauseProxy)),
-            pProxyDaiPrev,
-            "testUnwindSurplusBuffer/incorrect-pause-proxy-dai-balance"
-        );
-
-        // Check Usds amount on PauseProxy stays the same
-        assertEq(
-            usds.balanceOf(address(pauseProxy)),
-            pProxyUsdsPrev,
-            "testUnwindSurplusBuffer/incorrect-pause-proxy-usds-balance"
-        );
-
-        // Check Sky amount on PauseProxy is increased
-        uint256 receivedSkyAmount = sky.balanceOf(pauseProxy) - pProxySkyPrev - 8000; // Note: The spell accumulated leftover sky amount(8000) from SkyMkr conversion in transfer
-        assertGt(receivedSkyAmount, 0, "testUnwindSurplusBuffer/received-sky-balance-bigger-than-0");
-
-        // Check expected sky amount matches received
-        uint256 expectedSkyAmount = burntLpAmount * uniSkyPrev / totalSupplyLpPrev;
-        assertEq(receivedSkyAmount, expectedSkyAmount, "testUnwindSurplusBuffer/incorrect-received-sky-balance");
-
-        // Check Surplus amount is euqals to prev + expectedExactUsdsWithdraw
-        uint256 expectedUsdsAmount = burntLpAmount * uniUsdsPrev / totalSupplyLpPrev;
-        // Note: We cannot use assertEq here because jug.drip() is called in the spell
-        assertGe(
-            vat.dai(address(vow)),
-            vowDaiPrev + expectedUsdsAmount,
-            "testUnwindSurplusBuffer/insufficient-vow-dai-balance"
-        );
-    }
-
     function testAddChainlogKeys() public {
         bytes32[] memory addedKeys = new bytes32[](4);
-        addedKeys[0] = "ARBITRUM_TOKEN_BRIDGE";
-        addedKeys[1] = "ARBITRUM_TOKEN_BRIDGE_IMP";
-        addedKeys[2] = "EMSP_LITE_PSM_HALT_FAB";
-        addedKeys[3] = "EMSP_SPLITTER_STOP";
+        addedKeys[0] = "PIP_ALLOCATOR";
+        addedKeys[1] = "ALLOCATOR_NOVA_A_VAULT";
+        addedKeys[2] = "ALLOCATOR_NOVA_A_BUFFER";
+        addedKeys[3] = "MCD_BLOW2";
 
         for(uint256 i = 0; i < addedKeys.length; i++) {
             vm.expectRevert("dss-chain-log/invalid-key");
@@ -1267,27 +1140,35 @@ contract DssSpellTest is DssSpellTestBase {
         for(uint256 i = 0; i < addedKeys.length; i++) {
             assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
         }
+
+        // Note: Extra check to make sure PIP_ALLOCATOR_NOVA_A is removed from the chainlog
+        vm.expectRevert("dss-chain-log/invalid-key");
+        chainLog.getAddress("PIP_ALLOCATOR_NOVA_A");
     }
 
-    function testUpdateChainlogKeys() public {
-        bytes32[] memory updatedKeys = new bytes32[](2);
-        updatedKeys[0] = "EMSP_CLIP_BREAKER_FAB";
-        updatedKeys[1] = "EMSP_LINE_WIPE_FAB";
+    function testNewLineMomIlks() public {
+        string[1] memory ilks = [
+            "ALLOCATOR-NOVA-A"
+        ];
 
-        address[] memory newAddresses = new address[](2);
-        newAddresses[0] = 0x867852D30bb3CB1411fB4e404FAE28EF742b1023;
-        newAddresses[1] = 0x8646F8778B58a0dF118FacEdf522181bA7277529;
-
-        for(uint256 i = 0; i < updatedKeys.length; i++) {
-            assertNotEq(chainLog.getAddress(updatedKeys[i]), newAddresses[i], string.concat(_concat("testUpdateChainlogKeys/chainlog-key-already-match: ", _bytes32ToString(updatedKeys[i]))));
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                0,
+                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
+            );
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        for(uint256 i = 0; i < updatedKeys.length; i++) {
-            assertEq(chainLog.getAddress(updatedKeys[i]), newAddresses[i], string.concat(_concat("testUpdateChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(updatedKeys[i]))));
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                1,
+                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
+            );
         }
     }
 }
