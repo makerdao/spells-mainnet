@@ -162,9 +162,9 @@ contract DssSpellAction is DssAction {
             // cfg.duty: 0
             duty            : RAY,
             // cfg.gap: 1 million
-            maxLine         : 1_000_000 * RAD,
+            gap             : 1_000_000  * RAD,
             // cfg.maxLine: 60 million
-            gap             : 60_000_000 * RAD,
+            maxLine         : 60_000_000 * RAD,
             // cfg.ttl: 20 hours
             ttl             : 72_000 seconds,
             // cfg.allocatorProxy: MCD_PAUSE_PROXY from chainlog

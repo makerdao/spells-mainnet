@@ -1878,5 +1878,30 @@ contract Config {
             calc_cut:     0,
             offboarding:  false
         });
+        afterSpell.collaterals["ALLOCATOR-NOVA-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      1 * MILLION,
+            aL_gap:       60 * MILLION,
+            aL_ttl:       20 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          100_00,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
+            offboarding:  false
+        });
     }
 }

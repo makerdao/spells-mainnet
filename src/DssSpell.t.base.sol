@@ -332,8 +332,9 @@ interface AllocatorRegistryLike {
 }
 
 interface AllocatorRolesLike {
-    function ilkAdmins(bytes32) external view returns (address);
+    function hasActionRole(bytes32 ilk, address target, bytes4 sig, uint8 role) external view returns (bool has);
     function hasUserRole(bytes32 ilk, address who, uint8 role) external view returns (bool has);
+    function ilkAdmins(bytes32) external view returns (address);
 }
 
 interface L1TokenBridgeLike {
@@ -2101,9 +2102,11 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(reg.name(p.ilk),   _bytes32ToString(p.ilk));
         assertEq(reg.symbol(p.ilk), _bytes32ToString(p.ilk));
 
+        // Role checks
         address allocatorOperator =  0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
         assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
-        assertTrue(AllocatorRolesLike(p.roles).hasUserRole("ALLOCATOR-NOVA-A", allocatorOperator, 0));
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.draw.selector, 0));
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
 
         // Draw & Wipe from Vault
         vm.prank(address(p.allocatorProxy));
