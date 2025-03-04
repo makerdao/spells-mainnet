@@ -23,6 +23,10 @@ import { AllocatorSharedInstance, AllocatorIlkInstance } from "./dependencies/ds
 import { AllocatorInit, AllocatorIlkConfig } from "./dependencies/dss-allocator/AllocatorInit.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
+interface AllocatorBufferLike {
+    function approve(address asset, address spender, uint256 amount) external;
+}
+
 interface AllocatorRolesLike {
     function setUserRole(bytes32 ilk, address who, uint8 role, bool enabled) external;
 }
@@ -46,10 +50,6 @@ interface MkrSkyLike {
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
-}
-
-interface UsdsLike {
-    function approve(address spender, uint256 value) external returns (bool);
 }
 
 contract DssSpellAction is DssAction {
@@ -78,21 +78,21 @@ contract DssSpellAction is DssAction {
     uint256 internal constant FIVE_PT_FIVE_PCT_RATE        = 1000000001697766583380253701;
 
     // --- Math ---
-    uint256 internal constant WAD     = 10 ** 18;
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
     uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
     GemAbstract internal immutable DAI                    = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR                    = GemAbstract(DssExecLib.mkr());
     GemAbstract internal immutable SKY                    = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable MCD_FLAP                   = DssExecLib.flap();
     address internal immutable ALLOCATOR_ROLES            = DssExecLib.getChangelogAddress("ALLOCATOR_ROLES");
     address internal immutable ALLOCATOR_REGISTRY         = DssExecLib.getChangelogAddress("ALLOCATOR_REGISTRY");
-    address internal immutable ALLOCATOR_SPARK_VAULT      = DssExecLib.getChangelogAddress("ALLOCATOR_SPARK_VAULT");
     address internal immutable DAI_USDS                   = DssExecLib.getChangelogAddress("DAI_USDS");
     address internal immutable ILK_REGISTRY               = DssExecLib.getChangelogAddress("ILK_REGISTRY");
     address internal immutable LINE_MOM                   = DssExecLib.getChangelogAddress("LINE_MOM");
     address internal immutable MCD_PAUSE_PROXY            = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
+    address internal immutable MCD_SPLIT                  = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable MKR_SKY                    = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable PIP_ALLOCATOR              = DssExecLib.getChangelogAddress("PIP_ALLOCATOR_SPARK_A");
     address internal immutable USDS                       = DssExecLib.getChangelogAddress("USDS");
@@ -152,7 +152,7 @@ contract DssSpellAction is DssAction {
             // cfg.ilk: ALLOCATOR-NOVA-A
             ilk             : "ALLOCATOR-NOVA-A",
             // cfg.duty: 0
-            duty            : 0,
+            duty            : RAY,
             // cfg.gap: 1 million
             maxLine         : 1_000_000 * RAD,
             // cfg.maxLine: 60 million
@@ -165,10 +165,7 @@ contract DssSpellAction is DssAction {
             ilkRegistry     : ILK_REGISTRY
         });
 
-        // Note: Init shared components by calling AllocatorInit.initShared
-        AllocatorInit.initShared(dss, allocatorSharedInstance);
-
-        // Note: Init Allocator Ilk by calling AllocatorInit.initIlk
+        // Note: Now we can execute the initial instruction with all the relevant parameters by calling AllocatorInit.initIlk
         AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
 
         // Remove newly created PIP_ALLOCATOR_NOVA_A from chainlog
@@ -179,7 +176,7 @@ contract DssSpellAction is DssAction {
         // address asset: USDS from chainlog
         // address spender: 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54
         // uint256 amount: type(uint256).max
-        UsdsLike(USDS).approve(ALLOCATOR_NOVA_A_OPERATOR, type(uint256).max);
+        AllocatorBufferLike(ALLOCATOR_NOVA_A_BUFFER).approve(USDS, ALLOCATOR_NOVA_A_OPERATOR, type(uint256).max);
 
         // Allow Operator to call “draw” and “wipe” functions using ALLOCATOR_ROLES, with:
         // bytes32 ilk: ALLOCATOR-NOVA-A
@@ -196,7 +193,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-march-6-spell/26055/5
 
         // Increase hop for 1284 seconds, from 876 seconds to 2160 seconds
-        DssExecLib.setValue(MCD_FLAP, "hop", 2_160);
+        DssExecLib.setValue(MCD_SPLIT, "hop", 2_160);
 
         // ---------- Rates Changes ----------
         // Forum: https://forum.sky.money/t/march-6-2025-stability-scope-parameter-changes-23/26078
@@ -240,6 +237,11 @@ contract DssSpellAction is DssAction {
 
         // Trigger Spark Proxy Spell at 0xBeA5FA2bFC4F6a0b6060Eb8EC23F25db8259cEE0
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+
+        // ---------- Chainlog bump ----------
+
+        // Note: Bump chainlog patch version as new keys are being added
+        DssExecLib.setChangelogVersion("1.19.7");
     }
 
     // ---------- Helper Functions ----------

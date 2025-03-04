@@ -110,7 +110,7 @@ contract Config {
             deployed_spell_created: 0,          // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
             deployed_spell_block:   0,          // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   false,       // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -118,7 +118,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                  // Offset between the global line against the sum of local lines
-        afterSpell.pot_dsr                = 4_75;                           // In basis points
+        afterSpell.pot_dsr                = 5_50;                           // In basis points
         afterSpell.susds_ssr              = 6_50;                           // In basis points
         afterSpell.pause_delay            = 18 hours;                       // In seconds
         afterSpell.vow_wait               = 156 hours;                      // In seconds
@@ -127,7 +127,7 @@ contract Config {
         afterSpell.vow_bump               = 10 * THOUSAND;                  // In whole Dai units
         afterSpell.vow_hump_min           = 70 * MILLION;                   // In whole Dai units
         afterSpell.vow_hump_max           = 70 * MILLION;                   // In whole Dai units
-        afterSpell.split_hop              = 876 seconds;                    // In seconds
+        afterSpell.split_hop              = 2160 seconds;                   // In seconds
         afterSpell.split_burn             = 100_00;                         // In basis points
         afterSpell.split_farm             = "REWARDS_LSMKR_USDS";           // Farm chainlog key
         afterSpell.flap_want              = 9800;                           // In basis points
@@ -147,7 +147,7 @@ contract Config {
         afterSpell.vest_sky_mint_cap      = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
         afterSpell.ilk_count              = 69;                             // Num expected in system
-        afterSpell.chainlog_version       = "1.19.6";                       // String expected in system
+        afterSpell.chainlog_version       = "1.19.7";                       // String expected in system
 
         //
         // Values for all collateral
@@ -1860,7 +1860,7 @@ contract Config {
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,
-            pct:          3_22,
+            pct:          3_74,
             mat:          100_00,
             liqType:      "",
             liqOn:        false,
