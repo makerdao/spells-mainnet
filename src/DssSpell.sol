@@ -79,7 +79,6 @@ contract DssSpellAction is DssAction {
 
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
     uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
@@ -152,7 +151,7 @@ contract DssSpellAction is DssAction {
             // cfg.ilk: ALLOCATOR-NOVA-A
             ilk             : "ALLOCATOR-NOVA-A",
             // cfg.duty: 0
-            duty            : RAY,
+            duty            : 0,
             // cfg.gap: 1 million
             maxLine         : 1_000_000 * RAD,
             // cfg.maxLine: 60 million
