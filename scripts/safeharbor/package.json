@@ -1,0 +1,16 @@
+{
+    "name": "safeharbor",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Safe Harbor contract interaction scripts",
+    "main": "index.js",
+    "scripts": {
+      "start": "node .",
+      "generate": "node index.js"
+    },
+    "dependencies": {
+      "csv-parse": "^5.5.0",
+      "ethers": "^5.7.2"
+    }
+  }
+  
