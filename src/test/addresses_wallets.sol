@@ -204,5 +204,8 @@ contract Wallets {
 
         // Resilience Research Funding
         addr["RESILIENCE_RESEARCH_FUNDING"]  = 0x1378056c0cdd771de52A111E2777293516fA910c;
+
+        // Nova
+        addr["NOVA_OPERATOR"]                = 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
     }
 }

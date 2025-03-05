@@ -316,6 +316,12 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         _checkAllocatorIntegration(p);
+
+        // Role and allowance checks - Specific to ALLOCATOR-NOVA-A only
+        address allocatorOperator = wallets.addr("NOVA_OPERATOR");
+        assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.draw.selector, 0));
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
     }
 
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip

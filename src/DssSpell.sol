@@ -84,33 +84,34 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+
+    uint256 internal constant ZERO_PCT_RATE                = 1000000000000000000000000000;
     uint256 internal constant THREE_PT_SEVEN_FOUR_PCT_RATE = 1000000001164306917698440949;
     uint256 internal constant FIVE_PT_FIVE_PCT_RATE        = 1000000001697766583380253701;
 
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
     uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
     GemAbstract internal immutable DAI                    = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR                    = GemAbstract(DssExecLib.mkr());
     GemAbstract internal immutable SKY                    = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable MCD_PAUSE_PROXY            = DssExecLib.pauseProxy();
+    address internal immutable ILK_REGISTRY               = DssExecLib.reg();
     address internal immutable ALLOCATOR_ROLES            = DssExecLib.getChangelogAddress("ALLOCATOR_ROLES");
     address internal immutable ALLOCATOR_REGISTRY         = DssExecLib.getChangelogAddress("ALLOCATOR_REGISTRY");
     address internal immutable DAI_USDS                   = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable ILK_REGISTRY               = DssExecLib.getChangelogAddress("ILK_REGISTRY");
     address internal immutable LINE_MOM                   = DssExecLib.getChangelogAddress("LINE_MOM");
-    address internal immutable MCD_PAUSE_PROXY            = DssExecLib.getChangelogAddress("MCD_PAUSE_PROXY");
     address internal immutable MCD_SPLIT                  = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable MKR_SKY                    = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable PIP_ALLOCATOR              = DssExecLib.getChangelogAddress("PIP_ALLOCATOR_SPARK_A");
     address internal immutable REWARDS_LSMKR_USDS         = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
     address internal immutable USDS                       = DssExecLib.getChangelogAddress("USDS");
-    address internal constant  ALLOCATOR_NOVA_A_VAULT     = 0xe4470DD3158F7A905cDeA07260551F72d4bB0e77;
-    address internal constant  ALLOCATOR_NOVA_A_BUFFER    = 0x065E5De3D3A08c9d14BF79Ce5A6d3D0E8794640c;
-    address internal constant  ALLOCATOR_NOVA_A_OPERATOR  = 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
-    address internal immutable MCD_BLOW2                  = 0x81EFc7Dd25241acd8E5620F177E42F4857A02B79;
+    address internal constant ALLOCATOR_NOVA_A_VAULT      = 0xe4470DD3158F7A905cDeA07260551F72d4bB0e77;
+    address internal constant ALLOCATOR_NOVA_A_BUFFER     = 0x065E5De3D3A08c9d14BF79Ce5A6d3D0E8794640c;
+    address internal constant ALLOCATOR_NOVA_A_OPERATOR   = 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
+    address internal constant MCD_BLOW2                   = 0x81EFc7Dd25241acd8E5620F177E42F4857A02B79;
 
     // ---------- Wallets ----------
     address internal constant INTEGRATION_BOOST_INITIATIVE = 0xD6891d1DFFDA6B0B1aF3524018a1eE2E608785F7;
@@ -160,13 +161,14 @@ contract DssSpellAction is DssAction {
             // cfg.ilk: ALLOCATOR-NOVA-A
             ilk             : "ALLOCATOR-NOVA-A",
             // cfg.duty: 0
-            duty            : RAY,
+            // Note: it should be clarified that duty is 0% and not 0
+            duty            : ZERO_PCT_RATE,
             // cfg.gap: 1 million
             gap             : 1_000_000  * RAD,
             // cfg.maxLine: 60 million
             maxLine         : 60_000_000 * RAD,
             // cfg.ttl: 20 hours
-            ttl             : 72_000 seconds,
+            ttl             : 20 hours,
             // cfg.allocatorProxy: MCD_PAUSE_PROXY from chainlog
             allocatorProxy  : MCD_PAUSE_PROXY,
             // cfg.ilkRegistry: ILK_REGISTRY from chainlog
@@ -256,7 +258,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Chainlog bump ----------
 
-        // Note: Bump chainlog patch version as new keys are being added
+        // Note: Bump chainlog patch version as new keys are being added or renamed
         DssExecLib.setChangelogVersion("1.19.7");
     }
 

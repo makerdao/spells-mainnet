@@ -2081,17 +2081,17 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(address(AllocatorVaultLike(p.vault).jug()), address(jug));
 
         assertEq(usds.allowance(p.buffer, p.vault), type(uint256).max);
-        assertEq(usds.allowance(p.buffer, 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54), type(uint256).max);
 
         assertEq(AllocatorRolesLike(p.roles).ilkAdmins(p.ilk), p.allocatorProxy);
 
-        // Note: this is duplicate check, for clarity: pauseProxy == allocatorProxy in this instance
         assertEq(AllocatorVaultLike(p.vault).wards(pauseProxy),  1);
-        assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
-
-        // Note: this is duplicate check, for clarity: pauseProxy == allocatorProxy in this instance
         assertEq(WardsAbstract(p.buffer).wards(pauseProxy),  1);
-        assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
+
+        // Note: this an extra check only for instances where pauseProxy == allocatorProxy
+        if (pauseProxy == p.allocatorProxy) {
+            assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
+            assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
+        }
 
         assertEq(reg.join(p.ilk),   address(0));
         assertEq(reg.gem(p.ilk),    address(0));
@@ -2101,12 +2101,6 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(reg.xlip(p.ilk),   address(0));
         assertEq(reg.name(p.ilk),   _bytes32ToString(p.ilk));
         assertEq(reg.symbol(p.ilk), _bytes32ToString(p.ilk));
-
-        // Role checks
-        address allocatorOperator =  0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
-        assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.draw.selector, 0));
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
 
         // Draw & Wipe from Vault
         vm.prank(address(p.allocatorProxy));
