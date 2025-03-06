@@ -2084,13 +2084,14 @@ contract DssSpellTestBase is Config, DssTest {
 
         assertEq(AllocatorRolesLike(p.roles).ilkAdmins(p.ilk), p.allocatorProxy);
 
-        assertEq(AllocatorVaultLike(p.vault).wards(pauseProxy),  1);
-        assertEq(WardsAbstract(p.buffer).wards(pauseProxy),  1);
+        // Allocator Proxy is relied
+        assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
+        assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
 
-        // Note: this an extra check only for instances where pauseProxy == allocatorProxy
-        if (pauseProxy == p.allocatorProxy) {
-            assertEq(AllocatorVaultLike(p.vault).wards(p.allocatorProxy), 1);
-            assertEq(WardsAbstract(p.buffer).wards(p.allocatorProxy), 1);
+        // When pauseProxy != allocatorProxy, pauseProxy should not be relied!
+        if (pauseProxy != p.allocatorProxy) {
+            assertEq(AllocatorVaultLike(p.vault).wards(pauseProxy), 0);
+            assertEq(WardsAbstract(p.buffer).wards(pauseProxy), 0);
         }
 
         assertEq(reg.join(p.ilk),   address(0));
