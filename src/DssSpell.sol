@@ -160,8 +160,7 @@ contract DssSpellAction is DssAction {
         AllocatorIlkConfig memory allocatorIlkCfg = AllocatorIlkConfig({
             // cfg.ilk: ALLOCATOR-NOVA-A
             ilk             : "ALLOCATOR-NOVA-A",
-            // cfg.duty: 0
-            // Note: it should be clarified that duty is 0% and not 0
+            // cfg.duty: 0%
             duty            : ZERO_PCT_RATE,
             // cfg.gap: 1 million
             gap             : 1_000_000  * RAD,
