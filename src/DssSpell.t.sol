@@ -322,6 +322,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
         assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.draw.selector, 0));
         assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
+
+        // The allocator operator should be able to call draw() wipe()
+        vm.prank(address(allocatorOperator));
+        AllocatorVaultLike(p.vault).draw(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
+
+        vm.warp(block.timestamp + 1);
+        jug.drip(p.ilk);
+
+        vm.prank(address(allocatorOperator));
+        AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 0);
     }
 
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
