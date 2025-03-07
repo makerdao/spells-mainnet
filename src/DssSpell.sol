@@ -253,7 +253,8 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmbDzZ3F
 
         // Trigger Spark Proxy Spell at 0xBeA5FA2bFC4F6a0b6060Eb8EC23F25db8259cEE0
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Note: Make sure to not revert the Core spell if the Spark spell reverts
+        try ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()")) {} catch {}
 
         // ---------- Chainlog bump ----------
 
