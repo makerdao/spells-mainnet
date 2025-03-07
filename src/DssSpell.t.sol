@@ -724,7 +724,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = true;
+        bool ignoreTotalSupplyDaiUsds = false;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
