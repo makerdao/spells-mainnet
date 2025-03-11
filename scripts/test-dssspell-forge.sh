@@ -29,7 +29,7 @@ export FOUNDRY_MEMORY_LIMIT=167772160
 TEST_ARGS=''
 
 if [[ -n "$MATCH" ]]; then
-    TEST_ARGS="${TEST_ARGS} -vvv --match-test ${MATCH}"
+    TEST_ARGS="${TEST_ARGS} -vvvvv --match-test ${MATCH}"
 elif [[ -n "$NO_MATCH" ]]; then
     TEST_ARGS="${TEST_ARGS} -vvv --no-match-test ${NO_MATCH}"
 fi
