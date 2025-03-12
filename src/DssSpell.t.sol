@@ -45,10 +45,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface LineMomLike {
-    function ilks(bytes32 ilk) external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -205,7 +201,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public { // add the `skipped` modifier to skip
+    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
             "PIP_ALLOCATOR_SPARK_A"
         ];
@@ -293,7 +289,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
+    function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-NOVA-A",
                 pip: addr.addr("PIP_ALLOCATOR"),
@@ -722,7 +718,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
 
@@ -1120,7 +1116,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0xBeA5FA2bFC4F6a0b6060Eb8EC23F25db8259cEE0); // Insert Spark spell address
 
@@ -1139,54 +1135,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    function testAddChainlogKeys() public {
-        bytes32[] memory addedKeys = new bytes32[](4);
-        addedKeys[0] = "PIP_ALLOCATOR";
-        addedKeys[1] = "ALLOCATOR_NOVA_A_VAULT";
-        addedKeys[2] = "ALLOCATOR_NOVA_A_BUFFER";
-        addedKeys[3] = "MCD_BLOW2";
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            vm.expectRevert("dss-chain-log/invalid-key");
-            chainLog.getAddress(addedKeys[i]);
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
-        }
-
-        // Note: Extra check to make sure PIP_ALLOCATOR_NOVA_A is removed from the chainlog
-        vm.expectRevert("dss-chain-log/invalid-key");
-        chainLog.getAddress("PIP_ALLOCATOR_NOVA_A");
-    }
-
-    function testNewLineMomIlks() public {
-        string[1] memory ilks = [
-            "ALLOCATOR-NOVA-A"
-        ];
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                0,
-                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
-            );
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                1,
-                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
-            );
-        }
-    }
 }
