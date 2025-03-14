@@ -893,30 +893,6 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function _fixChronicleStaleness(address oracle) private {
-        bytes32 pokeDataSlot   = bytes32(uint256(4));
-        bytes32 opPokeDataSlot = bytes32(uint256(518));
-
-        bytes32 pokeData   = vm.load(oracle, pokeDataSlot);
-        bytes32 opPokeData = vm.load(oracle, opPokeDataSlot);
-
-        uint32  expiresAt = 365 days * 100;
-
-        uint128 pokePrice   = uint128(bytes16(pokeData << 128));
-        uint128 opPokePrice = uint128(bytes16(opPokeData << 128));
-
-        vm.store(oracle, pokeDataSlot,   bytes32(uint256(expiresAt) << 128 | uint256(pokePrice)));
-        vm.store(oracle, opPokeDataSlot, bytes32(uint256(expiresAt) << 128 | uint256(opPokePrice)));
-    }
-
-    function _fixChronicleStaleness() private {
-        address chronicleBtc = 0x24C392CDbF32Cf911B258981a66d5541d85269ce;
-        address chronicleEth = 0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E;
-
-        _fixChronicleStaleness(chronicleBtc);
-        _fixChronicleStaleness(chronicleEth);
-    }
-
     function test_chronicleStalenessFix() public {
         _fixChronicleStaleness();
         _vote(address(spell));
