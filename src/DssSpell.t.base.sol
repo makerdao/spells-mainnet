@@ -3584,6 +3584,24 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
+    function _fixChronicleStaleness(address oracle) internal {
+        bytes32 pokeDataSlot = bytes32(uint256(4));
+        bytes32 pokeData     = vm.load(oracle, pokeDataSlot);
+        uint128 pokePrice    = uint128(bytes16(pokeData << 128));
+
+        uint32 expiresAt = 365 days * 100;
+
+        vm.store(oracle, pokeDataSlot, bytes32(uint256(expiresAt) << 128 | uint256(pokePrice)));
+    }
+
+    function _fixChronicleStaleness() internal {
+        address chronicleBtc = 0x24C392CDbF32Cf911B258981a66d5541d85269ce;
+        address chronicleEth = 0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E;
+
+        _fixChronicleStaleness(chronicleBtc);
+        _fixChronicleStaleness(chronicleEth);
+    }
+
     // Obtained as `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)`
     bytes32 constant EIP1967_IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 

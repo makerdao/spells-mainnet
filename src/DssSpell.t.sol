@@ -893,6 +893,13 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
+    function test_chronicleStalenessFix() public {
+        _fixChronicleStaleness();
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+    }
+
     function testNewCronJobs() public skipped { // add the `skipped` modifier to skip
         SequencerLike seq = SequencerLike(addr.addr("CRON_SEQUENCER"));
         address[1] memory newJobs = [
