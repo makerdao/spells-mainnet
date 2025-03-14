@@ -648,26 +648,26 @@ contract DssSpellTestBase is Config, DssTest {
             ?  DssSpell(spellValues.deployed_spell)
             : new DssSpell();
 
-        if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
-            // if we have a deployed spell in the config
-            // we want to roll our fork to the block where it was deployed
-            // this means the test suite will continue to accurately pass/fail
-            // even if mainnet has already scheduled/cast the spell
-            vm.makePersistent(address(rates));
-            vm.makePersistent(address(addr));
-            vm.makePersistent(address(deployers));
-            vm.makePersistent(address(wallets));
-            vm.rollFork(spellValues.deployed_spell_block);
+        // if (spellValues.deployed_spell_block != 0 && spell.eta() != 0) {
+        //     // if we have a deployed spell in the config
+        //     // we want to roll our fork to the block where it was deployed
+        //     // this means the test suite will continue to accurately pass/fail
+        //     // even if mainnet has already scheduled/cast the spell
+        //     vm.makePersistent(address(rates));
+        //     vm.makePersistent(address(addr));
+        //     vm.makePersistent(address(deployers));
+        //     vm.makePersistent(address(wallets));
+        //     vm.rollFork(spellValues.deployed_spell_block);
 
-            // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
-            // This is a workaround for the issue described here:
-            // @see { https://github.com/foundry-rs/foundry/issues/5739 }
-            vm.store(
-                address(spell),
-                bytes32(0),
-                bytes32(0)
-            );
-        }
+        //     // Reset `eta` to `0`, otherwise the tests will fail with "This spell has already been scheduled".
+        //     // This is a workaround for the issue described here:
+        //     // @see { https://github.com/foundry-rs/foundry/issues/5739 }
+        //     vm.store(
+        //         address(spell),
+        //         bytes32(0),
+        //         bytes32(0)
+        //     );
+        // }
     }
 
     function _vote(address spell_) internal {
