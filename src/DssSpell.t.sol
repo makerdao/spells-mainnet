@@ -16,23 +16,8 @@
 
 pragma solidity 0.8.16;
 
-import { console } from "forge-std/console.sol";
-
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
-
-interface IOracle {
-    function latestRoundData()
-        external
-        view
-        returns (
-            uint80 roundId,
-            int answer,
-            uint startedAt,
-            uint updatedAt,
-            uint80 answeredInRound
-        );
-}
 
 interface L2Spell {
     function dstDomain() external returns (bytes32);
@@ -932,7 +917,7 @@ contract DssSpellTest is DssSpellTestBase {
         _fixChronicleStaleness(chronicleEth);
     }
 
-    function test_spell() public {
+    function test_chronicleStalenessFix() public {
         _fixChronicleStaleness();
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
