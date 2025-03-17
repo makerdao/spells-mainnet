@@ -108,8 +108,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- ETH and WSTETH Oracle Migration ----------
-        // TODO: URL should use HTTPS -> ask govfac to fix
-        // Forum: http://forum.sky.money/t/march-20-2025-final-native-vault-engine-oracle-migration-proposal-eth-steth/26110/3?u=votewizard
+        // Forum: https://forum.sky.money/t/march-20-2025-final-native-vault-engine-oracle-migration-proposal-eth-steth/26110?u=votewizard
         // Forum: https://forum.sky.money/t/technical-scope-of-the-eth-and-wsteth-oracles-migration/26128
         // Forum: https://forum.sky.money/t/march-20-2025-final-native-vault-engine-oracle-migration-proposal-eth-steth/26110/2
 
