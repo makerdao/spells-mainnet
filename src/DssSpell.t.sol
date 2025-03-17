@@ -18,6 +18,7 @@ pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
+import { OsmAbstract } from "dss-interfaces/dss/OsmAbstract.sol";
 
 interface L2Spell {
     function dstDomain() external returns (bytes32);
@@ -718,32 +719,43 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = false;
+        bool ignoreTotalSupplyDaiUsds = true;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[3] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000 ether), // Note: ether is only a keyword helper
+        Payee[14] memory payees = [
+            Payee(address(usds), wallets.addr("IMMUNEFI_USER_PAYOUT_2025_03_20"), 50_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("IMMUNEFI_COMISSION"),               5_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"),              4_000 ether + 50_167 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"),                      4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_2"),          4_000 ether + 16_417 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"),                       4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("WBC"),                              3_613 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("PBG"),                              3_429 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"),                            571 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),                  10_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"),                   10_055 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"), 9_600_000 ether) // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("BLUE"),                            330_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("CLOAKY_2"),                        288_000 ether)  // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         8_000_000 ether, // Note: ether is only a keyword helper
-            sky:          9_600_000 ether    // Note: ether is only a keyword helper
+            usds:         3_165_252 ether, // Note: ether is only a keyword helper
+            sky:          618_000 ether    // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -400 ether,
+            mkr: -25.75 ether,
             sky: 0
         });
 
@@ -1135,4 +1147,62 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    address immutable PIP_ETH = addr.addr("PIP_ETH");
+    address immutable PIP_WSTETH = addr.addr("PIP_WSTETH");
+
+    function testETH_OracleMigration() public {
+        // Check the current ETH OSM source
+        assertEq(OsmAbstract(PIP_ETH).src(), 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check if the migration happened
+        assertEq(OsmAbstract(PIP_ETH).src(), 0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E);
+
+        // Integration testing: the values are updated properly
+        GodMode.setWard(PIP_ETH, address(this), 1);
+        OsmAbstract(PIP_ETH).kiss(address(this));
+        // Before
+        (bytes32 currentPrice,) = OsmAbstract(PIP_ETH).peep();
+        uint64 currentZzz = OsmAbstract(PIP_ETH).zzz();
+        OsmAbstract(PIP_ETH).poke();
+        // After
+        vm.warp(block.timestamp + 3601);
+        OsmAbstract(PIP_ETH).poke();
+        (bytes32 newPrice,) = OsmAbstract(PIP_ETH).peep();
+        uint64 newZzz = OsmAbstract(PIP_ETH).zzz();
+        // Ensure that changes took place
+        assertNotEq(currentPrice, newPrice, "testETH_OracleMigration/no-price-change");
+        assertNotEq(currentZzz, newZzz, "testETH_OracleMigration/no-zzz-change");
+    }
+
+    function testWSTETH_OracleMigration() public {
+        // Check the current WSTETH OSM source
+        assertEq(OsmAbstract(PIP_WSTETH).src(), 0x2F73b6567B866302e132273f67661fB89b5a66F2);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check if the migration happened
+        assertEq(OsmAbstract(PIP_WSTETH).src(), 0xA770582353b573CbfdCC948751750EeB3Ccf23CF);
+
+        // Integration testing: the values are updated properly
+        GodMode.setWard(PIP_WSTETH, address(this), 1);
+        OsmAbstract(PIP_WSTETH).kiss(address(this));
+        // Before
+        (bytes32 currentPrice,) = OsmAbstract(PIP_WSTETH).peep();
+        uint64 currentZzz = OsmAbstract(PIP_WSTETH).zzz();
+        OsmAbstract(PIP_WSTETH).poke();
+        // After
+        vm.warp(block.timestamp + 3601);
+        OsmAbstract(PIP_WSTETH).poke();
+        (bytes32 newPrice,) = OsmAbstract(PIP_WSTETH).peep();
+        uint64 newZzz = OsmAbstract(PIP_WSTETH).zzz();
+        // Ensure that changes took place
+        assertNotEq(currentPrice, newPrice, "testWSTETH_OracleMigration/no-price-change");
+        assertNotEq(currentZzz, newZzz, "testWSTETH_OracleMigration/no-zzz-change");
+    }
 }
