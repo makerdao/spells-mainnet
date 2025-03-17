@@ -61,18 +61,17 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
-
-    uint256 internal constant SIX_PCT_RATE                = 1000000001847694957439350562;
-    uint256 internal constant SIX_PT_FIVE_PCT_RATE        = 1000000001996917783620820123;
-    uint256 internal constant FIVE_PT_SEVEN_FIVE_PCT_RATE = 1000000001772819380639683201;
-    uint256 internal constant SEVEN_PCT_RATE              = 1000000002145441671308778766;
-    uint256 internal constant SIX_PT_SEVEN_FIVE_PCT_RATE  = 1000000002071266685321207000;
-    uint256 internal constant ELEVEN_PCT_RATE             = 1000000003309234382829738808;
-    uint256 internal constant ELEVEN_PT_FIVE_PCT_RATE     = 1000000003451750542235895695;
-    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000003237735385034516037;
     uint256 internal constant TWO_PT_SIX_TWO_PCT_RATE     = 1000000000820099554044024241;
     uint256 internal constant THREE_PT_FIVE_PCT_RATE      = 1000000001090862085746321732;
     uint256 internal constant FOUR_PT_FIVE_PCT_RATE       = 1000000001395766281313196627;
+    uint256 internal constant FIVE_PT_SEVEN_FIVE_PCT_RATE = 1000000001772819380639683201;
+    uint256 internal constant SIX_PCT_RATE                = 1000000001847694957439350562;
+    uint256 internal constant SIX_PT_FIVE_PCT_RATE        = 1000000001996917783620820123;
+    uint256 internal constant SIX_PT_SEVEN_FIVE_PCT_RATE  = 1000000002071266685321207000;
+    uint256 internal constant SEVEN_PCT_RATE              = 1000000002145441671308778766;
+    uint256 internal constant TEN_PT_SEVEN_FIVE_PCT_RATE  = 1000000003237735385034516037;
+    uint256 internal constant ELEVEN_PCT_RATE             = 1000000003309234382829738808;
+    uint256 internal constant ELEVEN_PT_FIVE_PCT_RATE     = 1000000003451750542235895695;
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
