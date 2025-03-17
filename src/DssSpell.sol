@@ -80,13 +80,13 @@ contract DssSpellAction is DssAction {
     GemAbstract internal immutable DAI                = GemAbstract(DssExecLib.dai());
     GemAbstract internal immutable MKR                = GemAbstract(DssExecLib.mkr());
     GemAbstract internal immutable SKY                = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable     PIP_ETH            = DssExecLib.getChangelogAddress("PIP_ETH");
-    address internal immutable     PIP_WSTETH         = DssExecLib.getChangelogAddress("PIP_WSTETH");
-    address internal immutable     SUSDS              = DssExecLib.getChangelogAddress("SUSDS");
-    address internal immutable     MCD_SPLIT          = DssExecLib.getChangelogAddress("MCD_SPLIT");
-    address internal immutable     REWARDS_LSMKR_USDS = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
-    address internal immutable     DAI_USDS           = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable     MKR_SKY            = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable PIP_ETH                = DssExecLib.getChangelogAddress("PIP_ETH");
+    address internal immutable PIP_WSTETH             = DssExecLib.getChangelogAddress("PIP_WSTETH");
+    address internal immutable SUSDS                  = DssExecLib.getChangelogAddress("SUSDS");
+    address internal immutable MCD_SPLIT              = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable REWARDS_LSMKR_USDS     = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
+    address internal immutable DAI_USDS               = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY                = DssExecLib.getChangelogAddress("MKR_SKY");
 
     // ---------- Wallets ----------
     address internal constant BLUE                            = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
