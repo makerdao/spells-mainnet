@@ -668,6 +668,23 @@ contract DssSpellTestBase is Config, DssTest {
                 bytes32(0)
             );
         }
+
+        // Temporary fix to the reverts of the Spark spells interacting with Aggor oracles, due to the cast time manipulation
+        // Example revert: https://dashboard.tenderly.co/explorer/vnet/eb97d953-4642-4778-938e-d70ee25e3f58/tx/0xe427414d07c28b64c076e809983cfdee3bfd680866ebc7c40349700f4a6160bd?trace=0.5.5.1.62.1.2.0.2.2.0.2.2
+        _fixChronicleStaleness(0x24C392CDbF32Cf911B258981a66d5541d85269ce); // Chronicle_BTC_USD_3
+        _fixChronicleStaleness(0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E); // Chronicle_ETH_USD_3
+    }
+
+    function _fixChronicleStaleness(address oracle) private {
+        bytes32 slot = bytes32(uint256(4)); // the slot of Chronicle `_pokeData` is 4
+        bytes32 slotData = vm.load(oracle, slot);
+        uint256 price = uint256(slotData) & type(uint256).max; // price is the second half of a 256-bit slot
+        uint256 age = block.timestamp + 30 days; // extend age by a big margin
+        vm.store(
+            oracle,
+            slot,
+            bytes32((age << 128) | price)
+        );
     }
 
     function _vote(address spell_) internal {
