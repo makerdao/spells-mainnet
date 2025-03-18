@@ -119,6 +119,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/march-20-2025-final-native-vault-engine-oracle-migration-proposal-eth-steth/26110?u=votewizard
         // Forum: https://forum.sky.money/t/technical-scope-of-the-eth-and-wsteth-oracles-migration/26128
         // Forum: https://forum.sky.money/t/march-20-2025-final-native-vault-engine-oracle-migration-proposal-eth-steth/26110/2
+        // Poll: https://vote.makerdao.com/polling/QmV4uuru
 
         // Change ETH OSM source to 0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E
         OsmAbstract(PIP_ETH).change(0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E);
@@ -167,6 +168,7 @@ contract DssSpellAction is DssAction {
         // ---------- Smart Burn Engine Parameter Update ----------
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-march-20-spell/26130
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-march-20-spell/26130/3
+        // Poll: https://vote.makerdao.com/polling/QmVrRf9L
 
         // Splitter: decrease hop for 432 seconds, from 2,160 seconds to 1,728 seconds
         DssExecLib.setValue(MCD_SPLIT, "hop", 1728);
