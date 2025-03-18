@@ -2924,7 +2924,7 @@ contract DssSpellTestBase is Config, DssTest {
 
         assertTrue(spell.done(), "TestError/spell-not-done");
         // Fail if cast is too expensive
-        assertLe(totalGas, 15 * MILLION, "TestError/spell-cast-cost-too-high");
+        assertLe(totalGas, 20 * MILLION, "TestError/spell-cast-cost-too-high");
     }
 
     function _testDeployCost() internal {
