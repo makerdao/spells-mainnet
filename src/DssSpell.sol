@@ -39,6 +39,10 @@ interface StakingRewardsLike {
     function setRewardsDuration(uint256) external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -104,6 +108,11 @@ contract DssSpellAction is DssAction {
 
     // ---------- Constant Values ----------
     uint256 internal immutable MKR_SKY_RATE = MkrSkyLike(DssExecLib.getChangelogAddress("MKR_SKY")).rate();
+
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x1e865856d8F97FB34FBb0EDbF63f53E29a676aB6;
 
     function actions() public override {
         // ---------- ETH and WSTETH Oracle Migration ----------
@@ -234,9 +243,21 @@ contract DssSpellAction is DssAction {
         _transferUsds(INTEGRATION_BOOST_INITIATIVE, 3_000_000 * WAD);
 
         // ---------- Trigger Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/mar-20-2025-stability-scope-parameter-changes-24/26129
+        // Forum: https://forum.sky.money/t/mar-20-2025-stability-scope-parameter-changes-24/26129/2
+        // Forum: https://forum.sky.money/t/march-6-2025-proposed-changes-to-spark-for-upcoming-spell/26036
+        // Forum: https://forum.sky.money/t/march-20-2025-proposed-changes-to-spark-for-upcoming-spell/26113
+        // Poll: https://vote.makerdao.com/polling/QmQrGdQz
+        // Poll: https://vote.makerdao.com/polling/QmfM4SBB
+        // Poll: https://vote.makerdao.com/polling/QmbDzZ3F
+        // Poll: https://vote.makerdao.com/polling/Qmf4PDcJ#vote-breakdown
+        // Poll: https://vote.makerdao.com/polling/QmXvuNAv
+        // Poll: https://vote.makerdao.com/polling/QmXrHgdj
+        // Poll: https://vote.makerdao.com/polling/QmTj3BSu
+        // Poll: https://vote.makerdao.com/polling/QmPkA2GP
 
-        // TODO Wait for the content
-        // Execute Spark Spell at TBC
+        // Execute Spark Spell at 0x1e865856d8F97FB34FBb0EDbF63f53E29a676aB6
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
     // ---------- Helper Functions ----------
