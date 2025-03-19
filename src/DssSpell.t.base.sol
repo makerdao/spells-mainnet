@@ -678,7 +678,7 @@ contract DssSpellTestBase is Config, DssTest {
     function _fixChronicleStaleness(address oracle) private {
         bytes32 slot = bytes32(uint256(4)); // the slot of Chronicle `_pokeData` is 4
         bytes32 slotData = vm.load(oracle, slot);
-        uint256 price = uint256(slotData) & type(uint256).max; // price is the second half of a 256-bit slot
+        uint256 price = uint256(slotData) & type(uint128).max; // price is the second half of a 256-bit slot
         uint256 age = block.timestamp + 30 days; // extend age by a big margin
         vm.store(
             oracle,
