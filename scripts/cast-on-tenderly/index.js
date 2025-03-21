@@ -127,6 +127,32 @@ const giveTheHatToSpell = async function (spellAddress, provider) {
     console.info('spell have the hat...');
 };
 
+const fixChronicleStaleness = async function(provider) {
+    async function _fixChronicleStaleness(oracleAddress) {
+        const slot = ethers.utils.hexZeroPad(ethers.utils.hexValue(4), 32); // the slot of Chronicle `_pokeData` is 4
+        const slotData = await provider.getStorageAt(oracleAddress, slot);
+
+        const packedTypes = ['uint32 age', 'uint128 price'];
+        const abiCoder = new ethers.utils.AbiCoder();
+        abiCoder._getWordSize = () => 16;
+
+        // Extract price (second half of the uint256 slot)
+        const price = abiCoder.decode(packedTypes, slotData).price;
+
+        // Extend age by a 30 days margin
+        const age = BigInt(Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
+
+        await provider.send('tenderly_setStorageAt', [
+            oracleAddress,
+            slot,
+            abiCoder.encode(packedTypes, [age, price]),
+        ]);
+    }
+
+    await _fixChronicleStaleness('0x24C392CDbF32Cf911B258981a66d5541d85269ce'); // Chronicle_BTC_USD_3
+    await _fixChronicleStaleness('0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E'); // Chronicle_ETH_USD_3
+}
+
 const sheduleWarpAndCastSpell = async function (spellAddress, provider) {
     const spell = new Contract(
         spellAddress,
@@ -170,6 +196,10 @@ const castOnTenderly = async function (spellAddress) {
     const { testnetId, rpcUrlPrivate } = await createTenderlyTestnet(spellName);
 
     const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
+
+    // Temporary fix to the reverts of the Spark spells interacting with Aggor oracles, due to the cast time manipulation
+    // Example revert: https://dashboard.tenderly.co/explorer/vnet/eb97d953-4642-4778-938e-d70ee25e3f58/tx/0xe427414d07c28b64c076e809983cfdee3bfd680866ebc7c40349700f4a6160bd?trace=0.5.5.1.62.1.2.0.2.2.0.2.2
+    await fixChronicleStaleness(provider)
 
     await giveTheHatToSpell(spellAddress, provider);
 
