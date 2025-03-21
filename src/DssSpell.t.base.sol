@@ -3589,9 +3589,9 @@ contract DssSpellTestBase is Config, DssTest {
         bytes32 pokeData     = vm.load(oracle, pokeDataSlot);
         uint128 pokePrice    = uint128(bytes16(pokeData << 128));
 
-        uint32 expiresAt = 365 days * 100;
+        uint256 expiresAt = 365 days * 100;
 
-        vm.store(oracle, pokeDataSlot, bytes32(uint256(expiresAt) << 128 | uint256(pokePrice)));
+        vm.store(oracle, pokeDataSlot, bytes32(expiresAt << 128 | uint256(pokePrice)));
     }
 
     function _fixChronicleStaleness() internal {

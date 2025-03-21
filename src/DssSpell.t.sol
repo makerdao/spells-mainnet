@@ -50,6 +50,12 @@ interface LineMomLike {
 }
 
 contract DssSpellTest is DssSpellTestBase {
+
+    function setUp() public override {
+        super.setUp();
+        _fixChronicleStaleness();
+    }
+
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
         _testGeneral();
