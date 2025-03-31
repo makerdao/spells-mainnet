@@ -719,7 +719,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = true;
 
@@ -1128,7 +1128,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0x1e865856d8F97FB34FBb0EDbF63f53E29a676aB6); // Insert Spark spell address
 
@@ -1147,62 +1147,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    address immutable PIP_ETH = addr.addr("PIP_ETH");
-    address immutable PIP_WSTETH = addr.addr("PIP_WSTETH");
-
-    function testETH_OracleMigration() public {
-        // Check the current ETH OSM source
-        assertEq(OsmAbstract(PIP_ETH).src(), 0x64DE91F5A373Cd4c28de3600cB34C7C6cE410C85);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check if the migration happened
-        assertEq(OsmAbstract(PIP_ETH).src(), 0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E);
-
-        // Integration testing: the values are updated properly
-        GodMode.setWard(PIP_ETH, address(this), 1);
-        OsmAbstract(PIP_ETH).kiss(address(this));
-        // Before
-        (bytes32 currentPrice,) = OsmAbstract(PIP_ETH).peep();
-        uint64 currentZzz = OsmAbstract(PIP_ETH).zzz();
-        OsmAbstract(PIP_ETH).poke();
-        // After
-        vm.warp(block.timestamp + 3601);
-        OsmAbstract(PIP_ETH).poke();
-        (bytes32 newPrice,) = OsmAbstract(PIP_ETH).peep();
-        uint64 newZzz = OsmAbstract(PIP_ETH).zzz();
-        // Ensure that changes took place
-        assertNotEq(currentPrice, newPrice, "testETH_OracleMigration/no-price-change");
-        assertNotEq(currentZzz, newZzz, "testETH_OracleMigration/no-zzz-change");
-    }
-
-    function testWSTETH_OracleMigration() public {
-        // Check the current WSTETH OSM source
-        assertEq(OsmAbstract(PIP_WSTETH).src(), 0x2F73b6567B866302e132273f67661fB89b5a66F2);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check if the migration happened
-        assertEq(OsmAbstract(PIP_WSTETH).src(), 0xA770582353b573CbfdCC948751750EeB3Ccf23CF);
-
-        // Integration testing: the values are updated properly
-        GodMode.setWard(PIP_WSTETH, address(this), 1);
-        OsmAbstract(PIP_WSTETH).kiss(address(this));
-        // Before
-        (bytes32 currentPrice,) = OsmAbstract(PIP_WSTETH).peep();
-        uint64 currentZzz = OsmAbstract(PIP_WSTETH).zzz();
-        OsmAbstract(PIP_WSTETH).poke();
-        // After
-        vm.warp(block.timestamp + 3601);
-        OsmAbstract(PIP_WSTETH).poke();
-        (bytes32 newPrice,) = OsmAbstract(PIP_WSTETH).peep();
-        uint64 newZzz = OsmAbstract(PIP_WSTETH).zzz();
-        // Ensure that changes took place
-        assertNotEq(currentPrice, newPrice, "testWSTETH_OracleMigration/no-price-change");
-        assertNotEq(currentZzz, newZzz, "testWSTETH_OracleMigration/no-zzz-change");
-    }
 }
