@@ -176,6 +176,9 @@ contract DssSpellAction is DssAction {
         // Approve DAO Resolution with has bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
         // Note: see `dao_resolutions` public variable declared above
 
+        // Note: bump Chainlog version as multiple keys are being added
+        DssExecLib.setChangelogVersion("1.19.8");
+
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: TODO
         // Poll: TODO
