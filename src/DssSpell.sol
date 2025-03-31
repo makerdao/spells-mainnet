@@ -50,6 +50,9 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
+    // Note: by the previous convention it should be a comma-separated list of DAO resolutions IPFS hashes
+    string public constant dao_resolutions = "bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de";
+
     // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
@@ -167,10 +170,11 @@ contract DssSpellAction is DssAction {
         StakingRewardsLike(REWARDS_LSMKR_USDS).setRewardsDuration(1_235);
 
         // ---------- DAO Resolution ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154
+        // Poll: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154/2
 
         // Approve DAO Resolution with has bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
+        // Note: see `dao_resolutions` public variable declared above
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: TODO
