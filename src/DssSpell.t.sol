@@ -296,13 +296,13 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testAllocatorIntegration() public { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
-                ilk: "ALLOCATOR-BLOOM-A",
-                pip: addr.addr("PIP_ALLOCATOR"),
-                registry: addr.addr("ALLOCATOR_REGISTRY"),
-                roles: addr.addr("ALLOCATOR_ROLES"),
-                buffer: addr.addr("ALLOCATOR_BLOOM_A_BUFFER"),
-                vault: addr.addr("ALLOCATOR_BLOOM_A_VAULT"),
-                allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
+            ilk:            "ALLOCATOR-BLOOM-A",
+            pip:            addr.addr("PIP_ALLOCATOR"),
+            registry:       addr.addr("ALLOCATOR_REGISTRY"),
+            roles:          addr.addr("ALLOCATOR_ROLES"),
+            buffer:         addr.addr("ALLOCATOR_BLOOM_A_BUFFER"),
+            vault:          addr.addr("ALLOCATOR_BLOOM_A_VAULT"),
+            allocatorProxy: addr.addr("BLOOM_ALLOCATOR_PROXY")
         });
 
         // Sanity checks
@@ -331,8 +331,9 @@ contract DssSpellTest is DssSpellTestBase {
         // AllocatorVaultLike(p.vault).draw(1_000 * WAD);
         // assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
 
-        vm.warp(block.timestamp + 1);
-        jug.drip(p.ilk);
+        // Note: skipped for this onboarding as no operators are added
+        // vm.warp(block.timestamp + 1);
+        // jug.drip(p.ilk);
 
         // Note: skipped for this onboarding as no operators are added
         // vm.prank(address(allocatorOperator));
