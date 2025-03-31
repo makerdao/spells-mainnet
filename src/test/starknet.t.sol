@@ -36,14 +36,14 @@ contract ConfigStarknet {
         uint256 WAD = 10 ** 18;
 
         starknetValues = StarknetValues({
-            l2_spell:                  0,  // Set to zero if no spell is set.
-            core_implementation:       0x47103A9b801eB6a63555897d399e4b7c1c8Eb5bC, // As of 2024-08-21
-            dai_bridge_isOpen:         0,                     // 1 open, 0 closed
-            dai_bridge_ceiling:        5_000_000 * WAD,       // wei
-            dai_bridge_maxDeposit:     type(uint256).max,     // wei
+            l2_spell:                  0, // Set to zero if no spell is set.
+            core_implementation:       0x2793010E6711Acd5C46ed17f2183a9d58db71e04, // As of 2025-03-02
+            dai_bridge_isOpen:         0, // 1 open, 0 closed
+            dai_bridge_ceiling:        5_000_000 * WAD, // wei
+            dai_bridge_maxDeposit:     type(uint256).max, // wei
             l2_dai_bridge:             0x075ac198e734e289a6892baa8dd14b21095f13bf8401900f5349d5569c3f6e60,
             l2_gov_relay:              0x05f4d9b039f82e9a90125fb119ace0531f4936ff2a9a54a8598d49a4cd4bd6db,
-            relay_selector:            300224956480472355485152391090755024345070441743081995053718200325371913697  // Hardcoded in L1 gov relay, not public
+            relay_selector:            300224956480472355485152391090755024345070441743081995053718200325371913697 // Hardcoded in L1 gov relay, not public
         });
     }
 }
