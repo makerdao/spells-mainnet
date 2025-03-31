@@ -127,7 +127,7 @@ contract Config {
         afterSpell.vow_bump               = 10 * THOUSAND;                  // In whole Dai units
         afterSpell.vow_hump_min           = 70 * MILLION;                   // In whole Dai units
         afterSpell.vow_hump_max           = 70 * MILLION;                   // In whole Dai units
-        afterSpell.split_hop              = 1728 seconds;                   // In seconds
+        afterSpell.split_hop              = 1235 seconds;                   // In seconds
         afterSpell.split_burn             = 100_00;                         // In basis points
         afterSpell.split_farm             = "REWARDS_LSMKR_USDS";           // Farm chainlog key
         afterSpell.flap_want              = 9800;                           // In basis points

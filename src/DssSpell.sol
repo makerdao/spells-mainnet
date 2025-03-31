@@ -31,6 +31,10 @@ interface LineMomLike {
     function addIlk(bytes32 ilk) external;
 }
 
+interface StakingRewardsLike {
+    function setRewardsDuration(uint256) external;
+}
+
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
@@ -68,7 +72,9 @@ contract DssSpellAction is DssAction {
     address internal immutable PIP_ALLOCATOR      = DssExecLib.getChangelogAddress("PIP_ALLOCATOR");
     address internal immutable ALLOCATOR_ROLES    = DssExecLib.getChangelogAddress("ALLOCATOR_ROLES");
     address internal immutable ALLOCATOR_REGISTRY = DssExecLib.getChangelogAddress("ALLOCATOR_REGISTRY");
-    address internal immutable LINE_MOM = DssExecLib.getChangelogAddress("LINE_MOM");
+    address internal immutable LINE_MOM           = DssExecLib.getChangelogAddress("LINE_MOM");
+    address internal immutable MCD_SPLIT          = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable REWARDS_LSMKR_USDS = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
 
     address internal constant ALLOCATOR_BLOOM_A_VAULT    = 0x26512A41C8406800f21094a7a7A0f980f6e25d43;
     address internal constant ALLOCATOR_BLOOM_A_BUFFER   = 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd;
@@ -81,7 +87,7 @@ contract DssSpellAction is DssAction {
 
     function actions() public override {
         // ---------- Init Star 2 Allocator Instance Step 1 ----------
-        // Forum: TODO
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
         // Poll: TODO
 
         // Init new Allocator instance by calling AllocatorInit.initIlk with:
@@ -151,13 +157,19 @@ contract DssSpellAction is DssAction {
         LineMomLike(LINE_MOM).addIlk("ALLOCATOR-BLOOM-A");
 
         // ---------- Smart Burn Engine Parameter Update ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-april-3-spell/26201
+        // Poll: https://vote.makerdao.com/polling/Qmf3cZuM
+
         // Reduce Splitter.hop by 493 seconds from 1,728 seconds to 1,235 seconds
+        DssExecLib.setValue(MCD_SPLIT, "hop", 1_235);
+
+        // Note: Update farm rewards duration
+        StakingRewardsLike(REWARDS_LSMKR_USDS).setRewardsDuration(1_235);
 
         // ---------- DAO Resolution ----------
         // Forum: TODO
         // Poll: TODO
+
         // Approve DAO Resolution with has bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
 
         // ---------- Trigger Spark Proxy Spell ----------
