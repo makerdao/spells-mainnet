@@ -294,7 +294,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
+    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
                 ilk: "ALLOCATOR-BLOOM-A",
                 pip: addr.addr("PIP_ALLOCATOR"),
@@ -302,7 +302,7 @@ contract DssSpellTest is DssSpellTestBase {
                 roles: addr.addr("ALLOCATOR_ROLES"),
                 buffer: addr.addr("ALLOCATOR_BLOOM_A_BUFFER"),
                 vault: addr.addr("ALLOCATOR_BLOOM_A_VAULT"),
-                allocatorProxy: addr.addr("MCD_PAUSE_PROXY")
+                allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
         });
 
         // Sanity checks
@@ -318,23 +318,26 @@ contract DssSpellTest is DssSpellTestBase {
 
         _checkAllocatorIntegration(p);
 
+        // Note: skipped for this onboarding as no operators are added
         // Role and allowance checks - Specific to ALLOCATOR-BLOOM-A only
-        address allocatorOperator = wallets.addr("NOVA_OPERATOR");
-        assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.draw.selector, 0));
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
+        // address allocatorOperator = wallets.addr("BLOOM_OPERATOR");
+        // assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
+        // assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.draw.selector, 0));
+        // assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
 
+        // Note: skipped for this onboarding as no operators are added
         // The allocator operator should be able to call draw() wipe()
-        vm.prank(address(allocatorOperator));
-        AllocatorVaultLike(p.vault).draw(1_000 * WAD);
-        assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
+        // vm.prank(address(allocatorOperator));
+        // AllocatorVaultLike(p.vault).draw(1_000 * WAD);
+        // assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
 
         vm.warp(block.timestamp + 1);
         jug.drip(p.ilk);
 
-        vm.prank(address(allocatorOperator));
-        AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
-        assertEq(usds.balanceOf(p.buffer), 0);
+        // Note: skipped for this onboarding as no operators are added
+        // vm.prank(address(allocatorOperator));
+        // AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
+        // assertEq(usds.balanceOf(p.buffer), 0);
     }
 
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip
