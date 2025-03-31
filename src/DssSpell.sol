@@ -18,6 +18,18 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import { DssInstance, MCD } from "dss-test/MCD.sol";
+import { AllocatorSharedInstance, AllocatorIlkInstance } from "./dependencies/dss-allocator/AllocatorInstances.sol";
+import { AllocatorInit, AllocatorIlkConfig } from "./dependencies/dss-allocator/AllocatorInit.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+
+interface ChainlogLike {
+    function removeAddress(bytes32) external;
+}
+
+interface LineMomLike {
+    function addIlk(bytes32 ilk) external;
+}
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
@@ -45,10 +57,22 @@ contract DssSpellAction is DssAction {
     //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
     //
     // uint256 internal constant X_PCT_RATE = ;
+    uint256 internal constant ZERO_PCT_RATE = 1000000000000000000000000000;
 
     // ---------- Math ----------
+    uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
+    address internal immutable MCD_PAUSE_PROXY    = DssExecLib.pauseProxy();
+    address internal immutable ILK_REGISTRY       = DssExecLib.reg();
+    address internal immutable PIP_ALLOCATOR      = DssExecLib.getChangelogAddress("PIP_ALLOCATOR");
+    address internal immutable ALLOCATOR_ROLES    = DssExecLib.getChangelogAddress("ALLOCATOR_ROLES");
+    address internal immutable ALLOCATOR_REGISTRY = DssExecLib.getChangelogAddress("ALLOCATOR_REGISTRY");
+    address internal immutable LINE_MOM = DssExecLib.getChangelogAddress("LINE_MOM");
+
+    address internal constant ALLOCATOR_BLOOM_A_VAULT    = 0x26512A41C8406800f21094a7a7A0f980f6e25d43;
+    address internal constant ALLOCATOR_BLOOM_A_BUFFER   = 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd;
+    address internal constant SUBPROXY_ALLOCATOR_BLOOM_A = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -56,9 +80,85 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = address(0);
 
     function actions() public override {
-        // ---------- Section Text ----------
+        // ---------- Init Star 2 Allocator Instance Step 1 ----------
         // Forum: TODO
         // Poll: TODO
+
+        // Init new Allocator instance by calling AllocatorInit.initIlk with:
+        // sharedInstance.oracle:  PIP_ALLOCATOR from chainlog
+        // sharedInstance.roles: ALLOCATOR_ROLES from chainlog
+        // sharedInstance.registry: ALLOCATOR_REGISTRY from chainlog
+        // ilkInstance.owner: MCD_PAUSE_PROXY from chainlog
+        // ilkInstance.vault: 0x26512A41C8406800f21094a7a7A0f980f6e25d43
+        // ilkInstance.buffer: 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd
+        // cfg.ilk: ALLOCATOR-BLOOM-A
+        // cfg.duty: 0%
+        // cfg.gap: 10 million USDS
+        // cfg.maxLine: 10 million USDS
+        // cfg.ttl: 86400 seconds
+        // cfg,allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
+        // cfg.ilkRegistry: ILK_REGISTRY from chainlog
+
+        // Note: Set sharedInstance with the following parameters:
+        AllocatorSharedInstance memory allocatorSharedInstance = AllocatorSharedInstance({
+            // sharedInstance.oracle:  PIP_ALLOCATOR from chainlog
+            oracle:   PIP_ALLOCATOR,
+            // sharedInstance.roles: ALLOCATOR_ROLES from chainlog
+            roles:    ALLOCATOR_ROLES,
+            // sharedInstance.registry: ALLOCATOR_REGISTRY from chainlog
+            registry: ALLOCATOR_REGISTRY
+        });
+
+        // Note: Set ilkInstance with the following parameters:
+        AllocatorIlkInstance memory allocatorIlkInstance = AllocatorIlkInstance({
+            // ilkInstance.owner: MCD_PAUSE_PROXY from chainlog
+            owner:  MCD_PAUSE_PROXY,
+            // ilkInstance.vault: 0x26512A41C8406800f21094a7a7A0f980f6e25d43
+            vault:  ALLOCATOR_BLOOM_A_VAULT,
+            // ilkInstance.buffer: 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd
+            buffer: ALLOCATOR_BLOOM_A_BUFFER
+        });
+
+        // Note: Set cfg with the following parameters:
+        AllocatorIlkConfig memory allocatorIlkCfg = AllocatorIlkConfig({
+            // cfg.ilk: ALLOCATOR-BLOOM-A
+            ilk             : "ALLOCATOR-BLOOM-A",
+            // cfg.duty: 0%
+            duty            : ZERO_PCT_RATE,
+            // cfg.gap: 10 million USDS
+            gap             : 10_000_000  * RAD,
+            // cfg.maxLine: 10 million USDS
+            maxLine         : 10_000_000 * RAD,
+            // cfg.ttl: 86400 seconds
+            ttl             : 86400,
+            // cfg.allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
+            allocatorProxy  : SUBPROXY_ALLOCATOR_BLOOM_A,
+            // cfg.ilkRegistry: ILK_REGISTRY from chainlog
+            ilkRegistry     : ILK_REGISTRY
+        });
+
+        // Note: We also need dss as an input parameter for initIlk
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
+        // Note: Now we can execute the initial instruction with all the relevant parameters by calling AllocatorInit.initIlk
+        AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
+
+        // Remove newly created PIP_ALLOCATOR_BLOOM_A from chainlog
+        // Note: PIP_ALLOCATOR_BLOOM_A was added to the chainlog when calling AllocatorInit.initIlk above
+        ChainlogLike(DssExecLib.LOG).removeAddress("PIP_ALLOCATOR_BLOOM_A");
+
+        // Add ALLOCATOR-BLOOM-A ilk to the LINE_MOM
+        LineMomLike(LINE_MOM).addIlk("ALLOCATOR-BLOOM-A");
+
+        // ---------- Smart Burn Engine Parameter Update ----------
+        // Forum: TODO
+        // Poll: TODO
+        // Reduce Splitter.hop by 493 seconds from 1,728 seconds to 1,235 seconds
+
+        // ---------- DAO Resolution ----------
+        // Forum: TODO
+        // Poll: TODO
+        // Approve DAO Resolution with has bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
 
         // ---------- Trigger Spark Proxy Spell ----------
         // Forum: TODO

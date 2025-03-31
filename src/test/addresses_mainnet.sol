@@ -545,5 +545,7 @@ contract Addresses {
         addr["ARBITRUM_ROUTER"]                  = 0x72Ce9c846789fdB6fC1f34aC4AD25Dd9ef7031ef;
         addr["ARBITRUM_INBOX"]                   = 0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f;
         addr["MCD_BLOW2"]                        = 0x81EFc7Dd25241acd8E5620F177E42F4857A02B79;
+        addr["ALLOCATOR_BLOOM_A_VAULT"]          = 0x26512A41C8406800f21094a7a7A0f980f6e25d43;
+        addr["ALLOCATOR_BLOOM_A_BUFFER"]         = 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd;
     }
 }

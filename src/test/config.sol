@@ -146,7 +146,7 @@ contract Config {
         afterSpell.vest_sky_cap           = 475_200 * WAD / 30 days;        // In WAD SKY per second
         afterSpell.vest_sky_mint_cap      = 800 * MILLION * WAD / 365 days; // In WAD SKY per second
         afterSpell.sky_mkr_rate           = 24_000;                         // In whole SKY/MKR units
-        afterSpell.ilk_count              = 70;                             // Num expected in system
+        afterSpell.ilk_count              = 71;                             // Num expected in system
         afterSpell.chainlog_version       = "1.19.7";                       // String expected in system
 
         //
@@ -1883,6 +1883,31 @@ contract Config {
             aL_line:      60 * MILLION,
             aL_gap:       1 * MILLION,
             aL_ttl:       20 hours,
+            line:         0,
+            dust:         0,
+            pct:          0,
+            mat:          100_00,
+            liqType:      "",
+            liqOn:        false,
+            chop:         0,
+            dog_hole:     0,
+            clip_buf:     0,
+            clip_tail:    0,
+            clip_cusp:    0,
+            clip_chip:    0,
+            clip_tip:     0,
+            clipper_mom:  0,
+            cm_tolerance: 0,
+            calc_tau:     0,
+            calc_step:    0,
+            calc_cut:     0,
+            offboarding:  false
+        });
+        afterSpell.collaterals["ALLOCATOR-BLOOM-A"] = CollateralValues({
+            aL_enabled:   true,
+            aL_line:      10_000_000,
+            aL_gap:       10_000_000,
+            aL_ttl:       24 hours,
             line:         0,
             dust:         0,
             pct:          0,

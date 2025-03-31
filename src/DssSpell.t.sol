@@ -46,6 +46,10 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface LineMomLike {
+    function ilks(bytes32 ilk) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -292,12 +296,12 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
-                ilk: "ALLOCATOR-NOVA-A",
+                ilk: "ALLOCATOR-BLOOM-A",
                 pip: addr.addr("PIP_ALLOCATOR"),
                 registry: addr.addr("ALLOCATOR_REGISTRY"),
                 roles: addr.addr("ALLOCATOR_ROLES"),
-                buffer: addr.addr("ALLOCATOR_NOVA_A_BUFFER"),
-                vault: addr.addr("ALLOCATOR_NOVA_A_VAULT"),
+                buffer: addr.addr("ALLOCATOR_BLOOM_A_BUFFER"),
+                vault: addr.addr("ALLOCATOR_BLOOM_A_VAULT"),
                 allocatorProxy: addr.addr("MCD_PAUSE_PROXY")
         });
 
@@ -314,11 +318,11 @@ contract DssSpellTest is DssSpellTestBase {
 
         _checkAllocatorIntegration(p);
 
-        // Role and allowance checks - Specific to ALLOCATOR-NOVA-A only
+        // Role and allowance checks - Specific to ALLOCATOR-BLOOM-A only
         address allocatorOperator = wallets.addr("NOVA_OPERATOR");
         assertEq(usds.allowance(p.buffer, allocatorOperator), type(uint256).max);
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.draw.selector, 0));
-        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-NOVA-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.draw.selector, 0));
+        assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
 
         // The allocator operator should be able to call draw() wipe()
         vm.prank(address(allocatorOperator));
@@ -1147,4 +1151,53 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testAddChainlogKeys() public {
+        bytes32[] memory addedKeys = new bytes32[](2);
+        addedKeys[0] = "ALLOCATOR_BLOOM_A_VAULT";
+        addedKeys[1] = "ALLOCATOR_BLOOM_A_BUFFER";
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            vm.expectRevert("dss-chain-log/invalid-key");
+            chainLog.getAddress(addedKeys[i]);
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
+        }
+
+        // Note: Extra check to make sure PIP_ALLOCATOR_BLOOM_A is removed from the chainlog
+        vm.expectRevert("dss-chain-log/invalid-key");
+        chainLog.getAddress("PIP_ALLOCATOR_BLOOM_A");
+    }
+
+    function testNewLineMomIlks() public {
+        string[1] memory ilks = [
+            "ALLOCATOR-BLOOM-A"
+        ];
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                0,
+                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
+            );
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                1,
+                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
+            );
+        }
+    }
 }
