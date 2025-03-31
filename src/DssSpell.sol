@@ -94,20 +94,6 @@ contract DssSpellAction is DssAction {
         // Poll: TODO
 
         // Init new Allocator instance by calling AllocatorInit.initIlk with:
-        // sharedInstance.oracle:  PIP_ALLOCATOR from chainlog
-        // sharedInstance.roles: ALLOCATOR_ROLES from chainlog
-        // sharedInstance.registry: ALLOCATOR_REGISTRY from chainlog
-        // ilkInstance.owner: MCD_PAUSE_PROXY from chainlog
-        // ilkInstance.vault: 0x26512A41C8406800f21094a7a7A0f980f6e25d43
-        // ilkInstance.buffer: 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd
-        // cfg.ilk: ALLOCATOR-BLOOM-A
-        // cfg.duty: 0%
-        // cfg.gap: 10 million USDS
-        // cfg.maxLine: 10 million USDS
-        // cfg.ttl: 86400 seconds
-        // cfg,allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
-        // cfg.ilkRegistry: ILK_REGISTRY from chainlog
-
         // Note: Set sharedInstance with the following parameters:
         AllocatorSharedInstance memory allocatorSharedInstance = AllocatorSharedInstance({
             // sharedInstance.oracle:  PIP_ALLOCATOR from chainlog
@@ -139,7 +125,7 @@ contract DssSpellAction is DssAction {
             // cfg.maxLine: 10 million USDS
             maxLine         : 10_000_000 * RAD,
             // cfg.ttl: 86400 seconds
-            ttl             : 86400,
+            ttl             : 86_400,
             // cfg.allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
             allocatorProxy  : SUBPROXY_ALLOCATOR_BLOOM_A,
             // cfg.ilkRegistry: ILK_REGISTRY from chainlog
