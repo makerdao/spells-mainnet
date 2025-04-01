@@ -21,7 +21,6 @@ import "dss-exec-lib/DssAction.sol";
 import { DssInstance, MCD } from "dss-test/MCD.sol";
 import { AllocatorSharedInstance, AllocatorIlkInstance } from "./dependencies/dss-allocator/AllocatorInstances.sol";
 import { AllocatorInit, AllocatorIlkConfig } from "./dependencies/dss-allocator/AllocatorInit.sol";
-import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
 interface ChainlogLike {
     function removeAddress(bytes32) external;
@@ -81,7 +80,7 @@ contract DssSpellAction is DssAction {
 
     address internal constant ALLOCATOR_BLOOM_A_VAULT    = 0x26512A41C8406800f21094a7a7A0f980f6e25d43;
     address internal constant ALLOCATOR_BLOOM_A_BUFFER   = 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd;
-    address internal constant SUBPROXY_ALLOCATOR_BLOOM_A = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
+    address internal constant ALLOCATOR_BLOOM_A_SUBPROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
 
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -127,7 +126,7 @@ contract DssSpellAction is DssAction {
             // cfg.ttl: 86400 seconds
             ttl             : 86_400,
             // cfg.allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
-            allocatorProxy  : SUBPROXY_ALLOCATOR_BLOOM_A,
+            allocatorProxy  : ALLOCATOR_BLOOM_A_SUBPROXY,
             // cfg.ilkRegistry: ILK_REGISTRY from chainlog
             ilkRegistry     : ILK_REGISTRY
         });
@@ -138,11 +137,11 @@ contract DssSpellAction is DssAction {
         // Note: Now we can execute the initial instruction with all the relevant parameters by calling AllocatorInit.initIlk
         AllocatorInit.initIlk(dss, allocatorSharedInstance, allocatorIlkInstance, allocatorIlkCfg);
 
-        // Remove newly created PIP_ALLOCATOR_BLOOM_A from chainlog
+        // Remove newly created PIP_ALLOCATOR_BLOOM_A from the chainlog
         // Note: PIP_ALLOCATOR_BLOOM_A was added to the chainlog when calling AllocatorInit.initIlk above
         ChainlogLike(DssExecLib.LOG).removeAddress("PIP_ALLOCATOR_BLOOM_A");
 
-        // Add ALLOCATOR-BLOOM-A ilk to the LINE_MOM
+        // Add ALLOCATOR-BLOOM-A to the LineMOM
         LineMomLike(LINE_MOM).addIlk("ALLOCATOR-BLOOM-A");
 
         // ---------- Smart Burn Engine Parameter Update ----------
@@ -159,7 +158,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154
         // Poll: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154/2
 
-        // Approve DAO Resolution with has bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
+        // Approve DAO Resolution with hash bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
         // Note: see `dao_resolutions` public variable declared above
 
         // Note: bump Chainlog version as multiple keys are being added

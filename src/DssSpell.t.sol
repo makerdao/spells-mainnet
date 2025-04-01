@@ -302,7 +302,7 @@ contract DssSpellTest is DssSpellTestBase {
             roles:          addr.addr("ALLOCATOR_ROLES"),
             buffer:         addr.addr("ALLOCATOR_BLOOM_A_BUFFER"),
             vault:          addr.addr("ALLOCATOR_BLOOM_A_VAULT"),
-            allocatorProxy: addr.addr("BLOOM_ALLOCATOR_PROXY")
+            allocatorProxy: addr.addr("ALLOCATOR_BLOOM_A_SUBPROXY")
         });
 
         // Sanity checks
