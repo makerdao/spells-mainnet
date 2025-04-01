@@ -1136,9 +1136,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x1e865856d8F97FB34FBb0EDbF63f53E29a676aB6); // Insert Spark spell address
+        address SPARK_SPELL = address(0x6B34C0E12C84338f494efFbf49534745DDE2F24b); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,

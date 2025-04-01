@@ -85,7 +85,7 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0);
+    address internal constant SPARK_SPELL = 0x6B34C0E12C84338f494efFbf49534745DDE2F24b;
 
     function actions() public override {
         // ---------- Init Star 2 Allocator Instance Step 1 ----------
@@ -165,11 +165,21 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogVersion("1.19.8");
 
         // ---------- Trigger Spark Proxy Spell ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.sky.money/t/april-3-2025-proposed-changes-to-spark-for-upcoming-spell-2/26203
+        // Forum: https://forum.sky.money/t/april-3-2025-proposed-changes-to-spark-for-upcoming-spell/26155
+        // Poll: https://vote.makerdao.com/polling/QmehvjH9
+        // Poll: https://vote.makerdao.com/polling/QmNZVfSq
+        // Poll: https://vote.makerdao.com/polling/QmSwQ6Wc
+        // Poll: https://vote.makerdao.com/polling/QmSytTo4
+        // Poll: https://vote.makerdao.com/polling/QmT87a3p
+        // Poll: https://vote.makerdao.com/polling/QmTE29em
+        // Poll: https://vote.makerdao.com/polling/QmWQCbns
+        // Poll: https://vote.makerdao.com/polling/QmXAJTvs
+        // Poll: https://vote.makerdao.com/polling/QmY6tE6h
+        // Poll: https://vote.makerdao.com/polling/QmZGQhkG
 
-        // Execute Spark Spell at TODO
-        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Execute Spark Proxy spell at 0x6B34C0E12C84338f494efFbf49534745DDE2F24b
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
