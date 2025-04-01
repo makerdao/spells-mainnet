@@ -41,8 +41,8 @@ interface ProxyLike {
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
-    string public constant override description = "2025-04-03 MakerDAO Executive Spell | Hash: TODO";
+    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/community/d5a63907ac05e2fa109bf1e44f2e00a6769635e1/governance/votes/Executive%20vote%20-%20April%203%2C%202025.md' -q -O - 2>/dev/null)"
+    string public constant override description = "2025-04-03 MakerDAO Executive Spell | Hash: 0x472d46618b06928e248b7ff6d99a1ab343828ed8a3e7bcd8db4433c99aae777f";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -90,7 +90,7 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Init Star 2 Allocator Instance Step 1 ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
-        // Poll: TODO
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190/3
 
         // Init new Allocator instance by calling AllocatorInit.initIlk with:
         // Note: Set sharedInstance with the following parameters:
@@ -116,19 +116,19 @@ contract DssSpellAction is DssAction {
         // Note: Set cfg with the following parameters:
         AllocatorIlkConfig memory allocatorIlkCfg = AllocatorIlkConfig({
             // cfg.ilk: ALLOCATOR-BLOOM-A
-            ilk             : "ALLOCATOR-BLOOM-A",
+            ilk:            "ALLOCATOR-BLOOM-A",
             // cfg.duty: 0%
-            duty            : ZERO_PCT_RATE,
+            duty:           ZERO_PCT_RATE,
             // cfg.gap: 10 million USDS
-            gap             : 10_000_000  * RAD,
+            gap:            10_000_000  * RAD,
             // cfg.maxLine: 10 million USDS
-            maxLine         : 10_000_000 * RAD,
+            maxLine:        10_000_000 * RAD,
             // cfg.ttl: 86400 seconds
-            ttl             : 86_400,
+            ttl:            86_400,
             // cfg.allocatorProxy: 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba
-            allocatorProxy  : ALLOCATOR_BLOOM_A_SUBPROXY,
+            allocatorProxy: ALLOCATOR_BLOOM_A_SUBPROXY,
             // cfg.ilkRegistry: ILK_REGISTRY from chainlog
-            ilkRegistry     : ILK_REGISTRY
+            ilkRegistry:    ILK_REGISTRY
         });
 
         // Note: We also need dss as an input parameter for initIlk
