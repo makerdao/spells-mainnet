@@ -1201,4 +1201,24 @@ contract DssSpellTest is DssSpellTestBase {
             );
         }
     }
+
+    function testAllocatorBloomASubProxy() public {
+        address allocatorBloomAProxy = addr.addr("ALLOCATOR_BLOOM_A_SUBPROXY");
+        address subProxySpell = address(new MockSubProxySpell());
+
+        vm.prank(addr.addr("MCD_PAUSE_PROXY"));
+        vm.expectEmit();
+        emit Exec();
+        ProxyLike(allocatorBloomAProxy).exec(subProxySpell, abi.encodeWithSignature("execute()"));
+    }
+
+    event Exec();
+}
+
+contract MockSubProxySpell {
+    event Exec();
+
+    function execute() public {
+        emit Exec();
+    }
 }
