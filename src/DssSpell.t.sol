@@ -325,20 +325,17 @@ contract DssSpellTest is DssSpellTestBase {
         // assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.draw.selector, 0));
         // assertTrue(AllocatorRolesLike(p.roles).hasActionRole("ALLOCATOR-BLOOM-A", p.vault, AllocatorVaultLike.wipe.selector, 0));
 
-        // Note: skipped for this onboarding as no operators are added
-        // The allocator operator should be able to call draw() wipe()
-        // vm.prank(address(allocatorOperator));
-        // AllocatorVaultLike(p.vault).draw(1_000 * WAD);
-        // assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
+        // The allocator proxy should be able to call draw() wipe()
+        vm.prank(addr.addr("ALLOCATOR_BLOOM_A_SUBPROXY"));
+        AllocatorVaultLike(p.vault).draw(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 1_000 * WAD);
 
-        // Note: skipped for this onboarding as no operators are added
-        // vm.warp(block.timestamp + 1);
-        // jug.drip(p.ilk);
+        vm.warp(block.timestamp + 1);
+        jug.drip(p.ilk);
 
-        // Note: skipped for this onboarding as no operators are added
-        // vm.prank(address(allocatorOperator));
-        // AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
-        // assertEq(usds.balanceOf(p.buffer), 0);
+        vm.prank(addr.addr("ALLOCATOR_BLOOM_A_SUBPROXY"));
+        AllocatorVaultLike(p.vault).wipe(1_000 * WAD);
+        assertEq(usds.balanceOf(p.buffer), 0);
     }
 
     function testLerpSurplusBuffer() public skipped { // add the `skipped` modifier to skip

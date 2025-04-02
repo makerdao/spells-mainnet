@@ -156,7 +156,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- DAO Resolution ----------
         // Forum: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154
-        // Poll: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154/2
+        // Forum: https://forum.sky.money/t/spark-tokenization-grand-prix-legal-overview-of-selected-products/26154/2
 
         // Approve DAO Resolution with hash bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de
         // Note: see `dao_resolutions` public variable declared above
@@ -164,7 +164,7 @@ contract DssSpellAction is DssAction {
         // Note: bump Chainlog version as multiple keys are being added
         DssExecLib.setChangelogVersion("1.19.8");
 
-        // ---------- Trigger Spark Proxy Spell ----------
+        // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.sky.money/t/april-3-2025-proposed-changes-to-spark-for-upcoming-spell-2/26203
         // Forum: https://forum.sky.money/t/april-3-2025-proposed-changes-to-spark-for-upcoming-spell/26155
         // Poll: https://vote.makerdao.com/polling/QmehvjH9
