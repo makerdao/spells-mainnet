@@ -79,14 +79,14 @@ const createTenderlyTestnet = async function (spellName) {
     const endpoints = response.data.container?.connectivityConfig?.endpoints ?? [];
 
     const rpcEndpointAdmin = endpoints.find(
-        endpoint => /https:\/\//i.test(endpoint.uri) && endpoint.private === true
+        endpoint => endpoint.uri?.startsWith('https://') && endpoint.private === true
     );
     if (!rpcEndpointAdmin) {
         throw new Error('Failed to obtain the admin RPC endpoint');
     }
 
     const rpcEndpointPublic = endpoints.find(
-        endpoint => /https:\/\//i.test(endpoint.uri) && endpoint.private === false
+        endpoint => endpoint.uri?.startsWith('https://') && endpoint.private === false
     );
     if (!rpcEndpointPublic) {
         throw new Error('Failed to obtain the public RPC endpoint');
