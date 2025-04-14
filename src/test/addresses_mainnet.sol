@@ -548,5 +548,7 @@ contract Addresses {
         addr["ALLOCATOR_BLOOM_A_VAULT"]          = 0x26512A41C8406800f21094a7a7A0f980f6e25d43;
         addr["ALLOCATOR_BLOOM_A_BUFFER"]         = 0x629aD4D779F46B8A1491D3f76f7E97Cb04D8b1Cd;
         addr["ALLOCATOR_BLOOM_A_SUBPROXY"]       = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
+        addr["SPBEAM_MOM"]                       = 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0;
+        addr["MCD_SPBEAM"]                       = 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22;
     }
 }

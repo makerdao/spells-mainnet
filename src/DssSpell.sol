@@ -21,6 +21,11 @@ import "dss-exec-lib/DssAction.sol";
 
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { DssInstance, MCD } from "dss-test/MCD.sol";
+
+import { SPBEAMInit, SPBEAMConfig, SPBEAMRateConfig } from "./dependencies/sp-beam/SPBEAMInit.sol";
+import { SPBEAMInstance } from "./dependencies/sp-beam/SPBEAMInstance.sol";
+
 
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
@@ -75,6 +80,10 @@ contract DssSpellAction is DssAction {
     address internal immutable MKR_SKY              = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable REWARDS_LSMKR_USDS   = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
 
+    address internal constant MCD_SPBEAM = 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22;
+    address internal constant SPBEAM_MOM = 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0;
+    address internal constant SPBEAM_BUD = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309;
+
     // ---------- Wallets ----------
     address internal constant LAUNCH_PROJECT_FUNDING    = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
     address internal constant AAVE_V3_TREASURY          = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
@@ -97,6 +106,206 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = address(0);
 
     function actions() public override {
+
+        // ---------- SP BEAM Initialization ----------
+        // Forum: https://forum.sky.money/t/technical-scope-sp-beam-initialization-spell/26266
+
+        // Init SP BEAM by calling SPBEAMInit.init with the following parameters:
+        // Note: Create SPBEAMInstance with the following parameters:
+        SPBEAMInstance memory spbeamInstance = SPBEAMInstance({
+            // inst.spbeam: 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22
+            spbeam: MCD_SPBEAM,
+            // inst.mom: 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0
+            mom: SPBEAM_MOM
+        });
+
+        // Note: Create SPBEAMRateConfig array to include all 14 requested ilks
+        SPBEAMRateConfig[] memory spbeamIlkConfigs = new SPBEAMRateConfig[](14);
+
+        // For the following cfg.ilks.id:
+        // ETH-A, ETH-B, ETH-C, WSTETH-A, WSTETH-B, WBTC-A, WBTC-B, WBTC-C, SSR
+
+        // Note: Add config for ETH-A to ilk configs array
+        spbeamIlkConfigs[0] = SPBEAMRateConfig({
+            id: "ETH-A",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ETH-B to ilk configs array
+        spbeamIlkConfigs[1] = SPBEAMRateConfig({
+            id: "ETH-B",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ETH-C to ilk configs array
+        spbeamIlkConfigs[2] = SPBEAMRateConfig({
+            id: "ETH-C",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for WSTETH-A to ilk configs array
+        spbeamIlkConfigs[3] = SPBEAMRateConfig({
+            id: "WSTETH-A",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for WSTETH-B to ilk configs array
+        spbeamIlkConfigs[4] = SPBEAMRateConfig({
+            id: "WSTETH-B",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for WBTC-A to ilk configs array
+        spbeamIlkConfigs[5] = SPBEAMRateConfig({
+            id: "WBTC-A",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for WBTC-B to ilk configs array
+        spbeamIlkConfigs[6] = SPBEAMRateConfig({
+            id: "WBTC-B",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for WBTC-C to ilk configs array
+        spbeamIlkConfigs[7] = SPBEAMRateConfig({
+            id: "WBTC-C",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for SSR to ilk configs array
+        spbeamIlkConfigs[8] = SPBEAMRateConfig({
+            id: "SSR",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ETH-A to ilk configs array
+        spbeamIlkConfigs[9] = SPBEAMRateConfig({
+            id: "ETH-A",
+            // cfg.ilks.min: 200 basis points
+            min: 200,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ALLOCATOR-SPARK-A to ilk configs array
+        spbeamIlkConfigs[10] = SPBEAMRateConfig({
+            id: "ALLOCATOR-SPARK-A",
+            // cfg.ilks.min: 0 basis points
+            min: 0,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ALLOCATOR-NOVA-A to ilk configs array
+        spbeamIlkConfigs[11] = SPBEAMRateConfig({
+            id: "ALLOCATOR-NOVA-A",
+            // cfg.ilks.min: 0 basis points
+            min: 0,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for ALLOCATOR-BLOOM-A to ilk configs array
+        spbeamIlkConfigs[12] = SPBEAMRateConfig({
+            id: "ALLOCATOR-BLOOM-A",
+            // cfg.ilks.min: 0 basis points
+            min: 0,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Add config for DSR to ilk configs array
+        spbeamIlkConfigs[13] = SPBEAMRateConfig({
+            id: "DSR",
+            // cfg.ilks.min: 0 basis points
+            min: 0,
+            // cfg.ilks.max: 3,000 basis points
+            max: 3_000,
+            // cfg.ilks.step: 400 basis points
+            step: 400
+        });
+
+        // Note: Create SPBEAMConfig with the following parameters:
+        SPBEAMConfig memory spbeamConfig = SPBEAMConfig({
+            // cfg.tau: 57,600 seconds
+            tau: 57_600,
+            // Note: Use the SPBEAMRateConfig array created above
+            ilks: spbeamIlkConfigs,
+            // cfg.bud: 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309
+            bud: SPBEAM_BUD
+        });
+
+        // Note: We also need dss as an input parameter for SPBEAMInit.init
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
+        // Note: Now we can call SPBEAMInit.init with the instance and config created above
+        SPBEAMInit.init(dss, spbeamInstance, spbeamConfig);
+
+        // Add SPBEAM to the Chainlog as `MCD_SPBEAM` at 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22
+        DssExecLib.setChangelogAddress("MCD_SPBEAM", MCD_SPBEAM);
+
+        // Add SPBEAMMom to the Chainlog as `SPBEAM_MOM` at 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0
+        DssExecLib.setChangelogAddress("SPBEAM_MOM", SPBEAM_MOM);
+
+        // Note: bump Chainlog version as multiple keys are being added
+        DssExecLib.setChangelogVersion("1.19.9");
+
+        // ---------- Sky Token Rewards rebalance ----------
+        // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254
 
         // ---------- Set Aave Prime DDM DC to 0 ----------
         // Forum: https://forum.sky.money/t/spark-aave-lido-market-usds-allocation/25311/24
