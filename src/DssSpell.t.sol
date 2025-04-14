@@ -294,7 +294,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testAllocatorIntegration() public { // add the `skipped` modifier to skip
+    function testAllocatorIntegration() public skipped { // add the `skipped` modifier to skip
         AllocatorIntegrationParams memory p = AllocatorIntegrationParams({
             ilk:            "ALLOCATOR-BLOOM-A",
             pip:            addr.addr("PIP_ALLOCATOR"),
@@ -1114,7 +1114,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public view { // replace `view` with the `skipped` modifier to skip
+    function testDaoResolutions() public skipped { // replace `view` with the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
@@ -1133,7 +1133,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0x6B34C0E12C84338f494efFbf49534745DDE2F24b); // Insert Spark spell address
 
@@ -1152,73 +1152,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    function testAddChainlogKeys() public {
-        bytes32[] memory addedKeys = new bytes32[](2);
-        addedKeys[0] = "ALLOCATOR_BLOOM_A_VAULT";
-        addedKeys[1] = "ALLOCATOR_BLOOM_A_BUFFER";
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            vm.expectRevert("dss-chain-log/invalid-key");
-            chainLog.getAddress(addedKeys[i]);
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
-        }
-
-        // Note: Extra check to make sure PIP_ALLOCATOR_BLOOM_A is removed from the chainlog
-        vm.expectRevert("dss-chain-log/invalid-key");
-        chainLog.getAddress("PIP_ALLOCATOR_BLOOM_A");
-    }
-
-    function testNewLineMomIlks() public {
-        string[1] memory ilks = [
-            "ALLOCATOR-BLOOM-A"
-        ];
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                0,
-                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
-            );
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                1,
-                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
-            );
-        }
-    }
-
-    function testAllocatorBloomASubProxy() public {
-        address allocatorBloomAProxy = addr.addr("ALLOCATOR_BLOOM_A_SUBPROXY");
-        address subProxySpell = address(new MockSubProxySpell());
-
-        vm.prank(addr.addr("MCD_PAUSE_PROXY"));
-        vm.expectEmit();
-        emit Exec();
-        ProxyLike(allocatorBloomAProxy).exec(subProxySpell, abi.encodeWithSignature("execute()"));
-    }
-
-    event Exec();
-}
-
-contract MockSubProxySpell {
-    event Exec();
-
-    function execute() public {
-        emit Exec();
-    }
 }
