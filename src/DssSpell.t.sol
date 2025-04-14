@@ -46,6 +46,20 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface SPBEAMMomLike {
+    function authority() external view returns (address);
+}
+
+interface SPBEAMLike {
+    function wards(address) external view returns (uint256);
+    function tau() external view returns (uint64);
+    function buds(address) external view returns (uint256);
+    function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
+    function kiss(address usr) external;
+    function diss(address usr) external;
+    function file(bytes32 id, bytes32 what, uint256 data) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1131,7 +1145,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
     function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x6B34C0E12C84338f494efFbf49534745DDE2F24b); // Insert Spark spell address
+        address SPARK_SPELL = address(0); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1148,4 +1162,42 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testSPBEAM() public {
+        address SPBEAM_MOM = addr.addr("SPBEAM_MOM");
+        address MCD_SPBEAM = addr.addr("MCD_SPBEAM");
+        address SPBEAM_BUD = address(0xe1c6f81D0c3CD570A77813b81AA064c5fff80309);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(SPBEAMLike(MCD_SPBEAM).wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
+        assertEq(SPBEAMLike(MCD_SPBEAM).buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
+        assertEq(SPBEAMLike(MCD_SPBEAM).tau(), 57_600, "spbeam/invalid-tau");
+
+        // Verify sample ilk config
+        (uint16 min, uint16 max, uint16 step) = SPBEAMLike(MCD_SPBEAM).cfgs("ETH-A");
+        assertEq(min, uint16(200), "spbeam/invalid-collateral-min");
+        assertEq(max, uint16(3000), "spbeam/invalid-collateral-max");
+        assertEq(step, uint16(400), "spbeam/invalid-collateral-step");
+
+        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 0, "spbeam/facilitator-added-early");
+
+        vm.startPrank(address(pauseProxy));
+        // Add spell address as facilitator
+        SPBEAMLike(MCD_SPBEAM).kiss(address(this));
+        SPBEAMLike(MCD_SPBEAM).file("ETH-A", "min", 100);
+        vm.stopPrank();
+
+        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 1, "spbeam/facilitator-not-added");
+
+        (min,,) = SPBEAMLike(MCD_SPBEAM).cfgs("ETH-A");
+        assertEq(min, uint16(100), "spbeam/invalid-updated-collateral-min");
+
+        // Remove spell address as facilitator
+        vm.prank(address(pauseProxy));
+        SPBEAMLike(MCD_SPBEAM).diss(address(this));
+        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 0, "spbeam/facilitator-not-removed");
+    }
 }

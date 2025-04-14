@@ -44,6 +44,14 @@ interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface VestLike {
+    function yank(uint256) external;
+}
+
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -71,14 +79,16 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD = 10 ** 18;
 
     // ---------- Contracts ----------
-    GemAbstract internal immutable DAI              = GemAbstract(DssExecLib.dai());
-    GemAbstract internal immutable MKR              = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable SKY              = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable MCD_VAT              = DssExecLib.vat();
-    address internal immutable MCD_SPLIT            = DssExecLib.getChangelogAddress("MCD_SPLIT");
-    address internal immutable DAI_USDS             = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY              = DssExecLib.getChangelogAddress("MKR_SKY");
-    address internal immutable REWARDS_LSMKR_USDS   = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
+    GemAbstract internal immutable DAI                  = GemAbstract(DssExecLib.dai());
+    GemAbstract internal immutable MKR                  = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable SKY                  = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable MCD_VAT                  = DssExecLib.vat();
+    address internal immutable MCD_SPLIT                = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable DAI_USDS                 = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY                  = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable REWARDS_LSMKR_USDS       = DssExecLib.getChangelogAddress("REWARDS_LSMKR_USDS");
+    address internal immutable MCD_VEST_SKY             = DssExecLib.getChangelogAddress("MCD_VEST_SKY");
+    address internal immutable REWARDS_DIST_USDS_SKY    = DssExecLib.getChangelogAddress("REWARDS_DIST_USDS_SKY");
 
     address internal constant MCD_SPBEAM = 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22;
     address internal constant SPBEAM_MOM = 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0;
@@ -124,6 +134,7 @@ contract DssSpellAction is DssAction {
 
         // For the following cfg.ilks.id:
         // ETH-A, ETH-B, ETH-C, WSTETH-A, WSTETH-B, WBTC-A, WBTC-B, WBTC-C, SSR
+        // Note: This is done in the following steps
 
         // Note: Add config for ETH-A to ilk configs array
         spbeamIlkConfigs[0] = SPBEAMRateConfig({
@@ -235,6 +246,9 @@ contract DssSpellAction is DssAction {
             step: 400
         });
 
+        // For the following cfg.ilks.id: ALLOCATOR-SPARK-A, ALLOCATOR-NOVA-A, ALLOCATOR-BLOOM-A, DSR
+        // Note: This is done in the following steps
+
         // Note: Add config for ALLOCATOR-SPARK-A to ilk configs array
         spbeamIlkConfigs[10] = SPBEAMRateConfig({
             id: "ALLOCATOR-SPARK-A",
@@ -306,6 +320,12 @@ contract DssSpellAction is DssAction {
 
         // ---------- Sky Token Rewards rebalance ----------
         // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254
+
+        // Yank existing DssVest (0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9 | ID: 1)
+        VestLike(MCD_VEST_SKY).yank(1);
+
+        // VestedRewardsDistribution.distribute()
+        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
         // ---------- Set Aave Prime DDM DC to 0 ----------
         // Forum: https://forum.sky.money/t/spark-aave-lido-market-usds-allocation/25311/24
