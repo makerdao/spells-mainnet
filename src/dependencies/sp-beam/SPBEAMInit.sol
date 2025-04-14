@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 import {DssInstance} from "dss-test/MCD.sol";
 import {SPBEAMInstance} from "./SPBEAMInstance.sol";
