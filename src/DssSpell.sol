@@ -273,7 +273,7 @@ contract DssSpellAction is DssAction {
         // Create a new MCD_VEST_SKY stream:
         // Note: This is done in the steps below
 
-        // Rewards Distribution Cap: 176,000,000
+        // Rewards Distribution Cap: 176,000,000 per 182 days
         DssExecLib.setValue(MCD_VEST_SKY, "cap", 176_000_000 * WAD / 182 days);
 
         // MCD_VEST_SKY Vest Stream  | from 'block.timestamp' to 'block.timestamp + 15,724,800 seconds' | 160M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
