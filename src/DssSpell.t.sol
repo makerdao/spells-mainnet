@@ -46,8 +46,9 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface SPBEAMMomLike {
-    function authority() external view returns (address);
+struct ParamChange {
+    bytes32 id; // Rate identifier (ilk, "DSR", or "SSR")
+    uint256 bps; // New rate value in bps
 }
 
 interface SPBEAMLike {
@@ -55,9 +56,17 @@ interface SPBEAMLike {
     function tau() external view returns (uint64);
     function buds(address) external view returns (uint256);
     function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
-    function kiss(address usr) external;
-    function diss(address usr) external;
-    function file(bytes32 id, bytes32 what, uint256 data) external;
+    function set(ParamChange[] memory updates) external;
+}
+
+interface ConvLike {
+    function btor(uint256 bps) external view returns (uint256 ray);
+    function rtob(uint256 ray) external pure returns (uint256 bps);
+}
+
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function vestId() external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -606,7 +615,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestSKY(streams);
     }
 
-    function testVestSKYmint() public skipped { // add the `skipped` modifier to skip
+    function testVestSKYmint() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 DEC_01_2023 = 1701385200;
 
@@ -622,17 +631,16 @@ contract DssSpellTest is DssSpellTestBase {
             vm.warp(spell.nextCastTime());
 
             streams[0] = VestStream({
-                id:  1,
+                id:  2,
                 usr: addr.addr("REWARDS_DIST_USDS_SKY"),
-                bgn: block.timestamp - 7 days,
-                clf: block.timestamp - 7 days,
-                fin: block.timestamp - 7 days + 365 days - 1,
-                tau: 365 days - 1,
+                bgn: block.timestamp,
+                clf: block.timestamp,
+                fin: block.timestamp + 182 days,
+                tau: 182 days,
                 mgr: address(0),
                 res: 1,
-                tot: 600_000_000 * WAD,
-                // Note: the accumulated vested amount is claimed during the spell (`REWARDS_DIST_USDS_SKY.distribute()`)
-                rxd: 600_000_000 * WAD * 7 days / (365 days - 1)
+                tot: 160_000_000 * WAD,
+                rxd: 0
             });
 
             vm.revertTo(before);
@@ -713,6 +721,44 @@ contract DssSpellTest is DssSpellTestBase {
             vestTreasury.vest(yanks[i].streamId);
             assertTrue(!vestTreasury.valid(yanks[i].streamId));
             assertEq(vestTreasury.fin(yanks[i].streamId), block.timestamp, "testYankMKR/steam-fin-changed");
+        }
+    }
+
+    function testYankSKYmint() public { // add the `skipped` modifier to skip
+        // Provide human-readable names for timestamps
+        uint256 SEP_10_2025 = 1757505622;
+
+        // For each yanked stream, provide Yank object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yank[1] memory yanks = [
+            Yank(1, addr.addr("REWARDS_DIST_USDS_SKY"), SEP_10_2025)
+        ];
+
+        // Test stream id matches `addr` and `fin`
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_SKY"));
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankSKYmint/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankSKYmint/unexpected-fin-date");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSKYmint/steam-not-yanked");
+
+            // Give admin powers to test contract address and make the vesting unrestricted for testing
+            GodMode.setWard(address(vest), address(this), 1);
+
+            // Test vest can still be called, making stream "invalid" and not changing `fin` timestamp
+            vest.unrestrict(yanks[i].streamId);
+            vest.vest(yanks[i].streamId);
+            assertTrue(!vest.valid(yanks[i].streamId));
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSKYmint/steam-fin-changed");
         }
     }
 
@@ -1146,9 +1192,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0); // Insert Spark spell address
+        address SPARK_SPELL = address(0xA8FF99Ac98Fc0C3322F639a9591257518514455c); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1166,10 +1212,16 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    struct SPBEAMConfig {
+        bytes32 id;
+        uint16 expectedMin;
+    }
+
     function testSPBEAM() public {
         address SPBEAM_MOM = addr.addr("SPBEAM_MOM");
         address MCD_SPBEAM = addr.addr("MCD_SPBEAM");
-        address SPBEAM_BUD = address(0xe1c6f81D0c3CD570A77813b81AA064c5fff80309);
+        address SPBEAM_BUD = wallets.addr("SPBEAM_BUD");
+        address SPBEAM_CONV = address(0xea91A18dAFA1Cb1d2a19DFB205816034e6Fe7e52);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1179,28 +1231,68 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(SPBEAMLike(MCD_SPBEAM).buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
         assertEq(SPBEAMLike(MCD_SPBEAM).tau(), 57_600, "spbeam/invalid-tau");
 
-        // Verify sample ilk config
-        (uint16 min, uint16 max, uint16 step) = SPBEAMLike(MCD_SPBEAM).cfgs("ETH-A");
-        assertEq(min, uint16(200), "spbeam/invalid-collateral-min");
-        assertEq(max, uint16(3000), "spbeam/invalid-collateral-max");
-        assertEq(step, uint16(400), "spbeam/invalid-collateral-step");
+        SPBEAMConfig[13] memory configs = [
+            SPBEAMConfig("ALLOCATOR-BLOOM-A", 0),
+            SPBEAMConfig("ALLOCATOR-NOVA-A", 0),
+            SPBEAMConfig("ALLOCATOR-SPARK-A", 0),
+            SPBEAMConfig("DSR", 0),
+            SPBEAMConfig("ETH-A", 200),
+            SPBEAMConfig("ETH-B", 200),
+            SPBEAMConfig("ETH-C", 200),
+            SPBEAMConfig("SSR", 200),
+            SPBEAMConfig("WBTC-A", 200),
+            SPBEAMConfig("WBTC-B", 200),
+            SPBEAMConfig("WBTC-C", 200),
+            SPBEAMConfig("WSTETH-A", 200),
+            SPBEAMConfig("WSTETH-B", 200)
+        ];
 
-        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 0, "spbeam/facilitator-added-early");
+        ParamChange[] memory updates = new ParamChange[](13);
 
-        vm.startPrank(address(pauseProxy));
-        // Add spell address as facilitator
-        SPBEAMLike(MCD_SPBEAM).kiss(address(this));
-        SPBEAMLike(MCD_SPBEAM).file("ETH-A", "min", 100);
-        vm.stopPrank();
+        for (uint256 i = 0; i < configs.length; i++) {
+            (uint16 min, uint16 max, uint16 step) = SPBEAMLike(MCD_SPBEAM).cfgs(configs[i].id);
 
-        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 1, "spbeam/facilitator-not-added");
+            assertEq(min, configs[i].expectedMin, "spbeam/ilks/invalid-min");
+            assertEq(max, uint16(3000), "spbeam/ilks/invalid-max");
+            assertEq(step, uint16(400), "spbeam/ilks/invalid-step");
 
-        (min,,) = SPBEAMLike(MCD_SPBEAM).cfgs("ETH-A");
-        assertEq(min, uint16(100), "spbeam/invalid-updated-collateral-min");
+            uint256 baseRate;
+            if (configs[i].id == "DSR") {
+                baseRate = pot.dsr();
+            } else if (configs[i].id == "SSR") {
+                baseRate = susds.ssr();
+            } else {
+                (baseRate,) = jug.ilks(configs[i].id);
+            }
 
-        // Remove spell address as facilitator
-        vm.prank(address(pauseProxy));
-        SPBEAMLike(MCD_SPBEAM).diss(address(this));
-        assertEq(SPBEAMLike(MCD_SPBEAM).buds(address(this)), 0, "spbeam/facilitator-not-removed");
+            updates[i] = ParamChange(configs[i].id, ConvLike(SPBEAM_CONV).rtob(baseRate) + 50);
+        }
+
+        vm.prank(SPBEAM_BUD);
+        SPBEAMLike(MCD_SPBEAM).set(updates);
+
+        for (uint256 i = 0; i < updates.length; i++) {
+            uint256 rate;
+            if (updates[i].id == "DSR") {
+                rate = pot.dsr();
+            } else if (updates[i].id == "SSR") {
+                rate = susds.ssr();
+            } else {
+                (rate,) = jug.ilks(updates[i].id);
+            }
+            assertEq(rate, ConvLike(SPBEAM_CONV).btor(updates[i].bps), "spbeam/ilks/invalid-set-value");
+        }
+    }
+
+    function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {
+        address REWARDS_DIST_USDS_SKY = addr.addr("REWARDS_DIST_USDS_SKY");
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId(), 1, "rewards-dist-usds-sky/invalid-vest-id-before");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId(), 2, "rewards-dist-usds-sky/invalid-vest-id-after");
     }
 }
