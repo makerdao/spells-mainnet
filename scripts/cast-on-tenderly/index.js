@@ -102,7 +102,12 @@ const publishTenderlyTestnet = async function (testnetId) {
             },
         },
     });
-    if (response.data.container?.explorer_page !== 'ENABLED') {
+    // Note: apparently the response schema keeps changing, so the following conditions represent the ones that have been observed.
+    if (
+        response.data.container?.explorerConfig?.enabled !== true &&
+        response.data.container?.explorer_config?.enabled !== true &&
+        response.data.container?.explorer_page !== 'ENABLED'
+    ) {
         throw new Error('Failed to publish testnet');
     }
 
