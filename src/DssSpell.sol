@@ -383,6 +383,16 @@ contract DssSpellAction is DssAction {
         _transferSky(CLOAKY_2, 288_000 * WAD);
 
         // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/april-17-2025-proposed-changes-to-spark-for-upcoming-spell/26234
+        // Poll: https://vote.makerdao.com/polling/QmZbk3gD
+        // Poll: https://vote.makerdao.com/polling/QmbNssss
+        // Poll: https://vote.makerdao.com/polling/QmWgkXDA
+        // Poll: https://vote.makerdao.com/polling/QmWju9Uu
+        // Poll: https://vote.makerdao.com/polling/Qmc3WXej
+        // Poll: https://vote.makerdao.com/polling/QmU3y9jf
+        // Poll: https://vote.makerdao.com/polling/QmQk4XKy
+        // Poll: https://vote.makerdao.com/polling/QmQgnWbX
+        // Poll: https://vote.makerdao.com/polling/QmRkQDMT
 
         // Execute Spark Proxy spell at 0xA8FF99Ac98Fc0C3322F639a9591257518514455c
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
