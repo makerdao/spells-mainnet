@@ -47,7 +47,6 @@ interface ProxyLike {
 
 interface VestedRewardsDistributionLike {
     function distribute() external returns (uint256 amount);
-    function file(bytes32 what, uint256 data) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -111,7 +110,7 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0xA8FF99Ac98Fc0C3322F639a9591257518514455c);
+    address internal constant SPARK_SPELL = 0xA8FF99Ac98Fc0C3322F639a9591257518514455c;
 
     function actions() public override {
 
@@ -292,7 +291,10 @@ contract DssSpellAction is DssAction {
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
         // Note: Set the Rewards Distribution Cap first
-        VestAbstract(MCD_VEST_SKY).file("cap", 176_000_000 * WAD / 182 days);
+        DssExecLib.setValue(MCD_VEST_SKY, "cap", 176_000_000 * WAD / 182 days);
+
+        // Approve SKY vest to take 160,000,000 SKY from the treasury
+        SKY.approve(MCD_VEST_SKY, 160_000_000 * WAD);
 
         // Create a new MCD_VEST_SKY stream:
         uint256 streamId = VestAbstract(MCD_VEST_SKY).create(
@@ -317,7 +319,7 @@ contract DssSpellAction is DssAction {
         // Note: This is done above
 
         // File the new stream ID on REWARDS_DIST_USDS_SKY
-        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).file("vestId", streamId);
+        DssExecLib.setValue(REWARDS_DIST_USDS_SKY, "vestId", streamId);
 
         // ---------- Set Aave Prime DDM DC to 0 ----------
         // Forum: https://forum.sky.money/t/spark-aave-lido-market-usds-allocation/25311/24
