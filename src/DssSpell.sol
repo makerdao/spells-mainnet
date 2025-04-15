@@ -23,7 +23,6 @@ import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { DssInstance, MCD } from "dss-test/MCD.sol";
-
 import { SPBEAMInit, SPBEAMConfig, SPBEAMRateConfig } from "./dependencies/sp-beam/SPBEAMInit.sol";
 import { SPBEAMInstance } from "./dependencies/sp-beam/SPBEAMInstance.sol";
 
@@ -120,6 +119,8 @@ contract DssSpellAction is DssAction {
         // Poll: https://vote.makerdao.com/polling/QmWc4toZ
 
         // Init SP BEAM by calling SPBEAMInit.init with the following parameters:
+        // Note: This is done after creating the instance and config used as its parameters
+
         // Note: Create SPBEAMInstance with the following parameters:
         SPBEAMInstance memory spbeamInstance = SPBEAMInstance({
             // inst.spbeam: 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22
@@ -128,8 +129,8 @@ contract DssSpellAction is DssAction {
             mom: SPBEAM_MOM
         });
 
-        // Note: Create SPBEAMRateConfig array to include all 14 requested ilks
-        SPBEAMRateConfig[] memory spbeamIlkConfigs = new SPBEAMRateConfig[](14);
+        // Note: Create SPBEAMRateConfig array to include all 11 requested ilks, SSR and DSR
+        SPBEAMRateConfig[] memory spbeamRateConfigs = new SPBEAMRateConfig[](13);
 
         // For the following cfg.ilks.id:
         // ETH-A, ETH-B, ETH-C, WSTETH-A, WSTETH-B, WBTC-A, WBTC-B, WBTC-C, SSR
@@ -138,81 +139,64 @@ contract DssSpellAction is DssAction {
         // cfg.ilks.step: 400 basis points
         // Note: This is done in the following steps
 
-        // Note: Add config for ETH-A to ilk configs array
-        spbeamIlkConfigs[0] = SPBEAMRateConfig({
+        spbeamRateConfigs[0] = SPBEAMRateConfig({
             id: "ETH-A",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for ETH-B to ilk configs array
-        spbeamIlkConfigs[1] = SPBEAMRateConfig({
+        spbeamRateConfigs[1] = SPBEAMRateConfig({
             id: "ETH-B",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for ETH-C to ilk configs array
-        spbeamIlkConfigs[2] = SPBEAMRateConfig({
+        spbeamRateConfigs[2] = SPBEAMRateConfig({
             id: "ETH-C",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for WSTETH-A to ilk configs array
-        spbeamIlkConfigs[3] = SPBEAMRateConfig({
+        spbeamRateConfigs[3] = SPBEAMRateConfig({
             id: "WSTETH-A",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for WSTETH-B to ilk configs array
-        spbeamIlkConfigs[4] = SPBEAMRateConfig({
+        spbeamRateConfigs[4] = SPBEAMRateConfig({
             id: "WSTETH-B",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for WBTC-A to ilk configs array
-        spbeamIlkConfigs[5] = SPBEAMRateConfig({
+        spbeamRateConfigs[5] = SPBEAMRateConfig({
             id: "WBTC-A",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for WBTC-B to ilk configs array
-        spbeamIlkConfigs[6] = SPBEAMRateConfig({
+        spbeamRateConfigs[6] = SPBEAMRateConfig({
             id: "WBTC-B",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for WBTC-C to ilk configs array
-        spbeamIlkConfigs[7] = SPBEAMRateConfig({
+        spbeamRateConfigs[7] = SPBEAMRateConfig({
             id: "WBTC-C",
             min: 200,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for SSR to ilk configs array
-        spbeamIlkConfigs[8] = SPBEAMRateConfig({
+        spbeamRateConfigs[8] = SPBEAMRateConfig({
             id: "SSR",
-            min: 200,
-            max: 3_000,
-            step: 400
-        });
-
-        // Note: Add config for ETH-A to ilk configs array
-        spbeamIlkConfigs[9] = SPBEAMRateConfig({
-            id: "ETH-A",
             min: 200,
             max: 3_000,
             step: 400
@@ -224,32 +208,28 @@ contract DssSpellAction is DssAction {
         // cfg.ilks.step: 400 basis points
         // Note: This is done in the following steps
 
-        // Note: Add config for ALLOCATOR-SPARK-A to ilk configs array
-        spbeamIlkConfigs[10] = SPBEAMRateConfig({
+        spbeamRateConfigs[9] = SPBEAMRateConfig({
             id: "ALLOCATOR-SPARK-A",
             min: 0,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for ALLOCATOR-NOVA-A to ilk configs array
-        spbeamIlkConfigs[11] = SPBEAMRateConfig({
+        spbeamRateConfigs[10] = SPBEAMRateConfig({
             id: "ALLOCATOR-NOVA-A",
             min: 0,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for ALLOCATOR-BLOOM-A to ilk configs array
-        spbeamIlkConfigs[12] = SPBEAMRateConfig({
+        spbeamRateConfigs[11] = SPBEAMRateConfig({
             id: "ALLOCATOR-BLOOM-A",
             min: 0,
             max: 3_000,
             step: 400
         });
 
-        // Note: Add config for DSR to ilk configs array
-        spbeamIlkConfigs[13] = SPBEAMRateConfig({
+        spbeamRateConfigs[12] = SPBEAMRateConfig({
             id: "DSR",
             min: 0,
             max: 3_000,
@@ -261,7 +241,7 @@ contract DssSpellAction is DssAction {
             // cfg.tau: 57,600 seconds
             tau: 57_600,
             // Note: Use the SPBEAMRateConfig array created above
-            ilks: spbeamIlkConfigs,
+            ilks: spbeamRateConfigs,
             // cfg.bud: 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309
             bud: SPBEAM_BUD
         });
@@ -290,23 +270,17 @@ contract DssSpellAction is DssAction {
         // VestedRewardsDistribution.distribute()
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
-        // Note: Set the Rewards Distribution Cap first
+        // Create a new MCD_VEST_SKY stream:
+        // Note: This is done in the steps below
+
+        // Rewards Distribution Cap: 176,000,000
         DssExecLib.setValue(MCD_VEST_SKY, "cap", 176_000_000 * WAD / 182 days);
 
-        // Approve SKY vest to take 160,000,000 SKY from the treasury
-        SKY.approve(MCD_VEST_SKY, 160_000_000 * WAD);
-
-        // Create a new MCD_VEST_SKY stream:
+        // MCD_VEST_SKY Vest Stream  | from 'block.timestamp' to 'block.timestamp + 15,724,800 seconds' | 160M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
         uint256 streamId = VestAbstract(MCD_VEST_SKY).create(
-            // Note: Set User to Vested Rewards Distribution Contract
             REWARDS_DIST_USDS_SKY,
-            // Rewards Distribution: 160,000,000
             160_000_000 * WAD,
-            // Rewards Distribution Cap: 176,000,000
-            // Note: This is done in the step above
-            // bgn: block.timestamp
             block.timestamp,
-            // fin: block.timestamp + 182 days
             (block.timestamp + 182 days) - block.timestamp,
             0,
             address(0)
@@ -314,9 +288,6 @@ contract DssSpellAction is DssAction {
 
         // res: 1 (restricted)
         VestAbstract(MCD_VEST_SKY).restrict(streamId);
-
-        // MCD_VEST_SKY Vest Stream  | from 'block.timestamp' to 'block.timestamp + 15,724,800 seconds' | 160M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
-        // Note: This is done above
 
         // File the new stream ID on REWARDS_DIST_USDS_SKY
         DssExecLib.setValue(REWARDS_DIST_USDS_SKY, "vestId", streamId);

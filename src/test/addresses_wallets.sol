@@ -208,5 +208,8 @@ contract Wallets {
 
         // Nova
         addr["NOVA_OPERATOR"]                = 0x0f72935f6de6C54Ce8056FD040d4Ddb012B7cd54;
+
+        // SPBEAM
+        addr["SPBEAM_BUD"]                   = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309;
     }
 }
