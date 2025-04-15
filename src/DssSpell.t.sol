@@ -57,6 +57,12 @@ interface SPBEAMLike {
     function buds(address) external view returns (uint256);
     function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
     function set(ParamChange[] memory updates) external;
+    function bad() external view returns (uint8);
+}
+
+interface SPBEAMMomLike {
+    function halt(address spbeam) external;
+    function authority() external view returns (address);
 }
 
 interface ConvLike {
@@ -1221,6 +1227,7 @@ contract DssSpellTest is DssSpellTestBase {
         address SPBEAM_MOM = addr.addr("SPBEAM_MOM");
         address MCD_SPBEAM = addr.addr("MCD_SPBEAM");
         address SPBEAM_BUD = wallets.addr("SPBEAM_BUD");
+        address MCD_ADM = addr.addr("MCD_ADM");
         address SPBEAM_CONV = address(0xea91A18dAFA1Cb1d2a19DFB205816034e6Fe7e52);
 
         _vote(address(spell));
@@ -1230,6 +1237,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(SPBEAMLike(MCD_SPBEAM).wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
         assertEq(SPBEAMLike(MCD_SPBEAM).buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
         assertEq(SPBEAMLike(MCD_SPBEAM).tau(), 57_600, "spbeam/invalid-tau");
+        assertEq(SPBEAMMomLike(SPBEAM_MOM).authority(), MCD_ADM, "spbeam/adm-not-authority");
 
         SPBEAMConfig[13] memory configs = [
             SPBEAMConfig("ALLOCATOR-BLOOM-A", 0),
@@ -1283,6 +1291,14 @@ contract DssSpellTest is DssSpellTestBase {
             }
             assertEq(rate, ConvLike(SPBEAM_CONV).btor(updates[i].bps), "spbeam/ilks/invalid-set-value");
         }
+
+        // Test SPBEAM_MOM.halt()
+        assertEq(SPBEAMLike(MCD_SPBEAM).bad(), 0, "spbeam/bad-early");
+
+        vm.prank(chief.hat());
+        SPBEAMMomLike(SPBEAM_MOM).halt(MCD_SPBEAM);
+
+        assertEq(SPBEAMLike(MCD_SPBEAM).bad(), 1, "spbeam/bad-not-set-by-mom");
     }
 
     function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {
