@@ -47,6 +47,7 @@ interface ProxyLike {
 
 interface VestedRewardsDistributionLike {
     function distribute() external returns (uint256 amount);
+    function file(bytes32 what, uint256 data) external;
 }
 
 contract DssSpellAction is DssAction {
@@ -133,162 +134,126 @@ contract DssSpellAction is DssAction {
 
         // For the following cfg.ilks.id:
         // ETH-A, ETH-B, ETH-C, WSTETH-A, WSTETH-B, WBTC-A, WBTC-B, WBTC-C, SSR
+        // cfg.ilks.min: 200 basis points
+        // cfg.ilks.max: 3,000 basis points
+        // cfg.ilks.step: 400 basis points
         // Note: This is done in the following steps
 
         // Note: Add config for ETH-A to ilk configs array
         spbeamIlkConfigs[0] = SPBEAMRateConfig({
             id: "ETH-A",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for ETH-B to ilk configs array
         spbeamIlkConfigs[1] = SPBEAMRateConfig({
             id: "ETH-B",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for ETH-C to ilk configs array
         spbeamIlkConfigs[2] = SPBEAMRateConfig({
             id: "ETH-C",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for WSTETH-A to ilk configs array
         spbeamIlkConfigs[3] = SPBEAMRateConfig({
             id: "WSTETH-A",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for WSTETH-B to ilk configs array
         spbeamIlkConfigs[4] = SPBEAMRateConfig({
             id: "WSTETH-B",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for WBTC-A to ilk configs array
         spbeamIlkConfigs[5] = SPBEAMRateConfig({
             id: "WBTC-A",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for WBTC-B to ilk configs array
         spbeamIlkConfigs[6] = SPBEAMRateConfig({
             id: "WBTC-B",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for WBTC-C to ilk configs array
         spbeamIlkConfigs[7] = SPBEAMRateConfig({
             id: "WBTC-C",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for SSR to ilk configs array
         spbeamIlkConfigs[8] = SPBEAMRateConfig({
             id: "SSR",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for ETH-A to ilk configs array
         spbeamIlkConfigs[9] = SPBEAMRateConfig({
             id: "ETH-A",
-            // cfg.ilks.min: 200 basis points
             min: 200,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // For the following cfg.ilks.id: ALLOCATOR-SPARK-A, ALLOCATOR-NOVA-A, ALLOCATOR-BLOOM-A, DSR
+        // cfg.ilks.min: 0 basis points
+        // cfg.ilks.max: 3,000 basis points
+        // cfg.ilks.step: 400 basis points
         // Note: This is done in the following steps
 
         // Note: Add config for ALLOCATOR-SPARK-A to ilk configs array
         spbeamIlkConfigs[10] = SPBEAMRateConfig({
             id: "ALLOCATOR-SPARK-A",
-            // cfg.ilks.min: 0 basis points
             min: 0,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for ALLOCATOR-NOVA-A to ilk configs array
         spbeamIlkConfigs[11] = SPBEAMRateConfig({
             id: "ALLOCATOR-NOVA-A",
-            // cfg.ilks.min: 0 basis points
             min: 0,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for ALLOCATOR-BLOOM-A to ilk configs array
         spbeamIlkConfigs[12] = SPBEAMRateConfig({
             id: "ALLOCATOR-BLOOM-A",
-            // cfg.ilks.min: 0 basis points
             min: 0,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
         // Note: Add config for DSR to ilk configs array
         spbeamIlkConfigs[13] = SPBEAMRateConfig({
             id: "DSR",
-            // cfg.ilks.min: 0 basis points
             min: 0,
-            // cfg.ilks.max: 3,000 basis points
             max: 3_000,
-            // cfg.ilks.step: 400 basis points
             step: 400
         });
 
@@ -320,11 +285,39 @@ contract DssSpellAction is DssAction {
         // ---------- Sky Token Rewards rebalance ----------
         // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254
 
-        // Yank existing DssVest (0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9 | ID: 1)
+        // Yank MCD_VEST_SKY vest with ID 1
         VestAbstract(MCD_VEST_SKY).yank(1);
 
         // VestedRewardsDistribution.distribute()
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
+
+        // Note: Set the Rewards Distribution Cap first
+        VestAbstract(MCD_VEST_SKY).file("cap", 176_000_000 * WAD);
+
+        // Create a new MCD_VEST_SKY stream:
+        VestAbstract(MCD_VEST_SKY).create(
+            // Note: Set User to Vested Rewards Distribution Contract
+            REWARDS_DIST_USDS_SKY,
+            // Rewards Distribution: 160,000,000
+            160_000_000 * WAD,
+            // Rewards Distribution Cap: 176,000,000
+            // Note: This is done in the step above
+            // bgn: block.timestamp
+            block.timestamp,
+            // fin: block.timestamp + 182 days
+            (block.timestamp + 182 days) - block.timestamp,
+            0,
+            address(0)
+        );
+
+        // res: 1 (restricted)
+        VestAbstract(MCD_VEST_SKY).restrict(streamId);
+
+        // MCD_VEST_SKY Vest Stream  | from 'block.timestamp' to 'block.timestamp + 15,724,800 seconds' | 160M * WAD SKY | 0x2F0C88e935Db5A60DDA73b0B4EAEef55883896d9
+        // Note: This is done above
+
+        // File the new stream ID on REWARDS_DIST_USDS_SKY
+        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).file("vestId", streamId);
 
         // ---------- Set Aave Prime DDM DC to 0 ----------
         // Forum: https://forum.sky.money/t/spark-aave-lido-market-usds-allocation/25311/24
