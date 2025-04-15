@@ -295,7 +295,7 @@ contract DssSpellAction is DssAction {
         VestAbstract(MCD_VEST_SKY).file("cap", 176_000_000 * WAD);
 
         // Create a new MCD_VEST_SKY stream:
-        VestAbstract(MCD_VEST_SKY).create(
+        uint256 streamId = VestAbstract(MCD_VEST_SKY).create(
             // Note: Set User to Vested Rewards Distribution Contract
             REWARDS_DIST_USDS_SKY,
             // Rewards Distribution: 160,000,000
