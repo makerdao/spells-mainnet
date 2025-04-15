@@ -1265,6 +1265,7 @@ contract DssSpellTest is DssSpellTestBase {
                 (baseRate,) = jug.ilks(configs[i].id);
             }
 
+            // Change the current rate by some amount to test the set function below
             updates[i] = ParamChange(configs[i].id, ConvLike(SPBEAM_CONV).rtob(baseRate) + 50);
         }
 
