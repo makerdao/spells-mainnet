@@ -292,7 +292,7 @@ contract DssSpellAction is DssAction {
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
         // Note: Set the Rewards Distribution Cap first
-        VestAbstract(MCD_VEST_SKY).file("cap", 176_000_000 * WAD);
+        VestAbstract(MCD_VEST_SKY).file("cap", 176_000_000 * WAD / 182 days);
 
         // Create a new MCD_VEST_SKY stream:
         uint256 streamId = VestAbstract(MCD_VEST_SKY).create(
