@@ -1286,13 +1286,22 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {
         address REWARDS_DIST_USDS_SKY = addr.addr("REWARDS_DIST_USDS_SKY");
+        address MCD_VEST_SKY = addr.addr("MCD_VEST_SKY");
 
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId(), 1, "rewards-dist-usds-sky/invalid-vest-id-before");
+        uint256 vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
+        assertEq(vestId, 1, "rewards-dist-usds-sky/invalid-vest-id-before");
+
+        uint256 unpaidAmount = VestAbstract(MCD_VEST_SKY).unpaid(1);
+        assertTrue(unpaidAmount > 0, "rewards-dist-usds-sky/invalid-unpaid-amount-before");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId(), 2, "rewards-dist-usds-sky/invalid-vest-id-after");
+        vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
+        assertEq(vestId, 2, "rewards-dist-usds-sky/invalid-vest-id-after");
+
+        unpaidAmount = VestAbstract(MCD_VEST_SKY).unpaid(1);
+        assertEq(unpaidAmount, 0, "rewards-dist-usds-sky/invalid-unpaid-amount-after");
     }
 }
