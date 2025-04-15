@@ -21,6 +21,7 @@ import "dss-exec-lib/DssAction.sol";
 
 import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { DssInstance, MCD } from "dss-test/MCD.sol";
 
 import { SPBEAMInit, SPBEAMConfig, SPBEAMRateConfig } from "./dependencies/sp-beam/SPBEAMInit.sol";
@@ -42,10 +43,6 @@ interface StakingRewardsLike {
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
-}
-
-interface VestLike {
-    function yank(uint256) external;
 }
 
 interface VestedRewardsDistributionLike {
@@ -113,12 +110,14 @@ contract DssSpellAction is DssAction {
     // ---------- Spark Proxy Spell ----------
     // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0);
+    address internal constant SPARK_SPELL = address(0xA8FF99Ac98Fc0C3322F639a9591257518514455c);
 
     function actions() public override {
 
         // ---------- SP BEAM Initialization ----------
         // Forum: https://forum.sky.money/t/technical-scope-sp-beam-initialization-spell/26266
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-april-14-2025/26262/2
+        // Poll: https://vote.makerdao.com/polling/QmWc4toZ
 
         // Init SP BEAM by calling SPBEAMInit.init with the following parameters:
         // Note: Create SPBEAMInstance with the following parameters:
@@ -322,7 +321,7 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254
 
         // Yank existing DssVest (0xB313Eab3FdE99B2bB4bA9750C2DDFBe2729d1cE9 | ID: 1)
-        VestLike(MCD_VEST_SKY).yank(1);
+        VestAbstract(MCD_VEST_SKY).yank(1);
 
         // VestedRewardsDistribution.distribute()
         VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
@@ -419,7 +418,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Proxy Spell ----------
 
-        // Execute Spark Proxy spell at TBC
+        // Execute Spark Proxy spell at 0xA8FF99Ac98Fc0C3322F639a9591257518514455c
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
