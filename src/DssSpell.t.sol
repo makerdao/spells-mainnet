@@ -641,8 +641,8 @@ contract DssSpellTest is DssSpellTestBase {
                 usr: addr.addr("REWARDS_DIST_USDS_SKY"),
                 bgn: block.timestamp,
                 clf: block.timestamp,
-                fin: block.timestamp + 182 days,
-                tau: 182 days,
+                fin: block.timestamp + 15_724_800 seconds,
+                tau: 15_724_800 seconds,
                 mgr: address(0),
                 res: 1,
                 tot: 160_000_000 * WAD,
@@ -788,7 +788,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = true;
+        bool ignoreTotalSupplyDaiUsds = false;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
@@ -1303,13 +1303,13 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {
         address REWARDS_DIST_USDS_SKY = addr.addr("REWARDS_DIST_USDS_SKY");
-        address MCD_VEST_SKY = addr.addr("MCD_VEST_SKY");
+        address REWARDS_USDS_SKY = addr.addr("REWARDS_USDS_SKY");
 
         uint256 vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
         assertEq(vestId, 1, "rewards-dist-usds-sky/invalid-vest-id-before");
 
-        uint256 unpaidAmount = VestAbstract(MCD_VEST_SKY).unpaid(1);
-        assertTrue(unpaidAmount > 0, "rewards-dist-usds-sky/invalid-unpaid-amount-before");
+        uint256 unpaidAmount = vestSkyMint.unpaid(1);
+        assertTrue(unpaidAmount > 0, "rewards-dist-usds-sky/unpaid-zero-early");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1318,7 +1318,9 @@ contract DssSpellTest is DssSpellTestBase {
         vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
         assertEq(vestId, 2, "rewards-dist-usds-sky/invalid-vest-id-after");
 
-        unpaidAmount = VestAbstract(MCD_VEST_SKY).unpaid(1);
-        assertEq(unpaidAmount, 0, "rewards-dist-usds-sky/invalid-unpaid-amount-after");
+        unpaidAmount = vestSkyMint.unpaid(1);
+        assertEq(unpaidAmount, 0, "rewards-dist-usds-sky/unpaid-not-cleared");
+
+        assertEq(StakingRewardsLike(REWARDS_USDS_SKY).lastUpdateTime(), block.timestamp, "rewards-usds-sky/invalid-last-update-time");
     }
 }

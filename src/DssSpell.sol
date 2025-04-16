@@ -282,7 +282,7 @@ contract DssSpellAction is DssAction {
             REWARDS_DIST_USDS_SKY,
             160_000_000 * WAD,
             block.timestamp,
-            (block.timestamp + 182 days) - block.timestamp,
+            (block.timestamp + 15_724_800 seconds) - block.timestamp,
             0,
             address(0)
         );

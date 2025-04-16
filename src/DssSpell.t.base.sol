@@ -242,6 +242,7 @@ interface StakingRewardsLike {
     function rewardsDuration() external view returns (uint256);
     function rewardsToken() external view returns (address);
     function stakingToken() external view returns (address);
+    function lastUpdateTime() external view returns (uint256);
 }
 
 interface LockstakeEngineLike {
