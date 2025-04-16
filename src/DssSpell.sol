@@ -307,7 +307,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("DIRECT-SPK-AAVE-LIDO-USDS", 0);
 
         // Note: Update global debt ceiling
-        DssExecLib.decreaseGlobalDebtCeiling(line);
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - line);
 
         // ---------- SBE Changes ----------
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-april-17-spell/26253
