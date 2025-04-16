@@ -263,6 +263,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Sky Token Rewards rebalance ----------
         // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254
+        // Forum: https://forum.sky.money/t/sky-token-rewards-update-april-17-spell/26254/5
 
         // Yank MCD_VEST_SKY vest with ID 1
         VestAbstract(MCD_VEST_SKY).yank(1);
@@ -306,10 +307,11 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkDebtCeiling("DIRECT-SPK-AAVE-LIDO-USDS", 0);
 
         // Note: Update global debt ceiling
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - line);
+        DssExecLib.decreaseGlobalDebtCeiling(line);
 
         // ---------- SBE Changes ----------
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-april-17-spell/26253
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-april-17-spell/26253/2
 
         // Increase Splitter.hop for 493 seconds from 1,235 seconds to 1,728 seconds
         DssExecLib.setValue(MCD_SPLIT, "hop", 1_728);
@@ -329,6 +331,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark - Aave revenue share transfer ----------
         // Forum: https://forum.sky.money/t/spark-aave-revenue-share-calculation-payment-7-q1-2025/26219
+        // Forum: https://forum.sky.money/t/spark-aave-revenue-share-calculation-payment-7-q1-2025/26219/2
 
         // AAVE Revenue Share - 256,888 DAI - 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c
         DssExecLib.sendPaymentFromSurplusBuffer(AAVE_V3_TREASURY, 256_888);
@@ -360,6 +363,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Atlas Core Development April 2025 USDS Payments ----------
         // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-april-2025/26221
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-april-2025/26221/6
 
         // BLUE - 50,167 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferUsds(BLUE, 50_167 * WAD);
@@ -375,6 +379,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Atlas Core Development April 2025 SKY Payments ----------
         // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-april-2025/26221
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-april-2025/26221/6
 
         // BLUE - 330,000 SKY - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferSky(BLUE, 330_000 * WAD);
