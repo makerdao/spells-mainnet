@@ -58,6 +58,10 @@ interface SPBEAMLike {
     function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
     function set(ParamChange[] memory updates) external;
     function bad() external view returns (uint8);
+    function conv() external view returns (address);
+    function jug() external view returns (address);
+    function pot() external view returns (address);
+    function susds() external view returns (address);
 }
 
 interface SPBEAMMomLike {
@@ -1233,6 +1237,12 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Constructor Sanity Checks
+        assertEq(SPBEAMLike(MCD_SPBEAM).jug(), address(jug), "spbeam/invalid-jug");
+        assertEq(SPBEAMLike(MCD_SPBEAM).pot(), address(pot), "spbeam/invalid-pot");
+        assertEq(SPBEAMLike(MCD_SPBEAM).conv(), SPBEAM_CONV, "spbeam/invalid-conv");
+        assertEq(SPBEAMLike(MCD_SPBEAM).susds(), address(susds), "spbeam/invalid-susds");
 
         assertEq(SPBEAMLike(MCD_SPBEAM).wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
         assertEq(SPBEAMLike(MCD_SPBEAM).buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
