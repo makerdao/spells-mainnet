@@ -941,9 +941,9 @@ contract DssSpellTestBase is Config, DssTest {
 
             {
             if (!values.collaterals[ilk].SP_enabled) {
-                assertEq(SP_min, 0, _concat("TestError/spbeam-min-not-zero-", ilk));
-                assertEq(SP_max, 0, _concat("TestError/spbeam-max-not-zero-", ilk));
-                assertEq(SP_step, 0, _concat("TestError/spbeam-step-not-zero-", ilk));
+                assertEq(values.collaterals[ilk].SP_min, 0, _concat("TestError/spbeam-min-not-zero-", ilk));
+                assertEq(values.collaterals[ilk].SP_max, 0, _concat("TestError/spbeam-max-not-zero-", ilk));
+                assertEq(values.collaterals[ilk].SP_step, 0, _concat("TestError/spbeam-step-not-zero-", ilk));
 
                 assertEq(duty, rates.rates(values.collaterals[ilk].pct), _concat("TestError/jug-duty-", ilk));
                 assertTrue(
