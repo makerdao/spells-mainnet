@@ -961,8 +961,10 @@ contract DssSpellTestBase is Config, DssTest {
 
                 uint256 rtob_duty = ConvLike(spbeam.conv()).rtob(duty);
 
-                assertGe(rtob_duty, SP_min, _concat("TestError/spbeam-duty-below-min-", ilk));
-                assertLe(rtob_duty, SP_max, _concat("TestError/spbeam-duty-exceeds-max-", ilk));
+                assertGe(rtob_duty, SP_min, _concat("TestError/jug-duty-below-spbeam-min-", ilk));
+                assertLe(rtob_duty, SP_max, _concat("TestError/jug-duty-exceeds-spbeam-max-", ilk));
+
+                assertTrue(SP_max < THOUSAND * THOUSAND, _concat("TestError/spbeam-max-too-high-", ilk));   // check SPBEAM max lt 1000%
             }
             // make sure duty is less than 1000% APR
             // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
