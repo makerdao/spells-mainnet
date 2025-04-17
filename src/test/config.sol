@@ -49,6 +49,7 @@ contract Config {
         bytes32 line_mom_authority;
         bytes32 lite_psm_mom_authority;
         bytes32 splitter_mom_authority;
+        bytes32 spbeam_mom_authority;
         uint256 vest_dai_cap;
         uint256 vest_mkr_cap;
         uint256 vest_usds_cap;
@@ -148,6 +149,7 @@ contract Config {
         afterSpell.line_mom_authority     = "MCD_ADM";                                  // LineMom authority
         afterSpell.lite_psm_mom_authority = "MCD_ADM";                                  // LitePsmMom authority
         afterSpell.splitter_mom_authority = "MCD_ADM";                                  // SplitterMom authority
+        afterSpell.spbeam_mom_authority   = "MCD_ADM";                                  // SPBeamMom authority
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;                // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;                     // In WAD MKR per second
         afterSpell.vest_usds_cap          = 46_200 * WAD / 30 days;                     // In WAD USDS per second

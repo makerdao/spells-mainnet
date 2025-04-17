@@ -445,6 +445,11 @@ interface SPBEAMLike {
     function susds() external view returns (address);
 }
 
+interface SPBEAMMomLike {
+    function halt(address spbeam) external;
+    function authority() external view returns (address);
+}
+
 interface ConvLike {
     function btor(uint256 bps) external view returns (uint256 ray);
     function rtob(uint256 ray) external pure returns (uint256 bps);
@@ -503,6 +508,7 @@ contract DssSpellTestBase is Config, DssTest {
     VestAbstract             vestSkyMint = VestAbstract(       addr.addr("MCD_VEST_SKY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
     SPBEAMLike                    spbeam = SPBEAMLike(         addr.addr("MCD_SPBEAM"));
+    SPBEAMMomLike              spbeamMom = SPBEAMMomLike(      addr.addr("SPBEAM_MOM"));
     address          voteDelegateFactory =                     addr.addr("VOTE_DELEGATE_FACTORY");
 
     DssSpell spell;
@@ -876,6 +882,9 @@ contract DssSpellTestBase is Config, DssTest {
 
         // check SplitterMom authority
         assertEq(splitterMom.authority(), addr.addr(values.splitter_mom_authority), "TestError/splitterMom-authority");
+
+        // check SPBEAMMom authority
+        assertEq(spbeamMom.authority(), addr.addr(values.spbeam_mom_authority), "TestError/spbeamMom-authority");
 
         // check number of ilks
         assertEq(reg.count(), values.ilk_count, "TestError/ilks-count");

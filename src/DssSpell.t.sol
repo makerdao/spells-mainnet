@@ -46,11 +46,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface SPBEAMMomLike {
-    function halt(address spbeam) external;
-    function authority() external view returns (address);
-}
-
 interface VestedRewardsDistributionLike {
     function distribute() external returns (uint256 amount);
     function vestId() external view returns (uint256);
