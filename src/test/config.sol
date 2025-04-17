@@ -155,12 +155,12 @@ contract Config {
         afterSpell.vest_sky_mint_cap      = 176 * MILLION * WAD / 182 days;             // In WAD SKY per second
         afterSpell.SP_tau                 = 57_600 seconds;                             // In seconds
         afterSpell.SP_bud                 = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309; // Address of SPBEAM Bud
-        afterSpell.SP_ssr_min             = 200;                                        // In basis points
-        afterSpell.SP_ssr_max             = 3_000;                                      // In basis points
-        afterSpell.SP_ssr_step            = 400;                                        // In basis points
+        afterSpell.SP_ssr_min             = 2_00;                                       // In basis points
+        afterSpell.SP_ssr_max             = 30_00;                                      // In basis points
+        afterSpell.SP_ssr_step            = 4_00;                                       // In basis points
         afterSpell.SP_dsr_min             = 0;                                          // In basis points
-        afterSpell.SP_dsr_max             = 3_000;                                      // In basis points
-        afterSpell.SP_dsr_step            = 400;                                        // In basis points
+        afterSpell.SP_dsr_max             = 30_00;                                      // In basis points
+        afterSpell.SP_dsr_step            = 4_00;                                       // In basis points
         afterSpell.sky_mkr_rate           = 24_000;                                     // In whole SKY/MKR units
         afterSpell.ilk_count              = 71;                                         // Num expected in system
         afterSpell.chainlog_version       = "1.19.9";                                   // String expected in system
@@ -193,9 +193,9 @@ contract Config {
             calc_step:    90,             // In seconds
             calc_cut:     9900,           // In basis points
             SP_enabled:   true,           // SPBEAM is enabled?
-            SP_min:       200,            // In basis points
-            SP_max:       3_000,          // In basis points
-            SP_step:      400,            // In basis points
+            SP_min:       2_00,           // In basis points
+            SP_max:       30_00,          // In basis points
+            SP_step:      4_00,           // In basis points
             offboarding:  false           // If mat is being offboarded
         });
         afterSpell.collaterals["ETH-B"] = CollateralValues({
@@ -222,9 +222,9 @@ contract Config {
             calc_step:    60,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["ETH-C"] = CollateralValues({
@@ -251,9 +251,9 @@ contract Config {
             calc_step:    90,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["BAT-A"] = CollateralValues({
@@ -367,9 +367,9 @@ contract Config {
             calc_step:    90,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-B"] = CollateralValues({
@@ -396,9 +396,9 @@ contract Config {
             calc_step:    60,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["WBTC-C"] = CollateralValues({
@@ -425,9 +425,9 @@ contract Config {
             calc_step:    90,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["TUSD-A"] = CollateralValues({
@@ -1759,9 +1759,9 @@ contract Config {
             calc_step:    90,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["WSTETH-B"] = CollateralValues({
@@ -1788,9 +1788,9 @@ contract Config {
             calc_step:    90,
             calc_cut:     9900,
             SP_enabled:   true,
-            SP_min:       200,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_min:       2_00,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["DIRECT-SPK-AAVE-LIDO-USDS"] = CollateralValues({
@@ -2166,8 +2166,8 @@ contract Config {
             calc_cut:     0,
             SP_enabled:   true,
             SP_min:       0,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["ALLOCATOR-NOVA-A"] = CollateralValues({
@@ -2195,8 +2195,8 @@ contract Config {
             calc_cut:     0,
             SP_enabled:   true,
             SP_min:       0,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
         afterSpell.collaterals["ALLOCATOR-BLOOM-A"] = CollateralValues({
@@ -2224,8 +2224,8 @@ contract Config {
             calc_cut:     0,
             SP_enabled:   true,
             SP_min:       0,
-            SP_max:       3_000,
-            SP_step:      400,
+            SP_max:       30_00,
+            SP_step:      4_00,
             offboarding:  false
         });
     }

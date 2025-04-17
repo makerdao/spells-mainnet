@@ -114,6 +114,10 @@ contract DssSpellTest is DssSpellTestBase {
         _testSystemTokens();
     }
 
+    function testSPBEAMTauAndBudValues() public {
+        _testSPBEAMTauAndBudValues();
+    }
+
     // Leave this test always enabled as it acts as a config test
     function testPSMs() public {
         _vote(address(spell));

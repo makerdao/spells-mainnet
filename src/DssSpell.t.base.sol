@@ -739,7 +739,6 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
-
         // dsr
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
@@ -941,7 +940,6 @@ contract DssSpellTestBase is Config, DssTest {
             (uint256 duty,)  = jug.ilks(ilk);
 
             {
-            (uint256 SP_min, uint256 SP_max, uint256 SP_step) = spbeam.cfgs(ilk);
             if (!values.collaterals[ilk].SP_enabled) {
                 assertEq(SP_min, 0, _concat("TestError/spbeam-min-not-zero-", ilk));
                 assertEq(SP_max, 0, _concat("TestError/spbeam-max-not-zero-", ilk));
@@ -956,6 +954,7 @@ contract DssSpellTestBase is Config, DssTest {
             } else {
                 assertEq(values.collaterals[ilk].pct, 0, _concat("TestError/spbeam-pct-not-zero-", ilk));
 
+                (uint256 SP_min, uint256 SP_max, uint256 SP_step) = spbeam.cfgs(ilk);
                 assertEq(SP_min, values.collaterals[ilk].SP_min, _concat("TestError/spbeam-min-", ilk));
                 assertEq(SP_max, values.collaterals[ilk].SP_max, _concat("TestError/spbeam-max-", ilk));
                 assertEq(SP_step, values.collaterals[ilk].SP_step, _concat("TestError/spbeam-step-", ilk));
