@@ -46,32 +46,9 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-struct ParamChange {
-    bytes32 id; // Rate identifier (ilk, "DSR", or "SSR")
-    uint256 bps; // New rate value in bps
-}
-
-interface SPBEAMLike {
-    function wards(address) external view returns (uint256);
-    function tau() external view returns (uint64);
-    function buds(address) external view returns (uint256);
-    function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
-    function set(ParamChange[] memory updates) external;
-    function bad() external view returns (uint8);
-    function conv() external view returns (address);
-    function jug() external view returns (address);
-    function pot() external view returns (address);
-    function susds() external view returns (address);
-}
-
 interface SPBEAMMomLike {
     function halt(address spbeam) external;
     function authority() external view returns (address);
-}
-
-interface ConvLike {
-    function btor(uint256 bps) external view returns (uint256 ray);
-    function rtob(uint256 ray) external pure returns (uint256 bps);
 }
 
 interface VestedRewardsDistributionLike {
@@ -1229,7 +1206,6 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testSPBEAM() public {
         address SPBEAM_MOM = addr.addr("SPBEAM_MOM");
-        address MCD_SPBEAM = addr.addr("MCD_SPBEAM");
         address SPBEAM_BUD = wallets.addr("SPBEAM_BUD");
         address MCD_ADM = addr.addr("MCD_ADM");
         address SPBEAM_CONV = address(0xea91A18dAFA1Cb1d2a19DFB205816034e6Fe7e52);
@@ -1239,14 +1215,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         // Constructor Sanity Checks
-        assertEq(SPBEAMLike(MCD_SPBEAM).jug(), address(jug), "spbeam/invalid-jug");
-        assertEq(SPBEAMLike(MCD_SPBEAM).pot(), address(pot), "spbeam/invalid-pot");
-        assertEq(SPBEAMLike(MCD_SPBEAM).conv(), SPBEAM_CONV, "spbeam/invalid-conv");
-        assertEq(SPBEAMLike(MCD_SPBEAM).susds(), address(susds), "spbeam/invalid-susds");
+        assertEq(spbeam.jug(), address(jug), "spbeam/invalid-jug");
+        assertEq(spbeam.pot(), address(pot), "spbeam/invalid-pot");
+        assertEq(spbeam.conv(), SPBEAM_CONV, "spbeam/invalid-conv");
+        assertEq(spbeam.susds(), address(susds), "spbeam/invalid-susds");
 
-        assertEq(SPBEAMLike(MCD_SPBEAM).wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
-        assertEq(SPBEAMLike(MCD_SPBEAM).buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
-        assertEq(SPBEAMLike(MCD_SPBEAM).tau(), 57_600, "spbeam/invalid-tau");
+        assertEq(spbeam.wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
+        assertEq(spbeam.buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
+        assertEq(spbeam.tau(), 57_600, "spbeam/invalid-tau");
         assertEq(SPBEAMMomLike(SPBEAM_MOM).authority(), MCD_ADM, "spbeam/adm-not-authority");
 
         SPBEAMConfig[13] memory configs = [
@@ -1268,7 +1244,7 @@ contract DssSpellTest is DssSpellTestBase {
         ParamChange[] memory updates = new ParamChange[](13);
 
         for (uint256 i = 0; i < configs.length; i++) {
-            (uint16 min, uint16 max, uint16 step) = SPBEAMLike(MCD_SPBEAM).cfgs(configs[i].id);
+            (uint16 min, uint16 max, uint16 step) = spbeam.cfgs(configs[i].id);
 
             assertEq(min, configs[i].expectedMin, "spbeam/ilks/invalid-min");
             assertEq(max, uint16(3000), "spbeam/ilks/invalid-max");
@@ -1288,7 +1264,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         vm.prank(SPBEAM_BUD);
-        SPBEAMLike(MCD_SPBEAM).set(updates);
+        spbeam.set(updates);
 
         for (uint256 i = 0; i < updates.length; i++) {
             uint256 rate;
@@ -1303,12 +1279,12 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         // Test SPBEAM_MOM.halt()
-        assertEq(SPBEAMLike(MCD_SPBEAM).bad(), 0, "spbeam/bad-early");
+        assertEq(spbeam.bad(), 0, "spbeam/bad-early");
 
         vm.prank(chief.hat());
-        SPBEAMMomLike(SPBEAM_MOM).halt(MCD_SPBEAM);
+        SPBEAMMomLike(SPBEAM_MOM).halt(address(spbeam));
 
-        assertEq(SPBEAMLike(MCD_SPBEAM).bad(), 1, "spbeam/bad-not-set-by-mom");
+        assertEq(spbeam.bad(), 1, "spbeam/bad-not-set-by-mom");
     }
 
     function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {

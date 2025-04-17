@@ -44,6 +44,11 @@ struct TeleportGUID {
     uint48 timestamp;
 }
 
+struct ParamChange {
+    bytes32 id; // Rate identifier (ilk, "DSR", or "SSR")
+    uint256 bps; // New rate value in bps
+}
+
 interface DirectDepositLike is GemJoinAbstract {
     function file(bytes32, uint256) external;
     function exec() external;
@@ -427,6 +432,24 @@ interface L2TokenGatewayLike {
     function version() external view returns (string memory);
 }
 
+interface SPBEAMLike {
+    function wards(address) external view returns (uint256);
+    function tau() external view returns (uint64);
+    function buds(address) external view returns (uint256);
+    function cfgs(bytes32) external view returns (uint16 min, uint16 max, uint16 step);
+    function set(ParamChange[] memory updates) external;
+    function bad() external view returns (uint8);
+    function conv() external view returns (address);
+    function jug() external view returns (address);
+    function pot() external view returns (address);
+    function susds() external view returns (address);
+}
+
+interface ConvLike {
+    function btor(uint256 bps) external view returns (uint256 ray);
+    function rtob(uint256 ray) external pure returns (uint256 bps);
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -479,6 +502,7 @@ contract DssSpellTestBase is Config, DssTest {
     VestAbstract                 vestSky = VestAbstract(       addr.addr("MCD_VEST_SKY_TREASURY"));
     VestAbstract             vestSkyMint = VestAbstract(       addr.addr("MCD_VEST_SKY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
+    SPBEAMLike                    spbeam = SPBEAMLike(         addr.addr("MCD_SPBEAM"));
     address          voteDelegateFactory =                     addr.addr("VOTE_DELEGATE_FACTORY");
 
     DssSpell spell;
@@ -715,37 +739,49 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
+
         // dsr
-        uint256 expectedDSRRate = rates.rates(values.pot_dsr);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
-        assertEq(pot.dsr(), expectedDSRRate, "TestError/pot-dsr-expected-value");
         assertTrue(
             pot.dsr() >= RAY && pot.dsr() < 1000000021979553151239153027,
             "TestError/pot-dsr-range"
         );
-        assertTrue(
-            _diffCalc(_expectedRate(values.pot_dsr), _yearlyYield(expectedDSRRate)) <= TOLERANCE,
-            "TestError/pot-dsr-rates-table"
-        );
+
+        // check SPBEAM Values
+        (uint256 SP_min, uint256 SP_max, uint256 SP_step) = spbeam.cfgs("DSR");
+        assertEq(SP_min, values.SP_dsr_min, "TestError/spbeam-dsr-min");
+        assertEq(SP_max, values.SP_dsr_max, "TestError/spbeam-dsr-max");
+        assertEq(SP_step, values.SP_dsr_step, "TestError/spbeam-dsr-step");
+
+        uint256 rtob_dsr = ConvLike(spbeam.conv()).rtob(pot.dsr());
+
+        assertLe(rtob_dsr, SP_max, "TestError/spbeam-dsr-exceeds-max");
+        assertGe(rtob_dsr, SP_min, "TestError/spbeam-dsr-below-min");
 
         // ssr
-        uint256 expectedSSRRate = rates.rates(values.susds_ssr);
         // make sure dsr is less than 100% APR
         // bc -l <<< 'scale=27; e( l(2.00)/(60 * 60 * 24 * 365) )'
         // 1000000021979553151239153027
-        assertEq(susds.ssr(), expectedSSRRate, "TestError/susds-ssr-expected-value");
         assertTrue(
             susds.ssr() >= RAY && susds.ssr() < 1000000021979553151239153027,
             "TestError/susds-ssr-range"
         );
-        assertTrue(
-            _diffCalc(_expectedRate(values.susds_ssr), _yearlyYield(expectedSSRRate)) <= TOLERANCE,
-            "TestError/susds-ssr-rates-table"
-        );
+
+        // check SPBEAM Values
+        (SP_min, SP_max, SP_step) = spbeam.cfgs("SSR");
+        assertEq(SP_min, values.SP_ssr_min, "TestError/spbeam-ssr-min");
+        assertEq(SP_max, values.SP_ssr_max, "TestError/spbeam-ssr-max");
+        assertEq(SP_step, values.SP_ssr_step, "TestError/spbeam-ssr-step");
+
+        uint256 rtob_ssr = ConvLike(spbeam.conv()).rtob(susds.ssr());
+
+        assertLe(rtob_ssr, SP_max, "TestError/spbeam-ssr-exceeds-max");
+        assertGe(rtob_ssr, SP_min, "TestError/spbeam-ssr-below-min");
+
         // SSR should always be higher than or equal to DSR
-        assertGe(expectedSSRRate, expectedDSRRate, "TestError/ssr-lower-than-dsr");
+        assertGe(susds.ssr(), pot.dsr(), "TestError/ssr-lower-than-dsr");
 
         {
         // Line values in RAD
@@ -904,16 +940,37 @@ contract DssSpellTestBase is Config, DssTest {
             bytes32 ilk = ilks[i];
             (uint256 duty,)  = jug.ilks(ilk);
 
-            assertEq(duty, rates.rates(values.collaterals[ilk].pct), _concat("TestError/jug-duty-", ilk));
+            {
+            (uint256 SP_min, uint256 SP_max, uint256 SP_step) = spbeam.cfgs(ilk);
+            if (!values.collaterals[ilk].SP_enabled) {
+                assertEq(SP_min, 0, _concat("TestError/spbeam-min-not-zero-", ilk));
+                assertEq(SP_max, 0, _concat("TestError/spbeam-max-not-zero-", ilk));
+                assertEq(SP_step, 0, _concat("TestError/spbeam-step-not-zero-", ilk));
+
+                assertEq(duty, rates.rates(values.collaterals[ilk].pct), _concat("TestError/jug-duty-", ilk));
+                assertTrue(
+                    _diffCalc(_expectedRate(values.collaterals[ilk].pct), _yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE,
+                    _concat("TestError/rates-", ilk)
+                );
+                assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, _concat("TestError/pct-max-", ilk));   // check value lt 1000%
+            } else {
+                assertEq(values.collaterals[ilk].pct, 0, _concat("TestError/spbeam-pct-not-zero-", ilk));
+
+                assertEq(SP_min, values.collaterals[ilk].SP_min, _concat("TestError/spbeam-min-", ilk));
+                assertEq(SP_max, values.collaterals[ilk].SP_max, _concat("TestError/spbeam-max-", ilk));
+                assertEq(SP_step, values.collaterals[ilk].SP_step, _concat("TestError/spbeam-step-", ilk));
+
+                uint256 rtob_duty = ConvLike(spbeam.conv()).rtob(duty);
+
+                assertGe(rtob_duty, SP_min, _concat("TestError/spbeam-duty-below-min-", ilk));
+                assertLe(rtob_duty, SP_max, _concat("TestError/spbeam-duty-exceeds-max-", ilk));
+            }
             // make sure duty is less than 1000% APR
             // bc -l <<< 'scale=27; e( l(10.00)/(60 * 60 * 24 * 365) )'
             // 1000000073014496989316680335
             assertTrue(duty >= RAY && duty < 1000000073014496989316680335, _concat("TestError/jug-duty-range-", ilk));  // gt 0 and lt 1000%
-            assertTrue(
-                _diffCalc(_expectedRate(values.collaterals[ilk].pct), _yearlyYield(rates.rates(values.collaterals[ilk].pct))) <= TOLERANCE,
-                _concat("TestError/rates-", ilk)
-            );
-            assertTrue(values.collaterals[ilk].pct < THOUSAND * THOUSAND, _concat("TestError/pct-max-", ilk));   // check value lt 1000%
+            }
+
             {
             uint256 line;
             uint256 dust;
@@ -3592,13 +3649,24 @@ contract DssSpellTestBase is Config, DssTest {
             susds.drip();
 
             uint256 chi         = susds.chi();
-            uint256 expectedChi = _rpow(rates.rates(afterSpell.susds_ssr), interval, RAY) * pchi / RAY;
+            uint256 expectedChi = _rpow(susds.ssr(), interval, RAY) * pchi / RAY;
             uint256 assets      = susds.redeem(shares, address(this), address(this));
 
             // Allow a 0.01% rounding error
             assertApproxEqRel(chi, expectedChi, 10**14,     "TestError/sUSDS/invalid-chi");
             assertGt(assets, passets,                       "TestError/sUSDS/invalid-redeem-assets");
             assertEq(assets, usds.balanceOf(address(this)), "TestError/sUSDS/invalid-balance-after-redeem");
+        }
+    }
+
+    function _testSPBEAMTauAndBudValues() internal {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+
+        {
+            assertEq(spbeam.tau(), afterSpell.SP_tau, "TestError/SPBEAM/invalid-tau");
+            assertEq(spbeam.buds(afterSpell.SP_bud), 1, "TestError/SPBEAM/invalid-bud");
         }
     }
 
