@@ -1204,7 +1204,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testSPBEAM() public {
-        address SPBEAM_MOM = addr.addr("SPBEAM_MOM");
         address SPBEAM_BUD = wallets.addr("SPBEAM_BUD");
         address MCD_ADM = addr.addr("MCD_ADM");
         address SPBEAM_CONV = address(0xea91A18dAFA1Cb1d2a19DFB205816034e6Fe7e52);
@@ -1219,10 +1218,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(spbeam.conv(), SPBEAM_CONV, "spbeam/invalid-conv");
         assertEq(spbeam.susds(), address(susds), "spbeam/invalid-susds");
 
-        assertEq(spbeam.wards(SPBEAM_MOM), 1, "spbeam/mom-not-authorized");
+        assertEq(spbeam.wards(address(spbeamMom)), 1, "spbeam/mom-not-authorized");
         assertEq(spbeam.buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
         assertEq(spbeam.tau(), 57_600, "spbeam/invalid-tau");
-        assertEq(SPBEAMMomLike(SPBEAM_MOM).authority(), MCD_ADM, "spbeam/adm-not-authority");
+        assertEq(spbeamMom.authority(), MCD_ADM, "spbeam/adm-not-authority");
 
         SPBEAMConfig[13] memory configs = [
             SPBEAMConfig("ALLOCATOR-BLOOM-A", 0),
@@ -1281,7 +1280,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(spbeam.bad(), 0, "spbeam/bad-early");
 
         vm.prank(chief.hat());
-        SPBEAMMomLike(SPBEAM_MOM).halt(address(spbeam));
+        spbeamMom.halt(address(spbeam));
 
         assertEq(spbeam.bad(), 1, "spbeam/bad-not-set-by-mom");
     }
