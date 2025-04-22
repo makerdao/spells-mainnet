@@ -96,7 +96,7 @@ const publishTenderlyTestnet = async function (testnetId) {
         method: 'put',
         path: `/testnet/container/${testnetId}`,
         body: {
-            explorerConfig:{
+            explorerConfig: {
                 enabled: true,
                 verificationVisibility: "src"
             },
