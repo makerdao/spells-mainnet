@@ -64,46 +64,69 @@ const createTenderlyTestnet = async function (spellName) {
                     chainId: NETWORK_ID,
                 },
             },
-            explorerPage: 'DISABLED',
+            explorerConfig:{
+                enabled: false,
+                verificationVisibility: 'bytecode',
+            },
             syncState: true,
         },
     });
-    const testnetId = response.data.container.id;
-    const rpcEndpointPrivate = response.data.container.connectivityConfig.endpoints.find(
-        endpoint => endpoint.private === true
+    const testnetId = response.data.container?.id;
+    if (!testnetId) {
+        throw new Error('Failed to create the Tenderly Virtual Testnet');
+    }
+
+    const endpoints = response.data.container?.connectivityConfig?.endpoints ?? [];
+
+    const rpcEndpointAdmin = endpoints.find(
+        endpoint => endpoint.uri?.startsWith('https://') && endpoint.private === true
     );
-    console.info(`tenderly testnet "${testnetId}" is created`);
+    if (!rpcEndpointAdmin) {
+        throw new Error('Failed to obtain the admin RPC endpoint');
+    }
+
     return {
         testnetId,
-        rpcUrlPrivate: rpcEndpointPrivate.uri,
+        rpcUrlAdmin: rpcEndpointAdmin.uri,
     };
 };
 
 const publishTenderlyTestnet = async function (testnetId) {
-    console.info(`making tenderly testnet "${testnetId}" public...`);
     const response = await makeTenderlyApiRequest({
         method: 'put',
         path: `/testnet/container/${testnetId}`,
         body: {
             explorerConfig: {
                 enabled: true,
+                verificationVisibility: "src"
             },
         },
     });
-    if (response.data?.container?.explorer_page !== 'ENABLED') {
-        throw new Error('failed to publish testnet');
+    // Note: apparently the response schema keeps changing, so the following conditions represent the ones that have been observed.
+    if (
+        response.data.container?.explorerConfig?.enabled !== true &&
+        response.data.container?.explorer_config?.enabled !== true &&
+        response.data.container?.explorer_page !== 'ENABLED'
+    ) {
+        throw new Error('Failed to publish testnet');
     }
-    console.info(`tenderly testnet is now public and discoverable`);
-    const rpcEndpointPublic = response.data.container.connectivityConfig.endpoints.find(
-        endpoint => endpoint.private === false
+
+    const endpoints = response.data.container?.connectivityConfig?.endpoints ?? [];
+    const rpcEndpointPublic = endpoints.find(
+        endpoint => endpoint.uri?.startsWith('https://') && endpoint.private === false
     );
-    const explorerUrlPublic = `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`;
-    console.info(`public explorer url: ${explorerUrlPublic}`);
-    return { rpcUrlPrivate: rpcEndpointPublic.uri, explorerUrlPublic };
+    if (!rpcEndpointPublic) {
+        throw new Error('Failed to obtain the public RPC endpoint');
+    }
+
+    return {
+        rpcUrlPublic: rpcEndpointPublic.uri,
+        explorerUrlPublic: `https://dashboard.tenderly.co/explorer/vnet/${rpcEndpointPublic.id}`,
+    };
 };
 
 const giveTheHatToSpell = async function (spellAddress, provider) {
-    console.info('fetching the chief address from chainlog...');
+    console.info('Fetching the chief address from chainlog...');
     const chainlog = new Contract(
         CHAINLOG_ADDRESS,
         ['function getAddress(bytes32) external view returns (address)'],
@@ -111,20 +134,20 @@ const giveTheHatToSpell = async function (spellAddress, provider) {
     );
     const chiefAddress = await chainlog.getAddress(ethers.utils.formatBytes32String('MCD_ADM'));
 
-    console.info('overwriting the hat...');
+    console.info('Overwriting the hat...');
     await provider.send('tenderly_setStorageAt', [
         chiefAddress,
         ethers.utils.hexZeroPad(ethers.utils.hexValue(CHIEF_HAT_SLOT), 32),
         ethers.utils.hexZeroPad(spellAddress, 32),
     ]);
 
-    console.info('checking the hat...');
+    console.info('Checking the hat...');
     const chief = new Contract(chiefAddress, ['function hat() external view returns (address)'], provider.getSigner());
     const hatAddress = await chief.hat();
     if (hatAddress !== spellAddress) {
-        throw new Error('spell does not have the hat');
+        throw new Error('Spell does not have the hat');
     }
-    console.info('spell have the hat...');
+    console.info('Spell have the hat...\n');
 };
 
 const fixChronicleStaleness = async function(provider) {
@@ -153,7 +176,7 @@ const fixChronicleStaleness = async function(provider) {
     await _fixChronicleStaleness('0x46ef0071b1E2fF6B42d36e5A177EA43Ae5917f4E'); // Chronicle_ETH_USD_3
 }
 
-const sheduleWarpAndCastSpell = async function (spellAddress, provider) {
+const scheduleWarpAndCastSpell = async function (spellAddress, provider) {
     const spell = new Contract(
         spellAddress,
         [
@@ -164,48 +187,51 @@ const sheduleWarpAndCastSpell = async function (spellAddress, provider) {
         provider.getSigner()
     );
 
-    console.info('scheduling the spell...');
-    try {
-        const scheduleTx = await spell.schedule(DEFAULT_TRANSACTION_PARAMETERS);
-        await scheduleTx.wait();
-    } catch (error) {
-        console.warn('scheduling failed', error);
-    }
+    console.info('Scheduling the spell...');
+    const scheduleTx = await spell.schedule(DEFAULT_TRANSACTION_PARAMETERS);
+    await scheduleTx.wait();
 
-    console.info('fetching timestamp when the spell will be castable...');
+    console.info('Fetching timestamp when the spell will be castable...');
     const nextCastTime = await spell.nextCastTime();
-    console.info(`nextCastTime is "${nextCastTime}"`, new Date(nextCastTime.toNumber() * 1000));
 
-    console.info(`warping the time to "${nextCastTime}"...`);
+    console.info(`Warping the time to ${nextCastTime}...`);
     await provider.send('evm_setNextBlockTimestamp', [ethers.utils.hexValue(nextCastTime)]);
 
-    console.info('casting spell...');
-    try {
-        const castTx = await spell.cast(DEFAULT_TRANSACTION_PARAMETERS);
-        await castTx.wait();
-        console.info('successfully casted');
-    } catch (error) {
-        console.error('casting failed', error);
-    }
+    console.info('Casting spell...');
+    const castTx = await spell.cast(DEFAULT_TRANSACTION_PARAMETERS);
+    await castTx.wait();
+    console.info('Successfully cast!\n');
 };
 
 const castOnTenderly = async function (spellAddress) {
     const spellName = await getSpellName(spellAddress);
-    console.info(`preparing to cast spell "${spellAddress}" with name "${spellName}"...`);
+    console.info(`Preparing to cast spell ${spellAddress} with name "${spellName}"...\n`);
 
-    const { testnetId, rpcUrlPrivate } = await createTenderlyTestnet(spellName);
+    console.info('Creating Tenderly Virtual Testnet...');
+    const { testnetId, rpcUrlAdmin } = await createTenderlyTestnet(spellName);
+    console.info('Created!\n');
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrlPrivate);
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrlAdmin);
 
     // Temporary fix to the reverts of the Spark spells interacting with Aggor oracles, due to the cast time manipulation
     // Example revert: https://dashboard.tenderly.co/explorer/vnet/eb97d953-4642-4778-938e-d70ee25e3f58/tx/0xe427414d07c28b64c076e809983cfdee3bfd680866ebc7c40349700f4a6160bd?trace=0.5.5.1.62.1.2.0.2.2.0.2.2
-    await fixChronicleStaleness(provider)
+    await fixChronicleStaleness(provider);
 
     await giveTheHatToSpell(spellAddress, provider);
 
-    await sheduleWarpAndCastSpell(spellAddress, provider);
+    await scheduleWarpAndCastSpell(spellAddress, provider);
 
-    await publishTenderlyTestnet(testnetId);
+    console.info(`Making Tenderly Virtual Testnet ${testnetId} public...`);
+    const { explorerUrlPublic, rpcUrlPublic } = await publishTenderlyTestnet(testnetId);
+    console.info(`It is now public and discoverable!\n`);
+
+    console.info(`Tenderly Virtual Testnet for "${spellName}":`);
+    console.info('%o', {
+        'Testnet ID': testnetId,
+        'Admin RPC URL': rpcUrlAdmin,
+        'Public RPC URL': rpcUrlPublic,
+        'Public Explorer URL': explorerUrlPublic
+    });
 };
 
 castOnTenderly(utils.getAddress(SPELL_ADDRESS));
