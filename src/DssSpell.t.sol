@@ -601,7 +601,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestSKY(streams);
     }
 
-    function testVestSKYmint() public { // add the `skipped` modifier to skip
+    function testVestSKYmint() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 DEC_01_2023 = 1701385200;
 
@@ -710,7 +710,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankSKYmint() public { // add the `skipped` modifier to skip
+    function testYankSKYmint() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 SEP_10_2025 = 1757505622;
 
@@ -766,7 +766,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
 
@@ -1178,7 +1178,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0xA8FF99Ac98Fc0C3322F639a9591257518514455c); // Insert Spark spell address
 
@@ -1197,114 +1197,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    struct SPBEAMConfig {
-        bytes32 id;
-        uint16 expectedMin;
-    }
-
-    function testSPBEAM() public {
-        address SPBEAM_BUD = wallets.addr("SPBEAM_BUD");
-        address MCD_ADM = addr.addr("MCD_ADM");
-        address SPBEAM_CONV = address(0xea91A18dAFA1Cb1d2a19DFB205816034e6Fe7e52);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Constructor Sanity Checks
-        assertEq(spbeam.jug(), address(jug), "spbeam/invalid-jug");
-        assertEq(spbeam.pot(), address(pot), "spbeam/invalid-pot");
-        assertEq(spbeam.conv(), SPBEAM_CONV, "spbeam/invalid-conv");
-        assertEq(spbeam.susds(), address(susds), "spbeam/invalid-susds");
-
-        assertEq(spbeam.wards(address(spbeamMom)), 1, "spbeam/mom-not-authorized");
-        assertEq(spbeam.buds(SPBEAM_BUD), 1, "spbeam/bud-not-authorized");
-        assertEq(spbeam.tau(), 57_600, "spbeam/invalid-tau");
-        assertEq(spbeamMom.authority(), MCD_ADM, "spbeam/adm-not-authority");
-
-        SPBEAMConfig[13] memory configs = [
-            SPBEAMConfig("ALLOCATOR-BLOOM-A", 0),
-            SPBEAMConfig("ALLOCATOR-NOVA-A", 0),
-            SPBEAMConfig("ALLOCATOR-SPARK-A", 0),
-            SPBEAMConfig("DSR", 0),
-            SPBEAMConfig("ETH-A", 200),
-            SPBEAMConfig("ETH-B", 200),
-            SPBEAMConfig("ETH-C", 200),
-            SPBEAMConfig("SSR", 200),
-            SPBEAMConfig("WBTC-A", 200),
-            SPBEAMConfig("WBTC-B", 200),
-            SPBEAMConfig("WBTC-C", 200),
-            SPBEAMConfig("WSTETH-A", 200),
-            SPBEAMConfig("WSTETH-B", 200)
-        ];
-
-        ParamChange[] memory updates = new ParamChange[](13);
-
-        for (uint256 i = 0; i < configs.length; i++) {
-            (uint16 min, uint16 max, uint16 step) = spbeam.cfgs(configs[i].id);
-
-            assertEq(min, configs[i].expectedMin, "spbeam/ilks/invalid-min");
-            assertEq(max, uint16(3000), "spbeam/ilks/invalid-max");
-            assertEq(step, uint16(400), "spbeam/ilks/invalid-step");
-
-            uint256 baseRate;
-            if (configs[i].id == "DSR") {
-                baseRate = pot.dsr();
-            } else if (configs[i].id == "SSR") {
-                baseRate = susds.ssr();
-            } else {
-                (baseRate,) = jug.ilks(configs[i].id);
-            }
-
-            // Change the current rate by some amount to test the set function below
-            updates[i] = ParamChange(configs[i].id, ConvLike(SPBEAM_CONV).rtob(baseRate) + 50);
-        }
-
-        vm.prank(SPBEAM_BUD);
-        spbeam.set(updates);
-
-        for (uint256 i = 0; i < updates.length; i++) {
-            uint256 rate;
-            if (updates[i].id == "DSR") {
-                rate = pot.dsr();
-            } else if (updates[i].id == "SSR") {
-                rate = susds.ssr();
-            } else {
-                (rate,) = jug.ilks(updates[i].id);
-            }
-            assertEq(rate, ConvLike(SPBEAM_CONV).btor(updates[i].bps), "spbeam/ilks/invalid-set-value");
-        }
-
-        // Test SPBEAM_MOM.halt()
-        assertEq(spbeam.bad(), 0, "spbeam/bad-early");
-
-        vm.prank(chief.hat());
-        spbeamMom.halt(address(spbeam));
-
-        assertEq(spbeam.bad(), 1, "spbeam/bad-not-set-by-mom");
-    }
-
-    function testRewardsDistUsdsSkyUpdatedVestIdAndDistribute() public {
-        address REWARDS_DIST_USDS_SKY = addr.addr("REWARDS_DIST_USDS_SKY");
-        address REWARDS_USDS_SKY = addr.addr("REWARDS_USDS_SKY");
-
-        uint256 vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
-        assertEq(vestId, 1, "rewards-dist-usds-sky/invalid-vest-id-before");
-
-        uint256 unpaidAmount = vestSkyMint.unpaid(1);
-        assertTrue(unpaidAmount > 0, "rewards-dist-usds-sky/unpaid-zero-early");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        vestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).vestId();
-        assertEq(vestId, 2, "rewards-dist-usds-sky/invalid-vest-id-after");
-
-        unpaidAmount = vestSkyMint.unpaid(1);
-        assertEq(unpaidAmount, 0, "rewards-dist-usds-sky/unpaid-not-cleared");
-
-        assertEq(StakingRewardsLike(REWARDS_USDS_SKY).lastUpdateTime(), block.timestamp, "rewards-usds-sky/invalid-last-update-time");
-    }
 }
