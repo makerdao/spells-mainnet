@@ -56,7 +56,7 @@ contract DssSpellAction is DssAction {
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
-        return true;
+        return false;
     }
 
     // ---------- Rates ----------
@@ -403,37 +403,6 @@ contract DssSpellAction is DssAction {
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
-    // ---------- Helper Functions ----------
-
-    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
-    /// @param usr The USDS receiver.
-    /// @param wad The USDS amount in wad precision (10 ** 18).
-    function _transferUsds(address usr, uint256 wad) internal {
-        // Note: Enforce whole units to avoid rounding errors
-        require(wad % WAD == 0, "transferUsds/non-integer-wad");
-        // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
-        DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
-        // Note: Approve DAI_USDS for the amount sent to be able to convert it.
-        DAI.approve(DAI_USDS, wad);
-        // Note: Convert Dai to USDS for `usr`.
-        DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
-    }
-
-    /// @notice wraps the operations required to transfer SKY from the treasury.
-    /// @param usr The SKY receiver.
-    /// @param wad The SKY amount in wad precision (10 ** 18).
-    function _transferSky(address usr, uint256 wad) internal {
-        // Note: Calculate the equivalent amount of MKR required
-        uint256 mkrWad = wad / MKR_SKY_RATE;
-        // Note: if rounding error is expected, add an extra wei of MKR
-        if (wad % MKR_SKY_RATE != 0) { mkrWad++; }
-        // Note: Approve MKR_SKY for the amount sent to be able to convert it
-        MKR.approve(MKR_SKY, mkrWad);
-        // Note: Convert the calculated amount to SKY for `PAUSE_PROXY`
-        MkrSkyLike(MKR_SKY).mkrToSky(address(this), mkrWad);
-        // Note: Transfer originally requested amount, leaving extra on the `PAUSE_PROXY`
-        GemAbstract(SKY).transfer(usr, wad);
-    }
 }
 
 contract DssSpell is DssExec {
