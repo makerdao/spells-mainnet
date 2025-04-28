@@ -550,5 +550,6 @@ contract Addresses {
         addr["ALLOCATOR_BLOOM_A_SUBPROXY"]       = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
         addr["SPBEAM_MOM"]                       = 0xf0C6e6Ec8B367cC483A411e595D3Ba0a816d37D0;
         addr["MCD_SPBEAM"]                       = 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22;
+        addr["EMSP_SPBEAM_HALT"]                 = 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0;
     }
 }

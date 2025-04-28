@@ -129,7 +129,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 680 * MILLION;                              // Offset between the global line against the sum of local lines
-        afterSpell.pause_delay            = 18 hours;                                   // In seconds
+        afterSpell.pause_delay            = 48 hours;                                   // In seconds
         afterSpell.vow_wait               = 156 hours;                                  // In seconds
         afterSpell.vow_dump               = 250;                                        // In whole Dai units
         afterSpell.vow_sump               = 50 * THOUSAND;                              // In whole Dai units
@@ -165,7 +165,7 @@ contract Config {
         afterSpell.SP_dsr_step            = 4_00;                                       // In basis points
         afterSpell.sky_mkr_rate           = 24_000;                                     // In whole SKY/MKR units
         afterSpell.ilk_count              = 71;                                         // Num expected in system
-        afterSpell.chainlog_version       = "1.19.9";                                   // String expected in system
+        afterSpell.chainlog_version       = "1.19.10";                                   // String expected in system
 
         //
         // Values for all collateral
@@ -2203,8 +2203,8 @@ contract Config {
         });
         afterSpell.collaterals["ALLOCATOR-BLOOM-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      10_000_000,
-            aL_gap:       10_000_000,
+            aL_line:      100_000_000,
+            aL_gap:       50_000_000,
             aL_ttl:       24 hours,
             line:         0,
             dust:         0,

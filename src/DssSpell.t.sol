@@ -775,34 +775,23 @@ contract DssSpellTest is DssSpellTestBase {
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[14] memory payees = [
-            Payee(address(dai), wallets.addr("AAVE_V3_TREASURY"),           256_888 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"),    5_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BLUE"),                      4_000 ether + 50_167 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BONAPUBLICA"),               4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_2"),                  4_000 ether + 16_417 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("JULIACHANG"),                4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("WBC"),                       4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("PBG"),                       3_355 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BYTERON"),                   645 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_ENNOIA"),             20_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),            11_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("BLUE"),                       330_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("CLOAKY_2"),                   288_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"),     24_000_000 ether) // Note: ether is only a keyword helper
+        Payee[3] memory payees = [
+            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"),       5_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"),        30_000_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:          256_888 ether,   // Note: ether is only a keyword helper
+            dai:          0 ether,   // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         5_121_584 ether, // Note: ether is only a keyword helper
-            sky:          24_618_000 ether // Note: ether is only a keyword helper
+            usds:         8_000_000 ether, // Note: ether is only a keyword helper
+            sky:          30_000_000 ether // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -1_025.75 ether,
+            mkr: -1_250 ether,
             sky: 0
         });
 
@@ -908,8 +897,6 @@ contract DssSpellTest is DssSpellTestBase {
             "TestPayments/actual-vs-expected-sky-treasury-mismatch"
         );
         // Sky or MKR payments might come from token emission or from the treasury
-        // Note: Skipping this assertion as the VestedRewardsDistribution.distribute() call in the spell is messing with it
-        /*
         assertEq(
             (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
                 + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
@@ -917,7 +904,6 @@ contract DssSpellTest is DssSpellTestBase {
                 + calculatedTotalPayments.sky,
             "TestPayments/invalid-mkr-sky-total"
         );
-        */
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -1178,9 +1164,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xA8FF99Ac98Fc0C3322F639a9591257518514455c); // Insert Spark spell address
+        address SPARK_SPELL = address(0x9362B8a15ab78257b11a55F7CC272F4C4676C2fe); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1197,4 +1183,60 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testBloomSpellIsExecuted() public {
+        address BLOOM_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
+        address BLOOM_SPELL = address(0x0c9CC5D5fF3baf096d29676039BD6fB94586111A);
+
+        vm.expectCall(
+            BLOOM_PROXY,
+            /* value = */ 0,
+            abi.encodeCall(
+                ProxyLike(BLOOM_PROXY).exec,
+                (BLOOM_SPELL, abi.encodeWithSignature("execute()"))
+            )
+        );
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+    }
+
+    function testWhitelistALMProxy() public {
+        address almProxy = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
+        LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_PSM_USDC_A"));
+        GemAbstract usdc     = GemAbstract(addr.addr("USDC"));
+        // bud is 0 before kiss
+        assertEq(psmUsdcA.bud(almProxy), 0, "TestError/MCD_PSM_USDC_A/invalid-bud");
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+         {
+            // bud is 1 after kiss
+            assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
+            // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
+            vm.prank(almProxy);
+            psmUsdcA.buyGemNoFee(address(1), 1_000 * WAD);
+            assertEq(usdc.balanceOf(address(1)), 1_000 * WAD);
+        }
+    }
+
+    function testAddChainlogKey() public {
+        bytes32[] memory addedKeys = new bytes32[](1);
+        addedKeys[0] = "EMSP_SPBEAM_HALT";
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            vm.expectRevert("dss-chain-log/invalid-key");
+            chainLog.getAddress(addedKeys[i]);
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
+        }
+
+    }
+
 }
