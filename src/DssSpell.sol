@@ -77,7 +77,6 @@ contract DssSpellAction is DssAction {
     address internal immutable MKR_SKY                    = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable MCD_PAUSE                  = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable MCD_LITE_PSM_USDC_A        = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
-    address internal immutable MCD_IAM_AUTO_LINE          = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
 
     address internal constant ALM_PROXY =        0x491EDFB0B8b608044e227225C715981a30F3A44E;
     address internal constant EMSP_SPBEAM_HALT = 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0;
@@ -95,8 +94,8 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x9362B8a15ab78257b11a55F7CC272F4C4676C2fe;
 
     // ---------- STAR2 Proxy Spell ----------
-    // Bloom Proxy: https://github.com/makerdao/endgame-toolkit/blob/5bf4b1771b99f5f8758fd40a4ac567f797b5405b/src/SubProxy.sol
-    address internal immutable BLOOM_PROXY = DssExecLib.getChangelogAddress("ALLOCATOR_BLOOM_A_SUBPROXY");
+    // Note: The deployment address for the Bloom Proxy can be found at https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
+    address internal immutable BLOOM_PROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
     address internal constant  BLOOM_SPELL = 0x0c9CC5D5fF3baf096d29676039BD6fB94586111A;
 
     function actions() public override {

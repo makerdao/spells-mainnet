@@ -1203,7 +1203,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testWhitelistALMProxy() public {
         address almProxy = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
-        LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_PSM_USDC_A"));
+        LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_LITE_PSM_USDC_A"));
         GemAbstract usdc     = GemAbstract(addr.addr("USDC"));
         // bud is 0 before kiss
         assertEq(psmUsdcA.bud(almProxy), 0, "TestError/MCD_PSM_USDC_A/invalid-bud");
@@ -1214,9 +1214,15 @@ contract DssSpellTest is DssSpellTestBase {
             // bud is 1 after kiss
             assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
             // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
-            vm.prank(almProxy);
-            psmUsdcA.buyGemNoFee(address(1), 1_000 * WAD);
-            assertEq(usdc.balanceOf(address(1)), 1_000 * WAD);
+            uint256 daiAmount = 1_000 ether;
+            uint256 usdcAmount = 1_000 * 10**6;
+            address dest = address(0xb0b);
+            deal(address(dai), almProxy, daiAmount);
+            vm.startPrank(almProxy);
+            dai.approve(address(psmUsdcA) ,daiAmount);
+            psmUsdcA.buyGemNoFee(dest, usdcAmount);
+            vm.stopPrank();
+            assertEq(usdc.balanceOf(dest), usdcAmount);
         }
     }
 
