@@ -95,7 +95,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- STAR2 Proxy Spell ----------
     // Note: The deployment address for the Bloom Proxy can be found at https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
-    address internal immutable BLOOM_PROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
+    address internal constant BLOOM_PROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
     address internal constant  BLOOM_SPELL = 0x0c9CC5D5fF3baf096d29676039BD6fB94586111A;
 
     function actions() public override {
