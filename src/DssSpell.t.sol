@@ -1211,28 +1211,25 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done());
-         {
-            // bud is 1 after kiss
-            assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
-            // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
-            uint256 daiAmount  = 1_000 ether;
-            uint256 usdcAmount = 1_000 * 10**6;
-            // fund proxy
-            deal(address(dai), almProxy, daiAmount);
-            vm.startPrank(almProxy);
-            // buy gem with no fee
-            dai.approve(address(psmUsdcA), daiAmount);
-            psmUsdcA.buyGemNoFee(almProxy, usdcAmount);
-            assertEq(usdc.balanceOf(almProxy), usdcAmount);
-            assertEq(dai.balanceOf(almProxy), 0);
-            // now sell it back with no fee
-            usdc.approve(address(psmUsdcA), usdcAmount);
-            psmUsdcA.sellGemNoFee(almProxy, usdcAmount);
-            assertEq(usdc.balanceOf(almProxy), 0);
-            assertEq(dai.balanceOf(almProxy), daiAmount);
-            vm.stopPrank();
-
-        }
+        // bud is 1 after kiss
+        assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
+        // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
+        uint256 daiAmount  = 1_000 ether;
+        uint256 usdcAmount = 1_000 * 10**6;
+        // fund proxy
+        deal(address(dai), almProxy, daiAmount);
+        vm.startPrank(almProxy);
+        // buy gem with no fee
+        dai.approve(address(psmUsdcA), daiAmount);
+        psmUsdcA.buyGemNoFee(almProxy, usdcAmount);
+        assertEq(usdc.balanceOf(almProxy), usdcAmount);
+        assertEq(dai.balanceOf(almProxy), 0);
+        // now sell it back with no fee
+        usdc.approve(address(psmUsdcA), usdcAmount);
+        psmUsdcA.sellGemNoFee(almProxy, usdcAmount);
+        assertEq(usdc.balanceOf(almProxy), 0);
+        assertEq(dai.balanceOf(almProxy), daiAmount);
+        vm.stopPrank();
     }
 
     function testAddChainlogKey() public {
