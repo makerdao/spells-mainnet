@@ -67,7 +67,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
-    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant WAD     = 10 ** 18;
 
     // ---------- Contracts ----------
     GemAbstract internal immutable DAI                    = GemAbstract(DssExecLib.dai());
@@ -78,7 +78,7 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_PAUSE                  = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable MCD_LITE_PSM_USDC_A        = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
 
-    address internal constant ALM_PROXY =        0x491EDFB0B8b608044e227225C715981a30F3A44E;
+    address internal constant ALM_PROXY        = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
     address internal constant EMSP_SPBEAM_HALT = 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0;
 
     // ---------- Wallets ----------
@@ -108,7 +108,6 @@ contract DssSpellAction is DssAction {
         // MCD_LITE_PSM_USDC_A.kiss(0x491EDFB0B8b608044e227225C715981a30F3A44E)
         LitePsmLike(MCD_LITE_PSM_USDC_A).kiss(ALM_PROXY);
 
-
         // STAR2 Auto-line Changes
         // Increase DC-IAM gap by 40 million DAI from 10 million DAI to 50 million DAI.
         // Increase DC-IAM line by 90 million DAI from 10 million DAI to 100 million DAI.
@@ -124,9 +123,9 @@ contract DssSpellAction is DssAction {
 
         // ---------- Add Emergency Spell to Chainlog ----------
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-04-30/26304
+
         // Add EMSP_SPBEAM_HALT at 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0 to the Chainlog
         DssExecLib.setChangelogAddress("EMSP_SPBEAM_HALT", EMSP_SPBEAM_HALT);
-
 
         // Note: bump Chainlog version since a new key is being added
         DssExecLib.setChangelogVersion("1.19.10");

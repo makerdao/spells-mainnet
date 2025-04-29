@@ -1182,7 +1182,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
     }
 
-    // SPELL-SPECIFIC TESTS GO BELOW
+    // BLOOM TESTS
     function testBloomSpellIsExecuted() public {
         address BLOOM_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
         address BLOOM_SPELL = address(0x0c9CC5D5fF3baf096d29676039BD6fB94586111A);
@@ -1201,6 +1201,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
     }
 
+    // SPELL-SPECIFIC TESTS GO BELOW
     function testWhitelistALMProxy() public {
         address almProxy = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
         LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_LITE_PSM_USDC_A"));
