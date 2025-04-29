@@ -70,13 +70,13 @@ contract DssSpellAction is DssAction {
     uint256 internal constant WAD     = 10 ** 18;
 
     // ---------- Contracts ----------
-    GemAbstract internal immutable DAI                    = GemAbstract(DssExecLib.dai());
-    GemAbstract internal immutable MKR                    = GemAbstract(DssExecLib.mkr());
-    GemAbstract internal immutable SKY                    = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
-    address internal immutable DAI_USDS                   = DssExecLib.getChangelogAddress("DAI_USDS");
-    address internal immutable MKR_SKY                    = DssExecLib.getChangelogAddress("MKR_SKY");
-    address internal immutable MCD_PAUSE                  = DssExecLib.getChangelogAddress("MCD_PAUSE");
-    address internal immutable MCD_LITE_PSM_USDC_A        = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
+    GemAbstract internal immutable DAI             = GemAbstract(DssExecLib.dai());
+    GemAbstract internal immutable MKR             = GemAbstract(DssExecLib.mkr());
+    GemAbstract internal immutable SKY             = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable DAI_USDS            = DssExecLib.getChangelogAddress("DAI_USDS");
+    address internal immutable MKR_SKY             = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable MCD_PAUSE           = DssExecLib.getChangelogAddress("MCD_PAUSE");
+    address internal immutable MCD_LITE_PSM_USDC_A = DssExecLib.getChangelogAddress("MCD_LITE_PSM_USDC_A");
 
     address internal constant ALM_PROXY        = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
     address internal constant EMSP_SPBEAM_HALT = 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0;

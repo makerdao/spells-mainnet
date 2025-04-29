@@ -766,7 +766,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
 
@@ -783,7 +783,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:          0 ether,   // Note: ether is only a keyword helper
+            dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
             usds:         8_000_000 ether, // Note: ether is only a keyword helper
             sky:          30_000_000 ether // Note: ether is only a keyword helper
@@ -1215,18 +1215,18 @@ contract DssSpellTest is DssSpellTestBase {
             // bud is 1 after kiss
             assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
             // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
-            uint256 daiAmount = 1_000 ether;
+            uint256 daiAmount  = 1_000 ether;
             uint256 usdcAmount = 1_000 * 10**6;
             // fund proxy
             deal(address(dai), almProxy, daiAmount);
             vm.startPrank(almProxy);
             // buy gem with no fee
-            dai.approve(address(psmUsdcA) ,daiAmount);
+            dai.approve(address(psmUsdcA), daiAmount);
             psmUsdcA.buyGemNoFee(almProxy, usdcAmount);
             assertEq(usdc.balanceOf(almProxy), usdcAmount);
             assertEq(dai.balanceOf(almProxy), 0);
             // now sell it back with no fee
-            usdc.approve(address(psmUsdcA) ,usdcAmount);
+            usdc.approve(address(psmUsdcA), usdcAmount);
             psmUsdcA.sellGemNoFee(almProxy, usdcAmount);
             assertEq(usdc.balanceOf(almProxy), 0);
             assertEq(dai.balanceOf(almProxy), daiAmount);
