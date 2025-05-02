@@ -629,7 +629,7 @@ contract DssSpellTest is DssSpellTestBase {
                 rxd: 0
             });
 
-            vm.revertToState(before);
+            vm.revertToStateAndDelete(before);
         }
 
         _checkVestSkyMint(streams);
