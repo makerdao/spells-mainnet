@@ -206,9 +206,12 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
-        string[1] memory removedKeys = [
-            "PIP_ALLOCATOR_SPARK_A"
+    function testRemovedChainlogKeys() public { // add the `skipped` modifier to skip
+        string[4] memory removedKeys = [
+            "LOCKSTAKE_MKR",
+            "REWARDS_LSMKR_USDS",
+            "MCD_GOV_ACTIONS",
+            "GOV_GUARD"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
@@ -237,6 +240,35 @@ contract DssSpellTest is DssSpellTestBase {
             } catch {
                 revert(_concat("TestError/unknown-reason: ", removedKeys[i]));
             }
+        }
+    }
+
+    function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
+        string[7] memory addedKeys = [
+            "PIP_SKY",
+            "MKR",
+            "MKR_GUARD",
+            "LOCKSTAKE_SKY",
+            "LOCKSTAKE_MIGRATOR",
+            "MKR_SKY_LEGACY",
+            "REWARDS_LSSKY_USDS"
+        ];
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            vm.expectRevert("dss-chain-log/invalid-key");
+            chainLog.getAddress(_stringToBytes32(addedKeys[i]));
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            assertEq(
+                chainLog.getAddress(_stringToBytes32(addedKeys[i])),
+                addr.addr(_stringToBytes32(addedKeys[i])),
+                string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", addedKeys[i]))
+            );
         }
     }
 
