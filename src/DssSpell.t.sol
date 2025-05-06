@@ -46,11 +46,6 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface VestedRewardsDistributionLike {
-    function distribute() external returns (uint256 amount);
-    function vestId() external view returns (uint256);
-}
-
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -766,7 +761,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public { // add the `skipped` modifier to skip
+    function testPayments() public skipped { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
 
@@ -1164,9 +1159,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x9362B8a15ab78257b11a55F7CC272F4C4676C2fe); // Insert Spark spell address
+        address SPARK_SPELL = address(0); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1183,9 +1178,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // BLOOM TESTS
-    function testBloomSpellIsExecuted() public {
+    function testBloomSpellIsExecuted() public skipped {
         address BLOOM_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
-        address BLOOM_SPELL = address(0x0c9CC5D5fF3baf096d29676039BD6fB94586111A);
+        address BLOOM_SPELL = address(0);
 
         vm.expectCall(
             BLOOM_PROXY,
@@ -1202,53 +1197,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-    function testWhitelistALMProxy() public {
-        address almProxy = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
-        LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_LITE_PSM_USDC_A"));
-        GemAbstract usdc     = GemAbstract(addr.addr("USDC"));
-        // bud is 0 before kiss
-        assertEq(psmUsdcA.bud(almProxy), 0, "TestError/MCD_PSM_USDC_A/invalid-bud");
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done());
-        // bud is 1 after kiss
-        assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
-        // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
-        uint256 daiAmount  = 1_000 ether;
-        uint256 usdcAmount = 1_000 * 10**6;
-        // fund proxy
-        deal(address(dai), almProxy, daiAmount);
-        vm.startPrank(almProxy);
-        // buy gem with no fee
-        dai.approve(address(psmUsdcA), daiAmount);
-        psmUsdcA.buyGemNoFee(almProxy, usdcAmount);
-        assertEq(usdc.balanceOf(almProxy), usdcAmount);
-        assertEq(dai.balanceOf(almProxy), 0);
-        // now sell it back with no fee
-        usdc.approve(address(psmUsdcA), usdcAmount);
-        psmUsdcA.sellGemNoFee(almProxy, usdcAmount);
-        assertEq(usdc.balanceOf(almProxy), 0);
-        assertEq(dai.balanceOf(almProxy), daiAmount);
-        vm.stopPrank();
-    }
-
-    function testAddChainlogKey() public {
-        bytes32[] memory addedKeys = new bytes32[](1);
-        addedKeys[0] = "EMSP_SPBEAM_HALT";
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            vm.expectRevert("dss-chain-log/invalid-key");
-            chainLog.getAddress(addedKeys[i]);
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
-        }
-
-    }
-
 }
