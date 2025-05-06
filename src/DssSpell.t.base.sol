@@ -205,7 +205,6 @@ interface DaiUsdsLike {
 
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
-    function skyToMkr(address usr, uint256 skyAmt) external;
 }
 
 interface LitePsmLike {
@@ -469,6 +468,7 @@ contract DssSpellTestBase is Config, DssTest {
     ChainlogAbstract            chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
     DSPauseAbstract                pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
     address                   pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
+    DSChiefAbstract          chiefLegacy = DSChiefAbstract(    addr.addr("MCD_ADM_LEGACY"));
     DSChiefAbstract                chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
     VatAbstract                      vat = VatAbstract(        addr.addr("MCD_VAT"));
     VowAbstract                      vow = VowAbstract(        addr.addr("MCD_VOW"));
@@ -482,7 +482,7 @@ contract DssSpellTestBase is Config, DssTest {
     SUsdsLike                      susds = SUsdsLike(          addr.addr("SUSDS"));
     UsdsJoinLike                usdsJoin = UsdsJoinLike(       addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
-    DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MCD_GOV"));
+    DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MKR"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
     MkrSkyLike                    mkrSky = MkrSkyLike(         addr.addr("MKR_SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
@@ -719,10 +719,11 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function _vote(address spell_) internal {
-        if (chief.hat() != spell_) {
-            _giveTokens(address(gov), 999999999999 ether);
-            gov.approve(address(chief), type(uint256).max);
-            chief.lock(999999999999 ether);
+        // TODO after 2025-05-15: replace back `chiefLegacy` with `chief`, `mkr` with `gov`
+        if (chiefLegacy.hat() != spell_) {
+            _giveTokens(address(mkr), 999999999999 ether);
+            mkr.approve(address( chiefLegacy), type(uint256).max);
+            chiefLegacy.lock(999999999999 ether);
 
             address[] memory slate = new address[](1);
 
@@ -730,10 +731,10 @@ contract DssSpellTestBase is Config, DssTest {
 
             slate[0] = spell_;
 
-            chief.vote(slate);
-            chief.lift(spell_);
+            chiefLegacy.vote(slate);
+            chiefLegacy.lift(spell_);
         }
-        assertEq(chief.hat(), spell_);
+        assertEq(chiefLegacy.hat(), spell_);
     }
 
     function _scheduleWaitAndCast(address spell_) internal {
@@ -742,6 +743,15 @@ contract DssSpellTestBase is Config, DssTest {
         vm.warp(DssSpell(spell_).nextCastTime());
 
         DssSpell(spell_).cast();
+
+        // TODO after 2025-05-15: remove new chief bootsraping code below
+        if (chief.live() == 0 && chief.hat() == address(0)) {
+            _giveTokens(address(sky), 999999999999 ether);
+            sky.approve(address(chief), type(uint256).max);
+            chief.lock(999999999999 ether);
+            chief.vote(new address[](1));
+            chief.launch();
+        }
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
@@ -816,15 +826,17 @@ contract DssSpellTestBase is Config, DssTest {
             "TestError/vow-dump-range"
         );
         }
-        {
         // sump values in RAD
-        uint256 normalizedSump = values.vow_sump * RAD;
-        assertEq(vow.sump(), normalizedSump, "TestError/vow-sump");
-        assertTrue(
-            (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
-            vow.sump() == 0,
-            "TestError/vow-sump-range"
-        );
+        if (values.vow_sump == type(uint256).max) {
+            assertEq(vow.sump(), type(uint256).max, "TestError/vow-sump");
+        } else {
+            uint256 normalizedSump = values.vow_sump * RAD;
+            assertEq(vow.sump(), normalizedSump, "TestError/vow-sump");
+            assertTrue(
+                (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
+                vow.sump() == 0,
+                "TestError/vow-sump-range"
+            );
         }
         {
         // bump values in RAD
@@ -857,9 +869,13 @@ contract DssSpellTestBase is Config, DssTest {
 
         // ESM min in WAD
         {
-            uint256 normalizedMin = values.esm_min * WAD;
-            assertEq(esm.min(), normalizedMin, "TestError/esm-min");
-            assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
+            if (values.esm_min == type(uint256).max) {
+                assertEq(esm.min(), type(uint256).max, "TestError/vow-sump");
+            } else {
+                uint256 normalizedMin = values.esm_min * WAD;
+                assertEq(esm.min(), normalizedMin, "TestError/esm-min");
+                assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
+            }
         }
 
         // check Pause authority
@@ -2132,7 +2148,10 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(litePsm.wards(address(litePsmMom)), 1, _concat("checkLitePsmIlkIntegration/litePsmMom-not-ward-", p.ilk));
 
         // Gives the hat to the test contract, so it can invoke LitePsmMom
-        vm.store(address(chief), bytes32(uint256(0x0c)) /* `hat` slot */, bytes32(uint256(uint160(address(this)))));
+        stdstore
+            .target(address(chief))
+            .sig("hat()")
+            .checked_write(address(this));
         LitePsmMomLike(address(litePsmMom)).halt(address(litePsm), 2 /* = BOTH */);
 
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
@@ -2608,7 +2627,7 @@ contract DssSpellTestBase is Config, DssTest {
 
     function _checkVestMkr(VestStream[] memory _ss) internal {
         uint256 prevStreamCount = vestMkr.ids();
-        uint256 prevAllowance = gov.allowance(pauseProxy, address(vestMkr));
+        uint256 prevAllowance = mkr.allowance(pauseProxy, address(vestMkr));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -2621,13 +2640,13 @@ contract DssSpellTestBase is Config, DssTest {
             sumTot = sumTot + _ss[i].tot;
             sumRxd = sumRxd + _ss[i].rxd;
         }
-        assertEq(gov.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
+        assertEq(mkr.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
 
         // Check that all streams added in this spell are tested
         assertEq(vestMkr.ids(), prevStreamCount + _ss.length, "testVestMrk/not-all-streams-tested");
 
         for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestMkr", vestMkr, address(gov), _ss[i]);
+            _checkVestStream("testVestMkr", vestMkr, address(mkr), _ss[i]);
         }
     }
 
@@ -3590,7 +3609,7 @@ contract DssSpellTestBase is Config, DssTest {
         // Converter: MKR <-> SKY
         {
             address mkrHolder = address(0x42);
-            deal(address(gov), mkrHolder, 1_000 * WAD);
+            deal(address(mkr), mkrHolder, 1_000 * WAD);
             address skyHolder = address(0x65);
             deal(address(sky), skyHolder, 1_000 * WAD * afterSpell.sky_mkr_rate);
 
@@ -3599,38 +3618,18 @@ contract DssSpellTestBase is Config, DssTest {
             {
                 uint256 before = vm.snapshot();
 
-                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
+                uint256 pmkrBalance = mkr.balanceOf(mkrHolder);
                 uint256 pskyBalance = sky.balanceOf(skyHolder);
 
                 vm.startPrank(mkrHolder);
-                gov.approve(address(mkrSky), type(uint256).max);
+                mkr.approve(address(mkrSky), type(uint256).max);
                 mkrSky.mkrToSky(skyHolder,   pmkrBalance);
                 vm.stopPrank();
 
                 uint256 expectedSkyBalance = pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate);
 
-                assertEq(gov.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
+                assertEq(mkr.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
                 assertEq(sky.balanceOf(skyHolder), expectedSkyBalance, "TestError/Sky/bad-mkr-to-sky-conversion");
-
-                vm.revertTo(before);
-            }
-
-            // SKY -> MKR conversion
-            {
-                uint256 before = vm.snapshot();
-
-                uint256 pskyBalance = sky.balanceOf(skyHolder);
-                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
-
-                vm.startPrank(skyHolder);
-                sky.approve(address(mkrSky), type(uint256).max);
-                mkrSky.skyToMkr(mkrHolder,   pskyBalance);
-                vm.stopPrank();
-
-                uint256 expectedMkrBalance = pmkrBalance + (pskyBalance / afterSpell.sky_mkr_rate);
-
-                assertEq(sky.balanceOf(skyHolder), 0,                  "TestError/SKY/bad-sky-to-mkr-conversion");
-                assertEq(gov.balanceOf(mkrHolder), expectedMkrBalance, "TestError/Mkr/bad-sky-to-mkr-conversion");
 
                 vm.revertTo(before);
             }
