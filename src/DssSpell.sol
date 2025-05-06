@@ -67,63 +67,148 @@ contract DssSpellAction is DssAction {
     address internal constant LOCKSTAKE_MIGRATOR        = 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B;
 
     function actions() public override {
-        // Note: multple actions in the spell depend on DssInstance
+        // Note: DssInstance is required by the MigrationInit library below
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
-        // Note: prepare `farms` variable used inside LockstakeConfig below
+        // Note: `farms` array is required by the LockstakeConfig below
         address[] memory farms = new address[](1);
         farms[0] = REWARDS_LSSKY_USDS;
 
+        // Initialize chief migration by calling MigrationInit.initMigration with the following parameters:
         MigrationInit.initMigration(
+
+            // Note: this init library requires DssInstance
             dss,
+
             MigrationInstance({
+
+                // inst.chief: TBC new Chief address
                 chief:               MCD_ADM_NEW,
+
+                // inst.voteDelegateFactory: TBC new VoteDelegateFactory address
                 voteDelegateFactory: VOTE_DELEGATE_FACTORY_NEW,
+
+                // inst.mkrSky: TBC new MkrSky address
                 mkrSky:              MKR_SKY_NEW,
+
+                // inst.skyOsm: TBC new SkyOSM address
                 skyOsm:              PIP_SKY,
+
+                // inst.lsskyUsdsFarm: TBC new StakingRewards address
                 lsskyUsdsFarm:       REWARDS_LSSKY_USDS,
+
                 lockstakeInstance: LockstakeInstance({
+
+                    // inst.lockstakeInstance.lssky: TBC new LockstakeLssky address
                     lssky:           LOCKSTAKE_SKY,
+
+                    // inst.lockstakeInstance.engine: TBC new LockstakeEngine address
                     engine:          LOCKSTAKE_ENGINE_NEW,
+
+                    // inst.lockstakeInstance.clipper: TBC new LockstakeClipper address
                     clipper:         LOCKSTAKE_CLIP_NEW,
+
+                    // inst.lockstakeInstance.clipperCalc: TBC new Calc address
                     clipperCalc:     LOCKSTAKE_CLIP_CALC_NEW,
+
+                    // inst.lockstakeInstance.migrator: TBC new Migrator address
                     migrator:        LOCKSTAKE_MIGRATOR
                 })
             }),
+
             MigrationConfig({
+
+                // cfg.maxYays: 5
                 maxYays:             5,
+
+                // cfg.launchThreshold 2,400,000,000 SKY (equivalent to 100,000 MKR)
                 launchThreshold:     2_400_000_000 * WAD,
+
+                // cfg.liftCooldown: 10 blocks
                 liftCooldown:        10,
+
+                // cfg.skyOracle: 0x9f7Ce792d0ee09a6ce89eC2B9B236A44B0aCf73e
                 skyOracle:           0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff,
-                rewardsDuration:     1728 seconds,
+
+                // cfg.rewardsDuration: equal to the splitter.hop (1,728 seconds)
+                rewardsDuration:     1_728 seconds,
+
                 lockstakeConfig: LockstakeConfig({
+
+                    // cfg.lockstakeConfig.ilk: "LSEV2-SKY-A"
                     ilk :            "LSEV2-SKY-A",
+
+                    // cfg.lockstakeConfig.farms: an array with a single StakingRewards address
                     farms:           farms,
+
+                    // cfg.lockstakeConfig.fee: 0
                     fee:             0,
+
+                    // cfg.lockstakeConfig.dust: 30,000
                     dust:            30_000 * RAD,
+
+                    // cfg.lockstakeConfig.duty: 20%
                     duty:            TWENTY_PCT_RATE,
+
+                    // cfg.lockstakeConfig.mat: 125%
                     mat:             125 * RAY / 100,
+
+                    // cfg.lockstakeConfig.buf: 120%
                     buf:             120 * RAY / 100,
+
+                    // cfg.lockstakeConfig.tail: 6,000 seconds
                     tail:            6_000 seconds,
+
+                    // cfg.lockstakeConfig.cusp: 40%
                     cusp:            40 * RAY / 100,
+
+                    // cfg.lockstakeConfig.chip: 0.1%
                     chip:            1 * WAD / 1000,
+
+                    // cfg.lockstakeConfig.tip: 300 USDS
                     tip:             300 * RAD,
+
+                    // cfg.lockstakeConfig.stopped: 3
                     stopped:         3,
+
+                    // cfg.lockstakeConfig.chop: 13%
                     chop:            113 * WAD / 100,
+
+                    // cfg.lockstakeConfig.hole: 250,000
                     hole:            250_000 * RAD,
+
+                    // cfg.lockstakeConfig.tau: 0 days
                     tau:             0,
+
+                    // cfg.lockstakeConfig.cut: 0.99
                     cut:             99 * RAY / 100,
+
+                    // cfg.lockstakeConfig.step: 60 seconds
                     step:            60 seconds,
+
+                    // cfg.lockstakeConfig.lineMom: true (as "added to LINE_MOM")
                     lineMom:         true,
+
+                    // cfg.lockstakeConfig.tolerance: 0.5
                     tolerance:       5 * RAY / 10,
+
+                    // cfg.lockstakeConfig.name: LockstakeSky
                     name:            "LockstakeSky",
+
+                    // cfg.lockstakeConfig.symbol: lsSKY
                     symbol:          "lsSKY"
                 })
             })
         );
 
-        // Deny `CLIPPER_MOM` from the new `LockstakeClipper`
+        // Deny the CLIPPER_MOM from the new lockstake clipper
         DssExecLib.deauthorize(LOCKSTAKE_CLIP_NEW, CLIPPER_MOM);
+
+
+        // ---------- Spark Proxy Spell ----------
+
+        // Execute Spark Proxy spell at TBC
+        // TODO
 
         // ---------- Chainlog bump ----------
 
