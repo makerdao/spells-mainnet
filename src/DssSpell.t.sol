@@ -46,6 +46,10 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface LockstakeMigratorLike {
+    function migrate(address, uint256, address, uint256, uint16) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1229,4 +1233,128 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function _ink(bytes32 ilk_, address urn) internal view returns (uint256 ink) {
+        (ink,) = vat.urns(ilk_, urn);
+    }
+    function _art(bytes32 ilk_, address urn) internal view returns (uint256 art) {
+        (, art) = vat.urns(ilk_, urn);
+    }
+    function _Art(bytes32 ilk_) internal view returns (uint256 Art) {
+        (Art,,,,) = vat.ilks(ilk_);
+    }
+    function _rate(bytes32 ilk_) internal view returns (uint256 rate) {
+        (, rate,,,) = vat.ilks(ilk_);
+    }
+    function _line(bytes32 ilk_) internal view returns (uint256 line) {
+        (,,, line,) = vat.ilks(ilk_);
+    }
+
+    // The following part is ported from the LockstakeMigrator test
+    // https://github.com/makerdao/lockstake/blob/fe854c544d17b1b9353b83ada007a09817c26603/test/LockstakeMigrator.t.sol
+    LockstakeEngineLike oldEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE_OLD_V1"));
+    LockstakeEngineLike newEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE"));
+    bytes32 oldIlk                 = oldEngine.ilk();
+    bytes32 newIlk                 = newEngine.ilk();
+    LockstakeMigratorLike migrator = LockstakeMigratorLike(addr.addr("LOCKSTAKE_MIGRATOR"));
+    struct Urn {
+        address owner;
+        uint256 index;
+    }
+    function _checkLockstakeUrnMigration(Urn memory oldUrn, Urn memory newUrn, address caller, bool hasDebt) internal {
+        address oldUrnAddr = oldEngine.ownerUrns(oldUrn.owner, oldUrn.index);
+        uint256 oldInkPrev = _ink(oldIlk, oldUrnAddr);
+        uint256 oldArtPrev = _art(oldIlk, oldUrnAddr);
+        assertGt(oldInkPrev, 0);
+        if (hasDebt) {
+            assertGt(oldArtPrev, 0);
+        } else {
+            assertEq(oldArtPrev, 0);
+        }
+
+        vm.prank(newUrn.owner); address newUrnAddr = newEngine.open(newUrn.index);
+
+        assertEq(_ink(newIlk, newUrnAddr), 0);
+        assertEq(_art(newIlk, newUrnAddr), 0);
+
+        vm.expectRevert("LockstakeEngine/urn-not-authorized");
+        vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
+        vm.prank(oldUrn.owner); oldEngine.hope(oldUrn.owner, oldUrn.index, address(migrator));
+
+        if (hasDebt) {
+            vm.expectRevert("LockstakeEngine/urn-not-authorized");
+            vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
+            vm.prank(newUrn.owner); newEngine.hope(newUrn.owner, newUrn.index, address(migrator));
+
+            uint256 snapshotId = vm.snapshot();
+            vm.prank(pauseProxy); vat.file(oldIlk, "line", 1);
+            vm.expectRevert("LockstakeMigrator/old-ilk-line-not-zero");
+            vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
+            vm.revertTo(snapshotId);
+        }
+
+        uint256 oldIlkRate = _rate(oldIlk);
+
+        vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
+
+        assertEq(_ink(oldIlk, oldUrnAddr), 0);
+        assertEq(_art(oldIlk, oldUrnAddr), 0);
+
+        assertEq(_ink(newIlk, newUrnAddr), oldInkPrev * 24_000);
+        if (hasDebt) {
+            assertApproxEqAbs(_art(newIlk, newUrnAddr) * _rate(newIlk), oldArtPrev * oldIlkRate, RAY * 2);
+        } else {
+            assertEq(_art(newIlk, newUrnAddr), 0);
+        }
+
+        assertEq(_line(newIlk), 0);
+    }
+    function testLockstakeMigrateCurrentUrnsWithRelevantDebt() public {
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Propagate price into vat
+        OsmAbstract(addr.addr('PIP_SKY')).poke();
+        vm.warp(block.timestamp + 1 hours);
+        OsmAbstract(addr.addr('PIP_SKY')).poke();
+        spotter.poke("LSEV2-SKY-A");
+
+        // Simulate migration of existing urns
+        assertEq(_Art(newIlk), 0);
+        assertGt(_Art(oldIlk) * _rate(oldIlk), 40_000_000 * RAD);
+        _checkLockstakeUrnMigration({
+            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 4 }),
+            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 0 }),
+            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
+            hasDebt: true
+        });
+        _checkLockstakeUrnMigration({
+            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 5 }),
+            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 1 }),
+            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
+            hasDebt: true
+        });
+        _checkLockstakeUrnMigration({
+            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 7 }),
+            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 2 }),
+            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
+            hasDebt: true
+        });
+        _checkLockstakeUrnMigration({
+            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 6 }),
+            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 3 }),
+            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
+            hasDebt: true
+        });
+        _checkLockstakeUrnMigration({
+            oldUrn: Urn({ owner: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7, index: 0 }),
+            newUrn: Urn({ owner: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7, index: 0 }),
+            caller: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7,
+            hasDebt: true
+        });
+        assertGt(_Art(newIlk) * _rate(newIlk), 40_000_000 * RAD);
+        assertLt(_Art(oldIlk) * _rate(oldIlk),  1_000_000 * RAD);
+    }
 }
