@@ -1234,6 +1234,13 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    // The following part is ported from the LockstakeMigrator test
+    // https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/test/LockstakeMigrator.t.sol
+    LockstakeEngineLike oldEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE_OLD_V1"));
+    LockstakeEngineLike newEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE"));
+    bytes32 oldIlk                 = oldEngine.ilk();
+    bytes32 newIlk                 = newEngine.ilk();
+    LockstakeMigratorLike migrator = LockstakeMigratorLike(addr.addr("LOCKSTAKE_MIGRATOR"));
     function _ink(bytes32 ilk_, address urn) internal view returns (uint256 ink) {
         (ink,) = vat.urns(ilk_, urn);
     }
@@ -1249,14 +1256,6 @@ contract DssSpellTest is DssSpellTestBase {
     function _line(bytes32 ilk_) internal view returns (uint256 line) {
         (,,, line,) = vat.ilks(ilk_);
     }
-
-    // The following part is ported from the LockstakeMigrator test
-    // https://github.com/makerdao/lockstake/blob/fe854c544d17b1b9353b83ada007a09817c26603/test/LockstakeMigrator.t.sol
-    LockstakeEngineLike oldEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE_OLD_V1"));
-    LockstakeEngineLike newEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE"));
-    bytes32 oldIlk                 = oldEngine.ilk();
-    bytes32 newIlk                 = newEngine.ilk();
-    LockstakeMigratorLike migrator = LockstakeMigratorLike(addr.addr("LOCKSTAKE_MIGRATOR"));
     struct Urn {
         address owner;
         uint256 index;

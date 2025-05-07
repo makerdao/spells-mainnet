@@ -868,14 +868,12 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // ESM min in WAD
-        {
-            if (values.esm_min == type(uint256).max) {
-                assertEq(esm.min(), type(uint256).max, "TestError/vow-sump");
-            } else {
-                uint256 normalizedMin = values.esm_min * WAD;
-                assertEq(esm.min(), normalizedMin, "TestError/esm-min");
-                assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
-            }
+        if (values.esm_min == type(uint256).max) {
+            assertEq(esm.min(), type(uint256).max, "TestError/vow-sump");
+        } else {
+            uint256 normalizedMin = values.esm_min * WAD;
+            assertEq(esm.min(), normalizedMin, "TestError/esm-min");
+            assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
         }
 
         // check Pause authority
@@ -3564,7 +3562,6 @@ contract DssSpellTestBase is Config, DssTest {
             address usdsHolder = address(0x65);
             deal(address(usds), usdsHolder, 1_000 * WAD);
 
-
             // Dai -> USDS conversion
             {
                 uint256 before = vm.snapshot();
@@ -3606,7 +3603,7 @@ contract DssSpellTestBase is Config, DssTest {
             }
         }
 
-        // Converter: MKR <-> SKY
+        // Converter: MKR -> SKY
         {
             address mkrHolder = address(0x42);
             deal(address(mkr), mkrHolder, 1_000 * WAD);
