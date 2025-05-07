@@ -127,7 +127,7 @@ contract DssSpellAction is DssAction {
                 // cfg.liftCooldown: 10 blocks
                 liftCooldown:        10,
 
-                // cfg.skyOracle: 0x9f7Ce792d0ee09a6ce89eC2B9B236A44B0aCf73e
+                // cfg.skyOracle: 0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff
                 skyOracle:           0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff,
 
                 // cfg.rewardsDuration: equal to the splitter.hop (1,728 seconds)
@@ -201,9 +201,10 @@ contract DssSpellAction is DssAction {
             })
         );
 
-        // Deny the CLIPPER_MOM from the new lockstake clipper
-        DssExecLib.deauthorize(LOCKSTAKE_CLIP_NEW, CLIPPER_MOM);
+        // ---------- Remove CLIPPER_MOM Access ----------
 
+        // Deny CLIPPER_MOM from the new LockstakeClipper
+        DssExecLib.deauthorize(LOCKSTAKE_CLIP_NEW, CLIPPER_MOM);
 
         // ---------- Spark Proxy Spell ----------
 
