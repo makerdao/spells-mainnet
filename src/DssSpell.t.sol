@@ -325,24 +325,24 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLockstakeIlkIntegration() public skipped { // add the `skipped` modifier to skip
+    function testLockstakeIlkIntegration() public { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         _checkLockstakeIlkIntegration(
             LockstakeIlkParams({
-                ilk:    "LSE-MKR-A",
+                ilk:    "LSEV2-SKY-A",
                 fee:    0,
-                pip:    addr.addr("PIP_MKR"),
-                lsmkr:  addr.addr("LOCKSTAKE_MKR"),
+                pip:    addr.addr("PIP_SKY"),
+                lssky:  addr.addr("LOCKSTAKE_SKY"),
                 engine: addr.addr("LOCKSTAKE_ENGINE"),
                 clip:   addr.addr("LOCKSTAKE_CLIP"),
                 calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
-                farm:   addr.addr("REWARDS_LSMKR_USDS"),
+                farm:   addr.addr("REWARDS_LSSKY_USDS"),
                 rToken: addr.addr("USDS"),
                 rDistr: addr.addr("MCD_SPLIT"),
-                rDur:   15_649 seconds
+                rDur:   1_728 seconds
             })
         );
     }
