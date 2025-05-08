@@ -61,6 +61,12 @@ interface AuthedLike {
     function authority() external view returns (address);
 }
 
+interface VoteDelegateLike {
+    function lock(uint256) external;
+    function free(uint256) external;
+    function stake(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1251,10 +1257,6 @@ contract DssSpellTest is DssSpellTestBase {
     function testChiefMigration() public {
         // Check state before cast
         assertNotEq(address(chief), chainLog.getAddress("MCD_ADM"));
-        assertEq(chief.gov(), address(sky));
-        assertEq(chief.maxYays(), 5);
-        assertEq(chief.launchThreshold(), 2_400_000_000 * WAD);
-        assertEq(chief.liftCooldown(), 10);
 
         // Cast spell
         _vote(address(spell));
@@ -1265,6 +1267,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(address(chief), chainLog.getAddress("MCD_ADM"));
         assertEq(chief.hat(), address(0));
         assertEq(chief.live(), 0);
+        assertEq(chief.gov(), address(sky));
+        assertEq(chief.maxYays(), 5);
+        assertEq(chief.launchThreshold(), 2_400_000_000 * WAD);
+        assertEq(chief.liftCooldown(), 10);
 
         // Check changes to authority
         assertEq(pause.authority(), address(chief));
@@ -1343,6 +1349,46 @@ contract DssSpellTest is DssSpellTestBase {
         // Test spell can cast after gov delay has passed
         vm.warp(MockDssExecSpell(testSpell).eta());
         DssSpell(testSpell).cast();
+    }
+
+    function testVoteDelegateFactory() public {
+        // Check state before cast
+        address oldVoteDelegateFactory = chainLog.getAddress("VOTE_DELEGATE_FACTORY");
+        assertNotEq(oldVoteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY_LEGACY"));
+        assertNotEq(voteDelegateFactory, oldVoteDelegateFactory);
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Sanity checks
+        assertEq(oldVoteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY_LEGACY"));
+        assertEq(voteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY"));
+        assertEq(VoteDelegateFactoryLike(voteDelegateFactory).polling(), VoteDelegateFactoryLike(oldVoteDelegateFactory).polling());
+        assertNotEq(VoteDelegateFactoryLike(voteDelegateFactory).chief(), VoteDelegateFactoryLike(oldVoteDelegateFactory).chief());
+        assertEq(VoteDelegateFactoryLike(voteDelegateFactory).chief(), address(chief));
+
+        // Setup addresses
+        address voter = address(123);
+        address delegator = address(456);
+        uint256 delegationAmount = 10_000 * WAD;
+        deal(address(sky), delegator, delegationAmount);
+
+        // Lock SKY
+        uint256 initialSKY = sky.balanceOf(address(chief));
+        vm.prank(voter); VoteDelegateLike voteDelegate = VoteDelegateLike(VoteDelegateFactoryLike(voteDelegateFactory).create());
+        vm.prank(delegator); sky.approve(address(voteDelegate), type(uint256).max);
+        vm.prank(delegator); voteDelegate.lock(delegationAmount);
+        assertEq(sky.balanceOf(delegator), 0);
+        assertEq(sky.balanceOf(address(chief)), initialSKY + delegationAmount);
+        assertEq(voteDelegate.stake(delegator), delegationAmount);
+
+        // Free SKY
+        vm.prank(delegator); voteDelegate.free(delegationAmount); // note that we can free in the same block now
+        assertEq(sky.balanceOf(delegator), delegationAmount);
+        assertEq(sky.balanceOf(address(chief)), initialSKY);
+        assertEq(voteDelegate.stake(delegator), 0);
     }
 
     // The following part is ported from the LockstakeMigrator test

@@ -317,7 +317,9 @@ interface LockstakeClipperLike {
 }
 
 interface VoteDelegateFactoryLike {
+    function chief() external view returns (address);
     function create() external returns (address voteDelegate);
+    function polling() external view returns (address);
 }
 
 interface AllocatorVaultLike {
