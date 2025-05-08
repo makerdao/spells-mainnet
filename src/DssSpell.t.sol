@@ -1284,12 +1284,14 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(AuthedLike(addr.addr("SPBEAM_MOM")).authority(), address(chief));
 
         // Chief can't be launched with lower launchThreshold
+        uint256 snapshot = vm.snapshot();
         _giveTokens(address(sky), 1_000 * WAD * 24_000);
         sky.approve(address(chief), 1_000 * WAD * 24_000);
         chief.lock(1_000 * WAD * 24_000);
         chief.vote(new address[](1));
         vm.expectRevert("Chief/less-than-threshold");
         chief.launch();
+        vm.revertTo(snapshot);
 
         // Setup: lock enough SKY into new chief
         _giveTokens(address(sky), 100_000 * WAD * 24_000);

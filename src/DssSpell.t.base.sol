@@ -775,7 +775,7 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     // TODO after 2025-05-15: remove new chief bootsraping function below
-    function _activateNewCheif() internal {
+    function _activateNewChief() internal {
         if (chief.live() == 0 && chief.hat() == address(0)) {
             _giveTokens(address(sky), 999999999999 ether);
             sky.approve(address(chief), type(uint256).max);
@@ -2164,9 +2164,12 @@ contract DssSpellTestBase is Config, DssTest {
         // LitePsmMom can halt litePSM
         assertEq(litePsm.wards(address(litePsmMom)), 1, _concat("checkLitePsmIlkIntegration/litePsmMom-not-ward-", p.ilk));
 
+        _activateNewChief();
         // Gives the hat to the test contract, so it can invoke LitePsmMom
-        _activateNewCheif();
-        vm.prank(chief.hat());
+        stdstore
+            .target(address(chief))
+            .sig("hat()")
+            .checked_write(address(this));
         LitePsmMomLike(address(litePsmMom)).halt(address(litePsm), 2 /* = BOTH */);
 
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
@@ -3554,7 +3557,7 @@ contract DssSpellTestBase is Config, DssTest {
         {
             // The check for the configured value is already done in `_checkSystemValues()`
             assertLt(split.hop(), type(uint256).max, "TestError/SplitterMom/already-stopped");
-            _activateNewCheif();
+            _activateNewChief();
             vm.prank(chief.hat());
             splitterMom.stop();
             assertEq(split.hop(), type(uint256).max, "TestError/SplitterMom/not-stopped");
