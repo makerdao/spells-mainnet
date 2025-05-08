@@ -18,10 +18,15 @@ pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-
 import { MCD, DssInstance } from "dss-test/MCD.sol";
+
+// Note: code matches https://github.com/makerdao/chief-migration/blob/e4a820483694f015a2daf8b1dccc5548036d94d4/deploy/MigrationInit.sol
 import { MigrationInstance, MigrationConfig, MigrationInit } from "./dependencies/chief-migration/MigrationInit.sol";
+
+// Note: code matches https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/deploy/LockstakeInstance.sol
 import { LockstakeInstance } from "./dependencies/lockstake/LockstakeInstance.sol";
+
+// Note: code matches https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/deploy/LockstakeInit.sol
 import { LockstakeConfig } from "./dependencies/lockstake/LockstakeInit.sol";
 
 contract DssSpellAction is DssAction {
