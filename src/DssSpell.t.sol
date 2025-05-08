@@ -18,7 +18,14 @@ pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
-import { OsmAbstract } from "dss-interfaces/dss/OsmAbstract.sol";
+import { DssExec } from "dss-exec-lib/DssExec.sol";
+
+contract MockDssSpellAction  {
+    function execute() external {}
+}
+contract MockDssExecSpell is DssExec {
+    constructor() DssExec(block.timestamp + 30 days, address(new MockDssSpellAction())) {}
+}
 
 interface L2Spell {
     function dstDomain() external returns (bytes32);
@@ -1238,8 +1245,109 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
+    // The following part is ported from the Migration test
+    // https://github.com/makerdao/chief-migration/blob/e4a820483694f015a2daf8b1dccc5548036d94d4/test/Migration.t.sol
+
+    function testChiefMigration() public {
+        // Check state before cast
+        assertNotEq(address(chief), chainLog.getAddress("MCD_ADM"));
+        assertEq(chief.gov(), address(sky));
+        assertEq(chief.maxYays(), 5);
+        assertEq(chief.launchThreshold(), 2_400_000_000 * WAD);
+        assertEq(chief.liftCooldown(), 10);
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Sanity checks
+        assertEq(address(chief), chainLog.getAddress("MCD_ADM"));
+        assertEq(chief.hat(), address(0));
+        assertEq(chief.live(), 0);
+
+        // Check changes to authority
+        assertEq(pause.authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("SPLITTER_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("OSM_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("CLIPPER_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("DIRECT_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("STARKNET_ESCROW_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("LINE_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("LITE_PSM_MOM")).authority(), address(chief));
+        assertEq(AuthedLike(addr.addr("SPBEAM_MOM")).authority(), address(chief));
+
+        // Chief can't be launched with lower launchThreshold
+        _giveTokens(address(sky), 1_000 * WAD * 24_000);
+        sky.approve(address(chief), 1_000 * WAD * 24_000);
+        chief.lock(1_000 * WAD * 24_000);
+        chief.vote(new address[](1));
+        vm.expectRevert("Chief/less-than-threshold");
+        chief.launch();
+
+        // Setup: lock enough SKY into new chief
+        _giveTokens(address(sky), 100_000 * WAD * 24_000);
+        sky.approve(address(chief), 100_000 * WAD * 24_000);
+        chief.lock(100_000 * WAD * 24_000);
+        address[] memory slate = new address[](1);
+
+        // Check that Mom can't operate since chief is not live
+        address splitterStopSpell = addr.addr("EMSP_SPLITTER_STOP");
+        slate[0] = splitterStopSpell;
+        chief.vote(slate);
+        chief.lift(splitterStopSpell);
+        vm.expectRevert("SplitterMom/not-authorized");
+        DssSpell(splitterStopSpell).schedule();
+
+        // Check spell can't schedule since chief is not live
+        address testSpell = address(new MockDssExecSpell());
+        slate[0] = testSpell;
+        chief.vote(slate);
+        chief.lift(testSpell);
+        vm.expectRevert("ds-auth-unauthorized");
+        DssSpell(testSpell).schedule();
+
+        // Launch chief
+        slate[0] = address(0);
+        chief.vote(slate);
+        chief.lift(address(0));
+        chief.launch();
+        assertEq(chief.live(), 1);
+
+        // Mom can't operate since the calling spell is not the hat
+        vm.expectRevert("SplitterMom/not-authorized");
+        DssSpell(splitterStopSpell).schedule();
+
+        // Also test spell can't schedule since not the hat
+        vm.expectRevert("ds-auth-unauthorized");
+        DssSpell(testSpell).schedule();
+
+        // Mom can operate
+        slate[0] = splitterStopSpell;
+        chief.vote(slate);
+        chief.lift(splitterStopSpell);
+        assertLe(split.hop(), type(uint256).max);
+        DssSpell(splitterStopSpell).schedule();
+        assertEq(split.hop(), type(uint256).max);
+
+        // Test spell can schedule
+        slate[0] = testSpell;
+        chief.vote(slate);
+        chief.lift(testSpell);
+        DssSpell(testSpell).schedule();
+
+        // Test spell can't cast before gov delay has passed
+        vm.expectRevert("ds-pause-premature-exec");
+        DssSpell(testSpell).cast();
+
+        // Test spell can cast after gov delay has passed
+        vm.warp(MockDssExecSpell(testSpell).eta());
+        DssSpell(testSpell).cast();
+    }
+
     // The following part is ported from the LockstakeMigrator test
     // https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/test/LockstakeMigrator.t.sol
+
     LockstakeEngineLike oldEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE_OLD_V1"));
     LockstakeEngineLike newEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE"));
     bytes32 oldIlk                 = oldEngine.ilk();

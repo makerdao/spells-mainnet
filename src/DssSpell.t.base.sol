@@ -454,6 +454,39 @@ interface ConvLike {
     function rtob(uint256 ray) external pure returns (uint256 bps);
 }
 
+interface ChiefLike {
+    event Etch(bytes32 indexed slate, address[] yays);
+    event Free(address indexed usr, uint256 wad);
+    event Launch();
+    event Lift(address indexed whom);
+    event Lock(address indexed usr, uint256 wad);
+    event Vote(address indexed usr, bytes32 indexed slate);
+
+    function EMPTY_SLATE() external view returns (bytes32);
+    function GOV() external view returns (address);
+    function MAX_YAYS() external view returns (uint256);
+    function approvals(address yay) external view returns (uint256 amt);
+    function canCall(address caller, address, bytes4) external view returns (bool ok);
+    function deposits(address usr) external view returns (uint256 amt);
+    function etch(address[] memory yays) external returns (bytes32 slate);
+    function free(uint256 wad) external;
+    function gov() external view returns (address);
+    function hat() external view returns (address);
+    function last() external view returns (uint256);
+    function launch() external;
+    function launchThreshold() external view returns (uint256);
+    function length(bytes32 slate) external view returns (uint256);
+    function lift(address whom) external;
+    function liftCooldown() external view returns (uint256);
+    function live() external view returns (uint256);
+    function lock(uint256 wad) external;
+    function maxYays() external view returns (uint256);
+    function slates(bytes32 slate, uint256) external view returns (address yays);
+    function vote(bytes32 slate) external;
+    function vote(address[] memory yays) external returns (bytes32 slate);
+    function votes(address usr) external view returns (bytes32 slate);
+}
+
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -469,7 +502,7 @@ contract DssSpellTestBase is Config, DssTest {
     DSPauseAbstract                pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
     address                   pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
     DSChiefAbstract          chiefLegacy = DSChiefAbstract(    addr.addr("MCD_ADM_LEGACY"));
-    DSChiefAbstract                chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
+    ChiefLike                      chief = ChiefLike(          addr.addr("MCD_ADM"));
     VatAbstract                      vat = VatAbstract(        addr.addr("MCD_VAT"));
     VowAbstract                      vow = VowAbstract(        addr.addr("MCD_VOW"));
     DogAbstract                      dog = DogAbstract(        addr.addr("MCD_DOG"));
