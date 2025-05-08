@@ -50,6 +50,10 @@ interface LockstakeMigratorLike {
     function migrate(address, uint256, address, uint256, uint16) external;
 }
 
+interface AuthedLike {
+    function authority() external view returns (address);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
