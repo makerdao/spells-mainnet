@@ -67,6 +67,10 @@ interface VoteDelegateLike {
     function stake(address) external view returns (uint256);
 }
 
+interface LineMomLike {
+    function ilks(bytes32) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -1253,6 +1257,32 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testNewLineMomIlks() public {
+        string[1] memory ilks = [
+            "LSEV2-SKY-A"
+        ];
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                0,
+                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
+            );
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(
+                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
+                1,
+                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
+            );
+        }
+    }
 
     // The following part is ported from the Migration test
     // https://github.com/makerdao/chief-migration/blob/e4a820483694f015a2daf8b1dccc5548036d94d4/test/Migration.t.sol
