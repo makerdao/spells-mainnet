@@ -82,18 +82,18 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba;
 
     function actions() public override {
+        // ---------- Initialize chief migration by calling MigrationInit.initMigration with the following parameters: ----------
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+
         // Note: DssInstance is required by the MigrationInit library below
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // Note: `farms` array is required by the LockstakeConfig below
         address[] memory farms = new address[](1);
         farms[0] = REWARDS_LSSKY_USDS;
-
-        // ---------- Initialize chief migration by calling MigrationInit.initMigration with the following parameters: ----------
-        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
-        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
-        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
-        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
 
         MigrationInit.initMigration(
 
