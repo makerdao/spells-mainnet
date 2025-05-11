@@ -172,6 +172,7 @@ interface FlapUniV2Like {
 interface SplitLike {
     function burn() external view returns (uint256);
     function farm() external view returns (address);
+    function file(bytes32, uint256) external;
     function flapper() external view returns (address);
     function hop() external view returns (uint256);
 }
@@ -239,6 +240,7 @@ interface LitePsmMomLike is AuthorityLike {
 }
 
 interface StakingRewardsLike {
+    function owner() external view returns (address);
     function stake(uint256 amount) external;
     function notifyRewardAmount(uint256 reward) external;
     function rewardPerToken() external view returns (uint256);

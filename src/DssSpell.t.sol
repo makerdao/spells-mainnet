@@ -68,6 +68,8 @@ interface VoteDelegateLike {
 }
 
 contract DssSpellTest is DssSpellTestBase {
+    using stdStorage for StdStorage;
+
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
         _testGeneral();
@@ -1289,8 +1291,7 @@ contract DssSpellTest is DssSpellTestBase {
         sky.approve(address(chief), 1_000 * WAD * 24_000);
         chief.lock(1_000 * WAD * 24_000);
         chief.vote(new address[](1));
-        vm.expectRevert("Chief/less-than-threshold");
-        chief.launch();
+        vm.expectRevert("Chief/less-than-threshold"); chief.launch();
         vm.revertTo(snapshot);
 
         // Setup: lock enough SKY into new chief
@@ -1304,16 +1305,14 @@ contract DssSpellTest is DssSpellTestBase {
         slate[0] = splitterStopSpell;
         chief.vote(slate);
         chief.lift(splitterStopSpell);
-        vm.expectRevert("SplitterMom/not-authorized");
-        DssSpell(splitterStopSpell).schedule();
+        vm.expectRevert("SplitterMom/not-authorized"); DssSpell(splitterStopSpell).schedule();
 
         // Check spell can't schedule since chief is not live
         address testSpell = address(new MockDssExecSpell());
         slate[0] = testSpell;
         chief.vote(slate);
         chief.lift(testSpell);
-        vm.expectRevert("ds-auth-unauthorized");
-        DssSpell(testSpell).schedule();
+        vm.expectRevert("ds-auth-unauthorized"); DssSpell(testSpell).schedule();
 
         // Launch chief
         slate[0] = address(0);
@@ -1323,12 +1322,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(chief.live(), 1);
 
         // Mom can't operate since the calling spell is not the hat
-        vm.expectRevert("SplitterMom/not-authorized");
-        DssSpell(splitterStopSpell).schedule();
+        vm.expectRevert("SplitterMom/not-authorized"); DssSpell(splitterStopSpell).schedule();
 
         // Also test spell can't schedule since not the hat
-        vm.expectRevert("ds-auth-unauthorized");
-        DssSpell(testSpell).schedule();
+        vm.expectRevert("ds-auth-unauthorized"); DssSpell(testSpell).schedule();
 
         // Mom can operate
         slate[0] = splitterStopSpell;
@@ -1345,8 +1342,7 @@ contract DssSpellTest is DssSpellTestBase {
         DssSpell(testSpell).schedule();
 
         // Test spell can't cast before gov delay has passed
-        vm.expectRevert("ds-pause-premature-exec");
-        DssSpell(testSpell).cast();
+        vm.expectRevert("ds-pause-premature-exec"); DssSpell(testSpell).cast();
 
         // Test spell can cast after gov delay has passed
         vm.warp(MockDssExecSpell(testSpell).eta());
@@ -1391,6 +1387,56 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(sky.balanceOf(delegator), delegationAmount);
         assertEq(sky.balanceOf(address(chief)), initialSKY);
         assertEq(voteDelegate.stake(delegator), 0);
+    }
+
+    function testSplitToFarm() public {
+        // Check state before cast
+        address oldRewards = chainLog.getAddress("REWARDS_LSMKR_USDS");
+        assertNotEq(split.farm(), addr.addr("REWARDS_LSSKY_USDS"));
+        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSSKY_USDS");
+        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSMKR_USDS_LEGACY");
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check chainlog changes
+        address splitterFarm = split.farm();
+        assertEq(splitterFarm, addr.addr("REWARDS_LSSKY_USDS"));
+        assertEq(splitterFarm, chainLog.getAddress("REWARDS_LSSKY_USDS"));
+        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSMKR_USDS");
+        assertEq(chainLog.getAddress("REWARDS_LSMKR_USDS_LEGACY"), oldRewards);
+
+        // Sanity checks
+        assertEq(StakingRewardsLike(splitterFarm).rewardsDistribution(), address(split));
+        assertEq(StakingRewardsLike(splitterFarm).rewardsDuration(), 1_728 seconds);
+        assertEq(StakingRewardsLike(splitterFarm).rewardsDuration(), split.hop());
+        assertEq(StakingRewardsLike(splitterFarm).owner(), address(pauseProxy));
+        assertEq(StakingRewardsLike(splitterFarm).rewardsToken(), address(usds));
+        assertEq(StakingRewardsLike(splitterFarm).stakingToken(), addr.addr("LOCKSTAKE_SKY"));
+
+        // Move to a state where calling `vow.flap()` is possible
+        vm.warp(block.timestamp + split.hop());
+        // Create additional surplus, if needed
+        if (vat.dai(address(vow)) < vat.sin(address(vow)) + vow.bump() + vow.hump()) {
+            stdstore
+                .target(address(vat))
+                .sig("dai(address)")
+                .with_key(address(vow))
+                .checked_write(vat.sin(address(vow)) + vow.bump() + vow.hump());
+        }
+        // Heal if needed
+        if (vat.sin(address(vow)) > vow.Sin() + vow.Ash()) {
+            vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
+        }
+        // Set 0% burn
+        vm.prank(pauseProxy); split.file("burn", 0);
+
+        // Check flapping result
+        uint256 pbalanceUsdsFarm = usds.balanceOf(split.farm());
+        vow.flap();
+        assertEq(usds.balanceOf(splitterFarm), pbalanceUsdsFarm + vow.bump() / RAY, "testSplitToFarm/invalid-farm-balance");
     }
 
     // The following part is ported from the LockstakeMigrator test
