@@ -267,14 +267,15 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
-        string[7] memory addedKeys = [
+        string[8] memory addedKeys = [
             "PIP_SKY",
             "MKR",
             "MKR_GUARD",
             "LOCKSTAKE_SKY",
             "LOCKSTAKE_MIGRATOR",
             "MKR_SKY_LEGACY",
-            "REWARDS_LSSKY_USDS"
+            "REWARDS_LSSKY_USDS",
+            "MCD_PROTEGO"
         ];
 
         for(uint256 i = 0; i < addedKeys.length; i++) {
@@ -1214,9 +1215,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0); // Insert Spark spell address
+        address SPARK_SPELL = address(0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,

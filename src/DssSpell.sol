@@ -29,6 +29,10 @@ import { LockstakeInstance } from "./dependencies/lockstake/LockstakeInstance.so
 // Note: code matches https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/deploy/LockstakeInit.sol
 import { LockstakeConfig } from "./dependencies/lockstake/LockstakeInit.sol";
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -70,6 +74,12 @@ contract DssSpellAction is DssAction {
     address internal constant LOCKSTAKE_CLIP_NEW        = 0x35526314F18FeB5b7F124e40D6A99d64F7D7e89a;
     address internal constant LOCKSTAKE_CLIP_CALC_NEW   = 0xB8f8c7caabFa320717E3e848948450e120F0D9BB;
     address internal constant LOCKSTAKE_MIGRATOR        = 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B;
+    address internal constant MCD_PROTEGO               = 0x5C9c3cb0490938c9234ABddeD37a191576ED8624;
+
+    // ---------- Spark Proxy Spell ----------
+    // Spark Proxy: https://github.com/marsfoundation/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba;
 
     function actions() public override {
         // Note: DssInstance is required by the MigrationInit library below
@@ -79,7 +89,12 @@ contract DssSpellAction is DssAction {
         address[] memory farms = new address[](1);
         farms[0] = REWARDS_LSSKY_USDS;
 
-        // Initialize chief migration by calling MigrationInit.initMigration with the following parameters:
+        // ---------- Initialize chief migration by calling MigrationInit.initMigration with the following parameters: ----------
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+
         MigrationInit.initMigration(
 
             // Note: this init library requires DssInstance
@@ -87,36 +102,36 @@ contract DssSpellAction is DssAction {
 
             MigrationInstance({
 
-                // inst.chief: TBC new Chief address
+                // inst.chief: 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9
                 chief:               MCD_ADM_NEW,
 
-                // inst.voteDelegateFactory: TBC new VoteDelegateFactory address
+                // inst.voteDelegateFactory: 0x4Cf3DaeFA2683Cd18df00f7AFF5169C00a9EccD5
                 voteDelegateFactory: VOTE_DELEGATE_FACTORY_NEW,
 
-                // inst.mkrSky: TBC new MkrSky address
+                // inst.mkrSky: 0xA1Ea1bA18E88C381C724a75F23a130420C403f9a
                 mkrSky:              MKR_SKY_NEW,
 
-                // inst.skyOsm: TBC new SkyOSM address
+                // inst.skyOsm: 0x511485bBd96e7e3a056a8D1b84C5071071C52D6F
                 skyOsm:              PIP_SKY,
 
-                // inst.lsskyUsdsFarm: TBC new StakingRewards address
+                // inst.lsskyUsdsFarm: 0x38E4254bD82ED5Ee97CD1C4278FAae748d998865
                 lsskyUsdsFarm:       REWARDS_LSSKY_USDS,
 
                 lockstakeInstance: LockstakeInstance({
 
-                    // inst.lockstakeInstance.lssky: TBC new LockstakeLssky address
+                    // inst.lockstakeInstance.lssky: 0xf9A9cfD3229E985B91F99Bc866d42938044FFa1C
                     lssky:           LOCKSTAKE_SKY,
 
-                    // inst.lockstakeInstance.engine: TBC new LockstakeEngine address
+                    // inst.lockstakeInstance.engine: 0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3
                     engine:          LOCKSTAKE_ENGINE_NEW,
 
-                    // inst.lockstakeInstance.clipper: TBC new LockstakeClipper address
+                    // inst.lockstakeInstance.clipper:  0x35526314F18FeB5b7F124e40D6A99d64F7D7e89a
                     clipper:         LOCKSTAKE_CLIP_NEW,
 
-                    // inst.lockstakeInstance.clipperCalc: TBC new Calc address
+                    // inst.lockstakeInstance.clipperCalc: 0xB8f8c7caabFa320717E3e848948450e120F0D9BB
                     clipperCalc:     LOCKSTAKE_CLIP_CALC_NEW,
 
-                    // inst.lockstakeInstance.migrator: TBC new Migrator address
+                    // inst.lockstakeInstance.migrator: 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B
                     migrator:        LOCKSTAKE_MIGRATOR
                 })
             }),
@@ -143,7 +158,7 @@ contract DssSpellAction is DssAction {
                     // cfg.lockstakeConfig.ilk: "LSEV2-SKY-A"
                     ilk :            "LSEV2-SKY-A",
 
-                    // cfg.lockstakeConfig.farms: an array with a single StakingRewards address
+                    // cfg.lockstakeConfig.farms: array [StakingRewards: 0x38E4254bD82ED5Ee97CD1C4278FAae748d998865]
                     farms:           farms,
 
                     // cfg.lockstakeConfig.fee: 0
@@ -207,19 +222,31 @@ contract DssSpellAction is DssAction {
         );
 
         // ---------- Remove CLIPPER_MOM Access ----------
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
 
         // Deny CLIPPER_MOM from the new LockstakeClipper
         DssExecLib.deauthorize(LOCKSTAKE_CLIP_NEW, CLIPPER_MOM);
 
-        // ---------- Spark Proxy Spell ----------
+        // ---------- Add Protego to Chainlog ----------
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-protego-deployment/26365
+        // Forum: https://forum.sky.money/t/technical-scope-of-the-protego-deployment/26365/2
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
 
-        // Execute Spark Proxy spell at TBC
-        // TODO
+        // Add Protego (0x5C9c3cb0490938c9234ABddeD37a191576ED8624) to chainlog with key “MCD_PROTEGO”
+        DssExecLib.setChangelogAddress("MCD_PROTEGO", MCD_PROTEGO);
 
-        // ---------- Chainlog bump ----------
-
-        // Note: we have to bump minor chainlog version as MCD_ADM address is being updated
+        // Bump chainlog MINOR version
         DssExecLib.setChangelogVersion("1.20.0");
+
+        // ---------- Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+
+        // Execute Spark Proxy spell at 0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 
