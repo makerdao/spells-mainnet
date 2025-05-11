@@ -271,14 +271,19 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
-        string[8] memory addedKeys = [
+        string[13] memory addedKeys = [
             "PIP_SKY",
             "MKR",
             "MKR_GUARD",
+            "LOCKSTAKE_MKR_OLD_V1",
+            "LOCKSTAKE_ENGINE_OLD_V1",
+            "LOCKSTAKE_CLIP_OLD_V1",
+            "LOCKSTAKE_CLIP_CALC_OLD_V1",
             "LOCKSTAKE_SKY",
             "LOCKSTAKE_MIGRATOR",
             "MKR_SKY_LEGACY",
             "REWARDS_LSSKY_USDS",
+            "REWARDS_LSMKR_USDS_LEGACY",
             "MCD_PROTEGO"
         ];
 
@@ -1282,6 +1287,29 @@ contract DssSpellTest is DssSpellTestBase {
                 _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
             );
         }
+    }
+
+    function testNewOsmMomAddition() public {
+        bytes32 ilk = "LSEV2-SKY-A";
+        address osm = addr.addr("PIP_SKY");
+
+        // Check values before
+        assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check values after
+        assertEq(osmMom.osms(ilk), osm, "TestError/osm-not-in-mom");
+
+        // TODO after 2025: remove additional chief activation
+        _activateNewChief();
+
+        // Simulate mom call from emergency spell
+        assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
+        vm.prank(chief.hat()); osmMom.stop(ilk);
+        assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
     }
 
     // The following part is ported from the Migration test

@@ -1562,6 +1562,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(ClipAbstract(p.clip).vow(),             address(vow),         "checkLockstakeIlkIntegration/invalid-clip-vow");
             assertEq(ClipAbstract(p.clip).calc(),            p.calc,               "checkLockstakeIlkIntegration/invalid-clip-calc");
             assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,             "checkLockstakeIlkIntegration/invalid-clip-engine");
+            // TODO after 2025-05-15: enable liquidations
             assertEq(LockstakeClipperLike(p.clip).stopped(), 3,                    "checkLockstakeIlkIntegration/invalid-clip-stopped");
             assertEq(osmMom.osms(p.ilk),                     p.pip,                "checkLockstakeIlkIntegration/invalid-osmMom-pip");
         }
@@ -1596,6 +1597,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(WardsAbstract(p.engine).wards(p.clip),         1, "checkLockstakeIlkIntegration/missing-auth-engine-clip");
             assertEq(WardsAbstract(p.clip).wards(address(dog)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-dog");
             assertEq(WardsAbstract(p.clip).wards(address(end)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-end");
+            // TODO after 2025-05-15: rely clipMom
             assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 0, "checkLockstakeIlkIntegration/missing-auth-clip-clipMom");
         }
         // Check required OSM buds
@@ -1762,7 +1764,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-farm-balance");
         }
 
-        // TODO after 2025-05-15: remove mocked `line`
+        // TODO after 2025-05-15: remove mocked `stopped` value
         vm.prank(pauseProxy); LockstakeClipperLike(p.clip).file("stopped", uint256(0));
 
         _setIlkMat(p.ilk, 100_000 * RAY);
