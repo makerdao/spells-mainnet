@@ -1630,7 +1630,7 @@ contract DssSpellTestBase is Config, DssTest {
         }
 
         // TODO after 2025-05-15: remove mocked `line`
-        _setIlkLine(p.ilk, drawAmt * RAD * 100);
+        _setIlkLine(p.ilk, drawAmt * RAD);
 
         uint256 snapshot = vm.snapshot();
         // Check locking and freeing Sky

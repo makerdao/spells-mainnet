@@ -439,8 +439,8 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOsmReaders() public skipped { // add the `skipped` modifier to skip
-        address OSM = addr.addr("PIP_MKR");
+    function testOsmReaders() public { // add the `skipped` modifier to skip
+        address OSM = addr.addr("PIP_SKY");
         address[4] memory newReaders = [
             addr.addr("MCD_SPOT"),
             addr.addr("LOCKSTAKE_CLIP"),
