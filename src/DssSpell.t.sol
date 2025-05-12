@@ -71,6 +71,15 @@ interface LineMomLike {
     function ilks(bytes32) external view returns (uint256);
 }
 
+interface WardsLike {
+    function wards(address) external view returns (uint256);
+}
+
+interface OldMkrSkyLike {
+    function mkrToSky(address, uint256) external;
+    function skyToMkr(address, uint256) external;
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -1293,6 +1302,9 @@ contract DssSpellTest is DssSpellTestBase {
         bytes32 ilk = "LSEV2-SKY-A";
         address osm = addr.addr("PIP_SKY");
 
+        // Sanity checks
+        assertEq(OsmAbstract(osm).src(), addr.addr("FLAP_SKY_ORACLE"));
+
         // Check values before
         assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
 
@@ -1310,6 +1322,61 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
         vm.prank(chief.hat()); osmMom.stop(ilk);
         assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
+    }
+
+    function testMkrSkyConverterMigration() public {
+        uint256 amount = 100 * WAD;
+
+        // Check state before cast
+        address oldMkrSky = addr.addr("MKR_SKY_LEGACY");
+        assertEq(WardsLike(mkr.authority()).wards(oldMkrSky), 1, "TestError/oldMkrSky-not-yet-authorized-in-mkr-guard");
+        assertEq(sky.balanceOf(address(mkrSky)), 0, "TestError/newMkrSky-already-have-minted-sky");
+
+        // Before the migration old converter can swap both ways
+        {
+            deal(address(mkr), address(this), amount);
+            mkr.approve(oldMkrSky, amount);
+            OldMkrSkyLike(oldMkrSky).mkrToSky(address(this), amount);
+            assertEq(mkr.balanceOf(address(this)), 0, "TestError/before/oldMkrSky.mkrToSky-unexpected-mkr");
+            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/before/oldMkrSky.mkrToSky-unexpected-sky");
+            sky.approve(oldMkrSky, amount * afterSpell.sky_mkr_rate);
+            OldMkrSkyLike(oldMkrSky).skyToMkr(address(this), amount * afterSpell.sky_mkr_rate);
+            assertEq(sky.balanceOf(address(this)), 0, "TestError/before/oldMkrSky.skyToMkr-unexpected-sky");
+            assertEq(mkr.balanceOf(address(this)), amount, "TestError/before/oldMkrSky.skyToMkr-unexpected-mkr");
+        }
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check state after cast
+        assertEq(WardsLike(mkr.authority()).wards(oldMkrSky), 0, "TestError/oldMkrSky-still-authorized-in-mkr-guard");
+        assertEq(sky.balanceOf(address(mkrSky)), mkr.totalSupply() * afterSpell.sky_mkr_rate, "TestError/newMkrSky-have-no-minted-sky");
+        assertEq(mkrSky.fee(), 0, "TestError/newMkrSky-unexpected-fee");
+        assertEq(mkrSky.take(), 0, "TestError/newMkrSky-unexpected-take");
+
+        // After the migration old converter can swap only mkr=>sky
+        {
+            deal(address(mkr), address(this), amount);
+            mkr.approve(oldMkrSky, amount);
+            OldMkrSkyLike(oldMkrSky).mkrToSky(address(this), amount);
+            assertEq(mkr.balanceOf(address(this)), 0, "TestError/after/oldMkrSky.mkrToSky-unexpected-mkr");
+            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/after/oldMkrSky.mkrToSky-unexpected-sky");
+            sky.approve(oldMkrSky, amount * afterSpell.sky_mkr_rate);
+            vm.expectRevert();
+            OldMkrSkyLike(oldMkrSky).skyToMkr(address(this), amount * afterSpell.sky_mkr_rate);
+        }
+
+        // After the migration new converter can swap mkr=>sky
+        {
+            deal(address(mkr), address(this), amount);
+            deal(address(sky), address(this), 0);
+            mkr.approve(address(mkrSky), amount);
+            mkrSky.mkrToSky(address(this), amount);
+            assertEq(mkr.balanceOf(address(this)), 0, "TestError/after/newMkrSky.mkrToSky-unexpected-mkr");
+            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/after/newMkrSky.mkrToSky-unexpected-sky");
+        }
     }
 
     // The following part is ported from the Migration test

@@ -206,6 +206,8 @@ interface DaiUsdsLike {
 
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
+    function fee() external view returns (uint256);
+    function take() external view returns (uint256);
 }
 
 interface LitePsmLike {
@@ -1565,6 +1567,8 @@ contract DssSpellTestBase is Config, DssTest {
             // TODO after 2025-05-15: enable liquidations
             assertEq(LockstakeClipperLike(p.clip).stopped(), 3,                    "checkLockstakeIlkIntegration/invalid-clip-stopped");
             assertEq(osmMom.osms(p.ilk),                     p.pip,                "checkLockstakeIlkIntegration/invalid-osmMom-pip");
+            (address pip,) = spotter.ilks(p.ilk);
+            assertEq(pip, p.pip, "checkLockstakeIlkIntegration/invalid-spot-pip");
         }
         // Check ilk registry values
         {
@@ -3645,7 +3649,7 @@ contract DssSpellTestBase is Config, DssTest {
 
                 vm.startPrank(mkrHolder);
                 mkr.approve(address(mkrSky), type(uint256).max);
-                mkrSky.mkrToSky(skyHolder,   pmkrBalance);
+                mkrSky.mkrToSky(skyHolder, pmkrBalance);
                 vm.stopPrank();
 
                 uint256 expectedSkyBalance = pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate);
