@@ -74,6 +74,7 @@ contract DssSpellAction is DssAction {
     address internal constant LOCKSTAKE_CLIP        = 0x35526314F18FeB5b7F124e40D6A99d64F7D7e89a;
     address internal constant LOCKSTAKE_CLIP_CALC   = 0xB8f8c7caabFa320717E3e848948450e120F0D9BB;
     address internal constant LOCKSTAKE_MIGRATOR    = 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B;
+    address internal constant FLAP_SKY_ORACLE       = 0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff;
     address internal constant MCD_PROTEGO           = 0x5C9c3cb0490938c9234ABddeD37a191576ED8624;
 
     // ---------- Spark Proxy Spell ----------
@@ -148,7 +149,7 @@ contract DssSpellAction is DssAction {
                 liftCooldown:        10,
 
                 // cfg.skyOracle: 0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff
-                skyOracle:           0xc2ffbbDCCF1466Eb8968a846179191cb881eCdff,
+                skyOracle:           FLAP_SKY_ORACLE,
 
                 // cfg.rewardsDuration: equal to the splitter.hop (1,728 seconds)
                 rewardsDuration:     1_728 seconds,
