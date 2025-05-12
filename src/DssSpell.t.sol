@@ -1342,6 +1342,10 @@ contract DssSpellTest is DssSpellTestBase {
         GodMode.setWard(osm, address(this), 1);
         OsmAbstract(osm).kiss(address(this));
 
+        // Set arbitrary price in the source oracle
+        uint256 arbitraryPrice = 12345;
+        vm.store(src, bytes32(uint256(4)), bytes32(arbitraryPrice));
+
         // Get values before poke
         (bytes32 currentPrice,) = OsmAbstract(osm).peep();
         uint64 currentZzz = OsmAbstract(osm).zzz();
@@ -1356,6 +1360,9 @@ contract DssSpellTest is DssSpellTestBase {
         // Ensure that changes took place
         assertNotEq(currentPrice, newPrice, "testOsmSource/no-price-change");
         assertNotEq(currentZzz, newZzz, "testOsmSource/no-zzz-change");
+
+        // Ensure price is correctly propagated
+        assertEq(uint256(newPrice), arbitraryPrice, "testOsmSource/newPrice-not-arbitraryPrice");
     }
 
     function testMkrSkyConverterMigration() public {
