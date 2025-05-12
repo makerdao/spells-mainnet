@@ -1574,10 +1574,18 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(_line(newIlk), 0);
     }
     function testLockstakeMigrateCurrentUrnsWithRelevantDebt() public {
+        // Check state before cast
+        assertEq(oldEngine.wards(address(migrator)), 0, "TestError/migrator-already-authorized-in-old-engine");
+        assertEq(vat.wards(address(migrator)), 0, "TestError/migrator-already-authorized-in-vat");
+
         // Cast spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Sanity checks
+        assertEq(oldEngine.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-old-engine");
+        assertEq(vat.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-vat");
 
         // Propagate price into vat
         OsmAbstract(addr.addr('PIP_SKY')).poke();
