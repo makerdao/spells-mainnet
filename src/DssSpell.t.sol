@@ -54,6 +54,10 @@ interface SequencerLike {
 }
 
 interface LockstakeMigratorLike {
+    function flash() external view returns (address);
+    function newEngine() external view returns (address);
+    function oldEngine() external view returns (address);
+    function mkrSky() external view returns (address);
     function migrate(address, uint256, address, uint256, uint16) external;
 }
 
@@ -1302,12 +1306,10 @@ contract DssSpellTest is DssSpellTestBase {
         bytes32 ilk = "LSEV2-SKY-A";
         address osm = addr.addr("PIP_SKY");
 
-        // Sanity checks
-        assertEq(OsmAbstract(osm).src(), addr.addr("FLAP_SKY_ORACLE"));
-
         // Check values before
         assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
 
+        // Cast spell
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -1322,6 +1324,38 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
         vm.prank(chief.hat()); osmMom.stop(ilk);
         assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
+    }
+
+    function testOsmSource() public {
+        address osm = addr.addr("PIP_SKY");
+        address src = addr.addr("FLAP_SKY_ORACLE");
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Sanity checks
+        assertEq(OsmAbstract(osm).src(), src, "testOsmSource/incorrect-src");
+
+        // Add test contract to buds for testing
+        GodMode.setWard(osm, address(this), 1);
+        OsmAbstract(osm).kiss(address(this));
+
+        // Get values before poke
+        (bytes32 currentPrice,) = OsmAbstract(osm).peep();
+        uint64 currentZzz = OsmAbstract(osm).zzz();
+        OsmAbstract(osm).poke();
+
+        // Get value after poke
+        vm.warp(block.timestamp + 1 hours);
+        OsmAbstract(osm).poke();
+        (bytes32 newPrice,) = OsmAbstract(osm).peep();
+        uint64 newZzz = OsmAbstract(osm).zzz();
+
+        // Ensure that changes took place
+        assertNotEq(currentPrice, newPrice, "testOsmSource/no-price-change");
+        assertNotEq(currentZzz, newZzz, "testOsmSource/no-zzz-change");
     }
 
     function testMkrSkyConverterMigration() public {
@@ -1353,8 +1387,9 @@ contract DssSpellTest is DssSpellTestBase {
         // Check state after cast
         assertEq(WardsLike(mkr.authority()).wards(oldMkrSky), 0, "TestError/oldMkrSky-still-authorized-in-mkr-guard");
         assertEq(sky.balanceOf(address(mkrSky)), mkr.totalSupply() * afterSpell.sky_mkr_rate, "TestError/newMkrSky-have-no-minted-sky");
-        assertEq(mkrSky.fee(), 0, "TestError/newMkrSky-unexpected-fee");
-        assertEq(mkrSky.take(), 0, "TestError/newMkrSky-unexpected-take");
+        assertEq(mkrSky.mkr(), address(mkr), "TestError/newMkrSky-unexpected-mkr-address");
+        assertEq(mkrSky.sky(), address(sky), "TestError/newMkrSky-unexpected-sky-address");
+        assertEq(mkrSky.rate(), afterSpell.sky_mkr_rate, "TestError/newMkrSky-unexpected-sky-address");
 
         // After the migration old converter can swap only mkr=>sky
         {
@@ -1376,6 +1411,8 @@ contract DssSpellTest is DssSpellTestBase {
             mkrSky.mkrToSky(address(this), amount);
             assertEq(mkr.balanceOf(address(this)), 0, "TestError/after/newMkrSky.mkrToSky-unexpected-mkr");
             assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/after/newMkrSky.mkrToSky-unexpected-sky");
+            assertEq(mkrSky.fee(), 0, "TestError/newMkrSky-unexpected-fee");
+            assertEq(mkrSky.take(), 0, "TestError/newMkrSky-unexpected-take");
         }
     }
 
@@ -1653,6 +1690,10 @@ contract DssSpellTest is DssSpellTestBase {
         // Sanity checks
         assertEq(oldEngine.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-old-engine");
         assertEq(vat.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-vat");
+        assertEq(migrator.oldEngine(), address(oldEngine), "TestError/migrator-invalid-oldEngine");
+        assertEq(migrator.newEngine(), address(newEngine), "TestError/migrator-invalid-newEngine");
+        assertEq(migrator.mkrSky(), address(mkrSky), "TestError/migrator-invalid-mkrSky");
+        assertEq(migrator.flash(), addr.addr("MCD_FLASH"), "TestError/migrator-invalid-mkrSky");
 
         // Propagate price into vat
         OsmAbstract(addr.addr('PIP_SKY')).poke();

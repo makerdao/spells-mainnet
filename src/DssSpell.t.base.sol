@@ -207,6 +207,9 @@ interface DaiUsdsLike {
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
     function fee() external view returns (uint256);
+    function mkr() external view returns (address);
+    function rate() external view returns (uint256);
+    function sky() external view returns (address);
     function take() external view returns (uint256);
 }
 
@@ -1550,9 +1553,11 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(engine.ilk(),                           p.ilk,                "checkLockstakeIlkIntegration/invalid-engine-ilk");
             assertEq(engine.lssky(),                         p.lssky,              "checkLockstakeIlkIntegration/invalid-engine-lssky");
             assertEq(engine.jug(),                           address(jug),         "checkLockstakeIlkIntegration/invalid-engine-jug");
+            assertEq(engine.sky(),                           address(sky),         "checkLockstakeIlkIntegration/invalid-engine-sky");
             assertEq(engine.fee(),                           p.fee * WAD / 100_00, "checkLockstakeIlkIntegration/invalid-fee");
             assertNotEq(p.farm,                              address(0),           "checkLockstakeIlkIntegration/invalid-farm");
             assertEq(engine.farms(p.farm),                   1,                    "checkLockstakeIlkIntegration/disabled-farm");
+            assertEq(farm.owner(),                           address(pauseProxy),  "checkLockstakeIlkIntegration/invalid-owner");
             assertEq(farm.stakingToken(),                    p.lssky,              "checkLockstakeIlkIntegration/invalid-stakingToken");
             assertEq(farm.rewardsToken(),                    p.rToken,             "checkLockstakeIlkIntegration/invalid-rewardsToken");
             assertEq(farm.rewardsDistribution(),             p.rDistr,             "checkLockstakeIlkIntegration/invalid-rewardsDistribution");
