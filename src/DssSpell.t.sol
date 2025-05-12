@@ -84,6 +84,12 @@ interface OldMkrSkyLike {
     function skyToMkr(address, uint256) external;
 }
 
+interface ProtegoLike {
+    function drop(address _usr, bytes32 _tag, bytes memory _fax, uint256 _eta) external;
+    function pause() external view returns (address);
+    function planned(address _usr, bytes32 _tag, bytes memory _fax, uint256 _eta) external view returns (bool);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -1421,6 +1427,58 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(mkrSky.fee(), 0, "TestError/newMkrSky-unexpected-fee");
             assertEq(mkrSky.take(), 0, "TestError/newMkrSky-unexpected-take");
         }
+    }
+
+    ProtegoLike protego = ProtegoLike(addr.addr("MCD_PROTEGO"));
+    function _testProtego(bool useNewChief) public {
+        MockDssExecSpell badSpell = new MockDssExecSpell();
+
+        // Vote on the badSpell and schedule
+        if (useNewChief) {
+            _voteWithSky(address(badSpell));
+        } else {
+            _vote(address(badSpell));
+        }
+        badSpell.schedule();
+        address usr = badSpell.action();
+        bytes32 tag = badSpell.tag();
+        bytes memory sig = badSpell.sig();
+        uint256 eta = badSpell.eta();
+        assertTrue(protego.planned(usr, tag, sig, eta), "TestError/not-yet-planned");
+
+        // Vote on the protego and drop
+        if (useNewChief) {
+            _voteWithSky(address(protego));
+        } else {
+            _vote(address(protego));
+        }
+        protego.drop(usr, tag, sig, eta);
+        assertFalse(protego.planned(usr, tag, sig, eta), "TestError/still-planned");
+
+        // After Protego loses the hat, it can no longer drop spells
+        if (useNewChief) {
+            _voteWithSky(address(0));
+        } else {
+            _vote(address(0));
+        }
+        vm.expectRevert("ds-auth-unauthorized");
+        protego.drop(usr, tag, sig, eta);
+    }
+    function testProtego() public {
+        // Sanity checks
+        assertEq(protego.pause(), addr.addr("MCD_PAUSE"));
+
+        // Test before chief migration
+        _testProtego(false);
+
+        // Cast spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Test after chief migration
+        _activateNewChief();
+        _testProtego(true);
     }
 
     // The following part is ported from the Migration test

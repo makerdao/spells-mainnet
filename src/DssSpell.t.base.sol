@@ -754,23 +754,32 @@ contract DssSpellTestBase is Config, DssTest {
         );
     }
 
+    // TODO after 2025-05-15: rename into `_vote`
+    function _voteWithSky(address spell_) internal {
+        if (chief.hat() != spell_) {
+            _giveTokens(address(sky), 999999999999 ether);
+            sky.approve(address(chief), type(uint256).max);
+            chief.lock(999999999999 ether);
+            address[] memory slate = new address[](1);
+            slate[0] = spell_;
+            chief.vote(slate);
+            chief.lift(spell_);
+        }
+        assertEq(chief.hat(), spell_, "TestError/spell-is-not-hat");
+    }
+
+    // TODO after 2025-05-15: remove
     function _vote(address spell_) internal {
-        // TODO after 2025-05-15: replace back `chiefLegacy` with `chief`, `mkr` with `gov`
         if (chiefLegacy.hat() != spell_) {
             _giveTokens(address(mkr), 999999999999 ether);
-            mkr.approve(address( chiefLegacy), type(uint256).max);
+            mkr.approve(address(chiefLegacy), type(uint256).max);
             chiefLegacy.lock(999999999999 ether);
-
             address[] memory slate = new address[](1);
-
-            assertFalse(DssSpell(spell_).done(), "TestError/spell-done-before-vote");
-
             slate[0] = spell_;
-
             chiefLegacy.vote(slate);
             chiefLegacy.lift(spell_);
         }
-        assertEq(chiefLegacy.hat(), spell_);
+        assertEq(chiefLegacy.hat(), spell_, "TestError/spell-is-not-hat");
     }
 
     function _scheduleWaitAndCast(address spell_) internal {
