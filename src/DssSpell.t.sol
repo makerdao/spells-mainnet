@@ -1430,7 +1430,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     ProtegoLike protego = ProtegoLike(addr.addr("MCD_PROTEGO"));
-    function _testProtego(bool useNewChief) public {
+    function _testProtego(bool useNewChief) private {
         MockDssExecSpell badSpell = new MockDssExecSpell();
 
         // Vote on the badSpell and schedule
