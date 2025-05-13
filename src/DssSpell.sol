@@ -85,9 +85,11 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Initialize chief migration by calling MigrationInit.initMigration with the following parameters: ----------
         // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1_MKR_To_SKY_Upgrade/d5af8504-ddd6-416d-8429-897497b072dc%7Cb341f4c0b834
         // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
         // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
-        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-12-2025/26364
+        // Poll: https://vote.makerdao.com/polling/QmTVd4iq
 
         // Note: DssInstance is required by the MigrationInit library below
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
@@ -224,17 +226,18 @@ contract DssSpellAction is DssAction {
 
         // ---------- Remove CLIPPER_MOM Access ----------
         // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1_MKR_To_SKY_Upgrade/d5af8504-ddd6-416d-8429-897497b072dc%7Cb341f4c0b834
         // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361
         // Forum: https://forum.sky.money/t/technical-scope-of-the-chief-migration/26361/3
-        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
 
         // Deny CLIPPER_MOM from the new LockstakeClipper
         DssExecLib.deauthorize(LOCKSTAKE_CLIP, CLIPPER_MOM);
 
         // ---------- Add Protego to Chainlog ----------
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Atlas: https://sky-atlas.powerhouse.io/A.1.9.4.3_Protego/1f1f2ff0-8d73-80be-9ace-f125242ede47%7C0db307588902
         // Forum: https://forum.sky.money/t/technical-scope-of-the-protego-deployment/26365
         // Forum: https://forum.sky.money/t/technical-scope-of-the-protego-deployment/26365/2
-        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
 
         // Add Protego (0x5C9c3cb0490938c9234ABddeD37a191576ED8624) to chainlog with key “MCD_PROTEGO”
         DssExecLib.setChangelogAddress("MCD_PROTEGO", MCD_PROTEGO);
@@ -244,7 +247,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Spark Proxy Spell ----------
         // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
-        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1_MKR_To_SKY_Upgrade/d5af8504-ddd6-416d-8429-897497b072dc%7Cb341f4c0b834
 
         // Execute Spark Proxy spell at 0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
