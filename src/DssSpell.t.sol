@@ -1760,12 +1760,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(migrator.mkrSky(), address(mkrSky), "TestError/migrator-invalid-mkrSky");
         assertEq(migrator.flash(), addr.addr("MCD_FLASH"), "TestError/migrator-invalid-mkrSky");
 
-        // Propagate price into vat
-        OsmAbstract(addr.addr('PIP_SKY')).poke();
-        vm.warp(block.timestamp + 1 hours);
-        OsmAbstract(addr.addr('PIP_SKY')).poke();
-        spotter.poke("LSEV2-SKY-A");
-
         // Simulate migration of existing urns
         assertEq(_Art(newIlk), 0);
         assertGt(_Art(oldIlk) * _rate(oldIlk), 40_000_000 * RAD);

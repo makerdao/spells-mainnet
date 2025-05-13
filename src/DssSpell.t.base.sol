@@ -1636,11 +1636,6 @@ contract DssSpellTestBase is Config, DssTest {
                 stdstore.target(p.clip).sig("kicks()").checked_write(uint256(0));
                 assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeIlkIntegration/unchanged-kicks");
             }
-            // Poke OSM price
-            OsmAbstract(p.pip).poke();
-            vm.warp(block.timestamp + 1 hours);
-            OsmAbstract(p.pip).poke();
-            spotter.poke(p.ilk);
             // Calculate lock and draw amounts
             (,,,, uint256 dust) = vat.ilks(p.ilk);
             drawAmt = dust / RAY;
