@@ -897,7 +897,7 @@ contract DssSpellTestBase is Config, DssTest {
 
         // ESM min in WAD
         if (values.esm_min == type(uint256).max) {
-            assertEq(esm.min(), type(uint256).max, "TestError/vow-sump");
+            assertEq(esm.min(), type(uint256).max, "TestError/esm-min");
         } else {
             uint256 normalizedMin = values.esm_min * WAD;
             assertEq(esm.min(), normalizedMin, "TestError/esm-min");
@@ -3627,8 +3627,6 @@ contract DssSpellTestBase is Config, DssTest {
             address mkrHolder = address(0x42);
             deal(address(mkr), mkrHolder, 1_000 * WAD);
             address skyHolder = address(0x65);
-            deal(address(sky), skyHolder, 1_000 * WAD * afterSpell.sky_mkr_rate);
-
 
             // MKR -> SKY conversion
             {
