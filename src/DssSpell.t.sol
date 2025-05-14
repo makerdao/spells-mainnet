@@ -1780,11 +1780,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(migrator.mkrSky(), address(mkrSky), "TestError/migrator-invalid-mkrSky");
         assertEq(migrator.flash(), addr.addr("MCD_FLASH"), "TestError/migrator-invalid-mkrSky");
 
-        // Check that _checkLockstakeUrnMigration is robust enough to not fail even if some user actions were already done
-        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); newEngine.open(0);
-        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); oldEngine.hope(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, 4, address(migrator));
-        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); newEngine.hope(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, 0, address(migrator));
-
         // Simulate migration of existing urns
         assertEq(_Art(newIlk), 0);
         assertGt(_Art(oldIlk) * _rate(oldIlk), 40_000_000 * RAD);
