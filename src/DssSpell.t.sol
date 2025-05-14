@@ -1430,6 +1430,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     ProtegoLike protego = ProtegoLike(addr.addr("MCD_PROTEGO"));
+
     function _testProtego(bool useNewChief) private {
         MockDssExecSpell badSpell = new MockDssExecSpell();
 
@@ -1464,6 +1465,7 @@ contract DssSpellTest is DssSpellTestBase {
         vm.expectRevert("ds-auth-unauthorized");
         protego.drop(usr, tag, sig, eta);
     }
+
     function testProtego() public {
         // Sanity checks
         assertEq(protego.pause(), addr.addr("MCD_PAUSE"));
@@ -1675,25 +1677,32 @@ contract DssSpellTest is DssSpellTestBase {
     bytes32 oldIlk                 = oldEngine.ilk();
     bytes32 newIlk                 = newEngine.ilk();
     LockstakeMigratorLike migrator = LockstakeMigratorLike(addr.addr("LOCKSTAKE_MIGRATOR"));
+
     function _ink(bytes32 ilk_, address urn) internal view returns (uint256 ink) {
         (ink,) = vat.urns(ilk_, urn);
     }
+
     function _art(bytes32 ilk_, address urn) internal view returns (uint256 art) {
         (, art) = vat.urns(ilk_, urn);
     }
+
     function _Art(bytes32 ilk_) internal view returns (uint256 Art) {
         (Art,,,,) = vat.ilks(ilk_);
     }
+
     function _rate(bytes32 ilk_) internal view returns (uint256 rate) {
         (, rate,,,) = vat.ilks(ilk_);
     }
+
     function _line(bytes32 ilk_) internal view returns (uint256 line) {
         (,,, line,) = vat.ilks(ilk_);
     }
+
     struct Urn {
         address owner;
         uint256 index;
     }
+
     function _checkLockstakeUrnMigration(Urn memory oldUrn, Urn memory newUrn, address caller, bool hasDebt) internal {
         address oldUrnAddr = oldEngine.ownerUrns(oldUrn.owner, oldUrn.index);
         uint256 oldInkPrev = _ink(oldIlk, oldUrnAddr);
@@ -1742,6 +1751,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertEq(_line(newIlk), 0);
     }
+
     function testLockstakeMigrateCurrentUrnsWithRelevantDebt() public {
         // Check state before cast
         assertEq(oldEngine.wards(address(migrator)), 0, "TestError/migrator-already-authorized-in-old-engine");
