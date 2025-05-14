@@ -1714,19 +1714,29 @@ contract DssSpellTest is DssSpellTestBase {
             assertEq(oldArtPrev, 0);
         }
 
-        vm.prank(newUrn.owner); address newUrnAddr = newEngine.open(newUrn.index);
+        // Open new urn only if it's not yet done
+        address newUrnAddr = newEngine.ownerUrns(newUrn.owner, newUrn.index);
+        if (newUrnAddr == address(0)) {
+            vm.prank(newUrn.owner); newUrnAddr = newEngine.open(newUrn.index);
+        }
 
         assertEq(_ink(newIlk, newUrnAddr), 0);
         assertEq(_art(newIlk, newUrnAddr), 0);
 
-        vm.expectRevert("LockstakeEngine/urn-not-authorized");
-        vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-        vm.prank(oldUrn.owner); oldEngine.hope(oldUrn.owner, oldUrn.index, address(migrator));
-
-        if (hasDebt) {
+        // Hope migrator on the old urn only if it's not yet done
+        if (oldEngine.urnCan(oldUrnAddr, address(migrator)) == 0) {
             vm.expectRevert("LockstakeEngine/urn-not-authorized");
             vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-            vm.prank(newUrn.owner); newEngine.hope(newUrn.owner, newUrn.index, address(migrator));
+            vm.prank(oldUrn.owner); oldEngine.hope(oldUrn.owner, oldUrn.index, address(migrator));
+        }
+
+        if (hasDebt) {
+            // Hope migrator on the new urn only if it's not yet done
+            if (newEngine.urnCan(newUrnAddr, address(migrator)) == 0) {
+                vm.expectRevert("LockstakeEngine/urn-not-authorized");
+                vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
+                vm.prank(newUrn.owner); newEngine.hope(newUrn.owner, newUrn.index, address(migrator));
+            }
 
             uint256 snapshotId = vm.snapshot();
             vm.prank(pauseProxy); vat.file(oldIlk, "line", 1);
@@ -1769,6 +1779,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(migrator.newEngine(), address(newEngine), "TestError/migrator-invalid-newEngine");
         assertEq(migrator.mkrSky(), address(mkrSky), "TestError/migrator-invalid-mkrSky");
         assertEq(migrator.flash(), addr.addr("MCD_FLASH"), "TestError/migrator-invalid-mkrSky");
+
+        // Check that _checkLockstakeUrnMigration is robust enough to not fail even if some user actions were already done
+        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); newEngine.open(0);
+        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); oldEngine.hope(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, 4, address(migrator));
+        vm.prank(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d); newEngine.hope(0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, 0, address(migrator));
 
         // Simulate migration of existing urns
         assertEq(_Art(newIlk), 0);
