@@ -63,7 +63,7 @@ contract DssSpellAction is DssAction {
     uint256 internal constant RAD = 10 ** 45;
 
     // ---------- Contracts ----------
-    address internal immutable CLIPPER_MOM          = DssExecLib.getChangelogAddress("CLIPPER_MOM");
+    address internal immutable CLIPPER_MOM          = DssExecLib.clipperMom();
     address internal constant MCD_ADM               = 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9;
     address internal constant VOTE_DELEGATE_FACTORY = 0x4Cf3DaeFA2683Cd18df00f7AFF5169C00a9EccD5;
     address internal constant MKR_SKY               = 0xA1Ea1bA18E88C381C724a75F23a130420C403f9a;

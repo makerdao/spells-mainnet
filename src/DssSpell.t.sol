@@ -1323,7 +1323,7 @@ contract DssSpellTest is DssSpellTestBase {
         // Check values after
         assertEq(osmMom.osms(ilk), osm, "TestError/osm-not-in-mom");
 
-        // TODO after 2025: remove additional chief activation
+        // TODO after 2025-05-15: remove additional chief activation
         _activateNewChief();
 
         // Simulate mom call from emergency spell
