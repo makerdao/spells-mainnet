@@ -117,9 +117,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0), // populate with deployed spell if deployed
-            deployed_spell_created: 0, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   0,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0x53222d00ffbFf48bD74BddDE5592B1B98793bB07), // populate with deployed spell if deployed
+            deployed_spell_created: 1747327655, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   22489798,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
             office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
