@@ -141,7 +141,7 @@ contract Config {
         afterSpell.split_farm             = "REWARDS_LSSKY_USDS";                       // Farm chainlog key
         afterSpell.flap_want              = 9800;                                       // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                              // In whole Dai units
-        afterSpell.esm_min                = type(uint256).max;                          // In whole MKR units
+        afterSpell.esm_min                = type(uint256).max;                          // In wei
         afterSpell.pause_authority        = "MCD_ADM";                                  // Pause authority
         afterSpell.osm_mom_authority      = "MCD_ADM";                                  // OsmMom authority
         afterSpell.clipper_mom_authority  = "MCD_ADM";                                  // ClipperMom authority

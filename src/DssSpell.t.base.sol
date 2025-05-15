@@ -895,14 +895,8 @@ contract DssSpellTestBase is Config, DssTest {
             assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
         }
 
-        // ESM min in WAD
-        if (values.esm_min == type(uint256).max) {
-            assertEq(esm.min(), type(uint256).max, "TestError/esm-min");
-        } else {
-            uint256 normalizedMin = values.esm_min * WAD;
-            assertEq(esm.min(), normalizedMin, "TestError/esm-min");
-            assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
-        }
+        // Check ESM min value
+        assertEq(esm.min(), values.esm_min, "TestError/esm-min");
 
         // check Pause authority
         assertEq(pause.authority(), addr.addr(values.pause_authority), "TestError/pause-authority");
