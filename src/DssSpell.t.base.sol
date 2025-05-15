@@ -771,7 +771,7 @@ contract DssSpellTestBase is Config, DssTest {
         DssSpell(spell_).cast();
     }
 
-    // TODO after 2025-05-15: remove new chief bootsraping function below
+    // TODO after 2025-05-15: remove new chief bootstrapping function below
     function _activateNewChief() internal {
         if (chief.live() == 0 && chief.hat() == address(0)) {
             _giveTokens(address(sky), 999999999999 ether);
