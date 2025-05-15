@@ -1350,6 +1350,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Set arbitrary price in the source oracle
         uint256 arbitraryPrice = 12345;
+        // Note: this also overwrites `age` to be 0, but it doesn't have any impact on the OSM
         vm.store(src, bytes32(uint256(4)), bytes32(arbitraryPrice));
 
         // Get values before poke
