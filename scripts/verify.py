@@ -13,62 +13,33 @@ except KeyError:
 ''')
     exit()
 
-document = ''
-try:
-    document = open('out/dapp.sol.json')
-except FileNotFoundError:
-    exit('run dapp build first')
-try:
-    content = json.load(document)
-except json.decoder.JSONDecodeError:
-    exit('run dapp build again')
-
 if len(sys.argv) not in [3, 4]:
     print('''usage:\n
 ./verify.py <contractname> <address> [constructorArgs]
 ''')
     exit()
 
-contract_name = sys.argv[1]
-contract_address = sys.argv[2]
+spell_contract_name = sys.argv[1]
+spell_contract_address = sys.argv[2]
 print('Attempting to verify contract {0} at address {1} ...'.format(
-    contract_name,
-    contract_address
+    spell_contract_name,
+    spell_contract_address
 ))
 
-if len(contract_address) !=  42:
+if len(spell_contract_address) !=  42:
     exit('malformed address')
 constructor_arguments = ''
 if len(sys.argv) == 4:
     constructor_arguments = sys.argv[3]
 
-contract_path = ''
-for path in content['contracts'].keys():
-    try:
-        content['contracts'][path][contract_name]
-        contract_path = path
-    except KeyError:
-        continue
-if contract_path == '':
-    exit('contract name not found.')
+cast_call_actions = subprocess.run(['cast', 'call', spell_contract_address, 'action()(address)'], capture_output = True, env = os.environ | {
+    'ETH_GAS_PRICE': '0',
+    'ETH_PRIO_FEE': '0'
+})
+action_contract_name = "DssSpellAction"
+action_contract_address = cast_call_actions.stdout.decode('utf-8')[:-1]
 
-print('Obtaining chain... ')
-cast_chain = subprocess.run(['cast', 'chain'], capture_output=True)
-chain = cast_chain.stdout.decode('ascii').replace('\n', '')
-print(chain)
-
-text_metadata = content['contracts'][contract_path][contract_name]['metadata']
-metadata = json.loads(text_metadata)
-compiler_version = 'v' + metadata['compiler']['version']
-evm_version = metadata['settings']['evmVersion']
-optimizer_enabled = metadata['settings']['optimizer']['enabled']
-optimizer_runs = metadata['settings']['optimizer']['runs']
-license_name = metadata['sources'][contract_path]['license']
-license_numbers = {
-    'GPL-3.0-or-later': 5,
-    'AGPL-3.0-or-later': 13
-}
-license_number = license_numbers[license_name]
+print('Spell DssAction address: ' + action_contract_address)
 
 module = 'contract'
 action = 'verifysourcecode'
@@ -78,10 +49,11 @@ flatten_output_path = 'out/flat.sol'
 subprocess.run([
     'forge',
     'flatten',
-    contract_path,
+    'src/DssSpell.sol',
     '--output',
     flatten_output_path
 ])
+
 with open(flatten_output_path, 'r', encoding='utf-8') as code_file:
     code = code_file.read()
 
@@ -206,100 +178,146 @@ except ValueError as e:
     print(e)
     print('Assuming this contract uses no libraries')
 
-data = {
-    'apikey': api_key,
-    'module': module,
-    'action': action,
-    'contractaddress': contract_address,
-    'sourceCode': code,
-    'codeFormat': code_format,
-    'contractName': contract_name,
-    'compilerversion': compiler_version,
-    'optimizationUsed': '1' if optimizer_enabled else '0',
-    'runs': optimizer_runs,
-    'constructorArguements': constructor_arguments,
-    'evmversion': evm_version,
-    'licenseType': license_number,
-    'libraryname1': library_name,
-    'libraryaddress1': library_address,
-}
+print('Obtaining chain ID... ')
+cast_chain_id = subprocess.run(['cast', 'chain-id'], capture_output=True)
+chain_id = cast_chain_id.stdout.decode('utf-8')[:-1]
+print("CHAIN_ID: " + chain_id)
 
-if chain in ['mainnet', 'ethlive']:
-    chain_separator = False
-    chain_id = ''
-else:
-    chain_separator = True
-    chain_id = chain
-
-url = 'https://api{0}{1}.etherscan.io/api'.format(
-    '-' if chain_separator else '',
-    chain_id
-)
-
-headers = {
-    'User-Agent': ''
-}
-
-def send():
+def send_request(url, headers, params, data):
     print('Sending verification request...')
-    verify = requests.post(url, headers = headers, data = data)
-    verify_response = {}
+    verify_res = requests.post(url, headers = headers, params = params, data = data)
+    verify_payload = {}
     try:
-        verify_response = json.loads(verify.text)
+        verify_payload = json.loads(verify_res.text)
     except json.decoder.JSONDecodeError:
-        print(verify.text)
-        exit('Error: Etherscan responded with invalid JSON.')
-    return verify_response
+        print(verify_res.text)
+        raise Exception('Error: Etherscan responded with invalid JSON.')
+    return verify_payload
 
-verify_response = send()
+def verify(name=None, address=None, input_path=None, output_path=None):
+    document = ''
+    content = {}
+    try:
+        document = open(output_path)
+    except FileNotFoundError:
+        raise Exception('run forge build first')
 
-while 'locate' in verify_response['result'].lower():
-    print(verify_response['result'])
-    print('Waiting for 15 seconds for the network to update...')
-    time.sleep(15)
-    verify_response = send()
+    try:
+        content = json.load(document)
+    except json.decoder.JSONDecodeError:
+        raise Exception('run forge build again')
 
-if verify_response['status'] != '1' or verify_response['message'] != 'OK':
-    print('Error: ' + verify_response['result'])
-    exit()
+    metadata = content['metadata']
+    compiler_version = 'v' + metadata['compiler']['version']
+    evm_version = metadata['settings']['evmVersion']
+    optimizer_enabled = metadata['settings']['optimizer']['enabled']
+    optimizer_runs = metadata['settings']['optimizer']['runs']
+    license_name = metadata['sources'][input_path]['license']
+    license_numbers = {
+        'GPL-3.0-or-later': 5,
+        'AGPL-3.0-or-later': 13
+    }
+    license_number = license_numbers[license_name]
 
-print('Sent verification request with guid ' + verify_response['result'])
+    params = {
+        'chainid': chain_id,
+    }
 
-guid = verify_response['result']
-
-check_response = {}
-
-while check_response == {} or 'pending' in check_response['result'].lower():
-
-    if check_response != {}:
-        print(check_response['result'])
-        print('Waiting for 15 seconds for Etherscan to process the request...')
-        time.sleep(15)
-
-    check = requests.post(url, headers = headers, data = {
+    data = {
         'apikey': api_key,
         'module': module,
-        'action': 'checkverifystatus',
-        'guid': guid,
-    })
+        'action': action,
+        'contractaddress': address,
+        'sourceCode': code,
+        'codeFormat': code_format,
+        'contractName': name,
+        'compilerversion': compiler_version,
+        'optimizationUsed': '1' if optimizer_enabled else '0',
+        'runs': optimizer_runs,
+        'constructorArguements': constructor_arguments,
+        'evmversion': evm_version,
+        'licenseType': license_number,
+        'libraryname1': library_name,
+        'libraryaddress1': library_address,
+    }
 
-    try:
-        check_response = json.loads(check.text)
-    except json.decoder.JSONDecodeError:
-        print(check.text)
-        exit('Error: Etherscan responded with invalid JSON')
+    url = 'https://api.etherscan.io/v2/api'
+    headers = {
+        'User-Agent': ''
+    }
 
-if check_response['status'] != '1' or check_response['message'] != 'OK':
-    print('Error: ' + check_response['result'])
-    log_name = 'verify-{}.log'.format(datetime.now().timestamp())
-    log = open(log_name, 'w')
-    log.write(code)
-    log.close()
-    print('log written to {}'.format(log_name))
-    exit()
+    verify_response = send_request(url, headers, params, data)
 
-print('Contract verified at https://{0}{1}etherscan.io/address/{2}#code'.format(
-    chain_id,
-    '.' if chain_separator else '',
-    contract_address
+    while 'locate' in verify_response['result'].lower():
+        print(verify_response['result'])
+        print('Waiting for 15 seconds for the network to update...')
+        time.sleep(15)
+        verify_response = send_request(url, headers, params, data)
+
+    if verify_response['status'] != '1' or verify_response['message'] != 'OK':
+        print('Error: ' + verify_response['result'])
+        raise Exception('Failed to verify')
+
+    print('Sent verification request with guid ' + verify_response['result'])
+
+    guid = verify_response['result']
+
+    check_response = {}
+
+    while check_response == {} or 'pending' in check_response['result'].lower():
+
+        if check_response != {}:
+            print(check_response['result'])
+            print('Waiting for 15 seconds for Etherscan to process the request...')
+            time.sleep(15)
+
+        check = requests.post(url, headers = headers, params = params, data = {
+            'apikey': api_key,
+            'module': module,
+            'action': 'checkverifystatus',
+            'guid': guid,
+        })
+
+        try:
+            check_response = json.loads(check.text)
+        except json.decoder.JSONDecodeError:
+            print(check.text)
+            raise Exception('Error: Etherscan responded with invalid JSON')
+
+    if check_response['status'] != '1' or check_response['message'] != 'OK':
+        print('Error: ' + check_response['result'])
+        log_name = 'verify-{}.log'.format(datetime.now().timestamp())
+        log = open(log_name, 'w')
+        log.write(code)
+        log.close()
+        print('log written to {}'.format(log_name))
+        raise Exception('Failed to get verification status')
+
+etherscan_subdomains = {
+    '1': '',
+    '11155111': 'sepolia.'
+}
+
+verify(
+    name = spell_contract_name,
+    address = spell_contract_address,
+    input_path = 'src/DssSpell.sol',
+    output_path = 'out/DssSpell.sol/DssSpell.json',
+)
+
+print('Spell Contract verified at https://{0}etherscan.io/address/{1}#code'.format(
+    etherscan_subdomains[chain_id],
+    spell_contract_address
+))
+
+verify(
+    name = action_contract_name,
+    address = action_contract_address,
+    input_path = 'src/DssSpell.sol',
+    output_path = 'out/DssSpell.sol/DssSpellAction.json',
+)
+
+print('Action Contract verified at https://{0}etherscan.io/address/{1}#code'.format(
+    etherscan_subdomains[chain_id],
+    action_contract_address
 ))
