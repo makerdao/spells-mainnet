@@ -690,7 +690,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // This stream is configured in relative to the spell casting time.
         {
-            uint256 before = vm.snapshotState();
+            uint256 before = vm.snapshot();
             _vote(address(spell));
             spell.schedule();
             vm.warp(spell.nextCastTime());
@@ -708,7 +708,7 @@ contract DssSpellTest is DssSpellTestBase {
                 rxd: 0
             });
 
-            vm.revertToStateAndDelete(before);
+            vm.revertTo(before);
         }
 
         _checkVestSkyMint(streams);

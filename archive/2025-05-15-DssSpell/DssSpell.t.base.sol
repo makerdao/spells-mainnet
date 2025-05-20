@@ -1622,7 +1622,7 @@ contract DssSpellTestBase is Config, DssTest {
         // TODO after 2025-05-15: remove mocked `line`
         _setIlkLine(p.ilk, drawAmt * RAD);
 
-        uint256 snapshot = vm.snapshotState();
+        uint256 snapshot = vm.snapshot();
         // Check locking and freeing Sky
         {
             uint256 initialEngineBalance = sky.balanceOf(p.engine);
@@ -1635,7 +1635,7 @@ contract DssSpellTestBase is Config, DssTest {
             engine.free(address(this), 0, address(this), skyAmt);
             uint256 exitFee = lockAmt * p.fee / 100_00;
             assertGe(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
         // Check drawing and wiping
         {
@@ -1657,7 +1657,7 @@ contract DssSpellTestBase is Config, DssTest {
             usds.approve(address(engine), wipeAmt);
             engine.wipe(address(this), 0, wipeAmt);
             assertEq(usds.balanceOf(address(this)), 0, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-wipe");
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
         // Check farming and getting a reward
         {
@@ -1678,15 +1678,13 @@ contract DssSpellTestBase is Config, DssTest {
             uint256 resultAmt = engine.getReward(address(this), 0, p.farm, rewardsUser);
             assertGt(resultAmt, 0, "checkLockstakeIlkIntegration/FarmAndGetReward/no-reward-amt");
             assertGt(GemAbstract(rewardsToken).balanceOf(rewardsUser), 0, "checkLockstakeIlkIntegration/FarmAndGetReward/no-reward-balance");
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
         // Check liquidations
-        _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertToState(snapshot);
-        _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertToState(snapshot);
-        _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertToState(snapshot);
-        _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertToState(snapshot);
-
-        vm.deleteStateSnapshots();
+        _checkLockstakeTake(p, lockAmt, drawAmt, false, false); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, false, true); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, true, false); vm.revertTo(snapshot);
+        _checkLockstakeTake(p, lockAmt, drawAmt, true, true); vm.revertTo(snapshot);
     }
 
     struct Sale {
@@ -2082,7 +2080,7 @@ contract DssSpellTestBase is Config, DssTest {
         dai.approve(address(litePsm), type(uint256).max);
 
         // Scale up `amount` to the correct Gem decimals value (buyGem and sellGem both use Gem decimals for precision)
-        uint256 snapshot = vm.snapshotState();
+        uint256 snapshot = vm.snapshot();
 
         // Sell TOKEN _to_ the PSM for DAI (increases debt)
         {
@@ -2096,7 +2094,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(token.balanceOf(address(this)), 0,          _concat("checkLitePsmIlkIntegration/sellGem-token-balance-", p.ilk));
             assertEq(dai.balanceOf(address(this)),   sellWadOut, _concat("checkLitePsmIlkIntegration/sellGem-dai-balance-",   p.ilk));
 
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
 
         // Sell TOKEN _to_ the PSM for DAI with no fees (increases debt)
@@ -2111,7 +2109,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(token.balanceOf(address(this)), 0,          _concat("checkLitePsmIlkIntegration/sellGemNoFee-token-balance-", p.ilk));
             assertEq(dai.balanceOf(address(this)),   sellWadOut, _concat("checkLitePsmIlkIntegration/sellGemNoFee-dai-balance-",   p.ilk));
 
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
 
         // For `sellGem` we had `amount` TOKENS, so there is no issue calling it
@@ -2132,7 +2130,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertLe(dai.balanceOf(address(this)),   tout,   _concat("checkLitePsmIlkIntegration/buyGem-dai-balance-",   p.ilk));
             assertEq(token.balanceOf(address(this)), buyAmt, _concat("checkLitePsmIlkIntegration/buyGem-token-balance-", p.ilk));
 
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
 
         // Buy TOKEN _from_ the PSM for DAI with no fees (decreases debt)
@@ -2150,9 +2148,8 @@ contract DssSpellTestBase is Config, DssTest {
             assertLe(dai.balanceOf(address(this)),   tout,   _concat("checkLitePsmIlkIntegration/buyGemNoFee-dai-balance-",   p.ilk));
             assertEq(token.balanceOf(address(this)), buyAmt, _concat("checkLitePsmIlkIntegration/buyGemNoFee-token-balance-", p.ilk));
 
-            vm.revertToState(snapshot);
+            vm.revertTo(snapshot);
         }
-        vm.deleteStateSnapshots();
 
         // ----- LitePsmMom can halt swaps -----
 
@@ -2741,7 +2738,7 @@ contract DssSpellTestBase is Config, DssTest {
         GemAbstract token = GemAbstract(_token);
 
         {
-            uint256 before = vm.snapshotState();
+            uint256 before = vm.snapshot();
 
             // Check each new stream is payable in the future
             uint256 pbalance = token.balanceOf(_s.usr);
@@ -2756,10 +2753,8 @@ contract DssSpellTestBase is Config, DssTest {
                 _concat(_errPrefix, string("/invalid-received-amount"))
             );
 
-            vm.revertToState(before);
+            vm.revertTo(before);
         }
-
-        vm.deleteStateSnapshots();
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
@@ -2955,7 +2950,7 @@ contract DssSpellTestBase is Config, DssTest {
             _vote(address(spell));
             spell.schedule();
 
-            uint256 afterSchedule = vm.snapshotState();
+            uint256 afterSchedule = vm.snapshot();
 
             // Cast in the wrong day
             {
@@ -2972,7 +2967,7 @@ contract DssSpellTestBase is Config, DssTest {
                 spell.cast();
             }
 
-            vm.revertToState(afterSchedule);
+            vm.revertTo(afterSchedule);
 
             // Cast too early in the day
 
@@ -2988,7 +2983,7 @@ contract DssSpellTestBase is Config, DssTest {
                 spell.cast();
             }
 
-            vm.revertToState(afterSchedule);
+            vm.revertTo(afterSchedule);
 
             // Cast too late in the day
 
@@ -3004,7 +2999,6 @@ contract DssSpellTestBase is Config, DssTest {
                 spell.cast();
             }
 
-            vm.deleteStateSnapshots();
         }
     }
 
@@ -3583,7 +3577,7 @@ contract DssSpellTestBase is Config, DssTest {
 
             // Dai -> USDS conversion
             {
-                uint256 before = vm.snapshotState();
+                uint256 before = vm.snapshot();
 
                 uint256 pdaiBalance  = dai.balanceOf(daiHolder);
                 uint256 pusdsBalance = usds.balanceOf(usdsHolder);
@@ -3598,12 +3592,12 @@ contract DssSpellTestBase is Config, DssTest {
                 assertEq(dai.balanceOf(daiHolder),   0,                   "TestError/Dai/bad-dai-to-usds-conversion");
                 assertEq(usds.balanceOf(usdsHolder), expectedUsdsBalance, "TestError/Usds/bad-dai-to-usds-conversion");
 
-                vm.revertToState(before);
+                vm.revertTo(before);
             }
 
             // USDS -> Dai conversion
             {
-                uint256 before = vm.snapshotState();
+                uint256 before = vm.snapshot();
 
                 uint256 pusdsBalance = usds.balanceOf(usdsHolder);
                 uint256 pdaiBalance  = dai.balanceOf(daiHolder);
@@ -3618,7 +3612,7 @@ contract DssSpellTestBase is Config, DssTest {
                 assertEq(usds.balanceOf(usdsHolder), 0,                  "TestError/USDS/bad-usds-to-dai-conversion");
                 assertEq(dai.balanceOf(daiHolder),   expectedDaiBalance, "TestError/Dai/bad-usds-to-dai-conversion");
 
-                vm.revertToState(before);
+                vm.revertTo(before);
             }
         }
 
@@ -3630,7 +3624,7 @@ contract DssSpellTestBase is Config, DssTest {
 
             // MKR -> SKY conversion
             {
-                uint256 before = vm.snapshotState();
+                uint256 before = vm.snapshot();
 
                 uint256 pmkrBalance = mkr.balanceOf(mkrHolder);
                 uint256 pskyBalance = sky.balanceOf(skyHolder);
@@ -3645,7 +3639,7 @@ contract DssSpellTestBase is Config, DssTest {
                 assertEq(mkr.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
                 assertEq(sky.balanceOf(skyHolder), expectedSkyBalance, "TestError/Sky/bad-mkr-to-sky-conversion");
 
-                vm.revertToState(before);
+                vm.revertTo(before);
             }
         }
 
@@ -3680,8 +3674,6 @@ contract DssSpellTestBase is Config, DssTest {
             assertGt(assets, passets,                       "TestError/sUSDS/invalid-redeem-assets");
             assertEq(assets, usds.balanceOf(address(this)), "TestError/sUSDS/invalid-balance-after-redeem");
         }
-
-        vm.deleteStateSnapshots();
     }
 
     function _testSPBEAMTauAndBudValues() internal {
