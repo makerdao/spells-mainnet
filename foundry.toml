@@ -6,8 +6,18 @@ fs_permissions = [
     { access = "read", path = "./lib/dss-test/script/input/"},
     { access = "read", path = "./out/ArbitrumDomain.sol/ArbSysOverride.json"}
 ]
+solc_version = "0.8.16"
+optimizer = false
+optimzier_runs = 1 # Optimize for deployment size if the optimizer enabled
+via_ir = false
+libraries = [
+    "./lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x0496AbA1f2CD4038cC486993f5CCF97851AE26d3"
+]
 
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"
+sepolia = "${ETH_RPC_URL}"
 
-# See more config options https://github.com/gakonst/foundry/tree/master/config
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
