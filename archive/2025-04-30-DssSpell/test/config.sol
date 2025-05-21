@@ -117,9 +117,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0x53222d00ffbFf48bD74BddDE5592B1B98793bB07), // populate with deployed spell if deployed
-            deployed_spell_created: 1747327655, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   22489798,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0x039DCA7EBb7d7EEcFe9449211109A72DD988Bd81), // populate with deployed spell if deployed
+            deployed_spell_created: 1746025595, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   22382645,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
             office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
@@ -128,20 +128,20 @@ contract Config {
         //
         // Values for all system configuration changes
         //
-        afterSpell.line_offset            = 700 * MILLION;                              // Offset between the global line against the sum of local lines
+        afterSpell.line_offset            = 680 * MILLION;                              // Offset between the global line against the sum of local lines
         afterSpell.pause_delay            = 48 hours;                                   // In seconds
         afterSpell.vow_wait               = 156 hours;                                  // In seconds
         afterSpell.vow_dump               = 250;                                        // In whole Dai units
-        afterSpell.vow_sump               = type(uint256).max;                          // In whole Dai units
+        afterSpell.vow_sump               = 50 * THOUSAND;                              // In whole Dai units
         afterSpell.vow_bump               = 10 * THOUSAND;                              // In whole Dai units
         afterSpell.vow_hump_min           = 70 * MILLION;                               // In whole Dai units
         afterSpell.vow_hump_max           = 70 * MILLION;                               // In whole Dai units
         afterSpell.split_hop              = 1728 seconds;                               // In seconds
         afterSpell.split_burn             = 100_00;                                     // In basis points
-        afterSpell.split_farm             = "REWARDS_LSSKY_USDS";                       // Farm chainlog key
+        afterSpell.split_farm             = "REWARDS_LSMKR_USDS";                       // Farm chainlog key
         afterSpell.flap_want              = 9800;                                       // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                              // In whole Dai units
-        afterSpell.esm_min                = type(uint256).max;                          // In wei
+        afterSpell.esm_min                = 500 * THOUSAND;                             // In whole MKR units
         afterSpell.pause_authority        = "MCD_ADM";                                  // Pause authority
         afterSpell.osm_mom_authority      = "MCD_ADM";                                  // OsmMom authority
         afterSpell.clipper_mom_authority  = "MCD_ADM";                                  // ClipperMom authority
@@ -164,8 +164,8 @@ contract Config {
         afterSpell.SP_dsr_max             = 30_00;                                      // In basis points
         afterSpell.SP_dsr_step            = 4_00;                                       // In basis points
         afterSpell.sky_mkr_rate           = 24_000;                                     // In whole SKY/MKR units
-        afterSpell.ilk_count              = 72;                                         // Num expected in system
-        afterSpell.chainlog_version       = "1.20.0";                                   // String expected in system
+        afterSpell.ilk_count              = 71;                                         // Num expected in system
+        afterSpell.chainlog_version       = "1.19.10";                                   // String expected in system
 
         //
         // Values for all collateral
@@ -2115,10 +2115,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["LSE-MKR-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      45_000_000,
+            aL_gap:       45_000_000,
+            aL_ttl:       30 minutes,
             line:         0,
             dust:         30_000,
             pct:          20_00,
@@ -2133,35 +2133,6 @@ contract Config {
             clip_chip:    10,
             clip_tip:     300,
             clipper_mom:  1,
-            cm_tolerance: 50_00,
-            calc_tau:     0,
-            calc_step:    60,
-            calc_cut:     99_00,
-            SP_enabled:   false,
-            SP_min:       0,
-            SP_max:       0,
-            SP_step:      0,
-            offboarding:  false
-        });
-        afterSpell.collaterals["LSEV2-SKY-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
-            line:         0,
-            dust:         30_000,
-            pct:          20_00,
-            mat:          125_00,
-            liqType:      "clip",
-            liqOn:        false,
-            chop:         13_00,
-            dog_hole:     250_000,
-            clip_buf:     120_00,
-            clip_tail:    100 minutes,
-            clip_cusp:    40_00,
-            clip_chip:    10,
-            clip_tip:     300,
-            clipper_mom:  0,
             cm_tolerance: 50_00,
             calc_tau:     0,
             calc_step:    60,

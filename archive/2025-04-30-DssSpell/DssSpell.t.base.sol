@@ -172,7 +172,6 @@ interface FlapUniV2Like {
 interface SplitLike {
     function burn() external view returns (uint256);
     function farm() external view returns (address);
-    function file(bytes32, uint256) external;
     function flapper() external view returns (address);
     function hop() external view returns (uint256);
 }
@@ -206,11 +205,7 @@ interface DaiUsdsLike {
 
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
-    function fee() external view returns (uint256);
-    function mkr() external view returns (address);
-    function rate() external view returns (uint256);
-    function sky() external view returns (address);
-    function take() external view returns (uint256);
+    function skyToMkr(address usr, uint256 skyAmt) external;
 }
 
 interface LitePsmLike {
@@ -245,7 +240,6 @@ interface LitePsmMomLike is AuthorityLike {
 }
 
 interface StakingRewardsLike {
-    function owner() external view returns (address);
     function stake(uint256 amount) external;
     function notifyRewardAmount(uint256 reward) external;
     function rewardPerToken() external view returns (uint256);
@@ -263,16 +257,22 @@ interface LockstakeEngineLike {
     function draw(address owner, uint256 index, address to, uint256 wad) external;
     function farms(address farm) external view returns (uint8 farmStatus);
     function fee() external view returns (uint256);
+    function file(bytes32 what, uint256 data) external;
     function file(bytes32 what, address data) external;
     function free(address owner, uint256 index, address to, uint256 wad) external returns (uint256 freed);
     function freeNoFee(address owner, uint256 index, address to, uint256 wad) external;
+    function freeSky(address owner, uint256 index, address to, uint256 skyWad) external returns (uint256 skyFreed);
     function getReward(address owner, uint256 index, address farm, address to) external returns (uint256 amt);
     function hope(address owner, uint256 index, address usr) external;
     function ilk() external view returns (bytes32);
     function isUrnAuth(address owner, uint256 index, address usr) external view returns (bool ok);
     function jug() external view returns (address);
     function lock(address owner, uint256 index, uint256 wad, uint16 ref) external;
-    function lssky() external view returns (address);
+    function lockSky(address owner, uint256 index, uint256 skyWad, uint16 ref) external;
+    function lsmkr() external view returns (address);
+    function mkr() external view returns (address);
+    function mkrSky() external view returns (address);
+    function mkrSkyRate() external view returns (uint256);
     function multicall(bytes[] memory data) external returns (bytes[] memory results);
     function nope(address owner, uint256 index, address usr) external;
     function onKick(address urn, uint256 wad) external;
@@ -318,9 +318,7 @@ interface LockstakeClipperLike {
 }
 
 interface VoteDelegateFactoryLike {
-    function chief() external view returns (address);
     function create() external returns (address voteDelegate);
-    function polling() external view returns (address);
 }
 
 interface AllocatorVaultLike {
@@ -457,20 +455,6 @@ interface ConvLike {
     function rtob(uint256 ray) external pure returns (uint256 bps);
 }
 
-interface ChiefLike {
-    function free(uint256 wad) external;
-    function gov() external view returns (address);
-    function hat() external view returns (address);
-    function launch() external;
-    function launchThreshold() external view returns (uint256);
-    function lift(address whom) external;
-    function liftCooldown() external view returns (uint256);
-    function live() external view returns (uint256);
-    function lock(uint256 wad) external;
-    function maxYays() external view returns (uint256);
-    function vote(address[] memory yays) external returns (bytes32 slate);
-}
-
 contract DssSpellTestBase is Config, DssTest {
     using stdStorage for StdStorage;
 
@@ -485,8 +469,7 @@ contract DssSpellTestBase is Config, DssTest {
     ChainlogAbstract            chainLog = ChainlogAbstract(   addr.addr("CHANGELOG"));
     DSPauseAbstract                pause = DSPauseAbstract(    addr.addr("MCD_PAUSE"));
     address                   pauseProxy =                     addr.addr("MCD_PAUSE_PROXY");
-    DSChiefAbstract          chiefLegacy = DSChiefAbstract(    addr.addr("MCD_ADM_LEGACY"));
-    ChiefLike                      chief = ChiefLike(          addr.addr("MCD_ADM"));
+    DSChiefAbstract                chief = DSChiefAbstract(    addr.addr("MCD_ADM"));
     VatAbstract                      vat = VatAbstract(        addr.addr("MCD_VAT"));
     VowAbstract                      vow = VowAbstract(        addr.addr("MCD_VOW"));
     DogAbstract                      dog = DogAbstract(        addr.addr("MCD_DOG"));
@@ -499,7 +482,7 @@ contract DssSpellTestBase is Config, DssTest {
     SUsdsLike                      susds = SUsdsLike(          addr.addr("SUSDS"));
     UsdsJoinLike                usdsJoin = UsdsJoinLike(       addr.addr("USDS_JOIN"));
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
-    DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MKR"));
+    DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MCD_GOV"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
     MkrSkyLike                    mkrSky = MkrSkyLike(         addr.addr("MKR_SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
@@ -735,32 +718,22 @@ contract DssSpellTestBase is Config, DssTest {
         );
     }
 
-    // TODO after 2025-05-15: rename into `_vote`
-    function _voteWithSky(address spell_) internal {
+    function _vote(address spell_) internal {
         if (chief.hat() != spell_) {
-            _giveTokens(address(sky), 999999999999 ether);
-            sky.approve(address(chief), type(uint256).max);
+            _giveTokens(address(gov), 999999999999 ether);
+            gov.approve(address(chief), type(uint256).max);
             chief.lock(999999999999 ether);
+
             address[] memory slate = new address[](1);
+
+            assertFalse(DssSpell(spell_).done(), "TestError/spell-done-before-vote");
+
             slate[0] = spell_;
+
             chief.vote(slate);
             chief.lift(spell_);
         }
-        assertEq(chief.hat(), spell_, "TestError/spell-is-not-hat");
-    }
-
-    // TODO after 2025-05-15: remove
-    function _vote(address spell_) internal {
-        if (chiefLegacy.hat() != spell_) {
-            _giveTokens(address(mkr), 999999999999 ether);
-            mkr.approve(address(chiefLegacy), type(uint256).max);
-            chiefLegacy.lock(999999999999 ether);
-            address[] memory slate = new address[](1);
-            slate[0] = spell_;
-            chiefLegacy.vote(slate);
-            chiefLegacy.lift(spell_);
-        }
-        assertEq(chiefLegacy.hat(), spell_, "TestError/spell-is-not-hat");
+        assertEq(chief.hat(), spell_);
     }
 
     function _scheduleWaitAndCast(address spell_) internal {
@@ -769,17 +742,6 @@ contract DssSpellTestBase is Config, DssTest {
         vm.warp(DssSpell(spell_).nextCastTime());
 
         DssSpell(spell_).cast();
-    }
-
-    // TODO after 2025-05-15: remove new chief bootstrapping function below
-    function _activateNewChief() internal {
-        if (chief.live() == 0 && chief.hat() == address(0)) {
-            _giveTokens(address(sky), 999999999999 ether);
-            sky.approve(address(chief), type(uint256).max);
-            chief.lock(999999999999 ether);
-            chief.vote(new address[](1));
-            chief.launch();
-        }
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
@@ -854,17 +816,15 @@ contract DssSpellTestBase is Config, DssTest {
             "TestError/vow-dump-range"
         );
         }
+        {
         // sump values in RAD
-        if (values.vow_sump == type(uint256).max) {
-            assertEq(vow.sump(), type(uint256).max, "TestError/vow-sump");
-        } else {
-            uint256 normalizedSump = values.vow_sump * RAD;
-            assertEq(vow.sump(), normalizedSump, "TestError/vow-sump");
-            assertTrue(
-                (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
-                vow.sump() == 0,
-                "TestError/vow-sump-range"
-            );
+        uint256 normalizedSump = values.vow_sump * RAD;
+        assertEq(vow.sump(), normalizedSump, "TestError/vow-sump");
+        assertTrue(
+            (vow.sump() >= RAD && vow.sump() < 500 * THOUSAND * RAD) ||
+            vow.sump() == 0,
+            "TestError/vow-sump-range"
+        );
         }
         {
         // bump values in RAD
@@ -895,8 +855,12 @@ contract DssSpellTestBase is Config, DssTest {
             assertTrue(dog.Hole() >= MILLION * RAD && dog.Hole() <= 200 * MILLION * RAD, "TestError/dog-Hole-range");
         }
 
-        // Check ESM min value
-        assertEq(esm.min(), values.esm_min, "TestError/esm-min");
+        // ESM min in WAD
+        {
+            uint256 normalizedMin = values.esm_min * WAD;
+            assertEq(esm.min(), normalizedMin, "TestError/esm-min");
+            assertTrue(esm.min() > WAD && esm.min() < 600 * THOUSAND * WAD, "TestError/esm-min-range");
+        }
 
         // check Pause authority
         assertEq(pause.authority(), addr.addr(values.pause_authority), "TestError/pause-authority");
@@ -1511,7 +1475,7 @@ contract DssSpellTestBase is Config, DssTest {
         bytes32 ilk;
         uint256 fee;
         address pip;
-        address lssky;
+        address lsmkr;
         address engine;
         address clip;
         address calc;
@@ -1535,14 +1499,13 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(engine.voteDelegateFactory(),           voteDelegateFactory,  "checkLockstakeIlkIntegration/invalid-engine-voteDelegateFactory");
             assertEq(engine.usdsJoin(),                      address(usdsJoin),    "checkLockstakeIlkIntegration/invalid-engine-usdsJoin");
             assertEq(engine.ilk(),                           p.ilk,                "checkLockstakeIlkIntegration/invalid-engine-ilk");
-            assertEq(engine.lssky(),                         p.lssky,              "checkLockstakeIlkIntegration/invalid-engine-lssky");
+            assertEq(engine.mkrSky(),                        address(mkrSky),      "checkLockstakeIlkIntegration/invalid-engine-mkrSky");
+            assertEq(engine.lsmkr(),                         p.lsmkr,              "checkLockstakeIlkIntegration/invalid-engine-lsmkr");
             assertEq(engine.jug(),                           address(jug),         "checkLockstakeIlkIntegration/invalid-engine-jug");
-            assertEq(engine.sky(),                           address(sky),         "checkLockstakeIlkIntegration/invalid-engine-sky");
             assertEq(engine.fee(),                           p.fee * WAD / 100_00, "checkLockstakeIlkIntegration/invalid-fee");
             assertNotEq(p.farm,                              address(0),           "checkLockstakeIlkIntegration/invalid-farm");
             assertEq(engine.farms(p.farm),                   1,                    "checkLockstakeIlkIntegration/disabled-farm");
-            assertEq(farm.owner(),                           address(pauseProxy),  "checkLockstakeIlkIntegration/invalid-owner");
-            assertEq(farm.stakingToken(),                    p.lssky,              "checkLockstakeIlkIntegration/invalid-stakingToken");
+            assertEq(farm.stakingToken(),                    p.lsmkr,              "checkLockstakeIlkIntegration/invalid-stakingToken");
             assertEq(farm.rewardsToken(),                    p.rToken,             "checkLockstakeIlkIntegration/invalid-rewardsToken");
             assertEq(farm.rewardsDistribution(),             p.rDistr,             "checkLockstakeIlkIntegration/invalid-rewardsDistribution");
             assertEq(farm.rewardsDuration(),                 p.rDur,               "checkLockstakeIlkIntegration/invalid-rewardsDuration");
@@ -1553,11 +1516,8 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(ClipAbstract(p.clip).vow(),             address(vow),         "checkLockstakeIlkIntegration/invalid-clip-vow");
             assertEq(ClipAbstract(p.clip).calc(),            p.calc,               "checkLockstakeIlkIntegration/invalid-clip-calc");
             assertEq(LockstakeClipperLike(p.clip).engine(),  p.engine,             "checkLockstakeIlkIntegration/invalid-clip-engine");
-            // TODO after 2025-05-15: enable liquidations
-            assertEq(LockstakeClipperLike(p.clip).stopped(), 3,                    "checkLockstakeIlkIntegration/invalid-clip-stopped");
+            assertEq(LockstakeClipperLike(p.clip).stopped(), 0,                    "checkLockstakeIlkIntegration/invalid-clip-stopped");
             assertEq(osmMom.osms(p.ilk),                     p.pip,                "checkLockstakeIlkIntegration/invalid-osmMom-pip");
-            (address pip,) = spotter.ilks(p.ilk);
-            assertEq(pip, p.pip, "checkLockstakeIlkIntegration/invalid-spot-pip");
         }
         // Check ilk registry values
         {
@@ -1571,11 +1531,11 @@ contract DssSpellTestBase is Config, DssTest {
                 address gemJoin,
                 address clip
             ) = reg.info(p.ilk);
-            assertEq(name,     GemAbstract(p.lssky).name(),     "checkLockstakeIlkIntegration/incorrect-reg-name");
-            assertEq(symbol,   GemAbstract(p.lssky).symbol(),   "checkLockstakeIlkIntegration/incorrect-reg-symbol");
+            assertEq(name,     GemAbstract(p.lsmkr).name(),     "checkLockstakeIlkIntegration/incorrect-reg-name");
+            assertEq(symbol,   GemAbstract(p.lsmkr).symbol(),   "checkLockstakeIlkIntegration/incorrect-reg-symbol");
             assertEq(_class,   7,                               "checkLockstakeIlkIntegration/incorrect-reg-class"); // REG_CLASS_JOINLESS
-            assertEq(decimals, GemAbstract(p.lssky).decimals(), "checkLockstakeIlkIntegration/incorrect-reg-decimals");
-            assertEq(gem,      address(sky),                    "checkLockstakeIlkIntegration/incorrect-reg-gem");
+            assertEq(decimals, GemAbstract(p.lsmkr).decimals(), "checkLockstakeIlkIntegration/incorrect-reg-decimals");
+            assertEq(gem,      address(mkr),                    "checkLockstakeIlkIntegration/incorrect-reg-gem");
             assertEq(pip,      p.pip,                           "checkLockstakeIlkIntegration/incorrect-reg-pip");
             assertEq(gemJoin,  address(0),                      "checkLockstakeIlkIntegration/incorrect-reg-gemJoin");
             assertEq(clip,     p.clip,                          "checkLockstakeIlkIntegration/incorrect-reg-clip");
@@ -1586,12 +1546,11 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(vat.wards(p.clip),                             1, "checkLockstakeIlkIntegration/missing-auth-vat-clip");
             assertEq(WardsAbstract(p.pip).wards(address(osmMom)),   1, "checkLockstakeIlkIntegration/missing-auth-pip-osmMom");
             assertEq(dog.wards(p.clip),                             1, "checkLockstakeIlkIntegration/missing-auth-dog-clip");
-            assertEq(WardsAbstract(p.lssky).wards(p.engine),        1, "checkLockstakeIlkIntegration/missing-auth-lssky-engine");
+            assertEq(WardsAbstract(p.lsmkr).wards(p.engine),        1, "checkLockstakeIlkIntegration/missing-auth-lsmkr-engine");
             assertEq(WardsAbstract(p.engine).wards(p.clip),         1, "checkLockstakeIlkIntegration/missing-auth-engine-clip");
             assertEq(WardsAbstract(p.clip).wards(address(dog)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-dog");
             assertEq(WardsAbstract(p.clip).wards(address(end)),     1, "checkLockstakeIlkIntegration/missing-auth-clip-end");
-            // TODO after 2025-05-15: rely clipMom and update error message
-            assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 0, "checkLockstakeIlkIntegration/unexpected-auth-clip-clipMom");
+            assertEq(WardsAbstract(p.clip).wards(address(clipMom)), 1, "checkLockstakeIlkIntegration/missing-auth-clip-clipMom");
         }
         // Check required OSM buds
         {
@@ -1611,40 +1570,55 @@ contract DssSpellTestBase is Config, DssTest {
                 stdstore.target(p.clip).sig("kicks()").checked_write(uint256(0));
                 assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeIlkIntegration/unchanged-kicks");
             }
+            // Poke OSM price
+            OsmAbstract(p.pip).poke();
+            vm.warp(block.timestamp + 1 hours);
+            OsmAbstract(p.pip).poke();
+            spotter.poke(p.ilk);
             // Calculate lock and draw amounts
             (,,,, uint256 dust) = vat.ilks(p.ilk);
             drawAmt = dust / RAY;
             lockAmt = drawAmt * WAD / _getOSMPrice(p.pip) * 10;
             // Give tokens
-            _giveTokens(address(sky), lockAmt);
+            _giveTokens(address(mkr), lockAmt);
+            _giveTokens(address(sky), lockAmt * afterSpell.sky_mkr_rate);
         }
-
-        // TODO after 2025-05-15: remove mocked `line`
-        _setIlkLine(p.ilk, drawAmt * RAD);
-
         uint256 snapshot = vm.snapshot();
+        // Check locking and freeing Mkr
+        {
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
+            engine.open(0);
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-initial-balance");
+            mkr.approve(address(engine), lockAmt);
+            engine.lock(address(this), 0, lockAmt, 0);
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-locked-mkr-balance");
+            engine.free(address(this), 0, address(this), lockAmt);
+            uint256 exitFee = lockAmt * p.fee / 100_00;
+            assertEq(mkr.balanceOf(address(this)), lockAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeMkr/invalid-unlocked-balance");
+            vm.revertTo(snapshot);
+        }
         // Check locking and freeing Sky
         {
-            uint256 initialEngineBalance = sky.balanceOf(p.engine);
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
             engine.open(0);
-            uint256 skyAmt = lockAmt;
+            uint256 skyAmt = lockAmt * afterSpell.sky_mkr_rate;
             assertEq(sky.balanceOf(address(this)), skyAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-initial-balance");
             sky.approve(address(engine), skyAmt);
-            engine.lock(address(this), 0, skyAmt, 0);
-            assertEq(sky.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-sky-balance");
-            engine.free(address(this), 0, address(this), skyAmt);
-            uint256 exitFee = lockAmt * p.fee / 100_00;
+            engine.lockSky(address(this), 0, skyAmt, 0);
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-locked-mkr-balance");
+            engine.freeSky(address(this), 0, address(this), skyAmt);
+            uint256 exitFee = lockAmt * p.fee / 100_00 * afterSpell.sky_mkr_rate;
             assertGe(sky.balanceOf(address(this)), skyAmt - exitFee, "checkLockstakeIlkIntegration/LockAndFreeSky/invalid-unlocked-balance");
             vm.revertTo(snapshot);
         }
         // Check drawing and wiping
         {
-            uint256 initialEngineBalance = sky.balanceOf(p.engine);
+            uint256 initialEngineBalance = mkr.balanceOf(p.engine);
             address urn = engine.open(0);
-            assertEq(sky.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-initial-balance");
-            sky.approve(address(engine), lockAmt);
+            assertEq(mkr.balanceOf(address(this)), lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-initial-balance");
+            mkr.approve(address(engine), lockAmt);
             engine.lock(address(this), 0, lockAmt, 0);
-            assertEq(sky.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-sky-balance");
+            assertEq(mkr.balanceOf(p.engine), initialEngineBalance + lockAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-locked-mkr-balance");
             engine.draw(address(this), 0, address(this), drawAmt);
             assertEq(usds.balanceOf(address(this)), drawAmt, "checkLockstakeIlkIntegration/DrawAndWipe/invalid-usds-balance-after-draw");
             skip(10 days);
@@ -1663,7 +1637,7 @@ contract DssSpellTestBase is Config, DssTest {
         {
             // Lock with selected farm
             address urn = engine.open(0);
-            sky.approve(address(engine), lockAmt);
+            mkr.approve(address(engine), lockAmt);
             engine.selectFarm(address(this), 0, p.farm, 0);
             engine.lock(address(this), 0, lockAmt, 0);
             assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "checkLockstakeIlkIntegration/FarmAndGetReward/FarmAndGetReward/invalid-urn-farm-balance");
@@ -1698,9 +1672,9 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     struct LockstakeBalances {
-        uint256 chiefSky;
-        uint256 engineSky;
-        uint256 farmLssky;
+        uint256 chiefMkr;
+        uint256 engineMkr;
+        uint256 farmLsmkr;
         uint256 vatGem;
     }
 
@@ -1717,9 +1691,9 @@ contract DssSpellTestBase is Config, DssTest {
         assertNotEq(voteDelegate, address(0), "checkLockstakeTake/invalid-voteDelegate-address");
         address urn = engine.open(0);
         LockstakeBalances memory initialBalances = LockstakeBalances({
-            chiefSky: sky.balanceOf(address(chief)),
-            engineSky: sky.balanceOf(p.engine),
-            farmLssky: GemAbstract(p.lssky).balanceOf(p.farm),
+            chiefMkr: mkr.balanceOf(address(chief)),
+            engineMkr: mkr.balanceOf(p.engine),
+            farmLsmkr: GemAbstract(p.lsmkr).balanceOf(p.farm),
             vatGem: vat.gem(p.ilk, p.clip)
         });
 
@@ -1730,31 +1704,32 @@ contract DssSpellTestBase is Config, DssTest {
         if (withStaking) {
             engine.selectFarm(address(this), 0, address(p.farm), 0);
         }
-        sky.approve(address(engine), lockAmt);
+        mkr.approve(address(engine), lockAmt);
         engine.lock(address(this), 0, lockAmt, 0);
         engine.draw(address(this), 0, address(this), drawAmt);
         if (withDelegate) {
             assertEq(engine.urnVoteDelegates(urn), voteDelegate, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-voteDelegate-urn");
-            assertEq(sky.balanceOf(address(chief)) - initialBalances.chiefSky, lockAmt, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-chief-sky-balance");
-            assertEq(sky.balanceOf(p.engine), initialBalances.engineSky, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
+            assertEq(mkr.balanceOf(address(chief)) - initialBalances.chiefMkr, lockAmt, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr, "checkLockstakeTake/AfterLockDraw/withDelegate/invalid-engine-balance");
         } else {
             assertEq(engine.urnVoteDelegates(urn), address(0), "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-voteDelegate-urn");
-            assertEq(sky.balanceOf(address(chief)), initialBalances.chiefSky, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-chief-sky-balance");
-            assertEq(sky.balanceOf(p.engine), initialBalances.engineSky + lockAmt, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-chief-mkr-balance");
+            assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr + lockAmt, "checkLockstakeTake/AfterLockDraw/withoutDelegate/invalid-engine-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lssky).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
-            assertEq(GemAbstract(p.lssky).balanceOf(p.farm), initialBalances.farmLssky + lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr + lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withStaking/invalid-urn-farm-balance");
         } else {
-            assertEq(GemAbstract(p.lssky).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
-            assertEq(GemAbstract(p.lssky).balanceOf(p.farm), initialBalances.farmLssky, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(urn), lockAmt, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-farm-balance");
         }
 
-        // TODO after 2025-05-15: remove mocked `stopped` value
-        vm.prank(pauseProxy); LockstakeClipperLike(p.clip).file("stopped", uint256(0));
-
+        // Force liquidation
+        if (withDelegate) {
+            vm.roll(block.number + 1); // Roll one block to allow freeing from chief
+        }
         _setIlkMat(p.ilk, 100_000 * RAY);
         spotter.poke(p.ilk);
         assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeTake/non-0-kicks");
@@ -1772,13 +1747,13 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(sale.tic, block.timestamp, "checkLockstakeTake/AfterBark/invalid-sale.tic");
         assertEq(sale.top, _getOSMPrice(p.pip) * ClipAbstract(p.clip).buf() / WAD, "checkLockstakeTake/AfterBark/invalid-sale.top");
         assertEq(vat.gem(p.ilk, p.clip), initialBalances.vatGem + lockAmt, "checkLockstakeTake/AfterBark/invalid-vat-gem-clip");
-        assertEq(sky.balanceOf(p.engine), initialBalances.engineSky + lockAmt, "checkLockstakeTake/AfterBark/invalid-engine-sky-balance");
-        assertEq(GemAbstract(p.lssky).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/invalid-urn-lsgem-balance");
+        assertEq(mkr.balanceOf(p.engine), initialBalances.engineMkr + lockAmt, "checkLockstakeTake/AfterBark/invalid-engine-mkr-balance");
+        assertEq(GemAbstract(p.lsmkr).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/invalid-urn-lsgem-balance");
         if (withDelegate) {
-            assertEq(sky.balanceOf(address(chief)), initialBalances.chiefSky, "checkLockstakeTake/AfterBark/withDelegate/invalid-chief-sky-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterBark/withDelegate/invalid-chief-mkr-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lssky).balanceOf(p.farm), initialBalances.farmLssky, "checkLockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterBark/withStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterBark/withStaking/invalid-urn-farm-balance");
         }
 
@@ -1786,9 +1761,9 @@ contract DssSpellTestBase is Config, DssTest {
         address buyer = address(888);
         vm.prank(pauseProxy); vat.suck(address(0), buyer, sale.tab);
         vm.prank(buyer); vat.hope(p.clip);
-        assertEq(sky.balanceOf(buyer), 0, "checkLockstakeTake/AfterBark/invalid-buyer-sky-balance");
+        assertEq(mkr.balanceOf(buyer), 0, "checkLockstakeTake/AfterBark/invalid-buyer-mkr-balance");
         vm.prank(buyer); ClipAbstract(p.clip).take(id, lockAmt, type(uint256).max, buyer, "");
-        assertGt(sky.balanceOf(buyer), 0, "checkLockstakeTake/AfterTake/invalid-buyer-sky-balance");
+        assertGt(mkr.balanceOf(buyer), 0, "checkLockstakeTake/AfterTake/invalid-buyer-mkr-balance");
         (sale.pos, sale.tab, sale.lot, sale.tot, sale.usr, sale.tic, sale.top) = LockstakeClipperLike(p.clip).sales(id);
         assertEq(sale.pos, 0, "checkLockstakeTake/AfterTake/invalid-sale.pos");
         assertEq(sale.tab, 0, "checkLockstakeTake/AfterTake/invalid-sale.tab");
@@ -1799,10 +1774,10 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(sale.top, 0, "checkLockstakeTake/AfterTake/invalid-sale.top");
         assertEq(vat.gem(p.ilk, p.clip), initialBalances.vatGem, "checkLockstakeTake/AfterTake/invalid-vat.gem");
         if (withDelegate) {
-            assertEq(sky.balanceOf(address(chief)), initialBalances.chiefSky, "checkLockstakeTake/AfterTake/withDelegate/invalid-chief-sky-balance");
+            assertEq(mkr.balanceOf(address(chief)), initialBalances.chiefMkr, "checkLockstakeTake/AfterTake/withDelegate/invalid-chief-mkr-balance");
         }
         if (withStaking) {
-            assertEq(GemAbstract(p.lssky).balanceOf(p.farm), initialBalances.farmLssky, "checkLockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
+            assertEq(GemAbstract(p.lsmkr).balanceOf(p.farm), initialBalances.farmLsmkr, "checkLockstakeTake/AfterTake/withStaking/invalid-lsgem-farm-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterTake/withStaking/invalid-farm-urn-balance");
         }
     }
@@ -2156,12 +2131,8 @@ contract DssSpellTestBase is Config, DssTest {
         // LitePsmMom can halt litePSM
         assertEq(litePsm.wards(address(litePsmMom)), 1, _concat("checkLitePsmIlkIntegration/litePsmMom-not-ward-", p.ilk));
 
-        _activateNewChief();
         // Gives the hat to the test contract, so it can invoke LitePsmMom
-        stdstore
-            .target(address(chief))
-            .sig("hat()")
-            .checked_write(address(this));
+        vm.store(address(chief), bytes32(uint256(0x0c)) /* `hat` slot */, bytes32(uint256(uint160(address(this)))));
         LitePsmMomLike(address(litePsmMom)).halt(address(litePsm), 2 /* = BOTH */);
 
         assertEq(litePsm.tin(),  type(uint256).max, _concat("checkLitePsmIlkIntegration/mom-halt-invalid-tin-",  p.ilk));
@@ -2637,7 +2608,7 @@ contract DssSpellTestBase is Config, DssTest {
 
     function _checkVestMkr(VestStream[] memory _ss) internal {
         uint256 prevStreamCount = vestMkr.ids();
-        uint256 prevAllowance = mkr.allowance(pauseProxy, address(vestMkr));
+        uint256 prevAllowance = gov.allowance(pauseProxy, address(vestMkr));
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -2650,13 +2621,13 @@ contract DssSpellTestBase is Config, DssTest {
             sumTot = sumTot + _ss[i].tot;
             sumRxd = sumRxd + _ss[i].rxd;
         }
-        assertEq(mkr.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
+        assertEq(gov.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
 
         // Check that all streams added in this spell are tested
         assertEq(vestMkr.ids(), prevStreamCount + _ss.length, "testVestMrk/not-all-streams-tested");
 
         for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestMkr", vestMkr, address(mkr), _ss[i]);
+            _checkVestStream("testVestMkr", vestMkr, address(gov), _ss[i]);
         }
     }
 
@@ -3549,7 +3520,6 @@ contract DssSpellTestBase is Config, DssTest {
         {
             // The check for the configured value is already done in `_checkSystemValues()`
             assertLt(split.hop(), type(uint256).max, "TestError/SplitterMom/already-stopped");
-            _activateNewChief();
             vm.prank(chief.hat());
             splitterMom.stop();
             assertEq(split.hop(), type(uint256).max, "TestError/SplitterMom/not-stopped");
@@ -3574,6 +3544,7 @@ contract DssSpellTestBase is Config, DssTest {
             deal(address(dai), daiHolder, 1_000 * WAD);
             address usdsHolder = address(0x65);
             deal(address(usds), usdsHolder, 1_000 * WAD);
+
 
             // Dai -> USDS conversion
             {
@@ -3616,28 +3587,50 @@ contract DssSpellTestBase is Config, DssTest {
             }
         }
 
-        // Converter: MKR -> SKY
+        // Converter: MKR <-> SKY
         {
             address mkrHolder = address(0x42);
-            deal(address(mkr), mkrHolder, 1_000 * WAD);
+            deal(address(gov), mkrHolder, 1_000 * WAD);
             address skyHolder = address(0x65);
+            deal(address(sky), skyHolder, 1_000 * WAD * afterSpell.sky_mkr_rate);
+
 
             // MKR -> SKY conversion
             {
                 uint256 before = vm.snapshot();
 
-                uint256 pmkrBalance = mkr.balanceOf(mkrHolder);
+                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
                 uint256 pskyBalance = sky.balanceOf(skyHolder);
 
                 vm.startPrank(mkrHolder);
-                mkr.approve(address(mkrSky), type(uint256).max);
-                mkrSky.mkrToSky(skyHolder, pmkrBalance);
+                gov.approve(address(mkrSky), type(uint256).max);
+                mkrSky.mkrToSky(skyHolder,   pmkrBalance);
                 vm.stopPrank();
 
                 uint256 expectedSkyBalance = pskyBalance + (pmkrBalance * afterSpell.sky_mkr_rate);
 
-                assertEq(mkr.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
+                assertEq(gov.balanceOf(mkrHolder), 0,                  "TestError/MKR/bad-mkr-to-sky-conversion");
                 assertEq(sky.balanceOf(skyHolder), expectedSkyBalance, "TestError/Sky/bad-mkr-to-sky-conversion");
+
+                vm.revertTo(before);
+            }
+
+            // SKY -> MKR conversion
+            {
+                uint256 before = vm.snapshot();
+
+                uint256 pskyBalance = sky.balanceOf(skyHolder);
+                uint256 pmkrBalance = gov.balanceOf(mkrHolder);
+
+                vm.startPrank(skyHolder);
+                sky.approve(address(mkrSky), type(uint256).max);
+                mkrSky.skyToMkr(mkrHolder,   pskyBalance);
+                vm.stopPrank();
+
+                uint256 expectedMkrBalance = pmkrBalance + (pskyBalance / afterSpell.sky_mkr_rate);
+
+                assertEq(sky.balanceOf(skyHolder), 0,                  "TestError/SKY/bad-sky-to-mkr-conversion");
+                assertEq(gov.balanceOf(mkrHolder), expectedMkrBalance, "TestError/Mkr/bad-sky-to-mkr-conversion");
 
                 vm.revertTo(before);
             }

@@ -18,14 +18,7 @@ pragma solidity 0.8.16;
 
 import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
-import { DssExec } from "dss-exec-lib/DssExec.sol";
-
-contract MockDssSpellAction  {
-    function execute() external {}
-}
-contract MockDssExecSpell is DssExec {
-    constructor() DssExec(block.timestamp + 30 days, address(new MockDssSpellAction())) {}
-}
+import { OsmAbstract } from "dss-interfaces/dss/OsmAbstract.sol";
 
 interface L2Spell {
     function dstDomain() external returns (bytes32);
@@ -53,46 +46,12 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
-interface LockstakeMigratorLike {
-    function flash() external view returns (address);
-    function newEngine() external view returns (address);
-    function oldEngine() external view returns (address);
-    function mkrSky() external view returns (address);
-    function migrate(address, uint256, address, uint256, uint16) external;
-}
-
-interface AuthedLike {
-    function authority() external view returns (address);
-}
-
-interface VoteDelegateLike {
-    function lock(uint256) external;
-    function free(uint256) external;
-    function stake(address) external view returns (uint256);
-}
-
-interface LineMomLike {
-    function ilks(bytes32) external view returns (uint256);
-}
-
-interface WardsLike {
-    function wards(address) external view returns (uint256);
-}
-
-interface OldMkrSkyLike {
-    function mkrToSky(address, uint256) external;
-    function skyToMkr(address, uint256) external;
-}
-
-interface ProtegoLike {
-    function drop(address _usr, bytes32 _tag, bytes memory _fax, uint256 _eta) external;
-    function pause() external view returns (address);
-    function planned(address _usr, bytes32 _tag, bytes memory _fax, uint256 _eta) external view returns (bool);
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function vestId() external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
-    using stdStorage for StdStorage;
-
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
         _testGeneral();
@@ -252,12 +211,9 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemovedChainlogKeys() public { // add the `skipped` modifier to skip
-        string[4] memory removedKeys = [
-            "LOCKSTAKE_MKR",
-            "REWARDS_LSMKR_USDS",
-            "MCD_GOV_ACTIONS",
-            "GOV_GUARD"
+    function testRemoveChainlogValues() public skipped { // add the `skipped` modifier to skip
+        string[1] memory removedKeys = [
+            "PIP_ALLOCATOR_SPARK_A"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
@@ -286,41 +242,6 @@ contract DssSpellTest is DssSpellTestBase {
             } catch {
                 revert(_concat("TestError/unknown-reason: ", removedKeys[i]));
             }
-        }
-    }
-
-    function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
-        string[13] memory addedKeys = [
-            "PIP_SKY",
-            "MKR",
-            "MKR_GUARD",
-            "LOCKSTAKE_MKR_OLD_V1",
-            "LOCKSTAKE_ENGINE_OLD_V1",
-            "LOCKSTAKE_CLIP_OLD_V1",
-            "LOCKSTAKE_CLIP_CALC_OLD_V1",
-            "LOCKSTAKE_SKY",
-            "LOCKSTAKE_MIGRATOR",
-            "MKR_SKY_LEGACY",
-            "REWARDS_LSSKY_USDS",
-            "REWARDS_LSMKR_USDS_LEGACY",
-            "MCD_PROTEGO"
-        ];
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            vm.expectRevert("dss-chain-log/invalid-key");
-            chainLog.getAddress(_stringToBytes32(addedKeys[i]));
-        }
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        for(uint256 i = 0; i < addedKeys.length; i++) {
-            assertEq(
-                chainLog.getAddress(_stringToBytes32(addedKeys[i])),
-                addr.addr(_stringToBytes32(addedKeys[i])),
-                string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", addedKeys[i]))
-            );
         }
     }
 
@@ -356,24 +277,24 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLockstakeIlkIntegration() public { // add the `skipped` modifier to skip
+    function testLockstakeIlkIntegration() public skipped { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         _checkLockstakeIlkIntegration(
             LockstakeIlkParams({
-                ilk:    "LSEV2-SKY-A",
+                ilk:    "LSE-MKR-A",
                 fee:    0,
-                pip:    addr.addr("PIP_SKY"),
-                lssky:  addr.addr("LOCKSTAKE_SKY"),
+                pip:    addr.addr("PIP_MKR"),
+                lsmkr:  addr.addr("LOCKSTAKE_MKR"),
                 engine: addr.addr("LOCKSTAKE_ENGINE"),
                 clip:   addr.addr("LOCKSTAKE_CLIP"),
                 calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
-                farm:   addr.addr("REWARDS_LSSKY_USDS"),
+                farm:   addr.addr("REWARDS_LSMKR_USDS"),
                 rToken: addr.addr("USDS"),
                 rDistr: addr.addr("MCD_SPLIT"),
-                rDur:   1_728 seconds
+                rDur:   15_649 seconds
             })
         );
     }
@@ -468,8 +389,8 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testOsmReaders() public { // add the `skipped` modifier to skip
-        address OSM = addr.addr("PIP_SKY");
+    function testOsmReaders() public skipped { // add the `skipped` modifier to skip
+        address OSM = addr.addr("PIP_MKR");
         address[4] memory newReaders = [
             addr.addr("MCD_SPOT"),
             addr.addr("LOCKSTAKE_CLIP"),
@@ -845,7 +766,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
 
@@ -1245,7 +1166,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba); // Insert Spark spell address
+        address SPARK_SPELL = address(0x9362B8a15ab78257b11a55F7CC272F4C4676C2fe); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1262,9 +1183,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // BLOOM TESTS
-    function testBloomSpellIsExecuted() public skipped {
+    function testBloomSpellIsExecuted() public {
         address BLOOM_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
-        address BLOOM_SPELL = address(0);
+        address BLOOM_SPELL = address(0x0c9CC5D5fF3baf096d29676039BD6fB94586111A);
 
         vm.expectCall(
             BLOOM_PROXY,
@@ -1281,540 +1202,53 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testWhitelistALMProxy() public {
+        address almProxy = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
+        LitePsmLike psmUsdcA = LitePsmLike(addr.addr("MCD_LITE_PSM_USDC_A"));
+        GemAbstract usdc     = GemAbstract(addr.addr("USDC"));
+        // bud is 0 before kiss
+        assertEq(psmUsdcA.bud(almProxy), 0, "TestError/MCD_PSM_USDC_A/invalid-bud");
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done());
+        // bud is 1 after kiss
+        assertEq(psmUsdcA.bud(almProxy), 1, "TestError/MCD_PSM_USDC_A/invalid-bud");
+        // STAR2 can call buyGemNoFee() on MCD_LITE_PSM_USDC_A
+        uint256 daiAmount  = 1_000 ether;
+        uint256 usdcAmount = 1_000 * 10**6;
+        // fund proxy
+        deal(address(dai), almProxy, daiAmount);
+        vm.startPrank(almProxy);
+        // buy gem with no fee
+        dai.approve(address(psmUsdcA), daiAmount);
+        psmUsdcA.buyGemNoFee(almProxy, usdcAmount);
+        assertEq(usdc.balanceOf(almProxy), usdcAmount);
+        assertEq(dai.balanceOf(almProxy), 0);
+        // now sell it back with no fee
+        usdc.approve(address(psmUsdcA), usdcAmount);
+        psmUsdcA.sellGemNoFee(almProxy, usdcAmount);
+        assertEq(usdc.balanceOf(almProxy), 0);
+        assertEq(dai.balanceOf(almProxy), daiAmount);
+        vm.stopPrank();
+    }
 
-    function testNewLineMomIlks() public {
-        string[1] memory ilks = [
-            "LSEV2-SKY-A"
-        ];
+    function testAddChainlogKey() public {
+        bytes32[] memory addedKeys = new bytes32[](1);
+        addedKeys[0] = "EMSP_SPBEAM_HALT";
 
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                0,
-                _concat("testNewLineMomIlks/before-ilk-already-in-lineMom-", ilks[i])
-            );
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            vm.expectRevert("dss-chain-log/invalid-key");
+            chainLog.getAddress(addedKeys[i]);
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        for (uint256 i = 0; i < ilks.length; i++) {
-            assertEq(
-                LineMomLike(address(lineMom)).ilks(_stringToBytes32(ilks[i])),
-                1,
-                _concat("testNewLineMomIlks/after-ilk-not-added-to-lineMom-", ilks[i])
-            );
-        }
-    }
-
-    function testNewOsmMomAddition() public {
-        bytes32 ilk = "LSEV2-SKY-A";
-        address osm = addr.addr("PIP_SKY");
-
-        // Check values before
-        assertEq(osmMom.osms(ilk), address(0), "TestError/osm-already-in-mom");
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check values after
-        assertEq(osmMom.osms(ilk), osm, "TestError/osm-not-in-mom");
-
-        // TODO after 2025-05-15: remove additional chief activation
-        _activateNewChief();
-
-        // Simulate mom call from emergency spell
-        assertEq(OsmAbstract(osm).stopped(), 0, "TestError/unexpected-stopped-before");
-        vm.prank(chief.hat()); osmMom.stop(ilk);
-        assertEq(OsmAbstract(osm).stopped(), 1, "TestError/unexpected-stopped-after");
-    }
-
-    function testOsmSource() public {
-        address osm = addr.addr("PIP_SKY");
-        address src = addr.addr("FLAP_SKY_ORACLE");
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Sanity checks
-        assertEq(OsmAbstract(osm).src(), src, "testOsmSource/incorrect-src");
-
-        // Add test contract to buds for testing
-        GodMode.setWard(osm, address(this), 1);
-        OsmAbstract(osm).kiss(address(this));
-
-        // Set arbitrary price in the source oracle
-        uint256 arbitraryPrice = 12345;
-        // Note: this also overwrites `age` to be 0, but it doesn't have any impact on the OSM
-        vm.store(src, bytes32(uint256(4)), bytes32(arbitraryPrice));
-
-        // Get values before poke
-        (bytes32 currentPrice,) = OsmAbstract(osm).peep();
-        uint64 currentZzz = OsmAbstract(osm).zzz();
-        OsmAbstract(osm).poke();
-
-        // Get value after poke
-        vm.warp(block.timestamp + 1 hours);
-        OsmAbstract(osm).poke();
-        (bytes32 newPrice,) = OsmAbstract(osm).peep();
-        uint64 newZzz = OsmAbstract(osm).zzz();
-
-        // Ensure that changes took place
-        assertNotEq(currentPrice, newPrice, "testOsmSource/no-price-change");
-        assertNotEq(currentZzz, newZzz, "testOsmSource/no-zzz-change");
-
-        // Ensure price is correctly propagated
-        assertEq(uint256(newPrice), arbitraryPrice, "testOsmSource/newPrice-not-arbitraryPrice");
-    }
-
-    function testMkrSkyConverterMigration() public {
-        uint256 amount = 100 * WAD;
-
-        // Check state before cast
-        address oldMkrSky = addr.addr("MKR_SKY_LEGACY");
-        assertEq(WardsLike(mkr.authority()).wards(oldMkrSky), 1, "TestError/oldMkrSky-not-yet-authorized-in-mkr-guard");
-        assertEq(sky.balanceOf(address(mkrSky)), 0, "TestError/newMkrSky-already-have-minted-sky");
-
-        // Before the migration old converter can swap both ways
-        {
-            deal(address(mkr), address(this), amount);
-            mkr.approve(oldMkrSky, amount);
-            OldMkrSkyLike(oldMkrSky).mkrToSky(address(this), amount);
-            assertEq(mkr.balanceOf(address(this)), 0, "TestError/before/oldMkrSky.mkrToSky-unexpected-mkr");
-            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/before/oldMkrSky.mkrToSky-unexpected-sky");
-            sky.approve(oldMkrSky, amount * afterSpell.sky_mkr_rate);
-            OldMkrSkyLike(oldMkrSky).skyToMkr(address(this), amount * afterSpell.sky_mkr_rate);
-            assertEq(sky.balanceOf(address(this)), 0, "TestError/before/oldMkrSky.skyToMkr-unexpected-sky");
-            assertEq(mkr.balanceOf(address(this)), amount, "TestError/before/oldMkrSky.skyToMkr-unexpected-mkr");
+        for(uint256 i = 0; i < addedKeys.length; i++) {
+            assertEq(chainLog.getAddress(addedKeys[i]), addr.addr(addedKeys[i]), string.concat(_concat("testNewChainlogKeys/chainlog-key-mismatch: ", _bytes32ToString(addedKeys[i]))));
         }
 
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check state after cast
-        assertEq(WardsLike(mkr.authority()).wards(oldMkrSky), 0, "TestError/oldMkrSky-still-authorized-in-mkr-guard");
-        assertEq(sky.balanceOf(address(mkrSky)), mkr.totalSupply() * afterSpell.sky_mkr_rate, "TestError/newMkrSky-have-no-minted-sky");
-        assertEq(mkrSky.mkr(), address(mkr), "TestError/newMkrSky-unexpected-mkr-address");
-        assertEq(mkrSky.sky(), address(sky), "TestError/newMkrSky-unexpected-sky-address");
-        assertEq(mkrSky.rate(), afterSpell.sky_mkr_rate, "TestError/newMkrSky-unexpected-sky-address");
-
-        // After the migration old converter can swap only mkr=>sky
-        {
-            deal(address(mkr), address(this), amount);
-            mkr.approve(oldMkrSky, amount);
-            OldMkrSkyLike(oldMkrSky).mkrToSky(address(this), amount);
-            assertEq(mkr.balanceOf(address(this)), 0, "TestError/after/oldMkrSky.mkrToSky-unexpected-mkr");
-            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/after/oldMkrSky.mkrToSky-unexpected-sky");
-            sky.approve(oldMkrSky, amount * afterSpell.sky_mkr_rate);
-            vm.expectRevert();
-            OldMkrSkyLike(oldMkrSky).skyToMkr(address(this), amount * afterSpell.sky_mkr_rate);
-        }
-
-        // After the migration new converter can swap mkr=>sky
-        {
-            deal(address(mkr), address(this), amount);
-            deal(address(sky), address(this), 0);
-            mkr.approve(address(mkrSky), amount);
-            mkrSky.mkrToSky(address(this), amount);
-            assertEq(mkr.balanceOf(address(this)), 0, "TestError/after/newMkrSky.mkrToSky-unexpected-mkr");
-            assertEq(sky.balanceOf(address(this)), amount * afterSpell.sky_mkr_rate, "TestError/after/newMkrSky.mkrToSky-unexpected-sky");
-            assertEq(mkrSky.fee(), 0, "TestError/newMkrSky-unexpected-fee");
-            assertEq(mkrSky.take(), 0, "TestError/newMkrSky-unexpected-take");
-        }
     }
 
-    ProtegoLike protego = ProtegoLike(addr.addr("MCD_PROTEGO"));
-
-    function _testProtego(bool useNewChief) private {
-        MockDssExecSpell badSpell = new MockDssExecSpell();
-
-        // Vote on the badSpell and schedule
-        if (useNewChief) {
-            _voteWithSky(address(badSpell));
-        } else {
-            _vote(address(badSpell));
-        }
-        badSpell.schedule();
-        address usr = badSpell.action();
-        bytes32 tag = badSpell.tag();
-        bytes memory sig = badSpell.sig();
-        uint256 eta = badSpell.eta();
-        assertTrue(protego.planned(usr, tag, sig, eta), "TestError/not-yet-planned");
-
-        // Vote on the protego and drop
-        if (useNewChief) {
-            _voteWithSky(address(protego));
-        } else {
-            _vote(address(protego));
-        }
-        protego.drop(usr, tag, sig, eta);
-        assertFalse(protego.planned(usr, tag, sig, eta), "TestError/still-planned");
-
-        // After Protego loses the hat, it can no longer drop spells
-        if (useNewChief) {
-            _voteWithSky(address(0));
-        } else {
-            _vote(address(0));
-        }
-        vm.expectRevert("ds-auth-unauthorized");
-        protego.drop(usr, tag, sig, eta);
-    }
-
-    function testProtego() public {
-        // Sanity checks
-        assertEq(protego.pause(), addr.addr("MCD_PAUSE"));
-
-        // Test before chief migration
-        _testProtego(false);
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Test after chief migration
-        _activateNewChief();
-        _testProtego(true);
-    }
-
-    // The following part is ported from the Migration test
-    // https://github.com/makerdao/chief-migration/blob/e4a820483694f015a2daf8b1dccc5548036d94d4/test/Migration.t.sol
-
-    function testChiefMigration() public {
-        // Check state before cast
-        assertNotEq(address(chief), chainLog.getAddress("MCD_ADM"));
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Sanity checks
-        assertEq(address(chief), chainLog.getAddress("MCD_ADM"));
-        assertEq(chief.hat(), address(0));
-        assertEq(chief.live(), 0);
-        assertEq(chief.gov(), address(sky));
-        assertEq(chief.maxYays(), 5);
-        assertEq(chief.launchThreshold(), 2_400_000_000 * WAD);
-        assertEq(chief.liftCooldown(), 10);
-
-        // Check changes to authority
-        assertEq(pause.authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("SPLITTER_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("OSM_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("CLIPPER_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("DIRECT_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("STARKNET_ESCROW_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("LINE_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("LITE_PSM_MOM")).authority(), address(chief));
-        assertEq(AuthedLike(addr.addr("SPBEAM_MOM")).authority(), address(chief));
-
-        // Chief can't be launched with lower launchThreshold
-        uint256 snapshot = vm.snapshot();
-        _giveTokens(address(sky), 1_000 * WAD * 24_000);
-        sky.approve(address(chief), 1_000 * WAD * 24_000);
-        chief.lock(1_000 * WAD * 24_000);
-        chief.vote(new address[](1));
-        vm.expectRevert("Chief/less-than-threshold"); chief.launch();
-        vm.revertTo(snapshot);
-
-        // Setup: lock enough SKY into new chief
-        _giveTokens(address(sky), 100_000 * WAD * 24_000);
-        sky.approve(address(chief), 100_000 * WAD * 24_000);
-        chief.lock(100_000 * WAD * 24_000);
-        address[] memory slate = new address[](1);
-
-        // Check that Mom can't operate since chief is not live
-        address splitterStopSpell = addr.addr("EMSP_SPLITTER_STOP");
-        slate[0] = splitterStopSpell;
-        chief.vote(slate);
-        chief.lift(splitterStopSpell);
-        vm.expectRevert("SplitterMom/not-authorized"); DssSpell(splitterStopSpell).schedule();
-
-        // Check spell can't schedule since chief is not live
-        address testSpell = address(new MockDssExecSpell());
-        slate[0] = testSpell;
-        chief.vote(slate);
-        chief.lift(testSpell);
-        vm.expectRevert("ds-auth-unauthorized"); DssSpell(testSpell).schedule();
-
-        // Launch chief
-        slate[0] = address(0);
-        chief.vote(slate);
-        chief.lift(address(0));
-        chief.launch();
-        assertEq(chief.live(), 1);
-
-        // Mom can't operate since the calling spell is not the hat
-        vm.expectRevert("SplitterMom/not-authorized"); DssSpell(splitterStopSpell).schedule();
-
-        // Also test spell can't schedule since not the hat
-        vm.expectRevert("ds-auth-unauthorized"); DssSpell(testSpell).schedule();
-
-        // Mom can operate
-        slate[0] = splitterStopSpell;
-        chief.vote(slate);
-        chief.lift(splitterStopSpell);
-        assertLe(split.hop(), type(uint256).max);
-        DssSpell(splitterStopSpell).schedule();
-        assertEq(split.hop(), type(uint256).max);
-
-        // Test spell can schedule
-        slate[0] = testSpell;
-        chief.vote(slate);
-        chief.lift(testSpell);
-        DssSpell(testSpell).schedule();
-
-        // Test spell can't cast before gov delay has passed
-        vm.expectRevert("ds-pause-premature-exec"); DssSpell(testSpell).cast();
-
-        // Test spell can cast after gov delay has passed
-        vm.warp(MockDssExecSpell(testSpell).eta());
-        DssSpell(testSpell).cast();
-    }
-
-    function testVoteDelegateFactory() public {
-        // Check state before cast
-        address oldVoteDelegateFactory = chainLog.getAddress("VOTE_DELEGATE_FACTORY");
-        assertNotEq(oldVoteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY_LEGACY"));
-        assertNotEq(voteDelegateFactory, oldVoteDelegateFactory);
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Sanity checks
-        assertEq(oldVoteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY_LEGACY"));
-        assertEq(voteDelegateFactory, chainLog.getAddress("VOTE_DELEGATE_FACTORY"));
-        assertEq(VoteDelegateFactoryLike(voteDelegateFactory).polling(), VoteDelegateFactoryLike(oldVoteDelegateFactory).polling());
-        assertNotEq(VoteDelegateFactoryLike(voteDelegateFactory).chief(), VoteDelegateFactoryLike(oldVoteDelegateFactory).chief());
-        assertEq(VoteDelegateFactoryLike(voteDelegateFactory).chief(), address(chief));
-
-        // Setup addresses
-        address voter = address(123);
-        address delegator = address(456);
-        uint256 delegationAmount = 10_000 * WAD;
-        deal(address(sky), delegator, delegationAmount);
-
-        // Lock SKY
-        uint256 initialSKY = sky.balanceOf(address(chief));
-        vm.prank(voter); VoteDelegateLike voteDelegate = VoteDelegateLike(VoteDelegateFactoryLike(voteDelegateFactory).create());
-        vm.prank(delegator); sky.approve(address(voteDelegate), type(uint256).max);
-        vm.prank(delegator); voteDelegate.lock(delegationAmount);
-        assertEq(sky.balanceOf(delegator), 0);
-        assertEq(sky.balanceOf(address(chief)), initialSKY + delegationAmount);
-        assertEq(voteDelegate.stake(delegator), delegationAmount);
-
-        // Free SKY
-        vm.prank(delegator); voteDelegate.free(delegationAmount); // note that we can free in the same block now
-        assertEq(sky.balanceOf(delegator), delegationAmount);
-        assertEq(sky.balanceOf(address(chief)), initialSKY);
-        assertEq(voteDelegate.stake(delegator), 0);
-    }
-
-    function testSplitToFarm() public {
-        // Check state before cast
-        address oldRewards = chainLog.getAddress("REWARDS_LSMKR_USDS");
-        assertNotEq(split.farm(), addr.addr("REWARDS_LSSKY_USDS"));
-        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSSKY_USDS");
-        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSMKR_USDS_LEGACY");
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check chainlog changes
-        address splitterFarm = split.farm();
-        assertEq(splitterFarm, addr.addr("REWARDS_LSSKY_USDS"));
-        assertEq(splitterFarm, chainLog.getAddress("REWARDS_LSSKY_USDS"));
-        vm.expectRevert("dss-chain-log/invalid-key"); chainLog.getAddress("REWARDS_LSMKR_USDS");
-        assertEq(chainLog.getAddress("REWARDS_LSMKR_USDS_LEGACY"), oldRewards);
-
-        // Sanity checks
-        assertEq(StakingRewardsLike(splitterFarm).rewardsDistribution(), address(split));
-        assertEq(StakingRewardsLike(splitterFarm).rewardsDuration(), 1_728 seconds);
-        assertEq(StakingRewardsLike(splitterFarm).rewardsDuration(), split.hop());
-        assertEq(StakingRewardsLike(splitterFarm).owner(), address(pauseProxy));
-        assertEq(StakingRewardsLike(splitterFarm).rewardsToken(), address(usds));
-        assertEq(StakingRewardsLike(splitterFarm).stakingToken(), addr.addr("LOCKSTAKE_SKY"));
-
-        // Move to a state where calling `vow.flap()` is possible
-        vm.warp(block.timestamp + split.hop());
-        // Create additional surplus, if needed
-        if (vat.dai(address(vow)) < vat.sin(address(vow)) + vow.bump() + vow.hump()) {
-            stdstore
-                .target(address(vat))
-                .sig("dai(address)")
-                .with_key(address(vow))
-                .checked_write(vat.sin(address(vow)) + vow.bump() + vow.hump());
-        }
-        // Heal if needed
-        if (vat.sin(address(vow)) > vow.Sin() + vow.Ash()) {
-            vow.heal(vat.sin(address(vow)) - vow.Sin() - vow.Ash());
-        }
-        // Set 0% burn
-        vm.prank(pauseProxy); split.file("burn", 0);
-
-        // Check flapping result
-        uint256 pbalanceUsdsFarm = usds.balanceOf(split.farm());
-        vow.flap();
-        assertEq(usds.balanceOf(splitterFarm), pbalanceUsdsFarm + vow.bump() / RAY, "testSplitToFarm/invalid-farm-balance");
-    }
-
-    // The following part is ported from the LockstakeMigrator test
-    // https://github.com/makerdao/lockstake/blob/9cb25125bceb488f39dc4ddd3b54c05217a260d1/test/LockstakeMigrator.t.sol
-
-    LockstakeEngineLike oldEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE_OLD_V1"));
-    LockstakeEngineLike newEngine  = LockstakeEngineLike(addr.addr("LOCKSTAKE_ENGINE"));
-    bytes32 oldIlk                 = oldEngine.ilk();
-    bytes32 newIlk                 = newEngine.ilk();
-    LockstakeMigratorLike migrator = LockstakeMigratorLike(addr.addr("LOCKSTAKE_MIGRATOR"));
-
-    function _ink(bytes32 ilk_, address urn) internal view returns (uint256 ink) {
-        (ink,) = vat.urns(ilk_, urn);
-    }
-
-    function _art(bytes32 ilk_, address urn) internal view returns (uint256 art) {
-        (, art) = vat.urns(ilk_, urn);
-    }
-
-    function _Art(bytes32 ilk_) internal view returns (uint256 Art) {
-        (Art,,,,) = vat.ilks(ilk_);
-    }
-
-    function _rate(bytes32 ilk_) internal view returns (uint256 rate) {
-        (, rate,,,) = vat.ilks(ilk_);
-    }
-
-    function _line(bytes32 ilk_) internal view returns (uint256 line) {
-        (,,, line,) = vat.ilks(ilk_);
-    }
-
-    struct Urn {
-        address owner;
-        uint256 index;
-    }
-
-    function _checkLockstakeUrnMigration(Urn memory oldUrn, Urn memory newUrn, address caller, bool hasDebt) internal {
-        address oldUrnAddr = oldEngine.ownerUrns(oldUrn.owner, oldUrn.index);
-        uint256 oldInkPrev = _ink(oldIlk, oldUrnAddr);
-        uint256 oldArtPrev = _art(oldIlk, oldUrnAddr);
-        assertGt(oldInkPrev, 0);
-        if (hasDebt) {
-            assertGt(oldArtPrev, 0);
-        } else {
-            assertEq(oldArtPrev, 0);
-        }
-
-        // Open new urn only if it's not yet done
-        address newUrnAddr = newEngine.ownerUrns(newUrn.owner, newUrn.index);
-        if (newUrnAddr == address(0)) {
-            vm.prank(newUrn.owner); newUrnAddr = newEngine.open(newUrn.index);
-        }
-
-        assertEq(_ink(newIlk, newUrnAddr), 0);
-        assertEq(_art(newIlk, newUrnAddr), 0);
-
-        // Hope migrator on the old urn only if it's not yet done
-        if (oldEngine.urnCan(oldUrnAddr, address(migrator)) == 0) {
-            vm.expectRevert("LockstakeEngine/urn-not-authorized");
-            vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-            vm.prank(oldUrn.owner); oldEngine.hope(oldUrn.owner, oldUrn.index, address(migrator));
-        }
-
-        if (hasDebt) {
-            // Hope migrator on the new urn only if it's not yet done
-            if (newEngine.urnCan(newUrnAddr, address(migrator)) == 0) {
-                vm.expectRevert("LockstakeEngine/urn-not-authorized");
-                vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-                vm.prank(newUrn.owner); newEngine.hope(newUrn.owner, newUrn.index, address(migrator));
-            }
-
-            uint256 snapshotId = vm.snapshot();
-            vm.prank(pauseProxy); vat.file(oldIlk, "line", 1);
-            vm.expectRevert("LockstakeMigrator/old-ilk-line-not-zero");
-            vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-            vm.revertTo(snapshotId);
-        }
-
-        uint256 oldIlkRate = _rate(oldIlk);
-
-        vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-
-        assertEq(_ink(oldIlk, oldUrnAddr), 0);
-        assertEq(_art(oldIlk, oldUrnAddr), 0);
-
-        assertEq(_ink(newIlk, newUrnAddr), oldInkPrev * 24_000);
-        if (hasDebt) {
-            assertApproxEqAbs(_art(newIlk, newUrnAddr) * _rate(newIlk), oldArtPrev * oldIlkRate, RAY * 2);
-        } else {
-            assertEq(_art(newIlk, newUrnAddr), 0);
-        }
-
-        assertEq(_line(newIlk), 0);
-    }
-
-    function testLockstakeMigrateCurrentUrnsWithRelevantDebt() public {
-        // Check state before cast
-        assertEq(oldEngine.wards(address(migrator)), 0, "TestError/migrator-already-authorized-in-old-engine");
-        assertEq(vat.wards(address(migrator)), 0, "TestError/migrator-already-authorized-in-vat");
-
-        // Cast spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Sanity checks
-        assertEq(oldEngine.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-old-engine");
-        assertEq(vat.wards(address(migrator)), 1, "TestError/migrator-not-authorized-in-vat");
-        assertEq(migrator.oldEngine(), address(oldEngine), "TestError/migrator-invalid-oldEngine");
-        assertEq(migrator.newEngine(), address(newEngine), "TestError/migrator-invalid-newEngine");
-        assertEq(migrator.mkrSky(), address(mkrSky), "TestError/migrator-invalid-mkrSky");
-        assertEq(migrator.flash(), addr.addr("MCD_FLASH"), "TestError/migrator-invalid-mkrSky");
-
-        // Simulate migration of existing urns
-        assertEq(_Art(newIlk), 0);
-        assertGt(_Art(oldIlk) * _rate(oldIlk), 40_000_000 * RAD);
-        _checkLockstakeUrnMigration({
-            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 4 }),
-            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 0 }),
-            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
-            hasDebt: true
-        });
-        _checkLockstakeUrnMigration({
-            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 5 }),
-            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 1 }),
-            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
-            hasDebt: true
-        });
-        _checkLockstakeUrnMigration({
-            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 7 }),
-            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 2 }),
-            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
-            hasDebt: true
-        });
-        _checkLockstakeUrnMigration({
-            oldUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 6 }),
-            newUrn: Urn({ owner: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d, index: 3 }),
-            caller: 0xf65475e74C1Ed6d004d5240b06E3088724dFDA5d,
-            hasDebt: true
-        });
-        _checkLockstakeUrnMigration({
-            oldUrn: Urn({ owner: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7, index: 0 }),
-            newUrn: Urn({ owner: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7, index: 0 }),
-            caller: 0xBaF3605Ecbe395fA134A3F4c6a729E53b72E27B7,
-            hasDebt: true
-        });
-        assertGt(_Art(newIlk) * _rate(newIlk), 40_000_000 * RAD);
-        assertLt(_Art(oldIlk) * _rate(oldIlk),  1_000_000 * RAD);
-    }
 }
