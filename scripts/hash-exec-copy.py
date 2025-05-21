@@ -7,16 +7,16 @@ import subprocess
 import locale
 
 INPUT_DATE_FORMAT="%Y-%m-%d"
-REPO_URL = "/makerdao/community"
+REPO_URL = "/makerdao/executive-votes"
 
 # Set locale to en_US.UTF-8 to ensure consistent formatting
 locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
-def get_executive_by_title (exec_title):
+def get_executive_by_title (exec_title, year):
     base_git_api_url = f"https://api.github.com/repos{REPO_URL}/commits"
 
     api_response = requests.get(
-        f"{base_git_api_url}?path=governance/votes/{exec_title}",
+        f"{base_git_api_url}?path={year}/{exec_title}",
         params = {'per_page': '1'}
     )
     api_response.raise_for_status()
@@ -28,7 +28,7 @@ def get_executive_by_title (exec_title):
 
     # Get target exec copy content
     exec_copy_response = requests.get(
-        f"https://raw.githubusercontent.com{REPO_URL}/{commit_hash}/governance/votes/{exec_title}"
+        f"https://raw.githubusercontent.com{REPO_URL}/{commit_hash}/{year}/{exec_title}"
     )
     exec_copy_response.raise_for_status()
 
@@ -69,6 +69,9 @@ def main():
     except ValueError:
         raise SystemExit(f"Invalid date format. Please use {INPUT_DATE_FORMAT}.")
 
+    # Extract year from the date
+    year = date.strftime("%Y")
+
     # Find the executive doc for the given date
     POSSIBLE_EXEC_TITLES = [
         f"Executive%20vote%20-%20{date.strftime('%B %d, %Y')}.md",
@@ -81,7 +84,7 @@ def main():
     executive_content, executive_url, commit_hash = None, None, None
     for exec_title in POSSIBLE_EXEC_TITLES:
         try:
-            executive_content, executive_url, commit_hash = get_executive_by_title(exec_title)
+            executive_content, executive_url, commit_hash = get_executive_by_title(exec_title, year)
             break
         except ValueError as e:
             continue
