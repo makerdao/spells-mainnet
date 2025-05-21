@@ -12,7 +12,7 @@ optimizer = false
 optimzier_runs = 1
 via_ir = false
 libraries = [
-    "./lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x0496AbA1f2CD4038cC486993f5CCF97851AE26d3"
+    "./lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x8De6DDbCd5053d32292AAA0D2105A32d108484a6"
 ]
 
 [rpc_endpoints]
