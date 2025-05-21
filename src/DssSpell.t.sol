@@ -690,7 +690,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // This stream is configured in relative to the spell casting time.
         {
-            uint256 before = vm.snapshot();
+            uint256 before = vm.snapshotState();
             _vote(address(spell));
             spell.schedule();
             vm.warp(spell.nextCastTime());
@@ -708,7 +708,7 @@ contract DssSpellTest is DssSpellTestBase {
                 rxd: 0
             });
 
-            vm.revertTo(before);
+            vm.revertToStateAndDelete(before);
         }
 
         _checkVestSkyMint(streams);
@@ -1517,13 +1517,13 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(AuthedLike(addr.addr("SPBEAM_MOM")).authority(), address(chief));
 
         // Chief can't be launched with lower launchThreshold
-        uint256 snapshot = vm.snapshot();
+        uint256 snapshot = vm.snapshotState();
         _giveTokens(address(sky), 1_000 * WAD * 24_000);
         sky.approve(address(chief), 1_000 * WAD * 24_000);
         chief.lock(1_000 * WAD * 24_000);
         chief.vote(new address[](1));
         vm.expectRevert("Chief/less-than-threshold"); chief.launch();
-        vm.revertTo(snapshot);
+        vm.revertToStateAndDelete(snapshot);
 
         // Setup: lock enough SKY into new chief
         _giveTokens(address(sky), 100_000 * WAD * 24_000);
@@ -1739,11 +1739,11 @@ contract DssSpellTest is DssSpellTestBase {
                 vm.prank(newUrn.owner); newEngine.hope(newUrn.owner, newUrn.index, address(migrator));
             }
 
-            uint256 snapshotId = vm.snapshot();
+            uint256 snapshotId = vm.snapshotState();
             vm.prank(pauseProxy); vat.file(oldIlk, "line", 1);
             vm.expectRevert("LockstakeMigrator/old-ilk-line-not-zero");
             vm.prank(caller); migrator.migrate(oldUrn.owner, oldUrn.index, newUrn.owner, newUrn.index, 5);
-            vm.revertTo(snapshotId);
+            vm.revertToStateAndDelete(snapshotId);
         }
 
         uint256 oldIlkRate = _rate(oldIlk);
