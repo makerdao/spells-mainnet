@@ -18,5 +18,3 @@ libraries = [
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"
 
-[etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY}" }
