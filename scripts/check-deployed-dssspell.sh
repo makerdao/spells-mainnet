@@ -77,7 +77,7 @@ fi
 # Check verified spell linked library
 library_address=$(echo "$verified_spell_info" | jq -r '.Library | split(":") | .[1]')
 checksum_library_address=$(cast --to-checksum-address "$library_address")
-if [ "$checksum_library_address" == "$(cat foundry.toml | sed -nr 's/.*:DssExecLib:(0x[0-9a-fA-F]{40}).*/\1/p')" ]; then
+if [ "$checksum_library_address" == "$(cat foundry.toml | sed -nr 's/:DssExecLib:(0x[0-9a-fA-F]{40}).*/\1/p')" ]; then
   success_check "DssSpell library matches hardcoded address in foundry.toml."
 else
   error_check "DssSpell library does not match hardcoded address."

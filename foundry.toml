@@ -8,7 +8,8 @@ fs_permissions = [
 ]
 solc_version = "0.8.16"
 optimizer = false
-optimzier_runs = 1 # Optimize for deployment size if the optimizer enabled
+# If the optimizer is enabled, optimize for deployment size by using low runs
+optimzier_runs = 1
 via_ir = false
 libraries = [
     "./lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x0496AbA1f2CD4038cC486993f5CCF97851AE26d3"
