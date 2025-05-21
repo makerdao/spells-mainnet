@@ -7,17 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
 
-      - name: Install Dependencies
-        run: git submodule update --init --recursive
+      - name: Show Forge version
+        run: |
+          forge --version
 
-      - name: Run tests
-        run: make test
+      - name: Run Forge tests
+        run: |
+          make test
+        id: test
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
