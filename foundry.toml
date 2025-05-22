@@ -7,6 +7,7 @@ fs_permissions = [
     { access = "read", path = "./out/ArbitrumDomain.sol/ArbSysOverride.json"}
 ]
 solc_version = "0.8.16"
+evm_version  = "cancun"
 optimizer = false
 # If the optimizer is enabled, optimize for deployment size by using low runs
 optimzier_runs = 1
