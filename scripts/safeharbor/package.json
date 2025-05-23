@@ -1,0 +1,31 @@
+{
+    "name": "safeharbor",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Safe Harbor contract interaction scripts",
+    "main": "index.js",
+    "scripts": {
+        "start": "node .",
+        "generate": "node index.js",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    },
+    "dependencies": {
+        "csv-parse": "^5.5.0",
+        "ethers": "^5.7.2",
+        "node-fetch": "^3.3.2"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.23.9",
+        "@babel/preset-env": "^7.23.9",
+        "jest": "^29.7.0"
+    },
+    "jest": {
+        "transform": {},
+        "moduleNameMapper": {
+            "^(\\.{1,2}/.*)\\.js$": "$1"
+        },
+        "setupFilesAfterEnv": [
+            "./jest.setup.js"
+        ]
+    }
+}

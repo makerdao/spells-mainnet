@@ -1,0 +1,35 @@
+{
+  "agreementURI": "Agreement URI",
+  "bountyTerms": {
+    "bountyCapUSD": 10000000,
+    "bountyPercentage": 10,
+    "diligenceRequirements": "KYC and Sanctions Screening. Sky and Stars require all eligible whitehats to undergo Know Your Customer (KYC) verification and be screened against global sanctions lists, including OFAC, UK, and EU regulations. This ensures that bounty recipients meet legal and regulatory standards before qualifying for payment. The verification process shall be conducted by a trusted third-party provider at Sky and Stars discretion, and all data is deleted, if successful, within 30 days post-verification.",
+    "identity": 2,
+    "retainable": false
+  },
+  "chains": [
+    {
+      "accounts": [
+        {
+          "accountAddress": "0x5ef30b9986345249bc32d8928B7ee64DE9435E39",
+          "childContractScope": 0,
+          "signature": "0x"
+        },
+        {
+          "accountAddress": "0x373238337Bfe1146fb49989fc222523f83081dDb",
+          "childContractScope": 0,
+          "signature": "0x"
+        }
+      ],
+      "assetRecoveryAddress": "0x0000000000000000000000000000000000000022",
+      "id": 1
+    }
+  ],
+  "contactDetails": [
+    {
+      "name": "Contact Name",
+      "contact": "Contact@Info"
+    }
+  ],
+  "protocolName": "Sky"
+}
