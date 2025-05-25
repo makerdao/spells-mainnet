@@ -735,8 +735,7 @@ contract DssSpellTestBase is Config, DssTest {
         );
     }
 
-    // TODO after 2025-05-15: rename into `_vote`
-    function _voteWithSky(address spell_) internal {
+    function _vote(address spell_) internal {
         if (chief.hat() != spell_) {
             _giveTokens(address(sky), 999999999999 ether);
             sky.approve(address(chief), type(uint256).max);
@@ -749,37 +748,12 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(chief.hat(), spell_, "TestError/spell-is-not-hat");
     }
 
-    // TODO after 2025-05-15: remove
-    function _vote(address spell_) internal {
-        if (chiefLegacy.hat() != spell_) {
-            _giveTokens(address(mkr), 999999999999 ether);
-            mkr.approve(address(chiefLegacy), type(uint256).max);
-            chiefLegacy.lock(999999999999 ether);
-            address[] memory slate = new address[](1);
-            slate[0] = spell_;
-            chiefLegacy.vote(slate);
-            chiefLegacy.lift(spell_);
-        }
-        assertEq(chiefLegacy.hat(), spell_, "TestError/spell-is-not-hat");
-    }
-
     function _scheduleWaitAndCast(address spell_) internal {
         DssSpell(spell_).schedule();
 
         vm.warp(DssSpell(spell_).nextCastTime());
 
         DssSpell(spell_).cast();
-    }
-
-    // TODO after 2025-05-15: remove new chief bootstrapping function below
-    function _activateNewChief() internal {
-        if (chief.live() == 0 && chief.hat() == address(0)) {
-            _giveTokens(address(sky), 999999999999 ether);
-            sky.approve(address(chief), type(uint256).max);
-            chief.lock(999999999999 ether);
-            chief.vote(new address[](1));
-            chief.launch();
-        }
     }
 
     function _checkSystemValues(SystemValues storage values) internal view {
@@ -1619,9 +1593,6 @@ contract DssSpellTestBase is Config, DssTest {
             _giveTokens(address(sky), lockAmt);
         }
 
-        // TODO after 2025-05-15: remove mocked `line`
-        _setIlkLine(p.ilk, drawAmt * RAD);
-
         uint256 snapshot = vm.snapshotState();
         // Check locking and freeing Sky
         {
@@ -1753,9 +1724,6 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(GemAbstract(p.lssky).balanceOf(p.farm), initialBalances.farmLssky, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-farm-lsgem-balance");
             assertEq(GemAbstract(p.farm).balanceOf(urn), 0, "checkLockstakeTake/AfterLockDraw/withoutStaking/invalid-urn-farm-balance");
         }
-
-        // TODO after 2025-05-15: remove mocked `stopped` value
-        vm.prank(pauseProxy); LockstakeClipperLike(p.clip).file("stopped", uint256(0));
 
         _setIlkMat(p.ilk, 100_000 * RAY);
         spotter.poke(p.ilk);
@@ -2159,7 +2127,6 @@ contract DssSpellTestBase is Config, DssTest {
         // LitePsmMom can halt litePSM
         assertEq(litePsm.wards(address(litePsmMom)), 1, _concat("checkLitePsmIlkIntegration/litePsmMom-not-ward-", p.ilk));
 
-        _activateNewChief();
         // Gives the hat to the test contract, so it can invoke LitePsmMom
         stdstore
             .target(address(chief))
@@ -3555,7 +3522,6 @@ contract DssSpellTestBase is Config, DssTest {
         {
             // The check for the configured value is already done in `_checkSystemValues()`
             assertLt(split.hop(), type(uint256).max, "TestError/SplitterMom/already-stopped");
-            _activateNewChief();
             vm.prank(chief.hat());
             splitterMom.stop();
             assertEq(split.hop(), type(uint256).max, "TestError/SplitterMom/not-stopped");
