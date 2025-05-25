@@ -52,6 +52,20 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface DssVestLike {
+    function unpaid(uint256 id ) external view returns (uint256);
+}
+
+interface VestedRewardsDistributionLike {
+    function lastDistributedAt() external view returns (uint256);
+    function vestId() external view returns (uint256);
+}
+
+interface VestedRewardsDistributionJobLike {
+    function has(address) external view returns (bool);
+    function intervals(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -594,50 +608,37 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestUsds(streams);
     }
 
-    function testVestSKY() public skipped { // add the `skipped` modifier to skip
+    function testVestSKY() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 FEB_01_2025 = 1738368000;
-        uint256 DEC_31_2025 = 1767225599;
+        // uint256 FEB_01_2025 = 1738368000;
 
-        // For each new stream, provide Stream object
-        // and initialize the array with the corrent number of new streams
-        VestStream[] memory streams = new VestStream[](3);
-        streams[0] = VestStream({
-            id:  1,
-            usr: wallets.addr("VOTEWIZARD"),
-            bgn: FEB_01_2025,
-            clf: FEB_01_2025,
-            fin: DEC_31_2025,
-            tau: 334 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 4_752_000 * WAD,
-            rxd: 0
-        });
-        streams[1] = VestStream({
-            id:  2,
-            usr: wallets.addr("JANSKY"),
-            bgn: FEB_01_2025,
-            clf: FEB_01_2025,
-            fin: DEC_31_2025,
-            tau: 334 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 4_752_000 * WAD,
-            rxd: 0
-        });
-        streams[2] = VestStream({
-            id:  3,
-            usr: wallets.addr("ECOSYSTEM_FACILITATOR"),
-            bgn: FEB_01_2025,
-            clf: FEB_01_2025,
-            fin: DEC_31_2025,
-            tau: 334 days - 1,
-            mgr: address(0),
-            res: 1,
-            tot: 4_752_000 * WAD,
-            rxd: 0
-        });
+        VestStream[] memory streams = new VestStream[](1);
+
+        // This stream is configured in relative to the spell casting time.
+        {
+
+            uint256 before = vm.snapshotState();
+            _vote(address(spell));
+            spell.schedule();
+            vm.warp(spell.nextCastTime());
+
+            // For each new stream, provide Stream object
+            // and initialize the array with the corrent number of new streams
+            streams[0] = VestStream({
+                id:  4,
+                usr: addr.addr("REWARDS_DIST_USDS_SKY"),
+                bgn: block.timestamp,
+                clf: block.timestamp,
+                fin: block.timestamp + uint256(182 days),
+                tau: 182 days,
+                mgr: address(0),
+                res: 1,
+                tot: 137_500_000 * WAD,
+                rxd: 0
+            });
+
+            vm.revertToStateAndDelete(before);
+        }
 
         _checkVestSKY(streams);
     }
@@ -751,9 +752,9 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankSKYmint() public skipped { // add the `skipped` modifier to skip
+    function testYankSKYmint() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
-        uint256 SEP_10_2025 = 1757505622;
+        uint256 OCT_20_2025 = 1760968859;
 
         // For each yanked stream, provide Yank object with:
         //   the stream id
@@ -761,7 +762,7 @@ contract DssSpellTest is DssSpellTestBase {
         //   the planned fin of the stream (via variable defined above)
         // Initialize the array with the corrent number of yanks
         Yank[1] memory yanks = [
-            Yank(1, addr.addr("REWARDS_DIST_USDS_SKY"), SEP_10_2025)
+            Yank(2, chainLog.getAddress("REWARDS_DIST_USDS_SKY"), OCT_20_2025)
         ];
 
         // Test stream id matches `addr` and `fin`
@@ -1243,4 +1244,65 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    function testLockstakeMigratorDeauthInVat() public {
+        address LOCKSTAKE_MIGRATOR = chainLog.getAddress("LOCKSTAKE_MIGRATOR");
+        assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 1, "TestError/lockstake-not-ward-in-vat");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 0, "TestError/lockstake-still-ward-in-vat");
+    }
+
+    function testRewardsUsdsSkyDistribution() public {
+        uint256 vestId = 2;
+        DssVestLike vest = DssVestLike(chainLog.getAddress("MCD_VEST_SKY"));
+        VestedRewardsDistributionLike distribution = VestedRewardsDistributionLike(chainLog.getAddress("REWARDS_DIST_USDS_SKY"));
+
+        assertGt(vest.unpaid(vestId), 0, "TestError/no-rewards-to-distribute");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(vest.unpaid(vestId), 0, "TestError/rewards-not-distributed");
+        assertEq(distribution.lastDistributedAt(), block.timestamp, "TestError/rewards-not-distributed");
+    }
+
+    function testVestedRewardsDistributionAllowance() public {
+        address vestTreasury = chainLog.getAddress("MCD_VEST_SKY_TREASURY");
+        uint256 previousAllowance = sky.allowance(pauseProxy, vestTreasury);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(sky.allowance(pauseProxy, vestTreasury), previousAllowance + (137_500_000 * WAD), "TestError/invalid-allowance");
+    }
+
+    function testVestedRewardsDistributionSetup() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(VestedRewardsDistributionLike(chainLog.getAddress("REWARDS_DIST_USDS_SKY")).vestId(), 4);
+    }
+
+    function testCronRewardsJobs() public {
+        VestedRewardsDistributionJobLike job = VestedRewardsDistributionJobLike(chainLog.getAddress("CRON_REWARDS_DIST_JOB"));
+        address prevDistributor = chainLog.getAddress("REWARDS_DIST_USDS_SKY");
+        address newDistributor = 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F;
+
+        assertTrue(job.has(prevDistributor), "TestError/distributor-does-not-have-job");
+        assertFalse(job.has(newDistributor), "TestError/new-distributor-already-has-job");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertFalse(job.has(prevDistributor), "TestError/distributor-job-not-removed");
+        assertTrue(job.has(newDistributor), "TestError/new-distributor-job-not-added");
+        assertEq(job.intervals(newDistributor), 601200, "TestError/new-distributor-invalid-interval");
+    }
 }

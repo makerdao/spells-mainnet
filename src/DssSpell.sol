@@ -20,6 +20,28 @@ import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import { MCD, DssInstance } from "dss-test/MCD.sol";
 
+import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
+import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
+
+interface PauseLike {
+    function setDelay(uint256) external;
+}
+
+interface VestedRewardsDistributionLike {
+    function distribute() external;
+}
+
+interface VestedRewardsDistributionJobLike {
+    function rem(address) external;
+    function set(address, uint256) external;
+}
+
+interface DssVestLike {
+    function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
+    // function file(bytes32, uint256) external;
+    function restrict(uint256) external;
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -43,51 +65,86 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
+    // ---------- Math ----------
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 internal constant WAD = 10 ** 18;
+
+    // ---------- Contracts ----------
+    GemAbstract internal immutable SKY = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable MCD_SPLIT = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable MCD_PAUSE = DssExecLib.getChangelogAddress("MCD_PAUSE");
+    address internal immutable MCD_VAT = DssExecLib.getChangelogAddress("MCD_VAT");
+    address internal immutable LOCKSTAKE_MIGRATOR = DssExecLib.getChangelogAddress("LOCKSTAKE_MIGRATOR");
+    address internal immutable MCD_VEST_SKY = DssExecLib.getChangelogAddress("MCD_VEST_SKY");
+    address internal immutable REWARDS_DIST_USDS_SKY = DssExecLib.getChangelogAddress("REWARDS_DIST_USDS_SKY");
+    address internal immutable MCD_VEST_SKY_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_SKY_TREASURY");
+    address internal immutable CRON_REWARDS_DIST_JOB = DssExecLib.getChangelogAddress("CRON_REWARDS_DIST_JOB");
+
+    address constant REWARDS_DIST_USDS_SKY_NEW = 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F;
+
     function actions() public override {
         // ----- MKR to SKY Upgrade Phase Two -----
 
-        // ----- Activate USDS rewards on the LSEV2-SKY-A contract -----
-
+        // Activate USDS rewards on the LSEV2-SKY-A contract
         // Reduce splitter.burn by 50 percentage points from 100% to 50%
+        DssExecLib.setValue(MCD_SPLIT, "burn", WAD / 2); // Note: 100% == 1 WAD
 
-        // ----- LSEV2-SKY-A AutoLine Addition -----
+        // LSEV2-SKY-A AutoLine Addition
         // Add LSEV2-SKY-A to the AutoLine
-
         // Set line to 50,000,000 USDS
-
         // Set gap to 25,000,000 USDS
-
         // Set ttl to 86,400 seconds
+        DssExecLib.setIlkAutoLineParameters("LSEV2-SKY-A", 50 * MILLION, 25 * MILLION, 86_400);
 
-        // ----- Adjust GSM Pause Delay -----
-
+        // Adjust GSM Pause Delay
         // Reduce GSM Pause Delay by 24 hours from 48 hours to 24 hours
+        PauseLike(MCD_PAUSE).setDelay(24 hours);
 
-        // ----- Revoke Migrator Authority Over Vat Contract -----
-
+        // Revoke Migrator Authority Over Vat Contract
         // Revoke LOCKSTAKE_MIGRATOR's authority over the vat
+        DssExecLib.deauthorize(MCD_VAT, LOCKSTAKE_MIGRATOR);
 
-        // ----- Change Source of SKY For USDS -> SKY Farm -----
-
+        // Change Source of SKY For USDS -> SKY Farm
         // yank MCD_VEST_SKY stream ID 2
+        VestAbstract(MCD_VEST_SKY).yank(2);
 
         // Claim the remaining tokens from the old DssVest by calling VestedRewardsDistribution.distribute() on REWARDS_DIST_USDS_SKY
+        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
 
         // Set cap on MCD_VEST_SKY_TREASURY to `151,250,000 * WAD / 182 days`
+        DssExecLib.setValue(MCD_VEST_SKY_TREASURY, "cap", 151_250_000 * WAD / uint256(182 days));
 
         // Increase sky.approve(MCD_VEST_SKY_TREASURY, ...) by 137,500,000 SKY to account for new vesting stream
+        uint256 currentAllowance = SKY.allowance(address(this), MCD_VEST_SKY_TREASURY);
+        SKY.approve(MCD_VEST_SKY_TREASURY, currentAllowance + 137_500_000 * WAD);
 
         // Remove old REWARDS_USDS_SKY_DIST from the keeper job by calling `CRON_REWARDS_DIST_JOB.rem()` with the current REWARDS_USDS_SKY_DIST
+        VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).rem(REWARDS_DIST_USDS_SKY);
 
         // Update chainlog value for REWARDS_USDS_SKY_DIST to the new VestedRewardsDistribution contract at 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F
+        DssExecLib.setChangelogAddress("REWARDS_DIST_USDS_SKY", REWARDS_DIST_USDS_SKY_NEW);
+
+        // Note: Bump chainlog version
+        DssExecLib.setChangelogVersion("1.20.1");
 
         // Add new REWARDS_USDS_SKY_DIST to the keeper job by calling `CRON_REWARDS_DIST_JOB.set()` with the new REWARDS_USDS_SKY_DIST
+        VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).set(REWARDS_DIST_USDS_SKY_NEW, 601200); // TODO: Confirm frequency
 
         // Deploy new MCD_VEST_SKY_TREASURY stream with the following parameters: usr(REWARDS_USDS_SKY_DIST), tot(137,500,000 SKY), bgn(block.timestamp), tau(182 days), cliff: none, manager, none
+        uint256 vestId = DssVestLike(MCD_VEST_SKY_TREASURY).create(
+            REWARDS_DIST_USDS_SKY_NEW,
+            137_500_000 * WAD,
+            block.timestamp,
+            182 days,
+            0,
+            address(0)
+        );
 
         // Restrict the new stream, res: 1
+        DssVestLike(MCD_VEST_SKY_TREASURY).restrict(vestId);
 
         // file the id of the newly created stream to the new REWARDS_USDS_SKY_DIST contract
+        DssExecLib.setValue(REWARDS_DIST_USDS_SKY_NEW, "vestId", vestId);
 
         // ----- Init Unichain Native Bridge -----
 

@@ -129,7 +129,7 @@ contract Config {
         // Values for all system configuration changes
         //
         afterSpell.line_offset            = 700 * MILLION;                              // Offset between the global line against the sum of local lines
-        afterSpell.pause_delay            = 48 hours;                                   // In seconds
+        afterSpell.pause_delay            = 24 hours;                                   // In seconds
         afterSpell.vow_wait               = 156 hours;                                  // In seconds
         afterSpell.vow_dump               = 250;                                        // In whole Dai units
         afterSpell.vow_sump               = type(uint256).max;                          // In whole Dai units
@@ -137,7 +137,7 @@ contract Config {
         afterSpell.vow_hump_min           = 70 * MILLION;                               // In whole Dai units
         afterSpell.vow_hump_max           = 70 * MILLION;                               // In whole Dai units
         afterSpell.split_hop              = 1728 seconds;                               // In seconds
-        afterSpell.split_burn             = 100_00;                                     // In basis points
+        afterSpell.split_burn             = 50_00;                                      // In basis points
         afterSpell.split_farm             = "REWARDS_LSSKY_USDS";                       // Farm chainlog key
         afterSpell.flap_want              = 9800;                                       // In basis points
         afterSpell.dog_Hole               = 150 * MILLION;                              // In whole Dai units
@@ -153,7 +153,7 @@ contract Config {
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;                // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;                     // In WAD MKR per second
         afterSpell.vest_usds_cap          = 46_200 * WAD / 30 days;                     // In WAD USDS per second
-        afterSpell.vest_sky_cap           = 475_200 * WAD / 30 days;                    // In WAD SKY per second
+        afterSpell.vest_sky_cap           = 151_250_000 * WAD / 182 days;                // In WAD SKY per second
         afterSpell.vest_sky_mint_cap      = 176 * MILLION * WAD / 182 days;             // In WAD SKY per second
         afterSpell.SP_tau                 = 57_600 seconds;                             // In seconds
         afterSpell.SP_bud                 = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309; // Address of SPBEAM Bud
@@ -165,7 +165,7 @@ contract Config {
         afterSpell.SP_dsr_step            = 4_00;                                       // In basis points
         afterSpell.sky_mkr_rate           = 24_000;                                     // In whole SKY/MKR units
         afterSpell.ilk_count              = 72;                                         // Num expected in system
-        afterSpell.chainlog_version       = "1.20.0";                                   // String expected in system
+        afterSpell.chainlog_version       = "1.20.1";                                   // String expected in system
 
         //
         // Values for all collateral
@@ -2144,10 +2144,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["LSEV2-SKY-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      50 * MILLION,
+            aL_gap:       25 * MILLION,
+            aL_ttl:       24 hours,
             line:         0,
             dust:         30_000,
             pct:          20_00,
