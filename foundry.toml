@@ -6,8 +6,15 @@ fs_permissions = [
     { access = "read", path = "./lib/dss-test/script/input/"},
     { access = "read", path = "./out/ArbitrumDomain.sol/ArbSysOverride.json"}
 ]
+solc_version = "0.8.16"
+evm_version  = "cancun"
+optimizer = false
+# If the optimizer is enabled, optimize for deployment size by using low runs
+optimzier_runs = 1
+via_ir = false
+libraries = [
+    "./lib/dss-exec-lib/src/DssExecLib.sol:DssExecLib:0x8De6DDbCd5053d32292AAA0D2105A32d108484a6"
+]
 
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"
-
-# See more config options https://github.com/gakonst/foundry/tree/master/config

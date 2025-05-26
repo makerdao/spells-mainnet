@@ -1,305 +1,323 @@
 #! /usr/bin/env python3
 
-import os, sys, subprocess, time, re, json, requests
-from datetime import datetime
+import os, sys, subprocess
+import re
+import json
+from typing import Dict, Any, Tuple, Optional
 
-api_key = ''
-try:
-    api_key = os.environ['ETHERSCAN_API_KEY']
-except KeyError:
-    print('''  You need an Etherscan Api Key to verify contracts.
-  Create one at https://etherscan.io/myapikey\n
-  Then export it with `export ETHERSCAN_API_KEY=xxxxxxxx'
-''')
-    exit()
+# Constants
+LIBRARY_NAME = 'DssExecLib'
+LIBRARY_PATH = 'lib/dss-exec-lib/src/DssExecLib.sol'
+SOURCE_FILE_PATH = 'src/DssSpell.sol'
 
-document = ''
-try:
-    document = open('out/dapp.sol.json')
-except FileNotFoundError:
-    exit('run dapp build first')
-try:
-    content = json.load(document)
-except json.decoder.JSONDecodeError:
-    exit('run dapp build again')
-
-if len(sys.argv) not in [3, 4]:
-    print('''usage:\n
-./verify.py <contractname> <address> [constructorArgs]
-''')
-    exit()
-
-contract_name = sys.argv[1]
-contract_address = sys.argv[2]
-print('Attempting to verify contract {0} at address {1} ...'.format(
-    contract_name,
-    contract_address
-))
-
-if len(contract_address) !=  42:
-    exit('malformed address')
-constructor_arguments = ''
-if len(sys.argv) == 4:
-    constructor_arguments = sys.argv[3]
-
-contract_path = ''
-for path in content['contracts'].keys():
+def get_env_var(var_name: str, error_message: str) -> str:
+    """
+    Get environment variable with error handling.
+    """
     try:
-        content['contracts'][path][contract_name]
-        contract_path = path
+        return os.environ[var_name]
     except KeyError:
-        continue
-if contract_path == '':
-    exit('contract name not found.')
+        print(f"  {error_message}", file=sys.stderr)
+        sys.exit(1)
 
-print('Obtaining chain... ')
-cast_chain = subprocess.run(['cast', 'chain'], capture_output=True)
-chain = cast_chain.stdout.decode('ascii').replace('\n', '')
-print(chain)
+def parse_command_line_args() -> Tuple[str, str, str]:
+    """
+    Parse command line arguments.
+    """
+    if len(sys.argv) not in [3, 4]:
+        print("""usage:\n
+./verify.py <contractname> <address> [constructorArgs]
+""", file=sys.stderr)
+        sys.exit(1)
 
-text_metadata = content['contracts'][contract_path][contract_name]['metadata']
-metadata = json.loads(text_metadata)
-compiler_version = 'v' + metadata['compiler']['version']
-evm_version = metadata['settings']['evmVersion']
-optimizer_enabled = metadata['settings']['optimizer']['enabled']
-optimizer_runs = metadata['settings']['optimizer']['runs']
-license_name = metadata['sources'][contract_path]['license']
-license_numbers = {
-    'GPL-3.0-or-later': 5,
-    'AGPL-3.0-or-later': 13
-}
-license_number = license_numbers[license_name]
+    contract_name = sys.argv[1]
+    contract_address = sys.argv[2]
 
-module = 'contract'
-action = 'verifysourcecode'
-code_format = 'solidity-single-file'
+    if len(contract_address) != 42:
+        sys.exit('Malformed address')
 
-flatten_output_path = 'out/flat.sol'
-subprocess.run([
-    'forge',
-    'flatten',
-    contract_path,
-    '--output',
-    flatten_output_path
-])
-with open(flatten_output_path, 'r', encoding='utf-8') as code_file:
-    code = code_file.read()
+    constructor_args = ''
+    if len(sys.argv) == 4:
+        constructor_args = sys.argv[3]
 
-def get_block(signature, code, with_frame=False):
-    block_and_tail = code[code.find(signature) :]
-    start = float('inf')
-    level = 0
-    for i, char in enumerate(block_and_tail):
-        if char == '{':
-            if i < start:
-                start = i + 1
-            level += 1
-        elif char == '}':
-            level -= 1
-        if i >= start and level == 0:
-            if with_frame:
-                return block_and_tail[: i+1]
+    return contract_name, contract_address, constructor_args
+
+def get_chain_id() -> str:
+    """
+    Get the current chain ID.
+    """
+    print('Obtaining chain ID... ')
+    result = subprocess.run(['cast', 'chain-id'], capture_output=True)
+    chain_id = result.stdout.decode('utf-8').strip()
+    print(f"CHAIN_ID: {chain_id}")
+    return chain_id
+
+def get_library_address() -> str:
+    """
+    Find the DssExecLib address from either DssExecLib.address file or foundry.toml.
+    Returns an empty string if no library address is found.
+    """
+    library_address = ''
+
+    # First try to read from foundry.toml libraries
+    if os.path.exists('foundry.toml'):
+        try:
+            with open('foundry.toml', 'r') as f:
+                config = f.read()
+
+            result = re.search(r':DssExecLib:(0x[0-9a-fA-F]{40})', config)
+            if result:
+                library_address = result.group(1)
+                print(
+                    f'Using library {LIBRARY_NAME} at address {library_address}')
+                return library_address
             else:
-                return block_and_tail[start : i].strip()
-    raise ValueError('not found: ' + signature)
+                print('No DssExecLib configured in foundry.toml', file=sys.stderr)
+        except Exception as e:
+            print(f'Error reading foundry.toml: {str(e)}', file=sys.stderr)
+    else:
+        print('No foundry.toml found', file=sys.stderr)
 
-def remove_line_comments(line):
-    no_inline = re.sub('//.*', '', line)
-    no_block_start = re.sub('/\*.*', '', no_inline)
-    no_block_end = re.sub('.*\*/', '', no_block_start)
-    return no_block_end
+    # If it cannot be found, try DssExecLib.address
+    if os.path.exists('DssExecLib.address'):
+        try:
+            print(f'Trying to read DssExecLib.address...', file=sys.stderr)
+            with open('DssExecLib.address', 'r') as f:
+                library_address = f.read().strip()
+            print(f'Using library {LIBRARY_NAME} at address {library_address}')
+            return library_address
+        except Exception as e:
+            print(
+                f'Error reading DssExecLib.address: {str(e)}', file=sys.stderr)
 
-def remove_comments(original_block):
-    original_lines = original_block.split('\n')
-    lines = []
-    in_comment = False
-    for original_line in original_lines:
-        line = remove_line_comments(original_line)
-        if not in_comment and line.strip() != '':
-            lines.append(line)
-        if '/*' in original_line:
-            in_comment = True
-        if '*/' in original_line:
-            in_comment = False
-    block = '\n'.join(lines)
-    return block
+    # If we get here, no library address was found
+    print('WARNING: Assuming this contract uses no libraries', file=sys.stderr)
+    return ''
 
-lines = code.split('\n')
-in_comment = False
-libraries = {}
-
-for original_line in lines:
-    line = remove_line_comments(original_line)
-    if not in_comment and 'library' in line:
-        signature = re.sub('{.*', '', line)
-        block = get_block(signature, code)
-        libraries[signature] = block
-    if '/*' in original_line:
-        in_comment = True
-    if '*/' in original_line:
-        in_comment = False
-
-def select(library_name, block, external_code):
-    lines = block.split('\n')
-    lines.reverse()
-    for line in lines:
-        if 'function' in line:
-            signature = re.sub('\(.*', '', line)
-            name = re.sub('function', '', signature).strip()
-            full_name = library_name + '.' + name
-            if (external_code.count(full_name) == 0
-                and block.count(name) == block.count(signature)):
-                function_block = get_block(signature, block, with_frame=True)
-                block = block.replace(function_block + '\n', '')
-    return block
-
-def get_warning(library_name):
-    return '''/* WARNING
-
-The following library code acts as an interface to the actual {}
-library, which can be found in its own deployed contract. Only trust the actual
-library's implementation.
-
-    */
-
-'''.format(library_name)
-
-def get_stubs(block):
-    original_lines = block.split('\n')
-    lines = []
-    level = 0
-    for line in original_lines:
-        if level == 0:
-            difference = line.count('{') - line.count('}')
-            lines.append(line + '}' * difference)
-        level += line.count('{')
-        level -= line.count('}')
-    return '\n'.join(lines)
-
-for signature, block in libraries.items():
-    external_code = remove_comments(code.replace(block, ''))
-    library_name = re.sub('library ', '', signature).strip()
-    no_comments = remove_comments(block)
-    selected_pre = no_comments
-    selected_post = select(library_name, selected_pre, external_code)
-    while len(selected_post) < len(selected_pre):
-        selected_pre = selected_post
-        selected_post = select(library_name, selected_pre, external_code)
-    stubs = get_stubs(selected_post)
-    new_block = get_warning(library_name) + stubs
-    code = code.replace(block, new_block)
-
-def get_library_info():
+def get_action_address(spell_address: str) -> Optional[str]:
+    """
+    Get the action contract address from the spell contract.
+    """
     try:
-        library_name = "DssExecLib"
-        library_address = open('./DssExecLib.address').read()
-        return library_name, library_address
+        result = subprocess.run(
+            ['cast', 'call', spell_address, 'action()(address)'],
+            capture_output=True,
+            env=os.environ | {
+                'ETH_GAS_PRICE': '0',
+                'ETH_PRIO_FEE': '0'
+            }
+        )
+        return result.stdout.decode('utf-8').strip()
+    except Exception as e:
+        print(f'Error getting action address: {str(e)}', file=sys.stderr)
+        return None
+
+def get_contract_metadata(output_path: str) -> Dict[str, Any]:
+    """
+    Extract contract metadata from the compiled output.
+    """
+    try:
+        with open(output_path, 'r') as f:
+            content = json.load(f)
+
+        metadata = content['metadata']
+
+        return {
+            'compiler_version': 'v' + metadata['compiler']['version'],
+            'evm_version': metadata['settings']['evmVersion'],
+            'optimizer_enabled': metadata['settings']['optimizer']['enabled'],
+            'optimizer_runs': metadata['settings']['optimizer']['runs'],
+        }
     except FileNotFoundError:
-        raise ValueError('No Makefile found')
-
-library_name = ''
-library_address = ''
-
-try:
-    library_name, library_address = get_library_info()
-except ValueError as e:
-    print(e)
-    print('Assuming this contract uses no libraries')
-
-data = {
-    'apikey': api_key,
-    'module': module,
-    'action': action,
-    'contractaddress': contract_address,
-    'sourceCode': code,
-    'codeFormat': code_format,
-    'contractName': contract_name,
-    'compilerversion': compiler_version,
-    'optimizationUsed': '1' if optimizer_enabled else '0',
-    'runs': optimizer_runs,
-    'constructorArguements': constructor_arguments,
-    'evmversion': evm_version,
-    'licenseType': license_number,
-    'libraryname1': library_name,
-    'libraryaddress1': library_address,
-}
-
-if chain in ['mainnet', 'ethlive']:
-    chain_separator = False
-    chain_id = ''
-else:
-    chain_separator = True
-    chain_id = chain
-
-url = 'https://api{0}{1}.etherscan.io/api'.format(
-    '-' if chain_separator else '',
-    chain_id
-)
-
-headers = {
-    'User-Agent': ''
-}
-
-def send():
-    print('Sending verification request...')
-    verify = requests.post(url, headers = headers, data = data)
-    verify_response = {}
-    try:
-        verify_response = json.loads(verify.text)
+        raise Exception('Run forge build first')
     except json.decoder.JSONDecodeError:
-        print(verify.text)
-        exit('Error: Etherscan responded with invalid JSON.')
-    return verify_response
+        raise Exception('Run forge build again')
+    except KeyError as e:
+        raise Exception(f'Missing metadata field: {e}')
 
-verify_response = send()
+def verify_contract(
+    contract_name: str,
+    contract_address: str,
+    input_path: str,
+    output_path: str,
+    chain_id: str,
+    library_address: str,
+    verifier: str
+) -> bool:
+    """
+    Verify a contract on Etherscan.
+    """
+    print(f'\nVerifying {contract_name} at {contract_address} on {verifier}...')
 
-while 'locate' in verify_response['result'].lower():
-    print(verify_response['result'])
-    print('Waiting for 15 seconds for the network to update...')
-    time.sleep(15)
-    verify_response = send()
+    # Construct contract format
+    contract = input_path + ':' + contract_name
 
-if verify_response['status'] != '1' or verify_response['message'] != 'OK':
-    print('Error: ' + verify_response['result'])
-    exit()
+    # Construct library format
+    library_option = LIBRARY_PATH + ':' + LIBRARY_NAME + ':' + library_address
 
-print('Sent verification request with guid ' + verify_response['result'])
+    # Get contract metadata
+    metadata = get_contract_metadata(output_path)
+    compiler = metadata['compiler_version']
+    runs = str(metadata['optimizer_runs'])
 
-guid = verify_response['result']
+    #Verify on etherscan, this will automatically verify the contract on blocksout
+    response = subprocess.run([
+        'forge',
+        'verify-contract',
+        contract_address,
+        contract,
+        '--libraries', library_option,
+        '--compiler-version', compiler,
+        '--optimizer-runs', runs,
+        '--chain', chain_id,
+        '--verifier', verifier,
+        '--force',
+        "--json",
+        '--watch'
+    ])
 
-check_response = {}
+    if response == None:
+            print ("Error during verification")
+            return False
+    else:
+        if response.returncode == 0:
+            return True
+        else:
+            return False
 
-while check_response == {} or 'pending' in check_response['result'].lower():
 
-    if check_response != {}:
-        print(check_response['result'])
-        print('Waiting for 15 seconds for Etherscan to process the request...')
-        time.sleep(15)
-
-    check = requests.post(url, headers = headers, data = {
-        'apikey': api_key,
-        'module': module,
-        'action': 'checkverifystatus',
-        'guid': guid,
-    })
-
+def main():
+    """
+    Main entry point for the script.
+    """
     try:
-        check_response = json.loads(check.text)
-    except json.decoder.JSONDecodeError:
-        print(check.text)
-        exit('Error: Etherscan responded with invalid JSON')
+        # Get environment variables
+        api_key = get_env_var(
+            'ETHERSCAN_API_KEY',
+            "You need an Etherscan API key to verify contracts.\n"
+            "Create one at https://etherscan.io/myapikey\n"
+            "Then export it with `export ETHERSCAN_API_KEY=xxxxxxxx'"
+        )
 
-if check_response['status'] != '1' or check_response['message'] != 'OK':
-    print('Error: ' + check_response['result'])
-    log_name = 'verify-{}.log'.format(datetime.now().timestamp())
-    log = open(log_name, 'w')
-    log.write(code)
-    log.close()
-    print('log written to {}'.format(log_name))
-    exit()
+        rpc_url = get_env_var(
+            'ETH_RPC_URL',
+            "You need a valid ETH_RPC_URL.\n"
+            "Get a public one at https://chainlist.org/ or provide your own\n"
+            "Then export it with `export ETH_RPC_URL=https://....'"
+        )
 
-print('Contract verified at https://{0}{1}etherscan.io/address/{2}#code'.format(
-    chain_id,
-    '.' if chain_separator else '',
-    contract_address
-))
+        # Parse command line arguments
+        spell_name, spell_address, constructor_args = parse_command_line_args()
+
+        # Get chain ID
+        chain_id = get_chain_id()
+
+        # Get library address
+        library_address = get_library_address()
+
+        # Count in how many different explorers the contract was verified; min: 2/3
+        num_verifications_spell = 0
+        num_verifications_action = 0
+
+        # Verify Spell contract on Etherscan
+        verified = verify_contract(
+            contract_name=spell_name,
+            contract_address=spell_address,
+            input_path=SOURCE_FILE_PATH,
+            output_path=f'out/DssSpell.sol/DssSpell.json',
+            chain_id=chain_id,
+            library_address=library_address,
+            verifier="etherscan"
+            )
+
+        if verified:
+            num_verifications_spell += 1
+
+        # Get and verify action contract on Etherscan
+        action_address = get_action_address(spell_address)
+        if not action_address:
+            print('Could not determine action contract address', file=sys.stderr)
+            return
+
+        verify_contract(
+            contract_name="DssSpellAction",
+            contract_address=action_address,
+            input_path=SOURCE_FILE_PATH,
+            output_path=f'out/DssSpell.sol/DssSpell.json',
+            chain_id=chain_id,
+            library_address=library_address,
+            verifier="etherscan"
+        )
+
+        if verified:
+            num_verifications_action += 1
+
+        # This is needed in order to verify the contract outside of Etherscan
+        os.environ.pop("ETHERSCAN_API_KEY")
+
+        # Verify Spell contract on Blockscout
+        # verified = verify_contract(
+        #     contract_name=spell_name,
+        #     contract_address=spell_address,
+        #     input_path=SOURCE_FILE_PATH,
+        #     output_path=f'out/DssSpell.sol/DssSpell.json',
+        #     chain_id=chain_id,
+        #     library_address=library_address,
+        #     verifier="blockscout"
+        #     )
+
+        # if verified:
+        #     num_verifications_spell += 1
+
+        # Verify action contract on Blockscout
+        # verify_contract(
+        #     contract_name="DssSpellAction",
+        #     contract_address=action_address,
+        #     input_path=SOURCE_FILE_PATH,
+        #     output_path=f'out/DssSpell.sol/DssSpell.json',
+        #     chain_id=chain_id,
+        #     library_address=library_address,
+        #     verifier="blockscout"
+        # )
+
+        # if verified:
+            # num_verifications_action += 1
+
+         # Verify Spell contract on Sourcify
+        verify_contract(
+            contract_name=spell_name,
+            contract_address=spell_address,
+            input_path=SOURCE_FILE_PATH,
+            output_path=f'out/DssSpell.sol/DssSpell.json',
+            chain_id=chain_id,
+            library_address=library_address,
+            verifier="sourcify"
+        )
+
+        if verified:
+            num_verifications_spell += 1
+
+        # Verify action contract on Sourcify
+        verify_contract(
+            contract_name="DssSpellAction",
+            contract_address=action_address,
+            input_path=SOURCE_FILE_PATH,
+            output_path=f'out/DssSpell.sol/DssSpell.json',
+            chain_id=chain_id,
+            library_address=library_address,
+            verifier="sourcify"
+        )
+
+        if verified:
+            num_verifications_action += 1
+
+        print('\Contracts verified on' + str(num_verifications_spell) + ' and ' +
+              str(num_verifications_action) + ' explorers, respectively')
+
+    except Exception as e:
+        print(f'\nError: {str(e)}', file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
