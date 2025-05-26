@@ -12,7 +12,7 @@ REPO_URL = "/makerdao/executive-votes"
 # Set locale to en_US.UTF-8 to ensure consistent formatting
 locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
-def get_executive_by_title (exec_title, year):
+def get_executive (exec_title, year):
     base_git_api_url = f"https://api.github.com/repos{REPO_URL}/commits"
 
     api_response = requests.get(
