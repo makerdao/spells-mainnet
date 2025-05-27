@@ -85,7 +85,7 @@ contract DssSpellAction is DssAction {
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant MILLION = 10 ** 6;
-    uint256 constant BILLION = 10**9;
+    uint256 internal constant BILLION = 10**9;
 
     //  ---------- Contracts ----------
     address internal immutable USDS                         = DssExecLib.getChangelogAddress("USDS");
