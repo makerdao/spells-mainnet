@@ -2,22 +2,51 @@
 
 Safeharbor registry is a contract that allows protocols to identify addresses that are entitled to have funds recovered by a white hat during an attack.
 
-# How to use
+# Initial Deployment
 
-## Prerequisites
+Before adoption, a single-time deploy and configuration needs to happen so Sky protocol can safely include changes to the scope within spells. The deployment will happen with the following steps:
 
-1. Active contracts CSV file.
-Generated from the excel sheet, this file lives on the spells mainnet repo and is updated during the crafting process. If addressed are added or changed, they MUST appear in the diff of the active contracts file.
+1. **EOA AgreementV2 deployment**
+   - Anyone can deploy an instance of the `AgreementV2` contract through its factory
+   - Since the initial configuration is too big to safely fit within a spell execution, the first step will be done through an EOA
 
-## First time setup
-To adopt the safeharbor registry, there's a need to do a one time transaction to deploy the initial agreement details and then include the `adoptSafeHarbor` into a spell.
+2. **Initial chain configuration** 
+   - The EOA will use the reference sheet to create the initial state of the scope
+   - This includes adding all necessary chains and contracts, as well as the asset recovery addresses
 
-// TODO: add more details on this
+3. **Ownership transfer to DSPause**
+   - After the initial setup is done, the EOA will fully transfer the ownership of the `AgreementV2` contract to the PauseProxy
+   - This enables the PauseProxy to modify the scope in the future
 
-## Subsequent spells
+4. **Adoption**
+   - On a future spell, the pause proxy will call `safeharborRegistry.adoptSafeHarbor(agreementAddress)` 
+   - This officially accepts the terms and initiates the validity of SafeHarbor integration
 
-After the initial setup, the script takes care of generating the necessary calldata for updating the included contracts in the registry. The general execution flow is as follows:
+## Initial Deployment Verification
 
-1. Get the existing scope from the deployed registry.
-2. Parse the updated active contracts CSV file and compare it with the existing scope.
-3. If there are necessary changes, generate the calls to correctly update the registry.
+Since the initial deployment will be done through an EOA. The following steps need to be taken in consideration for spell crafters and reviwers safely include the `adoptSafeHarbor` into a spell:
+
+1. The `create` function was called through the verified AgreementV2Factory conract by SafeHarbor.
+2. The owner of the `AgreementV2` contract is the PauseProxy.
+3. The existing scope of the `AgreementV2` contract is the initial state of the scope of the sheet. This can be verified running the `generatePayload.js` script.
+
+# General Flow of `GeneratePayload.js`
+
+The script follows these steps:
+
+1. Downloads latest CSV from Google Sheets and parses it locally
+
+2. Builds internal representation of CSV data organized by chains/networks
+
+3. Downloads current on-chain state from SafeHarbor registry
+
+4. Builds comparable internal representation of on-chain state
+
+5. Compares CSV vs on-chain state to identify differences
+
+6. Outputs human-readable diff summary for Exec Sheet review:
+   - Added accounts (with contract scope)
+   - Removed accounts
+   - Chain additions/removals
+
+7. Generates encoded payload for executing the changes (if any).

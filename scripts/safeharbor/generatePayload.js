@@ -1,24 +1,16 @@
-import fs from 'fs';
-import { parse } from 'csv-parse/sync';
 import { ethers } from 'ethers';
-import fetch from 'node-fetch';
+
+import { downloadAndParseCSV } from './utils/csvUtils.js';
 
 // Constants
-const OWNER_ADDRESS = "0x195a7d8610edd06e0C27c006b6970319133Cb19A";
-const AGREEMENT_ADDRESS = "0xA3E1b36D112a5cE365546F53Fa3af3e1310d6b5A";
-const RPC_URL = "http://127.0.0.1:8545";
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1slHR9VbZOC3wp2ZQu7YbQEQh8N57ePfVvv0w35nz60Q/export?format=csv&gid=1121763694";
+import { 
+    OWNER_ADDRESS,
+    AGREEMENT_ADDRESS,
+    CSV_URL_SHEET1,
+    CSV_URL_SHEET2
+} from './constants.js';
 
-// ABI for AgreementV2
-const AGREEMENT_ABI = [
-    "function getDetails() view returns (tuple(string protocolName, tuple(string name, string contact)[] contactDetails, tuple(string assetRecoveryAddress, tuple(string accountAddress, uint8 childContractScope)[] accounts, uint256 id)[] chains, tuple(uint256 bountyPercentage, uint256 bountyCapUSD, bool retainable, uint8 identity, string diligenceRequirements) bountyTerms, string agreementURI))",
-    "function addChains(tuple(string assetRecoveryAddress, tuple(string accountAddress, uint8 childContractScope)[] accounts, uint256 id)[] chains)",
-    "function setChains(uint256[] chainIds, tuple(string assetRecoveryAddress, tuple(string accountAddress, uint8 childContractScope)[] accounts, uint256 id)[] chains)",
-    "function removeChain(uint256 chainId)",
-    "function addAccounts(uint256 chainId, tuple(string accountAddress, uint8 childContractScope)[] accounts)",
-    "function setAccounts(uint256 chainId, uint256[] accountIds, tuple(string accountAddress, uint8 childContractScope)[] accounts)",
-    "function removeAccount(uint256 chainId, uint256 accountId)"
-];
+import { AGREEMENTV2_ABI as AGREEMENT_ABI } from './abis.js';
 
 // Helper function to compare arrays
 export function arraysEqual(a, b) {
@@ -31,35 +23,6 @@ export function findArrayDifferences(current, desired) {
     const toAdd = desired.filter(item => !current.includes(item));
     const toRemove = current.filter(item => !desired.includes(item));
     return { toAdd, toRemove };
-}
-
-// Download and parse CSV
-export async function downloadAndParseCSV() {
-    try {
-        const response = await fetch(CSV_URL);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const csvText = await response.text();
-        
-        // Basic validation that we got CSV data
-        if (csvText.includes('<!DOCTYPE html>')) {
-            throw new Error('Received HTML instead of CSV data. Please check the URL format.');
-        }
-        
-        return parse(csvText, {
-            columns: true,
-            skip_empty_lines: true,
-            trim: true
-        });
-    } catch (error) {
-        console.error("Error downloading CSV:", error.message);
-        if (error.message.includes('HTML')) {
-            console.error("\nThe URL might be incorrect. For Google Sheets, make sure to use the export URL format:");
-            console.error("https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/export?format=csv&gid={SHEET_ID}");
-        }
-        throw error;
-    }
 }
 
 // Build internal representation from CSV
@@ -137,7 +100,7 @@ export function generateHumanReadableDiffs(csvState, onChainState) {
 
 // Data fetching and standardization
 export async function fetchAgreementDetails() {
-    const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
     return await agreement.getDetails();
 }
@@ -170,7 +133,7 @@ export function generateChainUpdates(currentChains, chainGroups) {
     );
     const chainDiff = findArrayDifferences(currentChainIds, desiredChainIds);
 
-    const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
 
     for (const chainId of chainDiff.toRemove) {
@@ -203,7 +166,7 @@ export function generateChainUpdates(currentChains, chainGroups) {
 
 export function generateAccountUpdates(currentChains, chainGroups) {
     const updates = [];
-    const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
 
     for (const [chainId, chain] of currentChains.entries()) {
@@ -266,16 +229,14 @@ export function generateAccountUpdates(currentChains, chainGroups) {
     return updates;
 }
 
-// File I/O operations
-export function saveUpdatesToFile(updates, filePath) {
-    fs.writeFileSync(filePath, JSON.stringify(updates, null, 2));
-}
-
 // Main function
 export async function generateUpdatePayload() {
     try {
         // 1. Download and parse CSV
-        const records = await downloadAndParseCSV();
+        const records1 = await downloadAndParseCSV(CSV_URL_SHEET1);
+        const records2 = await downloadAndParseCSV(CSV_URL_SHEET2);
+        const records = [...records1, ...records2];
+        
         const csvState = buildCSVRepresentation(records);
         
         // 2. Fetch on-chain state
@@ -291,12 +252,8 @@ export async function generateUpdatePayload() {
         const chainUpdates = generateChainUpdates(currentDetails.chains, csvState);
         const accountUpdates = generateAccountUpdates(currentDetails.chains, csvState);
         const updates = [...chainUpdates, ...accountUpdates];
-
-        // 5. Save updates
-        saveUpdatesToFile(updates, './agreement-updates.json');
-        console.log("\nUpdates saved to agreement-updates.json");
         
-        // 6. Display payload
+        // 5. Display payload
         console.log("\nGenerated payload:");
         updates.forEach(update => {
             console.log(`\n${update.function}:`);

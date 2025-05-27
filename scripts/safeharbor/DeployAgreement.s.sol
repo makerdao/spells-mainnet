@@ -4,8 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 
-
-
+// NOTE: File required for bootstrapping the initial deployment of the AgreementV2 contract, remove after adoption.
 contract DeployAgreement is Script {
     address constant FACTORY = 0x9d211CaC1ce390F676d1cB1D2Eb681410EC47E47;
 
