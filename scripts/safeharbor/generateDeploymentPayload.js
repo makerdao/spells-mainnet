@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import fetch from 'node-fetch';
 import { parse } from 'csv-parse/sync';
 
+// output: 0xa5c82ae35b653192d99c019a8eeaa159af0133e5
 // Constants
 const FACTORY_ADDRESS = "0x9d211CaC1ce390F676d1cB1D2Eb681410EC47E47";
 const OWNER_ADDRESS = "0x195a7d8610edd06e0C27c006b6970319133Cb19A";
@@ -61,6 +62,11 @@ const FACTORY_ABI = [{
     "stateMutability": "nonpayable"
 }];
 
+// ABI for the deployed agreement contract
+const AGREEMENT_ABI = [
+    "function addChains(tuple(string assetRecoveryAddress, tuple(string accountAddress, uint8 childContractScope)[] accounts, uint256 id)[] chains)"
+];
+
 // Download and parse CSV
 export async function downloadAndParseCSV() {
     try {
@@ -92,28 +98,13 @@ export async function downloadAndParseCSV() {
 
 // Build internal representation from CSV
 export function buildCSVRepresentation(records) {
-    console.log("\nDebug: Raw CSV Records:");
-    records.forEach(record => {
-        console.log(`Address: ${record.Address}, isFactory: ${record.isFactory}, Status: ${record.Status}`);
-    });
-
     const filteredRecords = records.filter(record => record.Status === 'ACTIVE');
-    console.log("\nDebug: Filtered Active Records:");
-    filteredRecords.forEach(record => {
-        console.log(`Address: ${record.Address}, isFactory: ${record.isFactory}, Status: ${record.Status}`);
-    });
-
     const groups = filteredRecords.reduce((groups, record) => {
         const chain = record.Chain;
         if (!groups[chain]) {
             groups[chain] = [];
         }
         const isFactory = record.isFactory === 'TRUE';
-        console.log(`\nDebug: Processing record for ${record.Address}:`);
-        console.log(`  isFactory value from CSV: ${record.isFactory}`);
-        console.log(`  isFactory after comparison: ${isFactory}`);
-        console.log(`  ChildContractScope to be set: ${isFactory ? 3 : 0}`);
-
         groups[chain].push({
             accountAddress: record.Address,
             childContractScope: isFactory ? 3 : 0,
@@ -121,16 +112,6 @@ export function buildCSVRepresentation(records) {
         });
         return groups;
     }, {});
-
-    console.log("\nDebug: Final Groups:");
-    Object.entries(groups).forEach(([chain, accounts]) => {
-        console.log(`\nChain: ${chain}`);
-        accounts.forEach(acc => {
-            console.log(`  Address: ${acc.accountAddress}`);
-            console.log(`  ChildContractScope: ${acc.childContractScope}`);
-            console.log(`  isFactory: ${acc.isFactory}`);
-        });
-    });
 
     return groups;
 }
@@ -142,17 +123,46 @@ export async function generateDeploymentPayload() {
         const records = await downloadAndParseCSV();
         const csvState = buildCSVRepresentation(records);
 
-        // 2. Construct the payload data
-        const protocolName = "Sky and Stars";
-        const contactDetails = [
-            {
-                name: "Contact Name",
-                contact: "Contact@Info"
-            }
-        ];
+        // 2. Generate empty contract creation payload
+        const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+        const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+
+        // Create empty details for initial deployment
+        const emptyDetails = {
+            protocolName: "Sky and Stars",
+            contactDetails: [
+                {
+                    name: "Contact Name",
+                    contact: "Contact@Info"
+                }
+            ],
+            chains: [], // Empty chains array
+            bountyTerms: {
+                bountyPercentage: 10000000, // 10%
+                bountyCapUSD: 0,
+                retainable: false,
+                identity: 2,
+                diligenceRequirements: "KYC and Sanctions Screening. Sky and Stars require all eligible whitehats to undergo Know Your Customer (KYC) verification and be screened against global sanctions lists, including OFAC, UK, and EU regulations. This ensures that bounty recipients meet legal and regulatory standards before qualifying for payment. The verification process shall be conducted by a trusted third-party provider at Sky and Stars discretion, and all data is deleted, if successful, within 30 days post-verification."
+            },
+            agreementURI: "Agreement URI"
+        };
+
+        // Encode the function call with empty chains
+        const createCalldata = factory.interface.encodeFunctionData("create", [
+            emptyDetails,
+            OWNER_ADDRESS
+        ]);
+
+        const createPayload = {
+            target: FACTORY_ADDRESS,
+            calldata: createCalldata
+        };
+
+        // 3. Generate addChains payload
+        const agreement = new ethers.Contract("0xa5c82ae35b653192d99c019a8eeaa159af0133e5", AGREEMENT_ABI, provider);
 
         // Convert CSV state to chains format
-        const chains = Object.entries(csvState).map(([chain, accounts]) => ({
+        const allChains = Object.entries(csvState).map(([chain, accounts]) => ({
             assetRecoveryAddress: "0x0000000000000000000000000000000000000022",
             accounts: accounts.map(acc => ({
                 accountAddress: acc.accountAddress,
@@ -161,53 +171,35 @@ export async function generateDeploymentPayload() {
             id: chain === "ETHEREUM" ? 1 : 0
         }));
 
-        const bountyTerms = {
-            bountyPercentage: 10000000, // 10%
-            bountyCapUSD: 0,
-            retainable: false,
-            identity: 2,
-            diligenceRequirements: "KYC and Sanctions Screening. Sky and Stars require all eligible whitehats to undergo Know Your Customer (KYC) verification and be screened against global sanctions lists, including OFAC, UK, and EU regulations. This ensures that bounty recipients meet legal and regulatory standards before qualifying for payment. The verification process shall be conducted by a trusted third-party provider at Sky and Stars discretion, and all data is deleted, if successful, within 30 days post-verification."
+        // Generate addChains calldata for all chains
+        const addChainsCalldata = agreement.interface.encodeFunctionData("addChains", [allChains]);
+        const addChainsPayload = {
+            target: "0xa5c82ae35b653192d99c019a8eeaa159af0133e5",
+            calldata: addChainsCalldata
         };
 
-        const agreementURI = "Agreement URI";
+        // 4. Log all payloads
+        console.log("\n1. Initial Contract Creation Payload:");
+        console.log(JSON.stringify(createPayload, null, 2));
 
-        // 3. Generate the payload
-        const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
-        const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-
-        // Encode the function call with the correct structure
-        const calldata = factory.interface.encodeFunctionData("create", [
-            {
-                protocolName,
-                contactDetails,
-                chains,
-                bountyTerms,
-                agreementURI
-            },
-            OWNER_ADDRESS
-        ]);
-
-        const payload = {
-            target: FACTORY_ADDRESS,
-            calldata
-        };
-
-        // 4. Log the generated payload
-        console.log("\nGenerated payload:");
-        console.log(JSON.stringify(payload, null, 2));
+        console.log("\n2. Add All Chains Payload:");
+        console.log(JSON.stringify(addChainsPayload, null, 2));
 
         // 5. Log the configuration that was used
         console.log("\nConfiguration used:");
-        console.log("Protocol Name:", protocolName);
+        console.log("Protocol Name:", emptyDetails.protocolName);
         console.log("\nChains and Accounts:");
-        chains.forEach(chain => {
+        allChains.forEach(chain => {
             console.log(`\nChain ID: ${chain.id}`);
             chain.accounts.forEach(account => {
                 console.log(`  - ${account.accountAddress} (Factory: ${account.childContractScope === 3})`);
             });
         });
 
-        return payload;
+        return {
+            createPayload,
+            addChainsPayload
+        };
     } catch (error) {
         console.error("Error generating deployment payload:", error);
         throw error;
