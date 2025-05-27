@@ -23,6 +23,8 @@ import {stdStorage, StdStorage} from "forge-std/Test.sol";
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
 import "./test/addresses_base.sol";
+import "./test/addresses_unichain.sol";
+import "./test/addresses_optimism.sol";
 import "./test/addresses_arbitrum.sol";
 import "./test/addresses_deployers.sol";
 import "./test/addresses_wallets.sol";
@@ -477,6 +479,8 @@ contract DssSpellTestBase is Config, DssTest {
     Rates                 rates = new Rates();
     Addresses              addr = new Addresses();
     BaseAddresses          base = new BaseAddresses();
+    UnichainAddresses  unichain = new UnichainAddresses();
+    OptimismAddresses  optimism = new OptimismAddresses();
     ArbitrumAddresses  arbitrum = new ArbitrumAddresses();
     Deployers         deployers = new Deployers();
     Wallets             wallets = new Wallets();
@@ -535,6 +539,7 @@ contract DssSpellTestBase is Config, DssTest {
     OptimismDomain optimismDomain;
     ArbitrumDomain arbitrumDomain;
     OptimismDomain baseDomain;
+    OptimismDomain unichainDomain;
 
     event Debug(uint256 index, uint256 val);
     event Debug(uint256 index, address addr);
@@ -2200,25 +2205,26 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(usds.balanceOf(p.buffer), 0);
     }
 
-    struct BaseTokenBridgeParams {
+    struct OpTokenBridgeParams {
         address l2Bridge;
         address l1Bridge;
         address l1Escrow;
         address[] tokens;
         address[] l2Tokens;
         uint256[] maxWithdrawals;
+        OptimismDomain domain;
     }
 
-    function _testBaseTokenBridgeIntegration(BaseTokenBridgeParams memory p) public {
+    function _testOpTokenBridgeIntegration(OpTokenBridgeParams memory p) public {
         for (uint i = 0; i < p.tokens.length; i ++) {
             rootDomain.selectFork();
 
             assertEq(GemAbstract(p.tokens[i]).allowance(p.l1Escrow, p.l1Bridge), type(uint256).max);
             assertEq(L1TokenBridgeLike(p.l1Bridge).l1ToL2Token(p.tokens[i]), p.l2Tokens[i]);
 
-            // switch to Base domain and relay the spell from L1
+            // switch to L2 domain and relay the spell from L1
             // the `true` keeps us on Base rather than `rootDomain.selectFork()`
-            baseDomain.relayFromHost(true);
+            p.domain.relayFromHost(true);
 
             // test L2 side of initBridges
             assertEq(L2TokenBridgeLike(p.l2Bridge).l1ToL2Token(p.tokens[i]), p.l2Tokens[i]);
@@ -2248,7 +2254,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(GemAbstract(p.tokens[i]).balanceOf(address(this)), 0);
             assertEq(GemAbstract(p.tokens[i]).balanceOf(p.l1Escrow), escrowBeforeBalance + 100 ether);
 
-            baseDomain.relayFromHost(true);
+            p.domain.relayFromHost(true);
 
             assertEq(GemAbstract(p.l2Tokens[i]).balanceOf(address(0xb0b)), 100 ether);
 
@@ -2271,7 +2277,7 @@ contract DssSpellTestBase is Config, DssTest {
 
             assertEq(GemAbstract(p.l2Tokens[i]).balanceOf(address(0xb0b)), 0);
 
-            baseDomain.relayToHost(true);
+            p.domain.relayToHost(true);
 
             assertEq(GemAbstract(p.tokens[i]).balanceOf(address(0xced)), 100 ether);
         }

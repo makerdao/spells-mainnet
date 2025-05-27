@@ -9,5 +9,6 @@ fs_permissions = [
 
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"
+unichain = "${UNICHAIN_RPC_URL}"
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config

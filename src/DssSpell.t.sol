@@ -52,6 +52,20 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface L1GovRelayLike {
+    function l2GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2GovRelayLike {
+    function l1GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2BridgeSpellLike {
+    function l2Bridge() external view returns (address);
+}
+
 interface DssVestLike {
     function unpaid(uint256 id ) external view returns (uint256);
 }
@@ -1304,5 +1318,155 @@ contract DssSpellTest is DssSpellTestBase {
         assertFalse(job.has(prevDistributor), "TestError/distributor-job-not-removed");
         assertTrue(job.has(newDistributor), "TestError/new-distributor-job-not-added");
         assertEq(job.intervals(newDistributor), 601200, "TestError/new-distributor-invalid-interval");
+    }
+
+    address            immutable SUSDS                      = addr.addr("SUSDS");
+    L1TokenBridgeLike  immutable l1UnichainBridge           = L1TokenBridgeLike(addr.addr("UNICHAIN_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1UnichainGovRelay         = L1GovRelayLike(addr.addr("UNICHAIN_GOV_RELAY"));
+    address            immutable UNICHAIN_ESCROW            = addr.addr("UNICHAIN_ESCROW");
+    address            immutable UNICHAIN_TOKEN_BRIDGE_IMP  = addr.addr("UNICHAIN_TOKEN_BRIDGE_IMP");
+    address            constant  UNICHAIN_MESSENGER         = 0x9A3D64E386C18Cb1d6d5179a9596A4B5736e98A6;
+
+    L2TokenBridgeLike  immutable l2UnichainBridge           = L2TokenBridgeLike(unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE"));
+    address            immutable L2_UNICHAIN_BRIDGE_IMP     = unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2UnichainGovRelay         = L2GovRelayLike(unichain.addr("L2_UNICHAIN_GOV_RELAY"));
+    address            immutable L2_UNICHAIN_SPELL          = unichain.addr("L2_UNICHAIN_SPELL");
+    address            immutable L2_UNICHAIN_USDS           = unichain.addr("L2_UNICHAIN_USDS");
+    address            immutable L2_UNICHAIN_SUSDS          = unichain.addr("L2_UNICHAIN_SUSDS");
+    address            immutable L2_UNICHAIN_MESSENGER      = unichain.addr("L2_UNICHAIN_MESSENGER");
+
+    L1TokenBridgeLike  immutable l1OptimismBridge           = L1TokenBridgeLike(addr.addr("OPTIMISM_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1OptimismGovRelay         = L1GovRelayLike(addr.addr("OPTIMISM_GOV_RELAY"));
+    address            immutable OPTIMISM_ESCROW            = addr.addr("OPTIMISM_ESCROW");
+    address            immutable OPTIMISM_TOKEN_BRIDGE_IMP  = addr.addr("OPTIMISM_TOKEN_BRIDGE_IMP");
+    address            constant  OPTIMISM_MESSENGER         = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
+
+    L2TokenBridgeLike  immutable l2OptimismBridge           = L2TokenBridgeLike(optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE"));
+    address            immutable L2_OPTIMISM_BRIDGE_IMP     = optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2OptimismGovRelay         = L2GovRelayLike(optimism.addr("L2_OPTIMISM_GOV_RELAY"));
+    address            immutable L2_OPTIMISM_SPELL          = optimism.addr("L2_OPTIMISM_SPELL");
+    address            immutable L2_OPTIMISM_USDS           = optimism.addr("L2_OPTIMISM_USDS");
+    address            immutable L2_OPTIMISM_SUSDS          = optimism.addr("L2_OPTIMISM_SUSDS");
+    address            immutable L2_OPTIMISM_MESSENGER      = optimism.addr("L2_OPTIMISM_MESSENGER");
+
+    function testUnichainTokenBridgeIntegration() public {
+        _setupRootDomain();
+        Chain memory chain =
+            Chain({name: "Unichain", chainId: 130, chainAlias: "unichain", rpcUrl: "https://unichain.drpc.org"});
+        setChain("unichain", chain);
+        unichainDomain = new OptimismDomain(config, getChain("unichain"), rootDomain);
+
+        // ------ Sanity checks -------
+
+        unichainDomain.selectFork();
+
+        require(l2UnichainBridge.isOpen()                       == 1, "L2UnichainTokenBridge/not-open");
+        require(l2UnichainBridge.otherBridge()                  == address(l1UnichainBridge), "L2UnichainTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2UnichainBridge.version()))    == keccak256("1"), "L2UnichainTokenBridge/version-does-not-match");
+        require(l2UnichainBridge.getImplementation()            == L2_UNICHAIN_BRIDGE_IMP, "L2UnichainTokenBridge/imp-does-not-match");
+        require(l2UnichainBridge.messenger()                    == L2_UNICHAIN_MESSENGER, "L2UnichainTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2UnichainGovRelay.l1GovernanceRelay()          == address(l1UnichainGovRelay), "L2UnichainTokenBridge/l2-gov-relay-mismatch");
+        require(l2UnichainGovRelay.messenger()                  == L2_UNICHAIN_MESSENGER, "L2UnichainGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_UNICHAIN_SPELL).l2Bridge() == address(l2UnichainBridge), "L2UnichainSpell/l2-bridge-mismatch");
+
+        rootDomain.selectFork();
+
+        require(keccak256(bytes(l1UnichainBridge.version()))    == keccak256("1"), "UnichainTokenBridge/version-does-not-match");
+        require(l1UnichainBridge.getImplementation()            == UNICHAIN_TOKEN_BRIDGE_IMP, "UnichainTokenBridge/imp-does-not-match");
+        require(l1UnichainBridge.isOpen()                       == 1, "UnichainTokenBridge/not-open");
+        require(l1UnichainBridge.otherBridge()                  == address(l2UnichainBridge), "UnichainTokenBridge/other-bridge-mismatch");
+        require(l1UnichainBridge.messenger()                    == UNICHAIN_MESSENGER, "UnichainTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1UnichainGovRelay.l2GovernanceRelay()          == address(l2UnichainGovRelay), "UnichainGovRelay/l2-gov-relay-mismatch");
+        require(l1UnichainGovRelay.messenger()                  == UNICHAIN_MESSENGER, "UnichainGovRelay/l1-gov-relay-messenger-mismatch");
+
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        require(l1UnichainBridge.escrow() == UNICHAIN_ESCROW, "UnichainTokenBridge/escrow-does-not-match");
+
+        address[] memory tokens = new address[](2);
+        address[] memory l2tokens = new address[](2);
+        uint256[] memory maxWithdrawals = new uint256[](2);
+
+        tokens[0] = address(usds);
+        tokens[1] = SUSDS;
+
+        l2tokens[0] = L2_UNICHAIN_USDS;
+        l2tokens[1] = L2_UNICHAIN_SUSDS;
+
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        _testOpTokenBridgeIntegration(OpTokenBridgeParams({
+            l2Bridge:       address(l2UnichainBridge),
+            l1Bridge:       address(l1UnichainBridge),
+            l1Escrow:       UNICHAIN_ESCROW,
+            tokens:         tokens,
+            l2Tokens:       l2tokens,
+            maxWithdrawals: maxWithdrawals,
+            domain:         unichainDomain
+        }));
+    }
+
+    function testOptimismTokenBridgeIntegration() public {
+        _setupRootDomain();
+        optimismDomain = new OptimismDomain(config, getChain("optimism"), rootDomain);
+
+        // ------ Sanity checks -------
+
+        optimismDomain.selectFork();
+
+        require(l2OptimismBridge.isOpen()                       == 1, "L2OptimismTokenBridge/not-open");
+        require(l2OptimismBridge.otherBridge()                  == address(l1OptimismBridge), "L2OptimismTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2OptimismBridge.version()))    == keccak256("1"), "L2OptimismTokenBridge/version-does-not-match");
+        require(l2OptimismBridge.getImplementation()            == L2_OPTIMISM_BRIDGE_IMP, "L2OptimismTokenBridge/imp-does-not-match");
+        require(l2OptimismBridge.messenger()                    == L2_OPTIMISM_MESSENGER, "L2OptimismTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2OptimismGovRelay.l1GovernanceRelay()          == address(l1OptimismGovRelay), "L2OptimismTokenBridge/l2-gov-relay-mismatch");
+        require(l2OptimismGovRelay.messenger()                  == L2_OPTIMISM_MESSENGER, "L2OptimismGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_OPTIMISM_SPELL).l2Bridge() == address(l2OptimismBridge), "L2OptimismSpell/l2-bridge-mismatch");
+
+        rootDomain.selectFork();
+
+        require(keccak256(bytes(l1OptimismBridge.version()))    == keccak256("1"), "OptimismTokenBridge/version-does-not-match");
+        require(l1OptimismBridge.getImplementation()            == OPTIMISM_TOKEN_BRIDGE_IMP, "OptimismTokenBridge/imp-does-not-match");
+        require(l1OptimismBridge.isOpen()                       == 1, "OptimismTokenBridge/not-open");
+        require(l1OptimismBridge.otherBridge()                  == address(l2OptimismBridge), "OptimismTokenBridge/other-bridge-mismatch");
+        require(l1OptimismBridge.messenger()                    == OPTIMISM_MESSENGER, "OptimismTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1OptimismGovRelay.l2GovernanceRelay()          == address(l2OptimismGovRelay), "OptimismGovRelay/l2-gov-relay-mismatch");
+        require(l1OptimismGovRelay.messenger()                  == OPTIMISM_MESSENGER, "OptimismGovRelay/l1-gov-relay-messenger-mismatch");
+
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        require(l1OptimismBridge.escrow() == OPTIMISM_ESCROW, "OptimismTokenBridge/escrow-does-not-match");
+
+        address[] memory tokens = new address[](2);
+        address[] memory l2tokens = new address[](2);
+        uint256[] memory maxWithdrawals = new uint256[](2);
+
+        tokens[0] = address(usds);
+        tokens[1] = SUSDS;
+
+        l2tokens[0] = L2_OPTIMISM_USDS;
+        l2tokens[1] = L2_OPTIMISM_SUSDS;
+
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        _testOpTokenBridgeIntegration(OpTokenBridgeParams({
+            l2Bridge:       address(l2OptimismBridge),
+            l1Bridge:       address(l1OptimismBridge),
+            l1Escrow:       OPTIMISM_ESCROW,
+            tokens:         tokens,
+            l2Tokens:       l2tokens,
+            maxWithdrawals: maxWithdrawals,
+            domain:         optimismDomain
+        }));
     }
 }

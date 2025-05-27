@@ -562,5 +562,13 @@ contract Addresses {
         addr["MCD_SPBEAM"]                       = 0x36B072ed8AFE665E3Aa6DaBa79Decbec63752b22;
         addr["EMSP_SPBEAM_HALT"]                 = 0xDECF4A7E4b9CAa3c3751D163866941a888618Ac0;
         addr["MCD_PROTEGO"]                      = 0x5C9c3cb0490938c9234ABddeD37a191576ED8624;
+        addr["UNICHAIN_GOV_RELAY"]               = 0xb383070Cf9F4f01C3a2cfD0ef6da4BC057b429b7;
+        addr["UNICHAIN_ESCROW"]                  = 0x1196F688C585D3E5C895Ef8954FFB0dCDAfc566A;
+        addr["UNICHAIN_TOKEN_BRIDGE"]            = 0xDF0535a4C96c9Cd8921d8FeC92A7680b281681d2;
+        addr["UNICHAIN_TOKEN_BRIDGE_IMP"]        = 0x8A925ccFd5F7f46332E2D719A916f8b4a643599F;
+        addr["OPTIMISM_GOV_RELAY"]               = 0x09B354CDA89203BB7B3131CC728dFa06ab09Ae2F;
+        addr["OPTIMISM_ESCROW"]                  = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
+        addr["OPTIMISM_TOKEN_BRIDGE"]            = 0x3d25B7d486caE1810374d37A48BCf0963c9B8057;
+        addr["OPTIMISM_TOKEN_BRIDGE_IMP"]        = 0xA50adBad34c1e9786979bD44220F8fd46e43A6B0;
     }
 }
