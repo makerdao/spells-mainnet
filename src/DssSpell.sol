@@ -195,19 +195,19 @@ contract DssSpellAction is DssAction {
         uint256 currentAllowance = SKY.allowance(address(this), MCD_VEST_SKY_TREASURY);
         SKY.approve(MCD_VEST_SKY_TREASURY, currentAllowance + 137_500_000 * WAD);
 
-        // Remove old REWARDS_USDS_SKY_DIST from the keeper job by calling `CRON_REWARDS_DIST_JOB.rem()` with the current REWARDS_USDS_SKY_DIST
+        // Remove old REWARDS_DIST_USDS_SKY from the keeper job by calling `CRON_REWARDS_DIST_JOB.rem()` with the current REWARDS_DIST_USDS_SKY
         VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).rem(REWARDS_DIST_USDS_SKY);
 
-        // Update chainlog value for REWARDS_USDS_SKY_DIST to the new VestedRewardsDistribution contract at 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F
+        // Update chainlog value for REWARDS_DIST_USDS_SKY to the new VestedRewardsDistribution contract at 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F
         DssExecLib.setChangelogAddress("REWARDS_DIST_USDS_SKY", REWARDS_DIST_USDS_SKY_NEW);
 
         // Note: Bump chainlog version
         DssExecLib.setChangelogVersion("1.20.1");
 
-        // Add new REWARDS_USDS_SKY_DIST to the keeper job by calling `CRON_REWARDS_DIST_JOB.set()` with the new REWARDS_USDS_SKY_DIST
+        // Add new REWARDS_DIST_USDS_SKY to the keeper job by calling `CRON_REWARDS_DIST_JOB.set()` with the new REWARDS_DIST_USDS_SKY and frequency 601200
         VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).set(REWARDS_DIST_USDS_SKY_NEW, 601200);
 
-        // Deploy new MCD_VEST_SKY_TREASURY stream with the following parameters: usr(REWARDS_USDS_SKY_DIST), tot(137,500,000 SKY), bgn(block.timestamp), tau(182 days), cliff: none, manager, none
+        // Deploy new MCD_VEST_SKY_TREASURY stream with the following parameters: usr(REWARDS_DIST_USDS_SKY), tot(137,500,000 SKY), bgn(block.timestamp), tau(182 days), cliff: none, manager, none
         uint256 vestId = DssVestLike(MCD_VEST_SKY_TREASURY).create(
             REWARDS_DIST_USDS_SKY_NEW,
             137_500_000 * WAD,
@@ -220,7 +220,7 @@ contract DssSpellAction is DssAction {
         // Restrict the new stream, res: 1
         DssVestLike(MCD_VEST_SKY_TREASURY).restrict(vestId);
 
-        // file the id of the newly created stream to the new REWARDS_USDS_SKY_DIST contract
+        // file the id of the newly created stream to the new REWARDS_DIST_USDS_SKY contract
         DssExecLib.setValue(REWARDS_DIST_USDS_SKY_NEW, "vestId", vestId);
 
         // ----- Init Unichain Native Bridge -----
@@ -427,7 +427,7 @@ contract DssSpellAction is DssAction {
 
         // ----- Execute Spark Proxy Spell -----
 
-        // Execute Spark Proxy Spell at address xyz
+        // Execute Spark Proxy Spell at address 0x3968a022D955Bbb7927cc011A48601B65a33F346
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
