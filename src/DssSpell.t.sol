@@ -822,33 +822,41 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = false;
+        bool ignoreTotalSupplyDaiUsds = true; // Note: Payments are being made through DaiUsds
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[3] memory payees = [
-            Payee(address(usds), wallets.addr("INTEGRATION_BOOST_INITIATIVE"), 3_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"),       5_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("LAUNCH_PROJECT_FUNDING"),        30_000_000 ether) // Note: ether is only a keyword helper
+        Payee[11] memory payees = [
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"), 54_167 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BYTERON"),  4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_2"),  20_417 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"),  4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("PBG"), 3_867 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("WBC"), 2_400 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"), 11_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("BLUE"), 330_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("CLOAKY_2"), 288_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether,         // Note: ether is only a keyword helper
             mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         8_000_000 ether, // Note: ether is only a keyword helper
-            sky:          30_000_000 ether // Note: ether is only a keyword helper
+            usds:         5_103_851 ether, // Note: ether is only a keyword helper
+            sky:          618_000 ether    // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: -1_250 ether,
-            sky: 0
+            mkr: 0,
+            sky: -618_000 ether
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -953,13 +961,14 @@ contract DssSpellTest is DssSpellTestBase {
             "TestPayments/actual-vs-expected-sky-treasury-mismatch"
         );
         // Sky or MKR payments might come from token emission or from the treasury
-        assertEq(
-            (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
-                + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
-            calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
-                + calculatedTotalPayments.sky,
-            "TestPayments/invalid-mkr-sky-total"
-        );
+        // Note: Uncomment if SKY payments were made using MRR -> SKY conversion
+        // assertEq(
+        //     (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
+        //         + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
+        //     calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
+        //         + calculatedTotalPayments.sky,
+        //     "TestPayments/invalid-mkr-sky-total"
+        // );
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -1220,9 +1229,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xC40611AC4Fff8572Dc5F02A238176edCF15Ea7ba); // Insert Spark spell address
+        address SPARK_SPELL = address(0x3968a022D955Bbb7927cc011A48601B65a33F346); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1258,6 +1267,35 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    address            immutable SUSDS                      = addr.addr("SUSDS");
+    L1TokenBridgeLike  immutable l1UnichainBridge           = L1TokenBridgeLike(addr.addr("UNICHAIN_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1UnichainGovRelay         = L1GovRelayLike(addr.addr("UNICHAIN_GOV_RELAY"));
+    address            immutable UNICHAIN_ESCROW            = addr.addr("UNICHAIN_ESCROW");
+    address            immutable UNICHAIN_TOKEN_BRIDGE_IMP  = addr.addr("UNICHAIN_TOKEN_BRIDGE_IMP");
+    address            constant  UNICHAIN_MESSENGER         = 0x9A3D64E386C18Cb1d6d5179a9596A4B5736e98A6;
+
+    L2TokenBridgeLike  immutable l2UnichainBridge           = L2TokenBridgeLike(unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE"));
+    address            immutable L2_UNICHAIN_BRIDGE_IMP     = unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2UnichainGovRelay         = L2GovRelayLike(unichain.addr("L2_UNICHAIN_GOV_RELAY"));
+    address            immutable L2_UNICHAIN_SPELL          = unichain.addr("L2_UNICHAIN_SPELL");
+    address            immutable L2_UNICHAIN_USDS           = unichain.addr("L2_UNICHAIN_USDS");
+    address            immutable L2_UNICHAIN_SUSDS          = unichain.addr("L2_UNICHAIN_SUSDS");
+    address            immutable L2_UNICHAIN_MESSENGER      = unichain.addr("L2_UNICHAIN_MESSENGER");
+
+    L1TokenBridgeLike  immutable l1OptimismBridge           = L1TokenBridgeLike(addr.addr("OPTIMISM_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1OptimismGovRelay         = L1GovRelayLike(addr.addr("OPTIMISM_GOV_RELAY"));
+    address            immutable OPTIMISM_ESCROW            = addr.addr("OPTIMISM_ESCROW");
+    address            immutable OPTIMISM_TOKEN_BRIDGE_IMP  = addr.addr("OPTIMISM_TOKEN_BRIDGE_IMP");
+    address            constant  OPTIMISM_MESSENGER         = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
+
+    L2TokenBridgeLike  immutable l2OptimismBridge           = L2TokenBridgeLike(optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE"));
+    address            immutable L2_OPTIMISM_BRIDGE_IMP     = optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2OptimismGovRelay         = L2GovRelayLike(optimism.addr("L2_OPTIMISM_GOV_RELAY"));
+    address            immutable L2_OPTIMISM_SPELL          = optimism.addr("L2_OPTIMISM_SPELL");
+    address            immutable L2_OPTIMISM_USDS           = optimism.addr("L2_OPTIMISM_USDS");
+    address            immutable L2_OPTIMISM_SUSDS          = optimism.addr("L2_OPTIMISM_SUSDS");
+    address            immutable L2_OPTIMISM_MESSENGER      = optimism.addr("L2_OPTIMISM_MESSENGER");
+
     function testLockstakeMigratorDeauthInVat() public {
         address LOCKSTAKE_MIGRATOR = chainLog.getAddress("LOCKSTAKE_MIGRATOR");
         assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 1, "TestError/lockstake-not-ward-in-vat");
@@ -1269,7 +1307,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 0, "TestError/lockstake-still-ward-in-vat");
     }
 
-    function testRewardsUsdsSkyDistribution() public {
+    function testOldRewardsUsdsSkyDistribution() public {
         uint256 vestId = 2;
         DssVestLike vest = DssVestLike(chainLog.getAddress("MCD_VEST_SKY"));
         VestedRewardsDistributionLike distribution = VestedRewardsDistributionLike(chainLog.getAddress("REWARDS_DIST_USDS_SKY"));
@@ -1319,35 +1357,6 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(job.has(newDistributor), "TestError/new-distributor-job-not-added");
         assertEq(job.intervals(newDistributor), 601200, "TestError/new-distributor-invalid-interval");
     }
-
-    address            immutable SUSDS                      = addr.addr("SUSDS");
-    L1TokenBridgeLike  immutable l1UnichainBridge           = L1TokenBridgeLike(addr.addr("UNICHAIN_TOKEN_BRIDGE"));
-    L1GovRelayLike     immutable l1UnichainGovRelay         = L1GovRelayLike(addr.addr("UNICHAIN_GOV_RELAY"));
-    address            immutable UNICHAIN_ESCROW            = addr.addr("UNICHAIN_ESCROW");
-    address            immutable UNICHAIN_TOKEN_BRIDGE_IMP  = addr.addr("UNICHAIN_TOKEN_BRIDGE_IMP");
-    address            constant  UNICHAIN_MESSENGER         = 0x9A3D64E386C18Cb1d6d5179a9596A4B5736e98A6;
-
-    L2TokenBridgeLike  immutable l2UnichainBridge           = L2TokenBridgeLike(unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE"));
-    address            immutable L2_UNICHAIN_BRIDGE_IMP     = unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE_IMP");
-    L2GovRelayLike     immutable l2UnichainGovRelay         = L2GovRelayLike(unichain.addr("L2_UNICHAIN_GOV_RELAY"));
-    address            immutable L2_UNICHAIN_SPELL          = unichain.addr("L2_UNICHAIN_SPELL");
-    address            immutable L2_UNICHAIN_USDS           = unichain.addr("L2_UNICHAIN_USDS");
-    address            immutable L2_UNICHAIN_SUSDS          = unichain.addr("L2_UNICHAIN_SUSDS");
-    address            immutable L2_UNICHAIN_MESSENGER      = unichain.addr("L2_UNICHAIN_MESSENGER");
-
-    L1TokenBridgeLike  immutable l1OptimismBridge           = L1TokenBridgeLike(addr.addr("OPTIMISM_TOKEN_BRIDGE"));
-    L1GovRelayLike     immutable l1OptimismGovRelay         = L1GovRelayLike(addr.addr("OPTIMISM_GOV_RELAY"));
-    address            immutable OPTIMISM_ESCROW            = addr.addr("OPTIMISM_ESCROW");
-    address            immutable OPTIMISM_TOKEN_BRIDGE_IMP  = addr.addr("OPTIMISM_TOKEN_BRIDGE_IMP");
-    address            constant  OPTIMISM_MESSENGER         = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
-
-    L2TokenBridgeLike  immutable l2OptimismBridge           = L2TokenBridgeLike(optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE"));
-    address            immutable L2_OPTIMISM_BRIDGE_IMP     = optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE_IMP");
-    L2GovRelayLike     immutable l2OptimismGovRelay         = L2GovRelayLike(optimism.addr("L2_OPTIMISM_GOV_RELAY"));
-    address            immutable L2_OPTIMISM_SPELL          = optimism.addr("L2_OPTIMISM_SPELL");
-    address            immutable L2_OPTIMISM_USDS           = optimism.addr("L2_OPTIMISM_USDS");
-    address            immutable L2_OPTIMISM_SUSDS          = optimism.addr("L2_OPTIMISM_SUSDS");
-    address            immutable L2_OPTIMISM_MESSENGER      = optimism.addr("L2_OPTIMISM_MESSENGER");
 
     function testUnichainTokenBridgeIntegration() public {
         _setupRootDomain();
@@ -1468,5 +1477,20 @@ contract DssSpellTest is DssSpellTestBase {
             maxWithdrawals: maxWithdrawals,
             domain:         optimismDomain
         }));
+    }
+
+    function testSparkTokenOwnership() public {
+        WardsAbstract sparkToken = WardsAbstract(0xc20059e0317DE91738d13af027DfC4a50781b066);
+        address sparkCoMultisig = 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B;
+
+        assertEq(sparkToken.wards(sparkCoMultisig), 0, "TestError/spark-company-multisig-is-ward");
+        assertEq(sparkToken.wards(pauseProxy), 1, "TestError/pause-proxy-is-not-ward");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(sparkToken.wards(sparkCoMultisig), 1, "TestError/spark-company-multisig-is-not-ward");
+        assertEq(sparkToken.wards(pauseProxy), 0, "TestError/pause-proxy-is-ward");
     }
 }

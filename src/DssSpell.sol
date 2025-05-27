@@ -24,6 +24,7 @@ import { BridgesConfig, TokenBridgeInit } from "./dependencies/op-token-bridge/T
 import { L1TokenBridgeInstance } from "./dependencies/op-token-bridge/L1TokenBridgeInstance.sol";
 import { L2TokenBridgeInstance } from "./dependencies/op-token-bridge/L2TokenBridgeInstance.sol";
 
+import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 import { VestAbstract } from "dss-interfaces/dss/VestAbstract.sol";
 import { GemAbstract } from "dss-interfaces/ERC/GemAbstract.sol";
 
@@ -42,8 +43,20 @@ interface VestedRewardsDistributionJobLike {
 
 interface DssVestLike {
     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-    // function file(bytes32, uint256) external;
     function restrict(uint256) external;
+}
+
+interface AuthLike {
+    function rely(address) external;
+    function deny(address) external;
+}
+
+interface DaiUsdsLike {
+    function daiToUsds(address usr, uint256 wad) external;
+}
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
 contract DssSpellAction is DssAction {
@@ -70,15 +83,18 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Math ----------
-    uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant MILLION = 10 ** 6;
+    uint256 constant BILLION = 10**9;
 
     //  ---------- Contracts ----------
     address internal immutable USDS                         = DssExecLib.getChangelogAddress("USDS");
     address internal immutable SUSDS                        = DssExecLib.getChangelogAddress("SUSDS");
+    GemAbstract internal immutable DAI                      = GemAbstract(DssExecLib.dai());
+    GemAbstract internal immutable SKY                      = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
+    address internal immutable DAI_USDS                     = DssExecLib.getChangelogAddress("DAI_USDS");
 
     // ---------- MKR to SKY Upgrade Phase Two ----------
-    GemAbstract internal immutable SKY                      = GemAbstract(DssExecLib.getChangelogAddress("SKY"));
     address internal immutable MCD_SPLIT                    = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable MCD_PAUSE                    = DssExecLib.getChangelogAddress("MCD_PAUSE");
     address internal immutable MCD_VAT                      = DssExecLib.getChangelogAddress("MCD_VAT");
@@ -120,6 +136,25 @@ contract DssSpellAction is DssAction {
     address internal constant L2_OPTIMISM_SUSDS             = 0xb5B2dc7fd34C249F4be7fB1fCea07950784229e0;
     address internal constant L2_OPTIMISM_SPELL             = 0x99892216eD34e8FD924A1dBC758ceE61a9109409;
     address internal constant L2_OPTIMISM_MESSENGER         = 0x4200000000000000000000000000000000000007;
+
+    // ----- Transfer Ownership of SPK Token to SPK Company Multisig -----
+    address internal constant SPK_TOKEN                     = 0xc20059e0317DE91738d13af027DfC4a50781b066;
+    address internal constant SPK_COMPANY_MULTISIG          = 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B;
+
+    // ----- Payments -----
+    address internal constant LAUNCH_PROJECT_FUNDING        = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
+    address internal constant BLUE                          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BONAPUBLICA                   = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant BYTERON                       = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
+    address internal constant CLOAKY                        = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
+    address internal constant JULIACHANG                    = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant PBG                           = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant WBC                           = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant KOHLA                         = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+
+    // ----- Execute Spark Proxy Spell -----
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x3968a022D955Bbb7927cc011A48601B65a33F346;
 
     function actions() public override {
         // Note: multple actions in the spell depend on DssInstance
@@ -170,7 +205,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogVersion("1.20.1");
 
         // Add new REWARDS_USDS_SKY_DIST to the keeper job by calling `CRON_REWARDS_DIST_JOB.set()` with the new REWARDS_USDS_SKY_DIST
-        VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).set(REWARDS_DIST_USDS_SKY_NEW, 601200); // TODO: Confirm frequency
+        VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).set(REWARDS_DIST_USDS_SKY_NEW, 601200);
 
         // Deploy new MCD_VEST_SKY_TREASURY stream with the following parameters: usr(REWARDS_USDS_SKY_DIST), tot(137,500,000 SKY), bgn(block.timestamp), tau(182 days), cliff: none, manager, none
         uint256 vestId = DssVestLike(MCD_VEST_SKY_TREASURY).create(
@@ -317,62 +352,99 @@ contract DssSpellAction is DssAction {
         // ----- Deactivate SparkLend DDM -----
 
         // Remove DIRECT-SPARK-DAI from the AutoLine
+        DssExecLib.removeIlkFromAutoLine("DIRECT-SPARK-DAI");
+
+        // Note: in order to decrease global debt ceiling, we need to fetch current `line`
+        (,,, uint256 line,) = VatAbstract(MCD_VAT).ilks("DIRECT-SPARK-DAI");
 
         // Set Debt Ceiling to 0 USDS
+        DssExecLib.setIlkDebtCeiling("DIRECT-SPARK-DAI", 0);
 
         // Reduce Global Debt Ceiling to account for this change
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - line);
 
         // ----- Transfer Ownership of SPK Token to SPK Company Multisig -----
 
         // Rely 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B on 0xc20059e0317DE91738d13af027DfC4a50781b066
+        AuthLike(SPK_TOKEN).rely(SPK_COMPANY_MULTISIG);
 
         // Deny MCD_PAUSE_PROXY on 0xc20059e0317DE91738d13af027DfC4a50781b066
+        AuthLike(SPK_TOKEN).deny(address(this));
 
         // ----- Increase ALLOCATOR-SPARK-A Maximum Debt Ceiling -----
 
         // Increase ALLOCATOR-SPARK-A line by 5 billion USDS from 5 billion USDS to 10 billion USDS
-
         // gap remains unchanged at 500 million USDS
-
         // ttl remains unchanged at 86,400 seconds
+        DssExecLib.setIlkAutoLineParameters("ALLOCATOR-SPARK-A", /* amount = */ 10 * BILLION, /* gap = */ 500 * MILLION, /* ttl = */ 86_400);
 
         // ----- Launch Project Funding -----
 
         // Transfer 5,000,000 USDS to 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        _transferUsds(LAUNCH_PROJECT_FUNDING, 5_000_000 * WAD);
 
         // ----- Delegate Compensation for April 2025 -----
 
         // BLUE - 4,000 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        _transferUsds(BLUE, 4_000 * WAD);
 
         // Bonapublica - 4,000 USDS - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        _transferUsds(BONAPUBLICA, 4_000 * WAD);
 
         // Byteron - 4,000 USDS - 0xc2982e72D060cab2387Dba96b846acb8c96EfF66
+        _transferUsds(BYTERON, 4_000 * WAD);
 
         // Cloaky - 4,000 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        _transferUsds(CLOAKY, 4_000 * WAD);
 
         // JuliaChang - 4,000 USDS - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        _transferUsds(JULIACHANG, 4_000 * WAD);
 
         // PBG - 3,867 USDS - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        _transferUsds(PBG, 3_867 * WAD);
 
         // WBC - 2,400 USDS - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        _transferUsds(WBC, 2_400 * WAD);
 
         // ----- Atlas Core Development USDS Payments for May 2025 -----
 
         // BLUE - 50,167 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        _transferUsds(BLUE, 50_167 * WAD);
 
         // Cloaky - 16,417 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        _transferUsds(CLOAKY, 16_417 * WAD);
 
         // Kohla - 11,000 USDS - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
+        _transferUsds(KOHLA, 11_000 * WAD);
 
         // ----- Atlas Core Development SKY Payments for May 2025 -----
 
         // BLUE - 330,000 SKY - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        SKY.transfer(BLUE, 330_000 * WAD);
 
         // Cloaky - 288,000 SKY - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        SKY.transfer(CLOAKY, 288_000 * WAD);
 
         // ----- Execute Spark Proxy Spell -----
 
         // Execute Spark Proxy Spell at address xyz
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+    }
+
+    // ---------- Helper Functions ----------
+
+    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
+    /// @param usr The USDS receiver.
+    /// @param wad The USDS amount in wad precision (10 ** 18).
+    function _transferUsds(address usr, uint256 wad) internal {
+        // Note: Enforce whole units to avoid rounding errors
+        require(wad % WAD == 0, "transferUsds/non-integer-wad");
+        // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
+        DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
+        // Note: Approve DAI_USDS for the amount sent to be able to convert it.
+        DAI.approve(DAI_USDS, wad);
+        // Note: Convert Dai to USDS for `usr`.
+        DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 }
 
