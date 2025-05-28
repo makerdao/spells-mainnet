@@ -161,6 +161,10 @@ contract DssSpellAction is DssAction {
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
         // ----- MKR to SKY Upgrade Phase Two -----
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-may-5-2025/26319
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1.2_MKR_To_SKY_Upgrade_Phase_Two/1f1f2ff0-8d73-80ee-81e9-f508c45f90ed|b341f4c0b83472dc
+        // Poll: https://vote.makerdao.com/polling/QmcZNZg3
+
 
         // Activate USDS rewards on the LSEV2-SKY-A contract
         // Reduce splitter.burn by 50 percentage points from 100% to 50%
@@ -181,7 +185,10 @@ contract DssSpellAction is DssAction {
         // Revoke LOCKSTAKE_MIGRATOR's authority over the vat
         DssExecLib.deauthorize(MCD_VAT, LOCKSTAKE_MIGRATOR);
 
-        // Change Source of SKY For USDS -> SKY Farm
+        // ----- Change Source of SKY For USDS -> SKY Farm -----
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
+
         // yank MCD_VEST_SKY stream ID 2
         VestAbstract(MCD_VEST_SKY).yank(2);
 
@@ -224,6 +231,10 @@ contract DssSpellAction is DssAction {
         DssExecLib.setValue(REWARDS_DIST_USDS_SKY_NEW, "vestId", vestId);
 
         // ----- Init Unichain Native Bridge -----
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Poll: https://vote.makerdao.com/polling/QmXjeJtw
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
 
         // Set l1BridgeInstance with the following parameters:
         L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
@@ -293,6 +304,10 @@ contract DssSpellAction is DssAction {
         TokenBridgeInit.initBridges(dss, l1BridgeInstance, l2BridgeInstance, bridgeCfg);
 
         // ----- Init Optimism Native Bridge -----
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Poll: https://vote.makerdao.com/polling/QmNe8Erm
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
 
         // Set l1BridgeInstance with the following parameters:
         l1BridgeInstance = L1TokenBridgeInstance({
@@ -350,6 +365,8 @@ contract DssSpellAction is DssAction {
         TokenBridgeInit.initBridges(dss, l1BridgeInstance, l2BridgeInstance, bridgeCfg);
 
         // ----- Deactivate SparkLend DDM -----
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
 
         // Remove DIRECT-SPARK-DAI from the AutoLine
         DssExecLib.removeIlkFromAutoLine("DIRECT-SPARK-DAI");
@@ -364,6 +381,8 @@ contract DssSpellAction is DssAction {
         VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - line);
 
         // ----- Transfer Ownership of SPK Token to SPK Company Multisig -----
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
 
         // Rely 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B on 0xc20059e0317DE91738d13af027DfC4a50781b066
         AuthLike(SPK_TOKEN).rely(SPK_COMPANY_MULTISIG);
@@ -372,6 +391,8 @@ contract DssSpellAction is DssAction {
         AuthLike(SPK_TOKEN).deny(address(this));
 
         // ----- Increase ALLOCATOR-SPARK-A Maximum Debt Ceiling -----
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Poll: https://vote.makerdao.com/polling/QmVMBXm8
 
         // Increase ALLOCATOR-SPARK-A line by 5 billion USDS from 5 billion USDS to 10 billion USDS
         // gap remains unchanged at 500 million USDS
@@ -379,11 +400,15 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineParameters("ALLOCATOR-SPARK-A", /* amount = */ 10 * BILLION, /* gap = */ 500 * MILLION, /* ttl = */ 86_400);
 
         // ----- Launch Project Funding -----
+        // Forum: https://forum.sky.money/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/43
+        // Atlas: https://sky-atlas.powerhouse.io/A.5.6_Launch_Project/1f433d9d-7cdb-406f-b7e8-f9bc4855eb77%7C8d5a
 
         // Transfer 5,000,000 USDS to 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
         _transferUsds(LAUNCH_PROJECT_FUNDING, 5_000_000 * WAD);
 
         // ----- Delegate Compensation for April 2025 -----
+        // Forum: https://forum.sky.money/t/april-2025-aligned-delegate-compensation/26441
+        // Atlas: https://sky-atlas.powerhouse.io/Budget_And_Participation_Requirements/4c698938-1a11-4486-a568-e54fc6b0ce0c|0db3af4e
 
         // BLUE - 4,000 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferUsds(BLUE, 4_000 * WAD);
@@ -407,6 +432,9 @@ contract DssSpellAction is DssAction {
         _transferUsds(WBC, 2_400 * WAD);
 
         // ----- Atlas Core Development USDS Payments for May 2025 -----
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-may-2025/26344
+        // Atlas: https://sky-atlas.powerhouse.io/A.2.2.1.1_Funding/8ea8dcb0-7261-4c1a-ae53-b7f3eb5362e5|9e1f3b569af1
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-may-2025/26344/6
 
         // BLUE - 50,167 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         _transferUsds(BLUE, 50_167 * WAD);
@@ -418,6 +446,9 @@ contract DssSpellAction is DssAction {
         _transferUsds(KOHLA, 11_000 * WAD);
 
         // ----- Atlas Core Development SKY Payments for May 2025 -----
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-may-2025/26344
+        // Atlas: https://sky-atlas.powerhouse.io/A.2.2.1.1_Funding/8ea8dcb0-7261-4c1a-ae53-b7f3eb5362e5|9e1f3b569af1
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-may-2025/26344/6
 
         // BLUE - 330,000 SKY - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
         SKY.transfer(BLUE, 330_000 * WAD);
@@ -426,6 +457,24 @@ contract DssSpellAction is DssAction {
         SKY.transfer(CLOAKY, 288_000 * WAD);
 
         // ----- Execute Spark Proxy Spell -----
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell-2/26440
+        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell-2/26440
+        // Poll: https://vote.makerdao.com/polling/QmXjeJtw
+        // Poll: https://vote.makerdao.com/polling/QmNe8Erm
+        // Poll: https://vote.makerdao.com/polling/QmUnygNr
+        // Poll: https://vote.makerdao.com/polling/QmVt1spi
+        // Poll: https://vote.makerdao.com/polling/QmX16hA3
+        // Poll: https://vote.makerdao.com/polling/QmfPc8Ub
+        // Poll: https://vote.makerdao.com/polling/QmUYRV1H
+        // Poll: https://vote.sky.money/polling/QmRtLuL2
+        // Poll: https://vote.sky.money/polling/QmcN7anL
 
         // Execute Spark Proxy Spell at address 0x3968a022D955Bbb7927cc011A48601B65a33F346
         ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
