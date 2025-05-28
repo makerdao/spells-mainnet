@@ -1,5 +1,8 @@
-import { createProvider, createContractInstances } from './utils/contractUtils.js';
-import { AGREEMENT_ADDRESS } from './constants.js';
+import {
+    createProvider,
+    createContractInstances,
+} from "./utils/contractUtils.js";
+import { AGREEMENT_ADDRESS } from "./constants.js";
 
 async function fetchRegistryState() {
     try {
@@ -9,17 +12,23 @@ async function fetchRegistryState() {
 
         // Fetch all details in a single call
         const details = await agreement.getDetails();
-        
+
         // Log the complete state
         console.log("\nRegistry State:");
-        console.log(JSON.stringify({
-            agreementAddress: AGREEMENT_ADDRESS,
-            protocolName: details.protocolName,
-            contactDetails: details.contactDetails,
-            chains: details.chains,
-            bountyTerms: details.bountyTerms,
-            agreementURI: details.agreementURI
-        }, null, 2));
+        console.log(
+            JSON.stringify(
+                {
+                    agreementAddress: AGREEMENT_ADDRESS,
+                    protocolName: details.protocolName,
+                    contactDetails: details.contactDetails,
+                    chains: details.chains,
+                    bountyTerms: details.bountyTerms,
+                    agreementURI: details.agreementURI,
+                },
+                null,
+                2,
+            ),
+        );
 
         return details;
     } catch (error) {
@@ -33,4 +42,4 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
     fetchRegistryState();
 }
 
-export { fetchRegistryState }; 
+export { fetchRegistryState };

@@ -1,25 +1,20 @@
 // NOTE: File required for bootstrapping the initial deployment of the AgreementV2 contract, remove after adoption.
-
-import { ethers } from 'ethers';
-
-import { 
-    downloadAndParseCSV, 
-    buildCSVRepresentation 
-} from './utils/csvUtils.js';
-import { 
-    createEmptyDetails, 
+import {
+    downloadAndParseCSV,
+    buildCSVRepresentation,
+} from "./utils/csvUtils.js";
+import {
+    createEmptyDetails,
     createContractInstances,
     createProvider,
-    generateCreatePayload, 
+    generateCreatePayload,
     generateAddChainsPayload,
-    logConfiguration 
-} from './utils/contractUtils.js';
+    logConfiguration,
+} from "./utils/contractUtils.js";
 
-import { 
-    CSV_URL_SHEET1
-} from './constants.js';
+import { CSV_URL_SHEET1 } from "./constants.js";
 
-import { getAssetRecoveryAddress, getChainId } from './utils/chainUtils.js';
+import { getAssetRecoveryAddress, getChainId } from "./utils/chainUtils.js";
 
 // Helper function to encode the deployment payload
 export async function generateDeploymentPayload() {
@@ -50,17 +45,17 @@ export async function generateDeploymentPayload() {
         // Log the configuration that was used
         const allChains = Object.entries(csvState).map(([chain, accounts]) => ({
             assetRecoveryAddress: getAssetRecoveryAddress(chain),
-            accounts: accounts.map(acc => ({
+            accounts: accounts.map((acc) => ({
                 accountAddress: acc.accountAddress,
-                childContractScope: acc.childContractScope
+                childContractScope: acc.childContractScope,
             })),
-            id: getChainId(chain)
+            id: getChainId(chain),
         }));
         logConfiguration(emptyDetails, allChains);
 
         return {
             createPayload,
-            addChainsPayload
+            addChainsPayload,
         };
     } catch (error) {
         console.error("Error generating deployment payload:", error);
@@ -71,4 +66,4 @@ export async function generateDeploymentPayload() {
 // Only run if this file is being executed directly
 if (process.argv[1] === new URL(import.meta.url).pathname) {
     generateDeploymentPayload();
-} 
+}
