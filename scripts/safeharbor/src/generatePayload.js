@@ -30,8 +30,8 @@ export function buildCSVRepresentation(records) {
         .reduce((groups, record) => {
             const chain = record.Chain;
             if (!groups[chain]) {
-                groups[chain] = [];
-            }
+                    groups[chain] = [];
+                }
             groups[chain].push({
                 accountAddress: record.Address,
                 childContractScope: record.IsFactory === "TRUE" ? 3 : 0,

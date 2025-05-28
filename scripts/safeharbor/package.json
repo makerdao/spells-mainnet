@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "generate": "node index.js",
+    "generate": "node src/generatePayload.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

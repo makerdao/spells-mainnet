@@ -6,7 +6,7 @@ import {
     standardizeChainData,
     generateChainUpdates,
     generateAccountUpdates,
-} from "./generatePayload.js";
+} from "../generatePayload.js";
 
 // Mock ethers provider and contract
 jest.mock("ethers", () => ({
