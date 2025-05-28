@@ -21,8 +21,8 @@ export const CSV_URL_SHEET2 =
 export const PROTOCOL_NAME = "Sky";
 export const AGREEMENT_URI = "Agreement URI";
 export const CONTACT_DETAILS = {
-    name: "Contact Name",
-    contact: "Contact@Info",
+    name: "",
+    contact: "safeharbor@sky.money",
 };
 export const BOUNTY_TERMS = {
     bountyPercentage: 10000000, // 10%
