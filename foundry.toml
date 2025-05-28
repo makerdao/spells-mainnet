@@ -7,6 +7,8 @@ fs_permissions = [
     { access = "read", path = "./out/ArbitrumDomain.sol/ArbSysOverride.json"}
 ]
 
+block_gas_limit = 1000000000000000000
+
 [rpc_endpoints]
 mainnet = "${ETH_RPC_URL}"
 unichain = "${UNICHAIN_RPC_URL}"

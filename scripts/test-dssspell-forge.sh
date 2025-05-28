@@ -35,4 +35,4 @@ if [[ -n "$BLOCK" ]]; then
     TEST_ARGS="${TEST_ARGS} --fork-block-number ${BLOCK}"
 fi
 
-forge test --memory-limit 2000000000 --fork-url "$ETH_RPC_URL" $TEST_ARGS
+forge test --fork-url "$ETH_RPC_URL" $TEST_ARGS
