@@ -46,11 +46,6 @@ interface DssVestLike {
     function restrict(uint256) external;
 }
 
-interface AuthLike {
-    function rely(address) external;
-    function deny(address) external;
-}
-
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
 }
@@ -63,7 +58,7 @@ contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/makerdao/executive-votes/be4713034956d61ee1b405bb3edc1a24575e166c/2025/executive-vote-2025-05-29-MKR-to-SKY-upgrade-phase-two.md' -q -O - 2>/dev/null)"
-    string public constant override description = "2025-05-15 MakerDAO Executive Spell | Hash: 0xfab5d8c1ed2ce3d781fd2910c6e3d93999891b5568419078dff909cc1996a7ef";
+    string public constant override description = "2025-05-29 MakerDAO Executive Spell | Hash: 0xfab5d8c1ed2ce3d781fd2910c6e3d93999891b5568419078dff909cc1996a7ef";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
@@ -85,7 +80,7 @@ contract DssSpellAction is DssAction {
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant MILLION = 10 ** 6;
-    uint256 internal constant BILLION = 10**9;
+    uint256 internal constant BILLION = 10 ** 9;
 
     //  ---------- Contracts ----------
     address internal immutable USDS                         = DssExecLib.getChangelogAddress("USDS");
@@ -123,8 +118,8 @@ contract DssSpellAction is DssAction {
 
     // ---------- Optimism Token Bridge ----------
     // Mainnet addresses
-    address internal constant OPTIMISM_ESCROW               = 0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65;
-    address internal constant OPTIMISM_GOV_RELAY            = 0x09B354CDA89203BB7B3131CC728dFa06ab09Ae2F;
+    address internal immutable OPTIMISM_ESCROW              = DssExecLib.getChangelogAddress("OPTIMISM_ESCROW");
+    address internal immutable OPTIMISM_GOV_RELAY           = DssExecLib.getChangelogAddress("OPTIMISM_GOV_RELAY");
     address internal constant OPTIMISM_TOKEN_BRIDGE         = 0x3d25B7d486caE1810374d37A48BCf0963c9B8057;
     address internal constant OPTIMISM_TOKEN_BRIDGE_IMP     = 0xA50adBad34c1e9786979bD44220F8fd46e43A6B0;
     address internal constant OPTIMISM_MESSENGER            = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
@@ -146,11 +141,11 @@ contract DssSpellAction is DssAction {
     address internal constant BLUE                          = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
     address internal constant BONAPUBLICA                   = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
     address internal constant BYTERON                       = 0xc2982e72D060cab2387Dba96b846acb8c96EfF66;
-    address internal constant CLOAKY                        = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
+    address internal constant CLOAKY_2                      = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
     address internal constant JULIACHANG                    = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
     address internal constant PBG                           = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
     address internal constant WBC                           = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
-    address internal constant KOHLA                         = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+    address internal constant CLOAKY_KOHLA_2                = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
 
     // ----- Execute Spark Proxy Spell -----
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
@@ -385,10 +380,10 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-upcoming-executive-spell-2025-05-29/26448/5
 
         // Rely 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B on 0xc20059e0317DE91738d13af027DfC4a50781b066
-        AuthLike(SPK_TOKEN).rely(SPK_COMPANY_MULTISIG);
+        DssExecLib.authorize(SPK_TOKEN, SPK_COMPANY_MULTISIG);
 
         // Deny MCD_PAUSE_PROXY on 0xc20059e0317DE91738d13af027DfC4a50781b066
-        AuthLike(SPK_TOKEN).deny(address(this));
+        DssExecLib.deauthorize(SPK_TOKEN, address(this));
 
         // ----- Increase ALLOCATOR-SPARK-A Maximum Debt Ceiling -----
         // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
@@ -420,7 +415,7 @@ contract DssSpellAction is DssAction {
         _transferUsds(BYTERON, 4_000 * WAD);
 
         // Cloaky - 4,000 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
-        _transferUsds(CLOAKY, 4_000 * WAD);
+        _transferUsds(CLOAKY_2, 4_000 * WAD);
 
         // JuliaChang - 4,000 USDS - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
         _transferUsds(JULIACHANG, 4_000 * WAD);
@@ -440,10 +435,10 @@ contract DssSpellAction is DssAction {
         _transferUsds(BLUE, 50_167 * WAD);
 
         // Cloaky - 16,417 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
-        _transferUsds(CLOAKY, 16_417 * WAD);
+        _transferUsds(CLOAKY_2, 16_417 * WAD);
 
         // Kohla - 11,000 USDS - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
-        _transferUsds(KOHLA, 11_000 * WAD);
+        _transferUsds(CLOAKY_KOHLA_2, 11_000 * WAD);
 
         // ----- Atlas Core Development SKY Payments for May 2025 -----
         // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-may-2025/26344
@@ -454,17 +449,10 @@ contract DssSpellAction is DssAction {
         SKY.transfer(BLUE, 330_000 * WAD);
 
         // Cloaky - 288,000 SKY - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
-        SKY.transfer(CLOAKY, 288_000 * WAD);
+        SKY.transfer(CLOAKY_2, 288_000 * WAD);
 
         // ----- Execute Spark Proxy Spell -----
         // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372
-        // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell-2/26440
         // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell-2/26440
         // Poll: https://vote.makerdao.com/polling/QmXjeJtw
         // Poll: https://vote.makerdao.com/polling/QmNe8Erm
