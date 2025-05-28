@@ -7,7 +7,11 @@
     "scripts": {
         "start": "node .",
         "generate": "node index.js",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "dependencies": {
         "csv-parse": "^5.5.0",
@@ -18,7 +22,9 @@
     "devDependencies": {
         "@babel/core": "^7.23.9",
         "@babel/preset-env": "^7.23.9",
-        "jest": "^29.7.0"
+        "eslint": "^9.27.0",
+        "jest": "^29.7.0",
+        "prettier": "^3.5.3"
     },
     "jest": {
         "transform": {},

@@ -8,29 +8,29 @@ import {
 } from './utils/csvUtils.js';
 import { 
     createEmptyDetails, 
-    createContractInstances, 
+    createContractInstances,
+    createProvider,
     generateCreatePayload, 
     generateAddChainsPayload,
     logConfiguration 
 } from './utils/contractUtils.js';
 
 import { 
-    CSV_URL_SHEET1,
-    CSV_URL_SHEET2
+    CSV_URL_SHEET1
 } from './constants.js';
+
+import { getAssetRecoveryAddress, getChainId } from './utils/chainUtils.js';
 
 // Helper function to encode the deployment payload
 export async function generateDeploymentPayload() {
     try {
         // 1. Download and parse CSV
-        const records1 = await downloadAndParseCSV(CSV_URL_SHEET1);
-        const records2 = await downloadAndParseCSV(CSV_URL_SHEET2);
-        const records = [...records1, ...records2];
-        
+        const records = await downloadAndParseCSV(CSV_URL_SHEET1);
+
         const csvState = buildCSVRepresentation(records);
 
         // 2. Generate empty contract creation payload
-        const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+        const provider = createProvider();
         const { factory, agreement } = createContractInstances(provider);
 
         // Create empty details for initial deployment
@@ -49,16 +49,12 @@ export async function generateDeploymentPayload() {
 
         // Log the configuration that was used
         const allChains = Object.entries(csvState).map(([chain, accounts]) => ({
-            assetRecoveryAddress: "0x0000000000000000000000000000000000000022",
+            assetRecoveryAddress: getAssetRecoveryAddress(chain),
             accounts: accounts.map(acc => ({
                 accountAddress: acc.accountAddress,
                 childContractScope: acc.childContractScope
             })),
-            id: chain === "ETHEREUM" ? 1 : 
-                chain === "BASE" ? 8453 :
-                chain === "GNOSIS" ? 100 :
-                chain === "ARBITRUM" ? 42161 :
-                chain === "SOLANA" ? 555 : 0
+            id: getChainId(chain)
         }));
         logConfiguration(emptyDetails, allChains);
 

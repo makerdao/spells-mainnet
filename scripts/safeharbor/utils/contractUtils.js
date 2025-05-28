@@ -2,27 +2,36 @@ import { ethers } from 'ethers';
 import { 
     FACTORY_ADDRESS, 
     OWNER_ADDRESS,
-    DEFAULT_PROTOCOL_NAME,
-    DEFAULT_CONTACT,
-    DEFAULT_BOUNTY_TERMS,
-    DEFAULT_AGREEMENT_URI,
-    DEFAULT_ASSET_RECOVERY_ADDRESS
+    PROTOCOL_NAME,
+    CONTACT_DETAILS,
+    BOUNTY_TERMS,
+    AGREEMENT_URI,
+    AGREEMENT_ADDRESS
 } from '../constants.js';
 import { FACTORY_ABI, AGREEMENTV2_ABI as AGREEMENT_ABI } from '../abis.js';
+import { getAssetRecoveryAddress, getChainId } from './chainUtils.js';
+
+// Create a provider instance
+export function createProvider() {
+    if (!process.env.RPC_URL) {
+        throw new Error('RPC_URL environment variable is not set');
+    }
+    return new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+}
 
 export function createEmptyDetails() {
     return {
-        protocolName: DEFAULT_PROTOCOL_NAME,
-        contactDetails: [DEFAULT_CONTACT],
+        protocolName: PROTOCOL_NAME,
+        contactDetails: [CONTACT_DETAILS],
         chains: [], // Empty chains array
-        bountyTerms: DEFAULT_BOUNTY_TERMS,
-        agreementURI: DEFAULT_AGREEMENT_URI
+        bountyTerms: BOUNTY_TERMS,
+        agreementURI: AGREEMENT_URI
     };
 }
 
 export function createContractInstances(provider) {
     const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
-    const agreement = new ethers.Contract("0xa5c82ae35b653192d99c019a8eeaa159af0133e5", AGREEMENT_ABI, provider);
+    const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
     return { factory, agreement };
 }
 
@@ -40,17 +49,17 @@ export function generateCreatePayload(factory, emptyDetails) {
 
 export function generateAddChainsPayload(agreement, csvState) {
     const allChains = Object.entries(csvState).map(([chain, accounts]) => ({
-        assetRecoveryAddress: DEFAULT_ASSET_RECOVERY_ADDRESS,
+        assetRecoveryAddress: getAssetRecoveryAddress(chain),
         accounts: accounts.map(acc => ({
             accountAddress: acc.accountAddress,
             childContractScope: acc.childContractScope
         })),
-        id: chain === "ETHEREUM" ? 1 : 0
+        id: getChainId(chain)
     }));
 
     const addChainsCalldata = agreement.interface.encodeFunctionData("addChains", [allChains]);
     return {
-        target: "0xa5c82ae35b653192d99c019a8eeaa159af0133e5",
+        target: AGREEMENT_ADDRESS,
         calldata: addChainsCalldata
     };
 }

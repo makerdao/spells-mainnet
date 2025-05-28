@@ -1,16 +1,15 @@
-import { ethers } from 'ethers';
-
 import { downloadAndParseCSV } from './utils/csvUtils.js';
+import { getAssetRecoveryAddress } from './utils/chainUtils.js';
+
 
 // Constants
 import { 
-    OWNER_ADDRESS,
-    AGREEMENT_ADDRESS,
-    CSV_URL_SHEET1,
-    CSV_URL_SHEET2
+    CSV_URL_SHEET1
 } from './constants.js';
 
 import { AGREEMENTV2_ABI as AGREEMENT_ABI } from './abis.js';
+import { createProvider, createContractInstances } from './utils/contractUtils.js';
+import { getChainId, getChainName } from './utils/chainUtils.js';
 
 // Helper function to compare arrays
 export function arraysEqual(a, b) {
@@ -46,7 +45,7 @@ export function buildCSVRepresentation(records) {
 // Build internal representation from on-chain state
 export function buildOnChainRepresentation(details) {
     return details.chains.reduce((groups, chain) => {
-        const chainName = chain.id.toString() === "1" ? "ETHEREUM" : "OTHER";
+        const chainName = getChainName(chain.id);
         groups[chainName] = chain.accounts;
         return groups;
     }, {});
@@ -100,8 +99,8 @@ export function generateHumanReadableDiffs(csvState, onChainState) {
 
 // Data fetching and standardization
 export async function fetchAgreementDetails() {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-    const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
+    const provider = createProvider();
+    const { agreement } = createContractInstances(provider);
     return await agreement.getDetails();
 }
 
@@ -129,12 +128,12 @@ export function generateChainUpdates(currentChains, chainGroups) {
     const updates = [];
     const currentChainIds = currentChains.map(chain => chain.id.toString());
     const desiredChainIds = Object.entries(chainGroups).map(([chain, _]) => 
-        chain === "ETHEREUM" ? "1" : "0"
+        getChainId(chain).toString()
     );
     const chainDiff = findArrayDifferences(currentChainIds, desiredChainIds);
 
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-    const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
+    const provider = createProvider();
+    const { agreement } = createContractInstances(provider);
 
     for (const chainId of chainDiff.toRemove) {
         updates.push({
@@ -145,11 +144,11 @@ export function generateChainUpdates(currentChains, chainGroups) {
     }
 
     for (const chainId of chainDiff.toAdd) {
-        const chainName = chainId === "1" ? "ETHEREUM" : "OTHER";
+        const chainName = getChainName(parseInt(chainId));
         const chainContracts = chainGroups[chainName] || [];
         
         const newChain = {
-            assetRecoveryAddress: "0x0000000000000000000000000000000000000022",
+            assetRecoveryAddress: getAssetRecoveryAddress(chainName),
             accounts: chainContracts,
             id: parseInt(chainId)
         };
@@ -166,11 +165,11 @@ export function generateChainUpdates(currentChains, chainGroups) {
 
 export function generateAccountUpdates(currentChains, chainGroups) {
     const updates = [];
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-    const agreement = new ethers.Contract(AGREEMENT_ADDRESS, AGREEMENT_ABI, provider);
+    const provider = createProvider();
+    const { agreement } = createContractInstances(provider);
 
     for (const [chainId, chain] of currentChains.entries()) {
-        const chainName = chain.id.toString() === "1" ? "ETHEREUM" : "OTHER";
+        const chainName = getChainName(chain.id);
         const desiredAccounts = chainGroups[chainName] || [];
         const currentAccounts = chain.accounts;
 
@@ -233,13 +232,13 @@ export function generateAccountUpdates(currentChains, chainGroups) {
 export async function generateUpdatePayload() {
     try {
         // 1. Download and parse CSV
-        const records1 = await downloadAndParseCSV(CSV_URL_SHEET1);
-        const records2 = await downloadAndParseCSV(CSV_URL_SHEET2);
-        const records = [...records1, ...records2];
+        console.log("Downloading Google Sheet CSV...");
+        const records = await downloadAndParseCSV(CSV_URL_SHEET1);
         
         const csvState = buildCSVRepresentation(records);
         
         // 2. Fetch on-chain state
+        console.log("Fetching on-chain state...");
         const currentDetails = await fetchAgreementDetails();
         const onChainState = buildOnChainRepresentation(currentDetails);
         
