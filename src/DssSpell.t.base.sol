@@ -248,6 +248,7 @@ interface LitePsmMomLike is AuthorityLike {
 
 interface StakingRewardsLike {
     function owner() external view returns (address);
+    function balanceOf(address) external view returns (uint256);
     function stake(uint256 amount) external;
     function notifyRewardAmount(uint256 reward) external;
     function rewardPerToken() external view returns (uint256);
@@ -256,6 +257,7 @@ interface StakingRewardsLike {
     function rewardsToken() external view returns (address);
     function stakingToken() external view returns (address);
     function lastUpdateTime() external view returns (uint256);
+    function getReward() external;
 }
 
 interface LockstakeEngineLike {

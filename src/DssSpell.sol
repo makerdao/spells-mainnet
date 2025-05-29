@@ -46,6 +46,10 @@ interface DssVestLike {
     function restrict(uint256) external;
 }
 
+interface StakingRewardsLike {
+    function setRewardsDistribution(address) external;
+}
+
 interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
 }
@@ -98,6 +102,7 @@ contract DssSpellAction is DssAction {
     address internal immutable REWARDS_DIST_USDS_SKY        = DssExecLib.getChangelogAddress("REWARDS_DIST_USDS_SKY");
     address internal immutable MCD_VEST_SKY_TREASURY        = DssExecLib.getChangelogAddress("MCD_VEST_SKY_TREASURY");
     address internal immutable CRON_REWARDS_DIST_JOB        = DssExecLib.getChangelogAddress("CRON_REWARDS_DIST_JOB");
+    address internal immutable REWARDS_USDS_SKY             = DssExecLib.getChangelogAddress("REWARDS_USDS_SKY");
     address internal constant REWARDS_DIST_USDS_SKY_NEW     = 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F;
 
     // ---------- Unichain Token Bridge ----------
@@ -224,6 +229,9 @@ contract DssSpellAction is DssAction {
 
         // file the id of the newly created stream to the new REWARDS_DIST_USDS_SKY contract
         DssExecLib.setValue(REWARDS_DIST_USDS_SKY_NEW, "vestId", vestId);
+
+        // Set rewardsDistribution on REWARDS_USDS_SKY to the new REWARDS_DIST_USDS_SKY contract
+        StakingRewardsLike(REWARDS_USDS_SKY).setRewardsDistribution(REWARDS_DIST_USDS_SKY_NEW);
 
         // ----- Init Unichain Native Bridge -----
         // Forum: https://forum.sky.money/t/may-29-2025-proposed-changes-to-spark-for-upcoming-spell/26372

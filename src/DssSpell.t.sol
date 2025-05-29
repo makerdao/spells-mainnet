@@ -49,6 +49,7 @@ interface SpellActionLike {
 }
 
 interface SequencerLike {
+    function getMaster() external view returns (bytes32);
     function hasJob(address job) external view returns (bool);
 }
 
@@ -71,13 +72,21 @@ interface DssVestLike {
 }
 
 interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function dssVest() external view returns (address);
     function lastDistributedAt() external view returns (uint256);
+    function stakingRewards() external view returns (address);
     function vestId() external view returns (uint256);
 }
 
 interface VestedRewardsDistributionJobLike {
     function has(address) external view returns (bool);
     function intervals(address) external view returns (uint256);
+}
+
+interface CronJobLike {
+    function work(bytes32 network, bytes memory args) external;
+    function workable(bytes32 network) external returns (bool, bytes memory);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -1356,6 +1365,85 @@ contract DssSpellTest is DssSpellTestBase {
         assertFalse(job.has(prevDistributor), "TestError/distributor-job-not-removed");
         assertTrue(job.has(newDistributor), "TestError/new-distributor-job-not-added");
         assertEq(job.intervals(newDistributor), 601200, "TestError/new-distributor-invalid-interval");
+    }
+
+    function testUsdsSkyRewardsIntegration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_SKY"));
+        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        // Sanity checks
+        assertEq(rewards.rewardsDistribution(), address(dist), "testUsdsSkyRewards/rewards-rewards-dist-mismatch");
+        assertEq(rewards.stakingToken(), address(usds), "testUsdsSkyRewards/rewards-staking-token-mismatch");
+        assertEq(rewards.rewardsToken(), address(sky), "testUsdsSkyRewards/rewards-rewards-token-mismatch");
+
+        assertTrue(vestSky.valid(dist.vestId()),               "testUsdsSkyRewards/invalid-dist-vest-id");
+
+        assertEq(dist.dssVest(), address(vestSky), "testUsdsSkyRewards/dist-vest-mismatch");
+        assertEq(dist.stakingRewards(), address(rewards), "testUsdsSkyRewards/dist-rewards-mismatch");
+
+        // Check if users can stake and get rewards
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 stakingWad = 100_000 * WAD;
+            _giveTokens(address(usds), stakingWad);
+            usds.approve(address(rewards), stakingWad);
+            rewards.stake(stakingWad);
+            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsdsSkyRewards/rewards-invalid-staked-balance");
+
+            uint256 pbalance = sky.balanceOf(address(this));
+            skip(7 days);
+            rewards.getReward();
+            assertGt(sky.balanceOf(address(this)), pbalance);
+
+            vm.revertTo(before);
+        }
+
+        // Check if distribute can be called again in the future
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 pbalance = sky.balanceOf(address(rewards));
+            skip(7 days);
+            dist.distribute();
+            assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
+
+            vm.revertTo(before);
+        }
+    }
+
+    function testVestedRewardsDistributionJobIntegration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        SequencerLike seq                         = SequencerLike(addr.addr("CRON_SEQUENCER"));
+        CronJobLike job                           = CronJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
+        VestedRewardsDistributionLike distUsdsSky = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        (bool ok, ) = job.workable(seq.getMaster());
+        assertFalse(ok, "testVestedRewardsDistributionJob/unexpected-due-job");
+
+        skip(7 days - 1 hours);
+
+        {
+            uint256 before = vm.snapshot();
+
+            (bool ok, bytes memory out) = job.workable(seq.getMaster());
+            assertTrue(ok, "testVestedRewardsDistributionJob/missing-due-job");
+            (address dist) = abi.decode(out, (address));
+            assertEq(dist, address(distUsdsSky), "testVestedRewardsDistributionJob/invalid-dist-returned");
+
+            vm.revertTo(before);
+        }
+
+        uint256 plastDistributed = distUsdsSky.lastDistributedAt();
+        job.work(seq.getMaster(), abi.encode(address(distUsdsSky)));
+        assertGt(distUsdsSky.lastDistributedAt(), plastDistributed, "testVestedRewardsDistributionJob/missing-distribution");
     }
 
     function testUnichainTokenBridgeIntegration() public {
