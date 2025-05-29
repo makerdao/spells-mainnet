@@ -57,7 +57,8 @@ contract Deployers {
             0x89aAB8CAeEf8d25051cA6E534C6944e51f15DAd2,  // Deployer for ALLOCATOR-NOVA-A,
             0xe3aeA2949A0b0F3BD4e897C577286766a9F4aed0,  // Deployer for SPBEAM
             0x20500bDe46Ed60fe622224a3610836B7535942B4,  // Deployer of Unichain token bridge
-            0x419C3ce2996e2c120e7cf40652e5dEBC0c422a39   // Deployer of Unichain token bridge
+            0x419C3ce2996e2c120e7cf40652e5dEBC0c422a39,  // Deployer of Unichain token bridge
+            0xA46C9A26100bcDA81D3fAEE5c4FdF6e2c2f6f957   // Deployer of Optimism token bridge
         ];
     }
 
