@@ -278,7 +278,6 @@ contract DssSpellAction is DssAction {
         maxWithdrawals[0] = type(uint256).max;
         maxWithdrawals[1] = type(uint256).max;
 
-
         // Set cfg with the following parameters:
         BridgesConfig memory bridgeCfg = BridgesConfig({
             // Set parameter cfg.l1Messenger: (l1messenger 0x9A3D64E386C18Cb1d6d5179a9596A4B5736e98A6)
