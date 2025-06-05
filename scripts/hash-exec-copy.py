@@ -84,7 +84,7 @@ def main():
     executive_content, executive_url, commit_hash = None, None, None
     for exec_title in POSSIBLE_EXEC_TITLES:
         try:
-            executive_content, executive_url, commit_hash = get_executive_by_title(exec_title, year)
+            executive_content, executive_url, commit_hash = get_executive(exec_title, year)
             break
         except ValueError as e:
             continue
