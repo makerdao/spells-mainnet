@@ -163,9 +163,9 @@ def get_contract_metadata(output_path: str, input_path: str) -> Dict[str, Any]:
             'license_number': LICENSE_NUMBERS.get(license_name, LICENSE_NUMBERS['AGPL-3.0-or-later'])
         }
     except FileNotFoundError:
-        raise Exception('Run forge build first')
+        raise Exception('Run `forge build` and try again')
     except json.decoder.JSONDecodeError:
-        raise Exception('Run forge build again')
+        raise Exception(f'Malformed JSON in {output_path}. Run `forge build --force` and try again')
     except KeyError as e:
         raise Exception(f'Missing metadata field: {e}')
 
@@ -378,8 +378,7 @@ def main():
         # Get and verify action contract
         action_address = get_action_address(spell_address)
         if not action_address:
-            print('Could not determine action contract address', file=sys.stderr)
-            return
+            raise Exception('Could not determine action contract address')
 
         verify_contract(
             contract_name="DssSpellAction",
