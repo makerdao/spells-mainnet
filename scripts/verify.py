@@ -159,8 +159,8 @@ def get_contract_metadata(output_path: str, input_path: str) -> Dict[str, Any]:
             'evm_version': metadata['settings']['evmVersion'],
             'optimizer_enabled': metadata['settings']['optimizer']['enabled'],
             'optimizer_runs': metadata['settings']['optimizer']['runs'],
-            # Default to MIT if unknown
-            'license_number': LICENSE_NUMBERS.get(license_name, 1)
+            # Default to AGPL-3.0-or-later if unknown
+            'license_number': LICENSE_NUMBERS.get(license_name, LICENSE_NUMBERS['AGPL-3.0-or-later'])
         }
     except FileNotFoundError:
         raise Exception('Run forge build first')
