@@ -7,7 +7,7 @@ import subprocess
 import locale
 
 INPUT_DATE_FORMAT="%Y-%m-%d"
-REPO_URL = "/makerdao/executive-votes"
+REPO_URL = "/skyecosystem/executive-votes"
 
 # Set locale to en_US.UTF-8 to ensure consistent formatting
 locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
