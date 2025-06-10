@@ -19,6 +19,12 @@ pragma solidity 0.8.16;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
+
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -42,7 +48,85 @@ contract DssSpellAction is DssAction {
     //
     // uint256 internal constant X_PCT_RATE = ;
 
+    // ---------- Contracts ----------
+    address internal immutable MCD_VAT = DssExecLib.vat();
+
+    // ---------- Execute Spark Proxy Spell ----------
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8;
+
     function actions() public override {
+        // ---------- Offboard BlockTower Andromeda (RWA015-A) ----------
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+
+        // Note: Defining required variables for global debt ceiling reductions
+        uint256 line;
+        uint256 globalLineReduction = 0;
+
+        // Note: Add currently set debt ceiling for RWA015-A to globalLineReduction
+        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA015-A");
+        globalLineReduction += line;
+
+        // Remove RWA015-A from the AutoLine
+        DssExecLib.removeIlkFromAutoLine("RWA015-A");
+
+        // Set RWA015-A Debt Ceiling to 0 DAI
+        DssExecLib.setIlkDebtCeiling("RWA015-A", 0);
+
+        // Reduce Global Debt Ceiling to account for this change
+        // Note: This is done collectively for all offboarded ilks below
+
+        // ---------- Offboard BlockTower S3 (RWA012-A) ----------
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+
+        // Note: Add currently set debt ceiling for RWA012-A to globalLineReduction
+        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA012-A");
+        globalLineReduction += line;
+
+        // Remove RWA012-A from the AutoLine
+        DssExecLib.removeIlkFromAutoLine("RWA012-A");
+
+        // Set RWA012-A Debt Ceiling to 0 DAI
+        DssExecLib.setIlkDebtCeiling("RWA012-A", 0);
+
+        // Reduce Global Debt Ceiling to account for this change
+        // Note: This is done collectively for all offboarded ilks below
+
+        // ---------- Offboard BlockTower S4 (RWA013-A) ----------
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+
+        // Note: Add currently set debt ceiling for RWA013-A to globalLineReduction
+        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA013-A");
+        globalLineReduction += line;
+
+        // Remove RWA013-A from the AutoLine
+        DssExecLib.removeIlkFromAutoLine("RWA013-A");
+
+        // Set RWA013-A Debt Ceiling to 0 DAI
+        DssExecLib.setIlkDebtCeiling("RWA013-A", 0);
+
+        // Reduce Global Debt Ceiling to account for this change
+        // Note: This includes all offboarded ilks above as well
+        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - globalLineReduction);
+
+        // ---------- Execute Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/june-12-2025-proposed-changes-to-spark-for-upcoming-spell/26559
+        // Forum: https://forum.sky.money/t/june-12-2025-proposed-changes-to-spark-for-upcoming-spell/26559/3
+        // Poll: https://vote.sky.money/polling/QmTX3KM9
+        // Poll: https://vote.sky.money/polling/QmQRCn2K
+        // Poll: https://vote.sky.money/polling/QmbY2bxz
+        // Poll: https://vote.sky.money/polling/Qme3Des6
+        // Poll: https://vote.sky.money/polling/QmUa7Au1
+        // Poll: https://vote.sky.money/polling/QmSZJpsT
+        // Poll: https://vote.sky.money/polling/QmRsqaaC
+        // Poll: https://vote.sky.money/polling/QmdyVQok
+        // Poll: https://vote.sky.money/polling/QmS3i2S3
+
+        // Execute Spark Proxy Spell at address 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 

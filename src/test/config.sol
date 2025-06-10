@@ -1539,7 +1539,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         80_000_000,
+            line:         0,
             dust:         0,
             pct:          4_00,
             mat:          100_00,
@@ -1568,7 +1568,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         70_000_000,
+            line:         0,
             dust:         0,
             pct:          4_00,
             mat:          100_00,
@@ -1622,10 +1622,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["RWA015-A"] = CollateralValues({
-            aL_enabled:   true,
-            aL_line:      3_000_000_000,
-            aL_gap:       50_000_000,
-            aL_ttl:       24 hours,
+            aL_enabled:   false,
+            aL_line:      0,
+            aL_gap:       0,
+            aL_ttl:       0,
             line:         0,
             dust:         0,
             pct:          0,
