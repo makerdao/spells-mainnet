@@ -56,7 +56,7 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8;
 
     function actions() public override {
-        // ---------- Offboard BlockTower Andromeda (RWA015-A) ----------
+        // ---------- Reduce BlockTower Andromeda (RWA015-A) Debt Ceiling and Remove from AutoLine ----------
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
 
@@ -85,9 +85,6 @@ contract DssSpellAction is DssAction {
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA012-A");
         globalLineReduction += line;
 
-        // Remove RWA012-A from the AutoLine
-        DssExecLib.removeIlkFromAutoLine("RWA012-A");
-
         // Set RWA012-A Debt Ceiling to 0 DAI
         DssExecLib.setIlkDebtCeiling("RWA012-A", 0);
 
@@ -101,9 +98,6 @@ contract DssSpellAction is DssAction {
         // Note: Add currently set debt ceiling for RWA013-A to globalLineReduction
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA013-A");
         globalLineReduction += line;
-
-        // Remove RWA013-A from the AutoLine
-        DssExecLib.removeIlkFromAutoLine("RWA013-A");
 
         // Set RWA013-A Debt Ceiling to 0 DAI
         DssExecLib.setIlkDebtCeiling("RWA013-A", 0);
