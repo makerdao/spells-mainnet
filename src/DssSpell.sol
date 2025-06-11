@@ -58,7 +58,7 @@ contract DssSpellAction is DssAction {
     function actions() public override {
         // ---------- Reduce BlockTower Andromeda (RWA015-A) Debt Ceiling and Remove from AutoLine ----------
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
 
         // Note: Defining required variables for global debt ceiling reductions
         uint256 line;
@@ -79,7 +79,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Offboard BlockTower S3 (RWA012-A) ----------
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
 
         // Note: Add currently set debt ceiling for RWA012-A to globalLineReduction
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA012-A");
@@ -93,7 +93,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Offboard BlockTower S4 (RWA013-A) ----------
         // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/3
+        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
 
         // Note: Add currently set debt ceiling for RWA013-A to globalLineReduction
         (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA013-A");
