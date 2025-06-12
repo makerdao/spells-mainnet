@@ -51,6 +51,9 @@ contract DssSpellAction is DssAction {
     // ---------- Contracts ----------
     address internal immutable MCD_VAT = DssExecLib.vat();
 
+    // ---------- Math ----------
+    uint256 internal constant RAD = 10 ** 45;
+
     // ---------- Execute Spark Proxy Spell ----------
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
     address internal constant SPARK_SPELL = 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8;
@@ -104,7 +107,7 @@ contract DssSpellAction is DssAction {
 
         // Reduce Global Debt Ceiling to account for this change
         // Note: This includes all offboarded ilks above as well
-        VatAbstract(MCD_VAT).file("Line", VatAbstract(MCD_VAT).Line() - globalLineReduction);
+        DssExecLib.decreaseGlobalDebtCeiling(globalLineReduction / RAD);
 
         // ---------- Execute Spark Proxy Spell ----------
         // Forum: https://forum.sky.money/t/june-12-2025-proposed-changes-to-spark-for-upcoming-spell/26559
