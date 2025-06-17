@@ -75,7 +75,7 @@ def get_executive(exec_title, year):
             - commit_hash (str): The commit hash of the document
 
     Raises:
-        ValueError: If the executive copy is not found
+        SystemExit: If the executive copy is not found
         requests.exceptions.RequestException: If the HTTP request fails
     """
     # Get the latest commit for this file
