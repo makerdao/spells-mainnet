@@ -50,8 +50,8 @@ contract DssExec {
     PauseLike    immutable public   pause;
 
     // 2025-06-30T14:00:00Z
-    uint256       constant internal JUN_30_2025_14_00_UTC = 1750428000;
-    uint256       constant public   MIN_ETA              = JUN_30_2025_14_00_UTC;
+    uint256       constant internal JUN_30_2025_14_00_UTC = 1751292000;
+    uint256       constant public   MIN_ETA               = JUN_30_2025_14_00_UTC;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions

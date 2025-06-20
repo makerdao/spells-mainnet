@@ -1241,7 +1241,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    uint256 constant MIN_ETA = 1750428000; // 2025-06-30T14:00:00Z
+    uint256 constant MIN_ETA = 1751292000; // 2025-06-30T14:00:00Z
 
     function testNextCastTimeMinEta() public {
         // Spell obtains approval for execution before MIN_ETA
