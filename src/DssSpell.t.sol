@@ -69,7 +69,8 @@ contract DssSpellTest is DssSpellTestBase {
         _testCastOnTime();
     }
 
-    function testNextCastTime() public {
+    // NOTE: skipped due to the custom min ETA logic in the current spell
+    function testNextCastTime() public skipped {
         _testNextCastTime();
     }
 
