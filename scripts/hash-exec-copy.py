@@ -184,7 +184,7 @@ def main():
         exec_hash = get_content_hash(executive_content)
 
         # Output results
-        print(f"Community repo commit: {commit_hash}")
+        print(f"Executive Votes repo commit: {commit_hash}")
         print(f"Raw GitHub URL: {executive_url}")
         print(f"Exec copy hash: {exec_hash}")
 
