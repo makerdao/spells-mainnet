@@ -1202,7 +1202,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
         address SPARK_SPELL = address(0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8); // Insert Spark spell address
 
@@ -1240,4 +1240,34 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    uint256 constant MIN_ETA = 1750428000; // 2025-06-30T14:00:00Z
+
+    function testNextCastTimeMinEta() public {
+        // Spell obtains approval for execution before MIN_ETA
+        {
+            uint256 before = vm.snapshotState();
+
+            vm.warp(1748736000); // 2025-06-01T00:00Z - could be any date far enough in the past
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
+
+            vm.revertToStateAndDelete(before);
+        }
+
+        // Spell obtains approval for execution after MIN_ETA
+        {
+            uint256 before = vm.snapshotState();
+
+            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
+            _vote(address(spell));
+            spell.schedule();
+
+            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
+
+            vm.revertToStateAndDelete(before);
+        }
+    }
 }

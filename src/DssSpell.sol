@@ -16,114 +16,118 @@
 
 pragma solidity 0.8.16;
 
-import "dss-exec-lib/DssExec.sol";
+// import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-
-import { VatAbstract } from "dss-interfaces/dss/VatAbstract.sol";
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
 }
 
+interface PauseLike {
+    function delay() external view returns (uint256);
+    function exec(address, bytes32, bytes calldata, uint256) external returns (bytes memory);
+    function plot(address, bytes32, bytes calldata, uint256) external;
+}
+
+interface ChainlogLike {
+    function getAddress(bytes32) external view returns (address);
+}
+
+interface SpellActionLike {
+    function officeHours() external view returns (bool);
+    function description() external view returns (string memory);
+    function nextCastTime(uint256) external view returns (uint256);
+}
+
+contract DssExec {
+    ChainlogLike  constant public   chainlog = ChainlogLike(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
+    uint256                public   eta;
+    bytes                  public   sig;
+    bool                   public   done;
+    bytes32      immutable public   tag;
+    address      immutable public   action;
+    uint256      immutable public   expiration;
+    PauseLike    immutable public   pause;
+
+    // 2025-06-30T14:00:00Z
+    uint256       constant internal JUN_30_2025_14_00_UTC = 1750428000;
+    uint256       constant public   MIN_ETA              = JUN_30_2025_14_00_UTC;
+
+    // Provides a descriptive tag for bot consumption
+    // This should be modified weekly to provide a summary of the actions
+    // Hash: seth keccak -- "$(wget https://<executive-vote-canonical-post> -q -O - 2>/dev/null)"
+    function description() external view returns (string memory) {
+        return SpellActionLike(action).description();
+    }
+
+    function officeHours() external view returns (bool) {
+        return SpellActionLike(action).officeHours();
+    }
+
+    function nextCastTime() external view returns (uint256 castTime) {
+        return SpellActionLike(action).nextCastTime(eta);
+    }
+
+    // @param _description  A string description of the spell
+    // @param _expiration   The timestamp this spell will expire. (Ex. block.timestamp + 30 days)
+    // @param _spellAction  The address of the spell action
+    constructor(uint256 _expiration, address _spellAction) {
+        pause       = PauseLike(chainlog.getAddress("MCD_PAUSE"));
+        expiration  = _expiration;
+        action      = _spellAction;
+
+        sig = abi.encodeWithSignature("execute()");
+        bytes32 _tag;                    // Required for assembly access
+        address _action = _spellAction;  // Required for assembly access
+        assembly { _tag := extcodehash(_action) }
+        tag = _tag;
+    }
+
+    function schedule() public {
+        require(block.timestamp <= expiration, "This contract has expired");
+        require(eta == 0, "This spell has already been scheduled");
+        // ---------- Set earliest execution date June 30, 14:00 UTC ----------
+        // Forum: TODO
+        // Poll: TODO
+        // Note: In case the spell is scheduled later than planned, we have to switch
+        //       back to the regular logic to respect GSM delay enforced by MCD_PAUSE
+        eta = _max(block.timestamp + PauseLike(pause).delay(), MIN_ETA);
+        pause.plot(action, tag, sig, eta);
+    }
+
+    function cast() public {
+        require(!done, "spell-already-cast");
+        done = true;
+        pause.exec(action, tag, sig, eta);
+    }
+
+    function _max(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a > b ? a : b;
+    }
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: cast keccak -- "$(wget 'https://raw.githubusercontent.com/sky-ecosystem/executive-votes/dcbb94711df17f340365345435007f2a3aa208e2/2025/executive-vote-2025-06-12-housekeeping-spark-proxy-spell.md' -q -O - 2>/dev/null)"
-    string public constant override description = "2025-06-12 MakerDAO Executive Spell | Hash: 0x9a536dc5d3f09ed4edfbd083bd421dbb456bdcf3fa2a43981f9533675a29284b";
+    // Hash: cast keccak -- "$(wget 'TODO' -q -O - 2>/dev/null)"
+    string public constant override description = "2025-06-26 MakerDAO Executive Spell | Hash: TODO";
 
     // Set office hours according to the summary
     function officeHours() public pure override returns (bool) {
         return false;
     }
 
-    // ---------- Rates ----------
-    // Many of the settings that change weekly rely on the rate accumulator
-    // described at https://docs.makerdao.com/smart-contract-modules/rates-module
-    // To check this yourself, use the following rate calculation (example 8%):
-    //
-    // $ bc -l <<< 'scale=27; e( l(1.08)/(60 * 60 * 24 * 365) )'
-    //
-    // A table of rates can be found at
-    //    https://ipfs.io/ipfs/QmVp4mhhbwWGTfbh2BzwQB9eiBrQBKiqcPRZCaAxNUaar6
-    //
-    // uint256 internal constant X_PCT_RATE = ;
-
-    // ---------- Contracts ----------
-    address internal immutable MCD_VAT = DssExecLib.vat();
-
-    // ---------- Math ----------
-    uint256 internal constant RAD = 10 ** 45;
-
     // ---------- Execute Spark Proxy Spell ----------
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8;
+    address internal constant SPARK_SPELL = address(0);
 
     function actions() public override {
-        // ---------- Reduce BlockTower Andromeda (RWA015-A) Debt Ceiling and Remove from AutoLine ----------
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
-
-        // Note: Defining required variables for global debt ceiling reductions
-        uint256 line;
-        uint256 globalLineReduction = 0;
-
-        // Note: Add currently set debt ceiling for RWA015-A to globalLineReduction
-        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA015-A");
-        globalLineReduction += line;
-
-        // Remove RWA015-A from the AutoLine
-        DssExecLib.removeIlkFromAutoLine("RWA015-A");
-
-        // Set RWA015-A Debt Ceiling to 0 DAI
-        DssExecLib.setIlkDebtCeiling("RWA015-A", 0);
-
-        // Reduce Global Debt Ceiling to account for this change
-        // Note: This is done collectively for all offboarded ilks below
-
-        // ---------- Offboard BlockTower S3 (RWA012-A) ----------
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
-
-        // Note: Add currently set debt ceiling for RWA012-A to globalLineReduction
-        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA012-A");
-        globalLineReduction += line;
-
-        // Set RWA012-A Debt Ceiling to 0 DAI
-        DssExecLib.setIlkDebtCeiling("RWA012-A", 0);
-
-        // Reduce Global Debt Ceiling to account for this change
-        // Note: This is done collectively for all offboarded ilks below
-
-        // ---------- Offboard BlockTower S4 (RWA013-A) ----------
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599
-        // Forum: https://forum.sky.money/t/proposed-housekeeping-item-2025-06-12-executive/26599/7
-
-        // Note: Add currently set debt ceiling for RWA013-A to globalLineReduction
-        (,,,line,) = VatAbstract(MCD_VAT).ilks("RWA013-A");
-        globalLineReduction += line;
-
-        // Set RWA013-A Debt Ceiling to 0 DAI
-        DssExecLib.setIlkDebtCeiling("RWA013-A", 0);
-
-        // Reduce Global Debt Ceiling to account for this change
-        // Note: This includes all offboarded ilks above as well
-        DssExecLib.decreaseGlobalDebtCeiling(globalLineReduction / RAD);
-
         // ---------- Execute Spark Proxy Spell ----------
-        // Forum: https://forum.sky.money/t/june-12-2025-proposed-changes-to-spark-for-upcoming-spell/26559
-        // Forum: https://forum.sky.money/t/june-12-2025-proposed-changes-to-spark-for-upcoming-spell/26559/3
-        // Poll: https://vote.sky.money/polling/QmTX3KM9
-        // Poll: https://vote.sky.money/polling/QmQRCn2K
-        // Poll: https://vote.sky.money/polling/QmbY2bxz
-        // Poll: https://vote.sky.money/polling/Qme3Des6
-        // Poll: https://vote.sky.money/polling/QmUa7Au1
-        // Poll: https://vote.sky.money/polling/QmSZJpsT
-        // Poll: https://vote.sky.money/polling/QmRsqaaC
-        // Poll: https://vote.sky.money/polling/QmdyVQok
-        // Poll: https://vote.sky.money/polling/QmS3i2S3
+        // Forum: TODO
+        // Poll: TODO
 
-        // Execute Spark Proxy Spell at address 0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8
-        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Execute Spark Proxy Spell at address TODO
+        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 }
 

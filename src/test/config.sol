@@ -117,9 +117,9 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0xbF5EF05A578F270C0E54c7f6eF7cCFB5c9cD56b0), // populate with deployed spell if deployed
-            deployed_spell_created: 1749746267, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   22689726,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0), // populate with deployed spell if deployed
+            deployed_spell_created: 0,          // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   0,          // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
             office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
@@ -153,7 +153,7 @@ contract Config {
         afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;                // In WAD Dai per second
         afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;                     // In WAD MKR per second
         afterSpell.vest_usds_cap          = 46_200 * WAD / 30 days;                     // In WAD USDS per second
-        afterSpell.vest_sky_cap           = 151_250_000 * WAD / 182 days;                // In WAD SKY per second
+        afterSpell.vest_sky_cap           = 151_250_000 * WAD / 182 days;               // In WAD SKY per second
         afterSpell.vest_sky_mint_cap      = 176 * MILLION * WAD / 182 days;             // In WAD SKY per second
         afterSpell.SP_tau                 = 57_600 seconds;                             // In seconds
         afterSpell.SP_bud                 = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309; // Address of SPBEAM Bud
