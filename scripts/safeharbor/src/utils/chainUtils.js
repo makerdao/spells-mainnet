@@ -3,6 +3,8 @@ import {
     BASE_ASSET_RECOVERY_ADDRESS,
     ARBITRUM_ASSET_RECOVERY_ADDRESS,
     SOLANA_ASSET_RECOVERY_ADDRESS,
+    OPTIMISM_ASSET_RECOVERY_ADDRESS,
+    UNICHAIN_ASSET_RECOVERY_ADDRESS,
 } from "../constants.js";
 
 // Chain ID mapping
@@ -12,6 +14,8 @@ export const CHAIN_IDS = {
     GNOSIS: 100,
     ARBITRUM: 42161,
     SOLANA: 555,
+    OPTIMISM: 10,
+    UNICHAIN: 130
 };
 
 // Reverse mapping for chain ID to name
@@ -44,6 +48,10 @@ export function getAssetRecoveryAddress(chain) {
             return ARBITRUM_ASSET_RECOVERY_ADDRESS;
         case "SOLANA":
             return SOLANA_ASSET_RECOVERY_ADDRESS;
+        case "OPTIMISM":
+            return OPTIMISM_ASSET_RECOVERY_ADDRESS;
+        case "UNICHAIN":
+            return UNICHAIN_ASSET_RECOVERY_ADDRESS;
         default:
             throw new Error(
                 `No asset recovery address defined for chain: ${chain}`,

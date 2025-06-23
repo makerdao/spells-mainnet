@@ -10,10 +10,14 @@ export const ETHEREUM_ASSET_RECOVERY_ADDRESS =
     "0xBE8E3e3618f7474F8cB1d074A26afFef007E98FB"; // PauseProxy
 export const SOLANA_ASSET_RECOVERY_ADDRESS =
     "STTUVCMPuNbk21y1J6nqEGXSQ8HKvFmFBKnCvKHTrWn"; // TODO: change to actual address
+export const OPTIMISM_ASSET_RECOVERY_ADDRESS =
+    "0x09b354cda89203bb7b3131cc728dfa06ab09ae2f"; // GovRelay
+export const UNICHAIN_ASSET_RECOVERY_ADDRESS =
+    "0xb383070cf9f4f01c3a2cfd0ef6da4bc057b429b7"; // GovRelay
 
 // CSV URLs
 export const CSV_URL_SHEET1 =
-    "https://docs.google.com/spreadsheets/d/1slHR9VbZOC3wp2ZQu7YbQEQh8N57ePfVvv0w35nz60Q/export?format=csv&gid=1121763694"; // Sky Contracts
+    "https://docs.google.com/spreadsheets/d/1e_KOYOeBGaA5EG3Xqco6lOP_a0zV4Vrm3w5-dqFk00U/export?format=csv&gid=1121763694"; // Sky Contracts
 export const CSV_URL_SHEET2 =
     "https://docs.google.com/spreadsheets/d/1slHR9VbZOC3wp2ZQu7YbQEQh8N57ePfVvv0w35nz60Q/export?format=csv&gid=92820546"; // Spark Contracts
 
