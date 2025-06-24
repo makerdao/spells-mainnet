@@ -68,10 +68,15 @@ interface ERC20Like {
     function approve(address, uint256) external;
     function balanceOf(address) external view returns (uint256);
     function burn(address, uint256) external;
+    function transfer(address, uint256) external;
 }
 
 interface StakingRewardsLike {
     function setRewardsDuration(uint256) external;
+}
+
+interface DaiUsdsLike {
+    function daiToUsds(address usr, uint256 wad) external;
 }
 
 contract DssExec {
@@ -166,6 +171,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     address internal immutable MCD_VAT               = DssExecLib.vat();
+    address internal immutable DAI                   = DssExecLib.dai();
     address internal immutable MCD_PAUSE_PROXY       = DssExecLib.pauseProxy();
     address internal immutable USDS                  = DssExecLib.getChangelogAddress("USDS");
     address internal immutable LSSKY                 = DssExecLib.getChangelogAddress("LOCKSTAKE_SKY");
@@ -177,6 +183,7 @@ contract DssSpellAction is DssAction {
     address internal immutable SKY                   = DssExecLib.getChangelogAddress("SKY");
     address internal immutable MCD_SPLIT             = DssExecLib.getChangelogAddress("MCD_SPLIT");
     address internal immutable REWARDS_LSSKY_USDS    = DssExecLib.getChangelogAddress("REWARDS_LSSKY_USDS");
+    address internal immutable DAI_USDS              = DssExecLib.getChangelogAddress("DAI_USDS");
 
     address internal constant SPK                    = 0xc20059e0317DE91738d13af027DfC4a50781b066;
     address internal constant MCD_VEST_SPK_TREASURY  = 0xF9A2002b471f600A5484da5a735a2A053d377078;
@@ -184,6 +191,17 @@ contract DssSpellAction is DssAction {
     address internal constant REWARDS_DIST_USDS_SPK  = 0x3959e23A63CA7ac12D658bb44F90cb1f7Ee4C02c;
     address internal constant REWARDS_LSSKY_SPK      = 0x99cBC0e4E6427F6939536eD24d1275B95ff77404;
     address internal constant REWARDS_DIST_LSSKY_SPK = 0xa3Ee378BdD0b7DD403cEd3a0A65B2B389A2eaB7e;
+
+    // ---------- Wallets ----------
+    address internal constant LAUNCH_PROJECT_FUNDING = 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F;
+    address internal constant BLUE                   = 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf;
+    address internal constant BONAPUBLICA            = 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3;
+    address internal constant CLOAKY_2               = 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5;
+    address internal constant PBG                    = 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2;
+    address internal constant JULIACHANG             = 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7;
+    address internal constant EXCEL                  = 0x0F04a22B62A26e25A29Cba5a595623038ef7AcE7;
+    address internal constant WBC                    = 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47;
+    address internal constant CLOAKY_KOHLA_2         = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
 
     // ---------- Math ----------
     uint256 internal constant WAD = 10 ** 18;
@@ -400,6 +418,70 @@ contract DssSpellAction is DssAction {
 
         // Increase the Maximum Debt Ceiling (line) by 2.4 billion USDS, from 100 million USDS to 2.5 billion USDS
         DssExecLib.setIlkAutoLineDebtCeiling("ALLOCATOR-BLOOM-A", 2_500_000_000);
+
+        // ---------- Spark USDS Transfer ----------
+        // Atlas: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-2025-06-23/26701
+
+        // Transfer 20,600,000 USDS to the Spark SubProxy (0x3300f198988e4C9C63F75dF86De36421f06af8c4)
+        _transferUsds(SPARK_PROXY, 20_600_000 * WAD);
+
+        // ---------- Launch Project Funding ----------
+        // Forum: https://forum.sky.money/t/utilization-of-the-launch-project-under-the-accessibility-scope/21468/46
+        // Atlas: https://sky-atlas.powerhouse.io/A.5.6_Launch_Project/1f433d9d-7cdb-406f-b7e8-f9bc4855eb77%7C8d5a
+
+        // Transfer 8,400,000 SKY to 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
+        ERC20Like(SKY).transfer(LAUNCH_PROJECT_FUNDING, 8_400_000 * WAD);
+
+        // ---------- Delegate Compensation for May 2025 ----------
+        // Forum: https://forum.sky.money/t/may-2025-aligned-delegate-compensation/26698
+        // Atlas: https://sky-atlas.powerhouse.io/Budget_And_Participation_Requirements/4c698938-1a11-4486-a568-e54fc6b0ce0c|0db3af4e
+
+        // BLUE - 4,000 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        _transferUsds(BLUE,        4_000 * WAD);
+
+        // Bonapublica - 4,000 USDS - 0x167c1a762B08D7e78dbF8f24e5C3f1Ab415021D3
+        _transferUsds(BONAPUBLICA, 4_000 * WAD);
+
+        // Cloaky - 4,000 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        _transferUsds(CLOAKY_2,    4_000 * WAD);
+
+        // PBG - 4,000 USDS - 0x8D4df847dB7FfE0B46AF084fE031F7691C6478c2
+        _transferUsds(PBG,         4_000 * WAD);
+
+        // JuliaChang - 2,323 USDS - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
+        _transferUsds(JULIACHANG, 2_323 * WAD);
+
+        // Excel - 1,088 USDS - 0x0F04a22B62A26e25A29Cba5a595623038ef7AcE7
+        _transferUsds(EXCEL,       1_088 * WAD);
+
+        // WBC - 1,032 USDS - 0xeBcE83e491947aDB1396Ee7E55d3c81414fB0D47
+        _transferUsds(WBC,         1_032 * WAD);
+
+        // ---------- Atlas Core Development USDS Payments for June 2025 ----------
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-june-2025/26585
+	    // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-june-2025/26585/7
+        // Atlas: https://sky-atlas.powerhouse.io/A.2.2.1.1_Funding/8ea8dcb0-7261-4c1a-ae53-b7f3eb5362e5%7C9e1f3b569af1
+
+        // BLUE - 50,167 USDS - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        _transferUsds(BLUE, 50_167 * WAD);
+
+        // Cloaky - 16,417 USDS - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        _transferUsds(CLOAKY_2, 16_417 * WAD);
+
+        // Kohla - 11,000 USDS - 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a
+        _transferUsds(CLOAKY_KOHLA_2, 11_000 * WAD);
+
+        // ---------- Atlas Core Development SKY Payments for June 2025 ----------
+        // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-june-2025/26585
+	    // Forum: https://forum.sky.money/t/atlas-core-development-payment-requests-june-2025/26585/7
+        // Atlas: https://sky-atlas.powerhouse.io/A.2.2.1.1_Funding/8ea8dcb0-7261-4c1a-ae53-b7f3eb5362e5%7C9e1f3b569af1
+
+        // BLUE - 330,000 SKY - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
+        ERC20Like(SKY).transfer(BLUE, 330_000 * WAD);
+
+        // Cloaky - 288,000 SKY - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
+        ERC20Like(SKY).transfer(CLOAKY_2, 288_000 * WAD);
+
         // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");
 
@@ -409,6 +491,22 @@ contract DssSpellAction is DssAction {
 
         // Execute Spark Proxy Spell at address TODO
         // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+    }
+
+    // ---------- Helper Functions ----------
+
+    /// @notice wraps the operations required to transfer USDS from the surplus buffer.
+    /// @param usr The USDS receiver.
+    /// @param wad The USDS amount in wad precision (10 ** 18).
+    function _transferUsds(address usr, uint256 wad) internal {
+        // Note: Enforce whole units to avoid rounding errors
+        require(wad % WAD == 0, "transferUsds/non-integer-wad");
+        // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
+        DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
+        // Note: Approve DAI_USDS for the amount sent to be able to convert it.
+        ERC20Like(DAI).approve(DAI_USDS, wad);
+        // Note: Convert Dai to USDS for `usr`.
+        DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
 }
 

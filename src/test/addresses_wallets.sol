@@ -187,6 +187,7 @@ contract Wallets {
         addr["CLOAKY_KOHLA"]                 = 0xA9D43465B43ab95050140668c87A2106C73CA811;
         addr["CLOAKY_ENNOIA"]                = 0xA7364a1738D0bB7D1911318Ca3FB3779A8A58D7b;
         addr["CLOAKY_KOHLA_2"]               = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
+        addr["EXCEL"]                        = 0x0F04a22B62A26e25A29Cba5a595623038ef7AcE7;
 
         // Protocol Engineering Scope
         addr["GOV_SECURITY_ENGINEERING"]     = 0x569fAD613887ddd8c1815b56A00005BCA7FDa9C0;
