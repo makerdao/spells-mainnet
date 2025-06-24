@@ -19,7 +19,6 @@ pragma solidity 0.8.16;
 // import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
-import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
 import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
 import {MCD, DssInstance} from "dss-test/MCD.sol";
 
@@ -63,6 +62,12 @@ interface LockstakeEngineLike {
 
 interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
+}
+
+interface ERC20Like {
+    function approve(address, uint256) external;
+    function balanceOf(address) external view returns (uint256);
+    function burn(address, uint256) external;
 }
 
 contract DssExec {
@@ -165,6 +170,7 @@ contract DssSpellAction is DssAction {
     address internal immutable MKR_SKY               = DssExecLib.getChangelogAddress("MKR_SKY");
     address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MKR                   = DssExecLib.getChangelogAddress("MKR");
+    address internal immutable SKY                   = DssExecLib.getChangelogAddress("SKY");
 
     address internal constant SPK                    = 0xc20059e0317DE91738d13af027DfC4a50781b066;
     address internal constant MCD_VEST_SPK_TREASURY  = 0xF9A2002b471f600A5484da5a735a2A053d377078;
@@ -191,7 +197,7 @@ contract DssSpellAction is DssAction {
         // Approve MCD_VEST_SPK_TREASURY to spend SPK in the treasury:
         // spender: 0xF9A2002b471f600A5484da5a735a2A053d377078
         // amount: 3_250_000_000 * WAD
-        GemAbstract(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
+        ERC20Like(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
 
         // Set cap in MCD_VEST_SPK_TREASURY:
         // target: 0xF9A2002b471f600A5484da5a735a2A053d377078
@@ -265,6 +271,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogAddress("REWARDS_DIST_USDS_SPK", REWARDS_DIST_USDS_SPK);
 
         // ---------- LSSKY to SPK Farm ----------
+
         // Initialize the LSSKY to SPK farm:
         // Create the vesting stream for the LSSKY to SPK farm:
         // vest: 0xF9A2002b471f600A5484da5a735a2A053d377078
@@ -335,10 +342,10 @@ contract DssSpellAction is DssAction {
             VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(39);
 
         // Note: approve MKR_SKY to spend MKR balance of the PauseProxy
-        GemAbstract(MKR).approve(MKR_SKY, GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
+        ERC20Like(MKR).approve(MKR_SKY, ERC20Like(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY ids 9, 18, 24, 35, 37, and 39
-        MkrSkyLike(MKR_SKY).mkrToSky(address(this), GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
+        MkrSkyLike(MKR_SKY).mkrToSky(address(this), ERC20Like(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // ---------- Disable MKR_SKY_LEGACY Converter ----------
         // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
@@ -356,6 +363,14 @@ contract DssSpellAction is DssAction {
 
         // Call burnExtraSky() to burn excess pre-minted SKY in the new MKR_SKY converter (https://github.com/sky-ecosystem/sky/pull/21/files#diff-f6cbf09833eed835c52b0a1c5be7dd9e84213d278c958843725af6a77faa77d4R81-R88)
         SkyInit.burnExtraSky(dss);
+
+        // ---------- Burn SKY held in PauseProxy ----------
+        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.2.4.1_SKY_Token_Rewards_Emissions/209f2ff0-8d73-80ee-bc70-f5cbed9c2664|b341f4c0b834477b310e
+
+        // Burn 426,292,860.23 SKY from the PauseProxy
+        // Note: `ether` is only used as a keyword. Only SKY is being burned.
+        ERC20Like(SKY).burn(address(this), 426_292_860.23 ether);
 
         // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");

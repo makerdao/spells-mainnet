@@ -1540,12 +1540,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertFalse(thirdWorkable, "VestedRewardsDistributionJob should not be workable");
     }
 
-    function test_treasuryMkrToSkyConversion() public {
-        // Get the MKR balance before the spell
-        uint256 mkrBalanceBefore = mkr.balanceOf(address(pauseProxy));
-        uint256 skyBalanceBefore = sky.balanceOf(address(pauseProxy));
-
-        // Get the unpaid MKR for vest id 39
+    function test_treasuryMkrToSkyConversion_leftoverMkr() public {
+        // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
         VestAbstract vestMkrTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
         uint256 unpaidMkr = vestMkrTreasury.unpaid(9) +
             vestMkrTreasury.unpaid(18) +
@@ -1561,11 +1557,9 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Check that the MKR balance has decreased by the expected amount
         uint256 mkrBalanceAfter = mkr.balanceOf(address(pauseProxy));
-        uint256 skyBalanceAfter = sky.balanceOf(address(pauseProxy));
 
         // Verify MKR was converted to SKY
         assertEq(mkrBalanceAfter, unpaidMkr, "MKR balance should equal unpaid vest amount");
-        assertEq(skyBalanceAfter, skyBalanceBefore + (mkrBalanceBefore - unpaidMkr) * 24_000, "SKY balance should have increased");
     }
 
     function test_disableMkrSkyLegacyConverter() public {
@@ -1596,24 +1590,54 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function test_burnExcessSkyFromOldConverter() public {
+    function test_burnSky() public {
         address mkrSkyAddr = chainLog.getAddress("MKR_SKY");
         MkrSkyLike mkrSky = MkrSkyLike(mkrSkyAddr);
+
         address skyToken = mkrSky.sky();
-        address mkrToken = mkrSky.mkr();
         uint256 skyTotalSupplyBefore = GemAbstract(skyToken).totalSupply();
-        uint256 skyBalanceBefore = GemAbstract(skyToken).balanceOf(address(mkrSky));
+        uint256 skyTreasuryBalanceBefore = sky.balanceOf(address(pauseProxy));
+        uint256 skyConverterBalanceBefore = GemAbstract(skyToken).balanceOf(address(mkrSky));
+
+        address mkrToken = mkrSky.mkr();
+        uint256 mkrTreasuryBalanceBefore = mkr.balanceOf(address(pauseProxy));
         uint256 mkrTotalSupplyBefore = GemAbstract(mkrToken).totalSupply();
         uint256 conversionRate = mkrSky.rate();
+
+        // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
+        VestAbstract vestMkrTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 unpaidMkr = vestMkrTreasury.unpaid(9) +
+            vestMkrTreasury.unpaid(18) +
+            vestMkrTreasury.unpaid(24) +
+            vestMkrTreasury.unpaid(35) +
+            vestMkrTreasury.unpaid(37) +
+            vestMkrTreasury.unpaid(39);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        uint256 skyTotalSupplyAfter = GemAbstract(skyToken).totalSupply();
-        uint256 expectedSkyTotalSupplyAfter = skyTotalSupplyBefore - (skyBalanceBefore - mkrTotalSupplyBefore * conversionRate);
+        uint256 expectedSkyTotalSupplyAfter = skyTotalSupplyBefore
+            // Excess SKY from the MKR_SKY_LEGACY converter
+            - (skyConverterBalanceBefore - mkrTotalSupplyBefore * conversionRate)
+            // Amount explicitly burned
+            - 426_292_860.23 ether;
+        assertEq(
+            GemAbstract(skyToken).totalSupply(),
+            expectedSkyTotalSupplyAfter,
+            "Excess SKY should be burned"
+        );
 
-        assertEq(skyTotalSupplyAfter, expectedSkyTotalSupplyAfter, "Excess SKY should be burned");
+        uint256 expectedSkyTreasuryBalanceAfter = skyTreasuryBalanceBefore
+            // Amount from Convert MKR balance of the PauseProxy to SKY
+            + (mkrTreasuryBalanceBefore - unpaidMkr) * 24_000
+            // Amount explicitly burned
+            - 426_292_860.23 ether;
+        assertEq(
+            sky.balanceOf(address(pauseProxy)),
+            expectedSkyTreasuryBalanceAfter,
+            "SKY balance should have increased"
+        );
     }
 }
 
