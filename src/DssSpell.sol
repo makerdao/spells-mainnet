@@ -70,6 +70,10 @@ interface ERC20Like {
     function burn(address, uint256) external;
 }
 
+interface StakingRewardsLike {
+    function setRewardsDuration(uint256) external;
+}
+
 contract DssExec {
     ChainlogLike  constant public   chainlog = ChainlogLike(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
     uint256                public   eta;
@@ -171,6 +175,8 @@ contract DssSpellAction is DssAction {
     address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
     address internal immutable MKR                   = DssExecLib.getChangelogAddress("MKR");
     address internal immutable SKY                   = DssExecLib.getChangelogAddress("SKY");
+    address internal immutable MCD_SPLIT             = DssExecLib.getChangelogAddress("MCD_SPLIT");
+    address internal immutable REWARDS_LSSKY_USDS    = DssExecLib.getChangelogAddress("REWARDS_LSSKY_USDS");
 
     address internal constant SPK                    = 0xc20059e0317DE91738d13af027DfC4a50781b066;
     address internal constant MCD_VEST_SPK_TREASURY  = 0xF9A2002b471f600A5484da5a735a2A053d377078;
@@ -371,6 +377,22 @@ contract DssSpellAction is DssAction {
         // Burn 426,292,860.23 SKY from the PauseProxy
         // Note: `ether` is only used as a keyword. Only SKY is being burned.
         ERC20Like(SKY).burn(address(this), 426_292_860.23 ether);
+
+        // ---------- vow.hump Reduction ----------
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-proposals-june-26-2025-spell-contents/26702
+
+        // Reduce vow.hump by 20 million USDS from 70 million USDS to 50 million USDS
+        DssExecLib.setSurplusBuffer(50_000_000);
+
+        // ---------- Splitter.hop Increase ----------
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-proposals-june-26-2025-spell-contents/26702
+        // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-proposals-june-26-2025-spell-contents/26702/3
+
+        // Increase splitter.hop by 432 seconds, from 1,728 seconds to 2,160 seconds
+        DssExecLib.setValue(MCD_SPLIT, "hop", 2_160);
+
+        // Increase rewardsDuration in REWARDS_LSSKY_USDS by 432 seconds from 1,728 seconds to 2,160 seconds
+        StakingRewardsLike(REWARDS_LSSKY_USDS).setRewardsDuration(2_160);
 
         // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");
