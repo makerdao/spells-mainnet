@@ -2234,7 +2234,7 @@ contract Config {
         });
         afterSpell.collaterals["ALLOCATOR-BLOOM-A"] = CollateralValues({
             aL_enabled:   true,
-            aL_line:      100_000_000,
+            aL_line:      2_500_000_000,
             aL_gap:       50_000_000,
             aL_ttl:       24 hours,
             line:         0,

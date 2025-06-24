@@ -394,6 +394,12 @@ contract DssSpellAction is DssAction {
         // Increase rewardsDuration in REWARDS_LSSKY_USDS by 432 seconds from 1,728 seconds to 2,160 seconds
         StakingRewardsLike(REWARDS_LSSKY_USDS).setRewardsDuration(2_160);
 
+        // ---------- Increase ALLOCATOR-BLOOM-A Maximum Debt Ceiling ----------
+        // Forum: https://forum.sky.money/t/parameter-changes-proposal-june-16-2025/26653
+        // Vote: https://vote.sky.money/polling/Qmcy6Lug
+
+        // Increase the Maximum Debt Ceiling (line) by 2.4 billion USDS, from 100 million USDS to 2.5 billion USDS
+        DssExecLib.setIlkAutoLineDebtCeiling("ALLOCATOR-BLOOM-A", 2_500_000_000);
         // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");
 
