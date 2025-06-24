@@ -326,11 +326,18 @@ contract DssSpellAction is DssAction {
         // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
         // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1.4.2.3_Upgrade_MKR_In_Pause_Proxy_To_SKY/1f1f2ff0-8d73-8064-ab0e-d51c96127c19|b341f4c0b83472dc1f9e1a3b
 
-        // Note: get unpaid MKR for MCD_VEST_MKR_TREASURY id 39
-        uint256 unpaidMkr = VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(39);
+        // Note: get unpaid MKR for MCD_VEST_MKR_TREASURY ids 9, 18, 24, 35, 37, and 39
+        uint256 unpaidMkr = VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(9) +
+            VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(18) +
+            VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(24) +
+            VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(35) +
+            VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(37) +
+            VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(39);
+
         // Note: approve MKR_SKY to spend MKR balance of the PauseProxy
         GemAbstract(MKR).approve(MKR_SKY, GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
-        // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY id 39
+
+        // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY ids 9, 18, 24, 35, 37, and 39
         MkrSkyLike(MKR_SKY).mkrToSky(address(this), GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // ---------- Disable MKR_SKY_LEGACY Converter ----------

@@ -1546,7 +1546,13 @@ contract DssSpellTest is DssSpellTestBase {
         uint256 skyBalanceBefore = sky.balanceOf(address(pauseProxy));
 
         // Get the unpaid MKR for vest id 39
-        uint256 unpaidMkr = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY")).unpaid(39);
+        VestAbstract vestMkrTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 unpaidMkr = vestMkrTreasury.unpaid(9) +
+            vestMkrTreasury.unpaid(18) +
+            vestMkrTreasury.unpaid(24) +
+            vestMkrTreasury.unpaid(35) +
+            vestMkrTreasury.unpaid(37) +
+            vestMkrTreasury.unpaid(39);
 
         // Cast the spell
         _vote(address(spell));
@@ -1610,3 +1616,4 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(skyTotalSupplyAfter, expectedSkyTotalSupplyAfter, "Excess SKY should be burned");
     }
 }
+
