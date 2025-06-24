@@ -16,8 +16,9 @@
 
 pragma solidity 0.8.16;
 
-// import "dss-exec-lib/DssExec.sol";
-import "dss-exec-lib/DssAction.sol";
+import "dss-exec-lib/DssExec.sol";
+import {DssExecLib} from "dss-exec-lib/DssExecLib.sol";
+// import "dss-exec-lib/DssAction.sol";
 
 import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
 import {MCD, DssInstance} from "dss-test/MCD.sol";
@@ -79,70 +80,42 @@ interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
 }
 
-contract DssExec {
-    ChainlogLike  constant public   chainlog = ChainlogLike(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
-    uint256                public   eta;
-    bytes                  public   sig;
-    bool                   public   done;
-    bytes32      immutable public   tag;
-    address      immutable public   action;
-    uint256      immutable public   expiration;
-    PauseLike    immutable public   pause;
+abstract contract DssAction {
 
-    // 2025-06-30T14:00:00Z
-    uint256       constant internal JUN_30_2025_14_00_UTC = 1751292000;
-    uint256       constant public   MIN_ETA               = JUN_30_2025_14_00_UTC;
+    using DssExecLib for *;
+
+    // Modifier used to limit execution time when office hours is enabled
+    modifier limited {
+        require(DssExecLib.canCast(uint40(block.timestamp), officeHours()), "Outside office hours");
+        _;
+    }
+
+    // Office Hours defaults to true by default.
+    //   To disable office hours, override this function and
+    //    return false in the inherited action.
+    function officeHours() public view virtual returns (bool) {
+        return true;
+    }
+
+    // DssExec calls execute. We limit this function subject to officeHours modifier.
+    function execute() external limited {
+        actions();
+    }
+
+    // DssAction developer must override `actions()` and place all actions to be called inside.
+    //   The DssExec function will call this subject to the officeHours limiter
+    //   By keeping this function public we allow simulations of `execute()` on the actions outside of the cast time.
+    function actions() public virtual;
 
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
     // Hash: seth keccak -- "$(wget https://<executive-vote-canonical-post> -q -O - 2>/dev/null)"
-    function description() external view returns (string memory) {
-        return SpellActionLike(action).description();
-    }
+    function description() external view virtual returns (string memory);
 
-    function officeHours() external view returns (bool) {
-        return SpellActionLike(action).officeHours();
-    }
-
-    function nextCastTime() external view returns (uint256 castTime) {
-        return SpellActionLike(action).nextCastTime(eta);
-    }
-
-    // @param _description  A string description of the spell
-    // @param _expiration   The timestamp this spell will expire. (Ex. block.timestamp + 30 days)
-    // @param _spellAction  The address of the spell action
-    constructor(uint256 _expiration, address _spellAction) {
-        pause       = PauseLike(chainlog.getAddress("MCD_PAUSE"));
-        expiration  = _expiration;
-        action      = _spellAction;
-
-        sig = abi.encodeWithSignature("execute()");
-        bytes32 _tag;                    // Required for assembly access
-        address _action = _spellAction;  // Required for assembly access
-        assembly { _tag := extcodehash(_action) }
-        tag = _tag;
-    }
-
-    function schedule() public {
-        require(block.timestamp <= expiration, "This contract has expired");
-        require(eta == 0, "This spell has already been scheduled");
-        // ---------- Set earliest execution date June 30, 14:00 UTC ----------
-        // Forum: TODO
-        // Poll: TODO
-        // Note: In case the spell is scheduled later than planned, we have to switch
-        //       back to the regular logic to respect GSM delay enforced by MCD_PAUSE
-        eta = _max(block.timestamp + PauseLike(pause).delay(), MIN_ETA);
-        pause.plot(action, tag, sig, eta);
-    }
-
-    function cast() public {
-        require(!done, "spell-already-cast");
-        done = true;
-        pause.exec(action, tag, sig, eta);
-    }
-
-    function _max(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a > b ? a : b;
+    // Returns the next available cast time
+    function nextCastTime(uint256 eta) external virtual view returns (uint256 castTime) {
+        require(eta <= type(uint40).max);
+        castTime = DssExecLib.nextCastTime(uint40(eta), uint40(block.timestamp), officeHours());
     }
 }
 
@@ -157,7 +130,21 @@ contract DssSpellAction is DssAction {
         return true;
     }
 
-        // ---------- Rates ----------
+    // ---------- Set earliest execution date June 30, 14:00 UTC ----------
+
+    // Note: 2025-06-30T14:00:00Z
+    uint256 constant internal JUN_30_2025_14_00_UTC = 1751292000;
+
+    // Note: Override nextCastTime to inform keepers about the earliest execution time
+    function nextCastTime(uint256 eta) external view override returns (uint256 castTime) {
+        require(eta <= type(uint40).max);
+        // Note: First calculate the standard office hours cast time
+        castTime = DssExecLib.nextCastTime(uint40(eta), uint40(block.timestamp), officeHours());
+        // Note: Then ensure it's not before our minimum date
+        return castTime < JUN_30_2025_14_00_UTC ? JUN_30_2025_14_00_UTC : castTime;
+    }
+
+    // ---------- Rates ----------
     // Many of the settings that change weekly rely on the rate accumulator
     // described at https://docs.makerdao.com/smart-contract-modules/rates-module
     // To check this yourself, use the following rate calculation (example 8%):
@@ -211,6 +198,8 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x74e1ba852C864d689562b5977EedCB127fDE0C9F;
 
     function actions() public override {
+        // Set earliest execution date June 30, 14:00 UTC
+        require(block.timestamp >= JUN_30_2025_14_00_UTC, "Spell can only be cast after June 30, 2025, 14:00 UTC");
 
         // ---------- SPK Farms ----------
         // Forum: https://forum.sky.money/t/technical-scope-of-spk-farms/26703
