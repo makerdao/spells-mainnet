@@ -420,7 +420,7 @@ contract DssSpellAction is DssAction {
         DssExecLib.setIlkAutoLineDebtCeiling("ALLOCATOR-BLOOM-A", 2_500_000_000);
 
         // ---------- Spark USDS Transfer ----------
-        // Atlas: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-2025-06-23/26701
+        // Forum: https://forum.sky.money/t/atlas-edit-weekly-cycle-proposal-week-of-2025-06-23/26701
 
         // Transfer 20,600,000 USDS to the Spark SubProxy (0x3300f198988e4C9C63F75dF86De36421f06af8c4)
         _transferUsds(SPARK_PROXY, 20_600_000 * WAD);
