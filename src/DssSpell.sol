@@ -19,6 +19,9 @@ pragma solidity 0.8.16;
 // import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 
+import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
+import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
+
 // Import init scripts and structs from dependencies
 import {StakingRewardsInit, StakingRewardsInitParams} from "./dependencies/endgame-toolkit/StakingRewardsInit.sol";
 import {VestInit, VestCreateParams} from "./dependencies/endgame-toolkit/VestInit.sol";
@@ -44,12 +47,6 @@ interface SpellActionLike {
     function nextCastTime(uint256) external view returns (uint256);
 }
 
-interface ERC20Like {
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function balanceOf(address account) external view returns (uint256);
-}
-
 interface VestedRewardsDistributionLike {
     function distribute() external;
 }
@@ -60,6 +57,10 @@ interface VestedRewardsDistributionJobLike {
 
 interface LockstakeEngineLike {
     function addFarm(address farm) external;
+}
+
+interface MkrSkyLike {
+    function mkrToSky(address usr, uint256 mkrAmt) external;
 }
 
 contract DssExec {
@@ -159,6 +160,9 @@ contract DssSpellAction is DssAction {
     address internal immutable LSSKY                 = DssExecLib.getChangelogAddress("LOCKSTAKE_SKY");
     address internal immutable CRON_REWARDS_DIST_JOB = DssExecLib.getChangelogAddress("CRON_REWARDS_DIST_JOB");
     address internal immutable LOCKSTAKE_ENGINE      = DssExecLib.getChangelogAddress("LOCKSTAKE_ENGINE");
+    address internal immutable MKR_SKY               = DssExecLib.getChangelogAddress("MKR_SKY");
+    address internal immutable MCD_VEST_MKR_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_MKR_TREASURY");
+    address internal immutable MKR                   = DssExecLib.getChangelogAddress("MKR");
 
     address internal constant SPK                    = 0xc20059e0317DE91738d13af027DfC4a50781b066;
     address internal constant MCD_VEST_SPK_TREASURY  = 0xF9A2002b471f600A5484da5a735a2A053d377078;
@@ -185,7 +189,7 @@ contract DssSpellAction is DssAction {
         // Approve MCD_VEST_SPK_TREASURY to spend SPK in the treasury:
         // spender: 0xF9A2002b471f600A5484da5a735a2A053d377078
         // amount: 3_250_000_000 * WAD
-        ERC20Like(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
+        GemAbstract(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
 
         // Set cap in MCD_VEST_SPK_TREASURY:
         // target: 0xF9A2002b471f600A5484da5a735a2A053d377078
@@ -315,6 +319,17 @@ contract DssSpellAction is DssAction {
         // addr: 0xa3Ee378BdD0b7DD403cEd3a0A65B2B389A2eaB7e
         DssExecLib.setChangelogAddress("REWARDS_LSSKY_SPK", REWARDS_LSSKY_SPK);
         DssExecLib.setChangelogAddress("REWARDS_DIST_LSSKY_SPK", REWARDS_DIST_LSSKY_SPK);
+
+        // ---------- Convert MKR balance of the PauseProxy to SKY ----------
+        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1.4.2.3_Upgrade_MKR_In_Pause_Proxy_To_SKY/1f1f2ff0-8d73-8064-ab0e-d51c96127c19|b341f4c0b83472dc1f9e1a3b
+
+        // Note: get unpaid MKR for MCD_VEST_MKR_TREASURY id 39
+        uint256 unpaidMkr = VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(39);
+        // Note: approve MKR_SKY to spend MKR balance of the PauseProxy
+        GemAbstract(MKR).approve(MKR_SKY, GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
+        // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY id 39
+        MkrSkyLike(MKR_SKY).mkrToSky(address(this), GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // Note: bump chainlog version because of new contracts being added
         DssExecLib.setChangelogVersion("1.20.2");

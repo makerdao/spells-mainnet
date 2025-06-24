@@ -1535,5 +1535,26 @@ contract DssSpellTest is DssSpellTestBase {
 
         assertFalse(thirdWorkable, "VestedRewardsDistributionJob should not be workable");
     }
-}
 
+    function test_treasuryMkrToSkyConversion() public {
+        // Get the MKR balance before the spell
+        uint256 mkrBalanceBefore = mkr.balanceOf(address(pauseProxy));
+        uint256 skyBalanceBefore = sky.balanceOf(address(pauseProxy));
+
+        // Get the unpaid MKR for vest id 39
+        uint256 unpaidMkr = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY")).unpaid(39);
+
+        // Cast the spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check that the MKR balance has decreased by the expected amount
+        uint256 mkrBalanceAfter = mkr.balanceOf(address(pauseProxy));
+        uint256 skyBalanceAfter = sky.balanceOf(address(pauseProxy));
+
+        // Verify MKR was converted to SKY
+        assertEq(mkrBalanceAfter, unpaidMkr, "MKR balance should equal unpaid vest amount");
+        assertEq(skyBalanceAfter, skyBalanceBefore + (mkrBalanceBefore - unpaidMkr) * 24_000, "SKY balance should have increased");
+    }
+}
