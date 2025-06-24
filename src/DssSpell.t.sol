@@ -72,6 +72,10 @@ interface VestedRewardsDistributionLike {
     function lastDistributedAt() external view returns (uint256);
 }
 
+interface WardsLike {
+    function wards(address) external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -1556,5 +1560,53 @@ contract DssSpellTest is DssSpellTestBase {
         // Verify MKR was converted to SKY
         assertEq(mkrBalanceAfter, unpaidMkr, "MKR balance should equal unpaid vest amount");
         assertEq(skyBalanceAfter, skyBalanceBefore + (mkrBalanceBefore - unpaidMkr) * 24_000, "SKY balance should have increased");
+    }
+
+    function test_disableMkrSkyLegacyConverter() public {
+        // Check if MKR_SKY_LEGACY exists in the chainlog before the spell
+        try chainLog.getAddress("MKR_SKY_LEGACY") returns (address mkrSkyLegacy) {
+            // Get SKY token from the MKR_SKY_LEGACY converter
+            address skyToken = MkrSkyLike(mkrSkyLegacy).sky();
+
+            // Check if MKR_SKY_LEGACY has authority on SKY token before the spell
+            assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
+
+            // Cast the spell
+            _vote(address(spell));
+            _scheduleWaitAndCast(address(spell));
+            assertTrue(spell.done(), "TestError/spell-not-done");
+
+            // Check if MKR_SKY_LEGACY has been removed from the chainlog
+            try chainLog.getAddress("MKR_SKY_LEGACY") {
+                revert("MKR_SKY_LEGACY should be removed from chainlog");
+            } catch {
+                // Expected to fail as MKR_SKY_LEGACY should be removed
+            }
+
+            // Check if MKR_SKY_LEGACY has lost authority on SKY token
+            assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
+        } catch {
+            revert("MKR_SKY_LEGACY should exist in chainlog before spell");
+        }
+    }
+
+    function test_burnExcessSkyFromOldConverter() public {
+        address mkrSkyAddr = chainLog.getAddress("MKR_SKY");
+        MkrSkyLike mkrSky = MkrSkyLike(mkrSkyAddr);
+        address skyToken = mkrSky.sky();
+        address mkrToken = mkrSky.mkr();
+        uint256 skyTotalSupplyBefore = GemAbstract(skyToken).totalSupply();
+        uint256 skyBalanceBefore = GemAbstract(skyToken).balanceOf(address(mkrSky));
+        uint256 mkrTotalSupplyBefore = GemAbstract(mkrToken).totalSupply();
+        uint256 conversionRate = mkrSky.rate();
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        uint256 skyTotalSupplyAfter = GemAbstract(skyToken).totalSupply();
+        uint256 expectedSkyTotalSupplyAfter = skyTotalSupplyBefore - (skyBalanceBefore - mkrTotalSupplyBefore * conversionRate);
+
+        assertEq(skyTotalSupplyAfter, expectedSkyTotalSupplyAfter, "Excess SKY should be burned");
     }
 }

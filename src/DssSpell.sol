@@ -21,11 +21,13 @@ import "dss-exec-lib/DssAction.sol";
 
 import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
 import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
+import {MCD, DssInstance} from "dss-test/MCD.sol";
 
-// Import init scripts and structs from dependencies
 import {StakingRewardsInit, StakingRewardsInitParams} from "./dependencies/endgame-toolkit/StakingRewardsInit.sol";
 import {VestInit, VestCreateParams} from "./dependencies/endgame-toolkit/VestInit.sol";
 import {VestedRewardsDistributionInit, VestedRewardsDistributionInitParams} from "./dependencies/endgame-toolkit/VestedRewardsDistributionInit.sol";
+
+import {SkyInit} from "./dependencies/sky/SkyInit.sol";
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
@@ -331,7 +333,24 @@ contract DssSpellAction is DssAction {
         // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY id 39
         MkrSkyLike(MKR_SKY).mkrToSky(address(this), GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
 
-        // Note: bump chainlog version because of new contracts being added
+        // ---------- Disable MKR_SKY_LEGACY Converter ----------
+        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.2.4.2.1_Disabling_Legacy_Conversion_Contract/210f2ff0-8d73-80d4-a983-f9217c9b244a|b341f4c0b834477b310e7381
+
+        // Note: load DssInstance from chainlog
+        DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
+
+        // Call disableOldConverterMkrSky() to deactive the legacy converter (https://github.com/sky-ecosystem/sky/pull/21/files#diff-f6cbf09833eed835c52b0a1c5be7dd9e84213d278c958843725af6a77faa77d4R69-R75)
+        SkyInit.disableOldConverterMkrSky(dss);
+
+        // ---------- Burn Excess SKY from MKR_SKY Converter ----------
+        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
+        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.2.4.2_MKR_To_SKY_Conversion_Emissions/209f2ff0-8d73-80c7-80e7-e61690dc7381|b341f4c0b834477b310e
+
+        // Call burnExtraSky() to burn excess pre-minted SKY in the new MKR_SKY converter (https://github.com/sky-ecosystem/sky/pull/21/files#diff-f6cbf09833eed835c52b0a1c5be7dd9e84213d278c958843725af6a77faa77d4R81-R88)
+        SkyInit.burnExtraSky(dss);
+
+        // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");
 
         // ---------- Execute Spark Proxy Spell ----------
