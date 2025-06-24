@@ -568,5 +568,11 @@ contract Addresses {
         addr["UNICHAIN_TOKEN_BRIDGE_IMP"]        = 0x8A925ccFd5F7f46332E2D719A916f8b4a643599F;
         addr["OPTIMISM_TOKEN_BRIDGE"]            = 0x3d25B7d486caE1810374d37A48BCf0963c9B8057;
         addr["OPTIMISM_TOKEN_BRIDGE_IMP"]        = 0xA50adBad34c1e9786979bD44220F8fd46e43A6B0;
+        addr["SPK"]                              = 0xc20059e0317DE91738d13af027DfC4a50781b066;
+        addr["MCD_VEST_SPK_TREASURY"]            = 0xF9A2002b471f600A5484da5a735a2A053d377078;
+        addr["REWARDS_USDS_SPK"]                 = 0x173e314C7635B45322cd8Cb14f44b312e079F3af;
+        addr["REWARDS_DIST_USDS_SPK"]            = 0x3959e23A63CA7ac12D658bb44F90cb1f7Ee4C02c;
+        addr["REWARDS_LSSKY_SPK"]                = 0x99cBC0e4E6427F6939536eD24d1275B95ff77404;
+        addr["REWARDS_DIST_LSSKY_SPK"]           = 0xa3Ee378BdD0b7DD403cEd3a0A65B2B389A2eaB7e;
     }
 }

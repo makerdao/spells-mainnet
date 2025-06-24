@@ -20,13 +20,6 @@ import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 import { DssExec } from "dss-exec-lib/DssExec.sol";
 
-contract MockDssSpellAction  {
-    function execute() external {}
-}
-contract MockDssExecSpell is DssExec {
-    constructor() DssExec(block.timestamp + 30 days, address(new MockDssSpellAction())) {}
-}
-
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -48,9 +41,35 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
+interface ERC20Like {
+    function allowance(address, address) external view returns (uint256);
+}
+
+interface DssVestLike {
+    function cap() external view returns (uint256);
+    function gem() external view returns (address);
+    function awards(uint256) external view returns (address, uint48, uint48, uint48, address, uint8, uint128);
+}
+
 interface SequencerLike {
     function getMaster() external view returns (bytes32);
     function hasJob(address job) external view returns (bool);
+}
+
+interface VestedRewardsDistributionJobLike {
+    function has(address) external view returns (bool);
+    function intervals(address) external view returns (uint256);
+    function workable(bytes32) external returns (bool, bytes memory);
+    function work(bytes32, bytes memory) external;
+}
+
+interface VestedRewardsDistributionLike {
+    function dssVest() external view returns (address);
+    function stakingRewards() external view returns (address);
+    function gem() external view returns (address);
+    function wards(address) external view returns (uint256);
+    function vestId() external view returns (uint256);
+    function lastDistributedAt() external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -320,7 +339,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testLockstakeIlkIntegration() public skipped { // add the `skipped` modifier to skip
+    function testLockstakeIlkIntegration() public { // add the `skipped` modifier to skip
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
@@ -334,10 +353,10 @@ contract DssSpellTest is DssSpellTestBase {
                 engine: addr.addr("LOCKSTAKE_ENGINE"),
                 clip:   addr.addr("LOCKSTAKE_CLIP"),
                 calc:   addr.addr("LOCKSTAKE_CLIP_CALC"),
-                farm:   addr.addr("REWARDS_LSSKY_USDS"),
-                rToken: addr.addr("USDS"),
-                rDistr: addr.addr("MCD_SPLIT"),
-                rDur:   1_728 seconds
+                farm:   addr.addr("REWARDS_LSSKY_SPK"),
+                rToken: addr.addr("SPK"),
+                rDistr: addr.addr("REWARDS_DIST_LSSKY_SPK"),
+                rDur:   7 days
             })
         );
     }
@@ -500,7 +519,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testVestDAI() public skipped { // add the `skipped` modifier to skip
+    function testVestDai() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
         uint256 JAN_31_2025 = 1738367999;
@@ -521,10 +540,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVestDai(streams);
+        _checkVest("dai", streams);
     }
 
-    function testVestMKR() public skipped { // add the `skipped` modifier to skip
+    function testVestMkr() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_01_2024 = 1727740800;
         uint256 JAN_31_2025 = 1738367999;
@@ -545,10 +564,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVestMkr(streams);
+        _checkVest("mkr", streams);
     }
 
-    function testVestUSDS() public skipped { // add the `skipped` modifier to skip
+    function testVestUsds() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 FEB_01_2025 = 1738368000;
         uint256 DEC_31_2025 = 1767225599;
@@ -593,10 +612,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVestUsds(streams);
+        _checkVest("usds", streams);
     }
 
-    function testVestSKY() public skipped { // add the `skipped` modifier to skip
+    function testVestSky() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 FEB_01_2025 = 1738368000;
 
@@ -628,10 +647,10 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertToStateAndDelete(before);
         }
 
-        _checkVestSKY(streams);
+        _checkVest("sky", streams);
     }
 
-    function testVestSKYmint() public skipped { // add the `skipped` modifier to skip
+    function testVestSkyMint() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 DEC_01_2023 = 1701385200;
 
@@ -662,7 +681,49 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertToStateAndDelete(before);
         }
 
-        _checkVestSkyMint(streams);
+        _checkVest("skyMint", streams);
+    }
+
+    function testVestSpk() public { // add the `skipped` modifier to skip
+        // Provide human-readable names for timestamps
+        uint256 beforeVote = vm.snapshotState();
+        _vote(address(spell));
+        spell.schedule();
+
+        uint256 CAST_TIME_MINUS_7_DAYS = spell.nextCastTime() - 7 days;
+        uint256 BGN_PLUS_730_DAYS = CAST_TIME_MINUS_7_DAYS + 730 days;
+
+        vm.revertToStateAndDelete(beforeVote);
+
+        // For each new stream, provide Stream object
+        // and initialize the array with the corrent number of new streams
+        VestStream[] memory streams = new VestStream[](2);
+        streams[0] = VestStream({
+            id:  1,
+            usr: addr.addr("REWARDS_DIST_USDS_SPK"),
+            bgn: CAST_TIME_MINUS_7_DAYS,
+            clf: CAST_TIME_MINUS_7_DAYS,
+            fin: BGN_PLUS_730_DAYS,
+            tau: 730 days,
+            mgr: address(0),
+            res: 1,
+            tot: 2_275_000_000 * WAD,
+            rxd: 7 days * 2_275_000_000 * WAD / 730 days
+        });
+        streams[1] = VestStream({
+            id:  2,
+            usr: addr.addr("REWARDS_DIST_LSSKY_SPK"),
+            bgn: CAST_TIME_MINUS_7_DAYS,
+            clf: CAST_TIME_MINUS_7_DAYS,
+            fin: BGN_PLUS_730_DAYS,
+            tau: 730 days,
+            mgr: address(0),
+            res: 1,
+            tot: 975_000_000 * WAD,
+            rxd: 7 days * 975_000_000 * WAD / 730 days
+        });
+
+        _checkVest("spk", streams);
     }
 
     struct Yank {
@@ -1271,4 +1332,208 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertToStateAndDelete(before);
         }
     }
+
+    address SPK = addr.addr("SPK");
+    address MCD_VEST_SPK_TREASURY = addr.addr("MCD_VEST_SPK_TREASURY");
+    address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
+    address CRON_REWARDS_DIST_JOB = addr.addr("CRON_REWARDS_DIST_JOB");
+    address LOCKSTAKE_ENGINE = addr.addr("LOCKSTAKE_ENGINE");
+    address USDS = addr.addr("USDS");
+    address LSSKY = addr.addr("LOCKSTAKE_SKY");
+    address MCD_PAUSE_PROXY = addr.addr("MCD_PAUSE_PROXY");
+    address REWARDS_USDS_SPK = addr.addr("REWARDS_USDS_SPK");
+    address REWARDS_DIST_USDS_SPK = addr.addr("REWARDS_DIST_USDS_SPK");
+    address REWARDS_LSSKY_SPK = addr.addr("REWARDS_LSSKY_SPK");
+    address REWARDS_DIST_LSSKY_SPK = addr.addr("REWARDS_DIST_LSSKY_SPK");
+
+    function test_usdsSpkFarm_deploymentAndInitialization() public {
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).stakingToken(), USDS, "before: Wrong staking token");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsToken(), SPK, "before: Wrong rewards token");
+
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).owner(), MCD_PAUSE_PROXY, "before: Wrong owner");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), address(0), "before: Wrong rewards distribution");
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).dssVest(), MCD_VEST_SPK_TREASURY, "before: Wrong DssVest");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).stakingRewards(), REWARDS_USDS_SPK, "before: Wrong StakingRewards");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).gem(), SPK, "before: Wrong gem token");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).wards(MCD_PAUSE_PROXY), 1, "before: PauseProxy not authorized");
+
+        assertEq(
+            DssVestLike(MCD_VEST_SPK_TREASURY).gem(),
+            address(StakingRewardsLike(REWARDS_USDS_SPK).rewardsToken()),
+            "before: DssVest gem != StakingRewards rewardsToken"
+        );
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).vestId(), 0, "before: vestId already set");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), 0, "before: Should not have distributed yet");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "before: Should have no reward rate");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), REWARDS_DIST_USDS_SPK, "after: Wrong rewards distribution");
+
+        uint256 usdsSpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).vestId();
+        assertGt(usdsSpkVestId, 0, "after: USDS->SPK vest stream not created");
+
+        (address usdsSpkUsr, , , , , , uint128 usdsSpkTot) =
+            DssVestLike(MCD_VEST_SPK_TREASURY).awards(usdsSpkVestId);
+        assertEq(usdsSpkUsr, REWARDS_DIST_USDS_SPK, "after: Wrong USDS->SPK vest recipient");
+        assertEq(usdsSpkTot, 2_275_000_000 * WAD, "after: Wrong USDS->SPK vest total");
+
+        assertGt(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "after: USDS->SPK farm reward rate is zero");
+        assertGt(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), 0, "after: Should have distributed");
+    }
+
+    function test_usdsSpkFarm_stakingDistributionAndUnstaking() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Set the USDS balance of the testing contract
+        uint256 stakingAmount = 1_000_000 * WAD;
+        address user = address(this);
+        deal(address(usds), user, stakingAmount, true);
+
+        // Approve USDS for staking
+        usds.approve(REWARDS_USDS_SPK, stakingAmount);
+
+        // Stake USDS
+        StakingRewardsLike(REWARDS_USDS_SPK).stake(stakingAmount);
+
+        // Verify staked balance
+        uint256 stakedBalance = StakingRewardsLike(REWARDS_USDS_SPK).balanceOf(user);
+        assertEq(stakedBalance, stakingAmount, "REWARDS_USDS_SPK/stake-failed");
+
+        // Wait for rewards to accumulate (or fast-forward time in test)
+        vm.warp(block.timestamp + 1 days);
+
+        // Check earned rewards
+        uint256 earned = StakingRewardsLike(REWARDS_USDS_SPK).earned(user);
+        assertGt(earned, 0, "No rewards earned");
+
+        // Claim rewards
+        StakingRewardsLike(REWARDS_USDS_SPK).getReward();
+        uint256 spkBalance = spk.balanceOf(user);
+        assertGt(spkBalance, 0, "Rewards not claimed");
+
+        // Unstake tokens
+        StakingRewardsLike(REWARDS_USDS_SPK).withdraw(stakingAmount);
+
+        // Verify USDS returned
+        uint256 usdsBalance = usds.balanceOf(user);
+        assertGe(usdsBalance, stakingAmount, "Unstaking failed");
+    }
+
+    function test_lsskySpkFarm_deploymentAndInitialization() public {
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).stakingToken(), LSSKY, "before: Wrong staking token");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsToken(), SPK, "before: Wrong rewards token");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDistribution(), address(0), "before: Wrong rewards distribution");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).owner(), MCD_PAUSE_PROXY, "before: Wrong owner");
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).dssVest(), MCD_VEST_SPK_TREASURY, "before: Wrong DssVest");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).stakingRewards(), REWARDS_LSSKY_SPK, "before: Wrong StakingRewards");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).gem(), SPK, "before: Wrong gem token");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).wards(MCD_PAUSE_PROXY), 1, "before: PauseProxy not authorized");
+
+        assertEq(
+            DssVestLike(MCD_VEST_SPK_TREASURY).gem(),
+            address(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsToken()),
+            "DssVest gem != StakingRewards rewardsToken"
+        );
+
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).vestId(), 0, "before: vestId already set");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), 0, "before: Should not have distributed yet");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).totalSupply(), 0, "before: Should have no staked tokens");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "before: Should have no reward rate");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDistribution(), REWARDS_DIST_LSSKY_SPK, "after: Wrong rewards distribution");
+
+        uint256 farmStatus = LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK);
+        assertEq(farmStatus, 1, "after: Farm not active in Lockstake Engine");
+
+        uint256 lsskySpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).vestId();
+        assertGt(lsskySpkVestId, 0, "after: LSSKY->SPK vest stream not created");
+
+        (address lsskySpkUsr, , , , , , uint128 lsskySpkTot) =
+            DssVestLike(MCD_VEST_SPK_TREASURY).awards(lsskySpkVestId);
+        assertEq(lsskySpkUsr, REWARDS_DIST_LSSKY_SPK, "after: Wrong LSSKY->SPK vest recipient");
+        assertEq(lsskySpkTot, 975_000_000 * WAD, "after: Wrong LSSKY->SPK vest total");
+
+        assertGt(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "after: LSSKY->SPK farm reward rate is zero");
+        assertGt(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), 0, "after: Should have distributed");
+    }
+
+    function test_vestedRewardsDistributionJob_configuration() public {
+        assertFalse(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_USDS_SPK), "before: USDS->SPK farm already registered in cron job");
+        assertFalse(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_LSSKY_SPK), "before: LSSKY->SPK farm already registered in cron job");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertTrue(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_USDS_SPK), "after: USDS->SPK farm not registered in cron job");
+        assertTrue(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_LSSKY_SPK), "after: LSSKY->SPK farm not registered in cron job");
+
+        uint256 usdsInterval = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).intervals(REWARDS_DIST_USDS_SPK);
+        uint256 lsskyInterval = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).intervals(REWARDS_DIST_LSSKY_SPK);
+        assertEq(usdsInterval, 7 days - 1 hours, "after: Wrong interval for USDS farm");
+        assertEq(lsskyInterval, 7 days - 1 hours, "after: Wrong interval for LSSKY farm");
+    }
+
+    function test_vestedRewardsDistributionJob_execution() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        uint256 originalTimestamp = block.timestamp;
+
+        // Advance time since distribute() was called in spell
+        vm.warp(originalTimestamp + 7 days);
+
+        // Test job execution
+        bytes32 network = SequencerLike(CRON_SEQUENCER).getMaster();
+
+        (bool isWorkable, bytes memory args) = (false, "");
+        (bool foundUsdsSpk, bool foundLsskySpk) = (false, false);
+        do {
+            // Note: `workable` is not a view function in this case, so we need to revert to the previous state after calling it.
+            uint256 beforeWorkable = vm.snapshotState();
+            (isWorkable, args) = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).workable(network);
+            vm.revertToStateAndDelete(beforeWorkable);
+
+            if (isWorkable) {
+                address dist = abi.decode(args, (address));
+                if (dist == REWARDS_DIST_USDS_SPK) {
+                    foundUsdsSpk = true;
+                } else if (dist == REWARDS_DIST_LSSKY_SPK) {
+                    foundLsskySpk = true;
+                }
+                // Execute the distribution job
+                VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).work(network, args);
+            }
+        } while(isWorkable);
+
+        // Verify both distributions have been executed
+        assertTrue(foundUsdsSpk, "USDS farm not distributed");
+        assertTrue(foundLsskySpk, "LSSKY farm not distributed");
+
+        // Verify both farms have reward rates > 0
+        assertGt(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "USDS farm reward rate still zero");
+        assertGt(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "LSSKY farm reward rate still zero");
+
+        // Check if the job is no longer workable
+        // Note: `workable` is not a view function in this case, so we need to revert to the previous state after calling it.
+        uint256 beforeThirdWorkable = vm.snapshotState();
+        (bool thirdWorkable, ) = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).workable(network);
+        vm.revertToStateAndDelete(beforeThirdWorkable);
+
+        assertFalse(thirdWorkable, "VestedRewardsDistributionJob should not be workable");
+    }
 }
+

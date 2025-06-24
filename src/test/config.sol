@@ -55,6 +55,7 @@ contract Config {
         uint256 vest_usds_cap;
         uint256 vest_sky_cap;
         uint256 vest_sky_mint_cap;
+        uint256 vest_spk_cap;
         uint256 SP_tau;
         address SP_bud;
         uint256 SP_ssr_min;
@@ -150,11 +151,12 @@ contract Config {
         afterSpell.lite_psm_mom_authority = "MCD_ADM";                                  // LitePsmMom authority
         afterSpell.splitter_mom_authority = "MCD_ADM";                                  // SplitterMom authority
         afterSpell.spbeam_mom_authority   = "MCD_ADM";                                  // SPBeamMom authority
-        afterSpell.vest_dai_cap           = 1 * MILLION * WAD / 30 days;                // In WAD Dai per second
-        afterSpell.vest_mkr_cap           = 2_220 * WAD / 365 days;                     // In WAD MKR per second
-        afterSpell.vest_usds_cap          = 46_200 * WAD / 30 days;                     // In WAD USDS per second
-        afterSpell.vest_sky_cap           = 151_250_000 * WAD / 182 days;               // In WAD SKY per second
-        afterSpell.vest_sky_mint_cap      = 176 * MILLION * WAD / 182 days;             // In WAD SKY per second
+        afterSpell.vest_dai_cap           =     1_000_000 * WAD /  30 days;             // In WAD Dai per second
+        afterSpell.vest_mkr_cap           =         2_220 * WAD / 365 days;             // In WAD MKR per second
+        afterSpell.vest_usds_cap          =        46_200 * WAD /  30 days;             // In WAD USDS per second
+        afterSpell.vest_sky_cap           =   151_250_000 * WAD / 182 days;             // In WAD SKY per second
+        afterSpell.vest_sky_mint_cap      =   176_000_000 * WAD / 182 days;             // In WAD SKY per second
+        afterSpell.vest_spk_cap           = 2_502_500_000 * WAD / 730 days;             // In WAD SKY per second
         afterSpell.SP_tau                 = 57_600 seconds;                             // In seconds
         afterSpell.SP_bud                 = 0xe1c6f81D0c3CD570A77813b81AA064c5fff80309; // Address of SPBEAM Bud
         afterSpell.SP_ssr_min             = 2_00;                                       // In basis points
@@ -165,7 +167,7 @@ contract Config {
         afterSpell.SP_dsr_step            = 4_00;                                       // In basis points
         afterSpell.sky_mkr_rate           = 24_000;                                     // In whole SKY/MKR units
         afterSpell.ilk_count              = 72;                                         // Num expected in system
-        afterSpell.chainlog_version       = "1.20.1";                                   // String expected in system
+        afterSpell.chainlog_version       = "1.20.2";                                   // String expected in system
 
         //
         // Values for all collateral

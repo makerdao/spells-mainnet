@@ -249,7 +249,9 @@ interface LitePsmMomLike is AuthorityLike {
 interface StakingRewardsLike {
     function owner() external view returns (address);
     function balanceOf(address) external view returns (uint256);
+    function earned(address) external view returns (uint256);
     function stake(uint256 amount) external;
+    function withdraw(uint256 amount) external;
     function notifyRewardAmount(uint256 reward) external;
     function rewardPerToken() external view returns (uint256);
     function rewardsDistribution() external view returns (address);
@@ -258,6 +260,9 @@ interface StakingRewardsLike {
     function stakingToken() external view returns (address);
     function lastUpdateTime() external view returns (uint256);
     function getReward() external;
+    function totalSupply() external view returns (uint256);
+    function rewardRate() external view returns (uint256);
+    function periodFinish() external view returns (uint256);
 }
 
 interface LockstakeEngineLike {
@@ -507,6 +512,7 @@ contract DssSpellTestBase is Config, DssTest {
     DSTokenAbstract                  gov = DSTokenAbstract(    addr.addr("MCD_GOV"));
     DSTokenAbstract                  mkr = DSTokenAbstract(    addr.addr("MKR"));
     GemAbstract                      sky = GemAbstract(        addr.addr("SKY"));
+    GemAbstract                      spk = GemAbstract(        addr.addr("SPK"));
     MkrSkyLike                    mkrSky = MkrSkyLike(         addr.addr("MKR_SKY"));
     EndAbstract                      end = EndAbstract(        addr.addr("MCD_END"));
     ESMAbstract                      esm = ESMAbstract(        addr.addr("MCD_ESM"));
@@ -528,6 +534,7 @@ contract DssSpellTestBase is Config, DssTest {
     VestAbstract                vestUsds = VestAbstract(       addr.addr("MCD_VEST_USDS"));
     VestAbstract                 vestMkr = VestAbstract(       addr.addr("MCD_VEST_MKR_TREASURY"));
     VestAbstract                 vestSky = VestAbstract(       addr.addr("MCD_VEST_SKY_TREASURY"));
+    VestAbstract                 vestSpk = VestAbstract(       addr.addr("MCD_VEST_SPK_TREASURY"));
     VestAbstract             vestSkyMint = VestAbstract(       addr.addr("MCD_VEST_SKY"));
     RwaLiquidationLike liquidationOracle = RwaLiquidationLike( addr.addr("MIP21_LIQUIDATION_ORACLE"));
     SPBEAMLike                    spbeam = SPBEAMLike(         addr.addr("MCD_SPBEAM"));
@@ -723,6 +730,8 @@ contract DssSpellTestBase is Config, DssTest {
                 bytes32(0)
             );
         }
+
+        _setUpVests();
 
         // Temporary fix to the reverts of the Spark spells interacting with Aggor oracles, due to the cast time manipulation
         // Example revert: https://dashboard.tenderly.co/explorer/vnet/eb97d953-4642-4778-938e-d70ee25e3f58/tx/0xe427414d07c28b64c076e809983cfdee3bfd680866ebc7c40349700f4a6160bd?trace=0.5.5.1.62.1.2.0.2.2.0.2.2
@@ -942,6 +951,7 @@ contract DssSpellTestBase is Config, DssTest {
             assertEq(vestUsds.cap(), values.vest_usds_cap, "TestError/vest-usds-cap");
             assertEq(vestSky.cap(), values.vest_sky_cap, "TestError/vest-sky-cap");
             assertEq(vestSkyMint.cap(), values.vest_sky_mint_cap, "TestError/vest-sky-mint-cap");
+            assertEq(vestSpk.cap(), values.vest_spk_cap, "TestError/vest-spk-cap");
         }
 
         assertEq(vat.wards(pauseProxy), uint256(1), "TestError/pause-proxy-deauthed-on-vat");
@@ -949,9 +959,11 @@ contract DssSpellTestBase is Config, DssTest {
         // transferrable vests
         {
             // check mkr allowance and balance
-            _checkTransferrableVestAllowanceAndBalance('mkr', address(mkr), vestMkr);
+            _checkTransferrableVestAllowanceAndBalance('mkr', GemAbstract(address(mkr)), vestMkr);
             // check sky allowance and balance
-            _checkTransferrableVestAllowanceAndBalance('sky', address(sky), vestSky);
+            _checkTransferrableVestAllowanceAndBalance('sky', sky, vestSky);
+            // check spk allowance and balance
+            _checkTransferrableVestAllowanceAndBalance('spk', spk, vestSpk);
         }
     }
 
@@ -1507,6 +1519,7 @@ contract DssSpellTestBase is Config, DssTest {
     ) internal {
         LockstakeEngineLike engine = LockstakeEngineLike(p.engine);
         StakingRewardsLike farm = StakingRewardsLike(p.farm);
+
         // Check relevant contracts are correctly configured
         {
             assertEq(dog.vat(),                              address(vat),         "checkLockstakeIlkIntegration/invalid-dog-vat");
@@ -1598,6 +1611,8 @@ contract DssSpellTestBase is Config, DssTest {
             lockAmt = drawAmt * WAD / _getOSMPrice(p.pip) * 10;
             // Give tokens
             _giveTokens(address(sky), lockAmt);
+            // Ensure there's enough room in the debt ceiling
+            _setIlkLine(p.ilk, drawAmt * RAD);
         }
 
         uint256 snapshot = vm.snapshotState();
@@ -1648,7 +1663,7 @@ contract DssSpellTestBase is Config, DssTest {
             // Deposit rewards into farm and notify
             uint256 rewardAmt = 1_000_000 * WAD;
             address rewardsToken = farm.rewardsToken();
-            deal(rewardsToken, p.farm, rewardAmt, true);
+            deal(rewardsToken, p.farm, GemAbstract(rewardsToken).balanceOf(p.farm) + rewardAmt, true);
             vm.prank(farm.rewardsDistribution()); farm.notifyRewardAmount(rewardAmt);
             // Claim rewards
             address rewardsUser = address(this);
@@ -1736,6 +1751,10 @@ contract DssSpellTestBase is Config, DssTest {
         spotter.poke(p.ilk);
         assertEq(ClipAbstract(p.clip).kicks(), 0, "checkLockstakeTake/non-0-kicks");
         assertEq(engine.urnAuctions(urn), 0, "checkLockstakeTake/non-0-actions");
+        // Overwrite stopped to enable liquidations even if they are disabled at the moment.
+        stdstore.target(p.clip).sig("stopped()").checked_write(uint256(0));
+        // Advance a block because it's not possible to lock and free in the same block on the new Chief.
+        skip(1); vm.roll(block.number + 1);
         uint256 id = dog.bark(p.ilk, urn, address(this));
         assertEq(ClipAbstract(p.clip).kicks(), 1, "checkLockstakeTake/AfterBark/no-kicks");
         assertEq(engine.urnAuctions(urn), 1, "checkLockstakeTake/AfterBark/no-actions");
@@ -2570,6 +2589,26 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(cure.tell(), expectedTell);
     }
 
+    struct VestInst {
+        GemAbstract gem;
+        VestAbstract vest;
+    }
+
+    mapping(bytes32 => VestInst) transferrableVests;
+    mapping(bytes32 => VestInst) suckableVests;
+    mapping(bytes32 => VestInst) mintableVests;
+
+    function _setUpVests() internal {
+        transferrableVests["mkr"] = VestInst({gem: GemAbstract(address(mkr)), vest: vestMkr});
+        transferrableVests["sky"] = VestInst({gem: sky, vest: vestSky});
+        transferrableVests["spk"] = VestInst({gem: spk, vest: vestSpk});
+
+        suckableVests["usds"] = VestInst({gem: usds, vest: vestUsds});
+        suckableVests["dai"] = VestInst({gem: GemAbstract(address(dai)), vest: vestDai});
+
+        mintableVests["skyMint"] = VestInst({gem: sky, vest: vestSkyMint});
+    }
+
     struct VestStream {
         uint256 id;
         address usr;
@@ -2583,64 +2622,59 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 rxd;
     }
 
-    function _checkVestDai(VestStream[] memory _ss) internal {
-        uint256 prevStreamCount = vestDai.ids();
+    function _checkVest(bytes32 key, VestStream[] memory _ss) internal {
+        bool isTransferrable;
+        GemAbstract gem;
+        VestAbstract vest;
+
+        if (address(transferrableVests[key].gem) != address(0)) {
+            isTransferrable = true;
+            gem = transferrableVests[key].gem;
+            vest = transferrableVests[key].vest;
+        } else if (address(suckableVests[key].gem) != address(0)) {
+            gem = suckableVests[key].gem;
+            vest = suckableVests[key].vest;
+        } else if (address(mintableVests[key].gem) != address(0)) {
+            gem = mintableVests[key].gem;
+            vest = mintableVests[key].vest;
+        } else {
+            revert(_concat("testVest/invalid-vest-key: ", key));
+        }
+
+        uint256 prevStreamCount = vest.ids();
+
+        uint256 prevAllowance;
+        if (isTransferrable) {
+            prevAllowance = gem.allowance(pauseProxy, address(vest));
+        }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        // Check that all streams added in this spell are tested
-        assertEq(vestDai.ids(), prevStreamCount + _ss.length, "testVestDai/not-all-streams-tested");
-
-        for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestDai", vestDai, address(dai), _ss[i]);
-        }
-    }
-
-    function _checkVestUsds(VestStream[] memory _ss) internal {
-        uint256 prevStreamCount = vestUsds.ids();
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
+        string memory errPrefix = _concat("testVest-", key);
 
         // Check that all streams added in this spell are tested
-        assertEq(vestUsds.ids(), prevStreamCount + _ss.length, "testVestUsds/not-all-streams-tested");
-
-        for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestUsds", vestUsds, address(usds), _ss[i]);
+        assertEq(vest.ids(), prevStreamCount + _ss.length, _concat(errPrefix, bytes32("/not-all-streams-tested")));
+        if (isTransferrable) {
+            // Check allowance was increased according to the streams
+            uint256 sumTot = 0;
+            uint256 sumRxd = 0;
+            for (uint256 i = 0; i < _ss.length; i++) {
+                sumTot = sumTot + _ss[i].tot;
+                sumRxd = sumRxd + _ss[i].rxd;
+            }
+          assertEq(gem.allowance(pauseProxy, address(vest)), prevAllowance + sumTot - sumRxd, _concat(errPrefix, bytes32("/invalid-allowance")));
         }
-    }
-
-    function _checkVestMkr(VestStream[] memory _ss) internal {
-        uint256 prevStreamCount = vestMkr.ids();
-        uint256 prevAllowance = mkr.allowance(pauseProxy, address(vestMkr));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check allowance was increased according to the streams
-        uint256 sumTot = 0;
-        uint256 sumRxd = 0;
-        for (uint256 i = 0; i < _ss.length; i++) {
-            sumTot = sumTot + _ss[i].tot;
-            sumRxd = sumRxd + _ss[i].rxd;
-        }
-        assertEq(mkr.allowance(pauseProxy, address(vestMkr)), prevAllowance + sumTot - sumRxd, "testVestMkr/invalid-allowance");
-
-        // Check that all streams added in this spell are tested
-        assertEq(vestMkr.ids(), prevStreamCount + _ss.length, "testVestMrk/not-all-streams-tested");
 
         for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestMkr", vestMkr, address(mkr), _ss[i]);
+            _checkVestStream(errPrefix, vest, gem, _ss[i]);
         }
     }
 
     function _checkTransferrableVestAllowanceAndBalance(
         string memory _errSuffix,
-        address token,
+        GemAbstract _gem,
         VestAbstract vest
     ) internal view {
         uint256 vestableAmt;
@@ -2652,55 +2686,17 @@ contract DssSpellTestBase is Config, DssTest {
             }
         }
 
-        uint256 allowance = GemAbstract(token).allowance(pauseProxy, address(vest));
+        uint256 allowance = _gem.allowance(pauseProxy, address(vest));
         assertGe(allowance, vestableAmt, _concat(string("TestError/insufficient-transferrable-vest-allowance-"), _errSuffix));
 
-        uint256 balance = GemAbstract(token).balanceOf(pauseProxy);
+        uint256 balance = _gem.balanceOf(pauseProxy);
         assertGe(balance, vestableAmt, _concat(string("TestError/insufficient-transferrable-vest-balance-"), _errSuffix));
-    }
-
-    function _checkVestSKY(VestStream[] memory _ss) internal {
-        uint256 prevStreamCount = vestSky.ids();
-        uint256 prevAllowance = sky.allowance(pauseProxy, address(vestSky));
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check allowance was increased according to the streams
-        uint256 vestableAmt;
-        for (uint256 i = 0; i < _ss.length; i++) {
-            vestableAmt += _ss[i].tot - _ss[i].rxd;
-        }
-        assertEq(sky.allowance(pauseProxy, address(vestSky)), prevAllowance + vestableAmt, "testVestSky/invalid-allowance");
-
-        // Check that all streams added in this spell are tested
-        assertEq(vestSky.ids(), prevStreamCount + _ss.length, "testVestSky/not-all-streams-tested");
-
-        for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestSky", vestSky, address(sky), _ss[i]);
-        }
-    }
-
-    function _checkVestSkyMint(VestStream[] memory _ss) internal {
-        uint256 prevStreamCount = vestSkyMint.ids();
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check that all streams added in this spell are tested
-        assertEq(vestSkyMint.ids(), prevStreamCount + _ss.length, "testVestSkyMint/not-all-streams-tested");
-
-        for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream("testVestSkyMint", vestSkyMint, address(sky), _ss[i]);
-        }
     }
 
     function _checkVestStream(
         string memory _errPrefix,
         VestAbstract _vest,
-        address _token,
+        GemAbstract _gem,
         VestStream memory _s
     ) internal {
         assertEq(_vest.usr(_s.id), _s.usr,          _concat(_errPrefix, string("/usr")));
@@ -2713,20 +2709,18 @@ contract DssSpellTestBase is Config, DssTest {
         assertEq(_vest.tot(_s.id), _s.tot,          _concat(_errPrefix, string("/tot")));
         assertEq(_vest.rxd(_s.id), _s.rxd,          _concat(_errPrefix, string("/rxd")));
 
-        GemAbstract token = GemAbstract(_token);
-
         {
             uint256 before = vm.snapshotState();
 
             // Check each new stream is payable in the future
-            uint256 pbalance = token.balanceOf(_s.usr);
+            uint256 pbalance = _gem.balanceOf(_s.usr);
             GodMode.setWard(address(_vest), address(this), 1);
             _vest.unrestrict(_s.id);
 
             vm.warp(_s.fin);
             _vest.vest(_s.id);
             assertEq(
-                token.balanceOf(_s.usr),
+                _gem.balanceOf(_s.usr),
                 pbalance + _s.tot - _s.rxd,
                 _concat(_errPrefix, string("/invalid-received-amount"))
             );
