@@ -1061,6 +1061,15 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(sky),  wallets.addr("CLOAKY_2"),                  288_000 ether)
         ];
 
+        // By default the expected balance changes are the payee amounts
+        int256[] memory expectedBalanceChanges = new int256[](payees.length);
+        for (uint256 i = 0; i < payees.length; i++) {
+            expectedBalanceChanges[i] = payees[i].amount;
+        }
+
+        // NOTE: the Spark Spell transfer 800,000 USDS out of the Spark Proxy
+        expectedBalanceChanges[0] = payees[0].amount - 800_000 ether; // Note: ether is only a keyword helper
+
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:           0 ether, // Note: ether is only a keyword helper
@@ -1138,25 +1147,25 @@ contract DssSpellTest is DssSpellTestBase {
             if (payees[i].token == address(dai)) {
                 assertEq(
                     int256(dai.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].dai + payees[i].amount,
+                    previousPayeeBalances[i].dai + expectedBalanceChanges[i],
                     "TestPayments/invalid-payee-dai-balance"
                 );
             } else if (payees[i].token == address(mkr)) {
                 assertEq(
                     int256(mkr.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].mkr + payees[i].amount,
+                    previousPayeeBalances[i].mkr + expectedBalanceChanges[i],
                     "TestPayments/invalid-payee-mkr-balance"
                 );
             } else if (payees[i].token == address(usds)) {
                 assertEq(
                     int256(usds.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].usds + payees[i].amount,
+                    previousPayeeBalances[i].usds + expectedBalanceChanges[i],
                     "TestPayments/invalid-payee-usds-balance"
                 );
             } else if (payees[i].token == address(sky)) {
                 assertEq(
                     int256(sky.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].sky + payees[i].amount,
+                    previousPayeeBalances[i].sky + expectedBalanceChanges[i],
                     "TestPayments/invalid-payee-sky-balance"
                 );
             } else {
@@ -1392,9 +1401,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8); // Insert Spark spell address
+        address SPARK_SPELL = address(0x74e1ba852C864d689562b5977EedCB127fDE0C9F); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1756,7 +1765,13 @@ contract DssSpellTest is DssSpellTestBase {
             // Amount from Convert MKR balance of the PauseProxy to SKY
             + (mkrTreasuryBalanceBefore - unpaidMkr) * 24_000
             // Amount explicitly burned
-            - 426_292_860.23 ether;
+            - 426_292_860.23 ether
+            // Amount transferred to LAUNCH_PROJECT_FUNDING
+            - 8_400_000 ether
+            // Amount transferred to BLUE
+            - 330_000 ether
+            // Amount transferred to CLOAKY
+            - 288_000 ether;
         assertEq(
             sky.balanceOf(address(pauseProxy)),
             expectedSkyTreasuryBalanceAfter,

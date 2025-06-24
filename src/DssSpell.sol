@@ -208,7 +208,7 @@ contract DssSpellAction is DssAction {
 
     // ---------- Execute Spark Proxy Spell ----------
     address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
-    address internal constant SPARK_SPELL = address(0);
+    address internal constant SPARK_SPELL = 0x74e1ba852C864d689562b5977EedCB127fDE0C9F;
 
     function actions() public override {
 
@@ -486,11 +486,12 @@ contract DssSpellAction is DssAction {
         DssExecLib.setChangelogVersion("1.20.2");
 
         // ---------- Execute Spark Proxy Spell ----------
-        // Forum: TODO
-        // Poll: TODO
+        // Forum: https://forum.sky.money/t/june-26-2025-proposed-changes-to-spark-for-upcoming-spell/26663
+        // Poll: https://vote.sky.money/polling/QmcGPTMX
+        // Poll: https://vote.sky.money/polling/QmWtGgPH
 
-        // Execute Spark Proxy Spell at address TODO
-        // ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
+        // Execute Spark Proxy Spell at address 0x74e1ba852C864d689562b5977EedCB127fDE0C9F
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
     // ---------- Helper Functions ----------
