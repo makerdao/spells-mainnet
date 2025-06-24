@@ -17,8 +17,8 @@
 pragma solidity 0.8.16;
 
 import "dss-exec-lib/DssExec.sol";
-import {DssExecLib} from "dss-exec-lib/DssExecLib.sol";
 // import "dss-exec-lib/DssAction.sol";
+import {DssExecLib} from "dss-exec-lib/DssExecLib.sol";
 
 import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
 import {MCD, DssInstance} from "dss-test/MCD.sol";
@@ -31,22 +31,6 @@ import {SkyInit} from "./dependencies/sky/SkyInit.sol";
 
 interface ProxyLike {
     function exec(address target, bytes calldata args) external payable returns (bytes memory out);
-}
-
-interface PauseLike {
-    function delay() external view returns (uint256);
-    function exec(address, bytes32, bytes calldata, uint256) external returns (bytes memory);
-    function plot(address, bytes32, bytes calldata, uint256) external;
-}
-
-interface ChainlogLike {
-    function getAddress(bytes32) external view returns (address);
-}
-
-interface SpellActionLike {
-    function officeHours() external view returns (bool);
-    function description() external view returns (string memory);
-    function nextCastTime(uint256) external view returns (uint256);
 }
 
 interface VestedRewardsDistributionLike {
