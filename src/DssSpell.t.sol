@@ -1683,13 +1683,12 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_treasuryMkrToSkyConversion_leftoverMkr() public {
         // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
-        VestAbstract vestMkrTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        uint256 unpaidMkr = vestMkrTreasury.unpaid(9) +
-            vestMkrTreasury.unpaid(18) +
-            vestMkrTreasury.unpaid(24) +
-            vestMkrTreasury.unpaid(35) +
-            vestMkrTreasury.unpaid(37) +
-            vestMkrTreasury.unpaid(39);
+        uint256 unpaidMkr = vestMkr.unpaid(9) +
+            vestMkr.unpaid(18) +
+            vestMkr.unpaid(24) +
+            vestMkr.unpaid(35) +
+            vestMkr.unpaid(37) +
+            vestMkr.unpaid(39);
 
         // Cast the spell
         _vote(address(spell));
@@ -1704,11 +1703,8 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function test_disableMkrSkyLegacyConverter() public {
-        // Get SKY token from the MKR_SKY_LEGACY converter
-        address skyToken = MkrSkyLike(mkrSkyLegacy).sky();
-
         // Check if MKR_SKY_LEGACY has authority on SKY token before the spell
-        assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
+        assertEq(WardsLike(address(sky)).wards(addr.addr("MKR_SKY_LEGACY")), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
 
         // Cast the spell
         _vote(address(spell));
@@ -1716,31 +1712,26 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         // Check if MKR_SKY_LEGACY has lost authority on SKY token
-        assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
+        assertEq(WardsLike(address(sky)).wards(addr.addr("MKR_SKY_LEGACY")), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
     }
 
     function test_burnSky() public {
-        address mkrSkyAddr = chainLog.getAddress("MKR_SKY");
-        MkrSkyLike mkrSky = MkrSkyLike(mkrSkyAddr);
-
-        address skyToken = mkrSky.sky();
-        uint256 skyTotalSupplyBefore = GemAbstract(skyToken).totalSupply();
+        uint256 skyTotalSupplyBefore = sky.totalSupply();
         uint256 skyTreasuryBalanceBefore = sky.balanceOf(address(pauseProxy));
-        uint256 skyConverterBalanceBefore = GemAbstract(skyToken).balanceOf(address(mkrSky));
+        uint256 skyConverterBalanceBefore = sky.balanceOf(address(mkrSky));
 
-        address mkrToken = mkrSky.mkr();
         uint256 mkrTreasuryBalanceBefore = mkr.balanceOf(address(pauseProxy));
-        uint256 mkrTotalSupplyBefore = GemAbstract(mkrToken).totalSupply();
+        uint256 mkrTotalSupplyBefore = mkr.totalSupply();
         uint256 conversionRate = mkrSky.rate();
 
         // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
-        VestAbstract vestMkrTreasury = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        uint256 unpaidMkr = vestMkrTreasury.unpaid(9) +
-            vestMkrTreasury.unpaid(18) +
-            vestMkrTreasury.unpaid(24) +
-            vestMkrTreasury.unpaid(35) +
-            vestMkrTreasury.unpaid(37) +
-            vestMkrTreasury.unpaid(39);
+        VestAbstract vestMkr = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
+        uint256 unpaidMkr = vestMkr.unpaid(9) +
+            vestMkr.unpaid(18) +
+            vestMkr.unpaid(24) +
+            vestMkr.unpaid(35) +
+            vestMkr.unpaid(37) +
+            vestMkr.unpaid(39);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
@@ -1752,7 +1743,7 @@ contract DssSpellTest is DssSpellTestBase {
             // Amount explicitly burned
             - 426_292_860.23 ether;
         assertEq(
-            GemAbstract(skyToken).totalSupply(),
+            sky.totalSupply(),
             expectedSkyTotalSupplyAfter,
             "Excess SKY should be burned"
         );
