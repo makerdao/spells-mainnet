@@ -141,11 +141,9 @@ contract DssSpellAction is DssAction {
     // uint256 internal constant X_PCT_RATE = ;
 
     // ---------- Contracts ----------
-    address internal immutable MCD_VAT               = DssExecLib.vat();
     address internal immutable DAI                   = DssExecLib.dai();
     address internal immutable MCD_PAUSE_PROXY       = DssExecLib.pauseProxy();
     address internal immutable USDS                  = DssExecLib.getChangelogAddress("USDS");
-    address internal immutable LSSKY                 = DssExecLib.getChangelogAddress("LOCKSTAKE_SKY");
     address internal immutable CRON_REWARDS_DIST_JOB = DssExecLib.getChangelogAddress("CRON_REWARDS_DIST_JOB");
     address internal immutable LOCKSTAKE_ENGINE      = DssExecLib.getChangelogAddress("LOCKSTAKE_ENGINE");
     address internal immutable MKR_SKY               = DssExecLib.getChangelogAddress("MKR_SKY");
