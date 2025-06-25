@@ -239,12 +239,9 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemovedChainlogKeys() public skipped { // add the `skipped` modifier to skip
-        string[4] memory removedKeys = [
-            "LOCKSTAKE_MKR",
-            "REWARDS_LSMKR_USDS",
-            "MCD_GOV_ACTIONS",
-            "GOV_GUARD"
+    function testRemovedChainlogKeys() public { // add the `skipped` modifier to skip
+        string[1] memory removedKeys = [
+            "MKR_SKY_LEGACY"
         ];
 
         for (uint256 i = 0; i < removedKeys.length; i++) {
@@ -276,21 +273,14 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testAddedChainlogKeys() public skipped { // add the `skipped` modifier to skip
-        string[13] memory addedKeys = [
-            "PIP_SKY",
-            "MKR",
-            "MKR_GUARD",
-            "LOCKSTAKE_MKR_OLD_V1",
-            "LOCKSTAKE_ENGINE_OLD_V1",
-            "LOCKSTAKE_CLIP_OLD_V1",
-            "LOCKSTAKE_CLIP_CALC_OLD_V1",
-            "LOCKSTAKE_SKY",
-            "LOCKSTAKE_MIGRATOR",
-            "MKR_SKY_LEGACY",
-            "REWARDS_LSSKY_USDS",
-            "REWARDS_LSMKR_USDS_LEGACY",
-            "MCD_PROTEGO"
+    function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
+        string[6] memory addedKeys = [
+            "SPK",
+            "MCD_VEST_SPK_TREASURY",
+            "REWARDS_USDS_SPK",
+            "REWARDS_DIST_USDS_SPK",
+            "REWARDS_LSSKY_SPK",
+            "REWARDS_DIST_LSSKY_SPK"
         ];
 
         for(uint256 i = 0; i < addedKeys.length; i++) {
