@@ -1715,30 +1715,23 @@ contract DssSpellTest is DssSpellTestBase {
 
     function test_disableMkrSkyLegacyConverter() public {
         // Check if MKR_SKY_LEGACY exists in the chainlog before the spell
-        try chainLog.getAddress("MKR_SKY_LEGACY") returns (address mkrSkyLegacy) {
-            // Get SKY token from the MKR_SKY_LEGACY converter
-            address skyToken = MkrSkyLike(mkrSkyLegacy).sky();
+        address mkrSkyLegacy = chainLog.getAddress("MKR_SKY_LEGACY");
+        // Get SKY token from the MKR_SKY_LEGACY converter
+        address skyToken = MkrSkyLike(mkrSkyLegacy).sky();
 
-            // Check if MKR_SKY_LEGACY has authority on SKY token before the spell
-            assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
+        // Check if MKR_SKY_LEGACY has authority on SKY token before the spell
+        assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
 
-            // Cast the spell
-            _vote(address(spell));
-            _scheduleWaitAndCast(address(spell));
-            assertTrue(spell.done(), "TestError/spell-not-done");
+        // Cast the spell
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
 
-            // Check if MKR_SKY_LEGACY has been removed from the chainlog
-            try chainLog.getAddress("MKR_SKY_LEGACY") {
-                revert("MKR_SKY_LEGACY should be removed from chainlog");
-            } catch {
-                // Expected to fail as MKR_SKY_LEGACY should be removed
-            }
+        vm.expectRevert("dss-chain-log/invalid-key");
+        chainLog.getAddress("MKR_SKY_LEGACY");
 
-            // Check if MKR_SKY_LEGACY has lost authority on SKY token
-            assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
-        } catch {
-            revert("MKR_SKY_LEGACY should exist in chainlog before spell");
-        }
+        // Check if MKR_SKY_LEGACY has lost authority on SKY token
+        assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
     }
 
     function test_burnSky() public {
