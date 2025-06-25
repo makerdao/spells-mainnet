@@ -544,7 +544,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVest("dai", streams);
+        _checkVest(
+            VestInst({vest: vestDai, gem: GemAbstract(address(dai)), name: "dai", isTransferrable: false}),
+            streams
+        );
     }
 
     function testVestMkr() public skipped { // add the `skipped` modifier to skip
@@ -568,7 +571,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVest("mkr", streams);
+        _checkVest(
+            VestInst({vest: vestMkr, gem: GemAbstract(address(mkr)), name: "mkr", isTransferrable: true}),
+            streams
+        );
     }
 
     function testVestUsds() public skipped { // add the `skipped` modifier to skip
@@ -616,7 +622,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 0
         });
 
-        _checkVest("usds", streams);
+        _checkVest(
+            VestInst({vest: vestUsds, gem: usds, name: "usds", isTransferrable: false}),
+            streams
+        );
     }
 
     function testVestSky() public skipped { // add the `skipped` modifier to skip
@@ -651,7 +660,10 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertToStateAndDelete(before);
         }
 
-        _checkVest("sky", streams);
+        _checkVest(
+            VestInst({vest: vestSky, gem: sky, name: "sky", isTransferrable: true}),
+            streams
+        );
     }
 
     function testVestSkyMint() public skipped { // add the `skipped` modifier to skip
@@ -685,7 +697,10 @@ contract DssSpellTest is DssSpellTestBase {
             vm.revertToStateAndDelete(before);
         }
 
-        _checkVest("skyMint", streams);
+        _checkVest(
+            VestInst({vest: vestSkyMint, gem: sky, name: "skyMint", isTransferrable: false}),
+            streams
+        );
     }
 
     function testVestSpk() public { // add the `skipped` modifier to skip
@@ -727,7 +742,10 @@ contract DssSpellTest is DssSpellTestBase {
             rxd: 7 days * 975_000_000 * WAD / 730 days
         });
 
-        _checkVest("spk", streams);
+        _checkVest(
+            VestInst({vest: vestSpk, gem: spk, name: "spk", isTransferrable: true}),
+            streams
+        );
     }
 
     struct Yank {
@@ -737,7 +755,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testYankDAI() public skipped { // add the `skipped` modifier to skip
-        // Provide human-readable names for timestamps
+        // Provide human-readable nmes for timestamps
         uint256 FEB_29_2024 = 1709251199;
         uint256 MAR_31_2024 = 1711929599;
 
@@ -1056,9 +1074,9 @@ contract DssSpellTest is DssSpellTestBase {
             Payee(address(usds), wallets.addr("JULIACHANG"),                  2_323 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("EXCEL"),                       1_088 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("WBC"),                         1_032 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),             11_000 ether), // Note: ether is only a keyword helper, // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),             11_000 ether), // Note: ether is only a keyword helper,
             Payee(address(sky),  wallets.addr("BLUE"),                      330_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky),  wallets.addr("CLOAKY_2"),                  288_000 ether)
+            Payee(address(sky),  wallets.addr("CLOAKY_2"),                  288_000 ether)  // Note: ether is only a keyword helper
         ];
 
         // By default the expected balance changes are the payee amounts

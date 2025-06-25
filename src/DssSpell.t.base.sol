@@ -636,6 +636,69 @@ contract DssSpellTestBase is Config, DssTest {
         }
     }
 
+
+    /**
+     * @dev Converts a `uint256` to its ASCII `string` decimal representation.
+     */
+    function _uintToString(uint256 value) internal pure returns (string memory) {
+        bytes16 HEX_DIGITS = "0123456789abcdef";
+        unchecked {
+            uint256 length = _log10(value) + 1;
+            string memory buffer = new string(length);
+            uint256 ptr;
+            assembly ("memory-safe") {
+                ptr := add(add(buffer, 0x20), length)
+            }
+            while (true) {
+                ptr--;
+                assembly ("memory-safe") {
+                    mstore8(ptr, byte(mod(value, 10), HEX_DIGITS))
+                }
+                value /= 10;
+                if (value == 0) break;
+            }
+            return buffer;
+        }
+    }
+
+    /**
+     * @dev Return the log in base 10 of a positive value rounded towards zero.
+     * Returns 0 if given 0.
+     */
+    function _log10(uint256 value) internal pure returns (uint256) {
+        uint256 result = 0;
+        unchecked {
+            if (value >= 10 ** 64) {
+                value /= 10 ** 64;
+                result += 64;
+            }
+            if (value >= 10 ** 32) {
+                value /= 10 ** 32;
+                result += 32;
+            }
+            if (value >= 10 ** 16) {
+                value /= 10 ** 16;
+                result += 16;
+            }
+            if (value >= 10 ** 8) {
+                value /= 10 ** 8;
+                result += 8;
+            }
+            if (value >= 10 ** 4) {
+                value /= 10 ** 4;
+                result += 4;
+            }
+            if (value >= 10 ** 2) {
+                value /= 10 ** 2;
+                result += 2;
+            }
+            if (value >= 10 ** 1) {
+                result += 1;
+            }
+        }
+        return result;
+    }
+
     /**
      * @dev Add this modifier to a test to skip it.
      *      It will still show in the test report, but with a `[SKIP]` label added to it.
@@ -730,8 +793,6 @@ contract DssSpellTestBase is Config, DssTest {
                 bytes32(0)
             );
         }
-
-        _setUpVests();
 
         // Temporary fix to the reverts of the Spark spells interacting with Aggor oracles, due to the cast time manipulation
         // Example revert: https://dashboard.tenderly.co/explorer/vnet/eb97d953-4642-4778-938e-d70ee25e3f58/tx/0xe427414d07c28b64c076e809983cfdee3bfd680866ebc7c40349700f4a6160bd?trace=0.5.5.1.62.1.2.0.2.2.0.2.2
@@ -2590,23 +2651,10 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     struct VestInst {
-        GemAbstract gem;
         VestAbstract vest;
-    }
-
-    mapping(bytes32 => VestInst) transferrableVests;
-    mapping(bytes32 => VestInst) suckableVests;
-    mapping(bytes32 => VestInst) mintableVests;
-
-    function _setUpVests() internal {
-        transferrableVests["mkr"] = VestInst({gem: GemAbstract(address(mkr)), vest: vestMkr});
-        transferrableVests["sky"] = VestInst({gem: sky, vest: vestSky});
-        transferrableVests["spk"] = VestInst({gem: spk, vest: vestSpk});
-
-        suckableVests["usds"] = VestInst({gem: usds, vest: vestUsds});
-        suckableVests["dai"] = VestInst({gem: GemAbstract(address(dai)), vest: vestDai});
-
-        mintableVests["skyMint"] = VestInst({gem: sky, vest: vestSkyMint});
+        GemAbstract gem;
+        string name;
+        bool isTransferrable;
     }
 
     struct VestStream {
@@ -2622,41 +2670,29 @@ contract DssSpellTestBase is Config, DssTest {
         uint256 rxd;
     }
 
-    function _checkVest(bytes32 key, VestStream[] memory _ss) internal {
-        bool isTransferrable;
-        GemAbstract gem;
-        VestAbstract vest;
-
-        if (address(transferrableVests[key].gem) != address(0)) {
-            isTransferrable = true;
-            gem = transferrableVests[key].gem;
-            vest = transferrableVests[key].vest;
-        } else if (address(suckableVests[key].gem) != address(0)) {
-            gem = suckableVests[key].gem;
-            vest = suckableVests[key].vest;
-        } else if (address(mintableVests[key].gem) != address(0)) {
-            gem = mintableVests[key].gem;
-            vest = mintableVests[key].vest;
-        } else {
-            revert(_concat("testVest/invalid-vest-key: ", key));
-        }
-
-        uint256 prevStreamCount = vest.ids();
-
+    function _checkVest(VestInst memory _vi, VestStream[] memory _ss) internal {
+        uint256 prevStreamCount = _vi.vest.ids();
         uint256 prevAllowance;
-        if (isTransferrable) {
-            prevAllowance = gem.allowance(pauseProxy, address(vest));
+        if (_vi.isTransferrable) {
+            prevAllowance = _vi.gem.allowance(pauseProxy, address(_vi.vest));
         }
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        string memory errPrefix = _concat("testVest-", key);
-
         // Check that all streams added in this spell are tested
-        assertEq(vest.ids(), prevStreamCount + _ss.length, _concat(errPrefix, bytes32("/not-all-streams-tested")));
-        if (isTransferrable) {
+        assertEq(
+            _vi.vest.ids(),
+            prevStreamCount + _ss.length,
+            string.concat("TestError/Vest/", _vi.name,"/not-all-streams-tested-")
+        );
+
+        for (uint256 i = 0; i < _ss.length; i++) {
+            _checkVestStream(_vi, _ss[i]);
+        }
+
+        if (_vi.isTransferrable) {
             // Check allowance was increased according to the streams
             uint256 sumTot = 0;
             uint256 sumRxd = 0;
@@ -2664,12 +2700,45 @@ contract DssSpellTestBase is Config, DssTest {
                 sumTot = sumTot + _ss[i].tot;
                 sumRxd = sumRxd + _ss[i].rxd;
             }
-          assertEq(gem.allowance(pauseProxy, address(vest)), prevAllowance + sumTot - sumRxd, _concat(errPrefix, bytes32("/invalid-allowance")));
+            assertEq(
+                _vi.gem.allowance(pauseProxy, address(_vi.vest)),
+                prevAllowance + sumTot - sumRxd,
+                string.concat("TestError/Vest/", _vi.name, "/invalid-allowance-")
+            );
+        }
+    }
+
+    function _checkVestStream(VestInst memory _vi, VestStream memory _s) internal {
+        assertEq(_vi.vest.usr(_s.id), _s.usr,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-usr"));
+        assertEq(_vi.vest.bgn(_s.id), _s.bgn,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-bgn"));
+        assertEq(_vi.vest.clf(_s.id), _s.clf,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-clf"));
+        assertEq(_vi.vest.fin(_s.id), _s.fin,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-fin"));
+        assertEq(_vi.vest.fin(_s.id), _s.bgn + _s.tau, string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-fin (bgn + tau)"));
+        assertEq(_vi.vest.mgr(_s.id), _s.mgr,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-mgr"));
+        assertEq(_vi.vest.res(_s.id), _s.res,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-res"));
+        assertEq(_vi.vest.tot(_s.id), _s.tot,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-tot"));
+        assertEq(_vi.vest.rxd(_s.id), _s.rxd,          string.concat("TestError/Vest/", _vi.name, "/", _uintToString(_s.id), "/invalid-rxd"));
+
+        {
+            uint256 before = vm.snapshotState();
+
+            // Check each new stream is payable in the future
+            uint256 pbalance = _vi.gem.balanceOf(_s.usr);
+            GodMode.setWard(address(_vi.vest), address(this), 1);
+            _vi.vest.unrestrict(_s.id);
+
+            vm.warp(_s.fin);
+            _vi.vest.vest(_s.id);
+            assertEq(
+                _vi.gem.balanceOf(_s.usr),
+                pbalance + _s.tot - _s.rxd,
+                string.concat("TestError/Vest/", _vi.name, ".", _uintToString(_s.id), "/invalid-received-amount")
+            );
+
+            vm.revertToState(before);
         }
 
-        for (uint256 i = 0; i < _ss.length; i++) {
-            _checkVestStream(errPrefix, vest, gem, _ss[i]);
-        }
+        vm.deleteStateSnapshots();
     }
 
     function _checkTransferrableVestAllowanceAndBalance(
@@ -2691,44 +2760,6 @@ contract DssSpellTestBase is Config, DssTest {
 
         uint256 balance = _gem.balanceOf(pauseProxy);
         assertGe(balance, vestableAmt, _concat(string("TestError/insufficient-transferrable-vest-balance-"), _errSuffix));
-    }
-
-    function _checkVestStream(
-        string memory _errPrefix,
-        VestAbstract _vest,
-        GemAbstract _gem,
-        VestStream memory _s
-    ) internal {
-        assertEq(_vest.usr(_s.id), _s.usr,          _concat(_errPrefix, string("/usr")));
-        assertEq(_vest.bgn(_s.id), _s.bgn,          _concat(_errPrefix, string("/bgn")));
-        assertEq(_vest.clf(_s.id), _s.clf,          _concat(_errPrefix, string("/clf")));
-        assertEq(_vest.fin(_s.id), _s.fin,          _concat(_errPrefix, string("/fin")));
-        assertEq(_vest.fin(_s.id), _s.bgn + _s.tau, _concat(_errPrefix, string("/fin (bgn + tau)")));
-        assertEq(_vest.mgr(_s.id), _s.mgr,          _concat(_errPrefix, string("/mgr")));
-        assertEq(_vest.res(_s.id), _s.res,          _concat(_errPrefix, string("/res")));
-        assertEq(_vest.tot(_s.id), _s.tot,          _concat(_errPrefix, string("/tot")));
-        assertEq(_vest.rxd(_s.id), _s.rxd,          _concat(_errPrefix, string("/rxd")));
-
-        {
-            uint256 before = vm.snapshotState();
-
-            // Check each new stream is payable in the future
-            uint256 pbalance = _gem.balanceOf(_s.usr);
-            GodMode.setWard(address(_vest), address(this), 1);
-            _vest.unrestrict(_s.id);
-
-            vm.warp(_s.fin);
-            _vest.vest(_s.id);
-            assertEq(
-                _gem.balanceOf(_s.usr),
-                pbalance + _s.tot - _s.rxd,
-                _concat(_errPrefix, string("/invalid-received-amount"))
-            );
-
-            vm.revertToState(before);
-        }
-
-        vm.deleteStateSnapshots();
     }
 
     function _getIlkMat(bytes32 _ilk) internal view returns (uint256 mat) {
