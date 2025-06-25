@@ -1527,8 +1527,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(usdsSpkUsr, REWARDS_DIST_USDS_SPK, "after: Wrong USDS->SPK vest recipient");
         assertEq(usdsSpkTot, 2_275_000_000 * WAD, "after: Wrong USDS->SPK vest total");
 
-        assertGt(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "after: USDS->SPK farm reward rate is zero");
-        assertGt(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), 0, "after: Should have distributed");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 2_275_000_000 * WAD / 730 days, "after: USDS->SPK farm invalid reward rate");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), block.timestamp, "after: Should have distributed");
     }
 
     function test_usdsSpkFarm_stakingDistributionAndUnstaking() public {
@@ -1610,8 +1610,8 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(lsskySpkUsr, REWARDS_DIST_LSSKY_SPK, "after: Wrong LSSKY->SPK vest recipient");
         assertEq(lsskySpkTot, 975_000_000 * WAD, "after: Wrong LSSKY->SPK vest total");
 
-        assertGt(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "after: LSSKY->SPK farm reward rate is zero");
-        assertGt(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), 0, "after: Should have distributed");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 975_000_000 * WAD / 730 days, "after: LSSKY->SPK farm invalid reward rate");
+        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), block.timestamp, "after: Should have distributed");
     }
 
     function test_vestedRewardsDistributionJob_configuration() public {
