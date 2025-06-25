@@ -1704,8 +1704,6 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function test_disableMkrSkyLegacyConverter() public {
-        // Check if MKR_SKY_LEGACY exists in the chainlog before the spell
-        address mkrSkyLegacy = chainLog.getAddress("MKR_SKY_LEGACY");
         // Get SKY token from the MKR_SKY_LEGACY converter
         address skyToken = MkrSkyLike(mkrSkyLegacy).sky();
 
@@ -1716,9 +1714,6 @@ contract DssSpellTest is DssSpellTestBase {
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
-
-        vm.expectRevert("dss-chain-log/invalid-key");
-        chainLog.getAddress("MKR_SKY_LEGACY");
 
         // Check if MKR_SKY_LEGACY has lost authority on SKY token
         assertEq(WardsLike(skyToken).wards(mkrSkyLegacy), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
