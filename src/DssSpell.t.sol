@@ -745,7 +745,7 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testYankDAI() public skipped { // add the `skipped` modifier to skip
-        // Provide human-readable nmes for timestamps
+        // Provide human-readable names for timestamps
         uint256 FEB_29_2024 = 1709251199;
         uint256 MAR_31_2024 = 1711929599;
 

@@ -420,7 +420,7 @@ contract DssSpellAction is DssAction {
         _transferUsds(PBG,         4_000 * WAD);
 
         // JuliaChang - 2,323 USDS - 0x252abAEe2F4f4b8D39E5F12b163eDFb7fac7AED7
-        _transferUsds(JULIACHANG, 2_323 * WAD);
+        _transferUsds(JULIACHANG,  2_323 * WAD);
 
         // Excel - 1,088 USDS - 0x0F04a22B62A26e25A29Cba5a595623038ef7AcE7
         _transferUsds(EXCEL,       1_088 * WAD);
