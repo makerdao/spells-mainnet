@@ -1,5 +1,6 @@
 {
   "name": "safeharbor",
+  "private": true,
   "type": "module",
   "version": "1.0.0",
   "description": "Safe Harbor contract interaction scripts",
@@ -21,7 +22,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@babel/preset-env": "^7.23.9",
-    "eslint": "^8.56.0",
+    "eslint": "^9.29.0",
     "prettier": "^3.5.3"
   }
 }

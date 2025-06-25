@@ -27,9 +27,9 @@ Before adoption, a single-time deploy and configuration needs to happen so Sky p
 
 ## Initial Deployment Verification
 
-Since the initial deployment will be done through an EOA. The following steps need to be taken in consideration for spell crafters and reviwers safely include the `adoptSafeHarbor` into a spell:
+Since the initial deployment will be done through an EOA, the following steps need to be taken into consideration for spell crafters and reviewers to safely include the `adoptSafeHarbor` into a spell:
 
-1. The `create` function was called through the verified AgreementV2Factory conract by SafeHarbor.
+1. The `create` function was called through the verified AgreementV2Factory contract by SafeHarbor.
 2. The owner of the `AgreementV2` contract is the PauseProxy.
 3. The existing scope of the `AgreementV2` contract is the initial state of the scope of the sheet. This can be verified running the `generatePayload.js` script.
 
