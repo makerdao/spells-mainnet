@@ -349,7 +349,7 @@ contract DssSpellAction is DssAction {
         // Note: load DssInstance from chainlog
         DssInstance memory dss = MCD.loadFromChainlog(DssExecLib.LOG);
 
-        // Call disableOldConverterMkrSky() to deactive the legacy converter (https://github.com/sky-ecosystem/sky/pull/21/files#diff-f6cbf09833eed835c52b0a1c5be7dd9e84213d278c958843725af6a77faa77d4R69-R75)
+        // Call disableOldConverterMkrSky() to deactivate the legacy converter (https://github.com/sky-ecosystem/sky/pull/21/files#diff-f6cbf09833eed835c52b0a1c5be7dd9e84213d278c958843725af6a77faa77d4R69-R75)
         SkyInit.disableOldConverterMkrSky(dss);
 
         // ---------- Burn Excess SKY from MKR_SKY Converter ----------
