@@ -47,6 +47,7 @@ interface ERC20Like {
 
 interface DssVestLike {
     function cap() external view returns (uint256);
+    function czar() external view returns (address);
     function gem() external view returns (address);
     function awards(uint256) external view returns (address, uint48, uint48, uint48, address, uint8, uint128);
 }
@@ -813,7 +814,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankSKYmint() public skipped { // add the `skipped` modifier to skip
+    function testYankSkyMint() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_20_2025 = 1760968859;
 
@@ -829,8 +830,8 @@ contract DssSpellTest is DssSpellTestBase {
         // Test stream id matches `addr` and `fin`
         VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_SKY"));
         for (uint256 i = 0; i < yanks.length; i++) {
-            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankSKYmint/unexpected-address");
-            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankSKYmint/unexpected-fin-date");
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankSkyMint/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankSkyMint/unexpected-fin-date");
         }
 
         _vote(address(spell));
@@ -838,7 +839,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
         for (uint256 i = 0; i < yanks.length; i++) {
             // Test stream.fin is set to the current block after the spell
-            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSKYmint/steam-not-yanked");
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSkyMint/steam-not-yanked");
 
             // Give admin powers to test contract address and make the vesting unrestricted for testing
             GodMode.setWard(address(vest), address(this), 1);
@@ -847,7 +848,7 @@ contract DssSpellTest is DssSpellTestBase {
             vest.unrestrict(yanks[i].streamId);
             vest.vest(yanks[i].streamId);
             assertTrue(!vest.valid(yanks[i].streamId));
-            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSKYmint/steam-fin-changed");
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSkyMint/steam-fin-changed");
         }
     }
 
@@ -1491,12 +1492,25 @@ contract DssSpellTest is DssSpellTestBase {
     address REWARDS_LSSKY_SPK = addr.addr("REWARDS_LSSKY_SPK");
     address REWARDS_DIST_LSSKY_SPK = addr.addr("REWARDS_DIST_LSSKY_SPK");
 
+    function test_vestSpkTreasury_deployment() public view {
+        // Check the token used for vesting
+        assertEq(DssVestLike(MCD_VEST_SPK_TREASURY).gem(), SPK, "MCD_VEST_SPK_TREASURY has wrong gem token");
+        // Check the pause proxy is the czar
+        assertEq(DssVestLike(MCD_VEST_SPK_TREASURY).czar(), address(pauseProxy), "MCD_VEST_SPK_TREASURY has wrong czar");
+
+        // Check that the pause proxy has authority
+        assertEq(WardsLike(MCD_VEST_SPK_TREASURY).wards(address(pauseProxy)), 1, "MCD_PAUSE_PROXY not authorized on MCD_VEST_SPK_TREASURY");
+
+        // Note: Initialization is already tested in `testGeneral`
+    }
+
     function test_usdsSpkFarm_deploymentAndInitialization() public {
         assertEq(StakingRewardsLike(REWARDS_USDS_SPK).stakingToken(), USDS, "before: Wrong staking token");
         assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsToken(), SPK, "before: Wrong rewards token");
 
         assertEq(StakingRewardsLike(REWARDS_USDS_SPK).owner(), MCD_PAUSE_PROXY, "before: Wrong owner");
         assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), address(0), "before: Wrong rewards distribution");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDuration(), 7 days, "before: Wrong rewards duration");
 
         assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).dssVest(), MCD_VEST_SPK_TREASURY, "before: Wrong DssVest");
         assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).stakingRewards(), REWARDS_USDS_SPK, "before: Wrong StakingRewards");
@@ -1518,9 +1532,10 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), REWARDS_DIST_USDS_SPK, "after: Wrong rewards distribution");
+        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDuration(), 7 days, "after: Wrong rewards duration");
 
         uint256 usdsSpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).vestId();
-        assertGt(usdsSpkVestId, 0, "after: USDS->SPK vest stream not created");
+        assertEq(usdsSpkVestId, 1, "after: USDS->SPK vest stream not created");
 
         (address usdsSpkUsr, , , , , , uint128 usdsSpkTot) =
             DssVestLike(MCD_VEST_SPK_TREASURY).awards(usdsSpkVestId);
@@ -1592,18 +1607,21 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), 0, "before: Should not have distributed yet");
         assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).totalSupply(), 0, "before: Should have no staked tokens");
         assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "before: Should have no reward rate");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDuration(), 7 days, "before: Wrong rewards duration");
+
+        assertEq(LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK), 0, "before: Farm active in Lockstake Engine");
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDistribution(), REWARDS_DIST_LSSKY_SPK, "after: Wrong rewards distribution");
+        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDuration(), 7 days, "after: Wrong rewards duration");
 
-        uint256 farmStatus = LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK);
-        assertEq(farmStatus, 1, "after: Farm not active in Lockstake Engine");
+        assertEq(LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK), 1, "after: Farm not active in Lockstake Engine");
 
         uint256 lsskySpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).vestId();
-        assertGt(lsskySpkVestId, 0, "after: LSSKY->SPK vest stream not created");
+        assertEq(lsskySpkVestId, 2, "after: LSSKY->SPK vest stream not created");
 
         (address lsskySpkUsr, , , , , , uint128 lsskySpkTot) =
             DssVestLike(MCD_VEST_SPK_TREASURY).awards(lsskySpkVestId);
@@ -1750,7 +1768,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         uint256 expectedSkyTreasuryBalanceAfter = skyTreasuryBalanceBefore
             // Amount from Convert MKR balance of the PauseProxy to SKY
-            + (mkrTreasuryBalanceBefore - unpaidMkr) * 24_000
+            + (mkrTreasuryBalanceBefore - unpaidMkr) * conversionRate
             // Amount explicitly burned
             - 426_292_860.23 ether
             // Amount transferred to LAUNCH_PROJECT_FUNDING

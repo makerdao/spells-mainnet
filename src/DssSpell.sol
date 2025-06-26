@@ -20,6 +20,7 @@ import "dss-exec-lib/DssExec.sol";
 // import "dss-exec-lib/DssAction.sol";
 import {DssExecLib} from "dss-exec-lib/DssExecLib.sol";
 
+import {GemAbstract} from "dss-interfaces/ERC/GemAbstract.sol";
 import {VestAbstract} from "dss-interfaces/dss/VestAbstract.sol";
 import {MCD, DssInstance} from "dss-test/MCD.sol";
 
@@ -49,11 +50,8 @@ interface MkrSkyLike {
     function mkrToSky(address usr, uint256 mkrAmt) external;
 }
 
-interface ERC20Like {
-    function approve(address, uint256) external;
-    function balanceOf(address) external view returns (uint256);
+interface BurnLike {
     function burn(address, uint256) external;
-    function transfer(address, uint256) external;
 }
 
 interface StakingRewardsLike {
@@ -142,8 +140,6 @@ contract DssSpellAction is DssAction {
 
     // ---------- Contracts ----------
     address internal immutable DAI                   = DssExecLib.dai();
-    address internal immutable MCD_PAUSE_PROXY       = DssExecLib.pauseProxy();
-    address internal immutable USDS                  = DssExecLib.getChangelogAddress("USDS");
     address internal immutable CRON_REWARDS_DIST_JOB = DssExecLib.getChangelogAddress("CRON_REWARDS_DIST_JOB");
     address internal immutable LOCKSTAKE_ENGINE      = DssExecLib.getChangelogAddress("LOCKSTAKE_ENGINE");
     address internal immutable MKR_SKY               = DssExecLib.getChangelogAddress("MKR_SKY");
@@ -192,7 +188,7 @@ contract DssSpellAction is DssAction {
         // Approve MCD_VEST_SPK_TREASURY to spend SPK in the treasury:
         // spender: 0xF9A2002b471f600A5484da5a735a2A053d377078
         // amount: 3_250_000_000 * WAD
-        ERC20Like(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
+        GemAbstract(SPK).approve(MCD_VEST_SPK_TREASURY, 3_250_000_000 * WAD);
 
         // Set cap in MCD_VEST_SPK_TREASURY:
         // target: 0xF9A2002b471f600A5484da5a735a2A053d377078
@@ -337,10 +333,10 @@ contract DssSpellAction is DssAction {
             VestAbstract(MCD_VEST_MKR_TREASURY).unpaid(39);
 
         // Note: approve MKR_SKY to spend MKR balance of the PauseProxy
-        ERC20Like(MKR).approve(MKR_SKY, ERC20Like(MKR).balanceOf(address(this)) - unpaidMkr);
+        GemAbstract(MKR).approve(MKR_SKY, GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // Call mkrToSky() on MKR_SKY with the MKR balance of the PauseProxy minus the unpaid() MKR for MCD_VEST_MKR_TREASURY ids 9, 18, 24, 35, 37, and 39
-        MkrSkyLike(MKR_SKY).mkrToSky(address(this), ERC20Like(MKR).balanceOf(address(this)) - unpaidMkr);
+        MkrSkyLike(MKR_SKY).mkrToSky(address(this), GemAbstract(MKR).balanceOf(address(this)) - unpaidMkr);
 
         // ---------- Disable MKR_SKY_LEGACY Converter ----------
         // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-june-26-spell/26710
@@ -365,7 +361,7 @@ contract DssSpellAction is DssAction {
 
         // Burn 426,292,860.23 SKY from the PauseProxy
         // Note: `ether` is only used as a keyword. Only SKY is being burned.
-        ERC20Like(SKY).burn(address(this), 426_292_860.23 ether);
+        BurnLike(SKY).burn(address(this), 426_292_860.23 ether);
 
         // ---------- vow.hump Reduction ----------
         // Forum: https://forum.sky.money/t/smart-burn-engine-parameter-update-proposals-june-26-2025-spell-contents/26702
@@ -385,7 +381,7 @@ contract DssSpellAction is DssAction {
 
         // ---------- Increase ALLOCATOR-BLOOM-A Maximum Debt Ceiling ----------
         // Forum: https://forum.sky.money/t/parameter-changes-proposal-june-16-2025/26653
-        // Vote: https://vote.sky.money/polling/Qmcy6Lug
+        // Poll: https://vote.sky.money/polling/Qmcy6Lug
 
         // Increase the Maximum Debt Ceiling (line) by 2.4 billion USDS, from 100 million USDS to 2.5 billion USDS
         DssExecLib.setIlkAutoLineDebtCeiling("ALLOCATOR-BLOOM-A", 2_500_000_000);
@@ -401,7 +397,7 @@ contract DssSpellAction is DssAction {
         // Atlas: https://sky-atlas.powerhouse.io/A.5.6_Launch_Project/1f433d9d-7cdb-406f-b7e8-f9bc4855eb77%7C8d5a
 
         // Transfer 8,400,000 SKY to 0x3C5142F28567E6a0F172fd0BaaF1f2847f49D02F
-        ERC20Like(SKY).transfer(LAUNCH_PROJECT_FUNDING, 8_400_000 * WAD);
+        GemAbstract(SKY).transfer(LAUNCH_PROJECT_FUNDING, 8_400_000 * WAD);
 
         // ---------- Delegate Compensation for May 2025 ----------
         // Forum: https://forum.sky.money/t/may-2025-aligned-delegate-compensation/26698
@@ -448,10 +444,10 @@ contract DssSpellAction is DssAction {
         // Atlas: https://sky-atlas.powerhouse.io/A.2.2.1.1_Funding/8ea8dcb0-7261-4c1a-ae53-b7f3eb5362e5%7C9e1f3b569af1
 
         // BLUE - 330,000 SKY - 0xb6C09680D822F162449cdFB8248a7D3FC26Ec9Bf
-        ERC20Like(SKY).transfer(BLUE, 330_000 * WAD);
+        GemAbstract(SKY).transfer(BLUE, 330_000 * WAD);
 
         // Cloaky - 288,000 SKY - 0x9244F47D70587Fa2329B89B6f503022b63Ad54A5
-        ERC20Like(SKY).transfer(CLOAKY_2, 288_000 * WAD);
+        GemAbstract(SKY).transfer(CLOAKY_2, 288_000 * WAD);
 
         // Note: bump chainlog version because of new contracts being added and some being removed
         DssExecLib.setChangelogVersion("1.20.2");
@@ -476,7 +472,7 @@ contract DssSpellAction is DssAction {
         // Note: DssExecLib currently only supports Dai transfers from the surplus buffer.
         DssExecLib.sendPaymentFromSurplusBuffer(address(this), wad / WAD);
         // Note: Approve DAI_USDS for the amount sent to be able to convert it.
-        ERC20Like(DAI).approve(DAI_USDS, wad);
+        GemAbstract(DAI).approve(DAI_USDS, wad);
         // Note: Convert Dai to USDS for `usr`.
         DaiUsdsLike(DAI_USDS).daiToUsds(usr, wad);
     }
