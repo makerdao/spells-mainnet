@@ -1056,15 +1056,15 @@ contract DssSpellTest is DssSpellTestBase {
     function testPayments_ignoreBurnsAndConversions() public {
         Payee[12] memory payees = [
             Payee(address(usds), addr.addr("SPARK_PROXY"),               20_600_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky),  wallets.addr("LAUNCH_PROJECT_FUNDING"),  8_400_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BLUE"),                       54_167 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BLUE"),         4_000 ether + 50_167 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("BONAPUBLICA"),                 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_2"),                   20_417 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_2"),     4_000 ether + 16_417 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("PBG"),                         4_000 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("JULIACHANG"),                  2_323 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("EXCEL"),                       1_088 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("WBC"),                         1_032 ether), // Note: ether is only a keyword helper
             Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),             11_000 ether), // Note: ether is only a keyword helper,
+            Payee(address(sky),  wallets.addr("LAUNCH_PROJECT_FUNDING"),  8_400_000 ether), // Note: ether is only a keyword helper
             Payee(address(sky),  wallets.addr("BLUE"),                      330_000 ether), // Note: ether is only a keyword helper
             Payee(address(sky),  wallets.addr("CLOAKY_2"),                  288_000 ether)  // Note: ether is only a keyword helper
         ];
