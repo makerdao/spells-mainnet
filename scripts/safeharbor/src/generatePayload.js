@@ -9,6 +9,10 @@ import {
     createContractInstances,
 } from "./utils/contractUtils.js";
 import { getChainId, getChainName } from "./utils/chainUtils.js";
+import { writeFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { AGREEMENTV2_RAW_ABI_MAP } from "./abis.js";
 
 // Helper function to compare arrays
 export function arraysEqual(a, b) {
@@ -30,8 +34,8 @@ export function buildCSVRepresentation(records) {
         .reduce((groups, record) => {
             const chain = record.Chain;
             if (!groups[chain]) {
-                    groups[chain] = [];
-                }
+                groups[chain] = [];
+            }
             groups[chain].push({
                 accountAddress: record.Address,
                 childContractScope: record.IsFactory === "TRUE" ? 3 : 0,
@@ -157,6 +161,7 @@ export function generateChainUpdates(currentChains, chainGroups) {
             calldata: agreement.interface.encodeFunctionData("removeChain", [
                 chainId,
             ]),
+            "raw-abi": AGREEMENTV2_RAW_ABI_MAP["removeChain"],
         });
     }
 
@@ -176,6 +181,7 @@ export function generateChainUpdates(currentChains, chainGroups) {
             calldata: agreement.interface.encodeFunctionData("addChains", [
                 [newChain],
             ]),
+            "raw-abi": AGREEMENTV2_RAW_ABI_MAP["addChains"],
         });
     }
 
@@ -222,6 +228,7 @@ export function generateAccountUpdates(currentChains, chainGroups) {
                     "setAccounts",
                     [chainId, accountIds, newAccounts],
                 ),
+                "raw-abi": AGREEMENTV2_RAW_ABI_MAP["setAccounts"],
             });
         }
 
@@ -244,6 +251,7 @@ export function generateAccountUpdates(currentChains, chainGroups) {
                         "removeAccount",
                         [chainId, index],
                     ),
+                    "raw-abi": AGREEMENTV2_RAW_ABI_MAP["removeAccount"],
                 });
             }
         }
@@ -258,6 +266,7 @@ export function generateAccountUpdates(currentChains, chainGroups) {
                     "addAccounts",
                     [chainId, remainingAdditions],
                 ),
+                "raw-abi": AGREEMENTV2_RAW_ABI_MAP["addAccounts"],
             });
         }
     }
@@ -295,12 +304,15 @@ export async function generateUpdatePayload() {
         );
         const updates = [...chainUpdates, ...accountUpdates];
 
-        // 5. Display payload
+        // 5. Display and save payload
         console.log("\nGenerated payload:");
-        updates.forEach((update) => {
-            console.log(`\n${update.function}:`);
-            console.log(update.calldata);
-        });
+
+        // Save updates to JSON file
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
+        const outputPath = join(__dirname, "..", "updates.json");
+        writeFileSync(outputPath, JSON.stringify(updates, null, 2));
+        console.log(`\nSaved updates to ${outputPath}`);
 
         return updates;
     } catch (error) {

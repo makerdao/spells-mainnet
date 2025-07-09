@@ -15,7 +15,7 @@ export const CHAIN_IDS = {
     ARBITRUM: 42161,
     SOLANA: 555,
     OPTIMISM: 10,
-    UNICHAIN: 130
+    UNICHAIN: 130,
 };
 
 // Reverse mapping for chain ID to name
