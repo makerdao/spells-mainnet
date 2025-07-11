@@ -16,7 +16,7 @@ fi
 
 echo "Starting anvil fork..."
 # Start anvil in the background
-anvil --auto-impersonate --disable-block-gas-limit --fork-url "$ETH_RPC_URL" &
+anvil --auto-impersonate --fork-url "$ETH_RPC_URL" &
 ANVIL_PID=$!
 
 # Wait for anvil to start

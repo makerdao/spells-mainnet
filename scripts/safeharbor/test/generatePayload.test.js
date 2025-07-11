@@ -41,24 +41,6 @@ describe('generatePayload.js', () => {
       assert.deepStrictEqual(result.toAdd, []);
       assert.deepStrictEqual(result.toRemove, []);
     });
-  });
-
-  describe('findArrayDifferences', () => {
-    test('should find elements to add and remove correctly', () => {
-      const current = ['a', 'b', 'c'];
-      const desired = ['b', 'c', 'd'];
-      const result = findArrayDifferences(current, desired);
-      assert.deepStrictEqual(result.toAdd, ['d']);
-      assert.deepStrictEqual(result.toRemove, ['a']);
-    });
-
-    test('should return empty arrays if no differences', () => {
-      const current = ['a', 'b', 'c'];
-      const desired = ['a', 'b', 'c'];
-      const result = findArrayDifferences(current, desired);
-      assert.deepStrictEqual(result.toAdd, []);
-      assert.deepStrictEqual(result.toRemove, []);
-    });
 
     test('should handle all additions', () => {
       const current = [];

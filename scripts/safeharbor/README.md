@@ -54,3 +54,36 @@ The script follows these steps:
    - Chain additions/removals
 
 7. Generates encoded payload for executing the changes (if any).
+
+# Running the script
+
+To run the script, run the following command:
+required env variables:
+```
+- RPC_URL: An endpoint to a node that has the registry and the agreement deployed.
+```
+
+```bash
+npm run generate
+```
+This will create a `updates.json` file in the `scripts/safeharbor` directory.
+
+# Testing
+
+## Setting up the environment
+required env variables:
+```
+- ETH_RPC_URL: An endpoint to a mainnet node 
+- ETH_SENDER: An EOA address that will be used to deploy the AgreementV2 contract
+- RPC_URL: An endpoint to a local anvil node
+```
+To setup the environment, run the following command:
+
+```bash
+source setupEnv.sh
+```
+This scripts will create a local anvil node using the mainnet node as a fork, fund the ETH_SENDER address and then run the script to deploy the AgreementV2 contract. Once the script is done running, it's possible to run the `generatePayload.js` script to generate the payload for the spell.
+
+Since the deployment script is comprehensive, without any changes, there will be no updates to the output. However it's possible to change the `DeployAgreement.s.sol` to remove the addition of contracts to the scope, making the some contracts to be outputted.
+
+NOTE: The script will leave an anvil instance running in the background, which will need to be stopped manually.
