@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: © 2025 Dai Foundation <www.daifoundation.org>
+// SPDX-FileCopyrightText: © 2024 Dai Foundation <www.daifoundation.org>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,9 @@
 
 pragma solidity >=0.8.0;
 
-import { LockstakeInstance } from "../lockstake/LockstakeInstance.sol";
-
-struct MigrationInstance {
-    address chief;
-    address voteDelegateFactory;
-    address mkrSky;
-    address skyOsm;
-    address lsskyUsdsFarm;
-    LockstakeInstance lockstakeInstance;
+struct L2TokenBridgeInstance {
+    address govRelay;
+    address bridge;
+    address bridgeImp;
+    address spell;
 }

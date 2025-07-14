@@ -117,11 +117,11 @@ contract Config {
         // Values for spell-specific parameters
         //
         spellValues = SpellValues({
-            deployed_spell:         address(0xbF5EF05A578F270C0E54c7f6eF7cCFB5c9cD56b0), // populate with deployed spell if deployed
-            deployed_spell_created: 1749746267, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
-            deployed_spell_block:   22689726,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
+            deployed_spell:         address(0x86F5A13C95ecf7263634b6e14E483d05D7d4aA0B), // populate with deployed spell if deployed
+            deployed_spell_created: 1748550983, // use `make deploy-info tx=<deployment-tx>` to obtain the timestamp
+            deployed_spell_block:   22590824,   // use `make deploy-info tx=<deployment-tx>` to obtain the block number
             previous_spells:        prevSpells, // older spells to ensure are executed first
-            office_hours_enabled:   false,      // true if officehours is expected to be enabled in the spell
+            office_hours_enabled:   true,       // true if officehours is expected to be enabled in the spell
             expiration_threshold:   30 days     // Amount of time before spell expires
         });
 
@@ -1539,7 +1539,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         0,
+            line:         80_000_000,
             dust:         0,
             pct:          4_00,
             mat:          100_00,
@@ -1568,7 +1568,7 @@ contract Config {
             aL_line:      0,
             aL_gap:       0,
             aL_ttl:       0,
-            line:         0,
+            line:         70_000_000,
             dust:         0,
             pct:          4_00,
             mat:          100_00,
@@ -1622,10 +1622,10 @@ contract Config {
             offboarding:  false
         });
         afterSpell.collaterals["RWA015-A"] = CollateralValues({
-            aL_enabled:   false,
-            aL_line:      0,
-            aL_gap:       0,
-            aL_ttl:       0,
+            aL_enabled:   true,
+            aL_line:      3_000_000_000,
+            aL_gap:       50_000_000,
+            aL_ttl:       24 hours,
             line:         0,
             dust:         0,
             pct:          0,

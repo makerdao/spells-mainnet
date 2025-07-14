@@ -53,6 +53,42 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface L1GovRelayLike {
+    function l2GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2GovRelayLike {
+    function l1GovernanceRelay() external view returns (address);
+    function messenger() external view returns (address);
+}
+
+interface L2BridgeSpellLike {
+    function l2Bridge() external view returns (address);
+}
+
+interface DssVestLike {
+    function unpaid(uint256 id ) external view returns (uint256);
+}
+
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function dssVest() external view returns (address);
+    function lastDistributedAt() external view returns (uint256);
+    function stakingRewards() external view returns (address);
+    function vestId() external view returns (uint256);
+}
+
+interface VestedRewardsDistributionJobLike {
+    function has(address) external view returns (bool);
+    function intervals(address) external view returns (uint256);
+}
+
+interface CronJobLike {
+    function work(bytes32 network, bytes memory args) external;
+    function workable(bytes32 network) external returns (bool, bytes memory);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -595,7 +631,7 @@ contract DssSpellTest is DssSpellTestBase {
         _checkVestUsds(streams);
     }
 
-    function testVestSKY() public skipped { // add the `skipped` modifier to skip
+    function testVestSKY() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 FEB_01_2025 = 1738368000;
 
@@ -739,7 +775,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testYankSKYmint() public skipped { // add the `skipped` modifier to skip
+    function testYankSKYmint() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_20_2025 = 1760968859;
 
@@ -795,7 +831,7 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = true; // Note: Payments are being made through DaiUsds
 
@@ -1204,7 +1240,7 @@ contract DssSpellTest is DssSpellTestBase {
     // SPARK TESTS
     function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0xF485e3351a4C3D7d1F89B1842Af625Fd0dFB90C8); // Insert Spark spell address
+        address SPARK_SPELL = address(0x3968a022D955Bbb7927cc011A48601B65a33F346); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1240,4 +1276,309 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+    address            immutable SUSDS                      = addr.addr("SUSDS");
+    L1TokenBridgeLike  immutable l1UnichainBridge           = L1TokenBridgeLike(addr.addr("UNICHAIN_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1UnichainGovRelay         = L1GovRelayLike(addr.addr("UNICHAIN_GOV_RELAY"));
+    address            immutable UNICHAIN_ESCROW            = addr.addr("UNICHAIN_ESCROW");
+    address            immutable UNICHAIN_TOKEN_BRIDGE_IMP  = addr.addr("UNICHAIN_TOKEN_BRIDGE_IMP");
+    address            constant  UNICHAIN_MESSENGER         = 0x9A3D64E386C18Cb1d6d5179a9596A4B5736e98A6;
+
+    L2TokenBridgeLike  immutable l2UnichainBridge           = L2TokenBridgeLike(unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE"));
+    address            immutable L2_UNICHAIN_BRIDGE_IMP     = unichain.addr("L2_UNICHAIN_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2UnichainGovRelay         = L2GovRelayLike(unichain.addr("L2_UNICHAIN_GOV_RELAY"));
+    address            immutable L2_UNICHAIN_SPELL          = unichain.addr("L2_UNICHAIN_SPELL");
+    address            immutable L2_UNICHAIN_USDS           = unichain.addr("L2_UNICHAIN_USDS");
+    address            immutable L2_UNICHAIN_SUSDS          = unichain.addr("L2_UNICHAIN_SUSDS");
+    address            immutable L2_UNICHAIN_MESSENGER      = unichain.addr("L2_UNICHAIN_MESSENGER");
+
+    L1TokenBridgeLike  immutable l1OptimismBridge           = L1TokenBridgeLike(addr.addr("OPTIMISM_TOKEN_BRIDGE"));
+    L1GovRelayLike     immutable l1OptimismGovRelay         = L1GovRelayLike(addr.addr("OPTIMISM_GOV_RELAY"));
+    address            immutable OPTIMISM_ESCROW            = addr.addr("OPTIMISM_ESCROW");
+    address            immutable OPTIMISM_TOKEN_BRIDGE_IMP  = addr.addr("OPTIMISM_TOKEN_BRIDGE_IMP");
+    address            constant  OPTIMISM_MESSENGER         = 0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
+
+    L2TokenBridgeLike  immutable l2OptimismBridge           = L2TokenBridgeLike(optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE"));
+    address            immutable L2_OPTIMISM_BRIDGE_IMP     = optimism.addr("L2_OPTIMISM_TOKEN_BRIDGE_IMP");
+    L2GovRelayLike     immutable l2OptimismGovRelay         = L2GovRelayLike(optimism.addr("L2_OPTIMISM_GOV_RELAY"));
+    address            immutable L2_OPTIMISM_SPELL          = optimism.addr("L2_OPTIMISM_SPELL");
+    address            immutable L2_OPTIMISM_USDS           = optimism.addr("L2_OPTIMISM_USDS");
+    address            immutable L2_OPTIMISM_SUSDS          = optimism.addr("L2_OPTIMISM_SUSDS");
+    address            immutable L2_OPTIMISM_MESSENGER      = optimism.addr("L2_OPTIMISM_MESSENGER");
+
+    function testLockstakeMigratorDeauthInVat() public {
+        address LOCKSTAKE_MIGRATOR = chainLog.getAddress("LOCKSTAKE_MIGRATOR");
+        assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 1, "TestError/lockstake-not-ward-in-vat");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(vat.wards(LOCKSTAKE_MIGRATOR), 0, "TestError/lockstake-still-ward-in-vat");
+    }
+
+    function testOldRewardsUsdsSkyDistribution() public {
+        uint256 vestId = 2;
+        DssVestLike vest = DssVestLike(chainLog.getAddress("MCD_VEST_SKY"));
+        VestedRewardsDistributionLike distribution = VestedRewardsDistributionLike(chainLog.getAddress("REWARDS_DIST_USDS_SKY"));
+
+        assertGt(vest.unpaid(vestId), 0, "TestError/no-rewards-to-distribute");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(vest.unpaid(vestId), 0, "TestError/rewards-not-distributed");
+        assertEq(distribution.lastDistributedAt(), block.timestamp, "TestError/rewards-not-distributed");
+    }
+
+    function testVestedRewardsDistributionAllowance() public {
+        address vestTreasury = chainLog.getAddress("MCD_VEST_SKY_TREASURY");
+        uint256 previousAllowance = sky.allowance(pauseProxy, vestTreasury);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(sky.allowance(pauseProxy, vestTreasury), previousAllowance + (137_500_000 * WAD), "TestError/invalid-allowance");
+    }
+
+    function testVestedRewardsDistributionSetup() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(VestedRewardsDistributionLike(chainLog.getAddress("REWARDS_DIST_USDS_SKY")).vestId(), 4);
+    }
+
+    function testCronRewardsJobs() public {
+        VestedRewardsDistributionJobLike job = VestedRewardsDistributionJobLike(chainLog.getAddress("CRON_REWARDS_DIST_JOB"));
+        address prevDistributor = chainLog.getAddress("REWARDS_DIST_USDS_SKY");
+        address newDistributor = 0xC8d67Fcf101d3f89D0e1F3a2857485A84072a63F;
+
+        assertTrue(job.has(prevDistributor), "TestError/distributor-does-not-have-job");
+        assertFalse(job.has(newDistributor), "TestError/new-distributor-already-has-job");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertFalse(job.has(prevDistributor), "TestError/distributor-job-not-removed");
+        assertTrue(job.has(newDistributor), "TestError/new-distributor-job-not-added");
+        assertEq(job.intervals(newDistributor), 601200, "TestError/new-distributor-invalid-interval");
+    }
+
+    function testUsdsSkyRewardsIntegration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_SKY"));
+        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        // Sanity checks
+        assertEq(rewards.rewardsDistribution(), address(dist), "testUsdsSkyRewards/rewards-rewards-dist-mismatch");
+        assertEq(rewards.stakingToken(), address(usds), "testUsdsSkyRewards/rewards-staking-token-mismatch");
+        assertEq(rewards.rewardsToken(), address(sky), "testUsdsSkyRewards/rewards-rewards-token-mismatch");
+
+        assertTrue(vestSky.valid(dist.vestId()),               "testUsdsSkyRewards/invalid-dist-vest-id");
+
+        assertEq(dist.dssVest(), address(vestSky), "testUsdsSkyRewards/dist-vest-mismatch");
+        assertEq(dist.stakingRewards(), address(rewards), "testUsdsSkyRewards/dist-rewards-mismatch");
+
+        // Check if users can stake and get rewards
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 stakingWad = 100_000 * WAD;
+            _giveTokens(address(usds), stakingWad);
+            usds.approve(address(rewards), stakingWad);
+            rewards.stake(stakingWad);
+            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsdsSkyRewards/rewards-invalid-staked-balance");
+
+            uint256 pbalance = sky.balanceOf(address(this));
+            skip(7 days);
+            rewards.getReward();
+            assertGt(sky.balanceOf(address(this)), pbalance);
+
+            vm.revertTo(before);
+        }
+
+        // Check if distribute can be called again in the future
+        {
+            uint256 before = vm.snapshot();
+
+            uint256 pbalance = sky.balanceOf(address(rewards));
+            skip(7 days);
+            dist.distribute();
+            assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
+
+            vm.revertTo(before);
+        }
+    }
+
+    function testVestedRewardsDistributionJobIntegration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        SequencerLike seq                         = SequencerLike(addr.addr("CRON_SEQUENCER"));
+        CronJobLike job                           = CronJobLike(addr.addr("CRON_REWARDS_DIST_JOB"));
+        VestedRewardsDistributionLike distUsdsSky = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        (bool ok, ) = job.workable(seq.getMaster());
+        assertFalse(ok, "testVestedRewardsDistributionJob/unexpected-due-job");
+
+        skip(7 days - 1 hours);
+
+        {
+            uint256 before = vm.snapshot();
+
+            (bool ok, bytes memory out) = job.workable(seq.getMaster());
+            assertTrue(ok, "testVestedRewardsDistributionJob/missing-due-job");
+            (address dist) = abi.decode(out, (address));
+            assertEq(dist, address(distUsdsSky), "testVestedRewardsDistributionJob/invalid-dist-returned");
+
+            vm.revertTo(before);
+        }
+
+        uint256 plastDistributed = distUsdsSky.lastDistributedAt();
+        job.work(seq.getMaster(), abi.encode(address(distUsdsSky)));
+        assertGt(distUsdsSky.lastDistributedAt(), plastDistributed, "testVestedRewardsDistributionJob/missing-distribution");
+    }
+
+    function testUnichainTokenBridgeIntegration() public {
+        _setupRootDomain();
+        Chain memory chain =
+            Chain({name: "Unichain", chainId: 130, chainAlias: "unichain", rpcUrl: "https://unichain.drpc.org"});
+        setChain("unichain", chain);
+        unichainDomain = new OptimismDomain(config, getChain("unichain"), rootDomain);
+
+        // ------ Sanity checks -------
+
+        unichainDomain.selectFork();
+
+        require(l2UnichainBridge.isOpen()                       == 1, "L2UnichainTokenBridge/not-open");
+        require(l2UnichainBridge.otherBridge()                  == address(l1UnichainBridge), "L2UnichainTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2UnichainBridge.version()))    == keccak256("1"), "L2UnichainTokenBridge/version-does-not-match");
+        require(l2UnichainBridge.getImplementation()            == L2_UNICHAIN_BRIDGE_IMP, "L2UnichainTokenBridge/imp-does-not-match");
+        require(l2UnichainBridge.messenger()                    == L2_UNICHAIN_MESSENGER, "L2UnichainTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2UnichainGovRelay.l1GovernanceRelay()          == address(l1UnichainGovRelay), "L2UnichainTokenBridge/l2-gov-relay-mismatch");
+        require(l2UnichainGovRelay.messenger()                  == L2_UNICHAIN_MESSENGER, "L2UnichainGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_UNICHAIN_SPELL).l2Bridge() == address(l2UnichainBridge), "L2UnichainSpell/l2-bridge-mismatch");
+
+        rootDomain.selectFork();
+
+        require(keccak256(bytes(l1UnichainBridge.version()))    == keccak256("1"), "UnichainTokenBridge/version-does-not-match");
+        require(l1UnichainBridge.getImplementation()            == UNICHAIN_TOKEN_BRIDGE_IMP, "UnichainTokenBridge/imp-does-not-match");
+        require(l1UnichainBridge.isOpen()                       == 1, "UnichainTokenBridge/not-open");
+        require(l1UnichainBridge.otherBridge()                  == address(l2UnichainBridge), "UnichainTokenBridge/other-bridge-mismatch");
+        require(l1UnichainBridge.messenger()                    == UNICHAIN_MESSENGER, "UnichainTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1UnichainGovRelay.l2GovernanceRelay()          == address(l2UnichainGovRelay), "UnichainGovRelay/l2-gov-relay-mismatch");
+        require(l1UnichainGovRelay.messenger()                  == UNICHAIN_MESSENGER, "UnichainGovRelay/l1-gov-relay-messenger-mismatch");
+
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        require(l1UnichainBridge.escrow() == UNICHAIN_ESCROW, "UnichainTokenBridge/escrow-does-not-match");
+
+        address[] memory tokens = new address[](2);
+        address[] memory l2tokens = new address[](2);
+        uint256[] memory maxWithdrawals = new uint256[](2);
+
+        tokens[0] = address(usds);
+        tokens[1] = SUSDS;
+
+        l2tokens[0] = L2_UNICHAIN_USDS;
+        l2tokens[1] = L2_UNICHAIN_SUSDS;
+
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        _testOpTokenBridgeIntegration(OpTokenBridgeParams({
+            l2Bridge:       address(l2UnichainBridge),
+            l1Bridge:       address(l1UnichainBridge),
+            l1Escrow:       UNICHAIN_ESCROW,
+            tokens:         tokens,
+            l2Tokens:       l2tokens,
+            maxWithdrawals: maxWithdrawals,
+            domain:         unichainDomain
+        }));
+    }
+
+    function testOptimismTokenBridgeIntegration() public {
+        _setupRootDomain();
+        optimismDomain = new OptimismDomain(config, getChain("optimism"), rootDomain);
+
+        // ------ Sanity checks -------
+
+        optimismDomain.selectFork();
+
+        require(l2OptimismBridge.isOpen()                       == 1, "L2OptimismTokenBridge/not-open");
+        require(l2OptimismBridge.otherBridge()                  == address(l1OptimismBridge), "L2OptimismTokenBridge/other-bridge-mismatch");
+        require(keccak256(bytes(l2OptimismBridge.version()))    == keccak256("1"), "L2OptimismTokenBridge/version-does-not-match");
+        require(l2OptimismBridge.getImplementation()            == L2_OPTIMISM_BRIDGE_IMP, "L2OptimismTokenBridge/imp-does-not-match");
+        require(l2OptimismBridge.messenger()                    == L2_OPTIMISM_MESSENGER, "L2OptimismTokenBridge/l2-bridge-messenger-mismatch");
+        require(l2OptimismGovRelay.l1GovernanceRelay()          == address(l1OptimismGovRelay), "L2OptimismTokenBridge/l2-gov-relay-mismatch");
+        require(l2OptimismGovRelay.messenger()                  == L2_OPTIMISM_MESSENGER, "L2OptimismGovRelay/l2-gov-relay-messenger-mismatch");
+        require(L2BridgeSpellLike(L2_OPTIMISM_SPELL).l2Bridge() == address(l2OptimismBridge), "L2OptimismSpell/l2-bridge-mismatch");
+
+        rootDomain.selectFork();
+
+        require(keccak256(bytes(l1OptimismBridge.version()))    == keccak256("1"), "OptimismTokenBridge/version-does-not-match");
+        require(l1OptimismBridge.getImplementation()            == OPTIMISM_TOKEN_BRIDGE_IMP, "OptimismTokenBridge/imp-does-not-match");
+        require(l1OptimismBridge.isOpen()                       == 1, "OptimismTokenBridge/not-open");
+        require(l1OptimismBridge.otherBridge()                  == address(l2OptimismBridge), "OptimismTokenBridge/other-bridge-mismatch");
+        require(l1OptimismBridge.messenger()                    == OPTIMISM_MESSENGER, "OptimismTokenBridge/l1-bridge-messenger-mismatch");
+        require(l1OptimismGovRelay.l2GovernanceRelay()          == address(l2OptimismGovRelay), "OptimismGovRelay/l2-gov-relay-mismatch");
+        require(l1OptimismGovRelay.messenger()                  == OPTIMISM_MESSENGER, "OptimismGovRelay/l1-gov-relay-messenger-mismatch");
+
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+
+        require(l1OptimismBridge.escrow() == OPTIMISM_ESCROW, "OptimismTokenBridge/escrow-does-not-match");
+
+        address[] memory tokens = new address[](2);
+        address[] memory l2tokens = new address[](2);
+        uint256[] memory maxWithdrawals = new uint256[](2);
+
+        tokens[0] = address(usds);
+        tokens[1] = SUSDS;
+
+        l2tokens[0] = L2_OPTIMISM_USDS;
+        l2tokens[1] = L2_OPTIMISM_SUSDS;
+
+        maxWithdrawals[0] = type(uint256).max;
+        maxWithdrawals[1] = type(uint256).max;
+
+        _testOpTokenBridgeIntegration(OpTokenBridgeParams({
+            l2Bridge:       address(l2OptimismBridge),
+            l1Bridge:       address(l1OptimismBridge),
+            l1Escrow:       OPTIMISM_ESCROW,
+            tokens:         tokens,
+            l2Tokens:       l2tokens,
+            maxWithdrawals: maxWithdrawals,
+            domain:         optimismDomain
+        }));
+    }
+
+    function testSparkTokenOwnership() public {
+        WardsAbstract sparkToken = WardsAbstract(0xc20059e0317DE91738d13af027DfC4a50781b066);
+        address sparkCoMultisig = 0x6FE588FDCC6A34207485cc6e47673F59cCEDF92B;
+
+        assertEq(sparkToken.wards(sparkCoMultisig), 0, "TestError/spark-company-multisig-is-ward");
+        assertEq(sparkToken.wards(pauseProxy), 1, "TestError/pause-proxy-is-not-ward");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(sparkToken.wards(sparkCoMultisig), 1, "TestError/spark-company-multisig-is-not-ward");
+        assertEq(sparkToken.wards(pauseProxy), 0, "TestError/pause-proxy-is-ward");
+    }
 }
