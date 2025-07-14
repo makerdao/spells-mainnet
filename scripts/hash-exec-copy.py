@@ -75,7 +75,7 @@ def get_executive(exec_title, year):
             - commit_hash (str): The commit hash of the document
 
     Raises:
-        SystemExit: If the executive copy is not found
+        SystemExit: If the executive copy is not found or the response is malformed
         requests.exceptions.RequestException: If the HTTP request fails
     """
     # Get the latest commit for this file
@@ -94,6 +94,10 @@ def get_executive(exec_title, year):
         raise SystemExit(f"Error: Executive copy not found: {exec_title}")
 
     commit_hash = commits[0].get("sha", "")
+
+    if not commit_hash:
+        raise SystemExit(
+            f"Error: Executive copy commit hash not found: {exec_title}")
 
     # Get the file content from the specific commit
     raw_url = f"{GITHUB_RAW_BASE}{REPO_URL}/{commit_hash}/{file_path}"
