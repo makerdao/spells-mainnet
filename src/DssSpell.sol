@@ -101,7 +101,10 @@ contract DssSpellAction is DssAction {
         VestAbstract(MCD_VEST_SKY_TREASURY).yank(4);
 
         // VestedRewardsDistribution.distribute() on REWARDS_DIST_USDS_SKY
-        VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
+        // Note: `distribute()` only needs to be called if it wasn't already, otherwise it reverts
+        if (VestAbstract(MCD_VEST_SKY_TREASURY).unpaid(4) > 0) {
+            VestedRewardsDistributionLike(REWARDS_DIST_USDS_SKY).distribute();
+        }
 
         // ---------- Create a New MCD_VEST_SKY_TREASURY Stream ----------
         // Forum: https://forum.sky.money/t/sky-token-rewards-usds-to-sky-rewards-normalization-configuration/26638/8

@@ -1409,4 +1409,27 @@ contract DssSpellTest is DssSpellTestBase {
             assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
         }
     }
+
+    function testSpellRevertEdgeCase() public {
+        _vote(address(spell));
+        DssSpell(spell).schedule();
+        vm.warp(DssSpell(spell).nextCastTime());
+
+        // The attack can be executed permissionlessly
+        vm.startPrank(address(0xB0B));
+
+        // If distribute() is called in the same block as the spell (using front-running)
+        VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY")).distribute();
+
+        // Spell casting would've revert with "VestedRewardsDistribution/no-pending-amount"
+        // Which would be handled by Pause and revert with "ds-pause-delegatecall-error"
+        // vm.expectRevert("ds-pause-delegatecall-error");
+        DssSpell(spell).cast();
+
+        // The same could've been done again in any other subsequent block (since there is no cooldown)
+        // vm.warp(DssSpell(spell).nextCastTime() + 1);
+        // VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY")).distribute();
+        // vm.expectRevert("ds-pause-delegatecall-error");
+        // DssSpell(spell).cast();
+    }
 }
