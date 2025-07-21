@@ -123,7 +123,7 @@ contract DssSpellAction is DssAction {
         // Note: restricting the stream, as instructed above
         VestAbstract(MCD_VEST_SKY_TREASURY).restrict(vestId);
 
-        // Note: we need to increase SKY allowance for MCD_VEST_SKY_TREASURY to the sum of all streams
+        // Increase SKY allowance for MCD_VEST_SKY_TREASURY to the sum of all streams
         GemAbstract(SKY).approve(
             MCD_VEST_SKY_TREASURY,
             VestAbstract(MCD_VEST_SKY_TREASURY).tot(1) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(1) +
