@@ -31,6 +31,10 @@ interface DaiUsdsLike {
     function daiToUsds(address usr, uint256 wad) external;
 }
 
+interface ProxyLike {
+    function exec(address target, bytes calldata args) external payable returns (bytes memory out);
+}
+
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
@@ -82,9 +86,20 @@ contract DssSpellAction is DssAction {
     address internal constant CLOAKY_KOHLA_2 = 0x73dFC091Ad77c03F2809204fCF03C0b9dccf8c7a;
     address internal constant AEGIS_D        = 0x78C180CF113Fe4845C325f44648b6567BC79d6E0;
 
+    // ---------- Grove Proxy Spell ----------
+    // Note: The deployment address for the Grove Proxy can be found at https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
+    address internal constant GROVE_PROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
+    address internal constant GROVE_SPELL = 0x8AfC2C232716674b45CB131F858e870AA6aCD9FF;
+
+    // ---------- Spark Proxy Spell ----------
+    // Note: Spark Proxy: https://github.com/sparkdotfi/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
+    address internal constant SPARK_PROXY = 0x3300f198988e4C9C63F75dF86De36421f06af8c4;
+    address internal constant SPARK_SPELL = 0x41EdbF09cd2f272175c7fACB857B767859543D15;
+
     function actions() public override {
         // ---------- MKR to SKY Upgrade Phase Three: Offboard LSE-MKR-A ----------
         // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-july-24th-spell/26750
+        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-july-24th-spell/26750/2
         // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1.4.2.2_Offboard_Borrowing_Against_Staked_MKR/1f1f2ff0-8d73-8024-bf88-f0a17374ceea%7Cb341f4c0b83472dc1f9e1a3b
 
         // Increase LSE-MKR-A liquidation ratio by 9,875 percentage points, from 125% to 10,000%
@@ -195,9 +210,12 @@ contract DssSpellAction is DssAction {
         // Approve DAO Resolution with hash bafkreidm3bqfiwv224m6w4zuabsiwqruy22sjfaxfvgx4kgcnu3wndxmva
         // Note: see `dao_resolutions` public variable declared above
 
-        // ---------- Spark <> Grove Token Transfers ----------
+        // ---------- Spark <> Grove Token Transfers and Grove Proxy Spell Execution ----------
         // Forum: https://forum.sky.money/t/july-24-2025-proposed-changes-to-spark-for-upcoming-spell/26796
+        // Forum: https://forum.sky.money/t/july-24-2025-proposed-onboardings-for-grove-in-upcoming-spell/26805
         // Poll: https://vote.sky.money/polling/Qme5qebN
+        // Poll: https://vote.sky.money/polling/QmdkNnmE
+        // Poll: https://vote.sky.money/polling/QmdKd2se
 
         // Increase ALLOCATOR-BLOOM-A DC-IAM gap by 1.2 billion USDS from 50 million USDS to 1.25 billion USDS
         // line remains unchanged at 2.5 billion USDS
@@ -207,16 +225,22 @@ contract DssSpellAction is DssAction {
         // Apply ALLOCATOR-BLOOM-A auto-line changes
         DssAutoLineAbstract(MCD_IAM_AUTO_LINE).exec("ALLOCATOR-BLOOM-A");
 
-        // Execute Grove Proxy Spell at address TBC
-        // TODO
+        // Execute Grove Proxy Spell at 0x8AfC2C232716674b45CB131F858e870AA6aCD9FF
+        ProxyLike(GROVE_PROXY).exec(GROVE_SPELL, abi.encodeWithSignature("execute()"));
 
         // Decrease ALLOCATOR-BLOOM-A gap by 1.2 billion USDS from 1.25 billion USDS to 50 million USDS
         DssExecLib.setIlkAutoLineParameters("ALLOCATOR-BLOOM-A", /* amount = */ 2_500 * MILLION, /* gap = */ 50 * MILLION, /* ttl = */ 86400 seconds);
 
         // ---------- Execute Spark Proxy Spell ----------
+        // Forum: https://forum.sky.money/t/july-24-2025-proposed-changes-to-spark-for-upcoming-spell/26796
+        // Poll: https://vote.sky.money/polling/QmUYJ9YQ
+        // Poll: https://vote.sky.money/polling/QmSnpq5K
+        // Poll: https://vote.sky.money/polling/Qme5qebN
+        // Poll: https://vote.sky.money/polling/QmaLxz19
+        // Poll: https://vote.sky.money/polling/QmP7RB2p
 
-        // Execute Spark Proxy Spell at address TBC
-        // TODO
+        // Execute Spark Proxy Spell at 0x41EdbF09cd2f272175c7fACB857B767859543D15
+        ProxyLike(SPARK_PROXY).exec(SPARK_SPELL, abi.encodeWithSignature("execute()"));
     }
 
     // ---------- Helper Functions ----------

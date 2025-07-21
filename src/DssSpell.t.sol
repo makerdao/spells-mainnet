@@ -888,7 +888,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = false;
+        bool ignoreTotalSupplyDaiUsds = true;
         bool ignoreTotalSupplyMkrSky = true;
 
         // For each payment, create a Payee object with:
@@ -1294,9 +1294,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0); // Insert Spark spell address
+        address SPARK_SPELL = address(0x41EdbF09cd2f272175c7fACB857B767859543D15); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1312,17 +1312,17 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
     }
 
-    // BLOOM TESTS
-    function testBloomSpellIsExecuted() public skipped {
-        address BLOOM_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
-        address BLOOM_SPELL = address(0);
+    // Grove/Bloom TESTS
+    function testGroveSpellIsExecuted() public {
+        address GROVE_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
+        address GROVE_SPELL = address(0x8AfC2C232716674b45CB131F858e870AA6aCD9FF);
 
         vm.expectCall(
-            BLOOM_PROXY,
+            GROVE_PROXY,
             /* value = */ 0,
             abi.encodeCall(
-                ProxyLike(BLOOM_PROXY).exec,
-                (BLOOM_SPELL, abi.encodeWithSignature("execute()"))
+                ProxyLike(GROVE_PROXY).exec,
+                (GROVE_SPELL, abi.encodeWithSignature("execute()"))
             )
         );
 
@@ -1333,7 +1333,7 @@ contract DssSpellTest is DssSpellTestBase {
 
     // SPELL-SPECIFIC TESTS GO BELOW
 
-    function testBloomLineChanges() public {
+    function testGroveLineChanges() public {
         bytes32 ilk = "ALLOCATOR-BLOOM-A";
         (uint256 pAL_line, uint256 pAL_gap, uint256 pAL_ttl,,) = autoLine.ilks(ilk);
         (,,, uint256 pLine,) = vat.ilks(ilk);
