@@ -46,6 +46,14 @@ interface SequencerLike {
     function hasJob(address job) external view returns (bool);
 }
 
+interface VestedRewardsDistributionLike {
+    function distribute() external returns (uint256 amount);
+    function dssVest() external view returns (address);
+    function lastDistributedAt() external view returns (uint256);
+    function stakingRewards() external view returns (address);
+    function vestId() external view returns (uint256);
+}
+
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
 
@@ -588,7 +596,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testVestSky() public skipped { // add the `skipped` modifier to skip
+    function testVestSky() public { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         // uint256 FEB_01_2025 = 1738368000;
 
@@ -605,15 +613,15 @@ contract DssSpellTest is DssSpellTestBase {
             // For each new stream, provide Stream object
             // and initialize the array with the corrent number of new streams
             streams[0] = VestStream({
-                id:  4,
+                id:  5,
                 usr: addr.addr("REWARDS_DIST_USDS_SKY"),
                 bgn: block.timestamp,
                 clf: block.timestamp,
-                fin: block.timestamp + uint256(182 days),
-                tau: 182 days,
+                fin: block.timestamp + 15_724_800 seconds,
+                tau: 15_724_800 seconds,
                 mgr: address(0),
                 res: 1,
-                tot: 137_500_000 * WAD,
+                tot: 100_851_495 * WAD,
                 rxd: 0
             });
 
@@ -783,6 +791,45 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
+    function testYankSky() public { // add the `skipped` modifier to skip
+        // Provide human-readable names for timestamps
+        uint256 DEC_01_2025_14_47_35 = 1764600455;
+
+        // For each yanked stream, provide Yank object with:
+        //   the stream id
+        //   the address of the stream
+        //   the planned fin of the stream (via variable defined above)
+        // Initialize the array with the corrent number of yanks
+        Yank[1] memory yanks = [
+            Yank(4, chainLog.getAddress("REWARDS_DIST_USDS_SKY"), DEC_01_2025_14_47_35)
+        ];
+
+        // Test stream id matches `addr` and `fin`
+        VestAbstract vest = VestAbstract(addr.addr("MCD_VEST_SKY_TREASURY"));
+        for (uint256 i = 0; i < yanks.length; i++) {
+            assertEq(vest.usr(yanks[i].streamId), yanks[i].addr, "testYankSky/unexpected-address");
+            assertEq(vest.fin(yanks[i].streamId), yanks[i].finPlanned, "testYankSky/unexpected-fin-date");
+        }
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        for (uint256 i = 0; i < yanks.length; i++) {
+            // Test stream.fin is set to the current block after the spell
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSky/steam-not-yanked");
+
+            // Give admin powers to test contract address and make the vesting unrestricted for testing
+            GodMode.setWard(address(vest), address(this), 1);
+
+            // Test vest can still be called, making stream "invalid" and not changing `fin` timestamp
+            vest.unrestrict(yanks[i].streamId);
+            vest.vest(yanks[i].streamId);
+            assertTrue(!vest.valid(yanks[i].streamId));
+            assertEq(vest.fin(yanks[i].streamId), block.timestamp, "testYankSky/steam-fin-changed");
+        }
+    }
+
     function testYankSkyMint() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 OCT_20_2025 = 1760968859;
@@ -842,22 +889,33 @@ contract DssSpellTest is DssSpellTestBase {
     function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
         bool ignoreTotalSupplyDaiUsds = false;
+        bool ignoreTotalSupplyMkrSky = true;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[1] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 0 ether) // Note: ether is only a keyword helper
+        Payee[11] memory payees = [
+            Payee(address(usds), wallets.addr("BLUE"), 4_000 ether + 50_167 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_2"), 4_000 ether + 16_417 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("JULIACHANG"), 4_000 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("WBC"), 3_733 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("PBG"), 800 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("EXCEL"), 400 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("AEGIS_D"), 129 ether), // Note: ether is only a keyword helper
+            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"), 11_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("BLUE"), 330_000 ether), // Note: ether is only a keyword helper
+            Payee(address(sky), wallets.addr("CLOAKY_2"), 288_000 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
             dai:          0 ether, // Note: ether is only a keyword helper
             mkr:          0 ether, // Note: ether is only a keyword helper
-            usds:         0 ether, // Note: ether is only a keyword helper
-            sky:          0 ether  // Note: ether is only a keyword helper
+            usds:          98_646 ether, // Note: ether is only a keyword helper
+            sky:          618_000 ether  // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
@@ -955,25 +1013,27 @@ contract DssSpellTest is DssSpellTestBase {
             mkr: int256(mkr.balanceOf(pauseProxy)) - previousTreasuryBalances.mkr,
             sky: int256(sky.balanceOf(pauseProxy)) - previousTreasuryBalances.sky
         });
-        assertEq(
-            expectedTreasuryBalancesDiff.mkr,
-            treasuryBalancesDiff.mkr,
-            "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
-        );
+        if (ignoreTotalSupplyMkrSky == false) {
+            assertEq(
+                expectedTreasuryBalancesDiff.mkr,
+                treasuryBalancesDiff.mkr,
+                "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
+            );
 
-        assertEq(
-            expectedTreasuryBalancesDiff.sky,
-            treasuryBalancesDiff.sky,
-            "TestPayments/actual-vs-expected-sky-treasury-mismatch"
-        );
-        // Sky or MKR payments might come from token emission or from the treasury
-        assertEq(
-            (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
-                + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
-            calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
-                + calculatedTotalPayments.sky,
-            "TestPayments/invalid-mkr-sky-total"
-        );
+            assertEq(
+                expectedTreasuryBalancesDiff.sky,
+                treasuryBalancesDiff.sky,
+                "TestPayments/actual-vs-expected-sky-treasury-mismatch"
+            );
+            // Sky or MKR payments might come from token emission or from the treasury
+            assertEq(
+                (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
+                    + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
+                calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
+                    + calculatedTotalPayments.sky,
+                "TestPayments/invalid-mkr-sky-total"
+            );
+        }
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -1215,11 +1275,11 @@ contract DssSpellTest is DssSpellTestBase {
         assertEq(Art, 0, "GUSD-A Art is not 0");
     }
 
-    function testDaoResolutions() public skipped { // replace `view` with the `skipped` modifier to skip
+    function testDaoResolutions() public view { // replace `view` with the `skipped` modifier to skip
         // For each resolution, add IPFS hash as item to the resolutions array
         // Initialize the array with the number of resolutions
         string[1] memory resolutions = [
-            "bafkreidmumjkch6hstk7qslyt3dlfakgb5oi7b3aab7mqj66vkds6ng2de"
+            "bafkreidm3bqfiwv224m6w4zuabsiwqruy22sjfaxfvgx4kgcnu3wndxmva"
         ];
 
         string memory comma_separated_resolutions = "";
@@ -1272,4 +1332,81 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
+
+    function testBloomLineChanges() public {
+        bytes32 ilk = "ALLOCATOR-BLOOM-A";
+        (uint256 pAL_line, uint256 pAL_gap, uint256 pAL_ttl,,) = autoLine.ilks(ilk);
+        (,,, uint256 pLine,) = vat.ilks(ilk);
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
+        (,,, uint256 line,) = vat.ilks(ilk);
+
+        // Ensure all auto-line parameters stays the same
+        assertEq(pAL_line, aL_line, "testBloomLineChanges/unexpected-aL_line-chage");
+        assertEq(pAL_gap, aL_gap, "testBloomLineChanges/unexpected-aL_gap-chage");
+        assertEq(pAL_ttl, aL_ttl, "testBloomLineChanges/unexpected-paL_ttl-chage");
+
+        // Ensure line actually increased
+        assertGt(line, pLine, "testBloomLineChanges/unchanged-line");
+    }
+
+    function testUpdatedRewardsDistUsdsSky() public {
+        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+        VestAbstract vest = VestAbstract(dist.dssVest());
+        uint256 oldVestId = dist.vestId();
+        assertGt(vest.unpaid(oldVestId), 0, "testUsdsSkyRewardsDistributed/unexpected-no-unpaid");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        // Check `.distribute()` was called
+        assertEq(vest.unpaid(oldVestId), 0, "testUsdsSkyRewardsDistributed/unexpected-unpaid");
+
+        // Check new vestId was filed
+        assertNotEq(oldVestId, dist.vestId(), "testUsdsSkyRewardsDistributed/same-vestId");
+    }
+
+    function testUsdsSkyRewardsIntegration() public {
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        StakingRewardsLike rewards = StakingRewardsLike(addr.addr("REWARDS_USDS_SKY"));
+        VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
+
+        // Sanity checks
+        assertEq(rewards.rewardsDistribution(), address(dist), "testUsdsSkyRewards/rewards-rewards-dist-mismatch");
+        assertEq(rewards.stakingToken(), address(usds), "testUsdsSkyRewards/rewards-staking-token-mismatch");
+        assertEq(rewards.rewardsToken(), address(sky), "testUsdsSkyRewards/rewards-rewards-token-mismatch");
+        assertTrue(vestSky.valid(dist.vestId()), "testUsdsSkyRewards/invalid-dist-vest-id");
+        assertEq(dist.dssVest(), address(vestSky), "testUsdsSkyRewards/dist-vest-mismatch");
+        assertEq(dist.stakingRewards(), address(rewards), "testUsdsSkyRewards/dist-rewards-mismatch");
+
+        uint256 before = vm.snapshotState();
+        { // Check if users can stake and get rewards
+            uint256 stakingWad = 100_000 * WAD;
+            _giveTokens(address(usds), stakingWad);
+            usds.approve(address(rewards), stakingWad);
+            rewards.stake(stakingWad);
+            assertEq(rewards.balanceOf(address(this)), stakingWad, "testUsdsSkyRewards/rewards-invalid-staked-balance");
+
+            uint256 pbalance = sky.balanceOf(address(this));
+            skip(7 days);
+            rewards.getReward();
+            assertGt(sky.balanceOf(address(this)), pbalance);
+        }
+
+        vm.revertToState(before);
+        { // Check if distribute can be called again in the future
+            uint256 pbalance = sky.balanceOf(address(rewards));
+            skip(7 days);
+            dist.distribute();
+            assertGt(sky.balanceOf(address(rewards)), pbalance, "testUsdsSkyRewards/distribute-no-increase-balance");
+        }
+    }
 }

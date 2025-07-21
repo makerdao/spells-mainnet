@@ -2124,10 +2124,10 @@ contract Config {
             line:         0,
             dust:         30_000,
             pct:          20_00,
-            mat:          125_00,
+            mat:          10_000_00,
             liqType:      "clip",
             liqOn:        true,
-            chop:         8_00,
+            chop:         0,
             dog_hole:     3 * MILLION,
             clip_buf:     120_00,
             clip_tail:    100 minutes,
@@ -2143,7 +2143,7 @@ contract Config {
             SP_min:       0,
             SP_max:       0,
             SP_step:      0,
-            offboarding:  false
+            offboarding:  true
         });
         afterSpell.collaterals["LSEV2-SKY-A"] = CollateralValues({
             aL_enabled:   true,

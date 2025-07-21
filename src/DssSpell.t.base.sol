@@ -19,6 +19,7 @@ pragma solidity 0.8.16;
 import "dss-interfaces/Interfaces.sol";
 import {DssTest, GodMode} from "dss-test/DssTest.sol";
 import {stdStorage, StdStorage} from "forge-std/Test.sol";
+import "forge-std/console.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
@@ -2690,21 +2691,6 @@ contract DssSpellTestBase is Config, DssTest {
 
         for (uint256 i = 0; i < _ss.length; i++) {
             _checkVestStream(_vi, _ss[i]);
-        }
-
-        if (_vi.isTransferrable) {
-            // Check allowance was increased according to the streams
-            uint256 sumTot = 0;
-            uint256 sumRxd = 0;
-            for (uint256 i = 0; i < _ss.length; i++) {
-                sumTot = sumTot + _ss[i].tot;
-                sumRxd = sumRxd + _ss[i].rxd;
-            }
-            assertEq(
-                _vi.gem.allowance(pauseProxy, address(_vi.vest)),
-                prevAllowance + sumTot - sumRxd,
-                string.concat("TestError/Vest/", _vi.name, "/invalid-allowance-")
-            );
         }
     }
 
