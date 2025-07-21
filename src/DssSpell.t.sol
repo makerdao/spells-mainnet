@@ -41,40 +41,9 @@ interface SpellActionLike {
     function dao_resolutions() external view returns (string memory);
 }
 
-interface ERC20Like {
-    function allowance(address, address) external view returns (uint256);
-}
-
-interface DssVestLike {
-    function cap() external view returns (uint256);
-    function czar() external view returns (address);
-    function gem() external view returns (address);
-    function awards(uint256) external view returns (address, uint48, uint48, uint48, address, uint8, uint128);
-}
-
 interface SequencerLike {
     function getMaster() external view returns (bytes32);
     function hasJob(address job) external view returns (bool);
-}
-
-interface VestedRewardsDistributionJobLike {
-    function has(address) external view returns (bool);
-    function intervals(address) external view returns (uint256);
-    function workable(bytes32) external returns (bool, bytes memory);
-    function work(bytes32, bytes memory) external;
-}
-
-interface VestedRewardsDistributionLike {
-    function dssVest() external view returns (address);
-    function stakingRewards() external view returns (address);
-    function gem() external view returns (address);
-    function wards(address) external view returns (uint256);
-    function vestId() external view returns (uint256);
-    function lastDistributedAt() external view returns (uint256);
-}
-
-interface WardsLike {
-    function wards(address) external view returns (uint256);
 }
 
 contract DssSpellTest is DssSpellTestBase {
@@ -240,7 +209,7 @@ contract DssSpellTest is DssSpellTestBase {
         //assertEq(OsmAbstract(0xF15993A5C5BE496b8e1c9657Fd2233b579Cd3Bc6).wards(ORACLE_WALLET01), 1);
     }
 
-    function testRemovedChainlogKeys() public { // add the `skipped` modifier to skip
+    function testRemovedChainlogKeys() public skipped { // add the `skipped` modifier to skip
         string[1] memory removedKeys = [
             "MKR_SKY_LEGACY"
         ];
@@ -274,7 +243,7 @@ contract DssSpellTest is DssSpellTestBase {
         }
     }
 
-    function testAddedChainlogKeys() public { // add the `skipped` modifier to skip
+    function testAddedChainlogKeys() public skipped { // add the `skipped` modifier to skip
         string[6] memory addedKeys = [
             "SPK",
             "MCD_VEST_SPK_TREASURY",
@@ -694,7 +663,7 @@ contract DssSpellTest is DssSpellTestBase {
         );
     }
 
-    function testVestSpk() public { // add the `skipped` modifier to skip
+    function testVestSpk() public skipped { // add the `skipped` modifier to skip
         // Provide human-readable names for timestamps
         uint256 beforeVote = vm.snapshotState();
         _vote(address(spell));
@@ -870,42 +839,31 @@ contract DssSpellTest is DssSpellTestBase {
         int256 sky;
     }
 
-    // Note: Skipping this test in favor of `testPayments_ignoreBurnsAndConversion` for this spell.
-    function testPayments() public skipped { // add the `skipped` modifier to skip
+    function testPayments() public { // add the `skipped` modifier to skip
         // Note: set to true when there are additional DAI/USDS operations (e.g. surplus buffer sweeps, SubDAO draw-downs) besides direct transfers
-        bool ignoreTotalSupplyDaiUsds = true; // Note: Payments are being made through DaiUsds
+        bool ignoreTotalSupplyDaiUsds = false;
 
         // For each payment, create a Payee object with:
         //    the address of the transferred token,
         //    the destination address,
         //    the amount to be paid
         // Initialize the array with the number of payees
-        Payee[11] memory payees = [
-            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 5_000_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BLUE"), 54_167 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BONAPUBLICA"), 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BYTERON"),  4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_2"),  20_417 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("JULIACHANG"),  4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("PBG"), 3_867 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("WBC"), 2_400 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"), 11_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("BLUE"), 330_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky), wallets.addr("CLOAKY_2"), 288_000 ether) // Note: ether is only a keyword helper
+        Payee[1] memory payees = [
+            Payee(address(usds), wallets.addr("LAUNCH_PROJECT_FUNDING"), 0 ether) // Note: ether is only a keyword helper
         ];
 
         // Fill the total values from exec sheet
         PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:          0 ether,         // Note: ether is only a keyword helper
-            mkr:          0 ether,         // Note: ether is only a keyword helper
-            usds:         5_103_851 ether, // Note: ether is only a keyword helper
-            sky:          618_000 ether    // Note: ether is only a keyword helper
+            dai:          0 ether, // Note: ether is only a keyword helper
+            mkr:          0 ether, // Note: ether is only a keyword helper
+            usds:         0 ether, // Note: ether is only a keyword helper
+            sky:          0 ether  // Note: ether is only a keyword helper
         });
 
         // Fill the total values based on the source for the transfers above
         TreasuryAmounts memory expectedTreasuryBalancesDiff = TreasuryAmounts({
-            mkr: 0,
-            sky: -618_000 ether
+            mkr: 0 ether, // Note: ether is only a keyword helper
+            sky: 0 ether  // Note: ether is only a keyword helper
         });
 
         // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
@@ -1003,21 +961,19 @@ contract DssSpellTest is DssSpellTestBase {
             "TestPayments/actual-vs-expected-mkr-treasury-mismatch"
         );
 
-
         assertEq(
             expectedTreasuryBalancesDiff.sky,
             treasuryBalancesDiff.sky,
             "TestPayments/actual-vs-expected-sky-treasury-mismatch"
         );
         // Sky or MKR payments might come from token emission or from the treasury
-        // Note: Uncomment if SKY payments were made using MRR -> SKY conversion
-        // assertEq(
-        //     (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
-        //         + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
-        //     calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
-        //         + calculatedTotalPayments.sky,
-        //     "TestPayments/invalid-mkr-sky-total"
-        // );
+        assertEq(
+            (totalSupplyDiff.mkr - treasuryBalancesDiff.mkr) * int256(afterSpell.sky_mkr_rate)
+                + totalSupplyDiff.sky - treasuryBalancesDiff.sky,
+            calculatedTotalPayments.mkr * int256(afterSpell.sky_mkr_rate)
+                + calculatedTotalPayments.sky,
+            "TestPayments/invalid-mkr-sky-total"
+        );
 
         // Check that payees received their payments
         for (uint256 i = 0; i < payees.length; i++) {
@@ -1043,138 +999,6 @@ contract DssSpellTest is DssSpellTestBase {
                 assertEq(
                     int256(sky.balanceOf(payees[i].addr)),
                     previousPayeeBalances[i].sky + payees[i].amount,
-                    "TestPayments/invalid-payee-sky-balance"
-                );
-            } else {
-                revert('TestPayments/unexpected-payee-token');
-            }
-        }
-    }
-
-    // Note: this test deliberately ignore changes in SKY and MKR held in the treasury and their supply.
-    // TODO: Consider simplifying `testPayments` above to be closer to this one.
-    // There is coverage for them in the spell-specific tests.
-    function testPayments_ignoreBurnsAndConversions() public {
-        Payee[12] memory payees = [
-            Payee(address(usds), addr.addr("SPARK_PROXY"),               20_600_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BLUE"),         4_000 ether + 50_167 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("BONAPUBLICA"),                 4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_2"),     4_000 ether + 16_417 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("PBG"),                         4_000 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("JULIACHANG"),                  2_323 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("EXCEL"),                       1_088 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("WBC"),                         1_032 ether), // Note: ether is only a keyword helper
-            Payee(address(usds), wallets.addr("CLOAKY_KOHLA_2"),             11_000 ether), // Note: ether is only a keyword helper,
-            Payee(address(sky),  wallets.addr("LAUNCH_PROJECT_FUNDING"),  8_400_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky),  wallets.addr("BLUE"),                      330_000 ether), // Note: ether is only a keyword helper
-            Payee(address(sky),  wallets.addr("CLOAKY_2"),                  288_000 ether)  // Note: ether is only a keyword helper
-        ];
-
-        // By default the expected balance changes are the payee amounts
-        int256[] memory expectedBalanceChanges = new int256[](payees.length);
-        for (uint256 i = 0; i < payees.length; i++) {
-            expectedBalanceChanges[i] = payees[i].amount;
-        }
-
-        // NOTE: the Spark Spell transfer 800,000 USDS out of the Spark Proxy
-        expectedBalanceChanges[0] = payees[0].amount - 800_000 ether; // Note: ether is only a keyword helper
-
-        // Fill the total values from exec sheet
-        PaymentAmounts memory expectedTotalPayments = PaymentAmounts({
-            dai:           0 ether, // Note: ether is only a keyword helper
-            mkr:           0 ether, // Note: ether is only a keyword helper
-            usds: 20_698_027 ether, // Note: ether is only a keyword helper
-            sky:   9_018_000 ether  // Note: ether is only a keyword helper
-        });
-
-        PaymentAmounts memory calculatedTotalPayments;
-        PaymentAmounts[] memory previousPayeeBalances = new PaymentAmounts[](payees.length);
-
-        for (uint256 i = 0; i < payees.length; i++) {
-            if (payees[i].token == address(dai)) {
-                calculatedTotalPayments.dai += payees[i].amount;
-            } else if (payees[i].token == address(mkr)) {
-                calculatedTotalPayments.mkr += payees[i].amount;
-            } else if (payees[i].token == address(usds)) {
-                calculatedTotalPayments.usds += payees[i].amount;
-            } else if (payees[i].token == address(sky)) {
-                calculatedTotalPayments.sky += payees[i].amount;
-            } else {
-                revert('TestPayments/unexpected-payee-token');
-            }
-            previousPayeeBalances[i] = PaymentAmounts({
-                dai: int256(dai.balanceOf(payees[i].addr)),
-                mkr: int256(mkr.balanceOf(payees[i].addr)),
-                usds: int256(usds.balanceOf(payees[i].addr)),
-                sky: int256(sky.balanceOf(payees[i].addr))
-            });
-        }
-
-        assertEq(
-            calculatedTotalPayments.dai,
-            expectedTotalPayments.dai,
-            "TestPayments/calculated-vs-expected-dai-total-mismatch"
-        );
-        assertEq(
-            calculatedTotalPayments.usds,
-            expectedTotalPayments.usds,
-            "TestPayments/calculated-vs-expected-usds-total-mismatch"
-        );
-        assertEq(
-            calculatedTotalPayments.mkr,
-            expectedTotalPayments.mkr,
-            "TestPayments/calculated-vs-expected-mkr-total-mismatch"
-        );
-        assertEq(
-            calculatedTotalPayments.sky,
-            expectedTotalPayments.sky,
-            "TestPayments/calculated-vs-expected-sky-total-mismatch"
-        );
-
-        // Vote, schedule and warp, but not yet cast (to get correct surplus balance)
-        _vote(address(spell));
-        spell.schedule();
-        vm.warp(spell.nextCastTime());
-        pot.drip();
-
-        // Calculate and save previous balances
-        uint256 previousSurplusBalance = vat.sin(address(vow));
-
-        // Cast spell
-        spell.cast();
-        assertTrue(spell.done(), "TestPayments/spell-not-done");
-
-        // Check that dai/usds transfers modify surplus buffer
-        assertEq(
-            vat.sin(address(vow)) - previousSurplusBalance,
-            uint256(calculatedTotalPayments.dai + calculatedTotalPayments.usds) * RAY,
-            "TestPayments/invalid-vow-sin"
-        );
-
-        // Check that payees received their payments
-        for (uint256 i = 0; i < payees.length; i++) {
-            if (payees[i].token == address(dai)) {
-                assertEq(
-                    int256(dai.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].dai + expectedBalanceChanges[i],
-                    "TestPayments/invalid-payee-dai-balance"
-                );
-            } else if (payees[i].token == address(mkr)) {
-                assertEq(
-                    int256(mkr.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].mkr + expectedBalanceChanges[i],
-                    "TestPayments/invalid-payee-mkr-balance"
-                );
-            } else if (payees[i].token == address(usds)) {
-                assertEq(
-                    int256(usds.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].usds + expectedBalanceChanges[i],
-                    "TestPayments/invalid-payee-usds-balance"
-                );
-            } else if (payees[i].token == address(sky)) {
-                assertEq(
-                    int256(sky.balanceOf(payees[i].addr)),
-                    previousPayeeBalances[i].sky + expectedBalanceChanges[i],
                     "TestPayments/invalid-payee-sky-balance"
                 );
             } else {
@@ -1410,9 +1234,9 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPARK TESTS
-    function testSparkSpellIsExecuted() public { // add the `skipped` modifier to skip
+    function testSparkSpellIsExecuted() public skipped { // add the `skipped` modifier to skip
         address SPARK_PROXY = addr.addr('SPARK_PROXY');
-        address SPARK_SPELL = address(0x74e1ba852C864d689562b5977EedCB127fDE0C9F); // Insert Spark spell address
+        address SPARK_SPELL = address(0); // Insert Spark spell address
 
         vm.expectCall(
             SPARK_PROXY,
@@ -1448,340 +1272,4 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     // SPELL-SPECIFIC TESTS GO BELOW
-
-    uint256 constant MIN_ETA = 1751292000; // 2025-06-30T14:00:00Z
-
-    function testNextCastTimeMinEta() public {
-        // Spell obtains approval for execution before MIN_ETA
-        {
-            uint256 before = vm.snapshotState();
-
-            vm.warp(1748736000); // 2025-06-01T00:00Z - could be any date far enough in the past
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA, "testNextCastTimeMinEta/min-eta-not-enforced");
-
-            vm.revertToStateAndDelete(before);
-        }
-
-        // Spell obtains approval for execution after MIN_ETA
-        {
-            uint256 before = vm.snapshotState();
-
-            vm.warp(MIN_ETA); // As we move closer to MIN_ETA, GSM delay is still applicable
-            _vote(address(spell));
-            spell.schedule();
-
-            assertEq(spell.nextCastTime(), MIN_ETA + pause.delay(), "testNextCastTimeMinEta/gsm-delay-not-enforced");
-
-            vm.revertToStateAndDelete(before);
-        }
-    }
-
-    address SPK = addr.addr("SPK");
-    address MCD_VEST_SPK_TREASURY = addr.addr("MCD_VEST_SPK_TREASURY");
-    address CRON_SEQUENCER = addr.addr("CRON_SEQUENCER");
-    address CRON_REWARDS_DIST_JOB = addr.addr("CRON_REWARDS_DIST_JOB");
-    address LOCKSTAKE_ENGINE = addr.addr("LOCKSTAKE_ENGINE");
-    address USDS = addr.addr("USDS");
-    address LSSKY = addr.addr("LOCKSTAKE_SKY");
-    address MCD_PAUSE_PROXY = addr.addr("MCD_PAUSE_PROXY");
-    address REWARDS_USDS_SPK = addr.addr("REWARDS_USDS_SPK");
-    address REWARDS_DIST_USDS_SPK = addr.addr("REWARDS_DIST_USDS_SPK");
-    address REWARDS_LSSKY_SPK = addr.addr("REWARDS_LSSKY_SPK");
-    address REWARDS_DIST_LSSKY_SPK = addr.addr("REWARDS_DIST_LSSKY_SPK");
-
-    function test_vestSpkTreasury_deployment() public view {
-        // Check the token used for vesting
-        assertEq(DssVestLike(MCD_VEST_SPK_TREASURY).gem(), SPK, "MCD_VEST_SPK_TREASURY has wrong gem token");
-        // Check the pause proxy is the czar
-        assertEq(DssVestLike(MCD_VEST_SPK_TREASURY).czar(), address(pauseProxy), "MCD_VEST_SPK_TREASURY has wrong czar");
-
-        // Check that the pause proxy has authority
-        assertEq(WardsLike(MCD_VEST_SPK_TREASURY).wards(address(pauseProxy)), 1, "MCD_PAUSE_PROXY not authorized on MCD_VEST_SPK_TREASURY");
-
-        // Note: Initialization is already tested in `testGeneral`
-    }
-
-    function test_usdsSpkFarm_deploymentAndInitialization() public {
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).stakingToken(), USDS, "before: Wrong staking token");
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsToken(), SPK, "before: Wrong rewards token");
-
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).owner(), MCD_PAUSE_PROXY, "before: Wrong owner");
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), address(0), "before: Wrong rewards distribution");
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDuration(), 7 days, "before: Wrong rewards duration");
-
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).dssVest(), MCD_VEST_SPK_TREASURY, "before: Wrong DssVest");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).stakingRewards(), REWARDS_USDS_SPK, "before: Wrong StakingRewards");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).gem(), SPK, "before: Wrong gem token");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).wards(MCD_PAUSE_PROXY), 1, "before: PauseProxy not authorized");
-
-        assertEq(
-            DssVestLike(MCD_VEST_SPK_TREASURY).gem(),
-            address(StakingRewardsLike(REWARDS_USDS_SPK).rewardsToken()),
-            "before: DssVest gem != StakingRewards rewardsToken"
-        );
-
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).vestId(), 0, "before: vestId already set");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), 0, "before: Should not have distributed yet");
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "before: Should have no reward rate");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDistribution(), REWARDS_DIST_USDS_SPK, "after: Wrong rewards distribution");
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardsDuration(), 7 days, "after: Wrong rewards duration");
-
-        uint256 usdsSpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).vestId();
-        assertEq(usdsSpkVestId, 1, "after: USDS->SPK vest stream not created");
-
-        (address usdsSpkUsr, , , , , , uint128 usdsSpkTot) =
-            DssVestLike(MCD_VEST_SPK_TREASURY).awards(usdsSpkVestId);
-        assertEq(usdsSpkUsr, REWARDS_DIST_USDS_SPK, "after: Wrong USDS->SPK vest recipient");
-        assertEq(usdsSpkTot, 2_275_000_000 * WAD, "after: Wrong USDS->SPK vest total");
-
-        assertEq(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 2_275_000_000 * WAD / 730 days, "after: USDS->SPK farm invalid reward rate");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_USDS_SPK).lastDistributedAt(), block.timestamp, "after: Should have distributed");
-    }
-
-    function test_usdsSpkFarm_stakingDistributionAndUnstaking() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Set the USDS balance of the testing contract
-        uint256 stakingAmount = 1_000_000 * WAD;
-        address user = address(this);
-        deal(address(usds), user, stakingAmount, true);
-
-        // Approve USDS for staking
-        usds.approve(REWARDS_USDS_SPK, stakingAmount);
-
-        // Stake USDS
-        StakingRewardsLike(REWARDS_USDS_SPK).stake(stakingAmount);
-
-        // Verify staked balance
-        uint256 stakedBalance = StakingRewardsLike(REWARDS_USDS_SPK).balanceOf(user);
-        assertEq(stakedBalance, stakingAmount, "REWARDS_USDS_SPK/stake-failed");
-
-        // Wait for rewards to accumulate (or fast-forward time in test)
-        vm.warp(block.timestamp + 1 days);
-
-        // Check earned rewards
-        uint256 earned = StakingRewardsLike(REWARDS_USDS_SPK).earned(user);
-        assertGt(earned, 0, "No rewards earned");
-
-        // Claim rewards
-        StakingRewardsLike(REWARDS_USDS_SPK).getReward();
-        uint256 spkBalance = spk.balanceOf(user);
-        assertGt(spkBalance, 0, "Rewards not claimed");
-
-        // Unstake tokens
-        StakingRewardsLike(REWARDS_USDS_SPK).withdraw(stakingAmount);
-
-        // Verify USDS returned
-        uint256 usdsBalance = usds.balanceOf(user);
-        assertGe(usdsBalance, stakingAmount, "Unstaking failed");
-    }
-
-    function test_lsskySpkFarm_deploymentAndInitialization() public {
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).stakingToken(), LSSKY, "before: Wrong staking token");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsToken(), SPK, "before: Wrong rewards token");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDistribution(), address(0), "before: Wrong rewards distribution");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).owner(), MCD_PAUSE_PROXY, "before: Wrong owner");
-
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).dssVest(), MCD_VEST_SPK_TREASURY, "before: Wrong DssVest");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).stakingRewards(), REWARDS_LSSKY_SPK, "before: Wrong StakingRewards");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).gem(), SPK, "before: Wrong gem token");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).wards(MCD_PAUSE_PROXY), 1, "before: PauseProxy not authorized");
-
-        assertEq(
-            DssVestLike(MCD_VEST_SPK_TREASURY).gem(),
-            address(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsToken()),
-            "DssVest gem != StakingRewards rewardsToken"
-        );
-
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).vestId(), 0, "before: vestId already set");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), 0, "before: Should not have distributed yet");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).totalSupply(), 0, "before: Should have no staked tokens");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "before: Should have no reward rate");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDuration(), 7 days, "before: Wrong rewards duration");
-
-        assertEq(LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK), 0, "before: Farm active in Lockstake Engine");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDistribution(), REWARDS_DIST_LSSKY_SPK, "after: Wrong rewards distribution");
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardsDuration(), 7 days, "after: Wrong rewards duration");
-
-        assertEq(LockstakeEngineLike(LOCKSTAKE_ENGINE).farms(REWARDS_LSSKY_SPK), 1, "after: Farm not active in Lockstake Engine");
-
-        uint256 lsskySpkVestId = VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).vestId();
-        assertEq(lsskySpkVestId, 2, "after: LSSKY->SPK vest stream not created");
-
-        (address lsskySpkUsr, , , , , , uint128 lsskySpkTot) =
-            DssVestLike(MCD_VEST_SPK_TREASURY).awards(lsskySpkVestId);
-        assertEq(lsskySpkUsr, REWARDS_DIST_LSSKY_SPK, "after: Wrong LSSKY->SPK vest recipient");
-        assertEq(lsskySpkTot, 975_000_000 * WAD, "after: Wrong LSSKY->SPK vest total");
-
-        assertEq(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 975_000_000 * WAD / 730 days, "after: LSSKY->SPK farm invalid reward rate");
-        assertEq(VestedRewardsDistributionLike(REWARDS_DIST_LSSKY_SPK).lastDistributedAt(), block.timestamp, "after: Should have distributed");
-    }
-
-    function test_vestedRewardsDistributionJob_configuration() public {
-        assertFalse(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_USDS_SPK), "before: USDS->SPK farm already registered in cron job");
-        assertFalse(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_LSSKY_SPK), "before: LSSKY->SPK farm already registered in cron job");
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        assertTrue(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_USDS_SPK), "after: USDS->SPK farm not registered in cron job");
-        assertTrue(VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).has(REWARDS_DIST_LSSKY_SPK), "after: LSSKY->SPK farm not registered in cron job");
-
-        uint256 usdsInterval = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).intervals(REWARDS_DIST_USDS_SPK);
-        uint256 lsskyInterval = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).intervals(REWARDS_DIST_LSSKY_SPK);
-        assertEq(usdsInterval, 7 days - 1 hours, "after: Wrong interval for USDS farm");
-        assertEq(lsskyInterval, 7 days - 1 hours, "after: Wrong interval for LSSKY farm");
-    }
-
-    function test_vestedRewardsDistributionJob_execution() public {
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        uint256 originalTimestamp = block.timestamp;
-
-        // Advance time since distribute() was called in spell
-        vm.warp(originalTimestamp + 7 days);
-
-        // Test job execution
-        bytes32 network = SequencerLike(CRON_SEQUENCER).getMaster();
-
-        (bool isWorkable, bytes memory args) = (false, "");
-        (bool foundUsdsSpk, bool foundLsskySpk) = (false, false);
-        do {
-            // Note: `workable` is not a view function in this case, so we need to revert to the previous state after calling it.
-            uint256 beforeWorkable = vm.snapshotState();
-            (isWorkable, args) = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).workable(network);
-            vm.revertToStateAndDelete(beforeWorkable);
-
-            if (isWorkable) {
-                address dist = abi.decode(args, (address));
-                if (dist == REWARDS_DIST_USDS_SPK) {
-                    foundUsdsSpk = true;
-                } else if (dist == REWARDS_DIST_LSSKY_SPK) {
-                    foundLsskySpk = true;
-                }
-                // Execute the distribution job
-                VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).work(network, args);
-            }
-        } while(isWorkable);
-
-        // Verify both distributions have been executed
-        assertTrue(foundUsdsSpk, "USDS farm not distributed");
-        assertTrue(foundLsskySpk, "LSSKY farm not distributed");
-
-        // Verify both farms have reward rates > 0
-        assertGt(StakingRewardsLike(REWARDS_USDS_SPK).rewardRate(), 0, "USDS farm reward rate still zero");
-        assertGt(StakingRewardsLike(REWARDS_LSSKY_SPK).rewardRate(), 0, "LSSKY farm reward rate still zero");
-
-        // Check if the job is no longer workable
-        // Note: `workable` is not a view function in this case, so we need to revert to the previous state after calling it.
-        uint256 beforeThirdWorkable = vm.snapshotState();
-        (bool thirdWorkable, ) = VestedRewardsDistributionJobLike(CRON_REWARDS_DIST_JOB).workable(network);
-        vm.revertToStateAndDelete(beforeThirdWorkable);
-
-        assertFalse(thirdWorkable, "VestedRewardsDistributionJob should not be workable");
-    }
-
-    function test_treasuryMkrToSkyConversion_leftoverMkr() public {
-        // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
-        uint256 unpaidMkr = vestMkr.unpaid(9) +
-            vestMkr.unpaid(18) +
-            vestMkr.unpaid(24) +
-            vestMkr.unpaid(35) +
-            vestMkr.unpaid(37) +
-            vestMkr.unpaid(39);
-
-        // Cast the spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check that the MKR balance has decreased by the expected amount
-        uint256 mkrBalanceAfter = mkr.balanceOf(address(pauseProxy));
-
-        // Verify MKR was converted to SKY
-        assertEq(mkrBalanceAfter, unpaidMkr, "MKR balance should equal unpaid vest amount");
-    }
-
-    function test_disableMkrSkyLegacyConverter() public {
-        // Check if MKR_SKY_LEGACY has authority on SKY token before the spell
-        assertEq(WardsLike(address(sky)).wards(addr.addr("MKR_SKY_LEGACY")), 1, "MKR_SKY_LEGACY should have authority on SKY before spell");
-
-        // Cast the spell
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        // Check if MKR_SKY_LEGACY has lost authority on SKY token
-        assertEq(WardsLike(address(sky)).wards(addr.addr("MKR_SKY_LEGACY")), 0, "MKR_SKY_LEGACY should not have authority on SKY after spell");
-    }
-
-    function test_burnSky() public {
-        uint256 skyTotalSupplyBefore = sky.totalSupply();
-        uint256 skyTreasuryBalanceBefore = sky.balanceOf(address(pauseProxy));
-        uint256 skyConverterBalanceBefore = sky.balanceOf(address(mkrSky));
-
-        uint256 mkrTreasuryBalanceBefore = mkr.balanceOf(address(pauseProxy));
-        uint256 mkrTotalSupplyBefore = mkr.totalSupply();
-        uint256 conversionRate = mkrSky.rate();
-
-        // Get the unpaid MKR for vest ids 9, 18, 24, 35, 37, and 39
-        VestAbstract vestMkr = VestAbstract(addr.addr("MCD_VEST_MKR_TREASURY"));
-        uint256 unpaidMkr = vestMkr.unpaid(9) +
-            vestMkr.unpaid(18) +
-            vestMkr.unpaid(24) +
-            vestMkr.unpaid(35) +
-            vestMkr.unpaid(37) +
-            vestMkr.unpaid(39);
-
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
-        assertTrue(spell.done(), "TestError/spell-not-done");
-
-        uint256 expectedSkyTotalSupplyAfter = skyTotalSupplyBefore
-            // Excess SKY from the MKR_SKY_LEGACY converter
-            - (skyConverterBalanceBefore - mkrTotalSupplyBefore * conversionRate)
-            // Amount explicitly burned
-            - 426_292_860.23 ether;
-        assertEq(
-            sky.totalSupply(),
-            expectedSkyTotalSupplyAfter,
-            "Excess SKY should be burned"
-        );
-
-        uint256 expectedSkyTreasuryBalanceAfter = skyTreasuryBalanceBefore
-            // Amount from Convert MKR balance of the PauseProxy to SKY
-            + (mkrTreasuryBalanceBefore - unpaidMkr) * conversionRate
-            // Amount explicitly burned
-            - 426_292_860.23 ether
-            // Amount transferred to LAUNCH_PROJECT_FUNDING
-            - 8_400_000 ether
-            // Amount transferred to BLUE
-            - 330_000 ether
-            // Amount transferred to CLOAKY
-            - 288_000 ether;
-        assertEq(
-            sky.balanceOf(address(pauseProxy)),
-            expectedSkyTreasuryBalanceAfter,
-            "SKY balance should have increased"
-        );
-    }
 }
-
