@@ -19,7 +19,6 @@ pragma solidity 0.8.16;
 import "dss-interfaces/Interfaces.sol";
 import {DssTest, GodMode} from "dss-test/DssTest.sol";
 import {stdStorage, StdStorage} from "forge-std/Test.sol";
-import "forge-std/console.sol";
 
 import "./test/rates.sol";
 import "./test/addresses_mainnet.sol";
