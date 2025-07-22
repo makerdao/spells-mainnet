@@ -128,6 +128,15 @@ contract DssSpellAction is DssAction {
         // res: 1 (restricted)
         // Note: the stream is restricted below, right after being created
 
+        // Increase SKY allowance for MCD_VEST_SKY_TREASURY to the sum of all streams
+        GemAbstract(SKY).approve(
+            MCD_VEST_SKY_TREASURY,
+            VestAbstract(MCD_VEST_SKY_TREASURY).tot(1) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(1) +
+            VestAbstract(MCD_VEST_SKY_TREASURY).tot(2) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(2) +
+            VestAbstract(MCD_VEST_SKY_TREASURY).tot(3) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(3) +
+            100_851_495 * WAD
+        );
+
         // MCD_VEST_SKY_TREASURY Vest Stream  | from 'block.timestamp' to 'block.timestamp + 15,724,800 seconds' | 100,851,495 * WAD SKY | REWARDS_DIST_USDS_SKY
         uint256 vestId = VestAbstract(MCD_VEST_SKY_TREASURY).create(
             REWARDS_DIST_USDS_SKY,
@@ -140,15 +149,6 @@ contract DssSpellAction is DssAction {
 
         // Note: restricting the stream, as instructed above
         VestAbstract(MCD_VEST_SKY_TREASURY).restrict(vestId);
-
-        // Increase SKY allowance for MCD_VEST_SKY_TREASURY to the sum of all streams
-        GemAbstract(SKY).approve(
-            MCD_VEST_SKY_TREASURY,
-            VestAbstract(MCD_VEST_SKY_TREASURY).tot(1) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(1) +
-            VestAbstract(MCD_VEST_SKY_TREASURY).tot(2) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(2) +
-            VestAbstract(MCD_VEST_SKY_TREASURY).tot(3) - VestAbstract(MCD_VEST_SKY_TREASURY).rxd(3) +
-            100_851_495 * WAD
-        );
 
         // File the new stream ID on REWARDS_DIST_USDS_SKY
         DssExecLib.setValue(REWARDS_DIST_USDS_SKY, "vestId", vestId);
