@@ -2143,7 +2143,7 @@ contract Config {
             SP_min:       0,
             SP_max:       0,
             SP_step:      0,
-            offboarding:  true
+            offboarding:  false
         });
         afterSpell.collaterals["LSEV2-SKY-A"] = CollateralValues({
             aL_enabled:   true,
