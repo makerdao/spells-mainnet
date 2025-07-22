@@ -89,7 +89,7 @@ contract DssSpellAction is DssAction {
     // ---------- Grove Proxy Spell ----------
     // Note: The deployment address for the Grove Proxy can be found at https://forum.sky.money/t/technical-scope-of-the-star-2-allocator-launch/26190
     address internal constant GROVE_PROXY = 0x1369f7b2b38c76B6478c0f0E66D94923421891Ba;
-    address internal constant GROVE_SPELL = 0x8AfC2C232716674b45CB131F858e870AA6aCD9FF;
+    address internal constant GROVE_SPELL = 0xe069f56033Ed646aF3B4024501FF47BBce67CfD1;
 
     // ---------- Spark Proxy Spell ----------
     // Note: Spark Proxy: https://github.com/sparkdotfi/sparklend-deployments/blob/bba4c57d54deb6a14490b897c12a949aa035a99b/script/output/1/primary-sce-latest.json#L2
@@ -225,7 +225,7 @@ contract DssSpellAction is DssAction {
         // Apply ALLOCATOR-BLOOM-A auto-line changes
         DssAutoLineAbstract(MCD_IAM_AUTO_LINE).exec("ALLOCATOR-BLOOM-A");
 
-        // Execute Grove Proxy Spell at 0x8AfC2C232716674b45CB131F858e870AA6aCD9FF
+        // Execute Grove Proxy Spell at 0xe069f56033Ed646aF3B4024501FF47BBce67CfD1
         ProxyLike(GROVE_PROXY).exec(GROVE_SPELL, abi.encodeWithSignature("execute()"));
 
         // Decrease ALLOCATOR-BLOOM-A gap by 1.2 billion USDS from 1.25 billion USDS to 50 million USDS

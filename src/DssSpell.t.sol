@@ -1315,7 +1315,7 @@ contract DssSpellTest is DssSpellTestBase {
     // Grove/Bloom TESTS
     function testGroveSpellIsExecuted() public {
         address GROVE_PROXY = addr.addr('ALLOCATOR_BLOOM_A_SUBPROXY');
-        address GROVE_SPELL = address(0x8AfC2C232716674b45CB131F858e870AA6aCD9FF);
+        address GROVE_SPELL = address(0xe069f56033Ed646aF3B4024501FF47BBce67CfD1); // Insert Grove spell address
 
         vm.expectCall(
             GROVE_PROXY,
