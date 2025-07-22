@@ -1346,9 +1346,9 @@ contract DssSpellTest is DssSpellTestBase {
         (,,, uint256 line,) = vat.ilks(ilk);
 
         // Ensure all auto-line parameters stays the same
-        assertEq(pAL_line, aL_line, "testBloomLineChanges/unexpected-aL_line-chage");
-        assertEq(pAL_gap, aL_gap, "testBloomLineChanges/unexpected-aL_gap-chage");
-        assertEq(pAL_ttl, aL_ttl, "testBloomLineChanges/unexpected-paL_ttl-chage");
+        assertEq(pAL_line, aL_line, "testBloomLineChanges/unexpected-aL_line-change");
+        assertEq(pAL_gap, aL_gap, "testBloomLineChanges/unexpected-aL_gap-change");
+        assertEq(pAL_ttl, aL_ttl, "testBloomLineChanges/unexpected-paL_ttl-change");
 
         // Ensure line actually increased
         assertGt(line, pLine, "testBloomLineChanges/unchanged-line");
