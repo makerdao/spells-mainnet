@@ -64,11 +64,9 @@ contract DssSpellAction is DssAction {
     // ---------- Math ----------
     uint256 internal constant MILLION = 10 ** 6;
     uint256 internal constant WAD     = 10 ** 18;
-    uint256 internal constant RAY     = 10 ** 27;
 
     // ---------- Addresses ----------
     address internal immutable DAI                   = DssExecLib.dai();
-    address internal immutable MCD_SPOT              = DssExecLib.spotter();
     address internal immutable MCD_VEST_SKY_TREASURY = DssExecLib.getChangelogAddress("MCD_VEST_SKY_TREASURY");
     address internal immutable REWARDS_DIST_USDS_SKY = DssExecLib.getChangelogAddress("REWARDS_DIST_USDS_SKY");
     address internal immutable MCD_IAM_AUTO_LINE     = DssExecLib.getChangelogAddress("MCD_IAM_AUTO_LINE");
@@ -97,17 +95,6 @@ contract DssSpellAction is DssAction {
     address internal constant SPARK_SPELL = 0x41EdbF09cd2f272175c7fACB857B767859543D15;
 
     function actions() public override {
-        // ---------- MKR to SKY Upgrade Phase Three: Offboard LSE-MKR-A ----------
-        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-july-24th-spell/26750
-        // Forum: https://forum.sky.money/t/phase-3-mkr-to-sky-migration-items-july-24th-spell/26750/2
-        // Atlas: https://sky-atlas.powerhouse.io/A.4.1.2.1.4.2.2_Offboard_Borrowing_Against_Staked_MKR/1f1f2ff0-8d73-8024-bf88-f0a17374ceea%7Cb341f4c0b83472dc1f9e1a3b
-
-        // Increase LSE-MKR-A liquidation ratio by 9,875 percentage points, from 125% to 10,000%
-        DssExecLib.setValue(MCD_SPOT, "LSE-MKR-A", "mat", 100 * RAY);
-
-        // Reduce LSE-MKR-A chop for 8 percentage points, from 8% to 0%
-        DssExecLib.setIlkLiquidationPenalty("LSE-MKR-A", 0);
-
         // ---------- Sky Token Rewards Rebalance ----------
         // Forum: https://forum.sky.money/t/sky-token-rewards-usds-to-sky-rewards-normalization-configuration/26638/8
         // Forum: https://forum.sky.money/t/sky-token-rewards-usds-to-sky-rewards-normalization-configuration/26638/9
