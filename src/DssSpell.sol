@@ -192,6 +192,7 @@ contract DssSpellAction is DssAction {
         GemAbstract(SKY).transfer(CLOAKY_2, 288_000 * WAD);
 
         // ---------- HVB DAO Resolution ----------
+        // Resolution: https://ipfs.io/ipfs/bafkreidm3bqfiwv224m6w4zuabsiwqruy22sjfaxfvgx4kgcnu3wndxmva
         // Forum: https://forum.sky.money/t/huntingdon-valley-bank-transaction-documents-on-permaweb/16264/28
 
         // Approve DAO Resolution with hash bafkreidm3bqfiwv224m6w4zuabsiwqruy22sjfaxfvgx4kgcnu3wndxmva
