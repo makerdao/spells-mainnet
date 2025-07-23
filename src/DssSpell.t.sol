@@ -20,6 +20,10 @@ import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 import { DssExec } from "dss-exec-lib/DssExec.sol";
 
+interface IERC20 {
+    function balanceOf(address account) external view returns (uint256);
+}
+
 interface L2Spell {
     function dstDomain() external returns (bytes32);
     function gateway() external returns (address);
@@ -1291,6 +1295,35 @@ contract DssSpellTest is DssSpellTestBase {
         }
 
         assertEq(SpellActionLike(spell.action()).dao_resolutions(), comma_separated_resolutions, "dao_resolutions/invalid-format");
+    }
+
+    function testTreasuryBalances() public {
+        address BUIDLI          = 0x6a9DA2D710BB9B700acde7Cb81F10F1fF8C89041;
+        address JTRSY           = 0x8c213ee79581Ff4984583C6a801e5263418C4b86;
+        address SPARK_ALM_PROXY = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
+        address GROVE_PROXY     = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
+        address USDS            = addr.addr('USDS');
+
+        uint256 SPARK_BUIDLI_balance = IERC20(BUIDLI).balanceOf(SPARK_ALM_PROXY);
+        uint256 SPARK_JTRSY_balance  = IERC20(JTRSY).balanceOf(SPARK_ALM_PROXY);
+        uint256 SPARK_USDS_balance   = IERC20(USDS).balanceOf(SPARK_ALM_PROXY);
+
+        uint256 JTRSY_USDS_MINT_AMOUNT = 404_016_484e18;
+        uint256 totalUsdsMintAmount    = SPARK_BUIDLI_balance * 1e12 + JTRSY_USDS_MINT_AMOUNT;
+
+        assertGe(SPARK_BUIDLI_balance, 600_000_000e6);
+        assertGe(SPARK_JTRSY_balance,  370_000_000e6);
+
+        assertEq(IERC20(BUIDLI).balanceOf(GROVE_PROXY), 0, "testTreasuryAssertions/BUIDLI-balance-mismatch");
+        assertEq(IERC20(JTRSY).balanceOf(GROVE_PROXY),  0, "testTreasuryAssertions/JTRSY-balance-mismatch");
+
+        _vote(address(spell));
+        _scheduleWaitAndCast(address(spell));
+        assertTrue(spell.done(), "TestError/spell-not-done");
+
+        assertEq(IERC20(BUIDLI).balanceOf(GROVE_PROXY),   SPARK_BUIDLI_balance,                     "testTreasuryAssertions/BUIDLI-balance-mismatch");
+        assertEq(IERC20(JTRSY).balanceOf(GROVE_PROXY),    SPARK_JTRSY_balance,                      "testTreasuryAssertions/JTRSY-balance-mismatch");
+        assertEq(IERC20(USDS).balanceOf(SPARK_ALM_PROXY), SPARK_USDS_balance + totalUsdsMintAmount, "testTreasuryAssertions/USDS-balance-mismatch");
     }
 
     // SPARK TESTS
