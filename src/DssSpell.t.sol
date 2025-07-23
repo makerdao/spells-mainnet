@@ -20,6 +20,10 @@ import "./DssSpell.t.base.sol";
 import {ScriptTools} from "dss-test/DssTest.sol";
 import { DssExec } from "dss-exec-lib/DssExec.sol";
 
+interface IERC4626 {
+    function convertToAssets(uint256 shares) external view returns (uint256 assets);
+}
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
@@ -60,6 +64,17 @@ interface VestedRewardsDistributionLike {
 
 contract DssSpellTest is DssSpellTestBase {
     using stdStorage for StdStorage;
+
+    bytes32 ALLOCATOR_ILK = "ALLOCATOR-BLOOM-A";
+
+    IERC20 buidlI = IERC20(0x6a9DA2D710BB9B700acde7Cb81F10F1fF8C89041);
+    IERC20 jtrsy  = IERC20(0x8c213ee79581Ff4984583C6a801e5263418C4b86);
+
+    IERC4626 jtrsyVault = IERC4626(0x36036fFd9B1C6966ab23209E073c68Eb9A992f50);
+
+    address JTRSY_VAULT     = 0x36036fFd9B1C6966ab23209E073c68Eb9A992f50;
+    address SPARK_ALM_PROXY = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
+    address GROVE_PROXY     = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
 
     // DO NOT TOUCH THE FOLLOWING TESTS, THEY SHOULD BE RUN ON EVERY SPELL
     function testGeneral() public {
@@ -1298,32 +1313,46 @@ contract DssSpellTest is DssSpellTestBase {
     }
 
     function testTreasuryBalances() public {
-        address BUIDLI          = 0x6a9DA2D710BB9B700acde7Cb81F10F1fF8C89041;
-        address JTRSY           = 0x8c213ee79581Ff4984583C6a801e5263418C4b86;
-        address SPARK_ALM_PROXY = 0x1601843c5E9bC251A3272907010AFa41Fa18347E;
-        address GROVE_PROXY     = 0x491EDFB0B8b608044e227225C715981a30F3A44E;
-        address USDS            = addr.addr('USDS');
+        IERC20 usds = IERC20(0xdC035D45d973E3EC169d2276DDab16f1e407384F);
 
-        uint256 SPARK_BUIDLI_balance = IERC20(BUIDLI).balanceOf(SPARK_ALM_PROXY);
-        uint256 SPARK_JTRSY_balance  = IERC20(JTRSY).balanceOf(SPARK_ALM_PROXY);
-        uint256 SPARK_USDS_balance   = IERC20(USDS).balanceOf(SPARK_ALM_PROXY);
+        uint256 sparkBuidlBalance = buidlI.balanceOf(SPARK_ALM_PROXY);
+        uint256 sparkJtrsyBalance = jtrsy.balanceOf(SPARK_ALM_PROXY);
+        uint256 sparkUsdsBalance  = usds.balanceOf(SPARK_ALM_PROXY);
+
+        uint256 sparkJtrsyValue = jtrsyVault.convertToAssets(sparkJtrsyBalance);
+
+        assertEq(sparkJtrsyValue, 403_889_786.523626e6);
+
+        uint256 totalTreasuryValue = (sparkBuidlBalance + sparkJtrsyValue) * 1e12;
 
         uint256 JTRSY_USDS_MINT_AMOUNT = 404_016_484e18;
-        uint256 totalUsdsMintAmount    = SPARK_BUIDLI_balance * 1e12 + JTRSY_USDS_MINT_AMOUNT;
+        uint256 totalUsdsMintAmount    = sparkBuidlBalance * 1e12 + JTRSY_USDS_MINT_AMOUNT;
 
-        assertGe(SPARK_BUIDLI_balance, 600_000_000e6);
-        assertGe(SPARK_JTRSY_balance,  370_000_000e6);
+        assertEq(totalTreasuryValue,  1_011_906_954.263626e18);
+        assertEq(totalUsdsMintAmount, 1_012_033_651.74e18);
 
-        assertEq(IERC20(BUIDLI).balanceOf(GROVE_PROXY), 0, "testTreasuryAssertions/BUIDLI-balance-mismatch");
-        assertEq(IERC20(JTRSY).balanceOf(GROVE_PROXY),  0, "testTreasuryAssertions/JTRSY-balance-mismatch");
+        assertEq(totalUsdsMintAmount - totalTreasuryValue, 126_697.476374e18);  // ~120k discrepancy
+
+        assertEq(buidlI.balanceOf(GROVE_PROXY),   0);
+        assertEq(jtrsy.balanceOf(GROVE_PROXY),    0);
+        assertEq(usds.balanceOf(SPARK_ALM_PROXY), sparkUsdsBalance);
+
+        ( uint256 beforeBloomArt,,,, ) = vat.ilks(ALLOCATOR_ILK);
+
+        assertEq(beforeBloomArt, 0);
 
         _vote(address(spell));
         _scheduleWaitAndCast(address(spell));
         assertTrue(spell.done(), "TestError/spell-not-done");
 
-        assertEq(IERC20(BUIDLI).balanceOf(GROVE_PROXY),   SPARK_BUIDLI_balance,                     "testTreasuryAssertions/BUIDLI-balance-mismatch");
-        assertEq(IERC20(JTRSY).balanceOf(GROVE_PROXY),    SPARK_JTRSY_balance,                      "testTreasuryAssertions/JTRSY-balance-mismatch");
-        assertEq(IERC20(USDS).balanceOf(SPARK_ALM_PROXY), SPARK_USDS_balance + totalUsdsMintAmount, "testTreasuryAssertions/USDS-balance-mismatch");
+        assertEq(buidlI.balanceOf(GROVE_PROXY),   sparkBuidlBalance);
+        assertEq(jtrsy.balanceOf(GROVE_PROXY),    sparkJtrsyBalance);
+        assertEq(usds.balanceOf(SPARK_ALM_PROXY), sparkUsdsBalance + totalUsdsMintAmount);
+
+        ( uint256 afterBloomArt,,,, ) = vat.ilks(ALLOCATOR_ILK);
+
+        assertEq(afterBloomArt, totalUsdsMintAmount);
+
     }
 
     // SPARK TESTS
