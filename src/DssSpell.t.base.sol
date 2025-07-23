@@ -763,8 +763,6 @@ contract DssSpellTestBase is Config, DssTest {
     }
 
     function setUp() public {
-        // vm.createSelectFork(getChain("mainnet").rpcUrl, 22982574);
-
         setValues();
         _castPreviousSpell();
 
