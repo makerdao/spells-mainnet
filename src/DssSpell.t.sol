@@ -1352,7 +1352,6 @@ contract DssSpellTest is DssSpellTestBase {
         ( uint256 afterBloomArt,,,, ) = vat.ilks(ALLOCATOR_ILK);
 
         assertEq(afterBloomArt, totalUsdsMintAmount);
-
     }
 
     // SPARK TESTS
