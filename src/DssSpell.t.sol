@@ -1358,10 +1358,17 @@ contract DssSpellTest is DssSpellTestBase {
         VestedRewardsDistributionLike dist = VestedRewardsDistributionLike(addr.addr("REWARDS_DIST_USDS_SKY"));
         VestAbstract vest = VestAbstract(dist.dssVest());
         uint256 oldVestId = dist.vestId();
+
+        // Vote, schedule and warp to the nextCastTime
+        _vote(address(spell));
+        DssSpell(spell).schedule();
+        vm.warp(DssSpell(spell).nextCastTime());
+
+        // Ensure there are some accumulated rewards
         assertGt(vest.unpaid(oldVestId), 0, "testUsdsSkyRewardsDistributed/unexpected-no-unpaid");
 
-        _vote(address(spell));
-        _scheduleWaitAndCast(address(spell));
+        // Execute spell
+        DssSpell(spell).cast();
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         // Check `.distribute()` was called
