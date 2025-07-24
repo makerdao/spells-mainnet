@@ -1343,7 +1343,7 @@ contract DssSpellTest is DssSpellTestBase {
         assertTrue(spell.done(), "TestError/spell-not-done");
 
         (uint256 aL_line, uint256 aL_gap, uint256 aL_ttl,,) = autoLine.ilks(ilk);
-        (,,, uint256 line,) = vat.ilks(ilk);
+        (uint256 Art, uint256 rate,, uint256 line,) = vat.ilks(ilk);
 
         // Ensure all auto-line parameters stays the same
         assertEq(pAL_line, aL_line, "testBloomLineChanges/unexpected-aL_line-change");
@@ -1352,6 +1352,7 @@ contract DssSpellTest is DssSpellTestBase {
 
         // Ensure line actually increased
         assertGt(line, pLine, "testBloomLineChanges/unchanged-line");
+        assertEq(line, Art * rate + 1_250 * MILLION * RAD, "testBloomLineChanges/invalid-gap");
     }
 
     function testUpdatedRewardsDistUsdsSky() public {
